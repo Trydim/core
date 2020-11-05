@@ -1,0 +1,187 @@
+/* Your rules here */
+body {
+  background: $bg-color;
+}
+
+.font-blue {
+  color: $color-blue;
+}
+
+.bg-blue {
+  background: $color-blue;
+  color:      white !important;
+}
+
+.exit-icon {
+  cursor:     pointer;
+}
+
+.m-left {
+  margin-left: 3.75rem;
+}
+
+.m-right {
+  margin-right: 15px;
+}
+
+.m-top {
+  margin-top: 0 !important;
+}
+
+.p-left {
+  padding-left: 3.4rem !important;
+}
+
+.p-bottom {
+  padding-bottom: 2.5rem;
+}
+
+.btn-calendar {
+  border-radius: 50px !important;
+  background:    #309DFF !important;
+  margin-right:  .3rem !important;
+  border:        none !important;
+}
+
+.select-width {
+  width: 10% !important;
+}
+
+.select-status {
+  width: 15% !important;
+}
+
+.btn-arrow {
+  color:  $color-blue;
+  border: none !important;
+
+  &:active,
+  &:focus {
+    border: none !important;
+  }
+}
+
+.input-paginator {
+  border:        1px solid $color-blue;
+  color:         $color-blue;
+  border-radius: 4px;
+}
+
+.flex-footer {
+  display:         flex;
+  flex-flow:       row wrap;
+  align-items:     center;
+  justify-content: center;
+}
+
+.res-table {
+  overflow-x: scroll;
+  height:     auto;
+
+  &::-webkit-scrollbar {
+    opacity: 0;
+  }
+}
+
+.p-a-20 {
+  padding: 15px !important;
+}
+
+.p-t-20 {
+  padding-top: 20px;
+}
+
+.pos-top {
+  top: 25px !important;
+}
+
+.table-th {
+  box-shadow: none !important;
+
+  &:hover {
+    box-shadow: none !important;
+  }
+}
+
+.table-form {
+  width:           100%;
+  border-collapse: collapse;
+  padding:         0;
+}
+
+.table-form th {
+  padding:     5px;
+  font-weight: bold;
+  text-align:  center;
+}
+
+.table-form td {
+  padding: 5px;
+}
+
+.cl_input-number__btn {
+  line-height: 40px;
+}
+
+/*toaster*/
+.notification-container {
+  top: 0px;
+  left:0;
+  right:0;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  line-height: 1rem;
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+  text-align: center;
+  background: #dfa2a2;
+  border-radius: 4px;
+  color: white;
+  padding: 15px 0;
+  box-shadow: 1px 2px 12px 1px rgba(117, 117, 117, 0.62);
+  transition: opacity 1s ease 0.5s;
+  user-select: none;
+  cursor: pointer;
+}
+
+.success {
+  background: #bbd6bb;
+}
+
+.warning {
+  background: #f3ba64;
+}
+
+.error {
+  background: #dfa2a2;
+}
+
+
+@media only screen and (max-width: 468px) {
+  .flex-footer {
+    display:         flex;
+    flex-flow:       row wrap;
+    align-items:     center;
+    justify-content: center;
+
+    & input {
+      margin-bottom: 5px;
+    }
+  }
+
+  .select-status {
+    width: 100% !important;
+  }
+}
+
+/*Добавить все таблицы*/
+#orderTable tr,
+#customersTable tr,
+#usersTable tr {
+  cursor: pointer;
+}

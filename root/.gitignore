@@ -1,0 +1,10 @@
+.idea/
+*.fbx
+/assets/images
+/assets/imagesStoleshkaBackUp
+/assets/fonts
+/vender/
+**font**/
+**vendor/
+temp/
+**/composer.bat

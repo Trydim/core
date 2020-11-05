@@ -1,0 +1,98 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: masterovit\n"
+"POT-Creation-Date: 2020-10-12 14:02+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Myname <myemail@gmail.com>\n"
+"Language-Team: vistegra\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: ;_;__;getText\n"
+"X-Poedit-Basepath: ../../..\n"
+"X-Generator: Poedit 2.4.1\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: assets\n"
+"X-Poedit-SearchPathExcluded-1: php/libs/vendor\n"
+
+#: lang/dictionary.php:4
+msgid "paramConfig"
+msgstr "конфигурация"
+
+#: lang/dictionary.php:5
+msgid "pipeConfig"
+msgstr "конфигурация труб"
+
+#: lang/dictionary.php:6
+msgid "price"
+msgstr "прайс"
+
+#: lang/dictionary.php:9
+msgid "O.ID"
+msgstr "Номер"
+
+#: lang/dictionary.php:10
+msgid "create_date"
+msgstr "Дата"
+
+#: lang/dictionary.php:11
+msgid "last_edit_date"
+msgstr "Дата редактирования"
+
+#: lang/dictionary.php:12
+msgid "name"
+msgstr "менеджер"
+
+#: lang/dictionary.php:13
+msgid "C.name"
+msgstr "клиент"
+
+#: lang/dictionary.php:14
+msgid "total"
+msgstr "Сумма"
+
+#: lang/dictionary.php:15
+msgid "important_value"
+msgstr "Подробности"
+
+#: lang/dictionary.php:16
+msgid "S.name"
+msgstr "Статус"
+
+#: lang/dictionary.php:20
+msgid "U.ID"
+msgstr "Ключ"
+
+#: lang/dictionary.php:21
+msgid "P.name"
+msgstr "Права"
+
+#: lang/dictionary.php:22
+msgid "login"
+msgstr "Логин"
+
+#: lang/dictionary.php:23
+msgid "U.name"
+msgstr "Имя"
+
+#: lang/dictionary.php:24
+msgid "contacts"
+msgstr "Контакты"
+
+#: lang/dictionary.php:25
+msgid "register_date"
+msgstr "Дата"
+
+#: lang/dictionary.php:26
+msgid "activity"
+msgstr "Активен"
+
+#~ msgid "hello"
+#~ msgstr "привет"
+
+#~ msgid "Find dealers"
+#~ msgstr "Найти дилера"

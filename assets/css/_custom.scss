@@ -1,0 +1,552 @@
+/* Your rules here */
+html,
+body {
+  max-width:       100%;
+  height:          100%;
+  background:      $body-bg;
+  scroll-behavior: smooth;
+}
+
+// MIXSINS
+@mixin flex-row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+@mixin span-assets {
+  display: block;
+  line-height: 24px;
+}
+
+@mixin heading-section {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1.1rem;
+  line-height: 30px;
+  color: #373737; //$color-text;
+}
+
+.container {
+  max-width: 1140px;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
+.margin-bottom {
+  margin-bottom: 20px
+}
+
+@media only screen and (max-width: 768px) {
+  .container {
+    padding: 0;
+  }
+}
+
+.cross-table {
+  font-size: 1.1rem;
+  color: #999999;
+}
+
+.cross-table>button {
+  border: none;
+  background: transparent;
+  cursor: pointer
+}
+
+.cross-table>button:hover{
+  transform: scale(1.2);
+  color: #1d4ba9;
+}
+
+.prompt-text {
+  font-size: 0.8rem;
+  margin-top: 10px;
+  display: inline-block;
+  font-style: oblique;
+  letter-spacing: 1px;
+  color: #999;
+}
+
+.calc-form {
+  margin-top: 20px;
+}
+
+.wrapper-calc {
+  background: $white;
+  padding: 25px;
+}
+
+.heading-block {
+  height: 45px;
+  @include flex-row;
+
+  &:before {
+    content:      "";
+    display:      inline-block;
+    background:   url(../images/calc-icon.png) no-repeat;
+    width:        30px;
+    height:       40px;
+    margin-right: 15px;
+  }
+
+  &__span {
+    @include span-assets;
+    color: #999999;
+  }
+
+  &__h1 {
+    font-size:   28px;
+    line-height: 25px;
+    color:       $color-text;
+    margin:      0;
+    font-weight: bold;
+  }
+}
+
+.calc-form__text-input, .modal-content__input {
+  width: 280px;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  padding: 10px 10px 10px 15px
+}
+
+.calc-form__text-input:focus, .modal-content__input:focus {
+  border: 1px solid #ffa945
+}
+
+.model {
+  position:      relative;
+  padding:       65px;
+  margin-top:    30px;
+  border:        1px solid #eeefee;
+  border-radius: 10px;
+
+  &:before {
+    content:    "";
+    position:   absolute;
+    display:    inline-block;
+    background: url(../icons/rotation-icon.svg) no-repeat;
+    width:      60px;
+    height:     60px;
+    top:        15px;
+    right:      15px;
+    cursor:     pointer;
+  }
+}
+
+.calc-section {
+  width: 50%;
+}
+
+.product-list {
+  margin-top:    40px;
+  border-bottom: 1px solid #e8e8e8;
+  justify-content: space-around;
+}
+
+.calc {
+  align-items:     flex-start;
+  justify-content: space-between;
+}
+
+.calc-block {
+  border-bottom: 1px solid #e8e8e8;
+  padding:       30px 0;
+
+  &__title {
+    @include heading-section;
+    border-left:  3px solid #00236a;
+    padding-left: 15px;
+  }
+
+  &__text {
+    @include span-text;
+    display:       inline-block;
+    margin-left:   10px;
+    padding:       0 5px;
+    background:    linear-gradient(180deg, rgba(29, 75, 169, 0.05) 0%, rgba(0, 35, 106, 0.05) 100%);
+    border-radius: 5px;
+  }
+
+  &:nth-last-child(-n + 2) {
+    border-bottom: none;
+  }
+}
+
+.frame-list {
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.wrapper-estimate {
+  background: $white;
+  margin:  30px auto 0;
+  padding: 30px;
+}
+
+.estimate-block {
+  margin-top: 30px;
+}
+
+.estimate__heading {
+  line-height: 30px;
+  font-weight: bold;
+
+  &:before {
+    content:      "";
+    display:      inline-block;
+    background:   url(../images/estimate-icon.png) 0 0 no-repeat;
+    width:        20px;
+    height:       25px;
+    margin-right: 10px;
+  }
+}
+
+.estimate-table {
+  border-spacing: 0;
+  font-size:      0.85rem;
+  line-height:    20px;
+
+  & th, & td {
+    font-weight: bold;
+    text-align:  left;
+    padding:     18px 15px 15px;
+  }
+
+  & th:first-child, & td:first-child {
+    font-weight: bold;
+  }
+
+  &__span-result {
+    @include heading-section;
+    color: $color-assets;
+  }
+}
+
+tr:nth-child(2n) {
+  background: linear-gradient(0deg, #f7f7f7, #f7f7f7);
+}
+
+tr:last-child {
+
+  & > td {
+    /*padding: 18px 0;*/
+  }
+}
+
+.table-link {
+  width:            200px;
+  text-decoration:  underline;
+  color:            #373737;
+  border:           none;
+  background-color: transparent;
+  cursor:           pointer;
+
+  &:before {
+    content:      "";
+    display:      inline-block;
+    background:   url(../icons/plus-icon.svg) 0 0 no-repeat;
+    width:        40px;
+    height:       37px;
+    margin-right: 10px;
+  }
+}
+
+td:nth-child(n + 2),
+th:nth-child(n + 2) {
+  text-align: center;
+}
+
+th {
+  background: #f7f7f7;
+  padding:    15px 24px;
+  text-align: left;
+}
+
+/*Закругленные углы таблицы*/
+th:first-child {
+  border-top-left-radius: 10px;
+}
+
+th:last-child {
+  border-top-right-radius: 10px;
+  border-right:            none;
+}
+
+tr:last-child td:first-child {
+  border-radius: 0 0 0 10px;
+}
+
+tr:last-child td:last-child {
+  border-radius: 0 0 10px 0;
+}
+
+.result-line {
+  background: #fef6ec;
+}
+
+tfoot::before {
+  height:  2em;
+  display: table-row;
+  content: '';
+}
+
+.result-line > td {
+  padding: 18px 0;
+}
+
+.form-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f2bc40;
+  border-radius: 10px;
+  padding: 10px 30px;
+  margin-top: 30px;
+
+  &__text {
+    @include span-assets;
+    font-weight:   bold;
+    text-align:    center;
+    color:         #20232f;
+    margin-bottom: 15px;
+  }
+
+  &__span {
+    @include flex-row;
+    margin-bottom: 15px;
+
+    &:before, &:after {
+      content: "";
+      display: inline-block;
+      border: 1px solid #20232F;
+      opacity: .5;
+      width: 70px;
+      margin-right: 10px;
+    }
+
+    &:after {
+      margin-right: 0;
+      margin-left: 10px;
+    }
+  }
+}
+
+.hamburger-icon {
+  margin-right: 20px;
+
+  & > span {
+    width:            25px;
+    height:           2px;
+    background-color: $color-assets;
+    display:          block;
+    margin:           0.3rem auto;
+    transition:       all 0.3s ease-in-out;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+@media only screen and (min-width: 769px) and (max-width: 1200px),
+only screen and (max-width: 768px) {
+
+  .cl_input-number__input {
+    min-width: 150px!important;
+  }
+
+  .logo__text {
+    font-size:   0.85rem;
+    width:       169px;
+    margin-left: 9px;
+  }
+
+  .header-item__number {
+    font-size: 1.1rem;
+  }
+
+  .calc-block {
+    margin-right: 30px;
+    width: 100%;
+  }
+
+  .estimate-block {
+    overflow-x: auto;
+  }
+
+  .form-block {
+    width:      100%;
+    margin-top: 30px;
+  }
+
+  .estimate-table {
+    width: 100%;
+
+    &__td {
+      padding: 18px 40px 15px 15px;
+    }
+  }
+
+  .form-block__btn {
+    width:        25%;
+    margin-right: 15px;
+  }
+
+  .flex-block {
+    flex-flow: row nowrap;
+  }
+
+  .product-list {
+    width: 100%;
+  }
+
+  .frame-list__label {
+    padding: 3px 40px;
+  }
+
+  .calc-form {
+    & > .form-group {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+@media only screen and (max-width: 768px) {
+
+  .d-small {
+    display: block;
+  }
+
+  .product-list {
+    @include grid-block;
+    width:         100%;
+    margin-top:    20px;
+    border-bottom: none;
+  }
+
+  .calc {
+    flex-flow: column nowrap;
+  }
+
+  .calc-section {
+    order: 2;
+    width: 100%;
+  }
+
+  .calc-form__quantity-input {
+    width: 100%;
+  }
+
+  .form-block__btn {
+    width: 60%;
+  }
+
+  .flex-block {
+    flex-flow: column nowrap;
+  }
+
+  .modal-content {
+    & .grid-block {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.canvas-wrap {
+  margin: 1.8rem auto;
+  position: relative;
+}
+
+.canvas-icons {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.canvas-wrap .icon {
+  font-size: 30px;
+  line-height: 35px;
+  background: white;
+  width: 60px;
+  height: 60px;
+  margin-right: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.canvas-wrap:after:hover {
+  background: #c4c4c4;
+}
+
+#rotate {
+  background: url(../icons/rotation-icon.svg) no-repeat;
+}
+
+//Стилизация чекбоксов
+.radio input {
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
+	margin: 10px 0 0 7px;
+}
+.radio__text {
+	position: relative;
+	padding: 0 0 0 30px;
+	cursor: pointer;
+}
+.radio__text:before {
+	content: '';
+	position: absolute;
+	top: -1px;
+	left: 0;
+	width: 20px;
+	height: 20px;
+	border: 1px solid #ffa945;
+	border-radius: 50%;
+	background: #FFF;
+}
+.radio__text:after {
+	content: '';
+	position: absolute;
+	top: 1px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: radial-gradient(ellipse at center, #ffa945 45%, transparent 55%);
+	opacity: 0;
+	transition: .2s;
+}
+.radio input:checked + .radio__text:after {
+	opacity: 1;
+}
+
+.cl-input-error,
+.cl-input-valid {
+  padding-right: calc(1.5em + .75rem);
+  background-repeat: no-repeat;
+  background-position: right calc(.375em + .1875rem) center;
+  background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+
+.cl-input-error {
+  border: 1px solid #dc3545!important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+}
+
+.cl-input-valid {
+  border-radius: 4px;
+  border-color: #198754!important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+}
+
+@import 'header';

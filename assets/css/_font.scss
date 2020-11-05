@@ -1,0 +1,38 @@
+$font-family-custom: Cirle;
+
+@mixin base-font-rules {
+  font-family:  $font-family-custom;
+  font-style:   normal;
+  font-display: auto;
+}
+
+@font-face {
+  @include base-font-rules;
+  font-weight: 400;
+  src: url(../fonts/Circe/Circle-Regular.otf) format("truetype");
+}
+
+@font-face {
+  @include base-font-rules;
+  font-weight: 300;
+  src: url(../fonts/Circe/circe_light.eot) format("truetype");
+  src: url(../fonts/Circe/circe_light.ttf) format("truetype");
+  src: url(../fonts/Circe/circe_light.woff2) format("truetype");
+  src: url(../fonts/Circe/circe_light.svg) format("truetype");
+}
+
+@font-face {
+  @include base-font-rules;
+  font-weight: 800;
+  src: url(../fonts/Circe/circe_bold.eot) format("truetype");
+  src: url(../fonts/Circe/circe_bold.ttf) format("truetype");
+  src: url(../fonts/Circe/circe_bold.woff2) format("truetype");
+}
+
+body {
+  font-family: $font-family-custom, var(--bs-font-sans-serif);
+}
+
+.font-bold {
+  font-weight: bold;
+}

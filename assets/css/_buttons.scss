@@ -1,0 +1,217 @@
+
+button:hover {
+  opacity: .8;
+}
+
+.cl_btn {
+  border:         none;
+  box-shadow:     0 5px 10px rgba(255, 169, 69, .3);
+  border-radius:  0.5em;
+  line-height:    13px;
+  letter-spacing: 0.05em;
+  font-size:      .85rem;
+  cursor:         pointer;
+  min-width:      150px;
+  max-width:      300px;
+  width:          100%;
+  height:         43px;
+  margin:         0 auto;
+
+  @for $i from 1 through 4 {
+    &.wide#{$i} { padding: 15px 20px * $i; }
+  }
+
+  &.st-white {
+    background: #fff;
+
+    &:hover {
+      background: #b8b5b5; // Для всех кнопок оформить
+    }
+
+    &:focus {
+      //background: #000000; // Для всех кнопок оформить
+    }
+  }
+
+  &.st-red {
+    background: linear-gradient(180deg, #c60000 0%, #cb6f00 100%);
+    color: white;
+    &:hover {}
+    &:focus {}
+  }
+
+  &.st-yellow {
+    background: linear-gradient(180deg, #ffce51 0%, #ffa945 100%);
+    color: white;
+    &:hover {}
+    &:focus {}
+  }
+
+  &.st-blue {
+    background: linear-gradient(180deg, #1d4ba9 0, #00236a 100%);
+    color: white;
+    &:hover {}
+    &:focus {}
+  }
+}
+
+/* RADIO */
+
+.custom-radio {
+  opacity:  0;
+  position: absolute;
+  z-index:  -1;
+}
+
+.custom-radio + label {
+  display:      inline-flex;
+  align-items:  center;
+  user-select:  none;
+  color:        #373737;
+  cursor:       pointer;
+  margin-right: 20px;
+
+  &:before {
+    content: "";
+  }
+}
+
+.custom-radio.style-circle + label::before {
+  content:       "";
+  width:         20px;
+  min-width:     20px;
+  height:        20px;
+  border:        1px solid #ffa945;
+  border-radius: 50%;
+  margin-right:  0.5em;
+}
+
+.custom-radio.style-circle:checked + label::before {
+  background: #1C6EA4;
+  /*background: -moz-radial-gradient(center, #ffa945 45%, transparent 55%);
+  background: -webkit-radial-gradient(center, #ffa945 45%, transparent 55%);*/
+  background: radial-gradient(ellipse at center, #ffa945 45%, transparent 55%);
+}
+
+.custom-radio.style-box + label::before {
+  width:               50px;
+  min-width:           50px;
+  height:              35px;
+  border:              1px solid transparent;
+  background-size:     95% 95%;
+  background-position: center center;
+  background-repeat:   no-repeat;
+  margin-right: 10px;
+}
+
+.bg-green + label::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='2' height='2' fill='%233fa486'/%3E%3C/svg%3E");
+}
+
+.bg-gray + label::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='2' height='2' fill='%234e5861'/%3E%3C/svg%3E");
+}
+
+.bg-amber + label::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='2' height='2' fill='%23916c14'/%3E%3C/svg%3E");
+}
+
+.custom-radio.style-box:checked + label::before {
+  border: 1px solid #ffa945;
+}
+
+/* RADIO TABS */
+
+.radio-tab {
+  $p: &;
+  max-width:  100%;
+  text-align: center;
+  min-width:  200px;
+
+  &.style1 input { display: none; }
+
+  /* RADIO TABS style1 */
+
+  &.style1 {
+    #{$p}__label {
+      position:        relative;
+      color:           $color-assets;
+      text-decoration: none;
+      padding:         25px 22px;
+      font-weight:     bold;
+      cursor:          pointer;
+      border-bottom: 2px solid transparent;
+
+      #{$p}:after {
+        content:  "";
+        position: absolute;
+        //background: url(../icons/line-vector.svg) no-repeat; // нарисовать
+        top:      calc(50% - 60px);
+        right:    0;
+        width:    2px;
+        height:   60px;
+      }
+    }
+
+    input:checked ~ #{$p}__label {
+      border-bottom: 2px solid #ffa945;
+      background:    #fef6ec;
+    }
+  }
+
+  /* RADIO TABS style2 */
+  &.style2 input { display: none; }
+
+  &.style2 {
+
+    #{$p}__label {
+      @include span-text;
+      padding:       3px 10px;
+      border-bottom: 2px solid transparent;
+      cursor:        pointer;
+    }
+
+    input:checked ~ #{$p}__label {
+      border-bottom: 2px solid $color-assets;
+      font-weight:   bold;
+    }
+  }
+}
+
+/* END RADIO TABS */
+/* END - RADIO */
+
+/* INPUTS NUMBER - кнопки по сторонам */
+
+.cl_input-number {
+  display: flex;
+  flex-flow: row nowrap;
+
+  &__btn {
+    width:         40px;
+    height:        40px;
+    color:         #373737;
+    background:    #eeefee;
+    font-size:     1.2rem;
+    border:        1px solid #e8e8e8;
+    border-radius: 0.25em;
+    cursor:        pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &__input {
+    min-width:     200px;
+    width:         40%;
+    max-width:     400px;
+    padding:       0;
+    margin:        0 15px;
+    text-align:    center;
+    border:        1px solid #e8e8e8;
+    border-radius: 5px;
+  }
+}
+
+/* END INPUTS NUMBER */
