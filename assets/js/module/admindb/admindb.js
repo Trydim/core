@@ -181,12 +181,12 @@ export const admindb = {
     f.qA('input[data-dbaction]').forEach(n => n.addEventListener('click', (e) => admindb.dbAction(e)));
 
     // Загрузить файл
-    node = f.gI('DBTables');
-    node && node.addEventListener('click', (e) => admindb.tableNameClick(e), {passive: true});
+    //node = f.gI('DBTables');
+    //node && node.addEventListener('click', (e) => admindb.tableNameClick(e), {passive: true});
 
     // Добавить строку
-    node = f.gI('btnAddMore');
-    node && node.addEventListener('click', () => tableValues.addValues());
+    //node = f.gI('btnAddMore');
+    //node && node.addEventListener('click', () => tableValues.addValues());
 
     // Добавлен файл
     node = f.gI('btnAddFileCsv');

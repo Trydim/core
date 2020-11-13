@@ -6,11 +6,12 @@ if ( !defined('SITE_PATH')) define('SITE_PATH', '/');
 if ( !defined('CONTROLLER')) define('CONTROLLER', 'core/controller/c_');
 if ( !defined('VIEW')) define('VIEW', 'core/views/');
 
-if ( !defined('CORE_CSS')) define('CORE_CSS', 'core/assets/css/');
-if ( !defined('CORE_SCRIPT')) define('CORE_SCRIPT', 'core/assets/js/');
+if ( !defined('CORE_CSS')) define('CORE_CSS', SITE_PATH . 'core/assets/css/');
+if ( !defined('CORE_SCRIPT')) define('CORE_SCRIPT', SITE_PATH . 'core/assets/js/');
 
-if ( !defined('PATH_IMG')) define('PATH_IMG', 'public/images/');
-if ( !defined('PATH_SCRIPT')) define('PATH_SCRIPT', 'public/js/');
+if ( !defined('PATH_CSS')) define('PATH_CSS', SITE_PATH . 'public/css/');
+if ( !defined('PATH_IMG')) define('PATH_IMG', SITE_PATH . 'public/images/');
+if ( !defined('PATH_SCRIPT')) define('PATH_SCRIPT', SITE_PATH . 'public/js/');
 
 //----------------------------------------------------------------------------------------------------------------------
 // project config
@@ -18,7 +19,7 @@ if ( !defined('PATH_SCRIPT')) define('PATH_SCRIPT', 'public/js/');
 if ( !defined('USE_DATABASE')) define('USE_DATABASE', true);
 
 /* Возможность прямого редактирования БД из админки */
-if ( !defined('CHANGE_DATABASE')) define('CHANGE_DATABASE', true);
+if ( !defined('CHANGE_DATABASE')) define('CHANGE_DATABASE', false);
 
 /* Папка с csv файлами */
 if ( !defined('PATH_CSV')) define('PATH_CSV', ABS_SITE_PATH . 'csv/');
@@ -39,7 +40,7 @@ if ( !defined('PDF_LIBRARY')) define('PDF_LIBRARY', 'mpdf');
 if(USE_DATABASE) {
 	$dbConfig = [
 		'dbHost'     => 'localhost',
-		'dbName'     => 'cms',
+		'dbName'     => 'vmeste-print',
     /*'dbUsername' => 'dbUser',
     'dbPass'     => 'WHZM4JpunONGycmf'*/
 		'dbUsername' => 'root',

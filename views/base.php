@@ -35,6 +35,9 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<?php if(count($cssLinks)) { array_map(function($item) { ?>
     <link rel="stylesheet" href="<?= CORE_CSS . $item; ?>">
 	<?php }, $cssLinks); } ?>
+
+  <link rel="stylesheet" href="<?= PATH_CSS ?>styles.css">
+
 </head>
 
 <body>

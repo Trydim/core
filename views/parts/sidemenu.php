@@ -12,7 +12,7 @@
           <p>Калькулятор</p>
         </a>
       </li>
-      <li class="nav-item">
+      <!--li class="nav-item">
         <a class="nav-link" href="orders">
           <i class="material-icons">table_chart</i>
           <p>Заказы</p>
@@ -41,7 +41,7 @@
           <i class="material-icons">timeline</i>
           <p>Статистика</p>
         </a>
-      </li>
+      </li-->
       <li class="nav-item">
         <?php global $dbTables; if(is_array($dbTables)) { ?>
           <a class="nav-link" href="#admindb">
@@ -68,7 +68,7 @@
         </a>
         <?php } ?>
       </li>
-      <li class="nav-item">
+      <!--li class="nav-item">
         <a class="nav-link" href="catalog">
           <i class="material-icons">view_list</i>
           <p>Каталог</p>
@@ -79,7 +79,7 @@
           <i class="material-icons">settings</i>
           <p>Настройки</p>
         </a>
-      </li>
+      </li-->
     </ul>
   </div>
 </div>

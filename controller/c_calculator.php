@@ -1,46 +1,14 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+
 if (!isset($main)) $main = new cms\Main();
 
-// Прайс
-$param = [
-	'id'    => 'id-product',
-	'name'  => 'Наименование',
-	'mName' => 'Материал',
-	'unit'  => 'Ед. изм.',
-	'value' => ['Стоимость, руб.', 'float'],
-];
-
-$price = loadCVS($param, 'price.csv');
-
-$price = json_encode(array_filter($price, function ($i) {
-	return boolval(strlen($i['id']));
-}));
-
-// Конфиг параметров
-$param = [
-  'key'   => 'key*',
-  'value' => ['значение', 'float'],
-];
-
-$config = loadCVS($param, 'config.csv');
-
-$config = json_encode(array_filter($config, function ($i) {
-  return boolval(strlen($i['key']));
-}));
-
-
-$authStatus = $main->checkStatus('ok');
+$dbContent = "";
 $field = [];
 
-$field['headContent'] = '<meta name="Калькулятор"><meta name="description" content="Калькулятор">';
-$field['cssLinks']    = ['style.css'];
-$field['pageTitle']   = 'Калькулятор';
-$field['pageFooter']  = '';
-//$field['pageHeader'] = '';
+require ABS_SITE_PATH . 'public/public.php';
 
-$dbContent = "<input type='hidden' id='dataPrice' value='$price'>" .
-             "<input type='hidden' id='dataConfig' value='$config'>";
+$authStatus = $main->checkStatus('ok');
 
 // Если загрузка
 if($authStatus && isset($_GET['orderId'])) {
