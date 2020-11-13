@@ -8,17 +8,6 @@ const initIndex = () => {
   f.init('home');
 }
 
-const setLinkMenu = (page) => {
-  f.qA('a').forEach(n => {
-    let href = n.getAttribute('href') || '';
-    if(href === page) n.parentNode.classList.add('active');
-    else if (href.includes(page) && href.includes('#')) n.click();
-
-    href = f.LINK_PATH + href;
-    n.setAttribute('href', href.replace('//', '/'));
-  })
-}
-
 const cancelFormSubmit = () => {
   f.qA('form', 'keypress', (e) => {
     if (e.key === 'Enter') {
@@ -83,9 +72,7 @@ const onClickSubmenu = () => {
   onAuthEvent();
   onClickSubmenu();
 
-  setLinkMenu(page|| '/');
   if(page) f.init(page);
   else initIndex();
 
 })();
- 

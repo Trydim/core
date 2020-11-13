@@ -29,15 +29,17 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
      <!-- Material Kit CSS -->
     <link rel="stylesheet" href="<?= CORE_CSS?>material-dashboard.css">
     <link rel="stylesheet" href="<?= CORE_CSS?>admin/admin.css">
-    <link rel="stylesheet" href="<?= CORE_CSS?>libs/calendar/calendar.css">
 	<?php } ?>
 
 	<?php if(count($cssLinks)) { array_map(function($item) { ?>
-    <link rel="stylesheet" href="<?= CORE_CSS . $item; ?>">
+    <link rel="stylesheet" href="<?= str_replace('//', '/', SITE_PATH . $item); ?>">
 	<?php }, $cssLinks); } ?>
 
-  <link rel="stylesheet" href="<?= PATH_CSS ?>styles.css">
-
+  <script>
+    window.LINK_PATH = '<?= SITE_PATH?>';
+    //window.MAIN_PHP_PATH = '<?= (CORE ? CORE : 'core/') . 'php/main.php' ?>';
+    window.MAIN_PHP_PATH = '<?= SITE_PATH?>index.php';
+  </script>
 </head>
 
 <body>

@@ -39,5 +39,6 @@ if($authStatus && isset($_GET['orderId'])) {
 
 if(!$authStatus) $field['sideLeft'] = '';
 
-require $pathTarget;
+
+require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
 $html = template('base', $field);

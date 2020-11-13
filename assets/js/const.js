@@ -8,9 +8,8 @@ export const c = {
 
   PAGE_NAME: location.href,
   //FILES_PATH: '/',
-  LINK_PATH: '/',
-  //LINK_PATH: location.pathname !== '/' ? location.pathname.replace(/\/$/, '?targetPage=') : '/', //Путь к папке с калькулятором
-  MAIN_PHP_PATH: 'core/php/main.php',
+  LINK_PATH: window['LINK_PATH'] || '/',
+  MAIN_PHP_PATH: window['MAIN_PHP_PATH'] || 'core/php/main.php',
 
   CURRENT_EVENT: 'none',
   PHONE_MASK: '+7 (___) ___ __ __',

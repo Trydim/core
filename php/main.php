@@ -1,15 +1,14 @@
 <?php
-
+/*
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 if (defined('MAIN_ACCESS')) die('access denied!');
 define('MAIN_ACCESS', true);
-define('ABS_SITE_PATH', __DIR__ . '/../../');
-define('MAIN_PATH', __DIR__ . '/');
 
-require_once '../model/func.php';
+require_once '../config.php';*/
+
 $mode = isset($_REQUEST['mode']) ? $_REQUEST['mode'] : 'noMode';
 $result = [];
 extract($_REQUEST);

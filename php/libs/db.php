@@ -29,12 +29,14 @@ class db extends \R {
 	/**
 	 * db constructor
 	 *
-	 * @param string $configPath
+	 * @param array $dbConfig
 	 * @param bool $freeze
 	 */
-	public function __construct($configPath = __DIR__ . '/../../config.php', $freeze = true) {
-		require $configPath;
-		if(!isset($dbConfig)) exit('Not configs');
+	public function __construct($dbConfig = [], $freeze = true) {
+    if(!count($dbConfig)) {
+      require ABS_SITE_PATH . 'config.php';
+      if(!count($dbConfig)) exit('Configs error');
+    }
 
 		$this->dbName = $dbConfig['dbName'];
 

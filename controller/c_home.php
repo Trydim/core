@@ -9,7 +9,7 @@ $dateRange = ["$curMonth-01 00:00:01", "$curMonth-31 23:59:59"];
 $orders = $db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
 $field = [];
-$field['cssLinks'] = []; //['/material-dashboard.css?v=2.1.2', 'libs/calendar/calendar.css'];//'libs/bootstrap.min.css',
+$field['cssLinks'] = [CORE_CSS . 'libs/calendar/calendar.css'];
 $field['pageTitle'] = 'Home';
 $field['footerContent'] = '';
 

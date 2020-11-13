@@ -1,10 +1,14 @@
 <?php use RedBeanPHP\db;
 
+/**
+ * @var array $dbConfig - config from public
+ */
+
 if (!defined('MAIN_ACCESS')) die('access denied!');
 
-require_once './libs/db.php';
+require_once 'libs/db.php';
 
-$db = new db('../config.php');
+$db = new db($dbConfig);
 
 !isset($dbAction) && $dbAction = '';
 isset($tableName) && $dbTable = $tableName;

@@ -199,7 +199,7 @@ const maskInit = (node) => {
 // загрузка картики фермы
 /* w = calculator.param.trussWidth */
 const getTrussImg = (w) => {
-  let link = c.LINK_PATH + 'assets/images/truss' + w + '.jpg';
+  let link = 'core/assets/images/truss' + w + '.jpg';
   return new Promise(resolve => {
     fetch(link).then(data => data.blob()).then(data => {
       let reader = new FileReader();

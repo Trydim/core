@@ -1,7 +1,10 @@
 <?php
-
 if (!defined('MAIN_ACCESS')) die('access denied!');
 if (!isset($main) || !isset($target)) die('variables undefined');
+
+/**
+ * @var array $dbConfig
+ */
 
 if (isset($_GET['status'])) $main->setLoginStatus($_GET['status']);
 
@@ -9,8 +12,8 @@ session_start();
 
 //Проверка пароля
 if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] === $_COOKIE['PHPSESSID']) {
-  require_once 'core/php/libs/db.php';
-  $db = new RedBeanPHP\db( 'core/config.php');
+  require_once CORE . 'php/libs/db.php';
+  $db = new RedBeanPHP\db($dbConfig);
   if ($db->checkUserHash($_SESSION)) {
     $main->setLogin($_SESSION);
     $target === 'admin' && header('location: ' . SITE_PATH . PUBLIC_PAGE);

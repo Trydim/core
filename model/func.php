@@ -6,7 +6,7 @@
  */
 function de($var, $die = 1) {
 	echo '<pre>';
-	echo var_dump($var);
+	var_dump($var);
 	echo '</pre>';
 	if($die) die();
 }
@@ -131,10 +131,11 @@ function findkey($cell, $input) {
  * @param string - csv filename with path
  * @param bool - if true that return one rang array
  *
- * @return array or bool
+ * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
 	$filename = str_replace('/', '//', 'csv/' . $filename);
+  $result = [];
 
 	if (($handle = fopen($filename, "r")) !== false) {
 		if (($data = fgetcsv($handle, 1000, ";"))) {
@@ -172,7 +173,6 @@ function loadCVS($dict, $filename, $one_rang = false) {
 
 			}
 
-			$result = [];
 			while (($data = fgetcsv($handle, 1000, ";")) !== false) {
 				$result[] = $addpos($data);
 			}
@@ -203,6 +203,7 @@ function convert($type, $value) {
 		case 'int': case 'integer': return floor((integer) $value);
 		case 'float': case 'double': return floatval(str_replace(',', '.', $value));
 	}
+	return $value;
 }
 
 /**
@@ -237,29 +238,10 @@ function setUserLocale($lang = 'ru_RU') {
   textdomain( $lang );
 }
 
-
-class Dictionary {
-
-  public function __construct($arr, $type) {
-
-  }
-}
-/**
- * @return array dictionary
- */
-function loadDictionary() {
-  if (!isset($main->dbTxt)) {
-    $arr = require_once 'lang/dictionary.php';
-
-  }
-
-  return dic();
-}
-
-
 function gTxt($str) {
   static $txt;
   if (!$txt) {
+    $mess = [];
     include ABS_SITE_PATH . 'lang/dictionary.php';
     $txt = $mess;
   }
@@ -269,6 +251,7 @@ function gTxt($str) {
 function gTxtDB($db, $str) {
   static $txt;
   if (!$txt) {
+    $mess = [];
     include ABS_SITE_PATH . 'lang/dbDictionary.php';
     $txt = $mess;
   }
