@@ -9,7 +9,6 @@ $field['footerContent'] = <<<footerContent
     <span class="modalT"></span>
   
     <form action="#" id="authForm">
-      <input type="hidden" name="C.ID" value="">
       <input type="hidden" name="changeBool" value="0">
       
       <div class="modal-content__field d-flex">
@@ -89,4 +88,4 @@ $field['footerContent'] = <<<footerContent
 </template>
 footerContent;
 
-$field['footerContent'] .= template('documents/printTpl');
+$field['footerContent'] .= template('docs/printTpl');

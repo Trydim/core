@@ -61,4 +61,4 @@ $field['footerContent'] .= <<<footerContent
 </template-->
 footerContent;
 
-$field['footerContent'] .= template('documents/printTpl');
+$field['footerContent'] .= template('docs/printTpl');

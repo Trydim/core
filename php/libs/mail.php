@@ -19,9 +19,7 @@ define('MAIL_FROM', 'noreplycalcby@yandex.ru');
 define('MAIL_PASSWORD', '638ch1');
 define('MAIL_FROM_USER', 'calc.by');
 
-// Path setting
-if(!defined('AUTOLOAD_PATH')) define("AUTOLOAD_PATH", __DIR__ . '/vendor/');
-require_once AUTOLOAD_PATH . 'autoload.php';
+require_once 'vendor/autoload.php';
 
 class Mail {
 	private $cpNumber = 1;
@@ -38,7 +36,12 @@ class Mail {
 
 		extract($array);
 		ob_start();
-		include '../views/documents/' . $this->mailTpl . '.php';
+
+		if (file_exists(ABS_SITE_PATH . 'public/views/docs/' . $this->mailTpl . '.php'))
+		  include ABS_SITE_PATH . "public/views/docs/$this->mailTpl.php";
+		else if (file_exists(CORE . "views/docs/$this->mailTpl.php"))
+      include CORE . "views/docs/$this->mailTpl.php";
+
 		$this->body = ob_get_clean();
 	}
 
@@ -50,7 +53,7 @@ class Mail {
 		$this->otherMail[] = $email;
 	}
 
-	public function addPdf($pdfPath, $fileName = '') {
+	public function addPdf($pdfPath, $fileName = "") {
 		$this->pdfPath = $pdfPath;
 		$this->pdfFileName = $fileName !== '' ? $fileName : uniqid() . '.pdf';
 		//'КП_' . $this->cpNumber . '_' . date('dmY') . '.pdf';

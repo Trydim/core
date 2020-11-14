@@ -2,8 +2,6 @@
 
 namespace RedBeanPHP;
 
-use mysql_xdevapi\Table;
-
 require 'rb.php';
 
 class db extends \R {

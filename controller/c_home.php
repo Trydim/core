@@ -1,8 +1,13 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
-require_once 'core/php/libs/db.php';
+/**
+ * @var array $dbConfig
+ * @var string $pathTarget
+ */
 
-if (!isset($db)) $db = new \RedBeanPHP\db('./config.php');
+require_once CORE . 'php/libs/db.php';
+
+if (!isset($db)) $db = new \RedBeanPHP\db($dbConfig);
 
 $curMonth = date('Y-m');
 $dateRange = ["$curMonth-01 00:00:01", "$curMonth-31 23:59:59"];

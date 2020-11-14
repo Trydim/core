@@ -56,13 +56,19 @@ class Pdf {
 			'margin_footer' => 5,
 		];
 
-		$this->imgPath = ABS_SITE_PATH . '/' . PATH_IMG;
+		$this->imgPath = ABS_SITE_PATH . PATH_IMG; // Public img
 	}
 
 	private function prepareTemplate() {
 		//extract($this->data);
 		ob_start();
-		include '../views/documents/' . $this->pdfTpl . '.php';
+
+    if (file_exists(ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.php")) {
+      include(ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.php");
+    } else if (file_exists(CORE . "views/docs/$this->pdfTpl.php")) {
+      include(CORE . "views/docs/$this->pdfTpl.php");
+    }
+
 		$this->content = ob_get_clean();
 	}
 
@@ -112,7 +118,7 @@ class Pdf {
 	}
 
 	private function setCss() {
-		$cssPath = ABS_SITE_PATH . '/views/documents/' . $this->pdfTpl . '.css';
+		$cssPath = ABS_SITE_PATH . '/views/docs/' . $this->pdfTpl . '.css';
 		if(file_exists($cssPath)) {
 			$stylesheet = file_get_contents($cssPath);
 			$this->pdf->WriteHTML($stylesheet,\Mpdf\HTMLParserMode::HEADER_CSS);

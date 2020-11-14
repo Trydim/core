@@ -2,13 +2,15 @@
 
 /**
  * @var array $publicConfig - config from public
+ * @var array $siteDir - site_path from index.php
  */
+if (stripos(ABS_SITE_PATH, $siteDir) !== false) $siteDir = '';
+define('SITE_PATH', $siteDir . '/');
 
 require 'config.php'; // Public config
 
 if (!defined('CORE')) define('CORE',  basename( __DIR__ ) . '/');
 
-if (!defined('CONTROLLER')) define('CONTROLLER', CORE . 'controller/c_');
 if (!defined('VIEW')) define('VIEW', CORE . 'views/');
 
 if (!defined('CORE_CSS')) define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
@@ -21,4 +23,4 @@ foreach ($publicConfig as $k => $v) {
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/Main.php';
 
-unset($publicConfig, $k, $v);
+unset($publicConfig, $k, $v, $siteDir);

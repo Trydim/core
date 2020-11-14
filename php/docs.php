@@ -1,6 +1,9 @@
-<?php
+<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
-if ( !defined('MAIN_ACCESS')) die('access denied!');
+/**
+ * @var array $dbConfig - config from public
+ * @var string $name
+ */
 
 require_once 'libs/pdf.php';
 
@@ -9,8 +12,8 @@ $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
 if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
   $orderIds = json_decode($orderIds);
 
-  require_once './libs/db.php';
-  $db = new RedBeanPHP\db('../config.php');
+  require_once 'libs/db.php';
+  $db = new RedBeanPHP\db($dbConfig);
   $reportVal = $db->loadOrderById($orderIds);
   isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true)['rBack'];
 }
@@ -24,7 +27,7 @@ if (isset($docType)) {
 			break;
 		case 'mail':
 			$pdfPath = $pdf->getPdf('save');
-			require_once './libs/mail.php';
+			require_once 'libs/mail.php';
 			$mail = new Mail();
 			$param = [
 				'name'  => $name,

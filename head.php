@@ -19,11 +19,11 @@ if ($target === PUBLIC_PAGE) {
   $pathTarget = '';
 } else $pathTarget = checkTemplate($target);
 
-if (strstr($pathTarget, '404')) require CONTROLLER . '404.php';
+if (strstr($pathTarget, '404')) require CORE . 'controller/c_404.php';
 else {
   $main = new cms\Main();
-  require CONTROLLER . "base.php";
-  require CONTROLLER . "$target.php";
+  require CORE . "controller/c_base.php";
+  require CORE . "controller/c_$target.php";
 }
 
 echo $html;
