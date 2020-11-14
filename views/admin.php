@@ -8,7 +8,7 @@ $field['global'] = <<<global
 <main class="container-fluid mx-auto">
   <section class="h-100 d-flex justify-content-center align-items-center">
     <div class="col-xl-4 col-lg-6 col-md-10 mx-auto mt-5">
-      <form action="core/php/main.php" method="POST" class="m-1">
+      <form action="index.php" method="POST" class="m-1">
         <div class="card wow fadeIn animated" data-wow-delay="0.3s"
           style="visibility: visible; animation-name: fadeIn; animation-delay: 0.3s;">
             <div class="card-body">

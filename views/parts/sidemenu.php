@@ -18,7 +18,7 @@
           <p>Заказы</p>
         </a>
       </li>
-      <!--li class="nav-item">
+      <li class="nav-item">
         <a class="nav-link" href="<?= SITE_PATH ?>">
           <i class="material-icons">date_range</i>
           <p>Календарь</p>
@@ -68,7 +68,7 @@
         </a>
         <?php } ?>
       </li>
-      <!--li class="nav-item">
+      <li class="nav-item">
         <a class="nav-link" href="<?= SITE_PATH ?>catalog">
           <i class="material-icons">view_list</i>
           <p>Каталог</p>
@@ -79,7 +79,7 @@
           <i class="material-icons">settings</i>
           <p>Настройки</p>
         </a>
-      </li-->
+      </li>
     </ul>
   </div>
 </div>

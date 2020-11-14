@@ -31,9 +31,9 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     <link rel="stylesheet" href="<?= CORE_CSS?>admin/admin.css">
 	<?php } ?>
 
-	<?php if(count($cssLinks)) { array_map(function($item) { ?>
+	<?php array_map(function($item) { ?>
     <link rel="stylesheet" href="<?= str_replace('//', '/', SITE_PATH . $item); ?>">
-	<?php }, $cssLinks); } ?>
+	<?php }, $cssLinks); ?>
 
   <script>
     window.LINK_PATH = '<?= SITE_PATH?>';
@@ -75,7 +75,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 <script type="module" src="<?= CORE_SCRIPT?>main.js"></script>
 
 <?php array_map(function($item) { ?>
-  <!-- <script type="module" src="<?= CORE_SCRIPT . $item; ?>main.js"></script> -->
+  <script type="module" src="<?= str_replace('//', '/', SITE_PATH . $item); ?>"></script>
 <?php }, $jsLinks) ?>
 
 <?= $footerContent; ?>

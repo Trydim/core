@@ -2,8 +2,7 @@
 
 if ( !defined('MAIN_ACCESS')) die('access denied!');
 
-require_once '../config.php';
-require_once './libs/pdf.php';
+require_once 'libs/pdf.php';
 
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
 
