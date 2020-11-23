@@ -33,7 +33,7 @@ session_abort();
 
 if (DB_TABLE_IN_SIDEMENU && $main->checkStatus('ok') && isset($db)) {
   $dbTables = [];
-  CHANGE_DATABASE && $dbTables = array_merge($dbTables, $db->getTables());
+  CHANGE_DATABASE && USE_DATABASE && $dbTables = array_merge($dbTables, $db->getTables());
   $dbTables = array_merge($dbTables, $db->scanDirCsv());
   $dbTables = array_map(function ($item) {
     $item['name'] = gTxt($item['name']);

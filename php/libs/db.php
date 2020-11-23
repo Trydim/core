@@ -7,6 +7,7 @@ require 'rb.php';
 class db extends \R {
 	private $currentUserID = 2;
 	private $dbName;
+	private $login;
 
 	/**
 	 * Plugin readbaen for special name
@@ -31,27 +32,29 @@ class db extends \R {
 	 * @param bool $freeze
 	 */
 	public function __construct($dbConfig = [], $freeze = true) {
-    if(!count($dbConfig)) {
-      require ABS_SITE_PATH . 'config.php';
-      if(!count($dbConfig)) exit('Configs error');
+    if (USE_DATABASE) {
+      if (!count($dbConfig)) {
+        require ABS_SITE_PATH . 'config.php';
+        if (!count($dbConfig)) exit('Configs error');
+      }
+
+      $this->dbName = $dbConfig['dbName'];
+
+      self::setup(
+        'mysql:host=' . $dbConfig['dbHost'] . ';dbname=' . $dbConfig['dbName'],
+        $dbConfig['dbUsername'],
+        $dbConfig['dbPass']
+      );
+
+      if (!self::testConnection()) {
+        header('location: /'); // TODO переделать.
+        die();
+      }
+
+      $this->setting();
+
+      self::freeze($freeze);
     }
-
-		$this->dbName = $dbConfig['dbName'];
-
-		self::setup(
-			'mysql:host=' . $dbConfig['dbHost'] . ';dbname=' . $dbConfig['dbName'],
-			$dbConfig['dbUsername'],
-			$dbConfig['dbPass']
-		);
-
-		if(!self::testConnection()) {
-			header('location: /'); // TODO переделать.
-			die();
-		}
-
-		$this->setting();
-
-		self::freeze($freeze);
 	}
 
 	/**
@@ -490,6 +493,23 @@ class db extends \R {
   // Users
 	//--------------------------------------------------------------------------------------------------------------------
 
+  private function getUserFromFile($login, $password) {
+    $file = CORE . 'php/system.php';
+
+    if(file_exists($file)) {
+      $value = file($file)[0];
+      $value && $value = explode('|||', $value);
+
+      if ($value[0] === $login && $value[1] === $password) {
+        $this->login = [$login , $password];
+        return true;
+      } else return false;
+    } else {
+      file_put_contents($file, '');
+      // Сделать регистрацию при первом разе
+    }
+  }
+
 	/**
 	 * @param $login
 	 * @param $column string
@@ -513,7 +533,11 @@ class db extends \R {
   }
 
 	public function checkPassword($login, $password) {
-		$user = $this->getUser($login, 'ID, password');
+    if (USE_DATABASE) {
+      $user = $this->getUser($login, 'ID, password');
+    } else {
+      return $this->getUserFromFile($login, $password);
+    }
 
 		if (count($user) && password_verify($password, $user['password'])) {
 			return $user['ID'];
@@ -550,15 +574,26 @@ class db extends \R {
   }
 
 	public function setUserHash($loginId, $hash) {
-		$user = self::xdispense('users');
-		$user->ID = $loginId;
-		$user->hash = $hash;
-		self::store($user);
+    if (USE_DATABASE) {
+      $user = self::xdispense('users');
+      $user->ID = $loginId;
+      $user->hash = $hash;
+      self::store($user);
+    } else {
+      $data = implode('|||' , $this->login);
+      $data .= '|||' . $hash;
+      file_put_contents(CORE . 'php/system.php', $data);
+    }
 	}
 
   public function checkUserHash($session) {
-		$hash = self::getCell( 'SELECT hash FROM users WHERE login = :login', [':login' => $session['login']] );
-	  return $session['hash'] === $hash;
+    if (USE_DATABASE) {
+      $hash = self::getCell('SELECT hash FROM users WHERE login = :login', [':login' => $session['login']]);
+    } else {
+      $value = file(CORE . 'php/system.php')[0];
+      $value && $hash = trim(explode('|||', $value)[2]);
+    }
+    return $session['hash'] === $hash;
   }
 
 	/**

@@ -73,10 +73,12 @@ const onClickSubmenu = () => {
 
 //entrance function
 (() => {
-  let page = f.PAGE_NAME.match(/[?<=\w][?<=\/](\w+)([?=(\?)]|$)/);
+  let page = f.PAGE_NAME.match(/[?<=\w][?<=\/](\w+)([?=(\?)]|[?=(\/)]|)$/);
   page = page && page[1];
 
   cancelFormSubmit();
+  if (page === 'admin' || f.gI('authForm')) return;
+
   onAuthEvent();
   onClickSubmenu();
 
