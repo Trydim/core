@@ -7,7 +7,7 @@ if (isset($main)) { ?>
       <input type="button" data-action="exit" value="выйти">
     </div>
   <?php } else { ?>
-		<a href="/admin">Войти</a>
+		<a href="/login">Войти</a>
   <?php } ?>
   </div>
 <?php } ?>

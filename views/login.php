@@ -1,8 +1,9 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 $pageTarget = isset($_REQUEST['targetPage']) ? $_REQUEST['targetPage'] : '';
-$actionLink = '../index.php';
+$actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="notification-container error" role="alert">Неправильный логин или пароль</div><br>' : '';
 
+$publicLink = PUBLIC_PAGE ? '<a href="/' . PUBLIC_PAGE . '">Открытая страница</a>' : '';
 
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global
@@ -34,7 +35,7 @@ $field['global'] = <<<global
               <input name="mode" type="hidden" value="auth">
               <input name="authAction" type="hidden" value="login">
               <input name="clientPageTarget" type="hidden" value="$pageTarget">
-              <a href="/calculator">Открытая страница</a>
+              $publicLink
             </div>
         </div>
       </form>

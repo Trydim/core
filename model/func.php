@@ -45,7 +45,7 @@ function checkTemplate($tmpFile) {
  * @return mixed|string
  */
 function getTargetPage($get) {
-	return (isset($get['targetPage']) && $get['targetPage'] !== '') ? str_replace('/', '', $get['targetPage']) : 'home';
+	return (isset($get['targetPage']) && $get['targetPage'] !== '') ? str_replace('/', '', $get['targetPage']) : HOME_PAGE;
 }
 
 /**

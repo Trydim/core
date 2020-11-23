@@ -21,7 +21,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 else {
 
 	if($dbTable) {
-	  $columns = $db->getColumnsTable($dbTable);
+	  USE_DATABASE && $columns = $db->getColumnsTable($dbTable);
     $db->setCsvTable($tableName);
   } else $columns = [];
 
@@ -34,7 +34,7 @@ else {
 		case 'showTable':
 			$result['columns'] = $columns;
       if(stripos($tableName, '.csv')) $result['csvValues'] = $db->openCsv();
-      else $result['dbValues'] = $db->loadTable($dbTable);
+      else USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
 			break;
 		case 'saveTable':
 			if($dbTable !== '') {

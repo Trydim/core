@@ -2,10 +2,10 @@
 
 /**
  * @var array $publicConfig - config from public
- * @var array $siteDir - site_path from index.php
  */
-if (stripos(ABS_SITE_PATH, $siteDir) !== false) $siteDir = '';
-define('SITE_PATH', $siteDir . '/');
+$absPath = str_replace('\\', '/', ABS_SITE_PATH);
+$siteDir = str_replace($_SERVER['DOCUMENT_ROOT'], '/', $absPath);
+define('SITE_PATH', str_replace('//', '/', $siteDir));
 
 require 'config.php'; // Public config
 
@@ -20,7 +20,10 @@ foreach ($publicConfig as $k => $v) {
   if (!defined($k)) define($k, $v);
 }
 
+if(!defined('HOME_PAGE')) define('HOME_PAGE', 'home');
+if(!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
+
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/Main.php';
 
-unset($publicConfig, $k, $v, $siteDir);
+unset($absPath, $siteDir, $publicConfig, $k, $v);

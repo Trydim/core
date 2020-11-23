@@ -493,15 +493,15 @@ class db extends \R {
   // Users
 	//--------------------------------------------------------------------------------------------------------------------
 
-  private function getUserFromFile($login, $password) {
+  private function getUserFromFile($login = '', $password = '') {
     $file = CORE . 'php/system.php';
 
     if(file_exists($file)) {
       $value = file($file)[0];
       $value && $value = explode('|||', $value);
+      $this->login = [$value[0] , $value[1]];
 
       if ($value[0] === $login && $value[1] === $password) {
-        $this->login = [$login , $password];
         return true;
       } else return false;
     } else {
@@ -580,6 +580,7 @@ class db extends \R {
       $user->hash = $hash;
       self::store($user);
     } else {
+      !$this->login && $this->getUserFromFile();
       $data = implode('|||' , $this->login);
       $data .= '|||' . $hash;
       file_put_contents(CORE . 'php/system.php', $data);
@@ -631,7 +632,7 @@ trait Csv {
       if ( !($item === '.' || $item === '..' || !stripos($item, '.csv'))) {
         $r[] = [
           'fileName' => $item,
-          'name' => str_replace('.csv', '', $item),
+          'name' => $item, //str_replace('.csv', '', $item),
         ];
       }
 

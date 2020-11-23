@@ -2,19 +2,13 @@
 
 if (!DB_TABLE_IN_SIDEMENU) { // Если таблицы не в подменю
   $field['sideRight'] = <<<sideRight
-<div id="DBTables"></div>
+<ul id="DBTablesWrap"></ul>
 <div>
   <h2></h2>
   <input type="button" value="Показать" id="btnRowsAdd" data-dbaction="showTable">
   <input type="button" value="Скачать CSV" id="btnLoadCSV" data-dbaction="loadCVS" class="fade">
   <input type="button" value="Удалить" id="btnRowsDel" data-dbaction="showDelete">
 </div>
-<div>
-  <h2>Прайсы</h2>
-  <input type="button" value="Создать прайс/csv" id="btnCsvAdd" data-dbaction="createCsvTable">
-  <form action="#" ><input type="file" value="Загрузить прайс/csv" id="btnAddFileCsv" ></form>
-  <input type="button" value="Отправить" id="btnConfirmAdd">
-</div--> 
 sideRight;
 }
 
@@ -22,13 +16,13 @@ $field['content'] = <<<main
 <div class="text-center">
   <h2 id="tableNameField"></h2>
 </div>
-<div class="p-bottom d-flex">
+<div class="d-flex">
   <div id="btnField" class="fade">
     <input type="button" class="btn btn-primary" value="Добавить" id="btnAddMore">
     <input type="button" class="btn btn-primary" value="Сохранить" id="btnSave" disabled>
   </div>
 </div>
-<form action="#" id="insertToDB" ></form>
+<div id="insertToDB"></div>
 main;
 
 $field['footerContent'] = <<<temp

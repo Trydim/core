@@ -24,7 +24,7 @@ if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] 
 
 if ( !$main->checkStatus('ok') && $target !== PUBLIC_PAGE) {
   $_SESSION['target'] = $target !== 'home' ? $target : '';
-  $target = 'admin';
+  $target = 'login';
   $pathTarget = checkTemplate($target);
   //header('Location: ' . SITE_PATH . 'admin?status=' . $main->getLoginStatus());
 }
