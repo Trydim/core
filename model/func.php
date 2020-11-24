@@ -24,7 +24,7 @@ function checkError($var) {
 
 function checkAccess($target) {
   if (in_array($target, [HOME_PAGE, PUBLIC_PAGE, 'public'])) return 'public';
-  if (in_array($target, ACCESS_MENU)) return $target;
+  if (in_array($target, array_merge(ACCESS_MENU, ['login']))) return $target;
 }
 
 /**
