@@ -14,8 +14,7 @@ $html = '';
 
 $target = getTargetPage($_GET);
 
-if ($target === PUBLIC_PAGE) {
-  $target = 'public';
+if ($target === 'public') {
   $pathTarget = '';
 } else $pathTarget = checkTemplate($target);
 

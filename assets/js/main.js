@@ -77,7 +77,7 @@ const onClickSubmenu = () => {
   page = page && page[1];
 
   cancelFormSubmit();
-  if (page === 'admin' || f.gI('authForm')) return;
+  if (f.gI('authForm')) return;
 
   onAuthEvent();
   onClickSubmenu();

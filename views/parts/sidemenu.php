@@ -7,7 +7,7 @@
   <div class="sidebar-wrapper">
     <ul id="sideMenu" class="nav">
       <li class="nav-item">
-        <a class="nav-link" href="<?= SITE_PATH . PUBLIC_PAGE ?>">
+        <a class="nav-link" href="<?= SITE_PATH ?>public">
           <i class="material-icons">calculate</i>
           <p>Калькулятор</p>
         </a>

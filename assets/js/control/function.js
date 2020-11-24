@@ -150,9 +150,15 @@ const initDefault = () => {
 }
 
 const importModuleFunc = async (moduleName) => {
+  let link;
+  if (moduleName === 'public') {
+    link = '/public/js/calculator.js';
+    moduleName = c.PUBLIC_PAGE;
+  } else link = `../module/${moduleName}/${moduleName}.js`;
+
   try {
     let importModule = await new Promise((resolve, reject) => {
-      import(`../module/${moduleName}/${moduleName}.js`)
+      import(link)
         .then(module => resolve(module[moduleName]))
         .catch(err => reject(err));
     });
