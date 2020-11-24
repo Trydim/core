@@ -32,7 +32,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<?php } ?>
 
 	<?php array_map(function($item) { ?>
-    <link rel="stylesheet" href="<?= str_replace('//', '/', SITE_PATH . $item); ?>">
+    <link rel="stylesheet" href="<?= str_replace('//', '/', $item); ?>">
 	<?php }, $cssLinks); ?>
 
   <script>
