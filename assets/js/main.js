@@ -11,10 +11,8 @@ const initIndex = () => {
 const setLinkMenu = (page) => {
   for (let n of [...f.qA('a')]) {
     let href = n.getAttribute('href') || '';
-    if (href.includes(page) && href.includes('#')) {
-      n.click();
-      page = new URLSearchParams(location.search);
-    } else if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
+    if (href.includes(page) && href.includes('#')) n.click();
+    else if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
   }
 }
 
@@ -79,7 +77,7 @@ const onClickSubmenu = () => {
   page = page && page[1];
 
   cancelFormSubmit();
-  if (page === 'admin' || f.gI('authForm')) return;
+  if (f.gI('authForm')) return;
 
   onAuthEvent();
   onClickSubmenu();

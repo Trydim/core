@@ -27,7 +27,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
      <!-- Material Kit CSS -->
-    <link rel="stylesheet" href="<?= CORE_CSS?>material-dashboard.css">
+    <link rel="stylesheet" href="<?= CORE_CSS?>libs/material-dashboard.min.css">
     <link rel="stylesheet" href="<?= CORE_CSS?>admin/admin.css">
 	<?php } ?>
 
@@ -36,9 +36,9 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<?php }, $cssLinks); ?>
 
   <script>
-    window.LINK_PATH = '<?= SITE_PATH?>';
-    //window.MAIN_PHP_PATH = '<?= (CORE ? CORE : 'core/') . 'php/main.php' ?>';
-    window.MAIN_PHP_PATH = '<?= SITE_PATH?>index.php';
+    window.LINK_PATH = '<?= SITE_PATH ?>';
+    window.MAIN_PHP_PATH = '<?= SITE_PATH ?>index.php';
+    window.PUBLIC_PAGE = '<?= PUBLIC_PAGE ?>';
   </script>
 </head>
 

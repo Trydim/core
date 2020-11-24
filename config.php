@@ -4,7 +4,7 @@
  * @var array $publicConfig - config from public
  */
 $absPath = strtolower(str_replace('\\', '/', ABS_SITE_PATH));
-$siteDir = str_replace($_SERVER['DOCUMENT_ROOT'], '/', strtolower($absPath));
+$siteDir = str_replace(strtolower($_SERVER['DOCUMENT_ROOT']), '/', $absPath);
 define('SITE_PATH', str_replace('//', '/', $siteDir));
 
 require 'config.php'; // Public config
