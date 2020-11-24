@@ -3,8 +3,8 @@
 /**
  * @var array $publicConfig - config from public
  */
-$absPath = str_replace('\\', '/', ABS_SITE_PATH);
-$siteDir = str_replace($_SERVER['DOCUMENT_ROOT'], '/', $absPath);
+$absPath = strtolower(str_replace('\\', '/', ABS_SITE_PATH));
+$siteDir = str_replace($_SERVER['DOCUMENT_ROOT'], '/', strtolower($absPath));
 define('SITE_PATH', str_replace('//', '/', $siteDir));
 
 require 'config.php'; // Public config

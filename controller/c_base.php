@@ -22,7 +22,7 @@ if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] 
   }
 }
 
-if ( !$main->checkStatus('ok') && $target !== PUBLIC_PAGE) {
+if ( !$main->checkStatus('ok') && $target !== 'public') {
   $_SESSION['target'] = $target !== 'home' ? $target : '';
   $target = 'login';
   $pathTarget = checkTemplate($target);
