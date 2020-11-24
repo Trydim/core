@@ -9,11 +9,13 @@ const initIndex = () => {
 }
 
 const setLinkMenu = (page) => {
-  f.qA('a').forEach(n => {
+  for (let n of [...f.qA('a')]) {
     let href = n.getAttribute('href') || '';
-    if(href === page) n.parentNode.classList.add('active');
-    else if (href.includes(page) && href.includes('#')) n.click();
-  })
+    if (href.includes(page) && href.includes('#')) {
+      n.click();
+      page = new URLSearchParams(location.search);
+    } else if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
+  }
 }
 
 const cancelFormSubmit = () => {
