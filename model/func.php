@@ -21,6 +21,12 @@ function checkError($var) {
 	return !( (is_array($var) && count($var)) || (is_string($var) && mb_strlen($var)) );
 }
 
+
+function checkAccess($target) {
+  if (in_array($target, [HOME_PAGE, PUBLIC_PAGE, 'public'])) return 'public';
+  if (in_array($target, ACCESS_MENU)) return $target;
+}
+
 /**
  *
  * @param $tmpFile

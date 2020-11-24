@@ -152,7 +152,7 @@ const initDefault = () => {
 const importModuleFunc = async (moduleName) => {
   let link;
   if (moduleName === 'public') {
-    link = '/public/js/calculator.js';
+    link = `/public/js/${c.PUBLIC_PAGE}.js`;
     moduleName = c.PUBLIC_PAGE;
   } else link = `../module/${moduleName}/${moduleName}.js`;
 

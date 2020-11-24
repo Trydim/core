@@ -13,6 +13,7 @@ if(isset($_REQUEST['mode'])) {
 $html = '';
 
 $target = getTargetPage($_GET);
+$target = checkAccess($target);
 
 if ($target === 'public') {
   $pathTarget = '';
