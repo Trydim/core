@@ -74,7 +74,7 @@ const onClickSubmenu = () => {
 //entrance function
 (() => {
   let page = f.PAGE_NAME.match(/[?<=\w][?<=\/](\w+)([?=(\?)]|[?=(\/)]|$)/);
-  page = page && page[1];
+  page = page ? page[1] : 'public';
 
   cancelFormSubmit();
   if (f.gI('authForm')) return;

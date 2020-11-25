@@ -140,8 +140,11 @@ function findkey($cell, $input) {
  * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
-	$filename = str_replace('/', '//', 'csv/' . $filename);
+	//$filename = str_replace('/', '//', PATH_CSV . $filename); // Зачем это
+	$filename = PATH_CSV . $filename;
   $result = [];
+
+  if (!count($dict)) return loadFullCVS($filename);
 
 	if (($handle = fopen($filename, "r")) !== false) {
 		if (($data = fgetcsv($handle, 1000, ";"))) {
@@ -189,6 +192,33 @@ function loadCVS($dict, $filename, $one_rang = false) {
 	}
 
 	return $result;
+}
+
+/**
+ * Поиск в первых пяти строках начала таблиц
+ *
+ * @param $path
+ * @return false|StdClass
+ */
+function loadFullCVS($path) {
+
+  if (file_exists($path) && ($handle = fopen($path, "r")) !== false) {
+    $result = [];
+    $emptyRow = 0;
+    while ($emptyRow < 5) { // Пять пустрых строк характеристик считаем что больше нету
+      if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
+        if (!mb_strlen(implode('', $data))) { $emptyRow++; continue; }
+        if ($emptyRow > 0) $emptyRow = 0;
+
+        $result[] = $data;
+      }
+      else $emptyRow++;
+    }
+    fclose($handle);
+  }
+  else return false;
+
+  return $result;
 }
 
 /**
