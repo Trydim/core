@@ -75,7 +75,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 <script type="module" src="<?= CORE_SCRIPT?>main.js"></script>
 
 <?php array_map(function($item) { ?>
-  <script type="module" src="<?= str_replace('//', '/', SITE_PATH . $item); ?>"></script>
+  <script type="module" src="<?= str_replace('//', '/', $item); ?>"></script>
 <?php }, $jsLinks) ?>
 
 <?= $footerContent; ?>

@@ -22,7 +22,7 @@ switch ($authAction) {
       $db->setUserHash($userId, $_SESSION['hash']);
       //$result = isset($_SESSION['target']) && $_SESSION['target'] !== 'admin' ? $_SESSION['target'] : '';
       $result = isset($clientPageTarget) && strlen($clientPageTarget) && $clientPageTarget !== 'login' ? $clientPageTarget :
-        (PUBLIC_PAGE ? PUBLIC_PAGE : '') ;
+        (PUBLIC_PAGE ? 'public' : '') ;
     } else $result = "login?status=error&login=$login&password=$password";
 		break;
 	case 'exit':
