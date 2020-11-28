@@ -1,0 +1,3 @@
+php/libs/vendor/
+!php/libs/vendor/composer**
+!php/libs/vendor/autoload.php
