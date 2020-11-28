@@ -16,18 +16,18 @@ if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] 
   $db = new RedBeanPHP\db($dbConfig);
   if ($db->checkUserHash($_SESSION)) {
     $main->setLogin($_SESSION);
-    $target === 'admin' && header('location: ' . SITE_PATH . PUBLIC_PAGE);
+    $target === '' && reDirect(true);
   } else {
     $main->setLoginStatus('no');
   }
 }
 
-if ( !$main->checkStatus('ok') && $target !== 'public') {
-  $_SESSION['target'] = $target !== 'home' ? $target : '';
-  $target = 'login';
-  $pathTarget = checkTemplate($target);
-  //header('Location: ' . SITE_PATH . 'admin?status=' . $main->getLoginStatus());
-}
+// Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт (PUBLIC_PAGE === false/'')
+if ($main->checkStatus('no') && !in_array($target, ['login', 'public'])) {
+  //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
+  $_SESSION['target'] = $target;
+  reDirect(false);
+} else if ($target === 'login') $pageTarget = isset($_SESSION['target']) ? $_SESSION['target'] : '';
 
 session_abort();
 

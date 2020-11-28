@@ -60,7 +60,7 @@ trait Page {
 	 */
 	public function setTarget($get) {
 		$this->target = (isset($get['targetPage']) && $get['targetPage'] !== '') ?
-			str_replace('/', '', $get['targetPage']) : 'home';
+			str_replace('/', '', $get['targetPage']) : HOME_PAGE;
 	}
 }
 

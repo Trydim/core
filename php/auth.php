@@ -20,21 +20,17 @@ switch ($authAction) {
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
       $db->setUserHash($userId, $_SESSION['hash']);
-      //$result = isset($_SESSION['target']) && $_SESSION['target'] !== 'admin' ? $_SESSION['target'] : '';
-      $result = isset($clientPageTarget) && strlen($clientPageTarget) && $clientPageTarget !== 'login' ? $clientPageTarget :
-        (PUBLIC_PAGE ? 'public' : '') ;
-    } else $result = "login?status=error&login=$login&password=$password";
+
+      reDirect(true, (isset($clientPageTarget) && $clientPageTarget !== 'login') ? $clientPageTarget : '');
+    } else reDirect(false, "login?status=error&login=$login&password=$password");
 		break;
 	case 'exit':
     if (isset($_SESSION['priority'])) {
       $hash = password_hash(uniqid(), PASSWORD_BCRYPT);
       $db->setUserHash($_SESSION['priority'], $hash);
       $_SESSION['target'] = '';
-      $result = 'login?status=no';
+      reDirect(false);
     }
 		break;
 
 }
-
-header('location: ' . SITE_PATH . $result);
-die();

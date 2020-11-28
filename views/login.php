@@ -1,5 +1,5 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
-$pageTarget = isset($_REQUEST['targetPage']) ? $_REQUEST['targetPage'] : '';
+!isset($pageTarget) && $pageTarget = '';
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="notification-container error" role="alert">Неправильный логин или пароль</div><br>' : '';
 

@@ -23,8 +23,24 @@ function checkError($var) {
 
 
 function checkAccess($target) {
-  if (in_array($target, [HOME_PAGE, PUBLIC_PAGE, 'public'])) return 'public';
-  if (in_array($target, array_merge(ACCESS_MENU, ['login']))) return $target;
+  if (in_array($target, [PUBLIC_PAGE, 'public'])) return 'public';
+  if (in_array($target, array_merge(ACCESS_MENU, [HOME_PAGE, 'login']))) return $target;
+}
+
+/**
+ * @param bool $status
+ * @param string $target
+ */
+function reDirect($status, $target = '') {
+  if (!$target) {
+    if ($status) $target = HOME_PAGE;
+    else {
+      if ($_SESSION['target']) $target = 'login';
+      else $target = PUBLIC_PAGE ? 'public' : 'login';
+    }
+  }
+  header('location: ' . SITE_PATH . $target);
+  die();
 }
 
 /**
@@ -34,7 +50,8 @@ function checkAccess($target) {
  * @return string path to file name
  */
 function checkTemplate($tmpFile) {
-  if (file_exists(ABS_SITE_PATH . 'public/views/' . "$tmpFile.php")) {
+  if ($tmpFile === 'public' && PUBLIC_PAGE
+      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE .".php")) {
     return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
   } else if (file_exists(VIEW . "$tmpFile.php")) {
 		return VIEW . "$tmpFile.php";
@@ -51,7 +68,7 @@ function checkTemplate($tmpFile) {
  * @return mixed|string
  */
 function getTargetPage($get) {
-	return (isset($get['targetPage']) && $get['targetPage'] !== '') ? str_replace('/', '', $get['targetPage']) : HOME_PAGE;
+	return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage']) : '';
 }
 
 /**

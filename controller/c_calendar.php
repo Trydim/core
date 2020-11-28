@@ -15,7 +15,7 @@ $orders = $db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
 $field = [];
 $field['cssLinks'] = [CORE_CSS . 'libs/calendar/calendar.css'];
-$field['pageTitle'] = 'Home';
+$field['pageTitle'] = HOME_PAGE;
 $field['footerContent'] = '';
 
 if(count($orders)) {

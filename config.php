@@ -20,8 +20,8 @@ foreach ($publicConfig as $k => $v) {
   if (!defined($k)) define($k, $v);
 }
 
-if(!defined('HOME_PAGE')) define('HOME_PAGE', 'home');
 if(!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
+if(!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : 'calendar');
 if(!defined('ACCESS_MENU')) define('ACCESS_MENU', []);
 
 require_once CORE . 'model/func.php';

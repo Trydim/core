@@ -199,46 +199,6 @@ const func = {
     });
   },
 
-  // Печать Отчетов для навесов
-  // загрузка картики фермы
-  getTrussImg: (w) => {
-    let link = 'core/assets/images/truss' + w + '.jpg';
-    return new Promise(resolve => {
-      fetch(link).then(data => data.blob()).then(data => {
-        let reader = new FileReader();
-
-        reader.onloadend = () => {
-          let img = document.createElement('img');
-          img.src = reader.result;
-          resolve(img);
-        }
-
-        reader.readAsDataURL(data);
-      });
-    })
-  },
-
-  // печать отчета
-  printReport: async (type, report, w, number = false) => {
-    let lReport = Object.assign({}, report),
-        table = func.gTNode('printTable'),
-        html = '';
-
-    //type = /\d/.exec(type)[0];
-
-    Object.values(lReport).map(i => {
-      !!+i[4] && (i[4] = (+i[4]).toFixed(2));
-      html += `<tr><td>${i[0]} ${i[1]}</td><td>${i[2]}</td><td>${i[3]}</td></tr>`;
-    });
-
-    if (number) table.querySelector('#number').innerHTML = number.toString();
-    else table.querySelector('#numberWrap').classList.add(c.CLASS_NAME.HIDDEN_NODE);
-    table.querySelector('tbody').innerHTML = html;
-    //html = await this.getTrussImg(w);
-    //table.querySelector('#trussImg').append(html);
-    return table.outerHTML;
-  },
-
   // Получить и скачать файл
   createLink: (fileName) => {
     //let date = new Date();
@@ -249,7 +209,7 @@ const func = {
   },
 
   savePdf: (data) => {
-    let link   = createLink(data.name || 'Name');
+    let link = func.createLink(data.name || 'Name');
     link.setAttribute('href', `data:application/pdf;base64,${data['pdfBody']}`);
     link.click();
   },

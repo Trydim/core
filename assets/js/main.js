@@ -19,7 +19,7 @@ const importModuleFunc = async (moduleName) => {
 
 //Index.php page
 const initIndex = () => {
-  //f.init('home');
+  //f.init('');
 }
 
 const init = (moduleName = 'default') => {
@@ -55,12 +55,7 @@ const authEvent = function(e) {
 
   let select = {
     'exit' : () => {
-      let data = new FormData();
-
-      data.set('mode', 'auth');
-      data.set('authAction', 'exit');
-
-      f.Post({data}).catch(er => {});
+      location.href = f.LINK_PATH + `?mode=auth&authAction=exit`;
     }
   }
 
@@ -97,9 +92,8 @@ const onClickSubmenu = () => {
   let page = f.PAGE_NAME.match(/[?<=\w][?<=\/](\w+)([?=(\?)]|[?=(\/)]|$)/);
   page = page ? page[1] : 'public';
 
-  cancelFormSubmit();
   if (f.gI('authForm')) return;
-
+  cancelFormSubmit();
   onAuthEvent();
   onClickSubmenu();
 

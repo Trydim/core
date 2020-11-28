@@ -18,7 +18,7 @@ const clickCustomBTN = () => {
   } catch (e) { console.log(e.message); return false; }
 }*/
 
-const calendar = {
+const component = {
   default: {
     initialView  : 'dayGridMonth', // Вид по умолчанию dayGridMonth timeGridWeek timeGridDay
     firstDay     : 1, // Первый день в календаре 0 воскр 1 понедельник...
@@ -105,7 +105,7 @@ name: "admin"*/
 
       div.innerHTML = content;
       div
-      home.M.show(title, div);
+      calendar.M.show(title, div);
     }
 
   },
@@ -148,7 +148,7 @@ const orders = {
 
       item = { id: o[0], title, start: o[1]['create_date'] };
 
-      calendar.addOrder(item);
+      component.addOrder(item);
     })
   },
 
@@ -158,13 +158,12 @@ const orders = {
   },
 }
 
-export const home = {
+export const calendar = {
   M: f.initModal(),
 
   init() {
-    calendar.init();
+    component.init();
     orders.init();
-    initCharts();
 
     return this;
   }

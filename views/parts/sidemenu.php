@@ -6,12 +6,14 @@
   </div>
   <div class="sidebar-wrapper">
     <ul id="sideMenu" class="nav">
-      <li class="nav-item">
-        <a class="nav-link" href="<?= SITE_PATH ?>public">
-          <i class="material-icons">calculate</i>
-          <p>Калькулятор</p>
-        </a>
-      </li>
+      <?php if (PUBLIC_PAGE) { ?>
+        <li class="nav-item">
+          <a class="nav-link" href="<?= SITE_PATH ?>public">
+            <i class="material-icons">calculate</i>
+            <p>Калькулятор</p>
+          </a>
+        </li>
+      <?php } ?>
       <?php foreach (ACCESS_MENU as $item) {
         switch ($item) {
           case 'orders': ?>
@@ -24,7 +26,7 @@
             <?php break;
           case 'calendar': ?>
             <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>">
+              <a class="nav-link" href="<?= SITE_PATH?>calendar">
                 <i class="material-icons">date_range</i>
                 <p>Календарь</p>
               </a>
