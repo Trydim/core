@@ -1,7 +1,5 @@
 'use strict';
 
-import {f} from '../../main.js';
-
 export const example = {
   form: new FormData(),
 

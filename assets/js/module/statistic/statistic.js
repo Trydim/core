@@ -1,6 +1,5 @@
 'use strict';
 
-import {f} from '../../main.js';
 import {CanvasJSModule as CanvasJS} from './canvasjs.min.js';
 
 // TODO click custom btn

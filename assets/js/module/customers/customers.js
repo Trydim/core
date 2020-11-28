@@ -1,7 +1,5 @@
 'use strict';
 
-import {f} from '../../main.js';
-
 // Customers list for search
 const CustomersList = {
   FD        : new FormData(),

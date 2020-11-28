@@ -1,6 +1,5 @@
 'use strict';
 
-import {f} from '../../main.js';
 
 /*
 function Node(node = {}) {
@@ -32,8 +31,6 @@ class SectionList {
   addChild(section) {
     this.childList.push(new SectionList(section));
   }
-
-
 
 }
 */

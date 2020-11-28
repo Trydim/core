@@ -1,6 +1,5 @@
 'use strict';
 
-import {f} from '../../main.js';
 import {FullCalendar} from './main.js';
 
 // TODO click custom btn

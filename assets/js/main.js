@@ -1,11 +1,32 @@
 "use strict";
 
-import {main} from "./control/function.js";
-export const f = main;
+const importModuleFunc = async (moduleName) => {
+  let link;
+  if (moduleName === 'public') {
+    link = `${f.LINK_PATH}public/js/${f.PUBLIC_PAGE}.js`;
+    moduleName = f.PUBLIC_PAGE;
+  } else link = `./module/${moduleName}/${moduleName}.js`;
+
+  try {
+    let importModule = await new Promise((resolve, reject) => {
+      import(/* webpackIgnore: true */ link)
+        .then(module => resolve(module[moduleName]))
+        .catch(err => reject(err));
+    });
+    return importModule.init() || false;
+  } catch (e) { console.log(e); return false; }
+}
 
 //Index.php page
 const initIndex = () => {
-  f.init('home');
+  //f.init('home');
+}
+
+const init = (moduleName = 'default') => {
+  let module = importModuleFunc(moduleName);
+  if (!module) initIndex();
+  f.relatedOption();
+  return module;
 }
 
 const setLinkMenu = (page) => {
@@ -83,7 +104,7 @@ const onClickSubmenu = () => {
   onClickSubmenu();
 
   setLinkMenu(page || '/');
-  if(page) f.init(page);
+  if(page) init(page);
   else initIndex();
 
 })();

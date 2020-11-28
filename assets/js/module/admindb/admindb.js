@@ -1,7 +1,5 @@
 "use strict";
 
-import {main as f} from '../../control/function.js';
-//import {test} from "../../Test/testIntterface.js";
 import {Handsontable} from './libs/handsontable.full.min.js';
 
 const handsonOption = {
