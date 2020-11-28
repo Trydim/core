@@ -216,6 +216,7 @@ const func = {
 
   // Маска для телефона
   maskInit: (node) => {
+    if (!node) return;
     const minValue = 2;
 
     const mask = (e) => {

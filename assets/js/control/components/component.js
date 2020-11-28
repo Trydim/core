@@ -47,7 +47,7 @@ export const Modal = () => {
 // Всплывающее сообщение
 export class MessageToast {
   constructor() {
-    let parentBlock   = document.querySelector('.navbar-collapse');
+    let parentBlock   = document.body;
     this.messageBlock = document.createElement("div");
     this.messageBlock.classList.add('notification-container');
     this.messageBlock.classList.add('d-small');
@@ -236,7 +236,7 @@ export const Searching = () => {
 
 // Валидация
 export const valid = {
-  debug: false,//c.DEBUG,
+  debug: c.DEBUG,
   valid: new Set(),
   idForm: 'authForm',
   idSubmit: 'btnConfirmSend',
