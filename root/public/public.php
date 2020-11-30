@@ -20,7 +20,7 @@ $field = [];
 
 $field['headContent'] = '<meta name="Public"><meta name="description" content="Public">';
 $field['cssLinks'] = [PATH_CSS . 'styles.css'];
-$field['jsLinks']    = [PATH_JS . 'js.js'];
+$field['jsLinks']    = [PATH_JS . 'calculator.min.js'];
 $field['pageTitle']   = 'Public';
 $field['pageFooter']  = '';
 //$field['pageHeader'] = '';
