@@ -3,7 +3,7 @@
 const importModuleFunc = async (moduleName) => {
   let link;
   if (moduleName === 'public') {
-    link = `${f.LINK_PATH}public/js/${f.PUBLIC_PAGE}.js`;
+    link = `${f.SITE_PATH}public/js/${f.PUBLIC_PAGE}.js`;
     moduleName = f.PUBLIC_PAGE;
   } else link = `./module/${moduleName}/${moduleName}.js`;
 
@@ -32,7 +32,7 @@ const init = (moduleName = 'default') => {
 const setLinkMenu = (page) => {
   for (let n of [...f.qA('a')]) {
     let href = n.getAttribute('href') || '';
-    if (href.includes(page) && href.includes('#')) n.click();
+    if (href.includes(page) && href.includes('#')) { n.click(); break; }
     else if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
   }
 }
@@ -55,7 +55,7 @@ const authEvent = function(e) {
 
   let select = {
     'exit' : () => {
-      location.href = f.LINK_PATH + `?mode=auth&authAction=exit`;
+      location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
     }
   }
 
@@ -89,7 +89,7 @@ const onClickSubmenu = () => {
 
 //entrance function
 (() => {
-  let page = f.PAGE_NAME.match(/[?<=\w][?<=\/](\w+)([?=(\?)]|[?=(\/)]|$)/);
+  let page = location.pathname.replace(f.SITE_PATH, '').match(/(\w+)/);
   page = page ? page[1] : 'public';
 
   if (f.gI('authForm')) return;

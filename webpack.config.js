@@ -15,7 +15,7 @@ module.exports = {
    },*/
   output: {
     path: path.resolve(__dirname, ''),
-    filename: './assets/js/control/src.min.js'
+    filename: './assets/js/control/src.min.js' // [contenthas] - для обхода кеширования
   },
   plugins: [ ],
   resolve: {

@@ -1,0 +1,14 @@
+{
+  "name": "webpack",
+  "version": "1.0.0",
+  "description": "webpack",
+  "main": "./assets/js/control/src.js",
+  "scripts": {
+    "startLIVEReload": "webpack-dev-server",
+    "build": "webpack --mode development",
+    "staticserver": "static build"
+  },
+  "author": "trydim",
+  "license": "ISC",
+  "keywords": []
+}

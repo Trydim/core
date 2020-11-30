@@ -5,11 +5,8 @@
  */
 export const c = {
   DEBUG: true,
-
-  PAGE_NAME: location.href,
-  //FILES_PATH: '/',
-  LINK_PATH: window['LINK_PATH'] || '/',
-  MAIN_PHP_PATH: (window['LINK_PATH'] || '/') + 'index.php',
+  SITE_PATH: window['SITE_PATH'] || '/',
+  MAIN_PHP_PATH: (window['SITE_PATH'] || '/') + 'index.php',
   PUBLIC_PAGE: (window['PUBLIC_PAGE'] || 'calculator'),
 
   CURRENT_EVENT: 'none',

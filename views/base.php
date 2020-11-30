@@ -36,7 +36,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<?php }, $cssLinks); ?>
 
   <script>
-    window.LINK_PATH = '<?= SITE_PATH ?>';
+    window.SITE_PATH = '<?= SITE_PATH ?>';
     window.MAIN_PHP_PATH = '<?= SITE_PATH ?>index.php';
     window.PUBLIC_PAGE = '<?= PUBLIC_PAGE ?>';
   </script>
