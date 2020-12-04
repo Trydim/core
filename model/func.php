@@ -25,6 +25,7 @@ function checkError($var) {
 function checkAccess($target) {
   if (in_array($target, [PUBLIC_PAGE, 'public'])) return 'public';
   if (in_array($target, array_merge(ACCESS_MENU, [HOME_PAGE, 'login']))) return $target;
+  reDirect(false);
 }
 
 /**
@@ -35,12 +36,12 @@ function reDirect($status, $target = '') {
   if (!$target) {
     if ($status) $target = HOME_PAGE;
     else {
-      if ($_SESSION['target']) $target = 'login';
+      if (isset($_SESSION['target']) && $_SESSION['target']) $target = 'login';
       else $target = PUBLIC_PAGE ? 'public' : 'login';
     }
   }
   header('location: ' . SITE_PATH . $target);
-  die();
+  die;
 }
 
 /**

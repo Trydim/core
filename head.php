@@ -17,7 +17,7 @@ else {
     $main = new cms\Main();
     require CORE . "controller/c_base.php";
 
-    $target && $target = checkAccess($target);
+    $target = checkAccess($target);
     $target !== 'public' && $pathTarget = checkTemplate($target);
     require CORE . "controller/c_$target.php";
   }
