@@ -275,6 +275,34 @@ const func = {
   removeLoading: (node) => {
     node && node.classList.remove(c.CLASS_NAME.LOADING);
   },
+
+  /**
+   *
+   * @param target HTML node (loading field)
+   * @param report object: send to pdf
+   * @param finishOk function
+   * @param err function
+   */
+  downloadPdf(target, report = {}, finishOk = () => {}, err = () => {}) {
+    if (!Object.keys(report).length) { err(); return; }
+
+    let data = new FormData();
+
+    func.setLoading(target);
+
+    data.set('dbAction', 'DB');
+    data.set('mode', 'docs');
+    data.set('docType', 'pdf');
+    data.set('reportVal', JSON.stringify(report));
+
+    q.Post({data}).then(data => {
+      f.removeLoading(target);
+      if (data['pdfBody']) {
+        f.savePdf(data);
+        finishOk();
+      }
+    });
+  }
 }
 
 export const f = Object.assign(func, q);

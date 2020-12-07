@@ -87,7 +87,7 @@ class Pdf {
 					//$mpdf->SetHTMLHeader('');
 					//$mpdf->SetHTMLFooter('<div class="footerPage"><b>{PAGENO} из {nbpg} стр.</b></div>');
 
-					
+
 					$this->pdf->WriteHTML($this->content, \Mpdf\HTMLParserMode::HTML_BODY);
 				}	catch (\Mpdf\MpdfException $e) {
 				  echo $e->getMessage();
@@ -118,11 +118,14 @@ class Pdf {
 	}
 
 	private function setCss() {
-		$cssPath = ABS_SITE_PATH . '/views/docs/' . $this->pdfTpl . '.css';
-		if(file_exists($cssPath)) {
-			$stylesheet = file_get_contents($cssPath);
-			$this->pdf->WriteHTML($stylesheet,\Mpdf\HTMLParserMode::HEADER_CSS);
-		}
+    if (file_exists(ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.css")) {
+      $cssPath = ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.css";
+    } else if (file_exists(CORE . "/views/docs/$this->pdfTpl.css")) {
+      $cssPath = CORE . "/views/docs/$this->pdfTpl.css";
+    }
+
+    $stylesheet = file_get_contents($cssPath);
+    $this->pdf->WriteHTML($stylesheet,\Mpdf\HTMLParserMode::HEADER_CSS);
 	}
 
 	public function __construct($data, $pdfTpl = 'pdfTpl') {
