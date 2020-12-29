@@ -1,5 +1,8 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var object $db
+ */
 
 if (!isset($main)) $main = new cms\Main();
 
@@ -13,10 +16,6 @@ $authStatus = $main->checkStatus('ok');
 // Если загрузка
 if($authStatus && isset($_GET['orderId'])) {
 	$orderId = $_GET['orderId'];
-
-	require_once 'php/libs/db.php';
-
-	if(!isset($db)) $db = new \RedBeanPHP\db('config.php');
 
 	if (is_finite($orderId)) {
 	  $order = $db->loadOrderById([$orderId]);

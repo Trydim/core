@@ -15,7 +15,7 @@ if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
   require_once 'libs/db.php';
   $db = new RedBeanPHP\db($dbConfig);
   $reportVal = $db->loadOrderById($orderIds);
-  isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true)['rBack'];
+  isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true);
 }
 $pdf = new Pdf($reportVal);
 //$pdf->setTemplate($docType);

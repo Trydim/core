@@ -1,5 +1,6 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 /**
+ * @var object $main
  * @var array $dbConfig
  * @var string $pathTarget
  */
@@ -34,6 +35,8 @@ if(!isset($setting->ordersColumnSort)) {
 $param['columns'] = $setting->ordersColumnSort;
 
 $field['content'] = template('parts/ordersContent', $param);
-$field['footerContent'] = '<a id="publicPageLink" href="' . PUBLIC_PAGE . '" hidden></a>';
+$field['footerContent'] = '<a id="publicPageLink" href="public" hidden></a>';
+
+$main->exist('orderTemplate') && $field = doHook('orderTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

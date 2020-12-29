@@ -17,9 +17,11 @@
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>
 <div class="p-bottom d-none" id="printTypeField">
-  <input type="button" class="btn btn-primary" data-action="printReport" data-type="printType1" value="Форма менеджера">
-  <input type="button" class="btn btn-primary" data-action="printReport" data-type="printType2" value="Форма в цех">
-  <input type="button" class="btn btn-primary" data-action="printReport" data-type="printType3" value="Форма монтажный отдел">
+<? for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
+  <input type="button" class="btn btn-primary"
+         data-action="printReport" data-type="printType<?= $i ?>"
+         value="<?= gTxt('printType' . $i) ?>">
+<? } ?>
   <input type="button" class="btn btn-warning" data-action="cancelPrint" value="Отмена">
 </div>
 <div class="res-table">

@@ -103,30 +103,35 @@ export class MessageToast {
 
 // Печать
 export const Print = () => {
-  let print   = Object.create(null);
-  print.frame = document.createElement("iframe");
-  print.data  = 'no content'; // html
+  let p   = Object.create(null);
+  p.frame = document.createElement("iframe");
+  p.data  = 'no content'; // html
 
-  print.frame.onload = function () {
+  p.frame.onload = function () {
     this.sandbox  = 'allow-modals';
-    this.contentDocument.body.append(print.data);
+    this.contentDocument.body.append(p.data);
     this.contentWindow.print();
   }
 
-  print.setContent = function (content, classList = []) {
+  p.setContent = function (content, classList = []) {
     let container = document.createElement('div');
     classList.map(i => container.classList.add(i));
     container.innerHTML = content;
     this.data           = container;
   }
 
-  print.print = function (content, classList = []) {
+  p.print = function (content, classList = []) {
     this.setContent(content, classList);
     document.body.append(this.frame);
     this.frame.remove();
   }
 
-  return print;
+  p.orderPrint = async function (printFunc, data, type) {
+    let report = JSON.parse(data.order['report_value']);
+    this.print(await printFunc(type, report));
+  }
+
+  return p;
 }
 
 // Поиск
@@ -377,4 +382,147 @@ export const valid = {
 
     sendFunc(this.form, finished);
   },
+}
+
+export class Valid {
+  valid = new Set();
+
+  /**
+   *
+   * @param param
+   */
+  constructor(param) {
+    let {
+          sendFunc = () => {},
+          formSelector = '#authForm',
+          submitSelector = '#btnConfirm',
+          cssClass = {
+            error: 'cl-input-error',
+            valid: 'cl-input-valid',
+          }
+        } = {...param};
+
+    // Form
+    try {
+      this.form = document.querySelector(formSelector);
+      this.btn =  this.form.querySelector(submitSelector) || document.querySelector(submitSelector);
+    } catch (e) {
+      console.log(e.message); return;
+    }
+
+    // Form
+    this.form.querySelectorAll('input').forEach(n => {
+      if (n.type === 'checkbox') n.addEventListener('click', (e) => this.validate(e));
+      else n.addEventListener('keydown', (e) => this.keyEnter(e));
+      n.addEventListener('blur', (e) => this.validate(e));
+    });
+
+    // Send Btn
+    this.btn.onclick = (e) => this.confirm(e, sendFunc);
+    this.btnDisabled();
+
+    this.initParam(cssClass);
+  }
+
+  initParam(cssClass) {
+    this.cssClass = cssClass;
+
+    let nodes = this.form.querySelectorAll('input[required]');
+    this.countNodes = nodes.length;
+
+    // Если обязательных полей 0
+    if (this.countNodes === 0) this.btnActivate();
+  }
+
+  // Активировать/Деактивировать кнопки
+  btnActivate() {
+    if (this.valid.size >= this.countNodes) this.btn.removeAttribute('disabled');
+    else this.btn.setAttribute('disabled', 'disabled');
+  }
+
+  btnDisabled() {
+    this.valid.clear();
+    this.btnActivate();
+  }
+
+  keyEnter(e) {
+    if (e.key === 'Enter') {
+      e.target.dispatchEvent(new Event('blur'));
+      e.target.blur();
+    }
+  }
+
+  validate(e) {
+    let node = e.target, reg;
+    if (node.value.length > 0) {
+      switch (node.name) {
+        case 'name':
+          if (node.value.length < 2) {
+            this.setErrorValidate(node);
+            return;
+          }
+          this.setValidated(node);
+          break;
+
+        case 'tel':
+          reg = /[^\d|\(|\)|\s|\-|_|\+]/;
+          if (node.value.length < 18 || reg.test(String(node.value).toLowerCase())) {
+            this.setErrorValidate(node);
+            return;
+          }
+          this.setValidated(node);
+          break;
+
+        case 'email':
+          reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          if (!reg.test(String(node.value).toLowerCase())) {
+            this.setErrorValidate(node);
+            return;
+          }
+          this.setValidated(node);
+          break;
+
+        default: {
+          this.setValidated(node);
+          switch (node.type) {
+            case 'text': { }
+          }
+        }
+      }
+    } else this.removeValidateClasses(node);
+    this.btnActivate();
+  }
+
+  // Показать/Скрыть (ошибки) валидации
+  setErrorValidate(node) {
+    this.removeValidateClasses(node);
+    node.classList.add(this.cssClass.error);
+    this.valid.delete(node.id);
+  }
+
+  setValidated(node) {
+    this.removeValidateClasses(node);
+    node.classList.add(this.cssClass.valid);
+    this.valid.add(node.id);
+  }
+
+  removeValidateClasses(node) {
+    node.classList.remove(this.cssClass.error, this.cssClass.valid);
+    this.valid.delete(node.id);
+  }
+
+  confirm(e, sendFunc) {
+
+    let finished = () => {
+
+      this.form.querySelectorAll('input')
+          .forEach(n => {
+            n.value = '';
+            this.removeValidateClasses(n);
+          });
+      this.btnDisabled();
+    }
+
+    sendFunc(this.form, finished);
+  }
 }

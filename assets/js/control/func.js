@@ -271,6 +271,21 @@ const func = {
     node.classList.add(c.CLASS_NAME.LOADING);
   },
 
+  // вывод печати.
+  printReport: (report, number = 1) => {
+    let table = f.gTNode('printTable'),
+        html = '';
+
+    Object.values(report).map(i => {
+      html += `<tr><td>${i[0]}</td><td>${i[1]}</td><td>${i[2]}</td></tr>`;
+    });
+
+    if (number) table.querySelector('#number').innerHTML = number.toString();
+    else table.querySelector('#numberWrap').classList.add(f.CLASS_NAME.HIDDEN_NODE);
+    table.querySelector('tbody').innerHTML = html;
+    return table.outerHTML;
+  },
+
   // Удалить иконку загрузки
   removeLoading: (node) => {
     node && node.classList.remove(c.CLASS_NAME.LOADING);

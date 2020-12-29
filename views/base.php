@@ -72,7 +72,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 <?php } else echo $global; ?>
 
 <?= $popupWindow ?>
-<script defer type="module" src="<?= CORE_SCRIPT?>control/src.min.js"></script>
+<script defer type="module" src="<?= CORE_SCRIPT?>control/src.js"></script>
 <script defer type="module" src="<?= CORE_SCRIPT?>main.js"></script>
 
 <?php array_map(function($item) { ?>

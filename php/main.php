@@ -1,21 +1,8 @@
 <?php
-/*
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-
-if (defined('MAIN_ACCESS')) die('access denied!');
-define('MAIN_ACCESS', true);
-
-require_once '../config.php';*/
 
 $mode = isset($_REQUEST['mode']) ? $_REQUEST['mode'] : 'noMode';
 $result = [];
 extract($_REQUEST);
-
-$added   = isset($added) ? $added = json_decode($added, true) : false;
-$changed = isset($changed) ? $changed = json_decode($changed, true) : false;
-$deleted = isset($deleted) ? $deleted = json_decode($deleted) : false;
 
 try {
 	switch ($mode) {

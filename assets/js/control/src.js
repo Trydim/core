@@ -41,6 +41,7 @@ const m = {
   initPrint : module.Print,
 
   searchInit: module.Searching,
+  Valid : module.Valid,
   initValid : (sendFunc, idForm, idSubmit) => module.valid.init(sendFunc, idForm, idSubmit),
 
   showMsg: (msg, type) => new module.MessageToast().show(msg, type),

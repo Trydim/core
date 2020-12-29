@@ -205,7 +205,10 @@ export const orders = {
       if(this.needReload) {
         this.needReload = false;
         this.selectedId = new Set();
-        this.pageBtn();
+        this.queryParam.dbAction = 'loadOrders';
+        this.queryParam.orderIds = '[]';
+        this.query();
+        return;
       } else {
         this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
       }
@@ -316,7 +319,7 @@ export const orders = {
       'printReport': () => {
         if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
         let P = f.initPrint(),
-            type = target.dataset.type,
+            type = target.dataset.type || false,
             fd = new FormData();
 
         f.setLoading(target);
@@ -325,12 +328,12 @@ export const orders = {
         fd.set('dbAction', 'loadOrder');
         fd.set( 'orderIds', this.queryParam.orderIds);
         f.Post({data: fd})
-          .then(async (data) => {
-            let report = JSON.parse(data.order['report_value']);
-
-            P.print(await f.printReport(type,
-              report.rBack.report.custom,
-              report.trussWidth));
+          .then((data) => {
+            try {
+              data && P.orderPrint(f.printReport, data, type);
+            } catch (e) {
+              console.log(e.message);
+            }
           });
 
         f.hide(f.gI('printTypeField'));

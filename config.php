@@ -23,8 +23,13 @@ foreach ($publicConfig as $k => $v) {
 if(!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
 if(!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : 'calendar');
 if(!defined('ACCESS_MENU')) define('ACCESS_MENU', []);
+if(!defined('PRINT_BTN')) define('PRINT_BTN', 1);
 
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/Main.php';
+require_once CORE . 'model/hooks.php';
+
+// Public php.
+if(file_exists(ABS_SITE_PATH . 'public/hooks.php')) require_once ABS_SITE_PATH . 'public/hooks.php';
 
 unset($absPath, $siteDir, $publicConfig, $k, $v);

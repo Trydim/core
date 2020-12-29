@@ -12,6 +12,17 @@ function de($var, $die = 1) {
 }
 
 /**
+ *
+ * @param $number
+ * @param $reportVal
+ * @return false|string
+ */
+function addCpNumber($number, $reportVal) {
+  $reportVal = doHook('addCpNumber', $number, $reportVal);
+  return gzcompress($reportVal, 9);
+}
+
+/**
  * Check have error
  * @param $var
  *
@@ -40,6 +51,7 @@ function reDirect($status, $target = '') {
       else $target = PUBLIC_PAGE ? 'public' : 'login';
     }
   }
+  //unset($_GET['targetPage']);
   header('location: ' . SITE_PATH . $target);
   die;
 }
@@ -310,4 +322,26 @@ function gTxtDB($db, $str) {
     $txt = $mess;
   }
   return isset($txt[$db][$str]) ? $txt[$db][$str] : $str;
+}
+
+/**
+ * Alias for $main->addAction();
+ * @param $hookName - string
+ * @param $callable - func
+ */
+function addHook($hookName, $callable) {
+  global $main;
+  if ($main instanceof cms\Main) $main->addAction($hookName, $callable);
+}
+
+/**
+ * Alias for $main->execAction();
+ * @param $hookName - string
+ * @param $args - array
+ * @return mixed
+ */
+function doHook($hookName, ...$args) {
+  global $main;
+  if ($main instanceof cms\Main) return $main->execAction($hookName, ...$args);
+  return false;
 }

@@ -38,9 +38,14 @@ else {
 			break;
 		case 'saveTable':
 			if($dbTable !== '') {
-				if (isset($deleted) && $deleted) $result['notAllowed'] = $db->deleteItem($dbTable, $deleted);
-				if (isset($added) && $added) $result['notAllowed'] = $db->insert($columns, $dbTable, $added);
-				if (isset($changed) && $changed) $result['notAllowed'] = $db->insert($columns, $dbTable, $changed, true);
+
+        $added   = isset($added) ? $added = json_decode($added, true) : false;
+        $changed = isset($changed) ? $changed = json_decode($changed, true) : false;
+        $deleted = isset($deleted) ? $deleted = json_decode($deleted) : false;
+
+        if ($deleted) $result['notAllowed'] = $db->deleteItem($dbTable, $deleted);
+				if ($added) $result['notAllowed'] = $db->insert($columns, $dbTable, $added);
+				if ($changed) $result['notAllowed'] = $db->insert($columns, $dbTable, $changed, true);
 			}
       if (isset($csvData)) {
         $db->saveCsv(json_decode($csvData));
@@ -78,23 +83,25 @@ else {
           !$changeUser && $id = $db->getLastID('customers');
         }
 
+        $idOrder = ((int) $db->getLastID('orders')) + 1;
+
 				$param = [];
         $param['save_value'] = $saveVal;
         $param['customer_id'] = $id;
         isset($importantVal) && $param['important_value'] = $importantVal;
         isset($orderTotal) && is_finite($orderTotal) && $param['total'] = floatval($orderTotal);
-        isset($reportVal) && $param['report_value'] = gzcompress($reportVal, 9);
+        isset($reportVal) && $param['report_value'] = addCpNumber($idOrder, $reportVal);
 
         // status_id = ; по умолчанию сохранять из настроек
         $db->saveOrder($param);
-        $result['orderID'] = $db->getLastID('orders');
+        $result['orderID'] = $idOrder;
 			}
 			break;
 		case 'loadOrders':
 			!isset($sortColumn) && $sortColumn = 'create_date';
 
       $search = isset($search);
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
+      $orderIds = isset($orderIds) ? json_decode($orderIds) : []; // TODO Зачем это
 
       // Значит нужны все заказы (поиск)
       if($countPerPage > 999) $countPerPage = 1000000;

@@ -86,9 +86,44 @@ trait Dictionary {
   }
 }
 
-class Main {
+/**
+ * Trait dictionary
+ * @package cms
+ */
+trait Hooks {
+  private $hooks = [];
+
+  public function addAction($hookName, $callable) {
+    if (!is_string($hookName) || !is_callable($callable)) return;
+
+    $this->hooks[$hookName] = $callable;
+  }
+
+  public function execAction($hookName, ...$args) {
+    if ($this->exist($hookName)) {
+      $func = $this->hooks[$hookName];
+
+      if (!isset($args) || !is_array($args)) {
+        $args = [];
+      }
+
+      if (isset($func)) {
+        return $func(...$args);
+      }
+    }
+  }
+
+  public function exist($hookName) {
+    return isset($this->hooks[$hookName]);
+  }
+}
+
+final class Main {
 	use Authorization;
+	use Hooks;
 
 	public function __construct() {
 	}
 }
+
+$main = new Main();
