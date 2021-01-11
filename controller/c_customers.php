@@ -1,15 +1,11 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var array $dbConfig
+ * @var object $db
  * @var string $pathTarget
  */
 
-require_once CORE . 'php/libs/db.php';
-
 $field = [ 'pageTitle' => 'Клиенты' ];
-
-if (!isset($db)) $db = new \RedBeanPHP\db($dbConfig);
 
 // получить конфиг текущего пользователя
 //$setting = $db->getUserSetting(/*login user*/);
@@ -33,8 +29,5 @@ if(!isset($setting)) {
 }
 
 $param['columns'] = $columns;
-
-$field['content'] = template('parts/customersContent', $param);
-$field['pageFooter'] = template('parts/paginationBlock', $param);
 require $pathTarget;
 $html = template('base', $field);

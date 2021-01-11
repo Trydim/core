@@ -69,20 +69,10 @@ trait Page {
  * @package cms
  */
 trait Dictionary {
-  private $target;
-
-  /**
-   * @return mixed
-   */
-  public function getTarget() {
-    return $this->target;
-  }
-
-  /**
-   * @param $arr
-   */
-  public function setDictionary($arr) {
-    $this->target = $arr;
+  public function initDictionary() {
+    include ABS_SITE_PATH . 'lang/dictionary.php';
+    $mess = isset($mess) ? json_encode($mess) : false;
+    return $mess ? "<input type='hidden' id='dictionaryData' value='$mess'>" : '';
   }
 }
 
@@ -111,6 +101,7 @@ trait Hooks {
         return $func(...$args);
       }
     }
+    return false;
   }
 
   public function exist($hookName) {
@@ -120,6 +111,7 @@ trait Hooks {
 
 final class Main {
 	use Authorization;
+	use Dictionary;
 	use Hooks;
 
 	public function __construct() {

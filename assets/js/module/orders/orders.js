@@ -25,7 +25,6 @@ const allOrdersList = {
   setData(node) {
     !this.node && (this.node = node);
 
-    this.node.addEventListener('input', this.inputSearch);
     this.getFormData();
     this.searchComponent = f.searchInit();
 
@@ -44,6 +43,10 @@ const allOrdersList = {
   },
 
   showResult(node, resultIds) {
+    let array = [];
+    resultIds.forEach(i => array.push(this.data[i]));
+    orders.fillTable(array, true);
+    /* Todo что бы учитывать настройки пагинации нужен запрос
     if (resultIds.length) {
       f.setLoading(this.node);
       this.FD.set('search', '1');
@@ -53,24 +56,7 @@ const allOrdersList = {
         f.removeLoading(this.node);
         if (data['orders']) orders.fillTable(data['orders'], true);
       });
-    } else orders.fillTable([], true);
-  },
-
-  inputSearch(e) {
-    clearTimeout(this.delay);
-    this.delay = setTimeout(() => {
-      let value = e.target.value;
-
-      if (value.length < 2) {
-        orders.queryParam.dbAction = 'loadOrders';
-        orders.query();
-      } else {
-        /*f.Post({data: this.FD}).then(data => {
-          data['orders'] && this.prepareSearchData(data['orders']);
-          this.searchComponent.setSearchData(this.searchData);
-        });*/
-      }
-    }, 300);
+    } else orders.fillTable([], true);*/
   },
 }
 
@@ -86,6 +72,7 @@ export const orders = {
   confirmMsg: false,
 
   queryParam: {
+    mode        : 'DB',
     dbAction    : 'loadOrders',
     tableName   : 'orders',
     sortColumn  : 'create_date',
@@ -101,17 +88,18 @@ export const orders = {
   btnMoreZero: f.qA('#actionBtnWrap input:not(.oneOrderOnly)'),
 
   init() {
-    this.form.set('mode', 'DB');
+    this.p = new f.Pagination( '#paginator',{
+      queryParam: this.queryParam,
+      query: this.query.bind(this),
+    });
+    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
+    this.l = new f.LoaderIcon(this.table);
     this.query();
 
     this.onEvent();
   },
 
   fillTable(data, search = false) {
-    if(data.length === 0) {
-      this.queryParam.currPage > 0 && this.queryParam.currPage--; // TODO Отключить кнопку далее
-    }
-
     this.impValue || (this.impValue = f.gT('tableImportantValue'));
     this.searchMsg || (this.searchMsg = f.gT('noFoundSearchMsg'));
     data = data.map(item => {
@@ -149,29 +137,6 @@ export const orders = {
     data.length && this.checkedRows();
   },
 
-  // Заполнить кнопки страниц
-  fillPagination(count) {
-    let countBtn = Math.ceil(+count / this.queryParam.countPerPage );
-
-    if(this.queryParam.pageCount !== +countBtn) this.queryParam.pageCount = +countBtn;
-    else return;
-
-    if (countBtn === 1) { f.eraseNode(f.gI('onePageBtn')); return; }
-
-    let html = '', tpl,
-        input = f.gT('onePageInput');
-
-    for(let i = 0; i < countBtn; i++) {
-      tpl = input.replace('${page}', i.toString());
-      tpl = tpl.replace('${pageValue}', (i + 1).toString());
-
-      html += tpl;
-    }
-
-    f.gI('onePageBtn').innerHTML = html;
-    this.onPagePaginationClick();
-  },
-
   // Заполнить статусы
   fillSelectStatus(data) {
     let tmp = f.gT('changeStatus'), html  = '';
@@ -200,8 +165,8 @@ export const orders = {
       this.form.set(param[0], param[1]);
     })
 
+    this.l.start();
     f.Post({data: this.form}).then(data => {
-
       if(this.needReload) {
         this.needReload = false;
         this.selectedId = new Set();
@@ -214,51 +179,15 @@ export const orders = {
       }
 
       if(data['orders']) this.fillTable(data['orders']);
-      if(data['countRows']) this.fillPagination(data['countRows']);
+      if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
       if(data.hasOwnProperty('statusOrders')) this.fillSelectStatus(data['statusOrders']);
+
+      this.l.stop();
     });
   },
 
   // TODO events function
   //--------------------------------------------------------------------------------------------------------------------
-
-  // сортировка заказов
-  sortRows(e) { /*'↑'*/
-
-    let input = e.target,
-        colSort = input.getAttribute('data-ordercolumn');
-
-    if(this.queryParam.sortColumn === colSort) {
-      this.queryParam.sortDirect = !this.queryParam.sortDirect;
-    } else {
-      this.queryParam.sortColumn = colSort;
-      this.queryParam.sortDirect = false;
-    }
-
-    this.table.querySelectorAll('thead input').forEach(n => n.classList.remove(f.CLASS_NAME.SORT_BTN_CLASS));
-    input.classList.add(f.CLASS_NAME.SORT_BTN_CLASS);
-
-    this.query();
-  },
-
-  // кнопки листания
-  pageBtn(e) {
-    let btn = e && e.target,
-        key = btn && btn.getAttribute('data-action') || 'def';
-
-    let select = {
-      'new'  : () => { this.queryParam.currPage--; },
-      'old'  : () => { this.queryParam.currPage++; },
-      'page' : () => { this.queryParam.currPage = btn.getAttribute('data-page'); },
-      'count': () => { this.queryParam.countPerPage = e.target.value; },
-      'def'  : () => { this.queryParam.dbAction     = 'loadOrders'; },
-    }
-    select[key]();
-
-    if (this.queryParam.currPage < 0) { this.queryParam.currPage = 0; return; }
-
-    this.query();
-  },
 
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
@@ -322,8 +251,6 @@ export const orders = {
             type = target.dataset.type || false,
             fd = new FormData();
 
-        f.setLoading(target);
-
         fd.set('mode', 'DB');
         fd.set('dbAction', 'loadOrder');
         fd.set( 'orderIds', this.queryParam.orderIds);
@@ -343,16 +270,15 @@ export const orders = {
       'savePdf': () => {
         hideActionWrap = false;
         if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
-
-        f.setLoading(target);
-        let fd = new FormData();
+        let fd = new FormData(),
+            loading = new f.LoaderIcon(target);
 
         fd.set('mode', 'docs');
         fd.set('docType', 'pdf');
         fd.set( 'orderIds', this.queryParam.orderIds);
         f.Post({data: fd})
           .then(data => {
-            f.removeLoading(target);
+            loading.stop();
             target.blur();
             if(data['pdfBody']) f.savePdf(data);
           });
@@ -379,7 +305,7 @@ export const orders = {
               contacts['email'] && (node.value = contacts['email']);
               node.dispatchEvent(new Event('change'));
 
-              // Добавить проверку почты
+              // TODO Добавить проверку почты
               this.queryParam.mode = 'docs';
               this.queryParam.docType = 'mail';
               this.M.btnConfig('confirmYes', {value: 'Отправить'});
@@ -439,15 +365,6 @@ export const orders = {
   },
 
   onEvent() {
-    // Sort Btn
-    this.table.querySelectorAll('thead input').forEach(n => {
-      n.addEventListener('click', (e) => this.sortRows.call(this, e));
-    });
-
-    // Pagination btn
-    f.qA('#footerBlock input[data-action]', 'click', (e) => this.pageBtn.call(this, e));
-    f.qA('#footerBlock select[data-action]', 'change', (e) => this.pageBtn.call(this, e));
-
     // Right buttons
     f.qA('input[data-action]', 'click', (e) => this.actionBtn.call(this, e));
 
@@ -456,10 +373,6 @@ export const orders = {
 
     // Focus Search Init
     this.onEventNode(f.gI('search'), this.focusSearch, {once: true}, 'focus');
-  },
-
-  onPagePaginationClick(e) {
-    f.qA('#onePageBtn input[data-action]', 'click', (() => (e) => this.pageBtn.call(this, e))());
   },
 
   /*onCheckEdit(node) {
@@ -502,8 +415,8 @@ export const orders = {
     //this.checkBtnRows();
   },
 
-  // Кнопки показать скрыть
-  /*checkBtnRows() {
+  /* Кнопки показать скрыть
+  checkBtnRows() {
     if (this.selectedId.size === 1) f.show(this.btnOneOrderOnly);
     else f.hide(this.btnOneOrderOnly);
     if (this.selectedId.size > 0) f.show(this.btnMoreZero);

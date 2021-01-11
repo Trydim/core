@@ -4,7 +4,7 @@
  * Global variables and simple functions
  */
 export const c = {
-  DEBUG: true,
+  DEBUG: false,
   SITE_PATH: window['SITE_PATH'] || '/',
   MAIN_PHP_PATH: (window['SITE_PATH'] || '/') + 'index.php',
   PUBLIC_PAGE: (window['PUBLIC_PAGE'] || 'calculator'),

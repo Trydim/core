@@ -18,17 +18,7 @@ $field['content']       = <<<content
           <thead><tr></tr></thead>
           <tbody></tbody>
         </table>
-        <div class="text-center pageWrap">
-          <input type="button" value="<" data-action="new">
-          <div id="elementsPageWrap" class="d-inline-flex"></div>
-          <input type="button" value=">" data-action="old">
-          <select data-action="count">
-            <option value="1">1 запись</option>    
-            <option value="2">2 записи</option>    
-            <option value="5">5 записей</option>    
-            <option value="20" selected>20 записей</option>    
-          </select>
-        </div>
+        <div class="text-center pageWrap"></div>
         <div class="mt-1 controlWrap">
           <input type="button" value="Создать элемент" data-action="createElements">
           <input type="button" value="Открыть элемент" data-action="openElements">
@@ -47,17 +37,7 @@ $field['content']       = <<<content
       <tbody></tbody>
     </table>
   </div>
-  <div class="text-center pageWrap">
-    <input type="button" value="<" data-action="new">
-    <div id="optionsPageWrap" class="d-inline-flex"></div>
-    <input type="button" value=">" data-action="old">
-    <select data-action="count">
-      <option value="1">1 запись</option>    
-      <option value="2">2 записи</option>    
-      <option value="5">5 записей</option>    
-      <option value="20" selected>20 записей</option>    
-    </select>
-  </div>
+  <div class="text-center pageWrap"></div>
   <div class="mt-1 text-center controlWrap">
     <input type="button" value="Добавить вариант" data-action="createOptions">
     <input type="button" value="Изменить вариант" data-action="changeOptions">
@@ -108,7 +88,7 @@ $field['footerContent'] = <<<footerContent
             <option value="2">МП</option>
           </select></label>
     <div>Входная цена
-        <br><label> валюта: 
+        <br><label> валюта:
           <select name="moneyInputId">
             <option value="1">USD</option>
             <option value="2">RUB</option>

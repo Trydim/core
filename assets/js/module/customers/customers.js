@@ -111,6 +111,8 @@ export const customers = {
   confirm: f.gI('confirmField'),
 
   queryParam: {
+    mode        : 'DB',
+    tableName   : 'customers',
     dbAction    : 'loadCustomers',
     sortColumn  : 'name',
     sortDirect  : false, // true = DESC, false
@@ -127,8 +129,11 @@ export const customers = {
   usersList: new Map(),
 
   init() {
-    this.form.set('mode', 'DB');
-    this.form.set('tableName', 'customers');
+    this.p = new f.Pagination( '#paginator',{
+      queryParam: this.queryParam,
+      query: this.query.bind(this),
+    });
+    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.M = f.initModal();
     this.query();
 
@@ -140,10 +145,6 @@ export const customers = {
     data.forEach(i => this.usersList.set(i['C.ID'], i));
   },
   fillTable(data, search = false) {
-    if(data.length === 0) {
-      this.queryParam.currPage > 0 && this.queryParam.currPage--; // TODO Отключить кнопку далее
-    }
-
     this.contValue || (this.contValue = f.gT('tableContactsValue'));
     this.searchMsg || (this.searchMsg = f.gT('noFoundSearchMsg'));
     this.orderBtn || (this.orderBtn = f.gT('tableOrderBtn'));
@@ -156,10 +157,7 @@ export const customers = {
           item['contactsParse'] = value;
           if (Object.values(value).length) {
             let arr = Object.entries(value).map(n => {
-              return {
-                key: n[0],
-                value: n[1]
-              };
+              return {key: _(n[0]), value: n[1]}
             });
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
@@ -195,89 +193,29 @@ export const customers = {
     data.length && this.checkedRows();
   },
 
-  // Заполнить кнопки страниц
-  fillPagination(count) {
-    let countBtn = Math.ceil(+count / this.queryParam.countPerPage );
-
-    if(this.queryParam.pageCount !== +countBtn) this.queryParam.pageCount = +countBtn;
-    else return;
-
-    if (countBtn === 1) { f.eraseNode(f.gI('onePageBtn')); return; }
-
-    let html = '', tpl,
-        input = f.gT('onePageInput');
-
-    for(let i = 0; i < countBtn; i++) {
-      tpl = input.replace('${page}', i.toString());
-      tpl = tpl.replace('${pageValue}', (i + 1).toString());
-
-      html += tpl;
-    }
-
-    f.gI('onePageBtn').innerHTML = html;
-    this.onPagePaginationClick();
-  },
-
   query() {
     Object.entries(this.queryParam).map(param => {
       this.form.set(param[0], param[1].toString());
     })
 
     f.Post({data: this.form}).then(data => {
+      if (!data.status) { f.showMsg('Ошибка'); return; }
 
-      if(this.needReload) {
+      if (this.needReload) {
         this.needReload = false;
         this.selectedId = new Set();
-        this.pageBtn();
-      } else {
-        this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
+        this.pageBtn(); return;
       }
 
+      data.status && this.confirmMsg && f.showMsg(this.confirmMsg);
+
       if(data['customers']) { this.setUsers(data['customers']); this.fillTable(data['customers']); }
-      if(data['countRows']) this.fillPagination(data['countRows']);
+      if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
     });
   },
 
   // TODO events function
   //--------------------------------------------------------------------------------------------------------------------
-
-  // сортировка
-  sortRows(e) { /*'↑'*/
-
-    let input = e.target,
-        colSort = input.getAttribute('data-ordercolumn');
-
-    if(this.queryParam.sortColumn === colSort) {
-      this.queryParam.sortDirect = !this.queryParam.sortDirect;
-    } else {
-      this.queryParam.sortColumn = colSort;
-      this.queryParam.sortDirect = false;
-    }
-
-    this.table.querySelectorAll('thead input').forEach(n => n.classList.remove(f.CLASS_NAME.SORT_BTN_CLASS));
-    input.classList.add(f.CLASS_NAME.SORT_BTN_CLASS);
-
-    this.query();
-  },
-
-  // кнопки листания
-  pageBtn(e) {
-    let btn = e && e.target,
-        key = btn && btn.getAttribute('data-action') || 'def';
-
-    let select = {
-      'new'  : () => { this.queryParam.currPage--; },
-      'old'  : () => { this.queryParam.currPage++; },
-      'page' : () => { this.queryParam.currPage = btn.getAttribute('data-page'); },
-      'count': () => { this.queryParam.countPerPage = e.target.value; },
-      'def'  : () => { this.queryParam.dbAction     = 'loadCustomers'; },
-    }
-    select[key]();
-
-    if (this.queryParam.currPage < 0) { this.queryParam.currPage = 0; return; }
-
-    this.query();
-  },
 
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
@@ -312,8 +250,7 @@ export const customers = {
         node.value = customer['name'];
 
         // Contacts
-        let emObj = {value: ''},
-            {phone = emObj, email = emObj, address = emObj} = customer['contactsParse'];
+        let {phone = '', email = '', address = ''} = customer['contactsParse'];
 
         node = form.querySelector(`[name="phone"]`);
         this.onEventNode(node, this.changeTextInput, {}, 'blur');
@@ -410,15 +347,6 @@ export const customers = {
   },
 
   onEvent() {
-    // Sort Btn
-    this.table.querySelectorAll('thead input').forEach(n => {
-      n.addEventListener('click', (e) => this.sortRows.call(this, e));
-    });
-
-    // Pagination btn
-    f.qA('#footerBlock input[data-action]', 'click', (() => (e) => this.pageBtn.call(this, e))());
-    f.qA('#footerBlock select[data-action]', 'change', (() => (e) => this.pageBtn.call(this, e))());
-
     // Action buttons
     f.qA('input[data-action]', 'click', (e) => this.actionBtn(e));
     // Click on row for selected
@@ -426,10 +354,6 @@ export const customers = {
 
     // Focus Search Init
     this.onEventNode(f.gI('search'), this.focusSearch, {once: true}, 'focus');
-  },
-
-  onPagePaginationClick(e) {
-    f.qA('#onePageBtn input[data-action]', 'click', (() => (e) => this.pageBtn.call(this, e))());
   },
 
   /*onCheckEdit(node) {

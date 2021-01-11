@@ -1,5 +1,12 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var object $main
+ */
+
+$field['content'] = template('parts/customersContent', $param);
+$field['pageFooter'] = '<div id="paginator"></div>';
+
 $field['footerContent'] = <<<footerContent
 <template id="tableOrderBtn">
   <input type="button" class="btn btn-info btn-sm table-th" value="Посмотреть заказы" data-id="\${C.ID}" data-action="openOrders">
@@ -34,13 +41,13 @@ $field['footerContent'] = <<<footerContent
           <span class="radio__text">Физ.лицо</span>
         </label>
       </div>
-      
+
       <div class="modal-content__field">
         <label class="radio">
           <input type="radio" class="custom-radio style-circle" name="customerType" value="b" data-target="intField">
           <span class="radio__text">Юр.лицо</span>
         </label>
-      </div>      
+      </div>
     </div-->
     
     <div class="form-group">
@@ -58,3 +65,4 @@ $field['footerContent'] = <<<footerContent
 footerContent;
 
 $field['footerContent'] .= '<a id="publicPageLink" href="' . PUBLIC_PAGE . '" hidden></a>';
+$field['footerContent'] .= $main->initDictionary();

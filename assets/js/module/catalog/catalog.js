@@ -1,6 +1,5 @@
 'use strict';
 
-
 /*
 function Node(node = {}) {
   this.nameNode = node.NAME;
@@ -69,15 +68,25 @@ export const catalog = {
   },
 
   queryParam: {
-    tableName: 'section',
-    dbAction: 'loadSection',
-    sectionId: 0,
-    sectionName: '',
-    sectionCode: '',
+    tableName      : 'section',
+    dbAction       : 'loadSection',
+    sectionId      : 0,
+    sectionName    : '',
+    sectionCode    : '',
     sectionParentId: 0,
   },
 
   init() {
+    this.pElements = new f.Pagination( '#elementsField .pageWrap',{
+      queryParam: this.queryParam,
+      query: this.query.bind(this),
+    });
+    this.pOptions = new f.Pagination( '#optionsField .pageWrap',{
+      queryParam: this.queryParam,
+      query: this.query.bind(this),
+    });
+    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
+    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.query();
 
     this.onEventNode(this.curSectionNode, this.clickSection);
@@ -116,11 +125,11 @@ export const catalog = {
       if (data['section']) this.appendSection(data['section']);
       if (data['elements']) {
         this.prepareElements(data);
-        if (data['countRowsElements'])  this.fillPagination(data['countRowsElements'], 'elements');
+        if (data['countRowsElements'])  this.pElements.setCountPageBtn(data['countRowsElements']);
       }
       if (data['options']) {
         this.prepareOptions(data);
-        if (data['countRowsOptions']) this.fillPagination(data['countRowsOptions'], 'options');
+        if (data['countRowsOptions']) this.pOptions.setCountPageBtn(data['countRowsOptions']);
       }
     });
   },
@@ -158,31 +167,6 @@ export const catalog = {
     return parent.id ? parent.id : 0;
   },
 
-  // Заполнить кнопки страниц
-  fillPagination(count, id) {
-    let countBtn = Math.ceil(+count / this.sortParam[id].countPerPage );
-
-    if(this.sortParam[id].pageCount !== +countBtn) this.sortParam[id].pageCount = +countBtn;
-    else return; // Кол кнопок не поменялось
-
-    if ( countBtn === 1) { // Одну кнопку не отображать
-      this.sortParam[id].pageCount = 0;
-      f.eraseNode(f.gI(id + 'PageWrap')); return;
-    }
-
-    let html = '', tpl, input = f.gT('onePageInput');
-
-    for(let i = 0; i < countBtn; i++) {
-      tpl = input.replace('${page}', i.toString());
-      tpl = tpl.replace('${pageValue}', (i + 1).toString());
-
-      html += tpl;
-    }
-
-    f.gI(id + 'PageWrap').innerHTML = html;
-    this.onPagePaginationClick(id);
-  },
-
   prepareElements(data) {
     let param = {
       type: 'elements',
@@ -218,15 +202,8 @@ export const catalog = {
 
     this[itemsField].querySelector('tr').innerHTML = html;
     this.onEventColumnTable(param.type);
-    this.onEventFooterTable(param.type);
   },
   showTableItems(elements, param) {
-    if (!elements.length) {
-      this.sortParam[param.type].currPage > 0 && this.sortParam[param.type].currPage--;
-      //this.query({sort: param.type});
-      return;
-    }
-
     let selParam = 'selected' + param.type + 'Id',
         itemsField = param.type + 'Field';
 
@@ -609,7 +586,7 @@ export const catalog = {
   },
 
   // сортировка Элементов
-  sortRows(e) { /*'↑'*/
+  sortRows(e) {
     let input = e.target,
         colSort = input.getAttribute('data-ordercolumn'),
         item = input && input.closest('[data-field]').getAttribute('data-field');
@@ -624,27 +601,6 @@ export const catalog = {
       this.sortParam[item].sortColumn = colSort;
       this.sortParam[item].sortDirect = false;
     }
-
-    this.queryParam.dbAction = item === 'elements' ? 'openSection' : 'openElements';
-    this.query({sort: item});
-  },
-
-  // кнопки листания
-  pageBtn(e) {
-    let btn = e && e.target,
-        key = btn && btn.getAttribute('data-action') || 'def',
-        item = btn && btn.closest('[data-field]').getAttribute('data-field');
-
-    let select = {
-      'new'  : (item) => { this.sortParam[item].currPage--; },
-      'old'  : (item) => { this.sortParam[item].currPage++; },
-      'page' : () => { this.sortParam[item].currPage = btn.getAttribute('data-page'); },
-      'count': (item) => { this.sortParam[item].countPerPage = e.target.value; },
-      //'def'  : (item) => { this.sortParam.dbAction     = 'openSection'; },
-    }
-    select[key](item);
-
-    if (this.sortParam[item].currPage < 0) { this.sortParam[item].currPage = 0; return; }
 
     this.queryParam.dbAction = item === 'elements' ? 'openSection' : 'openElements';
     this.query({sort: item});
@@ -673,10 +629,6 @@ export const catalog = {
     this[item + 'Field'].querySelectorAll('thead input').forEach(n => {
       n.addEventListener('click', (e) => this.sortRows.call(this, e));
     });
-  },
-
-  onPagePaginationClick(id) {
-    f.qA(`#${id}PageWrap input[data-action]`, 'click', (() => (e) => this.pageBtn.call(this, e))());
   },
 
   // TODO selected Rows
@@ -725,11 +677,5 @@ export const catalog = {
     this[itemsField].querySelectorAll('tbody input').forEach(n => {
       n.addEventListener('change', (e) => this.selectRows.call(this, e));
     });
-  },
-
-  onEventFooterTable(item) {
-    // Pagination btn
-    f.qA('#' + item + 'Field .pageWrap input[data-action]', 'click', (() => (e) => this.pageBtn.call(this, e))());
-    f.qA('#' + item + 'Field .pageWrap select[data-action]', 'change', (() => (e) => this.pageBtn.call(this, e))());
   },
 }

@@ -76,12 +76,13 @@ sup { top: -.5em; }
 
 // Links
 a {
-  color: $link-color; 
+  color: $link-color;
 
   &:hover {
-    color: $link-hover-color;   
+    color: $link-hover-color;
   }
 }
+
 a:not([href]):not([class]) {
   &, &:hover {
     color: inherit;
@@ -133,7 +134,7 @@ textarea {
 
 input,
 button:focus {
-  outline: none; 
+  outline: none;
 }
 
 button,
@@ -147,11 +148,11 @@ button,
 [type="submit"] {
   -webkit-appearance: button;
 
-  @if $enable-button-pointers {
+  /*@if $enable-button-pointers { материал не показывает курсор если кнопка выключена.
     &:not(:disabled) {
       cursor: pointer;
     }
-  }
+  }*/
 }
 
 @if $enable-input-spinner-hide {

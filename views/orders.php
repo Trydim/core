@@ -4,23 +4,13 @@
 // $field['pageHeader'] = <<<pageHeader
 
 // pageHeader;
+$field['content'] = template('parts/ordersContent', $param);
 
 $field['pageFooter'] = <<<pageFooter
-<div class="text-center flex-footer footer" id="footerBlock">
-  <button type="button" class="btn-arrow" data-action="new">&laquo;</i></button>
-  <div id="onePageBtn" class="flex-footer"></div>
-  <button type="button" class="btn-arrow" data-action="old">&raquo;</i></button>  
-
-  <select class="select-width custom-select" data-action="count">
-    <option value="1">1 запись</option>    
-    <option value="2">2 записи</option>    
-    <option value="5">5 записей</option>    
-    <option value="20" selected>20 записей</option>    
-  </select>   
-</nav>
-</div>
+<div id="paginator"></div>
 pageFooter;
 
+$field['footerContent'] = '<a id="publicPageLink" href="public" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>
@@ -39,7 +29,7 @@ $field['footerContent'] .= <<<footerContent
           <label class="w-100 bold">Почта:
             <input type="text" id="email" name="email" class="form-control">
           </label>
-        </div>      
+        </div>
       </div>
     </form>
   </div>

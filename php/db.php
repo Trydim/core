@@ -2,6 +2,7 @@
 
 /**
  * @var array $dbConfig - config from public
+ * @var object $main
  */
 
 if (!defined('MAIN_ACCESS')) die('access denied!');
@@ -17,8 +18,7 @@ isset($tableName) && $dbTable = $tableName;
 if ($dbAction === 'tables') { // todo добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
   $result['csvFiles'] = $db->scanDirCsv();
-}
-else {
+} else {
 
 	if($dbTable) {
 	  USE_DATABASE && $columns = $db->getColumnsTable($dbTable);
@@ -34,7 +34,10 @@ else {
 		case 'showTable':
 			$result['columns'] = $columns;
       if(stripos($tableName, '.csv')) $result['csvValues'] = $db->openCsv();
-      else USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
+      else {
+        if (!CHANGE_DATABASE && stripos($tableName, 'csv') === false) reDirect(false, '404');
+        USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
+      }
 			break;
 		case 'saveTable':
 			if($dbTable !== '') {
@@ -308,7 +311,7 @@ else {
       $usersId = isset($usersId) ? json_decode($usersId) : [];
 
       if (count($usersId)) {
-        $db->deleteItem('customers', $usersId);
+        $result['customers'] = $db->deleteItem('customers', $usersId);
       }
       break;
 

@@ -11,6 +11,8 @@ export const users = {
   confirmMsg: false,
 
   queryParam: {
+    mode        : 'DB',
+    tableName   : 'users',
     dbAction    : 'loadUsers',
     sortColumn  : 'register_date',
     sortDirect  : false, // true = DESC, false
@@ -25,8 +27,11 @@ export const users = {
   usersList: new Map(),
 
   init() {
-    this.form.set('mode', 'DB');
-    this.form.set('tableName', 'users');
+    this.p = new f.Pagination( '#paginator',{
+      queryParam: this.queryParam,
+      query: this.query.bind(this),
+    });
+    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.M = f.initModal();
     this.query();
 
@@ -38,11 +43,6 @@ export const users = {
     data.forEach(i => this.usersList.set(i['U.ID'], i));
   },
   fillTable(data) {
-    if(data.length === 0) {
-      this.queryParam.currPage--; // TODO Отключить кнопку далее
-      return;
-    }
-
     this.contValue || (this.contValue = f.gT('tableContactsValue'));
     data = data.map(item => {
       if(item['contacts']) {
@@ -53,7 +53,7 @@ export const users = {
           item['contactsParse'] = value;
           if(Object.values(value).length) {
             let arr = Object.entries(value).map(n => {
-              return { key: n[0], value: n[1] };
+              return { key: _(n[0]), value: n[1] };
             });
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
@@ -82,29 +82,6 @@ export const users = {
     this.checkedRows();
   },
 
-  // Заполнить кнопки страниц
-  fillPagination(count) {
-    let countBtn = Math.ceil(+count / this.queryParam.countPerPage );
-
-    if(this.queryParam.pageCount !== +countBtn) this.queryParam.pageCount = +countBtn;
-    else return;
-
-    if (countBtn === 1) { f.eraseNode(f.gI('onePageBtn')); return; }
-
-    let html = '', tpl,
-        input = f.gT('onePageInput');
-
-    for(let i = 0; i < countBtn; i++) {
-      tpl = input.replace('${page}', i.toString());
-      tpl = tpl.replace('${pageValue}', (i + 1).toString());
-
-      html += tpl;
-    }
-
-    f.gI('onePageBtn').innerHTML = html;
-    this.onPagePaginationClick();
-  },
-
   // Заполнить статусы
   fillPermission(data) {
     let tmp = f.gT('permission'), html  = '';
@@ -124,57 +101,22 @@ export const users = {
       if(this.needReload) {
         this.needReload = false;
         this.selectedId = new Set();
-        this.pageBtn();
+        this.queryParam.dbAction = 'loadUsers';
+        this.queryParam.usersId = '[]';
+        this.query();
+        return;
       } else {
         this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
       }
 
       if(data['users']) { this.setUsers(data['users']); this.fillTable(data['users']); }
-      if(data['countRows']) this.fillPagination(data['countRows']);
+      if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
       if(data['permissionUsers']) this.fillPermission(data['permissionUsers']);
     });
   },
 
   // TODO events function
   //--------------------------------------------------------------------------------------------------------------------
-
-  // сортировка заказов
-  sortRows(e) { /*'↑'*/
-
-    let input = e.target,
-        colSort = input.getAttribute('data-ordercolumn');
-
-    if(this.queryParam.sortColumn === colSort) {
-      this.queryParam.sortDirect = !this.queryParam.sortDirect;
-    } else {
-      this.queryParam.sortColumn = colSort;
-      this.queryParam.sortDirect = false;
-    }
-
-    this.table.querySelectorAll('thead input').forEach(n => n.classList.remove(f.CLASS_NAME.SORT_BTN_CLASS));
-    input.classList.add(f.CLASS_NAME.SORT_BTN_CLASS);
-
-    this.query();
-  },
-
-  // кнопки листания
-  pageBtn(e) {
-    let btn = e && e.target,
-        key = btn && btn.getAttribute('data-action') || 'def';
-
-    let select = {
-      'new'  : () => { this.queryParam.currPage--; },
-      'old'  : () => { this.queryParam.currPage++; },
-      'page' : () => { this.queryParam.currPage = btn.getAttribute('data-page'); },
-      'count': () => { this.queryParam.countPerPage = e.target.value; },
-      'def'  : () => { this.queryParam.dbAction     = 'loadUsers'; },
-    }
-    select[key]();
-
-    if (this.queryParam.currPage < 0) { this.queryParam.currPage = 0; return; }
-
-    this.query();
-  },
 
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
@@ -232,26 +174,25 @@ export const users = {
         form.querySelector('[name="userPassword"]').parentNode.remove();
 
         // Contacts
-        let emObj = {value: ''},
-            {phone = emObj, mail = emObj, more = emObj} = users['contactsParse'];
+        let {phone = '', email = '', more = ''} = users['contactsParse'];
 
         node = form.querySelector(`[name="userPhone"]`);
         if (oneElements) {
           this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = phone.value;
+          node.value = phone;
           f.maskInit(node); }
         else node.parentNode.remove();
 
         node = form.querySelector(`[name="userMail"]`);
         if (oneElements) {
           this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = mail.value; }
+          node.value = email; }
         else node.parentNode.remove();
 
         node = form.querySelector(`[name="userMoreContact"]`);
         if (oneElements) {
           this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = more.value; }
+          node.value = more; }
         else node.parentNode.remove();
 
         node = form.querySelector('[name="userActivity"]');
@@ -337,24 +278,11 @@ export const users = {
   },
 
   onEvent() {
-    // Sort Btn
-    this.table.querySelectorAll('thead input').forEach(n => {
-      n.addEventListener('click', (e) => this.sortRows.call(this, e));
-    });
-
-    // Pagination btn
-    f.qA('#footerBlock input[data-action]', 'click', (() => (e) => this.pageBtn.call(this, e))());
-    f.qA('#footerBlock select[data-action]', 'change', (() => (e) => this.pageBtn.call(this, e))());
-
     // Action buttons
     f.qA('input[data-action]', 'click', (() => (e) => this.actionBtn.call(this, e))());
 
     // Click on row for selected
     this.onEventNode(this.table.querySelector('tbody'), (e) => this.clickRows(e));
-  },
-
-  onPagePaginationClick(e) {
-    f.qA('#onePageBtn input[data-action]', 'click', (() => (e) => this.pageBtn.call(this, e))());
   },
 
   /*onCheckEdit(node) {

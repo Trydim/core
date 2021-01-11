@@ -145,12 +145,11 @@ button,
 [type=reset],
 [type=submit] {
   -webkit-appearance: button;
-}
-button:not(:disabled),
-[type=button]:not(:disabled),
-[type=reset]:not(:disabled),
-[type=submit]:not(:disabled) {
-  cursor: pointer;
+  /*@if $enable-button-pointers { материал не показывает курсор если кнопка выключена.
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+  }*/
 }
 
 input::-webkit-outer-spin-button,
@@ -256,8 +255,9 @@ textarea {
 
 .d-flex {
   display: flex;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   align-items: center;
+  justify-content: center;
 }
 
 .flex-column {
@@ -319,23 +319,11 @@ body {
   cursor: pointer;
 }
 
-.m-left {
-  margin-left: 3.75rem;
-}
-
-.m-right {
-  margin-right: 15px;
-}
-
-.m-top {
+.mt-0 {
   margin-top: 0 !important;
 }
 
-.p-left {
-  padding-left: 3.4rem !important;
-}
-
-.p-bottom {
+.p-bottom-25 {
   padding-bottom: 2.5rem;
 }
 
@@ -346,10 +334,10 @@ body {
   border: none !important;
 }
 
+/*
 .select-width {
   width: 10% !important;
-}
-
+}*/
 .select-status {
   width: 15% !important;
 }
@@ -366,15 +354,16 @@ body {
   border: 1px solid #309dff;
   color: #309dff;
   border-radius: 4px;
+  cursor: pointer;
 }
 
+/* есть d-flex
 .flex-footer {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
+  display:         flex;
+  flex-flow:       row wrap;
+  align-items:     center;
   justify-content: center;
-}
-
+}*/
 .res-table {
   overflow-x: scroll;
   height: auto;
@@ -424,7 +413,7 @@ body {
 
 /*toaster*/
 .notification-container {
-  top: 0px;
+  top: 0;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -461,16 +450,16 @@ body {
 }
 
 @media only screen and (max-width: 468px) {
-  .flex-footer {
-    display: flex;
-    flex-flow: row wrap;
-    align-items: center;
+  /*.flex-footer { есть уже
+    display:         flex;
+    flex-flow:       row wrap;
+    align-items:     center;
     justify-content: center;
-  }
-  .flex-footer input {
-    margin-bottom: 5px;
-  }
 
+    & input {
+      margin-bottom: 5px;
+    }
+  }*/
   .select-status {
     width: 100% !important;
   }

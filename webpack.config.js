@@ -23,7 +23,7 @@ module.exports = {
       //"jq-ui": path.join(__dirname, "/jquery-ui"),
     }
   },
-  devtool: '', //source mapping
+  devtool: '',
   //devtool: 'cheap-source-map', //source mapping
   module: {
     noParse: [ /jquery\/dist\/jquery.min.js/,

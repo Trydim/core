@@ -62,7 +62,7 @@ const func = {
   // Формат цифр (разделение пробелом)
   setFormat: (num) => (num.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g, " "),
 
-  // Показать элементы, аргументы коллеции NodeList
+  // Показать элементы, аргументы коллекции NodeList
   show: (...collection) => { collection.map(nodes => {
     if(!nodes) return;
     if(!nodes.forEach) nodes = [nodes];
@@ -112,34 +112,35 @@ const func = {
   replaceTemplate: (tmpString, arrayObjects) => {
     let html = '';
 
-    if (tmpString)
-      if(!arrayObjects.map) arrayObjects = [arrayObjects];
-    arrayObjects.map(item => {
-      let tmp = tmpString.trim();
-      Object.entries(item).map(v => {
-        if(!v[1]) v[1] = '';
-        v[1] = v[1].toString().replace(/"/g, '\''); //не помогло
-        let reg = new RegExp(`\\\${${v[0]}}`, 'mgi');
-        tmp     = tmp.replace(reg, v[1].toString()); // replace ${key from obj} from template to value from obj
-      });
+    if (tmpString) {
+      if (!arrayObjects.map) arrayObjects = [arrayObjects];
 
-      html += tmp;
-    })
+      arrayObjects.map(item => {
+        let tmp = tmpString.trim();
+        Object.entries(item).map(v => {
+          if (!v[1]) v[1] = '';
+          let reg = new RegExp(`\\\${${v[0]}}`, 'mgi');
+          tmp     = tmp.replace(reg, v[1].toString().replace(/"/g, '\'')); // replace ${key from obj} from template to value from obj //не помогло
+        });
+
+        html += tmp;
+      })
+    }
 
     return html;
   },
 
   /**
    * Переписан без JQuery.(не зависим)
-   * Секлекты должны иметь класс useToggleOption
-   * Инпуты будут открывтать зависимые поля когда активен(checked)
+   * Селекторы должны иметь класс useToggleOption
+   * Input-ы будут открывать зависимые поля когда активен(checked)
    * Если добавить класс "opposite", то будут скрывать когда активен
    * цель data-target="name", у цели добавить в класс
-   * опции селекта могут иметь data-target="name"
-   * Если в классе цели добавить No, например nameNo, цель будет скрываться когда инпут выбран
+   * опции селектора могут иметь data-target="name"
+   * Если в классе цели добавить No, например nameNo, цель будет скрываться когда input выбран
    */
-  relatedOption: () => {
-    document.querySelectorAll('input[data-target]')
+  relatedOption: (node = document) => {
+    node.querySelectorAll('input[data-target]')
             .forEach(node => {
               let nameAttr = node.name ? `[name="${node.name}"]` : '';
 
@@ -175,7 +176,7 @@ const func = {
 
               node.dispatchEvent(new Event('change'));
             });
-    document.querySelectorAll('select.useToggleOption').forEach(node => {
+    node.querySelectorAll('select.useToggleOption').forEach(node => {
       node.onchange = function () {
 
         let opList = this.options;
@@ -232,9 +233,7 @@ const func = {
       if (e.type === "blur" && target.value.length <= minValue) target.value = "";
     }
 
-    node.addEventListener('input', mask);
-    node.addEventListener('focus', mask);
-    node.addEventListener('blur', mask);
+    ['input', 'focus', 'blur'].map(e => node.addEventListener(e, mask));
   },
 
   // Активировать элементы
@@ -246,7 +245,7 @@ const func = {
         n.classList.remove(c.CLASS_NAME.DISABLED_NODE);
         n.removeAttribute('disabled');
 
-        /*switch (n.tagName) {
+        /*switch (n.tagName) { TODO что это
          case 'BUTTON': case 'INPUT': { }
          case 'A': { }
          }*/
@@ -317,7 +316,39 @@ const func = {
         finishOk();
       }
     });
-  }
+  },
+
+  /**
+   * Словарь
+   */
+  dictionaryInit() {
+    const d = Object.create(null),
+          node = f.qS('#dictionaryData');
+
+    if (!node) return;
+    d.data = JSON.parse(node.value);
+    node.remove();
+
+    d.getTitle = function (key) { return this.data[key] || key; }
+
+    /**
+     * Template string can be param (%1, %2)
+     * @param key - array, first item must be string
+     * @returns {*}
+     * @private
+     */
+    d.translate = function (...key) {
+      if(key.length === 1) return d.getTitle(key[0]);
+      else {
+        let str = d.getTitle(key[0]);
+        for(let i = 1; i< key.length; i++) {
+          if(key[i]) str = str.replace(`%${i}`, key[i]);
+        }
+        return str;
+      }
+    };
+    window._ = d.translate;
+  },
 }
 
 export const f = Object.assign(func, q);

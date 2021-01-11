@@ -9,21 +9,20 @@ if($main && $main->checkStatus('ok')) { ?>
       <span class="navbar-toggler-icon icon-bar"></span>
     </button>
     <div class="collapse navbar-collapse justify-content-end">
-      <ul class="navbar-nav">
-        <li class="nav-item">
+      <ul class="navbar-nav" id="authBlock">
+        <!--<li class="nav-item">
           <a class="nav-link" href="/">
             <i class="material-icons">date_range</i>
             <p class="d-lg-none d-md-block">
               Stats
             </p>
           </a>
-        </li>
-        <?= $main->getLogin() ?>
-        <li class="nav-item" id="authBlock">
-          <label class="exit-icon d-flex font-blue">
-            <input type="button" data-action="exit" style="display: none;">
-            <i class="material-icons font-blue mar-left">login_out</i>
-          </label>
+        </li>-->
+        <li class="nav-item"><?= $main->getLogin() ?></li>
+        <li class="nav-item" data-action="exit">
+          <span class="exit-icon d-flex">
+            <i class="material-icons font-blue">login_out</i>
+          </span>
         </li>
       </ul>
     </div>

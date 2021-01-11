@@ -1,5 +1,12 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var object $main
+ */
+
+$field['content'] = template('parts/usersContent', $param);
+$field['pageFooter'] = '<div id="paginator"></div>';
+
 $field['footerContent'] = <<<footerContent
 <template id="permission">
   <option value="\${ID}">\${name}</option>
@@ -13,7 +20,7 @@ $field['footerContent'] = <<<footerContent
       <label class="w-100">Имя пользователя: <input type="text" class="form-control" name="userName"></label>
     </div>
     <div class="form-group">
-      <label class="w-100 p-bottom">Доступ: 
+      <label class="w-100 p-bottom-25">Доступ: 
         <select class="form-control pos-top" name="userPermission">
           <option value="1">Администратор</option>
           <option value="2">< Аноним ></option>
@@ -53,3 +60,5 @@ $field['footerContent'] = <<<footerContent
   </form>
 </template>
 footerContent;
+
+$field['footerContent'] .= $main->initDictionary();

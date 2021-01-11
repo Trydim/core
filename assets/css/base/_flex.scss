@@ -1,9 +1,10 @@
 @if $enable-flex-classes {
 
   .d-flex {
-    display:     flex;
-    flex-wrap:   wrap;
+    display: flex;
+    flex-flow: row wrap;
     align-items: center;
+    justify-content: center;
   }
 
   .flex-column {

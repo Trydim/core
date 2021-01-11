@@ -1,5 +1,5 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!'); ?>
-<div class="d-flex justify-content-between p-bottom" id="actionBtnWrap">
+<div class="d-flex justify-content-between p-bottom-25" id="actionBtnWrap">
   <div>
     <input type="button" class="btn btn-success oneOrderOnly" value="Редактировать" data-action="openOrder">
     <input type="button" class="btn btn-warning" value="Изменить Статус" data-action="changeStatusOrder">
@@ -11,12 +11,12 @@
     <input type="button" class="btn btn-danger" value="Удалить" data-action="delOrders">
   </div>
 </div>
-<div class="d-none p-bottom" id="confirmField">
+<div class="d-none p-bottom-25" id="confirmField">
   <select id="selectStatus" class="d-none custom-select select-status" name="status_id"></select>
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>
-<div class="p-bottom d-none" id="printTypeField">
+<div class="p-bottom-25 d-none" id="printTypeField">
 <? for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
   <input type="button" class="btn btn-primary"
          data-action="printReport" data-type="printType<?= $i ?>"
@@ -36,18 +36,16 @@
       <th></th>
       <?php if(isset($columns)) foreach ($columns as $item) { ?>
         <th>
-          <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?> ↑↓" data-ordercolumn="<?= $item['dbName']; ?>">
+          <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-ordercolumn="<?= $item['dbName']; ?>">
         </th>
       <?php } ?>
     </tr>
     </thead>
     <tbody>
     <tr>
-      <td>
-        <input type="checkbox" class="" data-id="${O.ID}"></td>
+      <td><input type="checkbox" class="" data-id="${O.ID}"></td>
       <?php if(isset($columns)) foreach ($columns as $item) { ?>
-        <td>${<?= $item['dbName']; ?>}
-      </td>
+        <td>${<?= $item['dbName']; ?>}</td>
       <?php } ?>
     </tr>
     </tbody>

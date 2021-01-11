@@ -5,7 +5,7 @@ namespace RedBeanPHP;
 require 'rb.php';
 
 class db extends \R {
-	private $currentUserID = 2;
+  private $currentUserID = 2;
 	private $dbName;
 	private $login;
 
@@ -47,8 +47,8 @@ class db extends \R {
       );
 
       if (!self::testConnection()) {
-        header('location: /'); // TODO переделать.
-        die();
+        is_callable('reDirect') && reDirect(false, '404&dbError=true');
+        exit('Data Base connect error!');
       }
 
       $this->setting();
@@ -190,7 +190,7 @@ class db extends \R {
 	 * @return array
 	 */
 	public function deleteItem($tableName, $ids) {
-
+ob_start();
 		if (count($ids) === 1) {
 			$bean     = self::xdispense($tableName);
 			$bean->ID = $ids[0];
@@ -206,7 +206,7 @@ class db extends \R {
 
 			self::trashAll($beans);
 		}
-
+$temp = ob_get_clean();
 		return [];
 	}
 
@@ -534,13 +534,13 @@ class db extends \R {
 
 	public function checkPassword($login, $password) {
     if (USE_DATABASE) {
-      $user = $this->getUser($login, 'ID, password');
+      $user = $this->getUser($login, 'ID, name, password');
     } else {
       return $this->getUserFromFile($login, $password);
     }
 
 		if (count($user) && password_verify($password, $user['password'])) {
-			return $user['ID'];
+			return $user;
 		} else return false;
 	}
 
@@ -589,7 +589,7 @@ class db extends \R {
 
   public function checkUserHash($session) {
     if (USE_DATABASE) {
-      $hash = self::getCell('SELECT hash FROM users WHERE login = :login', [':login' => $session['login']]);
+      $hash = self::getCell('SELECT hash FROM users WHERE name = :name', [':name' => $session['login']]);
     } else {
       $value = file(CORE . 'php/system.php')[0];
       $value && $hash = trim(explode('|||', $value)[2]);

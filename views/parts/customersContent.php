@@ -2,7 +2,7 @@
   die('access denied!');
 } ?>
 
-<div class="d-flex justify-content-between p-bottom" id="actionBtnWrap">
+<div class="d-flex justify-content-between p-bottom-25" id="actionBtnWrap">
   <div>
     <input type="button" class="btn btn-success" value="Добавить" data-action="addCustomer">
     <input type="button" class="btn btn-warning" value="Изменить" data-action="changeCustomer">
@@ -11,7 +11,7 @@
     <input type="button" class="btn btn-danger" value="Удалить" data-action="delCustomer">
   </div>
 </div>
-<div class="p-bottom d-none" id="confirmField">
+<div class="p-bottom-25 d-none" id="confirmField">
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>
@@ -28,7 +28,7 @@
       <?php if (isset($columns)) {
         foreach ($columns as $item) { ?>
           <th>
-            <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?> ↑↓"
+            <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>"
                    data-ordercolumn="<?= $item['dbName']; ?>">
           </th>
         <?php }

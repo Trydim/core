@@ -79,7 +79,7 @@ const sideMenuExpanded = (e, node) => {
 // Block Authorization
 const onAuthEvent = () => {
   let node = f.gI(f.ID.AUTH_BLOCK);
-  node && node.querySelectorAll('input').forEach(n => n.onclick = authEvent );
+  node && node.querySelectorAll('[data-action]').forEach(n => n.onclick = authEvent );
 }
 
 const onClickSubmenu = () => {
@@ -96,6 +96,7 @@ const onClickSubmenu = () => {
   cancelFormSubmit();
   onAuthEvent();
   onClickSubmenu();
+  f.dictionaryInit();
 
   setLinkMenu(page || '/');
   if(page) init(page);

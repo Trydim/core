@@ -32,9 +32,5 @@ if(!isset($setting)) {
 }
 
 $param['columns'] = $columns;
-
-$field['content'] = template('parts/usersContent', $param);
-$field['pageFooter'] = template('parts/paginationBlock', $param);
-
 require $pathTarget;
 $html = template('base', $field);

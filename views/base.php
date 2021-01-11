@@ -43,6 +43,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 </head>
 
 <body>
+
 <?php if(!isset($global)) { ?>
 <main class="container-fluid mx-auto">
   <section class="wrapper">
@@ -54,7 +55,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     <section class="main-panel">
       <?= $pageHeader; ?>
 
-      <div class="content m-top">
+      <div class="content mt-0">
         <div class="row justify-center"> <!-- возможно убрать justify-center -->
           <div class="col-12 col-md-10"><?= $content; ?></div>
 

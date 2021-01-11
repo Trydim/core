@@ -13,13 +13,13 @@ session_start();
 
 switch ($authAction) {
 	case 'login':
-    if ($userId = $db->checkPassword($login, $password)) {
-      $_SESSION['login'] = $login;
-      $_SESSION['priority'] = $userId; //типа маскирую
+    if ($user = $db->checkPassword($login, $password)) {
+      $_SESSION['login'] = $user['name'];
+      $_SESSION['priority'] = $user['ID']; //типа маскирую
       $_SESSION['id'] = $_COOKIE['PHPSESSID'];
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
-      $db->setUserHash($userId, $_SESSION['hash']);
+      $db->setUserHash($user['ID'], $_SESSION['hash']);
 
       reDirect(true, (isset($clientPageTarget) && $clientPageTarget !== 'login') ? $clientPageTarget : '');
     } else reDirect(false, "login?status=error&login=$login&password=$password");

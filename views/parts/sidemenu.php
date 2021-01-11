@@ -71,7 +71,7 @@
                       !isset($item['fileName']) && $item['fileName'] = $item['name'];
                       $active = $tableActive === $item['fileName'] ? 'active' : ''; ?>
                       <li class="nav-item <?= $active ?>">
-                        <a class="nav-link p-left" href="<?= SITE_PATH ?>admindb?tableName=<?= $item['fileName'] ?>"><?= $item['name'] ?></a>
+                        <a class="nav-link pl-5" href="<?= SITE_PATH ?>admindb?tableName=<?= $item['fileName'] ?>"><?= $item['name'] ?></a>
                       </li>
                     <?php } ?>
                   </ul>

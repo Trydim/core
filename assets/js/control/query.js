@@ -4,7 +4,7 @@ import {c} from "../const.js";
 
 const checkJSON = (data) => {
   try { return JSON.parse(data); }
-  catch (e) { document.body.innerHTML = data; }
+  catch (e) { console.log(data); alert('Error! see console!'); return {status: false} }
 };
 
 const query = (url, data, type = 'json') => {
