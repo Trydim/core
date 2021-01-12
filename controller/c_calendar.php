@@ -1,16 +1,13 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var array $dbConfig
+ * @var object $db
  * @var string $pathTarget
  */
 
-require_once CORE . 'php/libs/db.php';
-
-if (!isset($db)) $db = new \RedBeanPHP\db($dbConfig);
-
 $curMonth = date('Y-m');
 $dateRange = ["$curMonth-01 00:00:01", "$curMonth-31 23:59:59"];
+$ordersStatus = $db->loadTable('order_status');
 $orders = $db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
 $field = [];
@@ -23,5 +20,11 @@ if(count($orders)) {
 	$field['footerContent'] .= "<div hidden id='ordersValue'>$orders</div>";
 }
 
+if(count($ordersStatus)) {
+  $ordersStatus = json_encode($ordersStatus);
+  $field['footerContent'] .= "<div hidden id='ordersStatusValue'>$ordersStatus</div>";
+}
+
+$main->exist('calendarTemplate') && $field = doHook('calendarTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

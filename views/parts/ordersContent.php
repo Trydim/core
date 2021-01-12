@@ -4,7 +4,7 @@
     <input type="button" class="btn btn-success oneOrderOnly" value="Редактировать" data-action="openOrder">
     <input type="button" class="btn btn-warning" value="Изменить Статус" data-action="changeStatusOrder">
     <input type="button" class="btn btn-primary oneOrderOnly" value="Pdf" data-action="savePdf">
-    <input type="button" class="btn btn-primary  oneOrderOnly" value="Печать" data-action="printOrder">
+    <input type="button" class="btn btn-primary oneOrderOnly" value="Печать" data-action="printOrder">
     <input type="button" class="btn btn-primary oneOrderOnly" value="Отправить на почту" data-action="sendOrder">
   </div>
   <div>

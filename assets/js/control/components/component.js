@@ -179,16 +179,16 @@ export class LoaderIcon {
   }
 }
 
-export const Modal = () => {
-  let modal     = Object.create(null);
-  modal.wrap    = f.gI('modalWrap');
-  modal.window  = modal.wrap.querySelector('.modal');
-  modal.title   = modal.wrap.querySelector('.modalT');
-  modal.content = modal.wrap.querySelector('.modalC');
+export const Modal = (param = {}) => {
+  let modal = Object.create(null),
+      {
+        modalId = 'adminPopup',
+        //btnConfig = false,
+      } = param;
 
-  modal.bindBtn = function () {
-    this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn').forEach(n =>
-      n.addEventListener('click', () => { modal.hide() }));
+  modal.bindBtn   = function () {
+    this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
+        .forEach(n => n.addEventListener('click', () => this.hide()));
   }
   modal.btnConfig = function (key, param) {
     let node = this.wrap.querySelector('.' + key.replace('.', ''));
@@ -201,11 +201,11 @@ export const Modal = () => {
    * @param content Nodes | string[]
    */
   modal.show = function (title = '', content = '') {
-    modal.wrap.classList.add('active');
-    modal.window.classList.add('active');
+    this.wrap.classList.add('active');
+    this.window.classList.add('active');
 
-    modal.title && title && f.eraseNode(modal.title).append(title);
-    modal.content && content && f.eraseNode(modal.content).append(content);
+    this.title && title && f.eraseNode(this.title).append(title);
+    this.content && content && f.eraseNode(this.content).append(content);
   }
 
   modal.hide = function () {
@@ -214,7 +214,39 @@ export const Modal = () => {
     //c.eraseNode(modal.content);
   }
 
+  modal.setTemplate = function () {
+    const node = document.createElement('div');
+    node.insertAdjacentHTML('afterbegin', templatePopup());
+
+    this.wrap    = node.children[0];
+    this.window  = node.querySelector('.modal');
+    this.title   = node.querySelector('.modalT');
+    this.content = node.querySelector('.modalC');
+
+    document.body.append(node.children[0]);
+  }
+
+  const templatePopup = () => {
+    return `
+    <div class="modal-overlay" id="${modalId}">
+      <div class="modal p-15">
+        <button type="button" class="close-modal">
+          <span class="material-icons">clear</span>
+        </button>
+        <div class="modal-title modalT">Some title here</div>
+        <div class="modalC w-100 pt-20"></div>
+        <div class="modal-button modalBtn">
+          <input type="button" class="confirmYes btn btn-success" value="Подтвердить" data-action="confirmYes">
+          <input type="button" class="closeBtn btn btn-warning" value="Отмена" data-action="confirmNo">
+        </div>
+      </div>
+    </div>`;
+  }
+
+  modal.setTemplate();
+  //btnConfig && modal.btnConfig(btnConfig);
   modal.bindBtn();
+
   return modal;
 }
 

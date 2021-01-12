@@ -1,15 +1,12 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 /**
  * @var object $main
+ * @var object $db
  * @var array $dbConfig
  * @var string $pathTarget
  */
 
-require_once CORE . 'php/libs/db.php';
-
 $field = [ 'pageTitle' => 'Заказы' ];
-
-if (!isset($db)) $db = new \RedBeanPHP\db();
 
 // получить конфиг текущего пользователя
 $setting = $db->getUserSetting(/*login user*/);

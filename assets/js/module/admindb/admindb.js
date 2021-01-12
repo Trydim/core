@@ -496,7 +496,7 @@ const tableValues = {
     data.set('csvData', JSON.stringify(admindb.handsontable.getData()));
 
     admindb.query(data).then(data => {
-      f.showMsg(data['status'] ? 'ok' : 'error');
+      f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
       f.removeLoading(e.target);
       tableValues.init();
     });

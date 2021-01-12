@@ -17,9 +17,6 @@ $field['footerContent'] .= <<<footerContent
 		<span>Менеджер: \${name}</span><br>
 		<span>Клиент: \${C.name}</span><br>
 		<span>\${important_value}</span><br>
-		
-		<input type="button" value="Распечатать">
-		<input type="button" value="Открыть">
 	</div>
 </template>
 footerContent;

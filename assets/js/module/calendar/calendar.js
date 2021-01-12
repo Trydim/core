@@ -1,6 +1,6 @@
 'use strict';
 
-import {FullCalendar} from './main.js';
+import {FullCalendar} from './fullCalendar.js';
 
 // TODO click custom btn
 const clickCustomBTN = () => {
@@ -44,6 +44,19 @@ const component = {
       }
     },
 
+    selectable: true,
+    displayEventTime: false,
+
+    /*eventTimeFormat: { // like '14:30:00'
+      hour: '2-digit',
+      minute: '2-digit',
+      //second: false, //'2-digit',
+      meridiem: false
+    },*/
+
+    // И как это связать с настройками добавить цвета
+    eventClassNames: (arg) => orders.status.call(orders, arg),
+
     buttonText: {
       today: "Сегодня",
       month: "Месяц",
@@ -53,11 +66,25 @@ const component = {
     },
   },
 
-  init() {
-    //let locale = await f.importModuleFunc();
+  form: new FormData(),
+  queryParam: {
+    mode        : 'DB',
+    tableName   : 'orders',
+    dbAction    : 'loadOrders',
+    countPerPage: 1000,
+  },
 
-    this.calendar = new FullCalendar.Calendar(f.gI('calendar'), Object.assign(this.default, {
-      selectable: true,
+  //$db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
+
+  init() {
+    Object.entries(this.queryParam).map(param => {
+      this.form.set(param[0], param[1].toString());
+    })
+
+    //let locale = await f.importModuleFunc();
+    let node = f.gI('calendar');
+
+    this.calendar = new FullCalendar.Calendar(node, Object.assign(this.default, {
       dateClick: (info) => { // клик по дате
         this.calendar.getEventById('123');
         //alert('Date: ' + info.dateStr);
@@ -78,7 +105,7 @@ const component = {
     //calendar.changeView('timeGridDay');
 
     this.calendar.render();
-
+    this.onEvent();
   },
 
   addOrder(order) {
@@ -86,74 +113,124 @@ const component = {
     return this.calendar;
   },
 
-/*O.ID: "16"
-S.name: "Заказ сформирован"
-create_date: "2020-09-11 14:38:52"
-customer: "quest"
-important_value: "[{"key":"Сумма","fieldName":"total","value":72901.73724000002}]"
-last_edit_date: "2020-09-02 14:38:52"
-name: "admin"*/
+  // Event function
+  // -------------------------------------------------------------------------------------------------------------------
 
+  /*O.ID: "16"
+   S.name: "Заказ сформирован"
+   create_date: "2020-09-11 14:38:52"
+   customer: "quest"
+   important_value: "[{"key":"Сумма","fieldName":"total","value":72901.73724000002}]"
+   last_edit_date: "2020-09-02 14:38:52"
+   name: "admin"*/
   clickOrder(info) {
     let order = orders.getOrder(info.event['_def'].publicId);
     if(order) {
       order.important_value = orders.formatImportant(order.important_value);
 
-      let title   = 'Заказ №' + order['O.ID'],
-          content = f.replaceTemplate(orders.tmp, order),
-          div = document.createElement('div');
+      let title = 'Заказ №' + order['O.ID'],
+          div   = document.createElement('div');
 
-      div.innerHTML = content;
-      div
+      div.innerHTML = f.replaceTemplate(orders.tmp, order);
       calendar.M.show(title, div);
     }
 
   },
 
-  //clickInput
+  changeDateRange(e) {
+    let target = e.target, y, m, d, queryRange = [],
+        range = this.calendar.currentData.dateProfile.renderRange;
+
+    if ((new Date()).getTime() < range.start.getTime()) return;
+
+    f.setLoading(target);
+
+    y = range.start.getFullYear();
+    m = range.start.getMonth() + 1;
+    d = range.start.getDate();
+    queryRange.push(`${y}-${m}-${d} 00:00:01`);
+
+    y = range.end.getFullYear();
+    m = range.end.getMonth() + 1;
+    d = range.end.getDate();
+    queryRange.push(`${y}-${m}-${d} 23:59:59`);
+
+    this.form.set('dateRange', JSON.stringify(queryRange));
+
+    f.Post({data: this.form}).then(data => {
+      f.removeLoading(target);
+      orders.setOrders(data['orders']);
+      orders.showOrders();
+    });
+  },
+
+  // Event bind
+  // -------------------------------------------------------------------------------------------------------------------
+
+  onEvent() {
+    f.qA('#calendar button', 'click', this.changeDateRange.bind(this));
+  }
 }
 
 const orders = {
   data: Object.create(null),
+  orderIds: new Set(),
 
   init() {
-    this.initOrders();
-    this.tmp || (this.tmp = f.gT('orderTemplate'));
-  },
+    let node = f.gI('ordersStatusValue');
+    node && node.innerText && this.setStatus(JSON.parse(node.innerText));
+    node && node.remove();
 
-  initOrders() {
-    let node = f.gI('ordersValue');
-    if(node && node.innerText) {
-      this.setOrders(JSON.parse(node.innerText));
-    }
+    node = f.gI('ordersValue');
+    node && node.innerText && this.setOrders(JSON.parse(node.innerText));
+    node && node.remove();
+
+    this.tmp || (this.tmp = f.gT('orderTemplate'));
   },
 
   setOrders(orders) {
     orders.map(i => this.data[i['O.ID']] = i);
-    this.showOrders();
   },
 
   getOrder(id) {
     return this.data[id] || false;
   },
 
-  showOrders() {
+  setStatus(data) {
+    console.log(data);
+    this.getStatusClass = function (status) {
+      /*switch (arg.event._def.extendedProps.status) {
+       case "fulfilled": return 'myClass1';
+       case "ok": return 'myClass2';
+       case "rejected":
+       default: return 'myClass3';
+       }*/
+    };
+  },
+
+  status(arg) {
+    this.getStatusClass(arg.event._def.extendedProps.status);
+  },
+
+  showOrders() { // TODO привязать к настройкам
     Object.entries(this.data).map(o => {
-      let item, title, temp;
+      if (this.orderIds.has(o[0])) return;
+      this.orderIds.add(o[0]);
 
-      o[1].important_value && (temp = this.formatImportant(o[1].important_value));
+      let title, temp;
 
-      title = o[0] + ' ';
-      title += temp;
+      //o[1].important_value && (temp = this.formatImportant(o[1].important_value));
 
-      item = { id: o[0], title, start: o[1]['create_date'] };
+      title = o[0] + ' / ' + o[1].total + ' руб.';
+      //title += temp;
 
-      component.addOrder(item);
+      // Мой статус для цвета кружка
+      component.addOrder({id: o[0], title, start: o[1]['create_date'], status: 'ok'});
     })
   },
 
   formatImportant(value) {
-    value = JSON.parse(value.replace(/'/g, '"'));
+    value = value ? JSON.parse(value.replace(/'/g, '"')) : '';
     return value.reduce ? value.reduce((a, i) => { a += `${i.key}:${i.value}`; return a; }, '') : '';
   },
 }
@@ -162,8 +239,10 @@ export const calendar = {
   M: f.initModal(),
 
   init() {
-    component.init();
+
     orders.init();
+    component.init();
+    orders.showOrders();
 
     return this;
   }

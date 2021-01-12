@@ -1,5 +1,9 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var array $vars extract param
+ */
+
 if(!isset($pageTitle)) $pageTitle = '';
 if(!isset($headContent)) $headContent = '';
 
@@ -12,7 +16,6 @@ if(!isset($global)) {
 }
 if(!isset($cssLinks)) $cssLinks = [];
 if(!isset($jsLinks)) $jsLinks = [];
-if(!isset($popupWindow)) $popupWindow = template('parts/popupWindow');
 if(!isset($footerContent)) $footerContent = '';
 if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase');
 
@@ -72,7 +75,6 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 </main>
 <?php } else echo $global; ?>
 
-<?= $popupWindow ?>
 <script defer type="module" src="<?= CORE_SCRIPT?>control/src.js"></script>
 <script defer type="module" src="<?= CORE_SCRIPT?>main.js"></script>
 

@@ -73,17 +73,18 @@ body {
   }
 }
 
-.p-a-20 {
+.p-15 {
   padding: 15px !important;
 }
 
-.p-t-20 {
+.pt-20 {
   padding-top: 20px;
 }
 
+/* плохое название и не используется
 .pos-top {
   top: 25px !important;
-}
+}*/
 
 .table-th {
   box-shadow: none !important;
@@ -173,5 +174,9 @@ body {
 #orderTable tr,
 #customersTable tr,
 #usersTable tr {
+  cursor: pointer;
+}
+
+.fc .fc-daygrid-event-harness {
   cursor: pointer;
 }

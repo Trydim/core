@@ -105,12 +105,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       $search = isset($search);
       $orderIds = isset($orderIds) ? json_decode($orderIds) : []; // TODO Зачем это
+      $dateRange = isset($dateRange) ? json_decode($dateRange) : [];
 
       // Значит нужны все заказы (поиск)
       if($countPerPage > 999) $countPerPage = 1000000;
 			else $result['countRows'] = $db->getCountRows('orders');
 
-			$result['orders'] = $db->loadOrder($pageNumber, $countPerPage, $sortColumn, $sortDirect, [], $orderIds);
+			$result['orders'] = $db->loadOrder($pageNumber, $countPerPage, $sortColumn, $sortDirect, $dateRange, $orderIds);
 			!$search && $result['statusOrders'] = $db->loadTable('order_status');
 			break;
 		case 'loadOrder': // Показать подробности
