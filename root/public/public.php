@@ -27,3 +27,10 @@ $field['pageFooter']  = '';
 
 /*$dbContent = "<input type='hidden' id='dataPrice' value='$price'>" .
              "<input type='hidden' id='dataConfig' value='$config'>";*/
+/*
+// Курс
+$rate = new Course();
+if ($rate) {
+  $rate = json_encode($rate);
+  $dbContent .= "<input type='hidden' id='dataRate' value='$rate'>";
+}*/

@@ -27,6 +27,7 @@ if(!defined('PRINT_BTN')) define('PRINT_BTN', 1);
 
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/Main.php';
+require_once CORE . 'model/Course.php';
 require_once CORE . 'model/hooks.php';
 
 // Public php.

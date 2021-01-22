@@ -349,6 +349,13 @@ const func = {
     };
     window._ = d.translate;
   },
+
+  // Курсы валют (РФ)
+  setRate(dataSelector = '#dataRate') {
+    let node = f.qS(dataSelector), json;
+    node && (json = JSON.parse(node.value)) && node.remove();
+    json && (this.rate = json['curs']);
+  }
 }
 
 export const f = Object.assign(func, q);
