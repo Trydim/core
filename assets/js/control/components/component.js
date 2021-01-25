@@ -214,13 +214,16 @@ export const Modal = (param = {}) => {
     this.wrap.classList.add('active');
     this.window.classList.add('active');
     data.bodyOver = document.body.style.overflow;
+    data.bodyMarginRight = document.body.style.marginRight;
     document.body.style.overflow = 'hidden';
+    document.body.style.marginRight = '8px';
   }
 
   modal.hide = function () {
     this.wrap.classList.remove('active');
     this.window.classList.remove('active');
     document.body.style.overflow = data.bodyOver || 'initial';
+    document.body.style.marginRight = data.bodyMarginRight || 'initial';
     //c.eraseNode(modal.content);
   }
 
