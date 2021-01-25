@@ -55,7 +55,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
       <aside id="left"><?= $sideLeft; ?></aside>
 		<?php } ?>
 
-    <section class="main-panel">
+    <section class="main-panel mx-auto" style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
       <?= $pageHeader; ?>
 
       <div class="content mt-0">

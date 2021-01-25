@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!'); ?>
 <div class="sidebar" data-background-color="white">
 
-  <div class="logo">
+  <div class="logo ml-3">
     <a href="/" class="simple-text logo-normal">Logo</a>
   </div>
   <div class="sidebar-wrapper">
