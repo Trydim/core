@@ -216,7 +216,7 @@ export const Modal = (param = {}) => {
     data.bodyOver = document.body.style.overflow;
     data.bodyMarginRight = document.body.style.marginRight;
     document.body.style.overflow = 'hidden';
-    document.body.style.marginRight = '8px';
+    document.body.style.marginRight = '16px';
   }
 
   modal.hide = function () {
