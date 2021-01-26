@@ -42,6 +42,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     window.SITE_PATH = '<?= SITE_PATH ?>';
     window.MAIN_PHP_PATH = '<?= SITE_PATH ?>index.php';
     window.PUBLIC_PAGE = '<?= PUBLIC_PAGE ?>';
+    window.PATH_IMG = '<?= PATH_IMG ?>';
   </script>
 </head>
 

@@ -8,6 +8,7 @@ export const c = {
   SITE_PATH: window['SITE_PATH'] || '/',
   MAIN_PHP_PATH: (window['SITE_PATH'] || '/') + 'index.php',
   PUBLIC_PAGE: (window['PUBLIC_PAGE'] || 'calculator'),
+  PATH_IMG: (window['PATH_IMG'] || 'public/images/'),
 
   CURRENT_EVENT: 'none',
   PHONE_MASK: '+7 (___) ___ __ __',
