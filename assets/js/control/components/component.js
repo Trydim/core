@@ -184,13 +184,14 @@ export const Modal = (param = {}) => {
       data = Object.create(null),
       {
         modalId = 'adminPopup',
+        template = '',
         showDefaultButton = true,
         btnConfig = false,
       } = param;
 
   const findNode = (n, role) => n.querySelector(`[data-role="${role}"]`);
 
-  modal.bindBtn   = function () {
+  modal.bindBtn = function () {
     this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
         .forEach(n => n.addEventListener('click', () => this.hide()));
   }
@@ -222,14 +223,17 @@ export const Modal = (param = {}) => {
   modal.hide = function () {
     this.wrap.classList.remove('active');
     this.window.classList.remove('active');
-    document.body.style.overflow = data.bodyOver || 'initial';
-    document.body.style.marginRight = data.bodyMarginRight || 'initial';
+
+    setTimeout( () => {
+      document.body.style.overflow = data.bodyOver || 'initial';
+      document.body.style.marginRight = data.bodyMarginRight || 'initial';
+    }, 300);
     //c.eraseNode(modal.content);
   }
 
   modal.setTemplate = function () {
     const node = document.createElement('div');
-    node.insertAdjacentHTML('afterbegin', templatePopup());
+    node.insertAdjacentHTML('afterbegin', template || templatePopup());
 
     this.wrap     = node.children[0];
     this.window   = findNode(node, 'window');
@@ -465,7 +469,7 @@ export const Searching = () => {
       wrap.append(this.resultTmp);
     }
 
-    target.dispatchEvent(new Event('input'));
+    target.dispatchEvent(new Event('keyup'));
   }
 
   obj.clickResult = function (e, inputNode) {

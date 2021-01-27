@@ -289,7 +289,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         isset($address) && $contacts['address'] = $address;
         count($contacts) && $param['0']['contacts'] = json_encode($contacts);
 
-        $result['error'] = $db->insert($columns, 'customers', $param);
+        // TODO обработка ошибки не верна
+        //$result['error'] = $db->insert($columns, 'customers', $param);
+        $db->insert($columns, 'customers', $param);
       }
       break;
     case 'changeCustomer':
@@ -305,7 +307,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         isset($ITN) && $param[$usersId]['ITN'] = $ITN;
         count($contacts) && $param[$usersId]['contacts'] = json_encode($contacts);
 
-        $result['error'] = $db->insert($columns, 'customers', $param, true);
+        $db->insert($columns, 'customers', $param, true);
       }
       break;
     case 'delCustomer':
@@ -379,6 +381,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $db->deleteItem('users', $usersId);
       }
       break;
+
+
+    case 'openOrders': /* TODO когда это отправляется */ break;
 
     default:
       echo 'SWITCH default DB.php' . var_dump($_REQUEST);

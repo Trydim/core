@@ -204,7 +204,10 @@ export const customers = {
       if (this.needReload) {
         this.needReload = false;
         this.selectedId = new Set();
-        this.pageBtn(); return;
+        this.queryParam.dbAction = 'loadCustomers';
+        this.queryParam.orderIds = '[]';
+        this.query();
+        return;
       }
 
       data.status && this.confirmMsg && f.showMsg(this.confirmMsg);
@@ -280,9 +283,6 @@ export const customers = {
         if (!this.selectedId.size) return;
 
         this.queryParam.usersId = JSON.stringify(this.getSelectedList());
-        this.delayFunc = () => {
-          this.selectedId.clear();
-        };
 
         this.confirmMsg = 'Успешно удалено';
         this.M.show('Удалить', 'Удалить выбранных клиентов?');

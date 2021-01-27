@@ -52,6 +52,8 @@ function reDirect($status, $target = '') {
     }
   }
   //unset($_GET['targetPage']);
+  // TODO учточнить
+  if ($target === 'public' && isset($_GET['orderId'])) $target .= '?orderId=' . $_GET['orderId'];
   header('location: ' . SITE_PATH . $target);
   die;
 }
