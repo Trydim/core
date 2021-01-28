@@ -491,14 +491,16 @@ export class Valid {
   constructor(param) {
     let {
           sendFunc = () => {},
+          formNode = false,
           formSelector = '#authForm',
+          submitNode = false,
           submitSelector = '#btnConfirmSend',
           initMask = true,
         } = param;
 
     try {
-      this.form = document.querySelector(formSelector);
-      this.btn =  this.form.querySelector(submitSelector) || document.querySelector(submitSelector);
+      this.form = formNode || document.querySelector(formSelector);
+      this.btn =  submitNode || this.form.querySelector(submitSelector) || document.querySelector(submitSelector);
     } catch (e) {
       console.log(e.message); return;
     }

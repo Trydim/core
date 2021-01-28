@@ -2,7 +2,10 @@
 
 /**
  * @var array $dbConfig - config from public
+ * @var string $docType
  * @var string $name
+ * @var string $phone
+ * @var string $email
  */
 
 require_once 'libs/pdf.php';
@@ -17,8 +20,12 @@ if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
   $reportVal = $db->loadOrderById($orderIds);
   isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true);
 }
-$pdf = new Pdf($reportVal);
-//$pdf->setTemplate($docType);
+
+$phone = isset($tel) ? $tel : $phone;
+$usePdf = isset($usePdf) || $docType === 'pdf';
+
+$usePdf && $pdf = new Pdf($reportVal);
+//$usePdf && $pdf->setTemplate($docType);
 
 if (isset($docType)) {
 	switch ($docType) {
@@ -26,7 +33,7 @@ if (isset($docType)) {
 			$result = $pdf->getPdf();
 			break;
 		case 'mail':
-			$pdfPath = $pdf->getPdf('save');
+      $usePdf && $pdfPath = $pdf->getPdf('save');
 			require_once 'libs/mail.php';
 			$mail = new Mail();
 			$param = [
@@ -37,7 +44,7 @@ if (isset($docType)) {
 			];
 			$mail->prepareMail($param);
 			//$mail->setSubject($pdfPath);
-      $mail->addPdf($pdfPath);
+      $usePdf && $mail->addPdf($pdfPath);
 			$mail->addMail($email);
 			$result['mail'] = $mail->send();
 			break;
