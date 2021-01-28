@@ -26,6 +26,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
   <?= $headContent ?>
 	<title><?= $pageTitle; ?></title>
+  <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
 	<?php if(!isset($eraseDefaultStyle)) { ?>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
@@ -46,7 +47,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
   </script>
 </head>
 
-<body>
+<body style="margin-right: 16px;">
 
 <?php if(!isset($global)) { ?>
 <main class="container-fluid mx-auto">
