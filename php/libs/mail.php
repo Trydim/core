@@ -26,6 +26,7 @@ class Mail {
 	private $mailTpl = '', $body = '', $pdfPath = '', $pdfFileName = '';
 	private $subject = MAIL_SUBJECT;
 	private $otherMail = [];
+	private $attachmentFiles = [];
 
 	public function __construct($mailTpl = 'mailTpl') {
 		$this->mailTpl = $mailTpl;
@@ -58,6 +59,18 @@ class Mail {
 		$this->pdfFileName = $fileName !== '' ? $fileName : uniqid() . '.pdf';
 		//'КП_' . $this->cpNumber . '_' . date('dmY') . '.pdf';
 	}
+
+	public function addOtherFile($files) {
+	  $that = $this;
+	  array_map(function ($file) use (&$that) {
+	    $that->attachmentFiles[] = [
+	      'path' => $file['tmp_name'],
+        'name' => $file['name'],
+        'type' => $file['type'],
+        //$encoding = self::ENCODING_BASE64,
+      ];
+    }, $files);
+  }
 
 	public function send() {
 		$mail = new PHPMailer();
@@ -100,9 +113,12 @@ class Mail {
 				$resource = [$this->pdfPath];
 			}
 
+			// Other Files
+      foreach ($this->attachmentFiles as $file) {
+        $mail->addAttachment($file['path'], $file['name'], 'base64', $file['type']);
+      }
+
 			$mail->send();
-
-
 
 			if (isset($resource)) array_map(function ($item) { unlink($item); }, $resource);
 

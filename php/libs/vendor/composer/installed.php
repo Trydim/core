@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'c19e8f8b4a17808bfccddd7514e82a9aca603078',
+    'reference' => '6cafa345330fa394f695eaabdbb9ccc684a74a97',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'c19e8f8b4a17808bfccddd7514e82a9aca603078',
+      'reference' => '6cafa345330fa394f695eaabdbb9ccc684a74a97',
     ),
     'mpdf/mpdf' => 
     array (

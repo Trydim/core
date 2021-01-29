@@ -180,3 +180,12 @@ body {
 .fc .fc-daygrid-event-harness {
   cursor: pointer;
 }
+
+
+.cl-input-error {
+  border: 1px solid red!important;
+}
+
+.cl-input-valid {
+  border: 1px solid green!important;
+}

@@ -495,6 +495,7 @@ export class Valid {
           formSelector = '#authForm',
           submitNode = false,
           submitSelector = '#btnConfirmSend',
+          fileFieldSelector = false, // Если поля не будет тогда просто after
           initMask = true,
         } = param;
 
@@ -519,10 +520,18 @@ export class Valid {
       n.addEventListener('blur', (e) => this.validate(e)); // может и не нужна
     });
 
+    // Files
+    this.fileInput = this.form.querySelector('input[type="file"]');
+    if (this.fileInput) {
+      fileFieldSelector && (this.fileField = this.form.querySelector(fileFieldSelector)); // Возможно понадобиться много полей
+    }
+
     // Send Btn
     this.btn.onclick = (e) => this.confirm(e, sendFunc);
     if (this.countNodes === 0 || this.debug) this.btnActivate();
     else this.btnDisabled();
+
+    this.onEventForm();
   }
 
   initParam(param) {
@@ -547,6 +556,26 @@ export class Valid {
   btnDisabled() {
     this.valid.clear();
     this.btnActivate();
+  }
+
+  checkFileInput() {
+    let error = false, files = [];
+    for (const file of Object.values(this.fileInput.files)) {
+      file.fileError = file.size > 1024*1024;
+      if (file.fileError && !error) error = true;
+
+      files.push(file);
+    }
+
+    this.showFiles(files);
+
+    if (error) {
+      this.setValidated(this.fileInput);
+      this.btnDisabled();
+    } else {
+      this.setErrorValidate(this.fileInput);
+      this.btnActivate();
+    }
   }
 
   keyEnter(e) {
@@ -601,6 +630,17 @@ export class Valid {
     this.valid.add(node.id);
   }
 
+  showFiles(files) {
+    let html = '';
+
+    files.forEach((file, i) => {
+      html += this.getFileTemplate(file, i);
+    });
+
+    if (this.fileField) this.fileField.innerHTML = html;
+    else this.fileInput.insertAdjacentHTML('afterend', '<div>' + html + '</div>');
+  }
+
   removeValidateClasses(node) {
     node.classList.remove(this.cssClass.error, this.cssClass.valid);
     this.valid.delete(node.id);
@@ -616,9 +656,42 @@ export class Valid {
             this.removeValidateClasses(n);
           });
       this.btnDisabled();
+
+      //  добавить удаление события проверки файла
     }
 
     sendFunc(this.form, finished);
+  }
+
+  clickCommon(e) {
+    let target = e.target.dataset.action ? e.target : e.target.closest('[data-action]'),
+        action = target && target.dataset.action;
+
+    if (!action) return false;
+
+    let select = {
+      'removeFile'  : () => this.removeFile(target),
+    }
+
+    select[action] && select[action]();
+  }
+
+  removeFile(target) {
+    delete this.fileInput.files[target.dataset.id];
+    this.checkFileInput();
+  }
+
+  onEventForm() {
+    this.form.addEventListener('click', (e) => this.clickCommon(e));
+    this.fileInput && this.fileInput.addEventListener('change', this.checkFileInput.bind(this));
+  }
+
+  getFileTemplate(file, i) {
+    return `<div class="attach__item ${file.fileError ? this.cssClass.error : ''}">
+        <span class="bold">${file.name}</span>
+        <span class="table-basket__cross"
+              data-id="${i}"
+              data-action="removeFile"></span></div>`;
   }
 }
 

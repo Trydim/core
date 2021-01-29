@@ -24,6 +24,11 @@ if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
 $phone = isset($tel) ? $tel : $phone;
 $usePdf = isset($usePdf) || $docType === 'pdf';
 
+if (count($_FILES)) {
+  //$filesArray = array_map(function ($files) { return $files; }, $_FILES);
+  $filesArray = $_FILES;
+}
+
 $usePdf && $pdf = new Pdf($reportVal);
 //$usePdf && $pdf->setTemplate($docType);
 
@@ -42,6 +47,7 @@ if (isset($docType)) {
 				'email' => $email,
 				'data'  => $reportVal
 			];
+			isset($filesArray) && $mail->addOtherFile($filesArray);
 			$mail->prepareMail($param);
 			//$mail->setSubject($pdfPath);
       $usePdf && $mail->addPdf($pdfPath);
