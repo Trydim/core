@@ -670,7 +670,7 @@ export class Valid {
     if (!action) return false;
 
     let select = {
-      'removeFile'  : () => this.removeFile(target),
+      'removeFile': () => this.removeFile(target),
     }
 
     select[action] && select[action]();

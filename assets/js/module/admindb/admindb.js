@@ -94,7 +94,7 @@ export const admindb = {
 
   setTableName() {
     let node = f.gI('tableNameField');
-    node && (node.innerHTML = this.tableName);
+    node && (node.innerHTML = _(this.tableName));
   },
   showTablesName: (data) => {
     if (!data.hasOwnProperty('tables') && !data.hasOwnProperty('csvFiles')) {

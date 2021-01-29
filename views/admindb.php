@@ -62,3 +62,5 @@ $field['footerContent'] = <<<temp
   <input type="button" value="Отменить" class="">
 </template>
 temp;
+
+$field['footerContent'] .= $main->initDictionary();

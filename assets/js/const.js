@@ -23,13 +23,7 @@ export const c = {
     PUBLIC_PAGE: 'publicPageLink'
   },
 
-  CONST: {
-    MODAL_DEF: 'modalDef',
-  },
-
   CLASS_NAME: {
-    SURFACE_FORM: 'active',
-
     // css класс который добавляется кнопкам сортировки
     SORT_BTN_CLASS: 'btn-light',
     // css класс который добавляется скрытым элементам

@@ -22,6 +22,7 @@ if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
 }
 
 $phone = isset($tel) ? $tel : $phone;
+$info = isset($info) ? $info : '';
 $usePdf = isset($usePdf) || $docType === 'pdf';
 
 if (count($_FILES)) {
@@ -45,6 +46,7 @@ if (isset($docType)) {
 				'name'  => $name,
 				'phone' => $phone,
 				'email' => $email,
+        'info'  => $info,
 				'data'  => $reportVal
 			];
 			isset($filesArray) && $mail->addOtherFile($filesArray);

@@ -334,10 +334,6 @@ body {
   border: none !important;
 }
 
-/*
-.select-width {
-  width: 10% !important;
-}*/
 .select-status {
   width: 15% !important;
 }
@@ -357,13 +353,6 @@ body {
   cursor: pointer;
 }
 
-/* есть d-flex
-.flex-footer {
-  display:         flex;
-  flex-flow:       row wrap;
-  align-items:     center;
-  justify-content: center;
-}*/
 .res-table {
   overflow-x: scroll;
   height: auto;
@@ -380,10 +369,6 @@ body {
   padding-top: 20px;
 }
 
-/* плохое название и не используется
-.pos-top {
-  top: 25px !important;
-}*/
 .table-th {
   box-shadow: none !important;
 }
@@ -478,13 +463,10 @@ body {
 @media only screen and (min-width: 40em) {
   .modal-overlay {
     display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     -webkit-box-align: center;
-    -ms-flex-align: center;
     align-items: center;
     -webkit-box-pack: center;
-    -ms-flex-pack: center;
     justify-content: center;
     position: fixed;
     top: 0;
@@ -511,14 +493,11 @@ body {
  */
 .modal {
   display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   flex-direction: column;
   -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: center;
-  -ms-flex-pack: center;
   justify-content: space-between;
   position: relative;
   margin: 0 auto;
@@ -536,8 +515,6 @@ body {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-transform: scale(1.2);
-  transform: scale(1.2);
   -webkit-transition: all 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   transition: all 0.3s cubic-bezier(0.55, 0, 0.1, 1);
 }
@@ -638,9 +615,6 @@ body {
 .loading-st1:after {
   content: " ";
   display: inline-block;
-  /*width:         64px;
-  height:        64px;
-  margin:        8px;*/
   border-radius: 50%;
   border: 6px solid #309dff;
   border-color: #309dff transparent #309dff transparent;
@@ -708,15 +682,6 @@ button.loading-st1:after {
 
 .subSection {
   user-select: none;
-}
-
-/* Default */
-.cl-input-error {
-  border: 1px solid red;
-}
-
-.cl-input-valid {
-  border: 1px solid green;
 }
 
 #columnValue input {

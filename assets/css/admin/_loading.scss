@@ -6,9 +6,6 @@ $loading-color: $white !default;
   &:after {
     content:       " ";
     display:       inline-block;
-    /*width:         64px;
-    height:        64px;
-    margin:        8px;*/
     border-radius: 50%;
     border:        6px solid $loading-color;
     border-color:  $loading-color transparent $loading-color transparent;
