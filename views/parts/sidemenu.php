@@ -92,6 +92,14 @@
               </a>
             </li>
             <?php break;
+          case 'fileManager': ?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?= SITE_PATH ?>fileManager">
+                <i class="material-icons">view_list</i>
+                <p>Файловый менеджер</p>
+              </a>
+            </li>
+            <?php break;
           case 'options': ?>
             <li class="nav-item">
               <a class="nav-link" href="<?= SITE_PATH ?>options">

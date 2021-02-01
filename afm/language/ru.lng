@@ -1,0 +1,22 @@
+<?php
+
+$lang = array (
+
+// file: 'filemanager/index.php'
+
+'file_size'               =>	"Размер",
+'back'                    =>	"Назад",
+'create_folder_here'      =>	"Создать здесь папку",
+'create_file_here'        =>	"Создать здесь файл",
+'upload_file_here'        =>	"Загрузить сюда файл",
+'zip_and_download_site'   =>	"Скачать сайт zip архивом",
+'zip_and_download'        =>	"Скачать zip архивом",
+'click_to_sort'           =>	"Клик сортировать",
+'delete'                  =>	"Удалить",
+'rename'                  =>	"Переименовать",
+'download'                =>	"Скачать",
+'action'                  =>	"Действие",
+'edit'                    =>	"Править",
+'general_settings'        =>    "Основные настройки"
+);
+?>

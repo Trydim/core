@@ -1,0 +1,24 @@
+<?php
+
+$lang = array (
+
+
+// file: 'filemanager/index.php'
+
+'file_size'               =>	" Size ",
+'back'                    =>	"Back",
+'create_folder_here'      =>	"Create folder here",
+'create_file_here'        =>	"Create file here",
+'upload_file_here'        =>	"Upload file here",
+'zip_and_download_site'   =>	"Zip and download site",
+'zip_and_download'        =>	"Zip and download",
+'click_to_sort'           =>	"Click to sort",
+'delete'                  =>	"Delete",
+'rename'                  =>	"Rename",
+'download'                =>	"Download",
+'action'                  =>	"Action",
+'edit'                    =>	"Edit",
+'general_settings'        =>    "General settings"
+
+);
+?>

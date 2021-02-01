@@ -193,7 +193,7 @@ export const Modal = (param = {}) => {
 
   modal.bindBtn = function () {
     this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
-        .forEach(n => n.addEventListener('click', () => this.hide()));
+        .forEach(n => n.onclick = () => this.hide());
   }
   modal.btnConfig = function (key, param) {
     let node = this.wrap.querySelector('.' + key.replace('.', ''));
@@ -212,12 +212,17 @@ export const Modal = (param = {}) => {
     if (btnConfig) this.btnConfig(btnConfig);
     else this.btnField && !showDefaultButton && f.eraseNode(this.btnField);
 
+    data.bodyOver = document.body.style.overflow;
+    data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
+    document.body.style.overflow = 'hidden';
+
+    if (document.body.scrollHeight > window.innerHeight && window.innerWidth > 800) {
+      data.bodyMarginRight = document.body.style.marginRight;
+      document.body.style.marginRight = '16px';
+    }
+
     this.wrap.classList.add('active');
     this.window.classList.add('active');
-    data.bodyOver = document.body.style.overflow;
-    data.bodyMarginRight = document.body.style.marginRight;
-    document.body.style.overflow = 'hidden';
-    document.body.style.marginRight = '16px';
   }
 
   modal.hide = function () {
@@ -226,7 +231,12 @@ export const Modal = (param = {}) => {
 
     setTimeout( () => {
       document.body.style.overflow = data.bodyOver || 'initial';
-      document.body.style.marginRight = data.bodyMarginRight || 'initial';
+      document.body.style.cssText = 'scroll-behavior: initial';
+      window.scrollTo(0, data.scrollY);
+      document.body.style.cssText = '';
+      //document.body.style.scrollBehavior = 'smooth';
+      if (document.body.scrollHeight > window.innerHeight)
+        document.body.style.marginRight = data.bodyMarginRight || 'initial';
     }, 300);
     //c.eraseNode(modal.content);
   }
@@ -660,6 +670,8 @@ export class Valid {
       //  добавить удаление события проверки файла
     }
 
+    //this.fileInput && add
+
     sendFunc(this.form, finished);
   }
 
@@ -689,9 +701,9 @@ export class Valid {
   getFileTemplate(file, i) {
     return `<div class="attach__item ${file.fileError ? this.cssClass.error : ''}">
         <span class="bold">${file.name}</span>
-        <span class="table-basket__cross"
+        <!--span class="table-basket__cross"
               data-id="${i}"
-              data-action="removeFile"></span></div>`;
+              data-action="removeFile"></span--></div>`;
   }
 }
 

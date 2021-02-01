@@ -47,7 +47,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
   </script>
 </head>
 
-<body style="margin-right: 16px;">
+<body>
 
 <?php if(!isset($global)) { ?>
 <main class="container-fluid mx-auto">
