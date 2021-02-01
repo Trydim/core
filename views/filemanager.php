@@ -10,13 +10,7 @@ pageFooter;
 $field['sideLeft']      = <<<sideLeft
 sideLeft;*/
 
-$vars2 = [
-  'config' => $config,
-  'lang' => $lang,
-];
-
-
-$field['content']       = template('parts/managerContent', $vars2);
+$field['content']       = template('parts/managerContent', ['config' => $config]);
 /*$field['content']       = <<<content
 <div class="ab-container ab-filemanager" id="ab-main">
 

@@ -1,7 +1,4 @@
 <?php
-header('content-Type: text/html; charset=utf-8');
-
-error_reporting(E_ALL);
 
 if (stream_resolve_include_path('config.php')) {
   include_once('config.php');
