@@ -10,6 +10,7 @@
 *,
 *::before,
 *::after {
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -72,11 +73,11 @@ sup {
 }
 
 sub {
-  bottom: -0.25em;
+  bottom: -.25em;
 }
 
 sup {
-  top: -0.5em;
+  top: -.5em;
 }
 
 a {
@@ -141,9 +142,9 @@ input {
 }
 
 button,
-[type=button],
-[type=reset],
-[type=submit] {
+[type="button"],
+[type="reset"],
+[type="submit"] {
   -webkit-appearance: button;
   /*@if $enable-button-pointers { материал не показывает курсор если кнопка выключена.
     &:not(:disabled) {
@@ -203,12 +204,19 @@ textarea {
 }
 
 .content {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
   flex-direction: column;
   min-height: 100vh;
 }
 .content > footer {
   max-height: 300px;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 0 auto;
   flex: 1 0 auto;
   margin-top: auto;
 }
@@ -254,28 +262,51 @@ textarea {
 }
 
 .d-flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row wrap;
   flex-flow: row wrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
 }
 
 .flex-column {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
   flex-flow: column nowrap;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
 }
 
 .justify-center {
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
 }
 
 .align-start {
+  -webkit-box-align: start;
+      -ms-flex-align: start;
   align-items: flex-start;
 }
 
 .col {
+  -ms-flex-preferred-size: 0;
   flex-basis: 0;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
   flex-grow: 1;
   min-width: 0;
   max-width: 100%;
@@ -294,8 +325,10 @@ textarea {
   @include make-grid-columns();
 }*/
 .grid-block {
+  display: -ms-grid;
   display: grid;
   /*grid-template-rows: 1fr 1fr;*/
+  -ms-grid-columns: 1fr 1fr;
   grid-template-columns: 1fr 1fr;
   grid-row-gap: 15px;
 }
@@ -330,7 +363,7 @@ body {
 .btn-calendar {
   border-radius: 50px !important;
   background: #309DFF !important;
-  margin-right: 0.3rem !important;
+  margin-right: .3rem !important;
   border: none !important;
 }
 
@@ -370,9 +403,11 @@ body {
 }
 
 .table-th {
+  -webkit-box-shadow: none !important;
   box-shadow: none !important;
 }
 .table-th:hover {
+  -webkit-box-shadow: none !important;
   box-shadow: none !important;
 }
 
@@ -402,9 +437,18 @@ body {
   left: 0;
   right: 0;
   margin: 0 auto;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
   align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
   justify-content: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
   flex-direction: column;
   height: auto;
   line-height: 1rem;
@@ -416,8 +460,13 @@ body {
   border-radius: 4px;
   color: white;
   padding: 15px 0;
+  -webkit-box-shadow: 1px 2px 12px 1px rgba(117, 117, 117, 0.62);
   box-shadow: 1px 2px 12px 1px rgba(117, 117, 117, 0.62);
+  -webkit-transition: opacity 1s ease 0.5s;
   transition: opacity 1s ease 0.5s;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
   user-select: none;
   cursor: pointer;
 }
@@ -435,16 +484,6 @@ body {
 }
 
 @media only screen and (max-width: 468px) {
-  /*.flex-footer { есть уже
-    display:         flex;
-    flex-flow:       row wrap;
-    align-items:     center;
-    justify-content: center;
-
-    & input {
-      margin-bottom: 5px;
-    }
-  }*/
   .select-status {
     width: 100% !important;
   }
@@ -479,13 +518,20 @@ body {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
 }
 
+.sidebar .logo {
+  padding: 4px 0 !important;
+}
+
 @media only screen and (min-width: 40em) {
   .modal-overlay {
     display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     position: fixed;
     top: 0;
@@ -512,11 +558,17 @@ body {
  */
 .modal {
   display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
   flex-direction: column;
   -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: center;
+  -ms-flex-pack: justify;
   justify-content: space-between;
   position: relative;
   margin: 0 auto;
@@ -531,6 +583,7 @@ body {
   opacity: 0;
   overflow-y: auto;
   visibility: hidden;
+  -webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -579,7 +632,10 @@ body {
 }
 
 .modal .modal-button {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -ms-flex-pack: distribute;
   justify-content: space-around;
   width: 90%;
   bottom: 1rem;
@@ -637,6 +693,7 @@ body {
   border-radius: 50%;
   border: 6px solid #309dff;
   border-color: #309dff transparent #309dff transparent;
+  -webkit-animation: lds-dual-ring 1.2s linear infinite;
   animation: lds-dual-ring 1.2s linear infinite;
 }
 
@@ -649,29 +706,45 @@ button.loading-st1:after {
   height: 20px;
   border-width: 3px;
   border-color: #fff transparent #fff transparent;
+  -webkit-box-shadow: 0 0 20px 0 #ffffff78;
   box-shadow: 0 0 20px 0 #ffffff78;
+}
+
+@-webkit-keyframes lds-dual-ring {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
 }
 
 @keyframes lds-dual-ring {
   0% {
+    -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
   100% {
+    -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
 }
 .form-header {
+  -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
   box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
   color: #fff;
   text-align: center;
   margin-top: -3.13rem;
   margin-bottom: 3rem;
   padding: 1rem;
-  -webkit-border-radius: 0.125rem;
-  border-radius: 0.125rem;
+  border-radius: .125rem;
 }
 
 .card-body {
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   padding: 1.25rem;
 }
@@ -683,8 +756,9 @@ button.loading-st1:after {
 
 /* dev style */
 .opacity5 {
-  opacity: 0.5;
-  transition: opacity 0.15s;
+  opacity: .5;
+  -webkit-transition: opacity .15s;
+  transition: opacity .15s;
 }
 
 .closeSection + .subSection {
@@ -700,6 +774,9 @@ button.loading-st1:after {
 }
 
 .subSection {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
   user-select: none;
 }
 
@@ -708,23 +785,3 @@ button.loading-st1:after {
 }
 
 /*# sourceMappingURL=admin.css.map */
-
-
-.cl-input-error,
-.cl-input-valid {
-    padding-right: calc(1.5em + .75rem);
-    background-repeat: no-repeat;
-    background-position: right calc(.375em + .1875rem) center;
-    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
-}
-
-.cl-input-error {
-    border: 1px solid #dc3545!important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-}
-
-.cl-input-valid {
-    border-radius: 4px;
-    border-color: #198754!important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-}

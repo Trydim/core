@@ -137,17 +137,6 @@ body {
 
 
 @media only screen and (max-width: 468px) {
-  /*.flex-footer { есть уже
-    display:         flex;
-    flex-flow:       row wrap;
-    align-items:     center;
-    justify-content: center;
-
-    & input {
-      margin-bottom: 5px;
-    }
-  }*/
-
   .select-status {
     width: 100% !important;
   }
@@ -181,4 +170,8 @@ body {
   border-radius: 4px;
   border-color: #198754!important;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+}
+
+.sidebar .logo {
+  padding: 4px 0!important;
 }

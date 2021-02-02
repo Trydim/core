@@ -72,9 +72,9 @@ if (isset($fmAction)) {
               $html .= '<tr class="lightgray">
                           <td class="ab-tdfolder"><a href="' . $folderpath . '" class="closed">' . $file . '</a></td>
                           <td>' . $foldersize . '</td>
-                          <td><a class="ab-btn red delete-directory" title="Удалить папку" href="' . $folderpath . '"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                          <button class="ab-btn blue renamefolder" title="Переименовать папку"><i class=" fa fa-random" aria-hidden="true"></i></button>
-                          <a class="ab-btn asphalt downloadfolder" title="Скачать архивом"  href="downloadfolder.php?file=' . $folderpath . '"><i class="fa fa-download" aria-hidden="true"></i></a></td></tr>';
+                          <td><a class="ab-btn btn-danger delete-directory" title="Удалить папку" href="' . $folderpath . '"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                          <!--<button class="ab-btn blue renamefolder" title="Переименовать папку"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
+                          <a class="ab-btn asphalt downloadfolder" title="Скачать архивом" data-action="downloadFolder" data-path="' . $folderpath . '"><i class="fa fa-download" aria-hidden="true"></i></a></td></tr>';
 
             }
           }
@@ -103,17 +103,17 @@ if (isset($fmAction)) {
               $html .= '<tr class="white">
                           <td class="ab-tdfile"><span class="ext-file ext-' . $ext . '">' . $file . '</span></td>
                           <td>' . $size . '</td>
-                          <td><a href="' . $filepath . '" class="ab-btn red delete-file" title="Удалить файл"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                          <button class="ab-btn blue renamefile" title="Переименовать файл"><i class=" fa fa-random" aria-hidden="true"></i></button>
-                          <a class="ab-btn asphalt downloadfile" title="Скачать файл"  href="downloadfile.php?file=' . $filepath . '"><i class="fa fa-download" aria-hidden="true"></i></a>';
+                          <td><a href="' . $filepath . '" class="ab-btn btn-danger delete-file" title="Удалить файл"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                          <!--<button class="ab-btn blue renamefile" title="Переименовать файл"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
+                          <a class="ab-btn asphalt downloadfile" title="Скачать файл" data-action="downloadFile" data-path="' . $filepath . '"><i class="fa fa-download" aria-hidden="true"></i></a>';
 
               //if image file
               if (in_array($ext, array("jpg", "jpeg", "png", "gif", "ico", "bmp"))) {
                 $html .= '<a class="ab-btn green zoom" href="' . $url . '" target="_blank"><i class="fa fa-eye" aria-hidden="true"></i></a>';
 
-                //if edited file
+              //if edited file
               } elseif (in_array($ext, $config['extensions_for_editor'])) {
-                $html .= '<a class="ab-btn violet ab-edit-file" href="editor.php?editfile=' . $filepath . '" target="_blank" title="Редактировать"><i class="fa fa-pencil" aria-hidden="true"></i></a></td></tr>';
+                //$html .= '<a class="ab-btn violet ab-edit-file" href="editor.php?editfile=' . $filepath . '" target="_blank" title="Редактировать"><i class="fa fa-pencil" aria-hidden="true"></i></a></td></tr>';
               }
 
               $html .= '</td></tr>';

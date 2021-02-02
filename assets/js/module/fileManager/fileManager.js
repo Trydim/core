@@ -167,10 +167,14 @@ export const fileManager = {
     });
 
     $("body").on("mousedown", "#zipsite, a.downloadfolder, a.downloadfile", function () {
-      var t = $(this);
-      t.html('<i class=" fa fa-refresh fa-spin fa-fw" aria-hidden="true"><\/i>');
-      window.location = $(this).attr("href");
-      setTimeout(function () {t.html('<i class=" fa fa-download" aria-hidden="true"><\/i>')}, 3000)
+      //var t = $(this);
+      //t.html('<i class=" fa fa-refresh fa-spin fa-fw" aria-hidden="true"><\/i>');
+
+      let fmAction = this.dataset.action,
+          dir = this.dataset.path;
+
+      fileManager.query({fmAction, dir}, () => {});
+      //setTimeout(function () {t.html('<i class=" fa fa-download" aria-hidden="true"><\/i>')}, 3000)
     });
 
     /*$("body").on("change", "#file", function () {
@@ -189,17 +193,24 @@ export const fileManager = {
       });
 
       fileManager.query({fmAction: 'uploadFile'},  function (t) {
-        let u = e.split("/");
-        Object.keys(u).length > 1 ? ($.each(u, function (i) {
-          var f = u[i].substr(u[i].lastIndexOf(".") + 1), e = r + u[i];
-          t(r);
-          !f == "" && $("#tree div.selected").next("ul").append('<li class="ext-file ext-' + f + '" style="border-right:1px solid red">' + u[i] + "<\/li>")
-        }),
+        let u = t.split("/");
+
+        if (u.length > 1) {
+          $.each(u, (i) => {
+            let f = u[i].substr(u[i].lastIndexOf(".") + 1), e = r + u[i];
+            t(r);
+            f !== "" && $("#tree div.selected").next("ul").append('<li class="ext-file ext-' + f + '" style="border-right:1px solid red">' + u[i] + "<\/li>");
+          }),
 
           $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {
-          $("#alerts").remove()})) : ($("#alerts").hide().remove(), $("body").append('<div id="alerts" class="btn blue">' + e + "<\/div>"),
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()}));
+            $("#alerts").remove();
+          })
+        } else {
+          $("#alerts").hide().remove();
+          $("body").append('<div id="alerts" class="btn blue">' + e + "<\/div>");
+          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
           $("#div-uploadfile").css("border-radius", 2).removeClass("fa-refresh fa-spin fa-fw").addClass("fa-upload")
+        }
       })
     })
 

@@ -4,32 +4,34 @@
   <div id="ab-content" class="ab-row">
 
     <!-- breadcrumb -->
-    <div class="ab-col12" id="ab-breadcrumb">
+    <div class="ab-col12 d-flex align-items-center" id="ab-breadcrumb">
 
       <div id="breadcrumb-links" class="ab-col7">
         <span class="open">public</span>
       </div>
 
       <div id="ab-top-action-btn" class="ab-col5 ab-text-right">
-        <a id="a-create-folder" class="ab-btn asphalt" title="Создать здесь папку" href="#">
+        <!--<a id="a-create-folder" class="ab-btn asphalt" title="Создать здесь папку" href="#">
           <i class="fa fa-folder-o" aria-hidden="true"></i>Создать папку
-        </a>
+        </a>-->
 
-        <button id="createfile" class="ab-btn asphalt" title="Создать здесь файл">
+       <!--<button id="createfile" class="ab-btn asphalt" title="Создать здесь файл">
           <i class="fa fa-file-text-o" aria-hidden="true"></i>Создать файл
-        </button>
+        </button>-->
 
-        <div id="div-uploadfile" class="ab-btn asphalt fa fa-upload" title="загрузить файл здесь">
+        <div class="dropzone">
+          <div id="div-uploadfile" class="" title="загрузить файл здесь">
           <form id="frm-uploadfile" name="frm-uploadfile" enctype="multipart/form-data">
             <input type="file" id="file" name="file[]" multiple="multiple">
             <input type="hidden" id="inputpath" name="inputpath">
           </form>
         </div>
+        </div>
 
-        <a id="zipsite" class="ab-btn asphalt" title="Архивировать и скачать"
+        <!--<a id="zipsite" class="ab-btn asphalt" title="Архивировать и скачать"
            href="<?= $config['rootdirectory'] ?>downloadfolder.php?file=<?php echo ROOT ?>">
           <i class=" fa fa-download" aria-hidden="true"></i>Архивировать и скачать
-        </a>
+        </a>-->
         <!--<a class="ab-btn asphalt" title="Основные настройки"
            href="<?/*= $config['rootdirectory'] */?>editor.php?editfile=config.php"
            target="_blank">
