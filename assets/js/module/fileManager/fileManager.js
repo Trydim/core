@@ -100,16 +100,13 @@ export const fileManager = {
             e = $("#ab-list-pages td.ab-tdfolder").find("a:contains(" + r + "):last"),
             o = $(".selected").next("ul").find("li div:contains(" + r + "):last"),
             s = $(this).parents("tr").find("a.delete-directory");
-        return $.ajax({
-          url    : "core/afm/renamefile.php",
-          data   : {oldname: f, newname: u},
-          success: function (t) {
-            $("body").append('<div id="alerts" class="btn blue">' + t + "<\/div>");
-            e.attr("href", u).text(i);
-            s.attr("href", u);
-            o.attr("id", i).attr("data-fo", u).text(i)
-          }
-        }), $("#alerts").remove(), !1
+
+        fileManager.query({fmAction: 'renameFolder', oldName: f, newName: u}, function (t) {
+          //$("body").append('<div id="alerts" class="btn blue">' + t + "<\/div>");
+          e.attr("href", u).text(i);
+          s.attr("href", u);
+          o.attr("id", i).attr("data-fo", u).text(i)
+        })
       }
     });
     $("body").on("click", ".renamefile", function (t) {
@@ -120,117 +117,90 @@ export const fileManager = {
           e = $(this).parents("tr").find("a.delete-file"),
           o = $(this).parents("tr").find("a.ab-edit-file");
       if (i != null && i != "") {
-        $("body").append('<div id="alerts" class="btn blue">working..<\/div>');
+        //$("body").append('<div id="alerts" class="btn blue">working..<\/div>');
         $("#alerts").fadeIn(1e3);
         var f = u.replace(r, i),
             s = $("#ab-list-pages td.ab-tdfile:contains(" + r + "):last"),
             h = $(".selected").next("ul").find("li:contains(" + r + "):last");
-        return $.ajax({
-          url    : "core/afm/renamefile.php",
-          data   : {oldname: u, newname: f},
-          success: function (t) {
-            $("#alerts").hide().remove();
-            $("body").append('<div id="alerts" class="btn blue">' + t + "<\/div>");
-            $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
-            s.find("span").text(i);
-            e.attr("href", f);
-            o.attr("href", "editor.php?editfile=" + f);
-            h.text(i)
-          },
-          error  : function (t, i) {
-            $("#alerts").remove();
-            var r = "";
-            r     = t.status === 0 ? "Not connect.\n Verify Network." : t.status == 404 ? "Requested page not found. [404]" : t.status == 500 ? "Internal Server Error [500]." : i === "parsererror" ? "Requested JSON parse failed." : i === "timeout" ? "Time out error." : i === "abort" ? "Ajax request aborted." : "Uncaught Error.\n" + t.responseText;
-            $("body").append('<div id="alerts" class="btn red">' + r + "<\/div>");
-            $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()})
-          }
-        }), $("#alerts").remove(), !1
+
+        return fileManager.query({fmAction: 'renameFolder', oldName: u, newName: f}, function (t) {
+          //$("#alerts").hide().remove();
+          //$("body").append('<div id="alerts" class="btn blue">' + t + "<\/div>");
+          //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
+          s.find("span").text(i);
+          e.attr("href", f);
+          o.attr("href", "editor.php?editfile=" + f);
+          h.text(i);
+        })
       }
-    });
+      });
     $("body").on("click", "a.delete-directory", function (t) {
       t.preventDefault();
-      var i = $(this).attr("href"), r = i.match(/([^\/]*)\/*$/)[1], u = "#" + r;
-      return tr = $(this).parents("tr"), confirm('Delete folder "' + r + '" ?') && ($("body").append('<div id="alerts" class="btn blue">working..<\/div>'), $("#alerts").fadeIn(1e3), $.ajax({
-        url    : "core/afm/deletefolder.php",
-        data   : {folder: i},
-        success: function (t) {
-          $("#alerts").hide().remove();
-          $("body").append('<div id="alerts" class="btn blue">' + t + "<\/div>");
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
+      var i = $(this).attr("href"),
+          r = i.match(/([^\/]*)\/*$/)[1],
+          u = "#" + r;
+
+      let tr = $(this).parents("tr");
+      confirm('Delete folder "' + r + '" ?') &&
+      fileManager.query({fmAction: 'deleteFolder', dir: i},  function (t) {
+          //$("#alerts").hide().remove();
+          //$("body").append('<div id="alerts" class="btn blue">' + t + "<\/div>");
+          //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
           tr.hide(100).remove();
           $(u).next("ul").remove();
           $(u).remove()
-        },
-        error  : function (t, i) {
-          $("#alerts").remove();
-          var r = "";
-          r     = t.status === 0 ? "Not connect.\n Verify Network." : t.status == 404 ? "Requested page not found. [404]" : t.status == 500 ? "Internal Server Error [500]." : i === "parsererror" ? "Requested JSON parse failed." : i === "timeout" ? "Time out error." : i === "abort" ? "Ajax request aborted." : "Uncaught Error.\n" + t.responseText;
-          $("body").append('<div id="alerts" class="btn red">' + r + "<\/div>");
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()})
-        }
-      })), $("#alerts").remove(), !1
+        })
     });
     $("body").on("click", "a.delete-file", function (t) {
       t.preventDefault();
       var i = $(this).attr("href"),
           r = i.match(/([^\/]*)\/*$/)[1],
           u = $(".selected").next("ul").find("li:contains(" + r + "):last");
-      return tr = $(this).parents("tr"), confirm('Delete file "' + r + '" ?') && ($("body").append('<div id="alerts" class="btn blue">working..<\/div>'), $("#alerts").fadeIn(1e3), $.ajax({
-        url    : "core/afm/deletefile.php",
-        data   : {file: i},
-        success: function (t) {
-          $("#alerts").hide().remove();
-          $("body").append('<div id="alerts" class="btn blue">' + t + "<\/div>");
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
+
+      let tr = $(this).parents("tr");
+
+      confirm('Delete file "' + r + '" ?')
+           && fileManager.query({fmAction: 'deleteFile', dir: i},  function (t) {
           tr.hide(100).remove();
-          u.remove()
-        },
-        error  : function (t, i) {
-          $("#alerts").remove();
-          var r = "";
-          r     = t.status === 0 ? "Not connect.\n Verify Network." : t.status == 404 ? "Requested page not found. [404]" : t.status == 500 ? "Internal Server Error [500]." : i === "parsererror" ? "Requested JSON parse failed." : i === "timeout" ? "Time out error." : i === "abort" ? "Ajax request aborted." : "Uncaught Error.\n" + t.responseText;
-          $("body").append('<div id="alerts" class="btn red">' + r + "<\/div>");
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()})
-        }
-      })), $("#alerts").remove(), !1
+          u.remove();
+        })
     });
+
     $("body").on("mousedown", "#zipsite, a.downloadfolder, a.downloadfile", function () {
       var t = $(this);
       t.html('<i class=" fa fa-refresh fa-spin fa-fw" aria-hidden="true"><\/i>');
       window.location = $(this).attr("href");
-      setTimeout(function () {t.html('<i class=" fa fa-download" aria-hidden="true"><\/i>')}, 3e3)
+      setTimeout(function () {t.html('<i class=" fa fa-download" aria-hidden="true"><\/i>')}, 3000)
     });
-    $("body").on("change", "#file", function () {
+
+    /*$("body").on("change", "#file", function () {
       $("#frm-uploadfile").submit();
       $("#div-uploadfile").css("border-radius", 17).removeClass("fa-upload").addClass("fa-refresh fa-spin fa-fw")
-    });
-    $("#frm-uploadfile").submit(function (i) {
-      var r, u;
-      return $("body").append('<div id="alerts" class="btn blue">working..<\/div>'), r = $("#tree div.selected").data("fo"), $("#inputpath").val(r), i.preventDefault(), u = new FormData(this), $.ajax({
-        type       : "POST",
-        url        : "core/afm/uploadfile.php",
-        cache      : !1,
-        contentType: !1,
-        processData: !1,
-        data       : u,
-        success    : function (i) {
-          var u = i.split("/");
-          Object.keys(u).length > 1 ? ($.each(u, function (i) {
-            var f = u[i].substr(u[i].lastIndexOf(".") + 1),
-                e = r + u[i];
-            t(r);
-            !f == "" && $("#tree div.selected").next("ul").append('<li class="ext-file ext-' + f + '" style="border-right:1px solid red">' + u[i] + "<\/li>")
-          }), $("#alerts").hide().remove(), $("body").append('<div id="alerts" class="btn blue">Loaded<\/div>'), $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()})) : ($("#alerts").hide().remove(), $("body").append('<div id="alerts" class="btn blue">' + i + "<\/div>"), $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()}));
+    });*/
+
+    $("#frm-uploadfile #file").on('change', function (e) {
+      e.preventDefault();
+
+      let r = $("#tree div.selected").data("fo");
+      $("#inputpath").val(r);
+
+      Object.values(this.files).forEach(file => {
+        fileManager.form.append('files[]', file, file['name']);
+      });
+
+      fileManager.query({fmAction: 'uploadFile'},  function (t) {
+        let u = e.split("/");
+        Object.keys(u).length > 1 ? ($.each(u, function (i) {
+          var f = u[i].substr(u[i].lastIndexOf(".") + 1), e = r + u[i];
+          t(r);
+          !f == "" && $("#tree div.selected").next("ul").append('<li class="ext-file ext-' + f + '" style="border-right:1px solid red">' + u[i] + "<\/li>")
+        }),
+
+          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {
+          $("#alerts").remove()})) : ($("#alerts").hide().remove(), $("body").append('<div id="alerts" class="btn blue">' + e + "<\/div>"),
+          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()}));
           $("#div-uploadfile").css("border-radius", 2).removeClass("fa-refresh fa-spin fa-fw").addClass("fa-upload")
-        },
-        error      : function (t, i) {
-          $("#alerts").remove();
-          var r = "";
-          r     = t.status === 0 ? "Not connect.\n Verify Network." : t.status == 404 ? "Requested page not found. [404]" : t.status == 500 ? "Internal Server Error [500]." : i === "parsererror" ? "Requested JSON parse failed." : i === "timeout" ? "Time out error." : i === "abort" ? "Ajax request aborted." : "Uncaught Error.\n" + t.responseText;
-          $("body").append('<div id="alerts" class="btn red">' + r + "<\/div>");
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()})
-        }
-      }), $("#alerts").remove(), !1
+      })
     })
 
   },

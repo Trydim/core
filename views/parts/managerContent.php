@@ -30,11 +30,11 @@
            href="<?= $config['rootdirectory'] ?>downloadfolder.php?file=<?php echo ROOT ?>">
           <i class=" fa fa-download" aria-hidden="true"></i>Архивировать и скачать
         </a>
-        <a class="ab-btn asphalt" title="Основные настройки"
-           href="<?= $config['rootdirectory'] ?>editor.php?editfile=config.php"
+        <!--<a class="ab-btn asphalt" title="Основные настройки"
+           href="<?/*= $config['rootdirectory'] */?>editor.php?editfile=config.php"
            target="_blank">
           <i class=" fa fa-cog" aria-hidden="true"></i>Основные настройки
-        </a>
+        </a>-->
 
       </div>
     </div>

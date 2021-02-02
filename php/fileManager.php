@@ -93,8 +93,8 @@ if (isset($fmAction)) {
               $current_url = $protocol . $_SERVER['SERVER_NAME'] . '/';
 
               $filepath = str_replace('\\', '/', $filepath); // исправить
-              $filepath = str_replace('//', '/', $filepath); // исправить
-              $url = str_replace($_SERVER['DOCUMENT_ROOT'], $current_url, $filepath);
+              $filepath = mb_strtolower(str_replace('//', '/', $filepath)); // исправить
+              $url = str_replace(mb_strtolower($_SERVER['DOCUMENT_ROOT']), $current_url, $filepath); // исрпавить
 
               $ext = strtolower(preg_replace('/^.*\./', '', $file));
 
@@ -132,6 +132,146 @@ if (isset($fmAction)) {
     case 'createFolder':
       if (isset($dir) && $dir) {
         mkdir($dir, 0777, true);
+      }
+      break;
+    case 'renameFolder':
+      if (isset($oldName) && $oldName && isset($newName) && $newName) {
+        rename($oldName, $newName);
+      }
+      break;
+    case 'deleteFolder':
+      function deletefolder($dir) {
+
+        $iterator = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+        $files = new RecursiveIteratorIterator($iterator,RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($files as $file) {
+          if ($file->isDir()) {
+            rmdir($file->getRealPath());
+          } else {
+            unlink($file->getRealPath());
+          }
+        }
+        rmdir($dir);
+        return true;
+      }
+
+      if (isset($dir) && $dir && file_exists($dir)) {
+        deletefolder($dir);
+      }
+      break;
+    case 'deleteFile':
+      if (isset($dir) && $dir && file_exists($dir)) {
+        unlink($dir);
+      }
+      break;
+    case 'downloadFolder':
+      if (isset($_REQUEST["file"]) && !empty($_REQUEST["file"]) && $_REQUEST["file"] != 'undefined') {
+
+        $dir = $_REQUEST["file"];
+        $folder = basename($dir);
+
+        if (!empty ($folder)) $zip_file = $folder . '.zip';
+        else $zip_file = 'download.zip';
+
+
+        // Get real path for our folder
+        $rootPath = realpath($dir);
+
+        // Initialize archive object
+        $zip = new ZipArchive();
+        $zip->open($zip_file, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+        // Create recursive directory iterator
+        /** @var SplFileInfo[] $files */
+        $files = new RecursiveIteratorIterator(
+          new RecursiveDirectoryIterator($rootPath),
+          RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $name => $file) {
+          // Skip directories (they would be added automatically)
+          if (!$file->isDir()) {
+            // Get real and relative path for current file
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($rootPath) + 1);
+
+            // Add current file to archive
+            $zip->addFile($filePath, $relativePath);
+          }
+        }
+
+        // Zip archive will be created only after closing object
+        $zip->close();
+
+        if (ob_get_level()) ob_end_clean();
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename=' . basename($zip_file));
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($zip_file));
+        if (readfile($zip_file)) {
+          $zip = dirname(__FILE__) . '/' . $zip_file;
+          unlink($zip);
+        }
+      }
+      break;
+    case 'downloadFile':
+      if (isset($_REQUEST["file"]) && !empty($_REQUEST['file']) && $_REQUEST['file'] != 'undefined') {
+
+        $file = urldecode($_REQUEST["file"]); // Decode URL-encoded string
+
+        if (file_exists($file)) {
+
+          // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
+          // если этого не сделать файл будет читаться в память полностью!
+          if (ob_get_level()) {
+            ob_end_clean();
+          }
+
+          header('Content-Description: File Transfer');
+          header('Content-Type: application/octet-stream');
+          header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+          header('Expires: 0');
+          header('Cache-Control: must-revalidate');
+          header('Pragma: public');
+          header('Content-Length: ' . filesize($file));
+          //flush(); // Flush system output buffer
+
+          if ($fd = fopen($file, 'rb')) {
+            while (!feof($fd)) {
+              print fread($fd, 1024);
+            }
+            fclose($fd);
+          }
+          exit;
+
+        }
+      }
+      break;
+    case 'uploadFile':
+      if (count($_FILES['files']['name']) && isset($dir) && $dir) {
+
+        for ($i = 0; $i < count($_FILES['files']['name']); $i++) {
+
+          $shortname = $_FILES['files']['name'][$i];
+
+          //Get the temp file path
+          $tmpFilePath = $_FILES['files']['tmp_name'][$i];
+
+          //Make sure we have a filepath
+          if ($tmpFilePath !== "") {
+
+            //save the url and the file
+            $filePath = $dir . $_FILES['files']['name'][$i];
+
+            //Upload the file into the temp dir
+            move_uploaded_file($tmpFilePath, $filePath);
+          }
+        }
       }
       break;
   }
