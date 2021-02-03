@@ -21,18 +21,18 @@ if (isset($fmAction)) {
           $retstring = '%01.2f %s';
         }
         $lastsizestring = end($sizes);
-        foreach ($sizes as $sizestring) {
+        foreach ($sizes as $sizeString) {
           if ($size < 1024) {
             break;
           }
-          if ($sizestring != $lastsizestring) {
+          if ($sizeString != $lastsizestring) {
             $size /= 1024;
           }
         }
-        if ($sizestring == $sizes[0]) {
+        if ($sizeString == $sizes[0]) {
           $retstring = '%01d %s';
         } // Bytes aren't normally fractional
-        return sprintf($retstring, $size, $sizestring);
+        return sprintf($retstring, $size, $sizeString);
       }
 
       function foldersize($path) {
@@ -165,12 +165,11 @@ if (isset($fmAction)) {
       }
       break;
     case 'downloadFolder':
-      if (isset($_REQUEST["file"]) && !empty($_REQUEST["file"]) && $_REQUEST["file"] != 'undefined') {
+      if (isset($dir) && $dir) {
 
-        $dir = $_REQUEST["file"];
         $folder = basename($dir);
 
-        if (!empty ($folder)) $zip_file = $folder . '.zip';
+        if (!empty($folder)) $zip_file = $folder . '.zip';
         else $zip_file = 'download.zip';
 
 
@@ -205,13 +204,7 @@ if (isset($fmAction)) {
 
         if (ob_get_level()) ob_end_clean();
 
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename=' . basename($zip_file));
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
+        header('FileName: ' . json_encode(basename($zip_file)));
         header('Content-Length: ' . filesize($zip_file));
         if (readfile($zip_file)) {
           $zip = dirname(__FILE__) . '/' . $zip_file;
@@ -220,9 +213,9 @@ if (isset($fmAction)) {
       }
       break;
     case 'downloadFile':
-      if (isset($_REQUEST["file"]) && !empty($_REQUEST['file']) && $_REQUEST['file'] != 'undefined') {
+      if (isset($dir) && $dir) {
 
-        $file = urldecode($_REQUEST["file"]); // Decode URL-encoded string
+        $file = urldecode($dir); // Decode URL-encoded string
 
         if (file_exists($file)) {
 
@@ -232,14 +225,8 @@ if (isset($fmAction)) {
             ob_end_clean();
           }
 
-          header('Content-Description: File Transfer');
-          header('Content-Type: application/octet-stream');
-          header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-          header('Expires: 0');
-          header('Cache-Control: must-revalidate');
-          header('Pragma: public');
+          header('FileName: ' . json_encode(basename($file)));
           header('Content-Length: ' . filesize($file));
-          //flush(); // Flush system output buffer
 
           if ($fd = fopen($file, 'rb')) {
             while (!feof($fd)) {
@@ -248,7 +235,6 @@ if (isset($fmAction)) {
             fclose($fd);
           }
           exit;
-
         }
       }
       break;

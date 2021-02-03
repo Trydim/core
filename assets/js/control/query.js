@@ -7,11 +7,32 @@ const checkJSON = (data) => {
   catch (e) { console.log(data); alert('Error! see console!'); return {status: false} }
 };
 
+const downloadBody = async (data) => {
+  const fileName = JSON.parse(data.headers.get('fileName')),
+        reader = data.body.getReader();
+  let chunks = [],
+      countSize = 0;
+
+  while(true) {
+    // done становится true в последнем фрагменте
+    // value - Uint8Array из байтов каждого фрагмента
+    const {done, value} = await reader.read();
+
+    if (done) break;
+
+    chunks.push(value);
+    countSize += value.length;
+  }
+  return Object.assign(new Blob(chunks), {fileName});
+}
+
 const query = (url, data, type = 'json') => {
+  type === 'file' && (type = 'body');
   return fetch(url, {method: 'post', body: data})
     .then(res => type === 'json' ? res.text() : res).then(
       data => {
         if (type === 'json') return checkJSON(data, type);
+        else if (type === 'body') return downloadBody(data);
         else return data[type]();
       },
       error => console.log(error),

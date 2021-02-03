@@ -1,4 +1,13 @@
 
+const t = (dir) => {
+  //$("body").append('<div id="alerts" class="btn blue">загрузка..</div>');
+  //$("#alerts").fadeIn(1e3);
+  fileManager.query({fmAction: 'showTable', dir}, (data) => {
+    $('#ab-container-table').html('').append(data);
+    //$("#alerts").hide().remove();
+  });
+}
+
 export const fileManager = {
   form: new FormData(),
 
@@ -8,22 +17,14 @@ export const fileManager = {
   },
 
   init() {
+    let node = f.qS('#rootDirData'),
+        root = node && node.value || 'public';
+    t(root);
 
-    //showtable
-    this.query({dir: 'public'}, (data) => {
-      $('#ab-container-table').html('').append(data);
+    $("div.fo").next().hide(1, () => {
+      $("#tree").css("display", "block")
     });
 
-    const t = (dir) => {
-      //$("body").append('<div id="alerts" class="btn blue">загрузка..</div>');
-      $("#alerts").fadeIn(1e3);
-      this.query({fmAction: 'showTable', dir}, (data) => {
-        $('#ab-container-table').html('').append(data);
-        //$("#alerts").hide().remove();
-      });
-    }
-
-    $("div.fo").next().hide(1, () => {$("#tree").css("display", "block")});
     $("body").on("click", "#tree div.fo", function () {
       $(this).next().toggle(100);
       $(".selected").removeClass("selected");
@@ -173,7 +174,7 @@ export const fileManager = {
       let fmAction = this.dataset.action,
           dir = this.dataset.path;
 
-      fileManager.query({fmAction, dir}, () => {});
+      fileManager.query({fmAction, dir, type: 'body'}, () => {});
       //setTimeout(function () {t.html('<i class=" fa fa-download" aria-hidden="true"><\/i>')}, 3000)
     });
 
@@ -182,23 +183,28 @@ export const fileManager = {
       $("#div-uploadfile").css("border-radius", 17).removeClass("fa-upload").addClass("fa-refresh fa-spin fa-fw")
     });*/
 
-    $("#frm-uploadfile #file").on('change', function (e) {
+    $("#frm-uploadfile #file").on('drop', changeInput)
+    $("#frm-uploadfile #file").on('change', changeInput);
+
+    function changeInput (e) {
       e.preventDefault();
 
-      let r = $("#tree div.selected").data("fo");
-      $("#inputpath").val(r);
+      let dir = $("#tree div.selected").data("fo"),
+          files = e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer.files : this.files;
 
-      Object.values(this.files).forEach(file => {
+      Object.values(files).forEach(file => {
         fileManager.form.append('files[]', file, file['name']);
       });
 
-      fileManager.query({fmAction: 'uploadFile'},  function (t) {
-        let u = t.split("/");
+      fileManager.query({fmAction: 'uploadFile', dir},  function () {
+        t(dir);
+
+        f.showMsg('Добавлено');
+        /*let u = t.split("/");
 
         if (u.length > 1) {
           $.each(u, (i) => {
             let f = u[i].substr(u[i].lastIndexOf(".") + 1), e = r + u[i];
-            t(r);
             f !== "" && $("#tree div.selected").next("ul").append('<li class="ext-file ext-' + f + '" style="border-right:1px solid red">' + u[i] + "<\/li>");
           }),
 
@@ -210,13 +216,15 @@ export const fileManager = {
           $("body").append('<div id="alerts" class="btn blue">' + e + "<\/div>");
           $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
           $("#div-uploadfile").css("border-radius", 2).removeClass("fa-refresh fa-spin fa-fw").addClass("fa-upload")
-        }
+        }*/
       })
-    })
+    }
 
   },
 
   query(param, func) {
+    let {type = ''} = param,
+        queryParam;
 
     this.queryParam = Object.assign(this.queryParam, param);
 
@@ -224,6 +232,12 @@ export const fileManager = {
       this.form.set(param[0], param[1]);
     })
 
-    f.Post({data: this.form}).then(data => func(data['html']));
+    queryParam = {data: this.form};
+    type && (queryParam.type = type);
+
+    f.Post(queryParam).then(data => {
+      if (type === 'body') f.saveFile({name: data['fileName'], blob: data});
+      else func(data['html'])
+    });
   },
 }

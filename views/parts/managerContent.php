@@ -23,13 +23,12 @@
           <div id="div-uploadfile" class="" title="загрузить файл здесь">
           <form id="frm-uploadfile" name="frm-uploadfile" enctype="multipart/form-data">
             <input type="file" id="file" name="file[]" multiple="multiple">
-            <input type="hidden" id="inputpath" name="inputpath">
           </form>
         </div>
         </div>
 
         <!--<a id="zipsite" class="ab-btn asphalt" title="Архивировать и скачать"
-           href="<?= $config['rootdirectory'] ?>downloadfolder.php?file=<?php echo ROOT ?>">
+           href="<?/*= $config['rootdirectory'] */?>downloadfolder.php?file=<?php echo ROOT ?>">
           <i class=" fa fa-download" aria-hidden="true"></i>Архивировать и скачать
         </a>-->
         <!--<a class="ab-btn asphalt" title="Основные настройки"
@@ -46,11 +45,11 @@
     <div id="leftpanel" class="ab-col4">
       <div id="tree">
 
-        <div id="home" data-fo="<?= ABS_SITE_PATH . 'public/' ?>" class="closed selected">
-          <?php echo basename(ABS_SITE_PATH . 'public/') ?>
+        <div id="home" data-fo="<?= SHARE_DIR . '/'?>" class="closed selected">
+          <?= SHARE_DIR . '/' ?>
         </div>
         <!-- tree  -->
-        <?php tree(ABS_SITE_PATH . 'public/'); ?>
+        <?php tree(ABS_SITE_PATH . SHARE_DIR . '/'); ?>
 
       </div>
     </div>
@@ -63,5 +62,6 @@
 
   </div>
 
+  <input type="hidden" id="rootDirData" value="<?= SHARE_DIR ?>">
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>

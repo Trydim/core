@@ -1205,7 +1205,7 @@ table#ab-list-pages {
 #leftpanel {
     background: #f9f9f9;
     border-right: 1px solid #ddd;
-    overflowy: auto;
+    overflow: auto;
 }
 
 #fahome {
@@ -1561,10 +1561,6 @@ label {
 
 #tree ul {
     list-style-type: none;
-}
-
-#tree {
-    display: none;
 }
 
 #tree li {

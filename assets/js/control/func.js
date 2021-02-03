@@ -209,9 +209,10 @@ const func = {
     return a;
   },
 
-  savePdf: (data) => {
-    let link = func.createLink(data.name || 'Name');
-    link.setAttribute('href', `data:application/pdf;base64,${data['pdfBody']}`);
+  saveFile: (data) => {
+    const {name = 'download.file', blob} = data;
+    let link = func.createLink(name);
+    link.href = URL.createObjectURL(blob);
     link.click();
   },
 
@@ -312,7 +313,10 @@ const func = {
     q.Post({data}).then(data => {
       f.removeLoading(target);
       if (data['pdfBody']) {
-        f.savePdf(data);
+        f.saveFile({
+          name: data['name'],
+          blob: data['pdfBody']
+        });
         finishOk();
       }
     });
