@@ -44,6 +44,9 @@ export const admindb = {
   tableName: '',
 
   init() {
+    //test
+    document.body.style.overflow = 'hidden';
+
     this.onBtnEvent();
 
     this.tableName = new URLSearchParams(location.search).get('tableName') || '';

@@ -359,7 +359,13 @@ const func = {
     let node = f.qS(dataSelector), json;
     node && (json = JSON.parse(node.value)) && node.remove();
     json && (this.rate = json['curs']);
-  }
+  },
+
+  parseNumber(value) {
+    typeof value === 'string' && (value = value.replace(',', '.'));
+    !isFinite(value) && (value = 0);
+    return +value;
+  },
 }
 
 export const f = Object.assign(func, q);
