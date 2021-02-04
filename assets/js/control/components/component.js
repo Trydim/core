@@ -534,6 +534,7 @@ export class Valid {
     this.fileInput = this.form.querySelector('input[type="file"]');
     if (this.fileInput) {
       fileFieldSelector && (this.fileField = this.form.querySelector(fileFieldSelector)); // Возможно понадобиться много полей
+      this.files = {};
     }
 
     // Send Btn
@@ -569,21 +570,26 @@ export class Valid {
   }
 
   checkFileInput() {
-    let error = false, files = [];
+    let error = false;
+
     for (const file of Object.values(this.fileInput.files)) {
+      let id = Math.random() * 10000 | 0;
+
       file.fileError = file.size > 1024*1024;
       if (file.fileError && !error) error = true;
 
-      files.push(file);
+      this.files[id] && (id += '1');
+      this.files[id] = file;
     }
+    this.fileInput.files = this.createInput().files;
 
-    this.showFiles(files);
+    this.showFiles();
 
     if (error) {
-      this.setValidated(this.fileInput);
+      this.setErrorValidate(this.fileInput);
       this.btnDisabled();
     } else {
-      this.setErrorValidate(this.fileInput);
+      this.setValidated(this.fileInput);
       this.btnActivate();
     }
   }
@@ -640,10 +646,10 @@ export class Valid {
     this.valid.add(node.id);
   }
 
-  showFiles(files) {
+  showFiles() {
     let html = '';
 
-    files.forEach((file, i) => {
+    Object.entries(this.files).forEach(([i, file]) => {
       html += this.getFileTemplate(file, i);
     });
 
@@ -657,8 +663,8 @@ export class Valid {
   }
 
   confirm(e, sendFunc) {
-
-    let finished = () => {
+    const formData = new FormData(this.form),
+          finished = () => {
 
       this.form.querySelectorAll('input')
           .forEach(n => {
@@ -670,9 +676,12 @@ export class Valid {
       //  добавить удаление события проверки файла
     }
 
-    //this.fileInput && add
+    this.fileInput && formData.delete(this.fileInput.name);
+    Object.entries(this.files).forEach(([id, file]) => {
+      formData.append(id, file, file.name);
+    });
 
-    sendFunc(this.form, finished);
+    sendFunc(formData, finished);
   }
 
   clickCommon(e) {
@@ -689,7 +698,7 @@ export class Valid {
   }
 
   removeFile(target) {
-    delete this.fileInput.files[target.dataset.id];
+    delete this.files[target.dataset.id];
     this.checkFileInput();
   }
 
@@ -698,12 +707,18 @@ export class Valid {
     this.fileInput && this.fileInput.addEventListener('change', this.checkFileInput.bind(this));
   }
 
+  createInput() {
+    let input = document.createElement('input');
+    input.type = 'file';
+    return input;
+  }
+
   getFileTemplate(file, i) {
     return `<div class="attach__item ${file.fileError ? this.cssClass.error : ''}">
         <span class="bold">${file.name}</span>
-        <!--span class="table-basket__cross"
+        <span class="table-basket__cross"
               data-id="${i}"
-              data-action="removeFile"></span--></div>`;
+              data-action="removeFile"></span></div>`;
   }
 }
 

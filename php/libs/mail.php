@@ -63,6 +63,7 @@ class Mail {
 	public function addOtherFile($files) {
 	  $that = $this;
 	  array_map(function ($file) use (&$that) {
+      if (!is_file($file['tmp_name'])) return;
 	    $that->attachmentFiles[] = [
 	      'path' => $file['tmp_name'],
         'name' => $file['name'],

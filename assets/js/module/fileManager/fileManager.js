@@ -160,10 +160,11 @@ export const fileManager = {
 
       let tr = $(this).parents("tr");
 
-      confirm('Delete file "' + r + '" ?')
+      confirm('Удалить файл "' + r + '" ?')
            && fileManager.query({fmAction: 'deleteFile', dir: i},  function (t) {
           tr.hide(100).remove();
           u.remove();
+          f.showMsg('Удалено');
         })
     });
 
