@@ -564,8 +564,8 @@ export class Valid {
     else this.btn.setAttribute('disabled', 'disabled');
   }
 
-  btnDisabled(clear = true) {
-    clear && this.valid.clear();
+  btnDisabled() {
+    this.valid.clear();
     this.btnActivate();
   }
 
@@ -587,7 +587,7 @@ export class Valid {
 
     if (error) {
       this.setErrorValidate(this.fileInput);
-      this.btnDisabled(false);
+      this.btn.setAttribute('disabled', 'disabled');
     } else {
       this.setValidated(this.fileInput);
       this.btnActivate();
