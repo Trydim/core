@@ -316,7 +316,7 @@ export class MessageToast {
     }
   }
 
-  show(msg = 'message body', type = 'warning') {
+  show(msg = 'message body', type = 'success') {
 
     if(typeof type !== 'string') this.checkMsq(msg, type);
     else {
