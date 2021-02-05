@@ -4,7 +4,7 @@ import {c} from "../const.js";
 
 const checkJSON = (data) => {
   try { return JSON.parse(data); }
-  catch (e) { console.log(data); alert('Error! see console!'); return {status: false} }
+  catch (e) { f.showMsg(data, 'error', false); return {status: false} }
 };
 
 const downloadBody = async (data) => {

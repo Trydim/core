@@ -12,7 +12,7 @@ class Pdf {
 	private $PDF_NAME = [
 		'name'      => [
 			'position' => 0,
-			'value'    => ''
+      'value'    => '',
 		],
 		'unique'    => [
 			'position'    => 1,
@@ -49,8 +49,8 @@ class Pdf {
 		$this->pdfParam = [
 			'format'       => 'A4',
 			'margin_left'   => 10,
-			'margin_top'    => 10,
-			'margin_right'  => 5,
+			'margin_top'    => 5,
+			'margin_right'  => 10,
 			'margin_bottom' => 5,
 			'margin_header' => 0,
 			'margin_footer' => 5,
@@ -79,14 +79,24 @@ class Pdf {
 			case 'mpdf':
 				try {
 					$this->pdf = new Mpdf\Mpdf($this->pdfParam);
-					//$mpdf->useOnlyCoreFonts = true;
-					//$mpdf->SetDisplayMode('fullpage');
+					//$this->pdf->useOnlyCoreFonts = true;
+					//$this->pdf->SetDisplayMode('fullpage');
 
 					$this->setCss();
 
-					//$mpdf->SetHTMLHeader('');
-					//$mpdf->SetHTMLFooter('<div class="footerPage"><b>{PAGENO} из {nbpg} стр.</b></div>');
-
+					//$this->pdf->SetHTMLHeader('');
+          // Todo куда нить добавить
+          $this->pdf->SetHTMLFooter('
+					<table>
+						<tbody>
+							<tr>
+								<td style="width: 25%; text-align:center">vmeste-studio.by</td>
+								<td style="width: 25%;text-align:center">vmeste-print.by</td>
+								<td style="width: 25%;text-align:center">vmestegroup.by</td>
+								<td style="width: 25%;text-align:center">vmeste-web.by</td>
+							</tr>
+						</tbody>
+					</table>');
 
 					$this->pdf->WriteHTML($this->content, \Mpdf\HTMLParserMode::HTML_BODY);
 				}	catch (\Mpdf\MpdfException $e) {

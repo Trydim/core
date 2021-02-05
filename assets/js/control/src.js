@@ -34,7 +34,13 @@ const m = {
 
   SortColumns: module.SortColumns,
 
-  showMsg: (msg, type) => new module.MessageToast().show(msg, type),
+  /**
+   *
+   * @param msg
+   * @param type (success, warning, error)
+   * @param autoClose bool
+   */
+  showMsg: (msg, type, autoClose) => new module.MessageToast().show(msg, type, autoClose),
   LoaderIcon: module.LoaderIcon,
 };
 

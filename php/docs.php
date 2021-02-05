@@ -21,7 +21,7 @@ if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
   isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true);
 }
 
-$phone = isset($tel) ? $tel : $phone;
+$phone = isset($tel) ? $tel : (isset($phone) ? $phone : '');
 $info = isset($info) ? $info : '';
 $usePdf = isset($usePdf) || $docType === 'pdf';
 

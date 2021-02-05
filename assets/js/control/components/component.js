@@ -316,10 +316,14 @@ export class MessageToast {
     }
   }
 
-  show(msg = 'message body', type = 'success') {
+  show(msg = 'message body', type = 'success', autoClose = true) {
+    const close = () => {
+      setTimeout(() => {
+        this.messageBlock.remove();
+      }, 3000);
+    }
 
-    if(typeof type !== 'string') this.checkMsq(msg, type);
-    else {
+    if (typeof type !== 'string') this.checkMsq(msg, type); else {
       this.setMessage(msg);
       this.setColor(type);
     }
@@ -327,9 +331,8 @@ export class MessageToast {
     this.messageBlock.classList.remove('d-small');
     this.messageBlock.classList.add('d-large');
 
-    setTimeout(() => {
-      this.messageBlock.remove();
-    }, 3000);
+    if (autoClose) close();
+    else this.messageBlock.addEventListener('click', close, {once: true});
   }
 }
 

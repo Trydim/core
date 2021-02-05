@@ -212,7 +212,8 @@ const func = {
   saveFile: (data) => {
     const {name = 'download.file', blob} = data;
     let link = func.createLink(name);
-    link.href = URL.createObjectURL(blob);
+    if (data.type === 'base64') link.href = blob;
+    else link.href = URL.createObjectURL(blob);
     link.click();
   },
 
@@ -315,7 +316,8 @@ const func = {
       if (data['pdfBody']) {
         f.saveFile({
           name: data['name'],
-          blob: data['pdfBody']
+          type: 'base64',
+          blob: 'data:application/pdf;base64,' + data['pdfBody']
         });
         finishOk();
       }
@@ -366,6 +368,17 @@ const func = {
     !isFinite(value) && (value = 0);
     return +value;
   },
+
+  // Border warning
+  flashNode(item) {
+    let def                 = item.style.boxShadow;
+    item.style.boxShadow    = '0px 0px 4px 1px #fb9c9c';
+    item.style.borderRadius = '4px';
+    item.style.transition   = 'all 0.2s ease';
+    setTimeout(() => {
+      item.style.boxShadow = def || 'none';
+    }, 1000);
+  }
 }
 
 export const f = Object.assign(func, q);
