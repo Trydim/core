@@ -27,7 +27,7 @@ class Pdf {
 
 	private $pdfTpl = 'pdfTpl'; // Шаблон pdf по умолчанию
 	private $data = []; // Отчет глобальный для вставки в шаблон
-	private $content;
+	private $content, $footerPage = '';
 	private $pdfParam; // Param
 	private $pdf;
 	private $pdfName;
@@ -69,6 +69,8 @@ class Pdf {
       include(CORE . "views/docs/$this->pdfTpl.php");
     }
 
+    isset($footerPage) && $this->footerPage = $footerPage;
+
 		$this->content = ob_get_clean();
 	}
 
@@ -85,18 +87,7 @@ class Pdf {
 					$this->setCss();
 
 					//$this->pdf->SetHTMLHeader('');
-          // Todo куда нить добавить
-          $this->pdf->SetHTMLFooter('
-					<table>
-						<tbody>
-							<tr>
-								<td style="width: 25%; text-align:center">vmeste-studio.by</td>
-								<td style="width: 25%;text-align:center">vmeste-print.by</td>
-								<td style="width: 25%;text-align:center">vmestegroup.by</td>
-								<td style="width: 25%;text-align:center">vmeste-web.by</td>
-							</tr>
-						</tbody>
-					</table>');
+          $this->pdf->SetHTMLFooter($this->footerPage);
 
 					$this->pdf->WriteHTML($this->content, \Mpdf\HTMLParserMode::HTML_BODY);
 				}	catch (\Mpdf\MpdfException $e) {
