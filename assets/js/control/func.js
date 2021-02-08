@@ -218,13 +218,13 @@ const func = {
   },
 
   // Маска для телефона
-  maskInit: (node) => {
+  maskInit: (node, phoneMask) => {
     if (!node) return;
     const minValue = 2;
 
     const mask = (e) => {
       let target = e.target, i = 0,
-          matrix = c.PHONE_MASK,
+          matrix = phoneMask || c.PHONE_MASK,
           def = matrix.replace(/\D/g, ""),
           val = target.value.replace(/\D/g, "");
 

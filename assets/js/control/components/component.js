@@ -199,6 +199,15 @@ export const Modal = (param = {}) => {
     let node = this.wrap.querySelector('.' + key.replace('.', ''));
     node && param.value && (node.value = param.value);
   }
+  modal.onEvent = function () {
+    let func = function (e) {
+      if (e.key === 'Escape') {
+        modal.hide();
+        document.removeEventListener('keyup', func);
+      }
+    }
+    document.addEventListener('keyup', func);
+  }
 
   /**
    * Show modal window
@@ -223,6 +232,7 @@ export const Modal = (param = {}) => {
 
     this.wrap.classList.add('active');
     this.window.classList.add('active');
+    modal.onEvent();
   }
 
   modal.hide = function () {
@@ -510,6 +520,7 @@ export class Valid {
           submitSelector = '#btnConfirmSend',
           fileFieldSelector = false, // Если поля не будет тогда просто after
           initMask = true,
+          phoneMask = false,
         } = param;
 
     try {
@@ -528,7 +539,7 @@ export class Valid {
       else {
         n.addEventListener('keyup', (e) => this.keyEnter(e));
 
-        initMask && n.type === 'tel' && f.maskInit && f.maskInit(n);
+        initMask && n.type === 'tel' && f.maskInit && f.maskInit(n, phoneMask);
       }
       n.addEventListener('blur', (e) => this.validate(e)); // может и не нужна
     });
