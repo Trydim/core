@@ -92,8 +92,8 @@ if (isset($fmAction)) {
 
               $current_url = $protocol . $_SERVER['SERVER_NAME'] . '/';
 
-              $filepath = str_replace('\\', '/', $filepath); // исправить
-              $filepath = mb_strtolower(str_replace('//', '/', $filepath)); // исправить
+              $filepath = str_replace('\\', '/', $filepath);                            // исправить
+              $filepath = mb_strtolower(str_replace('//', '/', $filepath));             // исправить
               $url = str_replace(mb_strtolower($_SERVER['DOCUMENT_ROOT']), $current_url, $filepath); // исрпавить
 
               $ext = strtolower(preg_replace('/^.*\./', '', $file));
@@ -111,7 +111,7 @@ if (isset($fmAction)) {
               if (in_array($ext, array("jpg", "jpeg", "png", "gif", "ico", "bmp"))) {
                 $html .= '<a class="ab-btn green zoom" href="' . $url . '" target="_blank"><i class="fa fa-eye" aria-hidden="true"></i></a>';
 
-              //if edited file
+                //if edited file
               } elseif (in_array($ext, $config['extensions_for_editor'])) {
                 //$html .= '<a class="ab-btn violet ab-edit-file" href="editor.php?editfile=' . $filepath . '" target="_blank" title="Редактировать"><i class="fa fa-pencil" aria-hidden="true"></i></a></td></tr>';
               }
@@ -143,7 +143,7 @@ if (isset($fmAction)) {
       function deletefolder($dir) {
 
         $iterator = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
-        $files = new RecursiveIteratorIterator($iterator,RecursiveIteratorIterator::CHILD_FIRST);
+        $files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST);
         foreach ($files as $file) {
           if ($file->isDir()) {
             rmdir($file->getRealPath());

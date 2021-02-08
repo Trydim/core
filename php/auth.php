@@ -12,7 +12,7 @@ $db = new db();
 session_start();
 
 switch ($authAction) {
-	case 'login':
+  case 'login':
     if ($user = $db->checkPassword($login, $password)) {
       $_SESSION['login'] = $user['name'];
       $_SESSION['priority'] = $user['ID']; //типа маскирую
@@ -23,14 +23,14 @@ switch ($authAction) {
 
       reDirect(true, (isset($clientPageTarget) && $clientPageTarget !== 'login') ? $clientPageTarget : '');
     } else reDirect(false, "login?status=error&login=$login&password=$password");
-		break;
-	case 'exit':
+    break;
+  case 'exit':
     if (isset($_SESSION['priority'])) {
       $hash = password_hash(uniqid(), PASSWORD_BCRYPT);
       $db->setUserHash($_SESSION['priority'], $hash);
       $_SESSION['target'] = '';
       reDirect(false);
     }
-		break;
+    break;
 
 }

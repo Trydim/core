@@ -1,4 +1,4 @@
-<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var array $dbConfig - config from public
@@ -34,27 +34,27 @@ $usePdf && $pdf = new Pdf($reportVal);
 //$usePdf && $pdf->setTemplate($docType);
 
 if (isset($docType)) {
-	switch ($docType) {
-		case 'pdf':
-			$result = $pdf->getPdf();
-			break;
-		case 'mail':
+  switch ($docType) {
+    case 'pdf':
+      $result = $pdf->getPdf();
+      break;
+    case 'mail':
       $usePdf && $pdfPath = $pdf->getPdf('save');
-			require_once 'libs/mail.php';
-			$mail = new Mail();
-			$param = [
-				'name'  => $name,
-				'phone' => $phone,
-				'email' => $email,
+      require_once 'libs/mail.php';
+      $mail = new Mail();
+      $param = [
+        'name'  => $name,
+        'phone' => $phone,
+        'email' => $email,
         'info'  => $info,
-				'data'  => $reportVal
-			];
-			isset($filesArray) && $mail->addOtherFile($filesArray);
-			$mail->prepareMail($param);
-			//$mail->setSubject($pdfPath);
+        'data'  => $reportVal
+      ];
+      isset($filesArray) && $mail->addOtherFile($filesArray);
+      $mail->prepareMail($param);
+      //$mail->setSubject($pdfPath);
       $usePdf && $mail->addPdf($pdfPath);
-			$mail->addMail($email);
-			$result['mail'] = $mail->send();
-			break;
-	}
+      $mail->addMail($email);
+      $result['mail'] = $mail->send();
+      break;
+  }
 }
