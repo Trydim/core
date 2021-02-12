@@ -13,7 +13,7 @@ else {
   $target && $pathTarget = checkTemplate($target);
   if ($target && strstr($pathTarget, '404')) require CORE . 'controller/c_404.php';
   else {
-    require CORE . "model/base.php";
+    if (!OUTSIDE) require CORE . "model/base.php";
 
     $target = checkAccess($target);
     $target !== 'public' && $pathTarget = checkTemplate($target);

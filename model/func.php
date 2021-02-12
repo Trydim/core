@@ -83,7 +83,8 @@ function checkTemplate($tmpFile) {
  * @return mixed|string
  */
 function getTargetPage($get) {
-	return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage']) : '';
+	return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage'])
+                                   : (OUTSIDE ? 'public' : '');
 }
 
 /**
@@ -98,6 +99,8 @@ function template($path = 'base', $vars = []) {
 	ob_start();
   if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {
     include(ABS_SITE_PATH . 'public/views/' . "$path.php");
+  } else if (file_exists(ABS_SITE_PATH . VIEW . "$path.php")) { // TODO два раза с нижним условием?
+    include(ABS_SITE_PATH . VIEW . "$path.php");
   } else if (file_exists(VIEW . "$path.php")) {
     include(VIEW . "$path.php");
   }
@@ -346,4 +349,15 @@ function doHook($hookName, ...$args) {
   global $main;
   if ($main instanceof cms\Main) return $main->execAction($hookName, ...$args);
   return false;
+}
+
+
+function getPageAsString($data) {
+  $html = '<div>' . $data['cssLinksArr'];
+  $html .= $data['globalWindowJsValue'];
+  $html .= $data['content'];
+  $html .= $data['jsLinksArr'];
+  $html .= $data['footerContent'] . '</div>';
+
+  return $html;
 }

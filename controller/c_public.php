@@ -40,4 +40,5 @@ if(!$authStatus) $field['sideLeft'] = '';
 
 
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
-$html = template('base', $field);
+if (OUTSIDE) $html = template('outside', $field);
+else $html = template('base', $field);

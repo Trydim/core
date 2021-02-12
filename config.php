@@ -20,11 +20,12 @@ foreach ($publicConfig as $k => $v) {
   if (!defined($k)) define($k, $v);
 }
 
-if(!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
-if(!defined('SHARE_DIR')) define('SHARE_DIR', false);
-if(!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : 'calendar');
-if(!defined('ACCESS_MENU')) define('ACCESS_MENU', []);
-if(!defined('PRINT_BTN')) define('PRINT_BTN', 1);
+if (!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
+if (!defined('SHARE_DIR')) define('SHARE_DIR', false);
+if (!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : 'calendar');
+if (!defined('ACCESS_MENU')) define('ACCESS_MENU', []);
+if (!defined('PRINT_BTN')) define('PRINT_BTN', 1);
+if (!defined('OUTSIDE')) define('OUTSIDE', isset($_GET['outside']));
 
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/Main.php';

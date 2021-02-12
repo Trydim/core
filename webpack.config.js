@@ -1,4 +1,4 @@
-const path = require('path');
+//const path = require('path');
 
 module.exports = {
   mode: 'production', // production / development
@@ -14,21 +14,22 @@ module.exports = {
    filename: 'js/[name].js'
    },*/
   output: {
-    path: path.resolve(__dirname, ''),
-    filename: './assets/js/control/src.min.js' // [contenthas] - для обхода кеширования
+    //path: path.resolve(__dirname, ''),
+    //filename: './assets/js/control/src.min.js' // [contenthas] - для обхода кеширования
+    filename: 'src.min.js' // [contenthas] - для обхода кеширования
   },
-  plugins: [ ],
+  /*plugins: [ ],
   resolve: {
     alias: {
       //"jq-ui": path.join(__dirname, "/jquery-ui"),
     }
   },
-  devtool: '',
+  devtool: '',*/
   //devtool: 'cheap-source-map', //source mapping
-  module: {
+  /*module: {
     noParse: [ /jquery\/dist\/jquery.min.js/,
                /jquery-ui\/ui\/version.js/,],
     rules: [ ]
-  },
+  },*/
 
 };

@@ -499,10 +499,13 @@ $temp = ob_get_clean();
     if(file_exists($file)) {
       $value = file($file)[0];
       $value && $value = explode('|||', $value);
-      $this->login = [$value[0] , $value[1]];
+      $this->login = [$value[0], $value[1]];
 
       if ($value[0] === $login && $value[1] === $password) {
-        return true;
+        return [
+          'name' => $value[0],
+          'ID' => 1,
+        ];
       } else return false;
     } else {
       file_put_contents($file, '');

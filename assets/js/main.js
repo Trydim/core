@@ -90,7 +90,7 @@ const onClickSubmenu = () => {
 //entrance function
 (() => {
   let page = location.pathname.replace(f.SITE_PATH, '').match(/(\w+)/);
-  page = page ? page[1] : 'public';
+  page = (page && !f.OUTSIDE) ? page[1] : 'public';
 
   if (f.gI('authForm')) return;
   cancelFormSubmit();
