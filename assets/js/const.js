@@ -34,4 +34,7 @@ export const c = {
     // css класс который добавляется при загрузке
     LOADING: 'loading-st1',
   },
+
+  // Пробное
+  calcWrap: document.querySelector('#wrapCalcNode'),
 };

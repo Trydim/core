@@ -4,6 +4,7 @@ import {c} from "../const.js";
 import {f} from "./func.js";
 
 import * as module from './components/component.js';
+import { showerCalc } from './components/shower-calc.js';
 
 const m = {
 
@@ -42,6 +43,11 @@ const m = {
    */
   showMsg: (msg, type, autoClose) => new module.MessageToast().show(msg, type, autoClose),
   LoaderIcon: module.LoaderIcon,
+
+  /*
+
+   */
+  initShadow: (param) => new showerCalc(param),
 };
 
 window.f = Object.assign(c, m, f);

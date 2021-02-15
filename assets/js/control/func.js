@@ -9,16 +9,21 @@ const func = {
   log: (msg) => c.DEBUG && console.log('Error:' + msg),
 
   /**
+   * deprecated wrap for f.qS
    * @param id
    * @return {HTMLElement | {}}
    */
-  gI: (id) => document.getElementById(id ? id.replace('#', '') : '') || func.log(id),
+  gI: (id) => func.qS('#' + id),
 
   /**
    * @param selector
+   * @param node
    * @return {HTMLElement | {}}
    */
-  qS: (selector) => document.querySelector(selector || '') || func.log(selector),
+  qS: (selector = '', node = c.calcWrap) => {
+    node = node || document;
+    return node.querySelector(selector) || document.querySelector(selector) || func.log(selector);
+  },
 
   /**
    *
@@ -28,7 +33,8 @@ const func = {
    * @return NodeListOf<HTMLElementTagNameMap[*]>|object
    */
   qA: (selector, nodeKey = null, value = null) => {
-    let nodeList = document.querySelectorAll(selector);
+    let  node = c.calcWrap || document,
+         nodeList = node.querySelectorAll(selector);
     if (!nodeList) return {};
     if (nodeKey && value) nodeList.forEach((item) => {
       if(typeof value === 'function') {
@@ -44,17 +50,17 @@ const func = {
   /**
    * получить html шаблона
    *
-   * @param id {string}
+   * @param selector {string}
    * @return {string}
    */
-  gT: (id) => { let node = func.gI(id); return node ? node.content.children[0].outerHTML : 'Not found template' + id},
+  gT: (selector) => { let node = func.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + id},
 
   /**
    * Получить Node шаблона
-   * @param id {string}
+   * @param selector {string}
    * @returns {Node}
    */
-  gTNode: (id) => func.gI(id).content.children[0].cloneNode(true),
+  gTNode: (selector) => func.qS(selector).content.children[0].cloneNode(true),
 
   // перевод в число
   toNumber: (input) => +(input.replace(/(\s|\D)/g, '')),

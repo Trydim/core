@@ -13,6 +13,7 @@ const importModuleFunc = async (moduleName) => {
         .then(module => resolve(module[moduleName]))
         .catch(err => reject(err));
     });
+    f.initShadow(); // todo убрать отсюда
     return importModule.init() || false;
   } catch (e) { console.log(e); return false; }
 }
@@ -102,4 +103,5 @@ const onClickSubmenu = () => {
   if(page) init(page);
   else initIndex();
 
+  /*setTimeout(() => { // todo разобраться с синхронизацией }, 100);*/
 })();
