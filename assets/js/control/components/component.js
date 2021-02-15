@@ -261,7 +261,7 @@ export const Modal = (param = {}) => {
     this.content  = findNode(node, 'content');
     this.btnField = findNode(node, 'bottomFieldBtn');
 
-    if (c.OUTSIDE) c.calcWrap.append(node.children[0]);
+    if (c.OUTSIDE && c.calcWrap) c.calcWrap.append(node.children[0]);
     else document.body.append(node.children[0]);
   }
 
