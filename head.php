@@ -19,6 +19,7 @@ else {
     $target !== 'public' && $pathTarget = checkTemplate($target);
     require CORE . "controller/c_$target.php";
   }
-
   echo $html;
 }
+
+unset($target, $pathTarget, $html, $authStatus, $dbContent, $field, $orderId, $main);

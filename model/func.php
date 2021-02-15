@@ -34,7 +34,7 @@ function checkError($var) {
 
 
 function checkAccess($target) {
-  if (in_array($target, [PUBLIC_PAGE, 'public'])) return 'public';
+  if (in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
   if (in_array($target, array_merge(ACCESS_MENU, [HOME_PAGE, 'login']))) return $target;
   reDirect(false);
 }
