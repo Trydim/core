@@ -20,7 +20,11 @@ $inline && $globalWindowJsValue = "<script>$globalWindowJsValue</script>";
 $cssLinksArr = $inline ? '' : [];
 if(!isset($cssLinks)) $cssLinks = [];
 array_map(function($item) use (&$cssLinksArr, $inline) {
-  if ($inline)  $cssLinksArr .= "<link rel=\"stylesheet\" data-href=\"$item\">";
+  if ($inline) {
+    $global = '';
+    if (stripos($item, 'global') !== false) $global = 'data-global="true"';
+    $cssLinksArr .= "<link rel=\"stylesheet\" $global data-href=\"$item\">";
+  }
   else $cssLinksArr[] = $item;
 }, $cssLinks);
 

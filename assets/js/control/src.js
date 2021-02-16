@@ -4,11 +4,12 @@ import {c} from "../const.js";
 import {f} from "./func.js";
 
 import * as module from './components/component.js';
-import { showerCalc } from './components/shower-calc.js';
+import { Modal } from './components/modal.js';
+import { shadowNode } from './components/shadownode.js';
 
 const m = {
 
-  initModal : module.Modal,
+  initModal : Modal,
   initPrint : module.Print,
 
   searchInit: module.Searching,
@@ -47,7 +48,7 @@ const m = {
   /*
 
    */
-  initShadow: (param) => new showerCalc(param),
+  initShadow: (param) => new shadowNode(param),
 };
 
 window.f = Object.assign(c, m, f);

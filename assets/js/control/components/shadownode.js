@@ -12,7 +12,7 @@ const getCustomElements = () => {
   return element;
 }
 
-export class showerCalc {
+export class shadowNode {
 
   constructor() {
     this.customElements = getCustomElements();
@@ -24,7 +24,10 @@ export class showerCalc {
         node = f.qS('#wrapCalcNode');
 
     shadowRoot.innerHTML = '';
-    node.querySelectorAll('link[data-href]').forEach(n => n.href = n.dataset.href);
+    node.querySelectorAll('link[data-href]').forEach(n => {
+      if (n.dataset.global) document.head.append(n);
+      n.href = n.dataset.href;
+    });
     shadowRoot.append(node);
     node.style.display = 'block';
 
