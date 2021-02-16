@@ -16,7 +16,7 @@ export class showerCalc {
 
   constructor() {
     this.customElements = getCustomElements();
-    this.init();
+    this.customElements && this.init();
   }
 
   init() {

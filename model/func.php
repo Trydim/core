@@ -353,7 +353,7 @@ function doHook($hookName, ...$args) {
 
 
 function getPageAsString($data, $wrapId = 'wrapCalcNode') {
-  $html = "<div class=\"container\"><shadow-calc></shadow-calc></div>";
+  $html = "<div class=\"shadow-calc\" id=\"shadow-calc\"><shadow-calc></shadow-calc></div>";
   $html .= "<div id=\"$wrapId\" style='display:none;'>" . $data['cssLinksArr'];
   $html .= $data['globalWindowJsValue'];
   $html .= $data['content'];
