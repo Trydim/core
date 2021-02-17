@@ -16,6 +16,8 @@ define('MAIL_HOST', 'smtp.yandex.ru');
 define('MAIL_PORT', 465);
 define('MAIL_FROM', 'noreplycalcby@yandex.ru');
 define('MAIL_PASSWORD', '638ch1');
+//define('MAIL_FROM', 'commonserver@yandex.ru');
+//define('MAIL_PASSWORD', 'xmbxqxulvhwcqyta');
 define('MAIL_FROM_USER', 'calc.by');
 
 require_once 'vendor/autoload.php';
@@ -77,7 +79,7 @@ class Mail {
     try {
       if (MAIL_SMTP) {
         $mail->isSMTP();                         // Send using SMTP
-        $mail->SMTPDebug = 0;                    // Enable verbose debug output
+        $mail->SMTPDebug = 1;                    // Enable verbose debug output
         $mail->Host = MAIL_HOST;                 // Set the SMTP server to send through
         $mail->SMTPAuth = true;                  // Enable SMTP authentication
         $mail->Username = MAIL_FROM;             // SMTP username

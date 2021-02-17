@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '6cafa345330fa394f695eaabdbb9ccc684a74a97',
+    'reference' => '63d8071237370faeeb548f71ff66bf93544b4d5d',
     'name' => '__root__',
   ),
   'versions' => 
@@ -31,7 +31,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '6cafa345330fa394f695eaabdbb9ccc684a74a97',
+      'reference' => '63d8071237370faeeb548f71ff66bf93544b4d5d',
     ),
     'mpdf/mpdf' => 
     array (
@@ -84,12 +84,12 @@ private static $installed = array (
     ),
     'setasign/fpdi' => 
     array (
-      'pretty_version' => 'v2.3.5',
-      'version' => '2.3.5.0',
+      'pretty_version' => 'v2.3.6',
+      'version' => '2.3.6.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'f2246c8669bd25834f5c264425eb0e250d7a9312',
+      'reference' => '6231e315f73e4f62d72b73f3d6d78ff0eed93c31',
     ),
   ),
 );

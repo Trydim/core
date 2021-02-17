@@ -62,7 +62,8 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 
       <div class="content mt-0">
         <div class="row justify-center"> <!-- возможно убрать justify-center -->
-          <div class="col-12 col-md-10"><?= $content; ?></div>
+                                         <!-- стили временно-->
+          <div class="col-12 col-xl-10" style="margin: 0 auto; max-width: 1200px"><?= $content; ?></div>
 
           <?php if($sideRight) { ?>
             <aside id="right" class="col-12 col-md-2"><?= $sideRight; ?></aside>
