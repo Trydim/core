@@ -8,7 +8,6 @@ if (!defined('MAIN_ACCESS')) die('access denied!');
 // General setting
 
 // To
-//define('MAIL_TARGET', 'info@calc.by');
 define('MAIL_TARGET', 'trydim@mail.ru');
 define('MAIL_SUBJECT', 'Заявка с сайта');
 // From
