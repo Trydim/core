@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '63d8071237370faeeb548f71ff66bf93544b4d5d',
+    'reference' => '31ec9a33713b5a3864a658f24652ecfa45768f42',
     'name' => '__root__',
   ),
   'versions' => 
@@ -31,38 +31,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '63d8071237370faeeb548f71ff66bf93544b4d5d',
-    ),
-    'mpdf/mpdf' => 
-    array (
-      'pretty_version' => 'v8.0.0',
-      'version' => '8.0.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'c13ebc0fd5cc0613dfb1fd37d55a67859b92cf0c',
-    ),
-    'myclabs/deep-copy' => 
-    array (
-      'pretty_version' => '1.10.2',
-      'version' => '1.10.2.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '776f831124e9c62e1a2c601ecc52e776d8bb7220',
-      'replaced' => 
-      array (
-        0 => '1.10.2',
-      ),
-    ),
-    'paragonie/random_compat' => 
-    array (
-      'pretty_version' => 'v9.99.99',
-      'version' => '9.99.99.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95',
+      'reference' => '31ec9a33713b5a3864a658f24652ecfa45768f42',
     ),
     'phpmailer/phpmailer' => 
     array (
@@ -73,23 +42,23 @@ private static $installed = array (
       ),
       'reference' => 'e38888a75c070304ca5514197d4847a59a5c853f',
     ),
-    'psr/log' => 
+    'spipu/html2pdf' => 
     array (
-      'pretty_version' => '1.1.3',
-      'version' => '1.1.3.0',
+      'pretty_version' => 'v5.2.2',
+      'version' => '5.2.2.0',
       'aliases' => 
       array (
       ),
-      'reference' => '0f73288fd15629204f9d42b7055f72dacbe811fc',
+      'reference' => 'e6d8ca22347b6691bb8c2652212b1be2c89b3eff',
     ),
-    'setasign/fpdi' => 
+    'tecnickcom/tcpdf' => 
     array (
-      'pretty_version' => 'v2.3.6',
-      'version' => '2.3.6.0',
+      'pretty_version' => '6.3.5',
+      'version' => '6.3.5.0',
       'aliases' => 
       array (
       ),
-      'reference' => '6231e315f73e4f62d72b73f3d6d78ff0eed93c31',
+      'reference' => '19a535eaa7fb1c1cac499109deeb1a7a201b4549',
     ),
   ),
 );

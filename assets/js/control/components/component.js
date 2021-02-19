@@ -217,10 +217,10 @@ export class MessageToast {
   }
 
   show(msg = 'message body', type = 'success', autoClose = true) {
-    const close = () => {
+    const close = (delay = 3000) => {
       setTimeout(() => {
         this.messageBlock.remove();
-      }, 3000);
+      }, delay);
     }
 
     if (typeof type !== 'string') this.checkMsq(msg, type); else {
@@ -232,7 +232,7 @@ export class MessageToast {
     this.messageBlock.classList.add('d-large');
 
     if (autoClose) close();
-    else this.messageBlock.addEventListener('click', close, {once: true});
+    else this.messageBlock.addEventListener('click', close.bind(this, 0), {once: true});
   }
 }
 

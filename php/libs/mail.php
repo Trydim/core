@@ -79,7 +79,7 @@ class Mail {
     try {
       if (MAIL_SMTP) {
         $mail->isSMTP();                         // Send using SMTP
-        $mail->SMTPDebug = 1;                    // Enable verbose debug output
+        $mail->SMTPDebug = 0;                    // Enable verbose debug output
         $mail->Host = MAIL_HOST;                 // Set the SMTP server to send through
         $mail->SMTPAuth = true;                  // Enable SMTP authentication
         $mail->Username = MAIL_FROM;             // SMTP username

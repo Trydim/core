@@ -105,6 +105,7 @@ class Pdf {
           ];
           $this->pdf = new Spipu\Html2Pdf\Html2Pdf('P', $format, 'ru', true, 'UTF-8', $param);
 
+          if (defined('DEBUG')) $this->pdf->setModeDebug();
           //$this->pdf->pdf->SetDisplayMode('fullpage');
           $this->pdf->setDefaultFont('freesans');
 
@@ -112,7 +113,7 @@ class Pdf {
         } catch (Spipu\Html2Pdf\Exception\Html2PdfException $e) {
           $this->pdf->clean();
           $formatter = new Spipu\Html2Pdf\Exception\ExceptionFormatter($e);
-          $errorMsg = $formatter->getHtmlMessage();
+          echo $formatter->getHtmlMessage();
         }
         break;
     }
