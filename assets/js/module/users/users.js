@@ -43,7 +43,7 @@ export const users = {
     data.forEach(i => this.usersList.set(i['U.ID'], i));
   },
   fillTable(data) {
-    this.contValue || (this.contValue = f.gT('tableContactsValue'));
+    this.contValue || (this.contValue = f.gT('#tableContactsValue'));
     data = data.map(item => {
       if(item['contacts']) {
         let value = '';
@@ -84,7 +84,7 @@ export const users = {
 
   // Заполнить статусы
   fillPermission(data) {
-    let tmp = f.gT('permission'), html  = '';
+    let tmp = f.gT('#permission'), html  = '';
 
     html += f.replaceTemplate(tmp, data);
 
@@ -125,7 +125,7 @@ export const users = {
 
     let select = {
       'addUser': () => {
-        let form = f.gTNode('userForm');
+        let form = f.gTNode('#userForm');
 
         this.onEventNode(form.querySelector('[name="userName"]'), this.changeTextInput, {}, 'blur');
 
@@ -149,7 +149,7 @@ export const users = {
         if (!this.selectedId.size) return;
 
         let oneElements = this.selectedId.size === 1,
-            form = f.gTNode('userForm'), node,
+            form = f.gTNode('#userForm'), node,
             id = this.getSelectedList(),
             users = this.usersList.get(id[0]);
 
@@ -211,7 +211,7 @@ export const users = {
 
         let id = this.getSelectedList(),
             user = this.usersList.get(id[0]),
-            form = f.gTNode('userChangePassForm');
+            form = f.gTNode('#userChangePassForm');
 
         this.queryParam.usersId = JSON.stringify(this.getSelectedList());
 

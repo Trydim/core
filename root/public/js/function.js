@@ -5,7 +5,7 @@
 export const publicFunction = {
 
   printReport: (report, number) => {
-    let table = f.gTNode('printTable'),
+    let table = f.gTNode('#printTable'),
         html = '';
 
     Object.values(report).map(i => {

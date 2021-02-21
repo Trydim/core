@@ -40,7 +40,7 @@ export const catalog = {
   field      : null,
   delayFunc  : () => {},
   sectionWrap: f.gI('sectionWrap').content.children[0],
-  section    : f.gT('section'),
+  section    : f.gT('#section'),
 
   curSectionNode: f.gI('sectionField'),
 
@@ -195,7 +195,7 @@ export const catalog = {
 
   setTableHead(column, param) {
     let itemsField = param.type + 'Field',
-        tmp = f.gT('itemsTableHead'), html = '<th></th>';
+        tmp = f.gT('#itemsTableHead'), html = '<th></th>';
     this.sortParam[param.type].sortColumn = column[0] || false;
 
     column.map(i => html += tmp.replace(/\${name}/g, i));
@@ -209,7 +209,7 @@ export const catalog = {
 
     this[selParam] = new Set();
     this[itemsField] || (this[itemsField] = f.gI(param.fieldId));
-    this.checkboxTmp || (this.checkboxTmp = f.gT('itemsTableRowsCheck'))
+    this.checkboxTmp || (this.checkboxTmp = f.gT('#itemsTableRowsCheck'))
     this.sortParam[param.type].sortColumn || (this.setTableHead(Object.keys(elements[0]), param));
 
     let trNode = [],
@@ -252,7 +252,7 @@ export const catalog = {
       },
       // Изменить секцию
       'changeSection' : () => {
-        let form = f.gTNode('sectionForm'), node;
+        let form = f.gTNode('#sectionForm'), node;
 
         this.queryParam.sectionId = this.curSectionNode.getAttribute('data-id') || false;
         if(!this.queryParam.sectionId) { this.M.hide(); return; }
@@ -290,7 +290,7 @@ export const catalog = {
         },
       // Создать секцию
       'createSection' : () => {
-        let form = f.gTNode('sectionForm');
+        let form = f.gTNode('#sectionForm');
 
         this.onEventNode(form.querySelector('[name="sectionName"]'), this.changeTextInput, {}, 'blur');
         this.onEventNode(form.querySelector('[name="sectionCode"]'), this.changeTextInput, {}, 'blur');
@@ -303,7 +303,7 @@ export const catalog = {
       // Создать элемент
       'createElements' : () => {
         // Запросить типы элементов
-        let form = f.gTNode('elementForm');
+        let form = f.gTNode('#elementForm');
 
         this.queryParam.sectionId = this.curSectionNode.getAttribute('data-id') || false;
         if(!this.queryParam.sectionId) { this.M.hide(); return; }
@@ -330,7 +330,7 @@ export const catalog = {
         if(!this.selectedId.elements.size) return;
 
         let oneElements = this.selectedId.elements.size === 1,
-            form = f.gTNode('elementForm'),
+            form = f.gTNode('#elementForm'),
             id = this.getSelectedList('elements'),
             element = this.elementsList.get(id[0]);
 
@@ -378,7 +378,7 @@ export const catalog = {
       'createOptions': () => {
         // Нужен запрос на ID валют
         // Нужен запрос на ID единиц измерения
-        let form = f.gTNode('optionForm');
+        let form = f.gTNode('#optionForm');
 
         //if(!this.queryParam.optionId) { this.M.hide(); return; }
 
@@ -422,7 +422,7 @@ export const catalog = {
         // Нужен запрос на ID валют
         // Нужен запрос на ID единиц измерения
         let oneElements = this.selectedId.options.size === 1,
-            form = f.gTNode('optionForm'), node,
+            form = f.gTNode('#optionForm'), node,
             id = this.getSelectedList('options'),
             options = this.optionsList.get(id[0]);
 

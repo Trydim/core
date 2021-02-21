@@ -369,7 +369,7 @@ export const Searching = () => {
         wrap = target.parentNode;
 
     if(this.usePopup && !this.resultTmp) {
-      this.resultTmp = f.gTNode('searchResult');
+      this.resultTmp = f.gTNode('#searchResult');
       this.resultTmp.addEventListener('click', (e) => this.clickResult(e, target));
     }
 

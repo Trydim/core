@@ -628,7 +628,7 @@ body {
   content: " ";
   display: inline-block;
   border-radius: 50%;
-  border: 6px solid #309dff;
+  border-width: 6px;
   border-color: #309dff transparent #309dff transparent;
   animation: lds-dual-ring 1.2s linear infinite;
 }

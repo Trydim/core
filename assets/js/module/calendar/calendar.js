@@ -185,7 +185,7 @@ const orders = {
     node && node.innerText && this.setOrders(JSON.parse(node.innerText));
     node && node.remove();
 
-    this.tmp || (this.tmp = f.gT('orderTemplate'));
+    this.tmp || (this.tmp = f.gT('#orderTemplate'));
   },
 
   setOrders(orders) {
@@ -236,7 +236,7 @@ const orders = {
 }
 
 export const calendar = {
-  M: f.initModal(),
+  M: f.initModal({showDefaultButton: false}),
 
   init() {
 

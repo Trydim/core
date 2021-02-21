@@ -97,7 +97,7 @@ const orders = {
   },
 
   initTemplate() {
-    this.ordersTmp = f.gT('tableOrdersNumbers');
+    this.ordersTmp = f.gT('#tableOrdersNumbers');
   },
 }
 
@@ -145,9 +145,9 @@ export const customers = {
     data.forEach(i => this.usersList.set(i['C.ID'], i));
   },
   fillTable(data, search = false) {
-    this.contValue || (this.contValue = f.gT('tableContactsValue'));
-    this.searchMsg || (this.searchMsg = f.gT('noFoundSearchMsg'));
-    this.orderBtn || (this.orderBtn = f.gT('tableOrderBtn'));
+    this.contValue || (this.contValue = f.gT('#tableContactsValue'));
+    this.searchMsg || (this.searchMsg = f.gT('#noFoundSearchMsg'));
+    this.orderBtn || (this.orderBtn = f.gT('#tableOrderBtn'));
     data = data.map(item => {
       if (item['contacts']) {
         let value = '';
@@ -227,7 +227,7 @@ export const customers = {
 
     let select = {
       'addCustomer': () => {
-        let form = f.gTNode('customerForm');
+        let form = f.gTNode('#customerForm');
 
         //this.onEventNode(form.querySelector('[name="name"]'), this.changeTextInput, {}, 'blur');
 
@@ -243,7 +243,7 @@ export const customers = {
       'changeCustomer': () => {
         if (this.selectedId.size !== 1) { f.showMsg('Выберите клиента!'); return; }
 
-        let form = f.gTNode('customerForm'), node,
+        let form = f.gTNode('#customerForm'), node,
             id = this.getSelectedList(),
             customer = this.usersList.get(id[0]);
 

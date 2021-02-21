@@ -4,7 +4,10 @@
 import {c} from "../../const.js";
 import {f} from "../func.js";
 
-// Модальное окно
+/**
+ * Модальное окно
+ * @var param = {modalId: string, template: string, showDefaultButton: bool, btnConfig: bool}
+  */
 export const Modal = (param = {}) => {
   let modal = Object.create(null),
       data = Object.create(null),
@@ -34,14 +37,16 @@ export const Modal = (param = {}) => {
     }
     document.addEventListener('keyup', func);
   }
+  modal.querySelector = function (selector) { return this.wrap.querySelector(selector) }
+  modal.querySelectorAll = function (selector) { return this.wrap.querySelectorAll(selector) }
 
   /**
    * Show modal window
    * @param title Nodes | string[]
    * @param content Nodes | string[]
    */
-  modal.show = function (title = '', content = '') {
-    this.title && title && f.eraseNode(this.title).append(title);
+  modal.show = function (title, content = '') {
+    this.title && title !== undefined && f.eraseNode(this.title).append(title);
     this.content && content && f.eraseNode(this.content).append(content);
 
     if (btnConfig) this.btnConfig(btnConfig);
@@ -107,6 +112,8 @@ export const Modal = (param = {}) => {
       </div>
     </div>`;
   }
+
+
 
   modal.setTemplate();
   //btnConfig && modal.btnConfig(btnConfig);
