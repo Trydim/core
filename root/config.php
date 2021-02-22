@@ -27,11 +27,11 @@ $publicConfig = [
   'PDF_LIBRARY' => 'mpdf',
 
   /* Пункты меню какие показывать и последовательность
-  'orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog'
-  заказы     календарь   клиенты   менеджеры статистика администрирование каталог
+  'orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog', 'fileManager'
+  заказы     календарь   клиенты   менеджеры статистика администрирование каталог файловый менеджер
   options - настройки
   */
-  'ACCESS_MENU' => ['orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog']
+  'ACCESS_MENU' => ['orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog', 'fileManager']
 
 ];
 

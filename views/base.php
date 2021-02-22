@@ -4,7 +4,7 @@
  * @var array $vars extract param
  */
 // Todo временно
-global $authStatus, $target;
+global $main, $target;
 
 if(!isset($pageTitle)) $pageTitle = '';
 if(!isset($headContent)) $headContent = '';
@@ -29,7 +29,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
   <?= $headContent ?>
 	<title><?= $pageTitle; ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
-	<?php if($authStatus || $target === 'login') { ?>
+	<?php if($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
      <!-- Material Kit CSS -->
