@@ -100,8 +100,8 @@ export const orders = {
   },
 
   fillTable(data, search = false) {
-    this.impValue || (this.impValue = f.gT('tableImportantValue'));
-    this.searchMsg || (this.searchMsg = f.gT('noFoundSearchMsg'));
+    this.impValue || (this.impValue = f.gT('#tableImportantValue'));
+    this.searchMsg || (this.searchMsg = f.gT('#noFoundSearchMsg'));
     data = data.map(item => {
       if(item.important_value) {
         let value = '';
@@ -139,7 +139,7 @@ export const orders = {
 
   // Заполнить статусы
   fillSelectStatus(data) {
-    let tmp = f.gT('changeStatus'), html  = '';
+    let tmp = f.gT('#changeStatus'), html  = '';
 
     html += f.replaceTemplate(tmp, data);
 
@@ -150,7 +150,7 @@ export const orders = {
   showOrder(data) {
     if(!data['order']) console.log('error');
 
-    let tmp = f.gT('orderOpenForm'),
+    let tmp = f.gT('#orderOpenForm'),
         html = document.createElement('div');
 
     data['order']['important_value'] = JSON.parse(data['order']['important_value'])[0];
@@ -286,7 +286,7 @@ export const orders = {
       'sendOrder': () => {
         hideActionWrap = false;
         if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
-        let form = f.gTNode('sendMailTmp');
+        let form = f.gTNode('#sendMailTmp');
 
         let fd = new FormData();
         fd.set('mode', 'DB');

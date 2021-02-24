@@ -65,7 +65,7 @@ const orders = {
 
   init() {
     this.initOrders();
-    this.tmp || (this.tmp = f.gT('orderTemplate'));
+    this.tmp || (this.tmp = f.gT('#orderTemplate'));
   },
 
   initOrders() {

@@ -1,7 +1,7 @@
 <?php ?>
 <template id="printTable">
   <div>
-    <style scoped>
+    <style>
       * {
         font-size: 14px;
       }

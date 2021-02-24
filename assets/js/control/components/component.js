@@ -272,10 +272,12 @@ export const Print = () => {
   }
 
   p.print = function (content, classList = []) {
+    const scrollY = window.pageYOffset;
     let delay = this.setContent(content, classList);
     setTimeout(() => {
       document.body.append(this.frame);
       this.frame.remove();
+      window.scrollTo(0, scrollY);
     }, delay);
   }
 
@@ -369,7 +371,7 @@ export const Searching = () => {
         wrap = target.parentNode;
 
     if(this.usePopup && !this.resultTmp) {
-      this.resultTmp = f.gTNode('searchResult');
+      this.resultTmp = f.gTNode('#searchResult');
       this.resultTmp.addEventListener('click', (e) => this.clickResult(e, target));
     }
 
@@ -581,11 +583,11 @@ export class Valid {
     }
 
     this.fileInput && formData.delete(this.fileInput.name);
-    Object.entries(this.files).forEach(([id, file]) => {
+    this.files && Object.entries(this.files).forEach(([id, file]) => {
       formData.append(id, file, file.name);
     });
 
-    sendFunc(formData, finished);
+    sendFunc(formData, finished, e);
   }
 
   clickCommon(e) {

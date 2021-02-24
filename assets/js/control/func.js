@@ -280,7 +280,7 @@ const func = {
 
   // вывод печати.
   printReport: (report, number = 1) => {
-    let table = f.gTNode('printTable'),
+    let table = f.gTNode('#printTable'),
         html = '';
 
     Object.values(report).map(i => {
