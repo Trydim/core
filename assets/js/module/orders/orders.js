@@ -280,7 +280,11 @@ export const orders = {
           .then(data => {
             loading.stop();
             target.blur();
-            if(data['pdfBody']) f.savePdf(data);
+            if(data['pdfBody']) f.saveFile({
+              name: data['name'],
+              type: 'base64',
+              blob: 'data:application/pdf;base64,' + data['pdfBody']
+            });
           });
       },
       'sendOrder': () => {

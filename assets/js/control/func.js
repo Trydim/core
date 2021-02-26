@@ -255,6 +255,16 @@ const func = {
     return a;
   },
 
+  /**
+   * Save file from browser
+   * @param {object} data
+   *
+   * data is {'name', 'type' , 'blob'}
+   * @example for PDF:
+   * {name: 'file.pdf',
+   * type: 'base64',
+   * blob: 'data:application/pdf;base64,' + data['pdfBody']}
+   */
   saveFile: (data) => {
     const {name = 'download.file', blob} = data;
     let link = func.createLink(name);

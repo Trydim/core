@@ -347,14 +347,12 @@ export const Searching = () => {
   }
 
   obj.clear = function (inputNode) {
-    console.log(1);
     inputNode.removeEventListener('keyup', this.bindInputNodeEvent);
     this.usePopup && this.resultTmp.remove();
   }
 
   // Events
   const inputNodeEvent = function (e) {
-    console.log(1);
     let value = e.target.value;
     if(value.length > 1) {
       f.show(this.resultTmp);
