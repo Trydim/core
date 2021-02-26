@@ -48,7 +48,7 @@ function reDirect($status, $target = '') {
     if ($status) $target = HOME_PAGE;
     else {
       if (isset($_SESSION['target']) && $_SESSION['target']) $target = 'login';
-      else $target = PUBLIC_PAGE ? 'public' : 'login';
+      else $target = ONLY_LOGIN ? 'login' : 'public';
     }
   }
   //unset($_GET['targetPage']);

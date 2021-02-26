@@ -56,7 +56,10 @@ class Pdf {
       'margin_footer' => 5,
     ];
 
-    $this->imgPath = PATH_IMG;
+    switch (PDF_LIBRARY) {
+      case 'mpdf': $this->imgPath = PATH_IMG; break; // возможно подойдет обоим
+      case 'html2pdf': $this->imgPath = $_SERVER['DOCUMENT_ROOT'] . PATH_IMG; break; // возможно подойдет обоим
+    }
   }
 
   private function prepareTemplate() {
@@ -105,11 +108,12 @@ class Pdf {
           ];
           $this->pdf = new Spipu\Html2Pdf\Html2Pdf('P', $format, 'ru', true, 'UTF-8', $param);
 
-          if (defined('DEBUG')) $this->pdf->setModeDebug();
-          //$this->pdf->pdf->SetDisplayMode('fullpage');
+          DEBUG && $this->pdf->setModeDebug();
           $this->pdf->setDefaultFont('freesans');
 
+          $this->setCss();
           $this->pdf->writeHTML($this->content);
+
         } catch (Spipu\Html2Pdf\Exception\Html2PdfException $e) {
           $this->pdf->clean();
           $formatter = new Spipu\Html2Pdf\Exception\ExceptionFormatter($e);
@@ -122,12 +126,21 @@ class Pdf {
   private function setCss() {
     if (file_exists(ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.css")) {
       $cssPath = ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.css";
-    } else if (file_exists(CORE . "/views/docs/$this->pdfTpl.css")) {
+    }
+    else if (file_exists(CORE . "/views/docs/$this->pdfTpl.css")) {
       $cssPath = CORE . "/views/docs/$this->pdfTpl.css";
     }
 
     $stylesheet = file_get_contents($cssPath);
-    $this->pdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
+
+    switch (PDF_LIBRARY) {
+      case 'mpdf':
+        $this->pdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
+        break;
+      case 'html2pdf':
+        $this->pdf->WriteHTML('<style>' . $stylesheet . '</style>');
+        break;
+    }
   }
 
   public function __construct($data, $pdfTpl = 'pdfTpl') {
@@ -175,7 +188,6 @@ class Pdf {
             'pdfBody' => base64_encode($this->pdf->Output('', 'S')),
           ];
         }
-        break;
       case 'html2pdf':
         /** Destination where to send the document. It can take one of the following values:
          * I: send the file inline to the browser (default). The plug-in is used if available. The name given by name is used when one selects the "Save as" option on the link generating the PDF.
@@ -195,7 +207,6 @@ class Pdf {
             'pdfBody' => base64_encode($this->pdf->Output('', 'S')),
           ];
         }
-        break;
     }
   }
 

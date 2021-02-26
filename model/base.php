@@ -22,8 +22,8 @@ if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] 
   }
 }
 
-// Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт (PUBLIC_PAGE === false/'')
-if ($main->checkStatus('no') && !in_array($target, ['login', 'public'])) {
+// Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт (ONLY_LOGIN === false/'')
+if ($main->checkStatus('no') && (ONLY_LOGIN && $target !== 'login')) {
   //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
   $_SESSION['target'] = $target;
   reDirect(false);

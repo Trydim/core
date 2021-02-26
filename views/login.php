@@ -3,7 +3,7 @@
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="notification-container error" role="alert">Неправильный логин или пароль</div><br>' : '';
 
-$publicLink = PUBLIC_PAGE ? '<a href="/' . PUBLIC_PAGE . '">Открытая страница</a>' : '';
+$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a href="/' . PUBLIC_PAGE . '">Открытая страница</a>' : '';
 
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global

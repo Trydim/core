@@ -144,64 +144,104 @@ const func = {
    * цель data-target="name", у цели добавить в класс
    * опции селектора могут иметь data-target="name"
    * Если в классе цели добавить No, например nameNo, цель будет скрываться когда input выбран
+   *
+   * (в разработке)
+   * Если цель зависима от нескольких полей в атрибуте data-toggle,
+   *   перечистиль название целей через пробел.
+   *
+   *
    */
   relatedOption: (node = document) => {
-    node.querySelectorAll('input[data-target]')
-            .forEach(node => {
-              let nameAttr = node.name ? `[name="${node.name}"]` : '';
+    const qs = (s) => document.querySelectorAll(s),
+          ga = (i, a) => i.getAttribute(a),
+          hide = (n) => n.classList.add('d-none'),
+          show = (n) => n.classList.remove('d-none'),
+          getOtherTarget = (cur, toggle) => toggle.split(' ').filter(i => i !== cur),
+          setTarget = (n, t) => n.dataset[t] = '+';
 
-              if (nameAttr) {
-                node.onchange = () => {
-                  let items = document.querySelectorAll(`input${nameAttr}`);
 
-                  items.forEach(item => { // Скрываем все зависимые поля
-                    let t = item.getAttribute('data-target');
-                    //if (t) $('.' + t).hide().addClass('hidden');
-                    if (t) document.querySelectorAll(`.${t}, .${t}No`)
-                                   .forEach(i => i.classList.add('d-none'));
-                  });
+    const checkTarget = (n, t) => {
+      if (!n.dataset.toggle) return;
+      delete n.dataset[t];
 
-                  items.forEach(item => { // Открываем все зависимые поля
-                    //if (t && item.checked) $('.' + t).show().removeClass('hidden');
-                    let t    = item.getAttribute('data-target'),
-                        flag = item.classList.contains('opposite') ? !item.checked : item.checked;
-                    if (t && flag) document.querySelectorAll(`.${t}`)
-                                           .forEach(i => i.classList.remove('d-none'));
-                    if (t && !flag) document.querySelectorAll(`.${t}No`)
-                                            .forEach(i => i.classList.remove('d-none'));
-                  });
+      for (const elem of getOtherTarget(t, n.dataset.toggle)) {
+        if (n.dataset[elem]) return true;
+      }
+    }
 
-                };
+    const selectChange = function (check = false) {
+      let opList = Object.values(this.options);
 
-              } else {
-                let target    = node.getAttribute('data-target'), nodeTL = document.querySelectorAll(`.${target}`);
-                node.onchange = () => {
-                  if (node.checked) nodeTL.forEach(i => i.classList.remove('d-none')); else nodeTL.forEach(i => i.classList.add('d-none'));
-                };
-              }
+      for (let item of opList) { //Скрыть все
+        let t = item.getAttribute('data-target'),
+            nodeTL = t && qs(`.${t}, .${t}No`);
 
-              node.dispatchEvent(new Event('change'));
-            });
-    node.querySelectorAll('select.useToggleOption').forEach(node => {
-      node.onchange = function () {
+        if (nodeTL) nodeTL.forEach(i => {
+          if (checkTarget(i, t)) return;
+          hide(i);
+        });
+      }
 
-        let opList = this.options;
+      for (let item of opList) {// Открыть нужные
+        let t = item.getAttribute('data-target'),
+            nodeTL = t && qs(`.${t}`);
 
-        for (let item in opList) // Скрыть все
-          if (opList.hasOwnProperty(item)) {
-            let target = opList[item].getAttribute('data-target'), nodeTL = document.querySelectorAll(`.${target}`);
-
-            if (!opList[item].selected) nodeTL.forEach(i => i.classList.add('d-none'));
+        if (item.selected && nodeTL) nodeTL.forEach(i => {
+          if (i.dataset.toggle) {
+            const arr = getOtherTarget(t, i.dataset.toggle);
           }
+          show(i);
+        });
+      }
 
-        for (let item in opList) // Открыть нужные
-          if (opList.hasOwnProperty(item)) {
-            let target = opList[item].getAttribute('data-target'), nodeTL = document.querySelectorAll(`.${target}`);
+      for (let item of opList) {// Открыть противоположные
+        let t = item.getAttribute('data-target'),
+            nodeTL = t && qs(`.${t}No`);
 
-            if (opList[item].selected) nodeTL.forEach(i => i.classList.remove('d-none'));
-          }
-      };
+        if (!item.selected && nodeTL) nodeTL.forEach(i => {
+          if (i.dataset.toggle) setTarget(i, t);
+          show(i);
+        })
+      }
+    };
 
+    qs('input[data-target]').forEach(node => {
+      let nameAttr = node.name ? `[name="${node.name}"]` : '';
+
+      if (nameAttr) {
+        let items = qs(`input${nameAttr}`);
+
+        node.onchange = () => {
+          items.forEach(item => { // Скрываем все зависимые поля
+            let t = ga(item, 'data-target');
+            //if (t) $('.' + t).hide().addClass('hidden');
+            if (t) qs(`.${t}, .${t}No`).forEach(i => hide(i));
+          });
+
+          items.forEach(item => { // Открываем все зависимые поля
+            //if (t && item.checked) $('.' + t).show().removeClass('hidden');
+            let t = ga(item, 'data-target'),
+                flag = item.classList.contains('opposite') ? !item.checked : item.checked;
+            if (t && flag) qs(`.${t}`).forEach(i => show(i));
+            if (t && !flag) qs(`.${t}No`).forEach(i => show(i));
+          });
+        };
+      }
+      else {
+        let target = ga(node, 'data-target'),
+            nodeTL = qs(`.${target}`);
+
+        node.onchange = () => {
+          if (node.checked) nodeTL.forEach(i => show(i));
+          else nodeTL.forEach(i => hide(i));
+        };
+      }
+
+      node.dispatchEvent(new Event('change'));
+    });
+
+    qs('select.useToggleOption').forEach(node => {
+      node.onchange = selectChange;
       node.dispatchEvent(new Event('change'));
     });
   },
@@ -280,7 +320,7 @@ const func = {
 
   // вывод печати.
   printReport: (report, number = 1) => {
-    let table = f.gTNode('#printTable'),
+    let table = f.gTNode('printTable'),
         html = '';
 
     Object.values(report).map(i => {
@@ -369,12 +409,6 @@ const func = {
     json && (this.rate = json['curs']);
   },
 
-  parseNumber(value) {
-    typeof value === 'string' && (value = value.replace(',', '.'));
-    !isFinite(value) && (value = 0);
-    return +value;
-  },
-
   // Border warning
   flashNode(item) {
     let def                 = item.style.boxShadow;
@@ -384,7 +418,18 @@ const func = {
     setTimeout(() => {
       item.style.boxShadow = def || 'none';
     }, 1000);
-  }
+  },
+
+  /**
+   * Try parse to float number any string
+   * @val v string
+   */
+  parseNumber(v) {
+    typeof v === 'string' && (v = v.replace(',', '.'));
+    !isFinite(v) && (v = parseFloat(v.match(/\d+|\.|\d+/g).join('')));
+    !isFinite(v) && (v = 0);
+    return +v;
+  },
 }
 
 export const f = Object.assign(func, q);
