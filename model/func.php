@@ -34,13 +34,15 @@ function checkError($var) {
 
 
 function checkAccess($target) {
-  if (in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
+  if (PUBLIC_PAGE && in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
   if (in_array($target, array_merge(ACCESS_MENU, [HOME_PAGE, 'login']))) return $target;
-  reDirect(false);
+  global $main;
+  $target = $main->checkStatus('no') ? 'login' : ACCESS_MENU[0];
+  reDirect(false, $target);
 }
 
 /**
- * @param bool $status
+ * @param $status
  * @param string $target
  */
 function reDirect($status, $target = '') {
@@ -52,8 +54,7 @@ function reDirect($status, $target = '') {
     }
   }
   //unset($_GET['targetPage']);
-  // TODO учточнить
-  if ($target === 'public' && isset($_GET['orderId'])) $target .= '?orderId=' . $_GET['orderId'];
+  if ($target === 'public' && isset($_GET['orderId'])) $target .= '?orderId=' . $_GET['orderId']; // TODO учточнить откуда такая заргрузка
   header('location: ' . SITE_PATH . $target);
   die;
 }

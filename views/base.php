@@ -42,10 +42,12 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<?php }, $cssLinks); ?>
 
   <script>
+    window.DEBUG = '<?= DEBUG ?>';
     window.SITE_PATH = '<?= SITE_PATH ?>';
     window.MAIN_PHP_PATH = '<?= SITE_PATH ?>index.php';
     window.PUBLIC_PAGE = '<?= PUBLIC_PAGE ?>';
     window.PATH_IMG = '<?= PATH_IMG ?>';
+    window.AUTH_STATUS = '<?= $main->checkStatus('ok') ?>';
   </script>
 </head>
 

@@ -4,12 +4,13 @@
  * Global variables and simple functions
  */
 export const c = {
-  DEBUG: false,
-  OUTSIDE: window['CL_OUTSIDE'],
-  SITE_PATH: window['SITE_PATH'] || '/',
+  DEBUG        : !!(window['DEBUG'] || false),
+  OUTSIDE      : window['CL_OUTSIDE'],
+  SITE_PATH    : window['SITE_PATH'] || '/',
   MAIN_PHP_PATH: (window['SITE_PATH'] || '/') + 'index.php',
-  PUBLIC_PAGE: (window['PUBLIC_PAGE'] || 'calculator'),
-  PATH_IMG: (window['PATH_IMG'] || 'public/images/'),
+  PUBLIC_PAGE  : (window['PUBLIC_PAGE'] || 'calculator'),
+  PATH_IMG     : (window['PATH_IMG'] || 'public/images/'),
+  AUTH_STATUS  : !!(window['AUTH_STATUS'] || false),
 
   CURRENT_EVENT: 'none',
   PHONE_MASK: '+7 (___) ___ __ __',
