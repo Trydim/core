@@ -363,3 +363,17 @@ function getPageAsString($data, $wrapId = 'wrapCalcNode') {
 
   return $html;
 }
+
+/**
+ * Get setting from file
+ *
+ * @param bool $decode
+ * @param bool $assoc
+ * @return false|mixed|string
+ */
+function getSettingFile($decode = true, $assoc = true) {
+  if (file_exists(SETTINGS_PATH)) {
+    $setting = file_get_contents(SETTINGS_PATH);
+    return $decode ? json_decode($setting, $assoc) : $setting;
+  }
+}

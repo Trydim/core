@@ -9,11 +9,14 @@ define('SITE_PATH', str_replace('//', '/', $siteDir));
 
 require 'config.php'; // Public config
 
-!defined('CORE') && define('CORE',  basename( __DIR__ ) . '/');
-!defined('VIEW') && define('VIEW', CORE . 'views/');
+define('CORE',  basename( __DIR__ ) . '/');
+define('VIEW', CORE . 'views/');
 
-!defined('CORE_CSS') && define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
-!defined('CORE_SCRIPT') && define('CORE_SCRIPT', SITE_PATH . CORE . 'assets/js/');
+define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
+define('CORE_SCRIPT', SITE_PATH . CORE . 'assets/js/');
+
+define('SETTINGS_PATH', CORE . 'settingSave.json');
+define('SYSTEM_PATH', CORE . 'php/system.php');
 
 !$publicConfig['PUBLIC_PAGE'] && define('ONLY_LOGIN', true);
 
@@ -26,6 +29,7 @@ if (!defined('DEBUG')) define('DEBUG', false);
 if (!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
 if (!defined('SHARE_DIR')) define('SHARE_DIR', false);
 if (!defined('ONLY_LOGIN')) define('ONLY_LOGIN', false);
+if (!defined('USE_DATABASE')) define('USE_DATABASE', true);
 if (!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : ACCESS_MENU[0]);
 if (!defined('ACCESS_MENU')) define('ACCESS_MENU', []);
 if (!defined('PRINT_BTN')) define('PRINT_BTN', 1);

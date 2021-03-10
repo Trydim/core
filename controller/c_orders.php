@@ -9,7 +9,7 @@
 $field = [ 'pageTitle' => 'Заказы' ];
 
 // получить конфиг текущего пользователя
-$setting = $db->getUserSetting(/*login user*/);
+$setting = $db->getUserSetting();
 
 if(!isset($setting->ordersColumnSort)) {
 	$setting->ordersColumnSort = $db->loadOrder(0, 1);

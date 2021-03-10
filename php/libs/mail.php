@@ -25,12 +25,19 @@ require_once 'vendor/autoload.php';
 class Mail {
   private $cpNumber        = 1;
   private $mailTpl         = '', $body = '', $pdfPath = '', $pdfFileName = '';
+  private $mailTarget      = MAIL_TARGET;
   private $subject         = MAIL_SUBJECT;
   private $otherMail       = [];
   private $attachmentFiles = [];
 
   public function __construct($mailTpl = 'mailTpl') {
     $this->mailTpl = $mailTpl;
+
+    if (!DEBUG && file_exists(SETTINGS_PATH)) {
+      $setting = getSettingFile();
+      $this->mailTarget = $setting['orderMail'];
+      isset($setting['orderMailCopy']) && $this->otherMail[] = $setting['orderMailCopy'];
+    }
   }
 
   public function prepareMail($array) {
@@ -79,7 +86,7 @@ class Mail {
     try {
       if (MAIL_SMTP) {
         $mail->isSMTP();                         // Send using SMTP
-        $mail->SMTPDebug = 0;                    // Enable verbose debug output
+        $mail->SMTPDebug = DEBUG;                // Enable verbose debug output
         $mail->Host = MAIL_HOST;                 // Set the SMTP server to send through
         $mail->SMTPAuth = true;                  // Enable SMTP authentication
         $mail->Username = MAIL_FROM;             // SMTP username
@@ -92,7 +99,7 @@ class Mail {
       $mail->FromName = MAIL_FROM_USER;
 
       // Получатель письма
-      //$mail->addBCC(MAIL_TARGET);
+      !DEBUG && $mail->addBCC($this->mailTarget);
       foreach ($this->otherMail as $moreMail)
         $mail->addBCC($moreMail);
 

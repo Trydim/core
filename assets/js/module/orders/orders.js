@@ -253,7 +253,7 @@ export const orders = {
 
         fd.set('mode', 'DB');
         fd.set('dbAction', 'loadOrder');
-        fd.set( 'orderIds', this.queryParam.orderIds);
+        fd.set('orderIds', this.queryParam.orderIds);
         f.Post({data: fd})
           .then((data) => {
             try {

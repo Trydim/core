@@ -15,8 +15,8 @@ $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
 if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
   $orderIds = json_decode($orderIds);
 
-  require_once 'libs/db.php';
-  $db = new RedBeanPHP\db($dbConfig);
+  require_once 'libs/Db.php';
+  $db = new RedBeanPHP\Db($dbConfig);
   $reportVal = $db->loadOrderById($orderIds);
   isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true);
 }

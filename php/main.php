@@ -19,6 +19,9 @@ try {
     case 'FM':
       require_once 'fileManager.php';
       break;
+    case 'setting':
+      require_once 'setting.php';
+      break;
   }
 
   // $result['error'] должен содержать сообщение

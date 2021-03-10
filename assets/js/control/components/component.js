@@ -233,6 +233,8 @@ export class MessageToast {
 
     if (autoClose) close();
     else this.messageBlock.addEventListener('click', close.bind(this, 0), {once: true});
+
+    return this.messageBlock;
   }
 }
 

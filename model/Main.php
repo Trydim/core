@@ -7,37 +7,41 @@ namespace cms;
  * @package cms
  */
 trait Authorization {
-	private $login;
-	private $status;
+  private $id, $login;
+  private      $status;
 
-	/**
-	 * @return mixed
-	 */
-	public function getLogin() {
-		return $this->login;
-	}
+  /**
+   * @param $field
+   * @return mixed
+   */
+  public function getLogin($field = 'login') {
+    return $this->$field;
+  }
 
-	public function setLogin($session) {
-		$this->login = $session['login'];
-		$this->setLoginStatus('ok');
-		return $this;
-	}
+  public function setLogin($session) {
+    $this->login = $session['login'];
+    $this->id = $session['priority'];
+    $this->setLoginStatus('ok');
+    return $this;
+  }
 
-	/**
-	 * @param $status
-	 *
-	 * @return bool
-	 */
-	public function checkStatus($status) {
-		return $this->status === $status;
-	}
-	public function getLoginStatus() {
-		return $this->status;
-	}
-	public function setLoginStatus($status) {
-		$this->status = $status;
-		return $this;
-	}
+  /**
+   * @param $status
+   *
+   * @return bool
+   */
+  public function checkStatus($status) {
+    return $this->status === $status;
+  }
+
+  public function getLoginStatus() {
+    return $this->status;
+  }
+
+  public function setLoginStatus($status) {
+    $this->status = $status;
+    return $this;
+  }
 
 }
 
@@ -46,22 +50,22 @@ trait Authorization {
  * @package cms
  */
 trait Page {
-	private $target;
+  private $target;
 
-	/**
-	 * @return mixed
-	 */
-	public function getTarget() {
-		return $this->target;
-	}
+  /**
+   * @return mixed
+   */
+  public function getTarget() {
+    return $this->target;
+  }
 
-	/**
-	 * @param mixed $get
-	 */
-	public function setTarget($get) {
-		$this->target = (isset($get['targetPage']) && $get['targetPage'] !== '') ?
-			str_replace('/', '', $get['targetPage']) : HOME_PAGE;
-	}
+  /**
+   * @param mixed $get
+   */
+  public function setTarget($get) {
+    $this->target = (isset($get['targetPage']) && $get['targetPage'] !== '') ?
+      str_replace('/', '', $get['targetPage']) : HOME_PAGE;
+  }
 }
 
 /**
@@ -110,12 +114,12 @@ trait Hooks {
 }
 
 final class Main {
-	use Authorization;
-	use Dictionary;
-	use Hooks;
+  use Authorization;
+  use Dictionary;
+  use Hooks;
 
-	public function __construct() {
-	}
+  public function __construct() {
+  }
 }
 
 $main = new Main();

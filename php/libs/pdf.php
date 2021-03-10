@@ -47,6 +47,7 @@ class Pdf {
 
   private function setDefaultParam() {
     $this->pdfParam = [
+      'debug'         => DEBUG,
       'format'        => 'A4',
       'margin_left'   => 10,
       'margin_top'    => 5,
@@ -56,10 +57,11 @@ class Pdf {
       'margin_footer' => 5,
     ];
 
-    switch (PDF_LIBRARY) {
-      case 'mpdf': $this->imgPath = PATH_IMG; break; // возможно подойдет обоим
+    $this->imgPath = $_SERVER['DOCUMENT_ROOT'] . PATH_IMG;
+    /*switch (PDF_LIBRARY) {
+      case 'mpdf': $this->imgPath = $_SERVER['DOCUMENT_ROOT'] . PATH_IMG; break; // возможно подойдет обоим
       case 'html2pdf': $this->imgPath = $_SERVER['DOCUMENT_ROOT'] . PATH_IMG; break; // возможно подойдет обоим
-    }
+    }*/
   }
 
   private function prepareTemplate() {
@@ -168,17 +170,17 @@ class Pdf {
 
     switch (PDF_LIBRARY) {
       case 'mpdf':
-        /** Default: \Mpdf\Output\Destination::INLINE
-         *        Values:
-         *  \Mpdf\Output\Destination::INLINE, or "I"
-         *  send the file inline to the browser. The plug-in is used if available. The name given by $filename is used when one selects the “Save as” option on the link generating the PDF.
-         *  \Mpdf\Output\Destination::DOWNLOAD, or "D"
-         *  send to the browser and force a file download with the name given by $filename.
-         *  \Mpdf\Output\Destination::FILE, or "F"
-         *  save to a local file with the name given by $filename (may include a path).
-         *  \Mpdf\Output\Destination::STRING_RETURN, or "S"
-         *  return the document as a string. $filename is ignored.
-         */
+      /** Default: \Mpdf\Output\Destination::INLINE
+       *        Values:
+       *  \Mpdf\Output\Destination::INLINE, or "I"
+       *  send the file inline to the browser. The plug-in is used if available. The name given by $filename is used when one selects the “Save as” option on the link generating the PDF.
+       *  \Mpdf\Output\Destination::DOWNLOAD, or "D"
+       *  send to the browser and force a file download with the name given by $filename.
+       *  \Mpdf\Output\Destination::FILE, or "F"
+       *  save to a local file with the name given by $filename (may include a path).
+       *  \Mpdf\Output\Destination::STRING_RETURN, or "S"
+       *  return the document as a string. $filename is ignored.
+       */
         if ($dest === 'save') {
           $this->pdf->Output($path . $this->pdfName, 'F');
           return $path . $this->pdfName;
@@ -189,15 +191,15 @@ class Pdf {
           ];
         }
       case 'html2pdf':
-        /** Destination where to send the document. It can take one of the following values:
-         * I: send the file inline to the browser (default). The plug-in is used if available. The name given by name is used when one selects the "Save as" option on the link generating the PDF.
-         * D: send to the browser and force a file download with the name given by name.
-         * F: save to a local server file with the name given by name.
-         * S: return the document as a string (name is ignored).
-         * FI: equivalent to F + I option
-         * FD: equivalent to F + D option
-         * E: return the document as base64 mime multi-part email attachment (RFC 2045)
-         * */
+      /** Destination where to send the document. It can take one of the following values:
+       * I: send the file inline to the browser (default). The plug-in is used if available. The name given by name is used when one selects the "Save as" option on the link generating the PDF.
+       * D: send to the browser and force a file download with the name given by name.
+       * F: save to a local server file with the name given by name.
+       * S: return the document as a string (name is ignored).
+       * FI: equivalent to F + I option
+       * FD: equivalent to F + D option
+       * E: return the document as base64 mime multi-part email attachment (RFC 2045)
+       */
         if ($dest === 'save') {
           $this->pdf->output($path . $this->pdfName);
           return $path . $this->pdfName;
@@ -208,6 +210,7 @@ class Pdf {
           ];
         }
     }
+    return false;
   }
 
   /**

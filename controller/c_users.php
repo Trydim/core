@@ -4,11 +4,11 @@
  * @var string $pathTarget
  */
 
-require_once CORE . 'php/libs/db.php';
+require_once CORE . 'php/libs/Db.php';
 
 $field = [ 'pageTitle' => 'Пользователи' ];
 
-if (!isset($db)) $db = new \RedBeanPHP\db($dbConfig);
+if (!isset($db)) $db = new \RedBeanPHP\Db($dbConfig);
 
 // получить конфиг текущего пользователя
 //$setting = $db->getUserSetting(/*login user*/);

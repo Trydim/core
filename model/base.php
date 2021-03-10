@@ -12,8 +12,8 @@ session_start();
 
 //Проверка пароля
 if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] === $_COOKIE['PHPSESSID']) {
-  require_once CORE . 'php/libs/db.php';
-  $db = new RedBeanPHP\db($dbConfig);
+  require_once CORE . 'php/libs/Db.php';
+  $db = new RedBeanPHP\Db($dbConfig);
   if ($db->checkUserHash($_SESSION)) {
     $main->setLogin($_SESSION);
     $target === '' && reDirect(true);

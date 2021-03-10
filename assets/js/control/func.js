@@ -328,9 +328,14 @@ const func = {
     node.classList.add(c.CLASS_NAME.LOADING);
   },
 
-  // вывод печати.
+  /**
+   * Функция по умолчанию
+   * @param report
+   * @param number
+   * @returns {string}
+   */
   printReport: (report, number = 1) => {
-    let table = f.gTNode('printTable'),
+    let table = f.gTNode('#printTable'),
         html = '';
 
     Object.values(report).map(i => {

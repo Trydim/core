@@ -100,9 +100,9 @@
               </a>
             </li>
             <?php break;
-          case 'options': ?>
+          case 'setting': ?>
             <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>options">
+              <a class="nav-link" href="<?= SITE_PATH ?>setting">
                 <i class="material-icons">settings</i>
                 <p>Настройки</p>
               </a>
