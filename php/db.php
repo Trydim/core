@@ -136,6 +136,33 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (count($orderIds)) $db->deleteItem('orders', $orderIds);
       break;
 
+    // VisitorOrders
+    case 'saveVisitorOrder':
+      if (isset($inputValue)) {
+        $param = [
+          'cp_number'   => isset($cpNumber) ? $cpNumber : time(),
+          'input_value' => $inputValue,
+          'total'       => isset($total) ? $total : 0,
+        ];
+
+        isset($importantValue) && $importantValue !== 'false' && $param['importantValue'] = $importantValue;
+
+        $db->saveVisitorOrder($param);
+      }
+      break;
+    case 'loadVisitorOrders':
+      !isset($sortColumn) && $sortColumn = 'create_date';
+
+      $search = isset($search);
+      // Значит нужны все заказы (поиск)
+      if ($countPerPage > 999) $countPerPage = 1000000;
+      else $result['countRows'] = $db->getCountRows('client_orders');
+
+      $result['orders'] = $db->loadVisitorOrder($pageNumber, $countPerPage, $sortColumn, $sortDirect);
+      break;
+    case 'loadVisitorOrder': break;
+    case 'delVisitorOrders': break;
+
     // Section
     case 'openSection':
       !isset($sortColumn) && $sortColumn = 'C.name';

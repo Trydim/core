@@ -1,46 +1,60 @@
 'use strict';
 
 // Orders list for search
-const allOrdersList = {
-  FD        : new FormData(),
-  data      : [],
-  searchData: Object.create(null),
+class allOrdersList {
+  constructor(param) {
+    const {node = false} = param;
+    if (!node) return;
 
-  getFormData() {
-    this.FD.set('mode', 'DB');
-    this.FD.set('dbAction', 'loadOrders');
-    this.FD.set('countPerPage', '1000');
-  },
+    const data = this.getFormData(param);
+
+    this.node = node;
+    this.table = param.table;
+    this.data = [];
+    this.searchData = Object.create(null);
+    this.searchComponent = f.searchInit();
+    this.loader = new f.LoaderIcon(this.node);
+
+    f.Post({data}).then(data => {
+      data['orders'] && this.prepareSearchData(data['orders']);
+      this.init(param);
+      this.loader.stop();
+    });
+  }
+
+  getFormData(param) {
+    const fd = new FormData();
+    fd.set('mode', 'DB');
+    fd.set('dbAction', param.dbAction);
+    fd.set('countPerPage', '1000');
+    return fd;
+  }
 
   init() {
-    this.count = 1;
+    //this.count = 1;
     this.searchComponent.init({
       popup: false,
       node: this.node,
       searchData: this.searchData,
       showResult: this.showResult.bind(this),
     });
-  },
-
-  setData(node) {
-    !this.node && (this.node = node);
-
-    this.getFormData();
-    this.searchComponent = f.searchInit();
-
-    f.Post({data: this.FD}).then(data => {
-      data['orders'] && this.prepareSearchData(data['orders']);
-      this.init();
-    });
-  },
+  }
 
   prepareSearchData(data) {
-    this.data = data.reduce((r, i) => {
-      this.searchData[i['O.ID']] = i['O.ID'] + i['C.name'] + i['name'];
-      r[i['O.ID']] = i;
-      return r;
-    }, Object.create(null));
-  },
+    if (this.table === 'order') {
+      this.data = data.reduce((r, i) => {
+        this.searchData[i['O.ID']] = i['O.ID'] + i['C.name'] + i['name'];
+        r[i['O.ID']] = i;
+        return r;
+      }, Object.create(null));
+    } else {
+      this.data = data.reduce((r, i) => {
+        this.searchData[i['ID']] = i['ID'] + i['cp_number'] + i['total'];
+        r[i['ID']] = i;
+        return r;
+      }, Object.create(null));
+    }
+  }
 
   showResult(node, resultIds) {
     let array = [];
@@ -57,7 +71,7 @@ const allOrdersList = {
         if (data['orders']) orders.fillTable(data['orders'], true);
       });
     } else orders.fillTable([], true);*/
-  },
+  }
 }
 
 export const orders = {
@@ -65,11 +79,16 @@ export const orders = {
   form: new FormData(),
 
   needReload: false,
-  table: f.gI('orderTable'),
-  tbody: '',
-  impValue: '',
-  confirm: f.gI('confirmField'),
+  table: f.qS('#commonTable'),
+  template: {
+    order    : f.gTNode('#orderTableTmp'),
+    orderVis : f.gTNode('#orderVisitorTableTmp'),
+    impValue : f.gT('#tableImportantValue'),
+    searchMsg: f.gT('#noFoundSearchMsg'),
+  },
+  confirm: f.qS('#confirmField'),
   confirmMsg: false,
+  currentTable: 'order',
 
   queryParam: {
     mode        : 'DB',
@@ -92,16 +111,21 @@ export const orders = {
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
-    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
-    this.l = new f.LoaderIcon(this.table);
+    this.setTableTemplate('order');
+
+    this.loaderTable = new f.LoaderIcon(this.table);
     this.query();
 
     this.onEvent();
   },
 
+  setTableTemplate(tmp) {
+    this.table.innerHTML = this.template[tmp].innerHTML;
+    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
+    this.onSearchFocus();
+  },
+
   fillTable(data, search = false) {
-    this.impValue || (this.impValue = f.gT('#tableImportantValue'));
-    this.searchMsg || (this.searchMsg = f.gT('#noFoundSearchMsg'));
     data = data.map(item => {
       if(item.important_value) {
         let value = '';
@@ -118,7 +142,8 @@ export const orders = {
         try {
           value = JSON.parse(item.important_value);
           if(Object.values(value).length) {
-            value = f.replaceTemplate(this.impValue, value);
+            Object.entries(value).forEach(([k, v]) => {value[k] = _(v);});
+            value = f.replaceTemplate(this.template.impValue, value);
           } else value = '';
         }
         catch (e) { console.log(`Заказ ID:${item['O.ID']} имеет не правильное значение`); }
@@ -127,10 +152,10 @@ export const orders = {
       return item;
     })
 
-    let html  = '';
-    this.tbody || (this.tbody = this.table.querySelector('tbody tr').outerHTML);
-    data.length && (html += f.replaceTemplate(this.tbody, data));
-    !data.length && search && (html = this.searchMsg);
+    let html  = '',
+        tbody = this.template[this.currentTable].querySelector('tbody tr').outerHTML;
+    data.length && (html += f.replaceTemplate(tbody, data));
+    !data.length && search && (html = this.template.searchMsg);
     this.table.querySelector('tbody').innerHTML = html;
 
     data.length && this.onTableEvent();
@@ -165,7 +190,7 @@ export const orders = {
       this.form.set(param[0], param[1]);
     })
 
-    this.l.start();
+    this.loaderTable.start();
     f.Post({data: this.form}).then(data => {
       if(this.needReload) {
         this.needReload = false;
@@ -180,9 +205,9 @@ export const orders = {
 
       if(data['orders']) this.fillTable(data['orders']);
       if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
-      if(data.hasOwnProperty('statusOrders')) this.fillSelectStatus(data['statusOrders']);
+      if(data['statusOrders']) this.fillSelectStatus(data['statusOrders']);
 
-      this.l.stop();
+      this.loaderTable.stop();
     });
   },
 
@@ -193,9 +218,9 @@ export const orders = {
   actionBtn(e) {
     let hideActionWrap = true,
         target = e.target,
-        action = target.getAttribute('data-action');
+        action = target.dataset.action;
 
-    if (!this.selectedId.size) { f.showMsg('Выберите заказ!'); return; }
+    if (!this.selectedId.size && !('orderType').includes(action)) { f.showMsg('Выберите заказ!'); return; }
     this.queryParam.orderIds = JSON.stringify(this.getSelectedList());
 
     let select = {
@@ -233,8 +258,9 @@ export const orders = {
           return;
         }
 
-        let link = f.gI(f.ID.PUBLIC_PAGE);
-        link.href += '?orderId=' + this.getSelectedList()[0];
+        let link = f.gI(f.ID.PUBLIC_PAGE),
+            query = this.currentTable === 'order' ? 'orderId=' : 'orderVisitorId=';
+        link.href += '?' + query + this.getSelectedList()[0];
         link.click();
       },
       'printOrder': () => {
@@ -325,11 +351,37 @@ export const orders = {
         f.show(f.gI('actionBtnWrap'));
         f.hide(f.gI('printTypeField'));
       },
+      'orderType': () => {
+        hideActionWrap = false;
+        if (this.orderType === target.value) return;
+        this.orderType = target.value;
+
+        this.queryParam.sortColumn = 'create_date';
+        this.queryParam.sortDirect = false;
+        this.queryParam.currPage   = 0;
+        this.queryParam.pageCount  = 0;
+
+        if (this.orderType.toString() === 'visit') {
+          this.queryParam.dbAction  = 'loadVisitorOrders';
+          this.queryParam.tableName = 'client_orders';
+          this.currentTable = 'orderVis';
+
+          f.hide(f.qS('#orderBtn'));
+        } else {
+          this.queryParam.dbAction  = 'loadOrders';
+          this.queryParam.tableName = 'orders';
+          this.currentTable = 'order';
+          f.show(f.qS('#orderBtn'));
+        }
+
+        this.setTableTemplate(this.currentTable);
+        this.query();
+      }
     }
 
     if(action.includes('confirm')) { // Закрыть подтверждение
-      f.hide(this.confirm, f.gI('selectStatus'), f.gI('printTypeField'));
-      f.show(f.gI('actionBtnWrap'));
+      f.hide(this.confirm, f.qS('#selectStatus'), f.qS('#printTypeField'));
+      f.show(f.qS('#actionBtnWrap'));
 
       if(action === 'confirmYes') {
         this.queryParam.commonValues = JSON.stringify(this.getSelectedList());
@@ -339,7 +391,7 @@ export const orders = {
     } else { // Открыть подтверждение
       this.queryParam.dbAction = action;
       select[action]();
-      hideActionWrap && f.hide(f.gI('actionBtnWrap'));
+      hideActionWrap && f.hide(f.qS('#actionBtnWrap'));
     }
   },
 
@@ -354,7 +406,11 @@ export const orders = {
   },
 
   focusSearch(e) {
-    allOrdersList.setData(e.target);
+    const dbAction = orders.currentTable === 'order'
+                     ? 'loadOrders'
+                     : 'loadVisitorOrders';
+
+    new allOrdersList({dbAction, node: e.target, table: orders.currentTable});
   },
 
   // TODO bind events
@@ -363,20 +419,26 @@ export const orders = {
   /**
    * @param node
    * @param func
+   * @param options
+   * @param eventType {string}
    */
   onEventNode(node, func, options = {}, eventType = 'click') {
     node.addEventListener(eventType, (e) => func.call(this, e), options);
   },
 
   onEvent() {
-    // Right buttons
+    // Top buttons
     f.qA('input[data-action]', 'click', (e) => this.actionBtn.call(this, e));
 
     // Click on row for selected
-    this.onEventNode(this.table.querySelector('tbody'), (e) => this.clickRows(e));
+    this.onEventNode(this.table, (e) => this.clickRows(e));
+  },
 
+  onSearchFocus() {
     // Focus Search Init
-    this.onEventNode(f.gI('search'), this.focusSearch, {once: true}, 'focus');
+    let node = f.qS('#search');
+    node.removeEventListener('focus', this.focusSearch);
+    node.addEventListener('focus', this.focusSearch, {once: true});
   },
 
   /*onCheckEdit(node) {

@@ -8,7 +8,7 @@ namespace cms;
  */
 trait Authorization {
   private $id, $login;
-  private      $status;
+  private $status = 'no';
 
   /**
    * @param $field

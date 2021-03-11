@@ -3,6 +3,7 @@
 
 import {c} from "../../const.js";
 import {f} from "../func.js";
+import {q} from "../query.js";
 
 // Загрузка
 export class LoaderIcon {
@@ -635,11 +636,11 @@ export class Pagination {
   constructor(fieldSelector = 'paginatorWrap', param) {
     let {
       queryParam = {}, // ссылка на объект отправляемый с функцией запроса
-      query = false, // функция запроса со страницы
+      query, // функция запроса со страницы
         } = param,
         field = f.qS(fieldSelector);
 
-    if (!(field && query && Object.values(queryParam).length)) return;
+    if (!(field && param.query && Object.values(queryParam).length)) return;
     this.node           = field;
     this.node.innerHTML = this.template();
     this.prevBtn        = {node: this.node.querySelector('[data-action="prev"]')};
@@ -648,7 +649,6 @@ export class Pagination {
     this.node.onclick   = this.onclick.bind(this);
     this.queryParam     = queryParam;
     this.query          = query;
-
   }
 
   setCountPageBtn(count) {
@@ -727,6 +727,7 @@ export class Pagination {
         break;
     }
 
+    //this.l = new LoaderIcon(this.node);
     this.checkBtn();
     this.query();
   }
@@ -806,5 +807,55 @@ export class SortColumns {
     else input.value = input.value.replace(arrowReg, arrowDown);
 
     this.query();
+  }
+}
+
+// Сохрание заказво посетителей
+export class SaveVisitorsOrder {
+  constructor(cpNumber = false) {
+    this.nodes = [];
+    this.getCpNumber = cpNumber || this.createCpNumber;
+  }
+
+  /**
+   * Add nodes to
+   * @param collection {nodes[]}
+   * @param report {!{cpNumber, inputValue, importantValue, total}}
+   * @param event {string}
+   */
+  setSaveVisitors(collection, report, event = 'click') {
+    collection = this.checkNewNodes(collection);
+    collection.forEach(n => {
+      n.addEventListener(event, (e) => this.addOrder(e, report));
+    })
+  }
+
+  createCpNumber() {
+    return new Date().getTime().toString().slice(7);
+  }
+
+  checkNewNodes(c) {
+    if (c instanceof NodeList) c = Object.values(c);
+    else if (typeof c !== 'object' || !c.length) c = [c];
+    return c.filter(n => !this.nodes.includes(n));
+  }
+
+  addOrder(e, report) {
+    console.log('save');
+    typeof report === 'function' && (report = report());
+
+    // Обязательно проверять есть ли вообще что сохранять
+    if (!report || !Object.values(report).length) return;
+
+    const data = new FormData();
+
+    data.set('mode', 'DB');
+    data.set('dbAction', 'saveVisitorOrder');
+    data.set('cpNumber', this.getCpNumber());
+    data.set('inputValue', JSON.stringify(report['inputValue'] || false));
+    data.set('importantValue', JSON.stringify(report['importantValue'] || false));
+    data.set('total', report.total);
+
+    q.Post({data});
   }
 }

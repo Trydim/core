@@ -220,7 +220,7 @@ class Pdf {
    *
    * @return string|string[]|null
    */
-  public function setNumFormat($total, $spacer = ' ', $precision = 2) {
+  public function setNumFormat($total, $spacer = ' ', $precision = 0) {
     is_numeric($total) && $total = round(floatval($total), $precision);
     return preg_replace('/\B(?=(\d{3})+(?!\d))/', $spacer, $total);
   }

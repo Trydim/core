@@ -68,7 +68,7 @@ const func = {
   // Формат цифр (разделение пробелом)
   setFormat: (num) => (num.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g, " "),
 
-  // Показать элементы, аргументы коллекции NodeList
+  /** Показать элементы, аргументы коллекции NodeList */
   show: (...collection) => { collection.map(nodes => {
     if(!nodes) return;
     if(!nodes.forEach) nodes = [nodes];
@@ -436,7 +436,7 @@ const func = {
   },
 
   /**
-   * Try parse to float number any string
+   * Try parse to float number from any string
    * @val v string
    */
   parseNumber(v) {

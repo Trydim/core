@@ -87,7 +87,7 @@ const onClickSubmenu = () => {
   node && node.addEventListener('click', (e) => sideMenuExpanded(e, node));
 }
 
-//entrance function
+// Entrance function
 (() => {
   let page = location.pathname.replace(f.SITE_PATH, '').match(/(\w+)/);
   page = (page && !f.OUTSIDE) ? page[1] : 'public';

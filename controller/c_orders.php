@@ -1,4 +1,4 @@
-<?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 /**
  * @var object $main
  * @var object $db
@@ -6,30 +6,35 @@
  * @var string $pathTarget
  */
 
-$field = [ 'pageTitle' => 'Заказы' ];
+$field = ['pageTitle' => 'Заказы'];
 
 // получить конфиг текущего пользователя
 $setting = $db->getUserSetting();
 
-if(!isset($setting->ordersColumnSort)) {
-	$setting->ordersColumnSort = $db->loadOrder(0, 1);
+if (!isset($setting->ordersColumnsSort)) {
+  $columns = array_keys($db->loadOrder(0, 1)[0]);
 
-	if(count($setting->ordersColumnSort)) {
-	  $columns = array_keys($setting->ordersColumnSort[0]) ?: [];
-		$setting->ordersColumnSort = array_map(function ($item) {
-		  $dbName = $item;
-
-		  $item = [
-		    'dbName' => $dbName,
-        'name' => gTxtDB('orders', $dbName),
-      ];
-
-		  return $item;
-    }, $columns);
-	}
+  $setting->ordersColumnsSort = array_map(function ($item) {
+    return [
+      'dbName' => $item,
+      'name'   => gTxtDB('orders', $item),
+    ];
+  }, $columns);
 }
 
-$param['columns'] = $setting->ordersColumnSort;
+if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
+  $columns = array_keys($db->loadVisitorOrder(0, 1)[0]);
+
+  $setting->ordersVisitorColumnsSort = array_map(function ($item) {
+    return [
+      'dbName' => $item,
+      'name'   => gTxtDB('visitorOrders', $item),
+    ];
+  }, $columns);
+}
+
+$param['ordersColumns'] = $setting->ordersColumnsSort;
+$param['ordersVisitorColumns'] = $setting->ordersVisitorColumnsSort;
 
 $main->exist('orderTemplate') && $field = doHook('orderTemplate', $field);
 require $pathTarget;

@@ -9,7 +9,7 @@ define('SITE_PATH', str_replace('//', '/', $siteDir));
 
 require 'config.php'; // Public config
 
-define('CORE',  basename( __DIR__ ) . '/');
+define('CORE', basename( __DIR__ ) . '/');
 define('VIEW', CORE . 'views/');
 
 define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
@@ -29,6 +29,7 @@ if (!defined('DEBUG')) define('DEBUG', false);
 if (!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
 if (!defined('SHARE_DIR')) define('SHARE_DIR', false);
 if (!defined('ONLY_LOGIN')) define('ONLY_LOGIN', false);
+if (!defined('USERS_ORDERS')) define('USERS_ORDERS', false);
 if (!defined('USE_DATABASE')) define('USE_DATABASE', true);
 if (!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : ACCESS_MENU[0]);
 if (!defined('ACCESS_MENU')) define('ACCESS_MENU', []);

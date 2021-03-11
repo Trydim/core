@@ -6,10 +6,10 @@ if (!isset($main) || !isset($target)) die('variables undefined');
  * @var array $dbConfig
  */
 
-if (isset($_GET['status'])) $main->setLoginStatus($_GET['status']);
-
 session_start();
 
+isset($_GET['status']) && $main->setLoginStatus($_GET['status']);
+!isset($_SESSION['hash']) && $main->setLoginStatus('no');
 //Проверка пароля
 if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] === $_COOKIE['PHPSESSID']) {
   require_once CORE . 'php/libs/Db.php';
@@ -22,8 +22,10 @@ if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] 
   }
 }
 
-// Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт (ONLY_LOGIN === false/'')
-if ($main->checkStatus('no') && (ONLY_LOGIN && $target !== 'login')) {
+// Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт или
+// нет регистрации и целевая страница не открыта
+if ($main->checkStatus('no') && $target !== 'login'
+    && (ONLY_LOGIN || (PUBLIC_PAGE && $target !== 'public'))) {
   //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
   $_SESSION['target'] = $target;
   reDirect(false);

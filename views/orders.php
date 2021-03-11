@@ -52,3 +52,4 @@ $field['footerContent'] .= <<<footerContent
 footerContent;
 
 $field['footerContent'] .= template('docs/printTpl');
+$field['footerContent'] .= $main->initDictionary();

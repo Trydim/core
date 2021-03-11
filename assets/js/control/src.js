@@ -6,6 +6,7 @@ import {f} from "./func.js";
 import * as module from './components/component.js';
 import { Modal } from './components/modal.js';
 import { shadowNode } from './components/shadownode.js';
+import {SaveVisitorsOrder} from "./components/component.js";
 
 const m = {
 
@@ -45,10 +46,15 @@ const m = {
   showMsg: (msg, type, autoClose) => new module.MessageToast().show(msg, type, autoClose),
   LoaderIcon: module.LoaderIcon,
 
-  /*
-
+  /**
+   *
    */
   initShadow: (param) => new shadowNode(param),
+
+  /**
+   *
+   */
+  InitSaveVisitorsOrder: SaveVisitorsOrder,
 };
 
 window.f = Object.assign(c, m, f);
