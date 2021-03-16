@@ -7,8 +7,9 @@ namespace cms;
  * @package cms
  */
 trait Authorization {
-  private $id, $login;
+  private $id, $login, $name;
   private $status = 'no';
+  private $permission = [], $sideMenu = [];
 
   /**
    * @param $field
@@ -20,7 +21,8 @@ trait Authorization {
 
   public function setLogin($session) {
     $this->login = $session['login'];
-    $this->id = $session['priority'];
+    $this->name  = $session['name'];
+    $this->id    = $session['priority'];
     $this->setLoginStatus('ok');
     return $this;
   }
@@ -41,6 +43,33 @@ trait Authorization {
   public function setLoginStatus($status) {
     $this->status = $status;
     return $this;
+  }
+
+  public function setPermission($permission) {
+    isset($permission['menuAccess']) && $permission['menuAccess'] = explode(',', $permission['menuAccess']);
+    count($permission) && $this->permission = $permission;
+  }
+
+  /**
+   * @param string $key
+   * @return array
+   */
+  public function getPermission($key = '') {
+    if (isset($this->permission[$key])) return $this->permission[$key];
+    if ($key) return [];
+    return $this->permission;
+  }
+
+  public function setSideMenu() {
+    $this->sideMenu = isset($this->permission['menuAccess'])
+      ? $this->permission['menuAccess']
+      : ACCESS_MENU;
+
+    //if (!in_array('setting', $this->sideMenu)) $this->sideMenu[] = 'setting';
+  }
+
+  public function getSideMenu() {
+    return $this->sideMenu;
   }
 
 }

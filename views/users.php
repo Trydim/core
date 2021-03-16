@@ -2,10 +2,13 @@
 
 /**
  * @var object $main
+ * @var array $param
  */
 
 $field['content'] = template('parts/usersContent', $param);
 $field['pageFooter'] = '<div id="paginator"></div>';
+
+$permission = $param['permission'];
 
 $field['footerContent'] = <<<footerContent
 <template id="permission">
@@ -20,11 +23,8 @@ $field['footerContent'] = <<<footerContent
       <label class="w-100">Имя пользователя: <input type="text" class="form-control" name="userName"></label>
     </div>
     <div class="form-group">
-      <label class="w-100 p-bottom-25">Доступ: 
-        <select class="form-control pos-top" name="userPermission">
-          <option value="1">Администратор</option>
-          <option value="2">< Аноним ></option>
-        </select>
+      <label class="w-100">Доступ: 
+        <select class="form-control" name="userPermission">$permission</select>
       </label>
     </div>
     <div class="form-group">

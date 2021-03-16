@@ -1,4 +1,6 @@
-<?php if (!defined('MAIN_ACCESS')) die('access denied!'); ?>
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
+global $main;
+?>
 <div class="sidebar" data-background-color="white">
 
   <div class="logo ml-3">
@@ -14,7 +16,7 @@
           </a>
         </li>
       <?php } ?>
-      <?php foreach (ACCESS_MENU as $item) {
+      <?php foreach ($main->getSideMenu() as $item) {
         switch ($item) {
           case 'orders': ?>
             <li class="nav-item">
@@ -101,15 +103,18 @@
             </li>
             <?php break;
           case 'setting': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>setting">
-                <i class="material-icons">settings</i>
-                <p>Настройки</p>
-              </a>
-            </li>
+
             <?php break;
         }
       } ?>
+      <?php if (in_array('setting', ACCESS_MENU)) { ?>
+      <li class="nav-item">
+        <a class="nav-link" href="<?= SITE_PATH ?>setting">
+          <i class="material-icons">settings</i>
+          <p>Настройки</p>
+        </a>
+      </li>
+      <?php } ?>
     </ul>
   </div>
 </div>

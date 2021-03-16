@@ -14,9 +14,10 @@ session_start();
 switch ($authAction) {
   case 'login':
     if ($user = $db->checkPassword($login, $password)) {
-      $_SESSION['login'] = $user['name'];
+      $_SESSION['login']    = $login;
+      $_SESSION['name']     = $user['name'];
       $_SESSION['priority'] = $user['ID']; //типа маскирую
-      $_SESSION['id'] = $_COOKIE['PHPSESSID'];
+      $_SESSION['id']       = $_COOKIE['PHPSESSID'];
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
       $db->setUserHash($user['ID'], $_SESSION['hash']);

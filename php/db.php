@@ -348,6 +348,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
 
+    // Permission
+    case 'loadPermission': break;
+
     // Users
     case 'loadUsers':
       !isset($sortColumn) && $sortColumn = 'create_date';
@@ -368,7 +371,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       $contacts = [];
       isset($userPhone) && $contacts['phone'] = $userPhone;
-      isset($userMail) && $contacts['mail'] = $userMail;
+      isset($userMail) && $contacts['email'] = $userMail;
       isset($userMoreContact) && $contacts['more'] = $userMoreContact;
       count($contacts) && $param['0']['contacts'] = json_encode($contacts);
 

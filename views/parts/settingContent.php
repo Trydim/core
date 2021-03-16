@@ -1,11 +1,12 @@
 <?php
-
+!isset($admin) && $admin = false;
 !isset($userId) && $userId = '';
 !isset($login) && $login = '';
 !isset($orderMail) && $orderMail = '';
 !isset($orderMailCopy) && $orderMailCopy = '';
 ?>
 <div class="row" id="settingForm">
+  <? if ($admin) { ?>
   <div class="col-6">
     <form action="#" id="mailForm" class="row">
       <div class="col-12 d-flex justify-content-between">
@@ -18,6 +19,7 @@
       </div>
     </form>
   </div>
+  <? } ?>
 
   <div class="col-6">
     <form action="#" id="userForm">

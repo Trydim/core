@@ -18,7 +18,7 @@ if($main && $main->checkStatus('ok')) { ?>
             </p>
           </a>
         </li>-->
-        <li class="nav-item"><?= $main->getLogin() ?></li>
+        <li class="nav-item"><?= $main->getLogin('name') ?></li>
         <li class="nav-item" data-action="exit">
           <span class="exit-icon d-flex">
             <i class="material-icons font-blue">login_out</i>

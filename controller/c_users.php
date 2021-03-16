@@ -6,10 +6,7 @@
 
 $field = [ 'pageTitle' => 'Пользователи' ];
 
-if (!isset($db)) {
-  require_once CORE . 'php/libs/Db.php';
-  $db = new \RedBeanPHP\Db($dbConfig);
-}
+if (!isset($db)) die('db not defined');
 
 // получить конфиг текущего пользователя
 //$setting = $db->getUserSetting(/*login user*/);
@@ -17,7 +14,8 @@ if (!isset($db)) {
 if(!isset($setting)) {
   $columns = $db->loadUsers(0, 1);
 
-	if(count($columns)) {
+	if(count($columns) === 1) {
+    unset($columns[0]['permission_id']);
     $columns = array_keys($columns[0]) ?: [];
     $columns = array_map(function ($item) {
       $dbName = $item;
@@ -32,6 +30,12 @@ if(!isset($setting)) {
 	}
 }
 
-$param['columns'] = $columns;
+$permission = $db->selectQuery('permission', ['ID', 'name']);
+
+$param['permission'] = implode('', array_map(function ($item) {
+  return "<option value=" . $item['ID'] . ">" . gTxt($item['name']) . "</option>";
+}, $permission));
+
+$param['columns'] = isset($columns) ? $columns : '';
 require $pathTarget;
 $html = template('base', $field);

@@ -1,6 +1,12 @@
-<?php if ( !defined('MAIN_ACCESS')) die('access denied!'); ?>
+<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
-<div class="d-flex justify-content-between p-bottom-25" id="actionBtnWrap">
+/**
+ * @var string $permission from user.php
+ */
+
+?>
+
+<div class="d-flex justify-content-between pb-4" id="actionBtnWrap">
   <div>
     <input type="button" class="btn btn-success" value="Добавить" data-action="addUser">
     <input type="button" class="btn btn-warning" value="Изменить" data-action="changeUser">
@@ -10,8 +16,8 @@
     <input type="button" class="btn btn-danger" value="Удалить" data-action="delUser">
   </div>
 </div>
-<div class="text-center d-none p-bottom-25" id="confirmField">
-  <select id="selectPermission" class="d-none"></select>
+<div class="text-center d-none" id="confirmField">
+  <select id="selectPermission" class="d-none"><?= $permission; ?></select>
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>

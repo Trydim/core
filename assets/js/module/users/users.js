@@ -45,7 +45,11 @@ export const users = {
   fillTable(data) {
     this.contValue || (this.contValue = f.gT('#tableContactsValue'));
     data = data.map(item => {
-      if(item['contacts']) {
+      if (item['P.name']) {
+        item['P.name'] = _(item['P.name']);
+      }
+
+      if (item['contacts']) {
         let value = '';
 
         try {
@@ -82,6 +86,10 @@ export const users = {
     this.checkedRows();
   },
 
+  setPermission(data) {
+    this.permissionList = new Map();
+    data.forEach(i => this.permissionList.set(i['ID'], i));
+  },
   // Заполнить статусы
   fillPermission(data) {
     let tmp = f.gT('#permission'), html  = '';
@@ -109,9 +117,9 @@ export const users = {
         this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
       }
 
+      if(data['permissionUsers']) { this.setPermission(data['permissionUsers']); this.fillPermission(data['permissionUsers']); }
       if(data['users']) { this.setUsers(data['users']); this.fillTable(data['users']); }
       if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
-      if(data['permissionUsers']) this.fillPermission(data['permissionUsers']);
     });
   },
 
@@ -162,7 +170,7 @@ export const users = {
 
         node = form.querySelector('[name="userPermission"]');
         this.onEventNode(node, this.changeSelectInput, {}, 'blur');
-        if(oneElements) node.value = users['permission_id'];
+        if (oneElements) node.value = users['permission_id'];
         else node.value = 1;
 
         node = form.querySelector('[name="userLogin"]');

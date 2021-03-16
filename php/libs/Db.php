@@ -535,6 +535,18 @@ class Db extends \R {
     return self::getRow($sql);
   }
 
+  // Permission
+  //--------------------------------------------------------------------------------------------------------------------
+
+  public function getPermissionById($id) {
+    $permission = $this->selectQuery('permission', ['access_val'], 'ID = ' . $id);
+
+    if (count($permission) === 1) {
+      return json_decode($permission[0]['access_val'], true);
+    }
+    return [];
+  }
+
   // Users
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -570,7 +582,10 @@ class Db extends \R {
    * @return array|null
    */
   public function getUser($login, $column = 'ID') {
-    return self::getRow("SELECT $column FROM users WHERE login = :login", [':login' => $login]);
+    $result = self::getRow("SELECT $column FROM users WHERE login = :login", [':login' => $login]);
+
+    if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
+    return $result;
   }
 
   /**
@@ -617,7 +632,7 @@ class Db extends \R {
   public function loadUsers($pageNumber = 0, $countPerPage = 20, $sortColumn = 'register_date', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT U.ID AS 'U.ID', P.name as 'P.name', login, U.name AS 'U.name', contacts, register_date, activity
+    $sql = "SELECT U.ID AS 'U.ID', permission_id, P.name AS 'P.name', login, U.name AS 'U.name', contacts, register_date, activity
     FROM users U
     LEFT JOIN permission P ON permission_id = P.ID\n";
 
@@ -642,7 +657,7 @@ class Db extends \R {
 
   public function checkUserHash($session) {
     if (USE_DATABASE) {
-      $hash = self::getCell('SELECT hash FROM users WHERE name = :name', [':name' => $session['login']]);
+      $hash = self::getCell('SELECT hash FROM users WHERE login = :login', [':login' => $session['login']]);
     } else {
       $value = file(SYSTEM_PATH)[0];
       $value && $hash = trim(explode('|||', $value)[2]);
@@ -663,13 +678,13 @@ class Db extends \R {
       global $main;
       $currentUser = $main->getLogin();
     }
-    $result = self::getAssocRow("SELECT $columns from users WHERE login = ?", [$currentUser])[0];
+    $result = self::getAssocRow("SELECT $columns from users WHERE login = ?", [$currentUser]);
 
-    if (count($result)) {
-      if ($columns === 'customization') return json_decode($result['customization']);
+    if (count($result) === 1) {
+      if ($columns === 'customization') return json_decode($result['customization'][0]);
       if (count(explode(',', $columns)) === 1) return $result[$columns];
     }
-    return false;
+    return new class {};
   }
 
   use MainCsv;

@@ -781,7 +781,7 @@ export class SortColumns {
     });
   }
 
-  // сортировка заказов
+  // сортировка
   sortRows(e) { /*↑↓*/
     let input = e.target,
         colSort = input.getAttribute('data-ordercolumn'),
