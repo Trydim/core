@@ -40,10 +40,17 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
   $orderId = $_GET['orderVisitorId'];
 
   if (is_finite($orderId)) {
-    $order = $db->selectQuery('client_orders', '*', ' ID = ' . $orderId . ' ');
+    $order = $db->selectQuery('client_orders', ['*'], ' cp_number = ' . $orderId . ' ');
 
-    if (count($order)) {
-      $dbContent .= "<input type='hidden' id='orderSaveValue' value='$order[input_value]'>";
+    if (count($order) === 1) {
+      $order = $order[0];
+
+      $oldData = json_encode([
+        'date'  => $order['create_date'],
+        'total' => $order['total'],
+      ]);
+      $dbContent .= "<input type='hidden' id='orderSaveValue' value='$order[input_value]'>" .
+                    "<input type='hidden' id='orderOldTotal' value='$oldData'>";
     }
   }
 }

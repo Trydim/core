@@ -296,22 +296,10 @@ export const orders = {
       'savePdf': () => {
         hideActionWrap = false;
         if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
-        let fd = new FormData(),
-            loading = new f.LoaderIcon(target);
-
-        fd.set('mode', 'docs');
-        fd.set('docType', 'pdf');
-        fd.set( 'orderIds', this.queryParam.orderIds);
-        f.Post({data: fd})
-          .then(data => {
-            loading.stop();
-            target.blur();
-            if(data['pdfBody']) f.saveFile({
-              name: data['name'],
-              type: 'base64',
-              blob: 'data:application/pdf;base64,' + data['pdfBody']
-            });
-          });
+        f.downloadPdf(target,
+          {orderIds: this.getSelectedList()},
+          () => target.blur()
+          );
       },
       'sendOrder': () => {
         hideActionWrap = false;

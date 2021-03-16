@@ -812,9 +812,9 @@ export class SortColumns {
 
 // Сохрание заказво посетителей
 export class SaveVisitorsOrder {
-  constructor(cpNumber = false) {
+  constructor(cpNumber) {
     this.nodes = [];
-    this.getCpNumber = cpNumber || this.createCpNumber;
+    this.createCpNumber = cpNumber || this.createCpNumberDefault;
   }
 
   /**
@@ -822,15 +822,21 @@ export class SaveVisitorsOrder {
    * @param collection {nodes[]}
    * @param report {!{cpNumber, inputValue, importantValue, total}}
    * @param event {string}
+   *
+   * @return result {object} - object contains result work save function;
    */
   setSaveVisitors(collection, report, event = 'click') {
+    const result = Object.create(null);
     collection = this.checkNewNodes(collection);
     collection.forEach(n => {
-      n.addEventListener(event, (e) => this.addOrder(e, report));
+      n.addEventListener(event, (e) => {
+        result.cpNumber = this.addOrder(e, report);
+      });
     })
+    return result;
   }
 
-  createCpNumber() {
+  createCpNumberDefault() {
     return new Date().getTime().toString().slice(7);
   }
 
@@ -848,14 +854,23 @@ export class SaveVisitorsOrder {
     if (!report || !Object.values(report).length) return;
 
     const data = new FormData();
+    this.cpNumber = this.createCpNumber();
 
     data.set('mode', 'DB');
     data.set('dbAction', 'saveVisitorOrder');
-    data.set('cpNumber', this.getCpNumber());
+    data.set('cpNumber', this.cpNumber);
     data.set('inputValue', JSON.stringify(report['inputValue'] || false));
     data.set('importantValue', JSON.stringify(report['importantValue'] || false));
     data.set('total', report.total);
 
     q.Post({data});
+  }
+
+  /** return Promise use await */
+  async getCpNumber() {
+    return await new Promise((res, err) => {
+      let i = setInterval(() => this.cpNumber && res(this.cpNumber), 50);
+      setTimeout(() => clearInterval(i) && err(''), 1000);
+    });
   }
 }

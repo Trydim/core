@@ -11,10 +11,10 @@
 require_once 'libs/pdf.php';
 
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
+$orderIds = isset($orderIds) ? json_decode($orderIds) : false;
+!$orderIds && $orderIds = isset($reportVal['orderIds']) && count($reportVal['orderIds']) === 1 ? $reportVal['orderIds'] : false;
 
-if (!$reportVal && isset($orderIds)) { // Отчет взять из базы
-  $orderIds = json_decode($orderIds);
-
+if ($orderIds) { // Отчет взять из базы
   require_once 'libs/Db.php';
   $db = new RedBeanPHP\Db($dbConfig);
   $reportVal = $db->loadOrderById($orderIds);

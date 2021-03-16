@@ -257,9 +257,8 @@ const func = {
 
   /**
    * Save file from browser
-   * @param {object} data
+   * @param data {{'name', 'type' , 'blob'}}
    *
-   * data is {'name', 'type' , 'blob'}
    * @example for PDF:
    * {name: 'file.pdf',
    * type: 'base64',
@@ -367,7 +366,7 @@ const func = {
 
     func.setLoading(target);
 
-    data.set('dbAction', 'DB');
+    //data.set('dbAction', 'DB');
     data.set('mode', 'docs');
     data.set('docType', 'pdf');
     data.set('reportVal', JSON.stringify(report));

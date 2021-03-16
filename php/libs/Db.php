@@ -474,7 +474,7 @@ class Db extends \R {
   public function loadVisitorOrder($pageNumber = 0, $countPerPage = 20, $sortColumn = 'create_date', $sortDirect = false, $dateRange = [], $ids = []) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT ID, cp_number, create_date, important_value, total FROM client_orders\n";
+    $sql = "SELECT cp_number, create_date, important_value, total FROM client_orders\n";
 
     if (count($dateRange)) $sql .= "WHERE create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
     if (count($ids)) {
@@ -672,13 +672,13 @@ class Db extends \R {
     return false;
   }
 
-  use Csv;
+  use MainCsv;
 }
 
 /**
  * Trait Csv
  */
-trait Csv {
+trait MainCsv {
   private $csvTable;
 
   /**
