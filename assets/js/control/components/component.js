@@ -468,8 +468,6 @@ export class Valid {
 
   // Активировать/Деактивировать кнопки
   btnActivate() {
-    //if (this.valid.size >= this.countNodes) this.btn.removeAttribute('disabled');
-    //else this.btn.setAttribute('disabled', 'disabled');
     if (this.valid.size >= this.countNodes) delete this.btn.dataset.disabled;
     else this.btn.dataset.disabled = '1';
   }

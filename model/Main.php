@@ -56,7 +56,7 @@ trait Authorization {
    */
   public function getPermission($key = '') {
     if (isset($this->permission[$key])) return $this->permission[$key];
-    if ($key) return [];
+    if ($key) return ACCESS_MENU;
     return $this->permission;
   }
 
