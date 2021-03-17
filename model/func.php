@@ -41,10 +41,11 @@ function checkAccess($target) {
   if (PUBLIC_PAGE && in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
   global $main;
   if (in_array($target, ['login', 'setting'])
-      || (in_array($target, array_merge(HOME_PAGE, ACCESS_MENU))
+      || (in_array($target, array_merge([HOME_PAGE], ACCESS_MENU))
       && in_array($target, $main->getPermission('menuAccess')))) return $target;
   $target = $main->checkStatus('no') ? 'login' : ACCESS_MENU[0];
   reDirect(false, $target);
+  die;
 }
 
 /**

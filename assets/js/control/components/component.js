@@ -426,7 +426,8 @@ export class Valid {
     this.initParam(param);
 
     // Form
-    this.form.querySelectorAll('input[required]').forEach(n => {
+    this.inputNodes = this.form.querySelectorAll('input[required]');
+    this.inputNodes.forEach(n => {
       this.countNodes++;
       if (n.type === 'checkbox') n.addEventListener('click', (e) => this.validate(e));
       else {
@@ -467,8 +468,10 @@ export class Valid {
 
   // Активировать/Деактивировать кнопки
   btnActivate() {
-    if (this.valid.size >= this.countNodes) this.btn.removeAttribute('disabled');
-    else this.btn.setAttribute('disabled', 'disabled');
+    //if (this.valid.size >= this.countNodes) this.btn.removeAttribute('disabled');
+    //else this.btn.setAttribute('disabled', 'disabled');
+    if (this.valid.size >= this.countNodes) delete this.btn.dataset.disabled;
+    else this.btn.dataset.disabled = '1';
   }
 
   btnDisabled() {
@@ -510,16 +513,16 @@ export class Valid {
     }
   }
 
-  validate(e) {
-    let node = e.target, reg;
-    if (node.value.length > 0) {
+  validate(e, ignoreValue = false) {
+    let node = e.target || target, reg;
+    if (node.value.length > 0 || ignoreValue) {
       switch (node.name) {
         case 'name':
           if (node.value.length < 2) { this.setErrorValidate(node); }
           else this.setValidated(node);
           break;
 
-        case 'tel':
+        case 'phone': case 'tel':
           reg = /[^\d|\(|\)|\s|\-|_|\+]/;
           if (node.value.length < 18 || reg.test(String(node.value).toLowerCase())) {
             this.setErrorValidate(node);
@@ -538,7 +541,7 @@ export class Valid {
         }
       }
     } else this.removeValidateClasses(node);
-    this.btnActivate();
+    !ignoreValue && this.btnActivate();
   }
 
   // Показать/Скрыть (ошибки) валидации
@@ -570,6 +573,11 @@ export class Valid {
   }
 
   confirm(e, sendFunc) {
+    if (e.target.dataset.disabled) {
+      this.inputNodes.forEach(target => this.validate({target}, true));
+      return;
+    }
+
     const formData = new FormData(this.form),
           finished = () => {
 

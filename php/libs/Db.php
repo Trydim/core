@@ -681,7 +681,7 @@ class Db extends \R {
     $result = self::getAssocRow("SELECT $columns from users WHERE login = ?", [$currentUser]);
 
     if (count($result) === 1) {
-      if ($columns === 'customization') return json_decode($result['customization'][0]);
+      if ($columns === 'customization') return json_decode($result[0]['customization']);
       if (count(explode(',', $columns)) === 1) return $result[$columns];
     }
     return new class {};
