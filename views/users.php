@@ -12,19 +12,17 @@ $field['pageFooter'] = '<div id="paginator"></div>';
 
 // Users/Manager custom field
 $managerFieldHtml = '';
-foreach ($managerField as $k => $type) {
-  $inputName = 'userF' . translit($k);
-
-  switch ($type) {
+foreach ($managerField as $k => $item) {
+  switch ($item['type']) {
     case 'textarea':
-      $input = '<textarea name="' . $inputName . '" class="form-control"></textarea>';
+      $input = '<textarea name="' . $k . '" class="form-control"></textarea>';
       break;
     case 'string': case 'number': case 'date': default:
-      $input = '<input type="' . $type . '" class="form-control" name="' . $inputName . '">';
+      $input = '<input type="' . $item['type'] . '" class="form-control" name="' . $k . '">';
       break;
   }
 
-  $managerFieldHtml .= '<div class="form-group"><label class="w-100">' . $k . $input .'</label></div>';
+  $managerFieldHtml .= '<div class="form-group"><label class="w-100">' . $item['name'] . $input .'</label></div>';
 }
 
 $field['footerContent'] = <<<footerContent

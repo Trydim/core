@@ -102,9 +102,21 @@ trait Page {
  * @package cms
  */
 trait Dictionary {
+  private function includeFromSetting() {
+    if (isset($this->setting['managerSetting'])) {
+      $list = $this->setting['managerSetting'];
+      return array_reduce(array_keys($list), function ($r, $k) use ($list) {
+        $r[$k] = $list[$k]['name'];
+        return $r;
+      }, []);
+    }
+  }
+
   public function initDictionary() {
+    $mess = [];
     include ABS_SITE_PATH . 'lang/dictionary.php';
-    $mess = isset($mess) ? json_encode($mess) : false;
+    $mess = array_merge($mess, $this->includeFromSetting());
+    $mess = json_encode($mess);
     return $mess ? "<input type='hidden' id='dictionaryData' value='$mess'>" : '';
   }
 }
@@ -154,7 +166,7 @@ final class Main {
   }
 
   public function getSettings($key) {
-    if (strlen($key))
+    if ($key === 'json') return json_encode($this->setting);
     if (isset($this->setting[$key])) return $this->setting[$key];
     return false;
   }

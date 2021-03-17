@@ -10,6 +10,10 @@ export const users = {
   confirm: f.gI('confirmField'),
   confirmMsg: false,
 
+  template: {
+    form: f.gTNode('#userForm'),
+  },
+
   queryParam: {
     mode        : 'DB',
     tableName   : 'users',
@@ -57,9 +61,7 @@ export const users = {
           item['contactsParse'] = value;
           if(Object.values(value).length) {
             let arr = Object.entries(value).map(([key, value]) => {
-              if (key.includes('stepF')) key = _(key.replace('stepF', ''));
-              else key = _(key);
-              return {key, value};
+              return {key: _(key), value};
             });
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
@@ -131,83 +133,63 @@ export const users = {
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
     let target = e.target,
-        action = target.getAttribute('data-action');
+        action = target.getAttribute('data-action'),
+        form;
+
+    if (['addUser', 'changeUser'].includes(action)) {
+      this.delayFunc = () => {
+        const f = new FormData(form), res = {};
+        for (const [k, v] of f.entries()) {
+          res[k] = v;
+        }
+        this.queryParam.authForm = JSON.stringify(res);
+      };
+    }
 
     let select = {
       'addUser': () => {
-        let form = f.gTNode('#userForm');
-
-        this.delayFunc = () => {
-          const f = new FormData(form),
-                res = {};
-          for (const [k, v] of f.entries()) {
-            res[k] = v;
-          }
-          this.queryParam.authForm = JSON.stringify(res);
-        }
-
+        form = this.template.form.cloneNode(true);
         form.querySelector('#changeField').remove();
-
         this.confirmMsg = 'Новый пользователь добавлен';
         this.M.show('Добавление пользователя', form);
       },
       'changeUser': () => {
-        if (!this.selectedId.size) return;
+        if (!this.selectedId.size) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
 
-        let oneElements = this.selectedId.size === 1,
-            form = f.gTNode('#userForm'), node,
+        let oneElements = this.selectedId.size === 1, node,
             id = this.getSelectedList(),
             users = this.usersList.get(id[0]);
+        form = this.template.form.cloneNode(true);
 
         this.queryParam.usersId = JSON.stringify(this.getSelectedList());
-        node = form.querySelector('[name="userName"]');
-        if (oneElements) {
-          this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = users['U.name']; }
+
+        node = form.querySelector('[name="name"]');
+        if (oneElements) node.value = users['U.name'];
         else node.parentNode.remove();
 
-        node = form.querySelector('[name="userPermission"]');
-        this.onEventNode(node, this.changeSelectInput, {}, 'blur');
+        node = form.querySelector('[name="permission_id"]');
         if (oneElements) node.value = users['permission_id'];
         else node.value = 1;
 
-        node = form.querySelector('[name="userLogin"]');
-        if (oneElements) {
-          this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = users['login']; }
+        node = form.querySelector('[name="login"]');
+        if (oneElements) node.value = users['login'];
         else node.parentNode.remove();
 
-        form.querySelector('[name="userPassword"]').parentNode.remove();
+        form.querySelector('[name="password"]').parentNode.remove();
 
         // Contacts
-        let {phone = '', email = '', more = ''} = users['contactsParse'];
-
-        node = form.querySelector(`[name="userPhone"]`);
-        if (oneElements) {
-          this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = phone;
-          f.maskInit(node); }
-        else node.parentNode.remove();
-
-        node = form.querySelector(`[name="userMail"]`);
-        if (oneElements) {
-          this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = email; }
-        else node.parentNode.remove();
-
-        node = form.querySelector(`[name="userMoreContact"]`);
-        if (oneElements) {
-          this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = more; }
-        else node.parentNode.remove();
-
-        node = form.querySelector('[name="userActivity"]');
-        node.checked = oneElements ? !!(+users['activity']) : true;
-        this.onEventNode(node, this.changeCheckInput, {}, 'change');
-
-        form.querySelectorAll('input').forEach(n => {
-          n.dispatchEvent(new Event('blur'));
+        Object.entries(users['contactsParse']).forEach(([k, v]) => {
+          node = form.querySelector(`[name="${k}"]`);
+          if (node) {
+            if (oneElements) {
+              node.value = v;
+              node.type === 'tel' && f.maskInit(node);
+            } else node.parentNode.remove();
+          }
         });
+
+        node = form.querySelector('[name="activity"]');
+        node.checked = oneElements ? !!(+users['activity']) : true;
 
         this.confirmMsg = 'Изменения сохранены';
         this.M.show('Изменение пользователей', form);
@@ -234,9 +216,7 @@ export const users = {
         if (!this.selectedId.size) return;
 
         this.queryParam.usersId = JSON.stringify(this.getSelectedList());
-        this.delayFunc = () => {
-          this.selectedId.clear();
-        };
+        this.delayFunc = () => this.selectedId.clear();
 
         this.confirmMsg = 'Удаление успешно';
         this.M.show('Удалить', 'Удалить выбранных пользователя?');
@@ -259,9 +239,6 @@ export const users = {
   changeTextInput(e) {
     if (e.target.value.length <= 2) e.target.value = '';
     //this.queryParam[e.target.name] = e.target.value;
-  },
-  changeSelectInput(e) {
-    this.queryParam[e.target.name] = e.target.value;
   },
   changeCheckInput(e) {
     this.queryParam[e.target.name] = e.target.checked;

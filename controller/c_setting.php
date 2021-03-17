@@ -23,8 +23,8 @@ $param = [
 if (USE_DATABASE) {
   //$setAction = 'loadPermission';
   //require CORE . 'php/setting.php';
-  $admin = $db->getUser($main->getLogin(), 'name, permission_id');
-  $admin = $admin['permission_id'] === 1 || strtolower($admin['name']) === 'admin';
+  $admin = $db->getUser($main->getLogin(), 'permission_id');
+  $admin = $admin === '1'; // || strtolower($admin['name']) === 'admin';
 } else $admin = true;
 $param['admin'] = $admin;
 

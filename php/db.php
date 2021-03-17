@@ -367,11 +367,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       $contacts = [];
       foreach ($user as $k => $v) {
-        if (in_array($k, ['login', 'password', 'name', 'permission_id'])) {
-          $param['0'][$k] = $v;
-        } else {
-          $contacts[$k] = $v;
-        }
+        if (in_array($k, ['login', 'password', 'name', 'permission_id'])) $param['0'][$k] = $v;
+        else $contacts[$k] = $v;
       }
 
       count($contacts) && $param['0']['contacts'] = json_encode($contacts);
@@ -380,19 +377,18 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'changeUser':
       $usersId = isset($usersId) ? json_decode($usersId) : [];
+      $user = isset($authForm) ? json_decode($authForm, true) : [];
 
       if (count($usersId)) {
         $param = [];
 
-        $contacts = [];
-        isset($userPhone) && $contacts['phone'] = $userPhone;
-        isset($userMail) && $contacts['email'] = $userMail;
-        isset($userMoreContact) && $contacts['more'] = $userMoreContact;
-
         foreach ($usersId as $id) {
-          isset($userLogin) && $param[$id]['login'] = $userLogin;
-          isset($userName) && $param[$id]['name'] = $userName;
-          isset($userActivity) && $param[$id]['activity'] = $userActivity;
+          $param[$id] = [];
+          $contacts = [];
+          foreach ($user as $k => $v) {
+            if (in_array($k, ['login', 'password', 'name', 'permission_id'])) $param[$id][$k] = $v;
+            else $contacts[$k] = $v;
+          }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
         }
 

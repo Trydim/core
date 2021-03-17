@@ -418,9 +418,10 @@ function setManagerCustomField() {
 
       //$fieldKey = preg_replace('/\D\S/g', '', trim($_REQUEST[$key]));
       $fieldKey = trim($_REQUEST[$key]);
+      $fieldIndex = translit($fieldKey);
       $fieldType = isset($_REQUEST[TYPE . $id]) ? $_REQUEST[TYPE . $id] : 'string';
 
-      $result[$fieldKey] = $fieldType;
+      $result[$fieldIndex] = ['name' => $fieldKey, 'type' => $fieldType];
     }
   }, array_keys($_REQUEST));
 
