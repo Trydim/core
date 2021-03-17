@@ -14,14 +14,18 @@ $setAction = 'load';
 require CORE . 'php/setting.php';
 
 $param = [
-  'userId'        => $main->getLogin('id'),
-  'login'         => isset($result['user']['login']) ? $result['user']['login'] : '',
-  'orderMail'     => isset($result['setting']['orderMail']) ? $result['setting']['orderMail'] : '',
-  'orderMailCopy' => isset($result['setting']['orderMailCopy']) ? $result['setting']['orderMailCopy'] : '',
+  'userId'         => $main->getLogin('id'),
+  'login'          => isset($result['user']['login']) ? $result['user']['login'] : '',
+  'orderMail'      => isset($result['setting']['orderMail']) ? $result['setting']['orderMail'] : '',
+  'orderMailCopy'  => isset($result['setting']['orderMailCopy']) ? $result['setting']['orderMailCopy'] : '',
 ];
 
-$admin = $db->getUser($main->getLogin(), 'name, permission_id');
-$admin = $admin['permission_id'] === 1 || strtolower($admin['name']) === 'admin';
+if (USE_DATABASE) {
+  //$setAction = 'loadPermission';
+  //require CORE . 'php/setting.php';
+  $admin = $db->getUser($main->getLogin(), 'name, permission_id');
+  $admin = $admin['permission_id'] === 1 || strtolower($admin['name']) === 'admin';
+} else $admin = true;
 $param['admin'] = $admin;
 
 require $pathTarget;

@@ -2,14 +2,13 @@
 
 /**
  * @var $param - from controller
+ * @var $admin - from controller
  */
 
 /*$field['headContent']    = <<<headContent
 headContent;
 $field['pageHeader']    = <<<pageHeader
 pageHeader;
-$field['pageFooter']    = <<<pageFooter
-pageFooter;
 $field['sideLeft']      = <<<sideLeft
 sideLeft;*/
 
@@ -20,3 +19,8 @@ if (isset($result)) {
   $field['footerContent'] = "<input type='hidden' id='userSetting' value='$result'>";
 }
 
+if ($admin) {
+  $field['footerContent'] .= <<<footerContent
+
+footerContent;
+}

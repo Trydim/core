@@ -147,7 +147,20 @@ final class Main {
   use Dictionary;
   use Hooks;
 
+  private $setting = [];
+
+  private function loadSetting() {
+    $this->setting = getSettingFile();
+  }
+
+  public function getSettings($key) {
+    if (strlen($key))
+    if (isset($this->setting[$key])) return $this->setting[$key];
+    return false;
+  }
+
   public function __construct() {
+    $this->loadSetting();
   }
 }
 

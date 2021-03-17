@@ -362,17 +362,18 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     //case 'loadUser': break; // Вероятно для загрузки пароля
     case 'addUser':
       $param = ['0' => []];
-      if (isset($userLogin) && isset($userPassword)) {
-        $param['0']['name'] = isset($userName) ? $userName : '';
-        $param['0']['login'] = $userLogin;
-        $param['0']['password'] = password_hash($userPassword, PASSWORD_BCRYPT);
-        $param['0']['permission_id'] = isset($userPermission) ? $userPermission : 1;
-      }
+
+      $user = isset($authForm) ? json_decode($authForm, true) : [];
 
       $contacts = [];
-      isset($userPhone) && $contacts['phone'] = $userPhone;
-      isset($userMail) && $contacts['email'] = $userMail;
-      isset($userMoreContact) && $contacts['more'] = $userMoreContact;
+      foreach ($user as $k => $v) {
+        if (in_array($k, ['login', 'password', 'name', 'permission_id'])) {
+          $param['0'][$k] = $v;
+        } else {
+          $contacts[$k] = $v;
+        }
+      }
+
       count($contacts) && $param['0']['contacts'] = json_encode($contacts);
 
       $result['error'] = $db->insert($columns, 'users', $param);

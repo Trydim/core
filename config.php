@@ -9,6 +9,8 @@ define('SITE_PATH', str_replace('//', '/', $siteDir));
 
 require 'config.php'; // Public config
 
+!isset($dbConfig) && $dbConfig = [];
+
 define('CORE', basename( __DIR__ ) . '/');
 define('VIEW', CORE . 'views/');
 

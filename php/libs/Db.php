@@ -565,8 +565,9 @@ class Db extends \R {
 
       if (($value[0] === $login && $value[1] === $password) || $status) {
         return [
-          'name' => $value[0],
-          'ID'   => 1,
+          'login' => $value[0],
+          'name'  => $value[0],
+          'ID'    => 1,
         ];
       } else return false;
     } else {

@@ -56,8 +56,10 @@ export const users = {
           value = JSON.parse(item['contacts']);
           item['contactsParse'] = value;
           if(Object.values(value).length) {
-            let arr = Object.entries(value).map(n => {
-              return { key: _(n[0]), value: n[1] };
+            let arr = Object.entries(value).map(([key, value]) => {
+              if (key.includes('stepF')) key = _(key.replace('stepF', ''));
+              else key = _(key);
+              return {key, value};
             });
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
@@ -135,18 +137,14 @@ export const users = {
       'addUser': () => {
         let form = f.gTNode('#userForm');
 
-        this.onEventNode(form.querySelector('[name="userName"]'), this.changeTextInput, {}, 'blur');
-
-        // доступ по умолчанию, заменить на select // Временно
-        let node = form.querySelector('[name="userPermission"]');
-        this.onEventNode(node, this.changeSelectInput, {}, 'blur');
-        node.dispatchEvent(new Event('blur'));
-
-        ['userLogin', 'userPassword', 'userPhone', 'userMail', 'userMoreContact'].map(i => {
-          let node = form.querySelector(`[name="${i}"]`);
-          i === 'userPhone' && f.maskInit(node);
-          node && this.onEventNode(node, this.changeTextInput, {}, 'blur');
-        });
+        this.delayFunc = () => {
+          const f = new FormData(form),
+                res = {};
+          for (const [k, v] of f.entries()) {
+            res[k] = v;
+          }
+          this.queryParam.authForm = JSON.stringify(res);
+        }
 
         form.querySelector('#changeField').remove();
 
@@ -259,9 +257,8 @@ export const users = {
   },
 
   changeTextInput(e) {
-    if (e.target.value.length === 0) return;
-    else if (e.target.value.length <= 2) { e.target.value = 'Ошибка'; return; }
-    this.queryParam[e.target.name] = e.target.value;
+    if (e.target.value.length <= 2) e.target.value = '';
+    //this.queryParam[e.target.name] = e.target.value;
   },
   changeSelectInput(e) {
     this.queryParam[e.target.name] = e.target.value;

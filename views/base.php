@@ -48,6 +48,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     window.PUBLIC_PAGE = '<?= PUBLIC_PAGE ?>';
     window.PATH_IMG = '<?= PATH_IMG ?>';
     window.AUTH_STATUS = '<?= $main->checkStatus('ok') ?>';
+    window.SETTING = '<?= $main->getSettings() ?>';
   </script>
 </head>
 

@@ -1,5 +1,6 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 /**
+ * @var object $main global
  * @var array $dbConfig
  * @var string $pathTarget
  */
@@ -32,9 +33,12 @@ if(!isset($setting)) {
 
 $permission = $db->selectQuery('permission', ['ID', 'name']);
 
-$param['permission'] = implode('', array_map(function ($item) {
+$param['permission'] = $permission = implode('', array_map(function ($item) {
   return "<option value=" . $item['ID'] . ">" . gTxt($item['name']) . "</option>";
 }, $permission));
+
+$managerField = $main->getSettings('managerSetting');
+if (!$managerField) $managerField = [];
 
 $param['columns'] = isset($columns) ? $columns : '';
 require $pathTarget;

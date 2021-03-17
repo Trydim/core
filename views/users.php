@@ -3,12 +3,29 @@
 /**
  * @var object $main
  * @var array $param
+ * @var array $permission
+ * @var array $managerField
  */
 
 $field['content'] = template('parts/usersContent', $param);
 $field['pageFooter'] = '<div id="paginator"></div>';
 
-$permission = $param['permission'];
+// Users/Manager custom field
+$managerFieldHtml = '';
+foreach ($managerField as $k => $type) {
+  $inputName = 'userF' . translit($k);
+
+  switch ($type) {
+    case 'textarea':
+      $input = '<textarea name="' . $inputName . '" class="form-control"></textarea>';
+      break;
+    case 'string': case 'number': case 'date': default:
+      $input = '<input type="' . $type . '" class="form-control" name="' . $inputName . '">';
+      break;
+  }
+
+  $managerFieldHtml .= '<div class="form-group"><label class="w-100">' . $k . $input .'</label></div>';
+}
 
 $field['footerContent'] = <<<footerContent
 <template id="permission">
@@ -20,30 +37,28 @@ $field['footerContent'] = <<<footerContent
 <template id="userForm">
   <form action="#">
     <div class="form-group">
-      <label class="w-100">Имя пользователя: <input type="text" class="form-control" name="userName"></label>
+      <label class="w-100">Имя пользователя: <input type="text" class="form-control" name="name"></label>
     </div>
     <div class="form-group">
       <label class="w-100">Доступ: 
-        <select class="form-control" name="userPermission">$permission</select>
+        <select class="form-control" name="permission_id">$permission</select>
       </label>
     </div>
     <div class="form-group">
-      <label class="w-100">Логин: <input type="text" class="form-control" name="userLogin"></label>
+      <label class="w-100">Логин: <input type="text" class="form-control" name="login"></label>
     </div>
     <div class="form-group">
-      <label class="w-100">Пароль: <input type="password" class="form-control" name="userPassword"></label>
+      <label class="w-100">Пароль: <input type="password" class="form-control" name="password"></label>
     </div>
     <div class="form-group">
-      <label class="w-100">Телефон: <input type="tel" class="form-control" name="userPhone"></label>
+      <label class="w-100">Телефон: <input type="tel" class="form-control" name="phone"></label>
     </div>
     <div class="form-group">
-      <label class="w-100">Почта: <input type="email" class="form-control" name="userMail"></label>
+      <label class="w-100">Почта: <input type="email" class="form-control" name="email"></label>
     </div>
-    <div class="form-group">
-      <label class="w-100">Дополнительно: <textarea name="userMoreContact" class="form-control" ></textarea></label>
-    </div>
+    $managerFieldHtml
     <div id="changeField">
-      <label class="w-100">Активность: <input type="checkbox" name="userActivity"></label>
+      <label class="w-100">Активность: <input type="checkbox" name="activity"></label>
     </div>
   </form>
 </template>

@@ -384,3 +384,45 @@ function getSettingFile($decode = true, $assoc = true) {
     return $decode ? json_decode($setting, $assoc) : $setting;
   }
 }
+
+/**
+ * @param $value {string}
+ * @return string
+ */
+function translit($value) {
+  $converter = [
+    'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
+    'е' => 'e', 'ё' => 'e', 'ж' => 'zh', 'з' => 'z', 'и' => 'i',
+    'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n',
+    'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't',
+    'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch',
+    'ш' => 'sh', 'щ' => 'sch', 'ь' => '', 'ы' => 'y', 'ъ' => '',
+    'э' => 'e', 'ю' => 'yu', 'я' => 'ya',
+  ];
+
+  return strtr(mb_strtolower($value), $converter);
+}
+
+/**
+ * Set manager custom field from Request
+ */
+function setManagerCustomField() {
+  define('KEY' , 'mCustomFieldKey');
+  define('TYPE' , 'mCustomFieldType');
+
+  $result = [];
+
+  array_map(function ($key) use (&$result) {
+    if (stripos($key, KEY) !== false) {
+      $id = str_replace(KEY, '', $key);
+
+      //$fieldKey = preg_replace('/\D\S/g', '', trim($_REQUEST[$key]));
+      $fieldKey = trim($_REQUEST[$key]);
+      $fieldType = isset($_REQUEST[TYPE . $id]) ? $_REQUEST[TYPE . $id] : 'string';
+
+      $result[$fieldKey] = $fieldType;
+    }
+  }, array_keys($_REQUEST));
+
+  return $result;
+}
