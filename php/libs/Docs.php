@@ -3,13 +3,13 @@
 /* Папка  для временных файлов */
 define('RESULT_PATH', '/temp/');
 
-class Pdf {
+class Docs {
 
   //private const RESULT_PATH = '/temp/';
 
   // Create name for new pdf file (Work only if DESTINATION=save)
   // if position = 0, then will use not
-  private $PDF_NAME = [
+  private $FILE_NAME = [
     'name'      => [
       'position' => 0,
       'value'    => '',
@@ -22,27 +22,53 @@ class Pdf {
       'position' => 3,
       'format'   => 'dmY', // 'd.m.y' = '31.12.20' / 'Ymd' = '20010310' / 'H:i:s' = '23:59:59'
     ],
-    'extension' => '.pdf',
   ];
 
-  private $pdfTpl               = 'pdfTpl'; // Шаблон pdf по умолчанию
-  private $data                 = [];       // Отчет глобальный для вставки в шаблон
-  private $content, $footerPage = '';
+  private $docsType, $fileTpl, $filePath;
+  private $data = [], $excelHeader = []; // Отчет глобальный для вставки в шаблон
+  private $content, $footerPage = '', $imgPath;
   private $pdfParam; // Param
-  private $pdf;
-  private $pdfName;
+  private $docs;
+  private $fileName;
+
+  public function __construct($docsType, $data, $fileTpl = 'default') {
+    $this->docsType = $docsType;
+    $this->data = $data;
+
+    $this->setFileTpl($fileTpl);
+    $this->setDefaultParam();
+    $this->getFileName();
+    $docsType === 'pdf' && $this->prepareTemplate();
+    $docsType === 'excel' && $this->setExcelDate();
+
+    $func = 'init' . $this->getFunc();
+    $this->$func();
+  }
 
   private function getFileName() {
-    $arr = $this->PDF_NAME;
+    $arr = $this->FILE_NAME;
     $file = '';
     for ($i = 1; $i < 4; $i++) {
       if ($arr['name']['position'] === $i) $file .= $arr['name']['value'];
       if ($arr['unique']['position'] === $i) $file .= substr(uniqid(), 0, $arr['unique']['countSymbol']);
       if ($arr['date']['position'] === $i) $file .= date($arr['date']['format']);
     }
-    if (isset($arr['extension'])) $file .= $arr['extension'];
-    else $file .= '.pdf';
-    $this->pdfName = $file;
+    switch ($this->docsType) {
+      case 'pdf': $file .= '.pdf'; break;
+      case 'excel': $file .= '.xlsx'; break;
+    }
+    $this->fileName = $file;
+  }
+
+  private function setFileTpl($fileTpl) {
+    $this->fileTpl = $fileTpl !== 'default' ? $fileTpl : ($this->docsType === 'pdf' ? 'pdfTpl' : 'excelTpl');
+
+    foreach ([ABS_SITE_PATH . "public/views/docs/$this->fileTpl.php",
+              CORE . "views/docs/$this->fileTpl.php"] as $path) {
+      if (file_exists($path)) {
+        $this->filePath = $path; break;
+      }
+    }
   }
 
   private function setDefaultParam() {
@@ -65,18 +91,19 @@ class Pdf {
   }
 
   private function prepareTemplate() {
-    //extract($this->data);
     ob_start();
-
-    if (file_exists(ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.php")) {
-      include(ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.php");
-    } else if (file_exists(CORE . "views/docs/$this->pdfTpl.php")) {
-      include(CORE . "views/docs/$this->pdfTpl.php");
-    }
-
+    include($this->filePath);
     isset($footerPage) && $this->footerPage = $footerPage;
-
     $this->content = ob_get_clean();
+  }
+
+  private function setExcelDate() {
+    $rows = [['header', 'type', 'comment'], ['c1-text', 'string', 'text'], ['c2-text', '@', 'text'],
+             ['c3-integer', 'integer', ''], ['c4-integer', '0', ''], ['c5-price', 'price', ''],
+             ['c6-price', '#,##0.00', 'custom'], ['c7-date', 'date', ''], ['c8-date', 'YYYY-MM-DD', '']];
+    include($this->filePath);
+    $this->data = $rows;
+    isset($header) && $this->excelHeader = $header;
   }
 
   private function initPDF() {
@@ -85,16 +112,16 @@ class Pdf {
     switch (PDF_LIBRARY) {
       case 'mpdf':
         try {
-          $this->pdf = new Mpdf\Mpdf($this->pdfParam);
+          $this->docs = new Mpdf\Mpdf($this->pdfParam);
           //$this->pdf->useOnlyCoreFonts = true;
           //$this->pdf->SetDisplayMode('fullpage');
 
           $this->setCss();
 
           //$this->pdf->SetHTMLHeader('');
-          $this->pdf->SetHTMLFooter($this->footerPage);
+          $this->docs->SetHTMLFooter($this->footerPage);
 
-          $this->pdf->WriteHTML($this->content, \Mpdf\HTMLParserMode::HTML_BODY);
+          $this->docs->WriteHTML($this->content, \Mpdf\HTMLParserMode::HTML_BODY);
         } catch (\Mpdf\MpdfException $e) {
           echo $e->getMessage();
         }
@@ -108,16 +135,16 @@ class Pdf {
             $this->pdfParam['margin_right'],
             $this->pdfParam['margin_bottom'],
           ];
-          $this->pdf = new Spipu\Html2Pdf\Html2Pdf('P', $format, 'ru', true, 'UTF-8', $param);
+          $this->docs = new Spipu\Html2Pdf\Html2Pdf('P', $format, 'ru', true, 'UTF-8', $param);
 
-          DEBUG && $this->pdf->setModeDebug();
-          $this->pdf->setDefaultFont('freesans');
+          DEBUG && $this->docs->setModeDebug();
+          $this->docs->setDefaultFont('freesans');
 
           $this->setCss();
-          $this->pdf->writeHTML($this->content);
+          $this->docs->writeHTML($this->content);
 
         } catch (Spipu\Html2Pdf\Exception\Html2PdfException $e) {
-          $this->pdf->clean();
+          $this->docs->clean();
           $formatter = new Spipu\Html2Pdf\Exception\ExceptionFormatter($e);
           echo $formatter->getHtmlMessage();
         }
@@ -125,48 +152,61 @@ class Pdf {
     }
   }
 
+  private function initExcel() {
+    require_once 'Xlsxwriter.php';
+    $this->docs = new XLSXWriter();
+    count($this->excelHeader) && $this->docs->writeSheetHeader(gTxt('Sheet1'), $this->excelHeader);
+
+    foreach($this->data as $row)
+      $this->docs->writeSheetRow(gTxt('Sheet1'), $row);
+  }
+
   private function setCss() {
-    if (file_exists(ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.css")) {
-      $cssPath = ABS_SITE_PATH . "public/views/docs/$this->pdfTpl.css";
-    }
-    else if (file_exists(CORE . "/views/docs/$this->pdfTpl.css")) {
-      $cssPath = CORE . "/views/docs/$this->pdfTpl.css";
+    foreach ([ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css",
+              CORE . "/views/docs/$this->fileTpl.css"] as $path) {
+      if (file_exists($path)) {
+        $cssPath = $path; break;
+      }
     }
 
-    $stylesheet = file_get_contents($cssPath);
-
-    switch (PDF_LIBRARY) {
-      case 'mpdf':
-        $this->pdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
-        break;
-      case 'html2pdf':
-        $this->pdf->WriteHTML('<style>' . $stylesheet . '</style>');
-        break;
+    if (isset($cssPath)) {
+      $stylesheet = file_get_contents($cssPath);
+      switch (PDF_LIBRARY) {
+        case 'mpdf':
+          $this->docs->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
+          break;
+        case 'html2pdf':
+          $this->docs->WriteHTML('<style>' . $stylesheet . '</style>');
+          break;
+      }
     }
   }
 
-  public function __construct($data, $pdfTpl = 'pdfTpl') {
-    $this->pdfTpl = $pdfTpl;
-    $this->data = $data;
+  private function getFunc() {
+    switch ($this->docsType) {
+      case 'pdf': return 'Pdf';
+      case 'excel': return 'Excel';
+    }
+    return false;
+  }
 
-    $this->setDefaultParam();
-    $this->getFileName();
-    $this->prepareTemplate();
-    $this->initPDF();
+  public function getDocs($dest = 'S') {
+    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
+    if (!is_dir($path)) mkdir($path);
+    $func = 'get' . $this->getFunc();
+    return $this->$func($path, $dest);
   }
 
   /**
-   *
    * What do with pdf file:
    * save - save on server in RESULT_PATH, any other value send to browser
    * I - inline, D - DOWNLOAD, F - save local file, S - string
-   * @param string $dest
+   * @param {string} $path
+   * @param {string} $dest
    *
    * @return mixed
    */
-  public function getPdf($dest = 'S') {
-    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
-    if (!is_dir($path)) mkdir($path);
+  public function getPdf($path, $dest) {
 
     switch (PDF_LIBRARY) {
       case 'mpdf':
@@ -182,12 +222,12 @@ class Pdf {
        *  return the document as a string. $filename is ignored.
        */
         if ($dest === 'save') {
-          $this->pdf->Output($path . $this->pdfName, 'F');
-          return $path . $this->pdfName;
+          $this->docs->Output($path . $this->fileName, 'F');
+          return $path . $this->fileName;
         } else {
           return [
-            'name'    => $this->pdfName,
-            'pdfBody' => base64_encode($this->pdf->Output('', 'S')),
+            'name'    => $this->fileName,
+            'pdfBody' => base64_encode($this->docs->Output('', 'S')),
           ];
         }
       case 'html2pdf':
@@ -201,16 +241,30 @@ class Pdf {
        * E: return the document as base64 mime multi-part email attachment (RFC 2045)
        */
         if ($dest === 'save') {
-          $this->pdf->output($path . $this->pdfName);
-          return $path . $this->pdfName;
+          $this->docs->output($path . $this->fileName);
+          return $path . $this->fileName;
         } else {
           return [
-            'name'    => $this->pdfName,
-            'pdfBody' => base64_encode($this->pdf->Output('', 'S')),
+            'name'    => $this->fileName,
+            'pdfBody' => base64_encode($this->docs->Output('', 'S')),
           ];
         }
     }
     return false;
+  }
+
+  public function getExcel($path, $dest) {
+    switch ($dest) {
+      case 'save':
+        $this->docs->writeToFile($path . $this->fileName);
+        return $path . $this->fileName;
+      case 'S':
+      default:
+        return [
+          'name'    => $this->fileName,
+          'excelBody' => base64_encode($this->docs->writeToString()),
+        ];
+    }
   }
 
   /**

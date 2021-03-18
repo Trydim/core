@@ -8,8 +8,6 @@
  * @var string $email
  */
 
-require_once 'libs/pdf.php';
-
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
 $orderIds = isset($orderIds) ? json_decode($orderIds) : false;
 !$orderIds && $orderIds = isset($reportVal['orderIds']) && count($reportVal['orderIds']) === 1 ? $reportVal['orderIds'] : false;
@@ -23,24 +21,28 @@ if ($orderIds) { // Отчет взять из базы
 
 $phone = isset($tel) ? $tel : (isset($phone) ? $phone : '');
 $info = isset($info) ? $info : '';
-$usePdf = isset($usePdf) || $docType === 'pdf';
+$useDocs = isset($usePdf) || isset($useExcel) || in_array($docType, ['pdf', 'excel']);
+isset($fileTpl) ? $useDocs = true : $fileTpl = 'default';
 
 if (count($_FILES)) {
   //$filesArray = array_map(function ($files) { return $files; }, $_FILES);
   $filesArray = $_FILES;
 }
 
-$usePdf && $pdf = new Pdf($reportVal);
-//$usePdf && $pdf->setTemplate($docType);
+if ($useDocs) {
+  require_once 'libs/Docs.php';
+  $docs = new Docs($docType, $reportVal, $fileTpl);
+}
 
 if (isset($docType)) {
   switch ($docType) {
-    case 'pdf': case 'excel':
-      $result = $pdf->getPdf();
+    case 'excel':
+    case 'pdf':
+      $useDocs && $result = $docs->getDocs();
       break;
     case 'mail':
-      $usePdf && $pdfPath = $pdf->getPdf('save');
-      require_once 'libs/mail.php';
+      $useDocs && $docsPath = $docs->getDocs('save');
+      require_once 'libs/Mail.php';
       $mail = new Mail();
       $param = [
         'name'  => $name,
@@ -52,7 +54,7 @@ if (isset($docType)) {
       isset($filesArray) && $mail->addOtherFile($filesArray);
       $mail->prepareMail($param);
       //$mail->setSubject($pdfPath);
-      $usePdf && $mail->addPdf($pdfPath);
+      $useDocs && $mail->addFile($docsPath);
       $mail->addMail($email);
       $result['mail'] = $mail->send();
       break;

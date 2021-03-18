@@ -23,9 +23,9 @@ define('MAIL_FROM_USER', 'calc.by');
 require_once 'vendor/autoload.php';
 
 class Mail {
-  private $cpNumber        = 1;
-  private $mailTpl         = '', $body = '', $pdfPath = '', $pdfFileName = '';
-  private $mailTarget      = MAIL_TARGET;
+  private $cpNumber   = 1;
+  private $mailTpl    = '', $body = '', $docPath = '', $pdfFileName = '';
+  private $mailTarget = MAIL_TARGET;
   private $subject         = MAIL_SUBJECT;
   private $otherMail       = [];
   private $attachmentFiles = [];
@@ -62,8 +62,8 @@ class Mail {
     $this->otherMail[] = $email;
   }
 
-  public function addPdf($pdfPath, $fileName = "") {
-    $this->pdfPath = $pdfPath;
+  public function addFile($docPath, $fileName = "") {
+    $this->docPath = $docPath;
     $this->pdfFileName = $fileName !== '' ? $fileName : uniqid() . '.pdf';
     //'КП_' . $this->cpNumber . '_' . date('dmY') . '.pdf';
   }
@@ -117,9 +117,9 @@ class Mail {
       $mail->AltBody = 'Тестовое сообщение.';
 
       // Attachment files
-      if (is_file($this->pdfPath)) {
-        $mail->addAttachment($this->pdfPath, $this->pdfFileName);
-        $resource = [$this->pdfPath];
+      if (is_file($this->docPath)) {
+        $mail->addAttachment($this->docPath, $this->pdfFileName);
+        $resource = [$this->docPath];
       }
 
       // Other Files
