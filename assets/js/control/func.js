@@ -372,7 +372,7 @@ const func = {
     data.set('reportVal', JSON.stringify(report));
 
     q.Post({data}).then(data => {
-      f.removeLoading(target);
+      func.removeLoading(target);
       if (data['pdfBody']) {
         f.saveFile({
           name: data['name'],

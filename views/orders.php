@@ -1,5 +1,9 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var $param - from controller c_orders.php
+ */
+
 // $auth = template('parts/authBlock');
 // $field['pageHeader'] = <<<pageHeader
 

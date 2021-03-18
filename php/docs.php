@@ -35,7 +35,7 @@ $usePdf && $pdf = new Pdf($reportVal);
 
 if (isset($docType)) {
   switch ($docType) {
-    case 'pdf':
+    case 'pdf': case 'excel':
       $result = $pdf->getPdf();
       break;
     case 'mail':

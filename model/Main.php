@@ -110,6 +110,7 @@ trait Dictionary {
         return $r;
       }, []);
     }
+    return [];
   }
 
   public function initDictionary() {

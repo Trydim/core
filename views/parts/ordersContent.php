@@ -1,7 +1,7 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+
 !isset($ordersColumns) && $ordersColumns = [];
 !isset($ordersVisitorColumns) && $ordersVisitorColumns = [];
-
 ?>
 <div class="d-flex justify-content-between pb-4" id="actionBtnWrap">
   <div>

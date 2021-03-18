@@ -190,7 +190,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
   if (!count($dict)) return loadFullCVS($filename);
 
 	if (($handle = fopen($filename, "r")) !== false) {
-		if (($data = fgetcsv($handle, 1000, ";"))) {
+		if (($data = fgetcsv($handle, 1000, CSV_DELIMITER))) {
 			$keyIndex = [];
 
       $inCharset = 'UTF-8'; //mb_detect_encoding(, ['windows-1251', 'UTF-8'], true);
@@ -225,7 +225,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
 
 			}
 
-			while (($data = fgetcsv($handle, 1000, ";")) !== false) {
+			while (($data = fgetcsv($handle, 1000, CSV_DELIMITER)) !== false) {
 				$result[] = $addpos($data);
 			}
 		}
