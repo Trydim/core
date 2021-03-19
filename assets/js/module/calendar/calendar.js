@@ -129,12 +129,23 @@ const component = {
       order.important_value = orders.formatImportant(order.important_value);
 
       let title = 'Заказ №' + order['O.ID'],
-          div   = document.createElement('div');
+          div   = document.createElement('div'),
+          content = orders.template.orderContentBody.outerHTML;
 
-      div.innerHTML = f.replaceTemplate(orders.tmp, order);
+      div.innerHTML = f.replaceTemplate(content, order);
+      orders.template.orderContentBtn.dataset.id = order['O.ID'];
+
       calendar.M.show(title, div);
-    }
+      calendar.M.btnField.append(orders.template.orderContentBtn);
+      calendar.M.bindBtn();
 
+      orders.template.orderContentBtn.onclick = function () {
+        let link = f.gI(f.ID.PUBLIC_PAGE),
+            query = this.currentTable === 'order' ? 'orderId=' : 'orderVisitorId=';
+        link.href += '?' + query + this.dataset.id;
+        link.click();
+      };
+    }
   },
 
   changeDateRange(e) {
@@ -176,6 +187,11 @@ const orders = {
   data: Object.create(null),
   orderIds: new Set(),
 
+  template: {
+    orderContentBody: f.gTNode('#orderTemplate'),
+    orderContentBtn: f.gTNode('#orderBtnTemplate'),
+  },
+
   init() {
     let node = f.gI('ordersStatusValue');
     node && node.innerText && this.setStatus(JSON.parse(node.innerText));
@@ -185,7 +201,7 @@ const orders = {
     node && node.innerText && this.setOrders(JSON.parse(node.innerText));
     node && node.remove();
 
-    this.tmp || (this.tmp = f.gT('#orderTemplate'));
+    this.onEvent();
   },
 
   setOrders(orders) {
@@ -232,6 +248,10 @@ const orders = {
   formatImportant(value) {
     value = value ? JSON.parse(value.replace(/'/g, '"')) : '';
     return value.reduce ? value.reduce((a, i) => { a += `${i.key}:${i.value}`; return a; }, '') : '';
+  },
+
+  onEvent() {
+
   },
 }
 

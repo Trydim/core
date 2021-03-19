@@ -8,6 +8,7 @@ $field['content'] = <<<CONTENT
 <div class="calendar" id="calendar"></div>
 CONTENT;
 
+$field['footerContent'] .= '<a id="publicPageLink" href="public" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="orderTemplate">
 	<div>
@@ -19,4 +20,8 @@ $field['footerContent'] .= <<<footerContent
 		<span>\${important_value}</span><br>
 	</div>
 </template>
+<template id="orderBtnTemplate">
+  <input type="button" class="btn btn-success" value="Редактировать" data-action="openOrder">
+</template>
+
 footerContent;

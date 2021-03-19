@@ -351,7 +351,9 @@ export const Searching = () => {
 
   obj.clear = function (inputNode) {
     inputNode.removeEventListener('keyup', this.bindInputNodeEvent);
-    this.usePopup && this.resultTmp.remove();
+    setTimeout(() => {
+      this.usePopup && this.resultTmp.remove();
+    }, 0);
   }
 
   // Events
@@ -389,6 +391,7 @@ export const Searching = () => {
   }
 
   obj.clickResult = function (e, inputNode) {
+    console.log(+e.target.dataset.id, e.target);
     if(this.resultTmp === e.target) return;
     let index = +e.target.dataset.id;
 
