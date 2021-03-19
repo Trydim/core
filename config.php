@@ -17,7 +17,7 @@ define('VIEW', CORE . 'views/');
 define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
 define('CORE_SCRIPT', SITE_PATH . CORE . 'assets/js/');
 
-define('SETTINGS_PATH', CORE . 'settingSave.json');
+define('SETTINGS_PATH', ABS_SITE_PATH . 'public/settingSave.json');
 define('SYSTEM_PATH', CORE . 'php/system.php');
 
 !$publicConfig['PUBLIC_PAGE'] && define('ONLY_LOGIN', true);

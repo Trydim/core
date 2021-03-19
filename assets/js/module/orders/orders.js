@@ -309,7 +309,7 @@ export const orders = {
         let fd = new FormData();
         fd.set('mode', 'DB');
         fd.set('dbAction', 'loadCustomerByOrder');
-        fd.set( 'orderIds', this.queryParam.orderIds);
+        fd.set('orderIds', this.queryParam.orderIds);
         f.Post({data: fd})
           .then(data => {
             if(data['customer'] && data['customer']['contacts']) {
@@ -317,19 +317,21 @@ export const orders = {
                   user = data['users'],
                   node = form.querySelector('[name="email"]');
 
-              this.queryParam.name = user.name;
-              this.queryParam.phone = user.contacts.phone;
+              this.queryParam.mode = 'docs';
+              this.queryParam.docsAction = 'mail';
+              this.queryParam.docType = 'pdf';
+              this.queryParam.name = user.name || user['login'];
+              this.queryParam.phone = user.contacts.phone || '';
+              this.queryParam.email = contacts['email'];
+
               this.onEventNode(node, this.changeSelectInput, {}, 'change');
               contacts['email'] && (node.value = contacts['email']);
-              node.dispatchEvent(new Event('change'));
 
-              // TODO Добавить проверку почты
-              this.queryParam.mode = 'docs';
-              this.queryParam.docType = 'mail';
               this.M.btnConfig('confirmYes', {value: 'Отправить'});
               this.M.show('Отправить на почту', form);
 
               this.confirmMsg = 'Отправлено';
+              // TODO Добавить проверку почты
               //f.initValid(() => {}, );
             }
           });

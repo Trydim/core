@@ -22,6 +22,14 @@
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>
+<div class="pb-4 d-none" id="printTypeField">
+<? for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
+  <input type="button" class="btn btn-primary"
+         data-action="printReport" data-type="printType<?= $i ?>"
+         value="<?= gTxt('printType' . $i) ?>">
+<? } ?>
+  <input type="button" class="btn btn-warning" data-action="cancelPrint" value="Отмена">
+</div>
 <? if (USERS_ORDERS) { ?>
   <div class="d-flex pb-4" style="justify-content: left">
     <div>
@@ -36,14 +44,6 @@
     </div>
   </div>
 <? } ?>
-<div class="pb-4 d-none" id="printTypeField">
-<? for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
-  <input type="button" class="btn btn-primary"
-         data-action="printReport" data-type="printType<?= $i ?>"
-         value="<?= gTxt('printType' . $i) ?>">
-<? } ?>
-  <input type="button" class="btn btn-warning" data-action="cancelPrint" value="Отмена">
-</div>
 <div class="res-table">
 
   <div class="form-group">

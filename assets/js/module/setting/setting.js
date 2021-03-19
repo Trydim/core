@@ -50,8 +50,8 @@ export const setting = {
     else return;
 
     if (value['setting'] && value['setting']['managerSetting']) {
-      Object.entries(value['setting']['managerSetting']).forEach(([k, v]) => {
-        this.addManagerField(k, v);
+      Object.values(value['setting']['managerSetting']).forEach((v) => {
+        this.addManagerField(v['name'], v['type']);
       });
     }
     //value.setting && (value.setting = JSON.parse(value.setting));

@@ -2,10 +2,8 @@
 
 /**
  * @var array $dbConfig - config from public
+ * @var string $docsAction
  * @var string $docType
- * @var string $name
- * @var string $phone
- * @var string $email
  */
 
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
@@ -19,9 +17,8 @@ if ($orderIds) { // Отчет взять из базы
   isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true);
 }
 
-$phone = isset($tel) ? $tel : (isset($phone) ? $phone : '');
-$info = isset($info) ? $info : '';
-$useDocs = isset($usePdf) || isset($useExcel) || in_array($docType, ['pdf', 'excel']);
+!isset($docsAction) && $docsAction = $docType;
+$useDocs = isset($usePdf) || in_array($docType, ['pdf', 'excel']);
 isset($fileTpl) ? $useDocs = true : $fileTpl = 'default';
 
 if (count($_FILES)) {
@@ -34,8 +31,8 @@ if ($useDocs) {
   $docs = new Docs($docType, $reportVal, $fileTpl);
 }
 
-if (isset($docType)) {
-  switch ($docType) {
+if (isset($docsAction)) {
+  switch ($docsAction) {
     case 'excel':
     case 'pdf':
       $useDocs && $result = $docs->getDocs();
@@ -45,11 +42,11 @@ if (isset($docType)) {
       require_once 'libs/Mail.php';
       $mail = new Mail();
       $param = [
-        'name'  => $name,
-        'phone' => $phone,
-        'email' => $email,
-        'info'  => $info,
-        'data'  => $reportVal
+        'name'  => isset($name) ? $name: '',
+        'phone' => isset($tel) ? $tel : (isset($phone) ? $phone : ''),
+        'email' => isset($email) ? $email : '',
+        'info'  => isset($info) ? $info : '',
+        'data'  => $reportVal,
       ];
       isset($filesArray) && $mail->addOtherFile($filesArray);
       $mail->prepareMail($param);

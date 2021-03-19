@@ -79,7 +79,6 @@
         <option value="textarea">Текст (много)</option>
         <option value="number">Число</option>
         <option value="date">Дата</option>
-        <option value="date">Дата</option>
       </select>
     </div>
   </div>
