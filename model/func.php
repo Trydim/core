@@ -49,7 +49,7 @@ function checkAccess($target) {
 }
 
 /**
- * @param $status
+ * @param $status - auth status
  * @param string $target
  */
 function reDirect($status, $target = '') {
@@ -61,7 +61,7 @@ function reDirect($status, $target = '') {
     }
   }
   //unset($_GET['targetPage']);
-  if ($target === 'public' && isset($_GET['orderId'])) $target .= '?orderId=' . $_GET['orderId']; // TODO учточнить откуда такая заргрузка
+  if ($target === 'public' && isset($_GET['orderId'])) $target .= '?orderId=' . $_GET['orderId']; // TODO уточнить откуда такая загрузка
   header('location: ' . SITE_PATH . $target);
   die;
 }
@@ -190,7 +190,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
   if (!count($dict)) return loadFullCVS($filename);
 
 	if (($handle = fopen($filename, "r")) !== false) {
-		if (($data = fgetcsv($handle, 1000, CSV_DELIMITER))) {
+		if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
 			$keyIndex = [];
 
       $inCharset = 'UTF-8'; //mb_detect_encoding(, ['windows-1251', 'UTF-8'], true);
@@ -225,7 +225,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
 
 			}
 
-			while (($data = fgetcsv($handle, 1000, CSV_DELIMITER)) !== false) {
+			while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER)) !== false) {
 				$result[] = $addpos($data);
 			}
 		}
@@ -241,7 +241,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
  * Поиск в первых пяти строках начала таблиц
  *
  * @param $path
- * @return false|StdClass
+ * @return array|bool
  */
 function loadFullCVS($path) {
 

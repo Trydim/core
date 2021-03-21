@@ -1,5 +1,4 @@
 <?php
-// TODO убрал тупость при загрузке заказа (docs.php:18), вырезал кусок отчета
 $listData = $this->data['report'];
 $global = $this->data['global'];
 $listTotal = $this->data['subList'];

@@ -12,7 +12,7 @@ isset($_GET['status']) && $main->setLoginStatus($_GET['status']);
 !isset($_SESSION['hash']) && $main->setLoginStatus('no');
 //Проверка пароля
 if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] === $_COOKIE['PHPSESSID']) {
-  require_once CORE . 'php/libs/Db.php';
+  require_once CORE . 'model/classes/Db.php';
   $db = new RedBeanPHP\Db($dbConfig);
   if ($db->checkUserHash($_SESSION)) {
     $main->setLogin($_SESSION);

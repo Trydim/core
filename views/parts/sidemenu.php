@@ -102,12 +102,9 @@ global $main;
               </a>
             </li>
             <?php break;
-          case 'setting': ?>
-
-            <?php break;
         }
       } ?>
-      <?php if (in_array('setting', ACCESS_MENU)) { ?>
+      <?php if (in_array('setting', ACCESS_MENU) || true) { ?>
       <li class="nav-item">
         <a class="nav-link" href="<?= SITE_PATH ?>setting">
           <i class="material-icons">settings</i>

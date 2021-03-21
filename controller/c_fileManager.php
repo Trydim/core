@@ -46,7 +46,7 @@ $field = [
 	'pageTitle' => 'File manager',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'libs/fm/fileManager.css', CORE_CSS . 'libs/fm/font-awesome.min.css'];
+$field['cssLinks'] = [CORE_CSS . 'libs/fileManager/fileManager.css'];
 
 require $pathTarget;
 $html = template('base', $field);

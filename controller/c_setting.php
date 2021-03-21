@@ -11,7 +11,7 @@ $field = [
 ];
 
 $setAction = 'load';
-require CORE . 'php/setting.php';
+require CORE . 'model/setting.php';
 
 $param = [
   'userId'         => $main->getLogin('id'),

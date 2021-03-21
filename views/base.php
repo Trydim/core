@@ -34,7 +34,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
      <!-- Material Kit CSS -->
     <link rel="stylesheet" href="<?= CORE_CSS?>libs/material-dashboard.min.css">
-    <link rel="stylesheet" href="<?= CORE_CSS?>admin/admin.css">
+    <link rel="stylesheet" href="<?= CORE_CSS?>admin.css">
 	<?php } ?>
 
 	<?php array_map(function($item) { ?>
@@ -82,7 +82,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src="<?= CORE_SCRIPT?>control/src.js"></script>
+<script defer type="module" src="<?= CORE_SCRIPT?>src.js"></script>
 <script defer type="module" src="<?= CORE_SCRIPT?>main.js"></script>
 
 <?php array_map(function($item) { ?>
