@@ -45,11 +45,11 @@
     <div id="leftpanel" class="ab-col4">
       <div id="tree">
 
-        <div id="home" data-fo="<?= SHARE_DIR . '/'?>" class="closed selected">
-          <?= SHARE_DIR . '/' ?>
+        <div id="home" data-fo="<?= SHARE_DIR ?>" class="closed selected">
+          <?= SHARE_DIR ?>
         </div>
         <!-- tree  -->
-        <?php tree(ABS_SITE_PATH . SHARE_DIR . '/'); ?>
+        <?php tree(ABS_SITE_PATH . SHARE_DIR); ?>
 
       </div>
     </div>

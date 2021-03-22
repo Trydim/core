@@ -1,9 +1,9 @@
 // МОДУЛИ
 //----------------------------------------------------------------------------------------------------------------------
 
-import {c} from "../const.js";
-import {f} from "../func.js";
-import {q} from "../query.js";
+import {c} from "./const.js";
+import {f} from "./func.js";
+import {q} from "./query.js";
 
 // Загрузка
 export class LoaderIcon {

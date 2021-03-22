@@ -46,7 +46,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename     : "../assets/css/[name].css",
+      filename     : "[name].css",
     }),
   ],
   /*resolve: {
@@ -55,7 +55,7 @@ module.exports = {
     }
   },*/
   //devtool: '',
-  //devtool: 'cheap-source-map', //source mapping
+  devtool: 'cheap-source-map', //source mapping
   module: {
     /*noParse: [ /jquery\/dist\/jquery.min.js/,
                /jquery-ui\/ui\/version.js/,],*/
@@ -70,31 +70,18 @@ module.exports = {
       {
         test: /\.s[ac]ss$/i,
         use: [
-          MiniCssExtractPlugin.loader,
           {
-            loader: "css-loader",
-            options: {
-              sourceMap: true,
-            },
+            loader: MiniCssExtractPlugin.loader,
           },
-          {
-            loader: "sass-loader",
-            options: {
-              sourceMap: true,
-            },
-          },
+          'css-loader',
+          'sass-loader',
         ],
       },
       {
         test: /\.css$/i,
         use: [
           MiniCssExtractPlugin.loader,
-          {
-            loader : 'css-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
+          'css-loader',
         ],
       }
     ],

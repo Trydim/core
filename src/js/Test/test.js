@@ -1,6 +1,6 @@
 'use strict';
 
-import {c} from '../const.js';
+import {c} from '../components/const.js';
 
 
 describe('Array', function() {

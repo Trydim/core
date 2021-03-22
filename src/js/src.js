@@ -1,9 +1,9 @@
 "use strict";
 
-import '../css/admin/admin.css';
+//import '../css/admin/admin.scss';
 
-import {c} from "./const.js";
-import {f} from "./func.js";
+import {c} from "./components/const.js";
+import {f} from "./components/func.js";
 
 import * as module from './components/component.js';
 import { Modal } from './components/modal.js';

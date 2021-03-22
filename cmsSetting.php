@@ -29,13 +29,13 @@ foreach ($publicConfig as $k => $v) {
 // Не использую цикл т.к. куча предупреждений
 if (!defined('DEBUG')) define('DEBUG', false);
 if (!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
-if (!defined('SHARE_DIR')) define('SHARE_DIR', false);
 if (!defined('ONLY_LOGIN')) define('ONLY_LOGIN', false);
 if (!defined('USERS_ORDERS')) define('USERS_ORDERS', false);
 if (!defined('USE_DATABASE')) define('USE_DATABASE', true);
 if (!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : ACCESS_MENU[0]);
 if (!defined('ACCESS_MENU')) define('ACCESS_MENU', []);
 if (!defined('PRINT_BTN')) define('PRINT_BTN', 1);
+if (!defined('SHARE_DIR')) define('SHARE_DIR', '/');
 if (!defined('OUTSIDE')) define('OUTSIDE', isset($_GET['outside']));
 
 require_once CORE . 'model/func.php';
