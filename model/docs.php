@@ -20,6 +20,7 @@ if ($orderIds) { // Отчет взять из базы
 !isset($docsAction) && $docsAction = $docType;
 $useDocs = isset($usePdf) || in_array($docType, ['pdf', 'excel']);
 isset($fileTpl) ? $useDocs = true : $fileTpl = 'default';
+$mailTpl = isset($mailTpl) ? $mailTpl : 'mailTpl';
 
 if (count($_FILES)) {
   //$filesArray = array_map(function ($files) { return $files; }, $_FILES);
@@ -35,7 +36,7 @@ if (isset($docsAction)) {
   switch ($docsAction) {
     case 'excel':
     case 'pdf':
-      $useDocs && $result = $docs->getDocs();
+      $useDocs && $result = $docs->getDocs($mailTpl);
       break;
     case 'mail':
       $useDocs && $docsPath = $docs->getDocs('save');
@@ -52,7 +53,7 @@ if (isset($docsAction)) {
       $mail->prepareMail($param);
       //$mail->setSubject($pdfPath);
       $useDocs && $mail->addFile($docsPath);
-      $mail->addMail($email);
+      isset($email) && $mail->addMail($email);
       $result['mail'] = $mail->send();
       break;
   }

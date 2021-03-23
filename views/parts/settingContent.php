@@ -1,23 +1,31 @@
 <?php
-//$admin = false;
-
 !isset($admin) && $admin = true;
 !isset($userId) && $userId = '';
 !isset($login) && $login = '';
 !isset($orderMail) && $orderMail = '';
 !isset($orderMailCopy) && $orderMailCopy = '';
+!isset($orderMailSubject) && $orderMailSubject = '';
+!isset($orderMailFromName) && $orderMailFromName = '';
 ?>
 <div class="row" id="settingForm">
   <? if ($admin) { ?>
   <div class="col-6">
     <form action="#" id="mailForm" class="row">
       <div class="col-12 d-flex justify-content-between">
-        <p>Почта для отправки заказов</p>
+        <p>Почта для получения заказов</p>
         <input type="email" name="orderMail" value="<?= $orderMail ?>">
       </div>
       <div class="col-12 d-flex justify-content-between">
         <p class="mt-1">Копия письма</p>
         <input class="mt-1" type="email" name="orderMailCopy" value="<?= $orderMailCopy ?>">
+      </div>
+      <div class="col-12 d-flex justify-content-between">
+        <p class="mt-1">Тема письма</p>
+        <input class="mt-1" type="text" name="orderMailSubject" value="<?= $orderMailSubject ?>">
+      </div>
+      <div class="col-12 d-flex justify-content-between">
+        <p class="mt-1">Имя отправителя</p>
+        <input class="mt-1" type="text" name="orderMailFromName" value="<?= $orderMailFromName ?>">
       </div>
     </form>
   </div>
@@ -41,6 +49,7 @@
     </form>
   </div>
 
+  <? if (DEBUG) { ?>
   <div class="col-6">
     <form action="#" id="customForm" class="row">
       <div class="col-12 d-flex justify-content-between">
@@ -49,6 +58,7 @@
       </div>
     </form>
   </div>
+  <? } ?>
 
   <? if ($admin) { ?>
     <div class="col-6">

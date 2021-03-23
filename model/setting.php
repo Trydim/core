@@ -14,6 +14,55 @@
  * @var $customization - fromQuery
  */
 
+/**
+ * Set manager custom field from Request
+ */
+function setOrderMailField() {
+  define('KEY' , 'orderMail');
+
+  $result = [];
+
+  array_map(function ($key) use (&$result) {
+    if (stripos($key, KEY) !== false) {
+      $id = str_replace(KEY, '', $key);
+
+      //$fieldKey = preg_replace('/\D\S/g', '', trim($_REQUEST[$key]));
+      $fieldKey = trim($_REQUEST[$key]);
+      $fieldIndex = translit($fieldKey);
+      $fieldType = isset($_REQUEST[TYPE . $id]) ? $_REQUEST[TYPE . $id] : 'string';
+
+      $result[$fieldIndex] = ['name' => $fieldKey, 'type' => $fieldType];
+    }
+  }, array_keys($_REQUEST));
+
+  return $result;
+}
+
+/**
+ * Set manager custom field from Request
+ */
+function setManagerCustomField() {
+  define('KEY' , 'mCustomFieldKey');
+  define('TYPE' , 'mCustomFieldType');
+
+  $result = [];
+
+  array_map(function ($key) use (&$result) {
+    if (stripos($key, KEY) !== false) {
+      $id = str_replace(KEY, '', $key);
+
+      //$fieldKey = preg_replace('/\D\S/g', '', trim($_REQUEST[$key]));
+      $fieldKey = trim($_REQUEST[$key]);
+      $fieldIndex = translit($fieldKey);
+      $fieldType = isset($_REQUEST[TYPE . $id]) ? $_REQUEST[TYPE . $id] : 'string';
+
+      $result[$fieldIndex] = ['name' => $fieldKey, 'type' => $fieldType];
+    }
+  }, array_keys($_REQUEST));
+
+  return $result;
+}
+
 if (!isset($db)) {
   require_once 'classes/Db.php';
   $db = new RedBeanPHP\Db($dbConfig);
@@ -54,9 +103,8 @@ if (isset($setAction)) {
 
       // Global mail setting
       $setting = [];
-      isset($orderMail) && $setting['orderMail'] = $orderMail;
-      isset($orderMailCopy) && $setting['orderMailCopy'] = $orderMailCopy;
-
+      $orderMailSetting = setOrderMailField();
+      count($orderMailSetting) && $setting['orderMail'] = $orderMailSetting;
 
       // Global manager setting
       $managerSetting = setManagerCustomField();

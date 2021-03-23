@@ -237,7 +237,7 @@ class Docs {
        * E: return the document as base64 mime multi-part email attachment (RFC 2045)
        */
         if ($dest === 'save') {
-          $this->docs->output($path . $this->fileName);
+          $this->docs->output($path . $this->fileName, 'F');
           return $path . $this->fileName;
         } else {
           return [
