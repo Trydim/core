@@ -1,16 +1,16 @@
 <?php ?>
-<div class="ab-container ab-filemanager" id="ab-main">
+<div class="container-fluid ab-filemanager" id="ab-main">
 
-  <div id="ab-content" class="ab-row">
+  <div class="row" id="ab-content">
 
     <!-- breadcrumb -->
-    <div class="ab-col12 d-flex align-items-center" id="ab-breadcrumb">
+    <div class="col-12 d-flex align-items-center" id="ab-breadcrumb">
 
-      <div id="breadcrumb-links" class="ab-col7">
+      <div class="col-7" id="breadcrumb-links">
         <span class="open">public</span>
       </div>
 
-      <div id="ab-top-action-btn" class="ab-col5 ab-text-right">
+      <div class="col-5 text-right" id="ab-top-action-btn">
         <!--<a id="a-create-folder" class="ab-btn asphalt" title="Создать здесь папку" href="#">
           <i class="fa fa-folder-o" aria-hidden="true"></i>Создать папку
         </a>-->
@@ -42,7 +42,7 @@
 
     <!-- left panel ........................................... -->
 
-    <div id="leftpanel" class="ab-col4">
+    <div  class="col-4" id="leftpanel">
       <div id="tree">
 
         <div id="home" data-fo="<?= SHARE_DIR ?>" class="closed selected">
@@ -56,7 +56,7 @@
 
     <!-- table data ........................................... -->
 
-    <div class="ab-col8" id="ab-container-table">
+    <div class="col-8" id="ab-container-table">
       <!-- ajax data here.. -->
     </div>
 

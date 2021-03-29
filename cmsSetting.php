@@ -41,6 +41,7 @@ if (!defined('OUTSIDE')) define('OUTSIDE', isset($_GET['outside']));
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/classes/Main.php';
 require_once CORE . 'model/classes/Course.php';
+require_once CORE . 'model/classes/Xml.php';
 require_once CORE . 'model/hooks.php';
 
 // Public php.

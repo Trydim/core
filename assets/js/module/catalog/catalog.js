@@ -241,7 +241,7 @@ export const catalog = {
 
   actionBtn(e) {
     let target = e.target,
-        action = target.getAttribute('data-action');
+        action = target.dataset.action;
 
     let select = {
       // Открыть секцию

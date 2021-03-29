@@ -413,7 +413,7 @@ class Db extends \R {
 
   /**
    * load full information order
-   * @param $id - array
+   * @param $id {string}
    *
    * @return array rows
    */
@@ -425,9 +425,9 @@ class Db extends \R {
             LEFT JOIN users ON user_id = users.ID
             LEFT JOIN customers C ON customer_id = C.ID
             JOIN order_status S ON status_id = S.ID
-            WHERE O.ID = ?";
+            WHERE O.ID = :id";
 
-    $res = self::getAll($sql, $id);
+    $res = self::getAll($sql, [':id' => $id]);
 
     if (count($res)) {
       $res = $res[0];
@@ -658,13 +658,23 @@ class Db extends \R {
 
   public function checkUserHash($session) {
     if (USE_DATABASE) {
-      $hash = self::getCell('SELECT hash FROM users WHERE login = :login', [':login' => $session['login']]);
+      $user = self::getRow('SELECT hash, password, customization FROM users WHERE login = :login', [':login' => $session['login']]);
+      $onlyOne = isset(json_decode($user['customization'])->onlyOne);
     } else {
       if (!file_exists(SYSTEM_PATH)) file_put_contents(SYSTEM_PATH, 'admin|||123|||');
       $value = file(SYSTEM_PATH)[0];
-      $value && $hash = trim(explode('|||', $value)[2]);
+      $value && $value = explode('|||', $value);
+      $user = [
+        'password' => $value[1],
+        'hash' => trim($value[2]),
+      ];
     }
-    return $session['hash'] === $hash;
+    global $main;
+    $onlyOne = isset($onlyOne) || $main->getSettings('onlyOne');
+    if (!$onlyOne && isset($user['password']) && isset($_SESSION['password'])) {
+      $ok = $_SESSION['password'] === $user['password'];
+    }
+    return $session['hash'] === $user['hash'] || (isset($ok) && $ok);
   }
 
   /**

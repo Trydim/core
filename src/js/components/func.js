@@ -152,7 +152,7 @@ const func = {
    *
    */
   relatedOption: (node = document) => {
-    const qs = (s) => document.querySelectorAll(s),
+    const qs = (s) => node.querySelectorAll(s),
           ga = (i, a) => i.getAttribute(a),
           hide = (n) => n.classList.add('d-none'),
           show = (n) => n.classList.remove('d-none'),

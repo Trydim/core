@@ -44,11 +44,11 @@ $publicConfig = [
   'PDF_LIBRARY' => 'mpdf',
 
   /** Пункты меню какие показывать и последовательность
-  'orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog', 'setting'
-  заказы     календарь   клиенты   менеджеры статистика администрирование каталог настройки
+  'orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog', 'setting', 'fileManager'
+  заказы     календарь   клиенты   менеджеры статистика администрирование каталог настройки файловый менеджер
   options - настройки
    */
-  'ACCESS_MENU' => ['orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'setting'],
+  'ACCESS_MENU' => ['orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'fileManager', 'setting'],
 
   /**
    * Количество кнопок для печати.
@@ -56,6 +56,9 @@ $publicConfig = [
    * printType1 - printType2 - ... - printTypeN
    */
   'PRINT_BTN' => 3,
+
+  /** Папка по умолчанию для файлового менеджера */
+  'SHARE_DIR' => 'public/images/',
 ];
 
 //----------------------------------------------------------------------------------------------------------------------

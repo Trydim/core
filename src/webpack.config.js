@@ -3,7 +3,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
 
-const absPath = '../../',
+/*const absPath = '../../',
       resFileName = 'webpackModule.js';
 function copyFile(source, target) {
   let rd = fs.readFileSync(source);
@@ -11,13 +11,13 @@ function copyFile(source, target) {
   fs.unlink(path, (err) => {
     err;
   })
-}
+}*/
 //copyFile(absPath +'public/' + resFileName, __dirname + 'js/' +resFileName);
 
 
 module.exports = {
   mode: 'development', // production / development
-  //watch: true, // слежка за изменениями файлов(или флаг при запуске)
+  watch: true, // слежка за изменениями файлов(или флаг при запуске)
   //watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
   //externals: { lodash: "_" } // подключение внешних библиотек
 

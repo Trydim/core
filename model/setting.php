@@ -97,14 +97,15 @@ if (isset($setAction)) {
           $hash = $param[2];
         }
 
-        $result = implode('|||', [$login, $password, $hash]);
-        file_put_contents(SETTINGS_PATH, $result);
+        $fileData = implode('|||', [$login, $password, $hash]);
+        file_put_contents(SETTINGS_PATH, $fileData);
       }
 
       // Global mail setting
-      $setting = [];
-      $orderMailSetting = setOrderMailField();
-      count($orderMailSetting) && $setting['orderMail'] = $orderMailSetting;
+      // Переписать и согласовать с mail.php загрузка пустые строки не сохранять
+      isset($orderMail) && $setting['orderMail'] = $orderMail;
+      isset($orderMailCopy) && $setting['orderMailCopy'] = $orderMailCopy;
+      !USE_DATABASE && $setting['onlyOne'] = isset($onlyOne);
 
       // Global manager setting
       $managerSetting = setManagerCustomField();

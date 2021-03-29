@@ -90,18 +90,17 @@ export const setting = {
 
   saveSetting() {
     const form = new FormData(),
-          customForm = new FormData(this.customForm),
+          customization = Object.create(null),
           setData = (f) => {for (const [k, v] of (new FormData(f)).entries()) form.set(k, v)};
-    let customization = Object.create(null);
 
-    for (const [k, v] of customForm.entries()) {
-      customization[k] = v;
-    }
+    this.mailForm && setData(this.mailForm);
+    this.customForm && setData(this.customForm);
+    this.userForm && setData(this.userForm);
+    this.managerForm && setData(this.managerForm);
+
+    // Special field
+    form.get('onlyOne') && (customization['onlyOne'] = true);
     form.set('customization', JSON.stringify(customization));
-
-    setData(this.mailForm);
-    setData(this.userForm);
-    setData(this.managerForm);
 
     this.query(form);
   },

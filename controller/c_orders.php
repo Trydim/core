@@ -10,6 +10,7 @@ $field = ['pageTitle' => 'Заказы'];
 
 // получить конфиг текущего пользователя
 $setting = $db->getUserSetting();
+if (!$setting) $setting = new class {};
 
 if (!isset($setting->ordersColumnsSort)) {
   $columns = array_keys($db->loadOrder(0, 1)[0]);

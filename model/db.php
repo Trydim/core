@@ -20,10 +20,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $result['csvFiles'] = $db->scanDirCsv();
 } else {
 
+  $columns = [];
   if ($dbTable) {
     USE_DATABASE && $columns = $db->getColumnsTable($dbTable);
-    $db->setCsvTable($tableName);
-  } else $columns = [];
+    $db->setCsvTable($dbTable);
+  }
 
   $pageNumber = isset($currPage) ? $currPage : 0;
   !isset($countPerPage) && $countPerPage = 20;
@@ -33,9 +34,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Table
     case 'showTable':
       $result['columns'] = $columns;
-      if (stripos($tableName, '.csv')) $result['csvValues'] = $db->openCsv();
+      if (stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
       else {
-        if (!CHANGE_DATABASE && stripos($tableName, 'csv') === false) reDirect(false, '404');
+        if (!CHANGE_DATABASE && stripos($dbTable, 'csv') === false) reDirect(false, '404');
         USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
       }
       break;
@@ -54,9 +55,34 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $db->saveCsv(json_decode($csvData));
       }
       break;
-    case 'loadCVS':
-      $db->fileForceDownload();
+    case 'loadCVS': $db->fileForceDownload(); break;
+    case 'loadFormConfig':
+      if (isset($dbTable)) {
+        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
+        $filePath = PATH_CSV . $fileName . '.xml';
+        if (file_exists($filePath) && filesize($filePath) > 60) {
+          $result['csvValues'] = $db->openCsv();
+          $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
+        } else $result['error'] = 'File error';
+      }
       break;
+    case 'saveXMLConfig':
+      if (isset($dbTable) && isset($XMLConfig)) {
+        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
+        $result['error'] = Xml::saveXml($fileName, json_decode($XMLConfig, true));
+      }
+      break;
+    case 'loadXmlConfig':
+      if (isset($dbTable)) {
+        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
+        $filePath = PATH_CSV . $fileName . '.xml';
+        if (file_exists($filePath)) {
+          if (filesize($filePath) < 60) Xml::createXmlDefault($fileName);
+          $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
+        }
+      }
+      break;
+
     // Orders
     case 'saveOrder':
       if (isset($saveVal)) {
@@ -119,7 +145,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'loadOrder': // Показать подробности
       $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
-      if (count($orderIds) === 1) $result['order'] = $db->loadOrderById($orderIds);
+      if (count($orderIds) === 1) $result['order'] = $db->loadOrderById($orderIds[0]);
       break;
     case 'changeStatusOrder':
       if (isset($commonValues) && isset($status_id) && count($columns)) {

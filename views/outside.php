@@ -28,7 +28,7 @@ array_map(function($item) use (&$cssLinksArr, $inline) {
   else $cssLinksArr[] = $item;
 }, $cssLinks);
 
-$jsLinksArr = [ $coreScript . 'control/src.js', $coreScript . 'main.js'];
+$jsLinksArr = [ $coreScript . 'src.js', $coreScript . 'main.js'];
 if(!isset($jsLinks)) $jsLinks = [];
 array_map(function($item) use (&$jsLinksArr) {
   $jsLinksArr[] = $item;

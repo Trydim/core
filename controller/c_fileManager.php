@@ -15,16 +15,25 @@ function tree($path) {
   if (stream_resolve_include_path($path)) {
 
     $files = scandir($path);
+    array_shift($files);
+    array_shift($files);
     natcasesort($files);
 
     echo '<ul>';
 
-    if (count($files) > 2) {
+    if (count($files)) {
 
       foreach ($files as $file) {
-        if (stream_resolve_include_path($path . $file) && $file != '.' && $file != '..') {
-          if (filetype($path . $file) == 'dir') sub($file, $path); // if folder
-          else if ($file) {
+        if (stream_resolve_include_path($path . $file)) {
+          if (filetype($path . $file) === 'dir') {
+            sub($file, $path); // if folder
+          }
+        }
+      }
+
+      foreach ($files as $file) {
+        if (stream_resolve_include_path($path . $file)) {
+          if (filetype($path . $file) !== 'dir') {
             $ext = strtolower(preg_replace('/^.*\./', '', $file));
             echo '<li class="ext-file ext-' . $ext . '">' . $file . '</li>';
           }

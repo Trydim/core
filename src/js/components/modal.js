@@ -22,11 +22,11 @@ export const Modal = (param = {}) => {
 
   modal.bindBtn = function () {
     this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
-        .forEach(n => n.onclick = () => this.hide());
+        .forEach(n => n.addEventListener('click', () => this.hide()));
   }
-  modal.btnConfig = function ({key, param}) {
+  modal.btnConfig = function (key, param = Object.create(null)) {
     let node = this.wrap.querySelector('.' + key.replace('.', ''));
-    node && param.value && (node.value = param.value);
+    node && param && Object.entries(param).forEach(([k, v]) => {node[k] = v});
   }
   modal.onEvent = function () {
     let func = function (e) {

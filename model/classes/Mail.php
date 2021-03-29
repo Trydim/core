@@ -9,7 +9,7 @@ if (!defined('MAIN_ACCESS')) die('access denied!');
 
 // To
 define('MAIL_TARGET_DEBUG', 'trydim@mail.ru');
-define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта');
+define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта ' . $_SERVER['SERVER_NAME']);
 // From
 define('MAIL_SMTP', true);
 define('MAIL_HOST', 'smtp.yandex.ru');
@@ -19,7 +19,7 @@ define('MAIL_PASSWORD', '638ch1');
 //define('MAIL_FROM', 'commonserver@yandex.ru');
 //define('MAIL_PASSWORD', 'xmbxqxulvhwcqyta');
 
-require_once 'vendor/autoload.php';
+require_once CORE . 'model/libs/vendor/autoload.php';
 
 class Mail {
   private $mailTpl    = '', $body = '', $docPath = '', $pdfFileName = '';
@@ -34,8 +34,11 @@ class Mail {
     if (!DEBUG && file_exists(SETTINGS_PATH)) {
       $setting = getSettingFile();
       $this->mailTarget = $setting['orderMail'];
-      isset($setting['orderMailCopy']) && $this->otherMail[] = $setting['orderMailCopy'];
-      isset($setting['mailFromName']) && $this->otherMail[] = $setting['orderMailCopy'];
+      isset($setting['orderMailCopy']) && strlen($setting['orderMailCopy']) && $this->otherMail[] = $setting['orderMailCopy'];
+      isset($setting['mailFromName']) && strlen($setting['mailFromName']) && $this->otherMail[] = $setting['orderMailCopy'];
+
+      if (isset($setting['mailSubject'])) $this->subject = $setting['mailSubject'];
+      else $this->subject = MAIL_SUBJECT_DEFAULT;
     }
   }
 
@@ -82,7 +85,7 @@ class Mail {
 
   public function send() {
     $mail = new PHPMailer();
-    $mail->SMTPDebug = true;                // Enable verbose debug output
+    $mail->SMTPDebug = DEBUG;                // Enable verbose debug output
     $mail->CharSet = "UTF-8";
 
     try {
@@ -98,16 +101,13 @@ class Mail {
 
       // Получатель письма
       if (DEBUG) {
-        $mail->addBCC(MAIL_TARGET_DEBUG);
+        $this->mailTarget = MAIL_TARGET_DEBUG;
         $this->subject = 'Тестовое письмо ' . $_SERVER['SERVER_NAME'];
         $this->fromName = 'vistegra.by';
-
-        //if ($this->body) $this->body = 'тестовое содержание'; //если что-то не так с телом письма?
-        if (in_array(MAIL_TARGET_DEBUG, $this->otherMail)) $this->otherMail = [];
-      } else {
-        $mail->addBCC($this->mailTarget);
       }
 
+      $mail->addBCC($this->mailTarget);
+      if (in_array($this->mailTarget, $this->otherMail)) $this->otherMail = [];
       $mail->From = MAIL_FROM;
       $mail->FromName = $this->fromName;
 

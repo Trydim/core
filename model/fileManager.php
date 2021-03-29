@@ -12,103 +12,91 @@ $config = [
 if (isset($fmAction)) {
   switch ($fmAction) {
     case 'showTable':
-      if (isset($dir) && $dir) $dir = urldecode($dir) . '/';
+      if (isset($dir) && $dir) $dir = urldecode($dir);
 
       function formatBytes($size) {
-        $sizes = array('b', 'kb', 'mb', 'gb', 'tb');
-        $retstring = 0;
-        if ($retstring === 0) {
-          $retstring = '%01.2f %s';
-        }
+        $sizes = ['b', 'kb', 'mb', 'gb', 'tb'];
+        $retString = '%01.2f %s';
         $lastsizestring = end($sizes);
         foreach ($sizes as $sizeString) {
-          if ($size < 1024) {
-            break;
-          }
-          if ($sizeString != $lastsizestring) {
-            $size /= 1024;
-          }
+          if ($size < 1024) break;
+          if ($sizeString !== $lastsizestring) $size /= 1024;
         }
-        if ($sizeString == $sizes[0]) {
-          $retstring = '%01d %s';
+        if ($sizeString === $sizes[0]) {
+          $retString = '%01d %s';
         } // Bytes aren't normally fractional
-        return sprintf($retstring, $size, $sizeString);
+        return sprintf($retString, $size, $sizeString);
       }
 
-      function foldersize($path) {
+      function folderSize($path) {
         if (!file_exists($path)) return 0;
         if (is_file($path)) return filesize($path);
         $ret = 0;
         foreach (glob($path . "/*") as $fn)
-          $ret += foldersize($fn);
+          $ret += folderSize($fn);
         return $ret;
       }
 
       function slashes($str) {
-        $pos = strpos($str, "//");
-        while ($pos != false) {
-          $str = str_replace("//", "/", $str);
-          $pos = strpos($str, "//");
-        }
-        return $str;
+        return str_replace("//", "/", $str);
       }
 
-      $html = '<table id="ab-list-pages"><thead>
-                 <tr><th>' . basename($dir) . '/</th><th>Размер</th><th>Действие</th></tr>
-               </thead>';
+      $html = '<table id="ab-list-pages"><thead><tr><th>' . basename($dir) . '</th><th>Размер</th><th>Действие</th></tr></thead>';
+      $curTime = time();
 
       if (stream_resolve_include_path($dir)) {
         $files = scandir($dir);
+        array_shift($files);
+        array_shift($files);
         natcasesort($files);
+
 
         if (count($files) > 2) {
           foreach ($files as $file) {
-            if (stream_resolve_include_path($dir . $file) && $file != '.' && $file != '..' && filetype($dir . $file) == 'dir') {
+            if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) == 'dir') {
 
               // if folder
-              $foldersize = '<small>' . formatBytes(foldersize($dir . '/' . $file)) . '</small>';
-              $folderpath = slashes($dir . '/' . $file . '/');
+              $foldersize = '<small>' . formatBytes(folderSize($dir . $file)) . '</small>';
+              $folderpath = slashes($dir . $file . '/');
 
               $html .= '<tr class="lightgray">
                           <td class="ab-tdfolder"><a href="' . $folderpath . '" class="closed">' . $file . '</a></td>
                           <td>' . $foldersize . '</td>
-                          <td><a class="ab-btn btn-danger delete-directory" title="Удалить папку" href="' . $folderpath . '"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                          <td><a class="ab-btn btn-danger delete-directory" title="Удалить папку" href="' . $folderpath . '"><i class="fa fa-trash" aria-hidden="true"></i></a>
                           <!--<button class="ab-btn blue renamefolder" title="Переименовать папку"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
                           <a class="ab-btn asphalt downloadfolder" title="Скачать архивом" data-action="downloadFolder" data-path="' . $folderpath . '"><i class="fa fa-download" aria-hidden="true"></i></a></td></tr>';
 
             }
           }
 
-          foreach ($files as $file) {
+          foreach ($files as $file) { //if files
 
-            if (stream_resolve_include_path($dir . $file) && $file != '.' && $file != '..' && filetype($dir . $file) !== 'dir') {
-
-              //if files
-
-              $filepath = slashes($dir . '/' . $file);
+            if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) !== 'dir') {
+              $filepath = slashes($dir . $file);
 
               $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ||
                            $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
               $current_url = $protocol . $_SERVER['SERVER_NAME'] . '/';
 
-              $filepath = str_replace('\\', '/', $filepath);                            // исправить
-              $filepath = mb_strtolower(str_replace('//', '/', $filepath));             // исправить
+              //$filepath = mb_strtolower($filepath);
               $url = str_replace(mb_strtolower($_SERVER['DOCUMENT_ROOT']), $current_url, $filepath); // исрпавить
 
-              $ext = strtolower(preg_replace('/^.*\./', '', $file));
+              $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 
               $size = '<small>' . formatBytes(filesize($filepath)) . '</small>';
+              $newFileIcon = filectime($filepath) - $curTime > -1800
+                ? '<i class="ml-2 fas fa-plus" aria-hidden="true" style="color: red" title="Новый файл"></i>' : '';
 
               $html .= '<tr class="white">
-                          <td class="ab-tdfile"><span class="ext-file ext-' . $ext . '">' . $file . '</span></td>
+                          <td class="ab-tdfile"><span class="ext-file ext-' . $ext . '">' . $file . $newFileIcon .'</i></span></td>
                           <td>' . $size . '</td>
-                          <td><a href="' . $filepath . '" class="ab-btn btn-danger delete-file" title="Удалить файл"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                          <td><a href="' . $filepath . '" class="ab-btn btn-danger delete-file" title="Удалить файл"><i class="fa fa-trash" aria-hidden="true"></i></a>
                           <!--<button class="ab-btn blue renamefile" title="Переименовать файл"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
                           <a class="ab-btn asphalt downloadfile" title="Скачать файл" data-action="downloadFile" data-path="' . $filepath . '"><i class="fa fa-download" aria-hidden="true"></i></a>';
 
               //if image file
-              if (in_array($ext, array("jpg", "jpeg", "png", "gif", "ico", "bmp"))) {
+              if (in_array($ext, array("jpg", "jpeg", "png", "gif", "ico", "bmp", 'svg'))) {
                 $html .= '<a class="ab-btn green zoom" href="' . $url . '" target="_blank"><i class="fa fa-eye" aria-hidden="true"></i></a>';
 
                 //if edited file

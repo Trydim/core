@@ -74,6 +74,68 @@ class allOrdersList {
   }
 }
 
+// TODO сохранять в сессии потом, что бы можно было перезагрузить страницу
+class SelectedRow {
+  constructor(param) {
+    let {
+      table = f.qS(''),
+      type = false,
+        } = param;
+
+    if (!(table && type)) return;
+
+    this.table = table;
+    this.type = type;
+    this.clear();
+  }
+
+  clear() {
+    this.selectedId = new Set();
+  }
+
+  getSelectedList() {
+    let ids = [];
+    for( let id of this.selectedId.values()) ids.push(id);
+    return ids;
+  }
+  getSelectedSize() {
+    return this.selectedId.size;
+  }
+
+  // выбор заказа
+  clickRows(e) {
+    if (orders.currentTable !== this.type) return;
+    let input = e.target.closest('tr').querySelector('input'),
+        id = input.dataset.id;
+
+    if (input.checked) this.selectedId.delete(id);
+    else this.selectedId.add(id);
+
+    input.checked = !input.checked;
+    //this.checkBtnRows();
+  }
+
+  /* Кнопки показать скрыть
+  checkBtnRows() {
+    if (this.selectedId.size === 1) f.show(this.btnOneOrderOnly);
+    else f.hide(this.btnOneOrderOnly);
+    if (this.selectedId.size > 0) f.show(this.btnMoreZero);
+    else f.hide(this.btnMoreZero);
+  },*/
+
+  // Выделить выбранные Заказы
+  checkedRows() {
+    this.selectedId.forEach(id => {
+      let input = this.table.querySelector(`input[data-id="${id}"]`);
+      if (input) input.checked = true;
+    });
+  }
+
+  onTableEvent() {
+    this.table.onclick = (e) => this.clickRows(e);
+  }
+}
+
 export const orders = {
   M: f.initModal(),
   form: new FormData(),
@@ -82,7 +144,7 @@ export const orders = {
   table: f.qS('#commonTable'),
   template: {
     order    : f.gTNode('#orderTableTmp'),
-    orderVis : f.gTNode('#orderVisitorTableTmp'),
+    visit    : f.gTNode('#orderVisitorTableTmp'),
     impValue : f.gT('#tableImportantValue'),
     searchMsg: f.gT('#noFoundSearchMsg'),
   },
@@ -101,19 +163,22 @@ export const orders = {
     pageCount   : 0,
   },
 
+  selected: Object.create(null),   // Выделенные строки таблиц
   statusList: Object.create(null), // Возможные статусы
 
   btnOneOrderOnly: f.qA('#actionBtnWrap input.oneOrderOnly'),
   btnMoreZero: f.qA('#actionBtnWrap input:not(.oneOrderOnly)'),
 
   init() {
-    this.p = new f.Pagination( '#paginator',{
+    this.p = new f.Pagination( '#paginator', {
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
     this.setTableTemplate('order');
 
     this.loaderTable = new f.LoaderIcon(this.table);
+    this.selected.order = new SelectedRow({table: this.table, type: 'order'});
+    this.selected.visit = new SelectedRow({table: this.table, type: 'visit'});
     this.query();
 
     this.onEvent();
@@ -158,8 +223,8 @@ export const orders = {
     !data.length && search && (html = this.template.searchMsg);
     this.table.querySelector('tbody').innerHTML = html;
 
-    data.length && this.onTableEvent();
-    data.length && this.checkedRows();
+    data.length && this.selected[this.currentTable].onTableEvent();
+    data.length && this.selected[this.currentTable].checkedRows();
   },
 
   // Заполнить статусы
@@ -194,7 +259,7 @@ export const orders = {
     f.Post({data: this.form}).then(data => {
       if(this.needReload) {
         this.needReload = false;
-        this.selectedId = new Set();
+        this.selected[this.currentTable].clear();
         this.queryParam.dbAction = 'loadOrders';
         this.queryParam.orderIds = '[]';
         this.query();
@@ -217,18 +282,19 @@ export const orders = {
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
     let hideActionWrap = true,
-        target = e.target,
-        action = target.dataset.action;
+        target         = e.target,
+        action         = target.dataset.action,
+        selectedSize   = this.selected[this.currentTable].getSelectedSize();
 
-    if (!this.selectedId.size && !('orderType').includes(action)) { f.showMsg('Выберите заказ!'); return; }
-    this.queryParam.orderIds = JSON.stringify(this.getSelectedList());
+    if (!selectedSize && !('orderType').includes(action)) { f.showMsg('Выберите заказ!'); return; }
+    this.queryParam.orderIds = JSON.stringify(this.selected[this.currentTable].getSelectedList());
+    if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
 
     let select = {
       'changeStatusOrder': () => {
         this.needReload = true;
-        this.queryParam.dbAction = action;
 
-        let node = f.gI('selectStatus');
+        let node = f.qS('#selectStatus');
         this.onEventNode(node, this.changeSelectInput, {}, 'change');
         node.dispatchEvent(new Event('change'));
 
@@ -237,15 +303,12 @@ export const orders = {
       },
       'delOrders': () => {
         this.needReload = true;
-        this.queryParam.dbAction = action;
-        this.queryParam.orderIds = JSON.stringify(this.getSelectedList());
-
         this.confirmMsg = 'Удаление выполнено';
         f.show(this.confirm);
       },
       'loadOrder': () => {
         hideActionWrap = false;
-        if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
 
         this.form.set('dbAction', action);
         this.form.set( 'orderIds', this.queryParam.orderIds);
@@ -253,26 +316,23 @@ export const orders = {
           .then((data) => this.showOrder(data));
       },
       'openOrder': () => {
-        if (this.selectedId.size !== 1) {
-          hideActionWrap = false; f.showMsg('Выберите 1 заказ!');
-          return;
+        if (selectedSize !== 1) {
+          hideActionWrap = false; f.showMsg('Выберите 1 заказ!'); return;
         }
 
         let link = f.gI(f.ID.PUBLIC_PAGE),
             query = this.currentTable === 'order' ? 'orderId=' : 'orderVisitorId=';
-        link.href += '?' + query + this.getSelectedList()[0];
+        link.href += '?' + query + JSON.parse(this.queryParam.orderIds)[0];
         link.click();
       },
       'printOrder': () => {
-        if(this.selectedId.size !== 1) {
-          hideActionWrap = false;
-          f.showMsg('Выберите 1 заказ!');
-          return;
+        if(selectedSize !== 1) {
+          hideActionWrap = false; f.showMsg('Выберите 1 заказ!'); return;
         }
-        f.show(f.gI('printTypeField'));
+        f.show(f.qS('#printTypeField'));
       },
       'printReport': () => {
-        if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if(selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
         let P = f.initPrint(),
             type = target.dataset.type || false,
             fd = new FormData();
@@ -282,28 +342,25 @@ export const orders = {
         fd.set('orderIds', this.queryParam.orderIds);
         f.Post({data: fd})
           .then((data) => {
-            try {
-              data && P.orderPrint(f.printReport, data, type);
-            } catch (e) {
-              console.log(e.message);
-            }
+            try { data && P.orderPrint(f.printReport, data, type); }
+            catch (e) { console.log(e.message); }
           });
 
-        f.hide(f.gI('printTypeField'));
-        f.show(f.gI('actionBtnWrap'));
+        f.hide(f.qS('#printTypeField'));
+        f.show(f.qS('#actionBtnWrap'));
         hideActionWrap = false;
       },
       'savePdf': () => {
         hideActionWrap = false;
-        if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
         f.downloadPdf(target,
-          {orderIds: this.getSelectedList()},
+          {orderIds: this.queryParam.orderIds},
           () => target.blur()
           );
       },
       'sendOrder': () => {
         hideActionWrap = false;
-        if(this.selectedId.size !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
         let form = f.gTNode('#sendMailTmp');
 
         let fd = new FormData();
@@ -338,8 +395,8 @@ export const orders = {
       },
       'cancelPrint': () => {
         hideActionWrap = false;
-        f.show(f.gI('actionBtnWrap'));
-        f.hide(f.gI('printTypeField'));
+        f.show(f.qS('#actionBtnWrap'));
+        f.hide(f.qS('#printTypeField'));
       },
       'orderType': () => {
         hideActionWrap = false;
@@ -350,11 +407,12 @@ export const orders = {
         this.queryParam.sortDirect = false;
         this.queryParam.currPage   = 0;
         this.queryParam.pageCount  = 0;
+        delete this.queryParam.orderIds;
 
         if (this.orderType.toString() === 'visit') {
           this.queryParam.dbAction  = 'loadVisitorOrders';
           this.queryParam.tableName = 'client_orders';
-          this.currentTable = 'orderVis';
+          this.currentTable = 'visit';
 
           f.hide(f.qS('#orderBtn'));
         } else {
@@ -366,21 +424,19 @@ export const orders = {
 
         this.setTableTemplate(this.currentTable);
         this.query();
-      }
+      },
     }
 
-    if(action.includes('confirm')) { // Закрыть подтверждение
+    if (action.includes('confirm')) { // Закрыть подтверждение
       f.hide(this.confirm, f.qS('#selectStatus'), f.qS('#printTypeField'));
       f.show(f.qS('#actionBtnWrap'));
 
       if(action === 'confirmYes') {
-        this.queryParam.commonValues = JSON.stringify(this.getSelectedList());
+        this.queryParam.commonValues = this.queryParam.orderIds;
         this.query();
       }
-
     } else { // Открыть подтверждение
-      this.queryParam.dbAction = action;
-      select[action]();
+      select[action] && select[action]();
       hideActionWrap && f.hide(f.qS('#actionBtnWrap'));
     }
   },
@@ -419,9 +475,6 @@ export const orders = {
   onEvent() {
     // Top buttons
     f.qA('input[data-action]', 'click', (e) => this.actionBtn.call(this, e));
-
-    // Click on row for selected
-    this.onEventNode(this.table, (e) => this.clickRows(e));
   },
 
   onSearchFocus() {
@@ -437,60 +490,4 @@ export const orders = {
       n.addEventListener('focus', (e) => this.focusInput(e));
     });
   },*/
-
-  selectedId: new Set(), // TODO сохранять в сессии потом, что бы можно было перезагрузить страницу
-
-  getSelectedList() {
-    let ids = [];
-    for( let id of this.selectedId.values()) ids.push(id);
-    return ids;
-  },
-
-  clickRows(e) {
-    let target = e.target,
-        i = 0;
-
-    if(target.tagName === 'INPUT') return false;
-
-    while (target.tagName !== 'TR' || i > 4) {
-      target = target.parentNode; i++;
-    }
-
-    let node = target.querySelector('input');
-    node && node.click();
-  },
-
-  // выбор заказа
-  selectRows(e) {
-    let input = e.target,
-        id = input.getAttribute('data-id');
-
-    if (input.checked) this.selectedId.add(id);
-    else this.selectedId.delete(id);
-
-    //this.checkBtnRows();
-  },
-
-  /* Кнопки показать скрыть
-  checkBtnRows() {
-    if (this.selectedId.size === 1) f.show(this.btnOneOrderOnly);
-    else f.hide(this.btnOneOrderOnly);
-    if (this.selectedId.size > 0) f.show(this.btnMoreZero);
-    else f.hide(this.btnMoreZero);
-  },*/
-
-  // Выделить выбранные Заказы
-  checkedRows() {
-    this.selectedId.forEach(id => {
-      let input = this.table.querySelector(`input[data-id="${id}"]`);
-      if (input) input.checked = true;
-    });
-  },
-
-  onTableEvent() {
-    // Checked rows
-    this.table.querySelectorAll('tbody input').forEach(n => {
-      n.addEventListener('change', (e) => this.selectRows(e));
-    });
-  },
 }

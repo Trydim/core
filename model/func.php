@@ -42,8 +42,8 @@ function checkAccess($target) {
   global $main;
   if (in_array($target, ['login', 'setting'])
       || (in_array($target, array_merge([HOME_PAGE], ACCESS_MENU))
-      && in_array($target, $main->getPermission('menuAccess')))) return $target;
-  $target = $main->checkStatus('no') ? 'login' : ACCESS_MENU[0];
+      && in_array($target, $main->getSideMenu()))) return $target;
+  $target = $main->checkStatus('no') ? 'login' : $main->getSideMenu(true);
   reDirect(false, $target);
   die;
 }
@@ -401,29 +401,4 @@ function translit($value) {
   ];
 
   return strtr(mb_strtolower($value), $converter);
-}
-
-/**
- * Set manager custom field from Request
- */
-function setManagerCustomField() {
-  define('KEY' , 'mCustomFieldKey');
-  define('TYPE' , 'mCustomFieldType');
-
-  $result = [];
-
-  array_map(function ($key) use (&$result) {
-    if (stripos($key, KEY) !== false) {
-      $id = str_replace(KEY, '', $key);
-
-      //$fieldKey = preg_replace('/\D\S/g', '', trim($_REQUEST[$key]));
-      $fieldKey = trim($_REQUEST[$key]);
-      $fieldIndex = translit($fieldKey);
-      $fieldType = isset($_REQUEST[TYPE . $id]) ? $_REQUEST[TYPE . $id] : 'string';
-
-      $result[$fieldIndex] = ['name' => $fieldKey, 'type' => $fieldType];
-    }
-  }, array_keys($_REQUEST));
-
-  return $result;
 }

@@ -1,4 +1,5 @@
 Ядро CMS
+git submodule add 
 git submodule update --remote
 
 константы:

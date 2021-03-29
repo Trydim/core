@@ -6,6 +6,7 @@
 !isset($orderMailCopy) && $orderMailCopy = '';
 !isset($orderMailSubject) && $orderMailSubject = '';
 !isset($orderMailFromName) && $orderMailFromName = '';
+$onlyOne = isset($onlyOne) && $onlyOne ? 'checked' : '';
 ?>
 <div class="row" id="settingForm">
   <? if ($admin) { ?>
@@ -45,6 +46,12 @@
       <div class="col-12 d-flex justify-content-between">
         <p class="mt-1">Повторите пароль</p>
         <input class="mt-1" type="password" name="passwordRepeat">
+      </div>
+      <div class="col-12 d-flex justify-content-between">
+        <p class="mt-1" >Запретить одновременный вход</p>
+        <label class="d-block w-50 text-center">
+          <input class="mt-1" type="checkbox" name="onlyOne" <?= $onlyOne ?>>
+        </label>
       </div>
     </form>
   </div>

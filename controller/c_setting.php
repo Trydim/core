@@ -23,9 +23,14 @@ $param = [
 if (USE_DATABASE) {
   //$setAction = 'loadPermission';
   //require CORE . 'php/setting.php';
-  $admin = $db->getUser($main->getLogin(), 'permission_id');
-  $admin = $admin === '1'; // || strtolower($admin['name']) === 'admin';
-} else $admin = true;
+  $user = $db->getUser($main->getLogin(), 'permission_id, customization');
+  $admin = $user['permission_id'] === '1'; // || strtolower($admin['name']) === 'admin';
+  $customization = json_decode($user['customization'], true);
+  $param['onlyOne'] = isset($customization['onlyOne']);
+} else {
+  $admin = true;
+  $param['onlyOne'] = $main->getSettings('onlyOne');
+}
 $param['admin'] = $admin;
 
 require $pathTarget;

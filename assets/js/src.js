@@ -34,7 +34,7 @@ class LoaderIcon {
   constructor(field, showNow = true, targetBlock = true, param = {}) {
     this.node = typeof field === 'string' ? _func_js__WEBPACK_IMPORTED_MODULE_1__.f.qS(field) : field;
     if (!(this.node instanceof HTMLElement)) return;
-    this.block         = targetBlock;
+    //this.block         = targetBlock;
     this.customWrap    = param.wrap || false;
     this.customLoader  = param.loader || false;
     this.customLoaderS = param.loaderS || false;
@@ -431,7 +431,7 @@ const Searching = () => {
 class Valid {
   constructor(param) {
     let {
-          sendFunc = () => {},
+      sendFunc = () => {},
           formNode = false,
           formSelector = '#authForm',
           submitNode = false,
@@ -1131,7 +1131,7 @@ const func = {
    *
    */
   relatedOption: (node = document) => {
-    const qs = (s) => document.querySelectorAll(s),
+    const qs = (s) => node.querySelectorAll(s),
           ga = (i, a) => i.getAttribute(a),
           hide = (n) => n.classList.add('d-none'),
           show = (n) => n.classList.remove('d-none'),
@@ -1466,11 +1466,11 @@ const Modal = (param = {}) => {
 
   modal.bindBtn = function () {
     this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
-        .forEach(n => n.onclick = () => this.hide());
+        .forEach(n => n.addEventListener('click', () => this.hide()));
   }
-  modal.btnConfig = function ({key, param}) {
+  modal.btnConfig = function (key, param = Object.create(null)) {
     let node = this.wrap.querySelector('.' + key.replace('.', ''));
-    node && param.value && (node.value = param.value);
+    node && param && Object.entries(param).forEach(([k, v]) => {node[k] = v});
   }
   modal.onEvent = function () {
     let func = function (e) {

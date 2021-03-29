@@ -1,4 +1,3 @@
 model/libs/vendor/
-!php/libs/vendor/composer**
-!php/libs/vendor/autoload.php
-settingSave.json
+!model/libs/vendor/composer**
+!model/libs/vendor/autoload.php

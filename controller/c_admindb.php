@@ -8,7 +8,7 @@ $field = [
   'pageTitle' => 'Administration DB',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/handsontable.full.min.css'];
+$field['cssLinks'] = [CORE_CSS . 'module/admindb/handsontable.full.min.css'];
 
 if (DB_TABLE_IN_SIDEMENU) {
   if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];

@@ -24,7 +24,12 @@ trait Authorization {
     $this->name  = $session['name'];
     $this->id    = $session['priority'];
     $this->setLoginStatus('ok');
+    $this->setHash($session);
     return $this;
+  }
+
+  public function setHash($session) {
+
   }
 
   /**
@@ -70,11 +75,13 @@ trait Authorization {
       $this->sideMenu = array_filter($this->sideMenu, function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);
       });
+      PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
     }
     //if (!in_array('setting', $this->sideMenu)) $this->sideMenu[] = 'setting';
   }
 
-  public function getSideMenu() {
+  public function getSideMenu($first = false) {
+    if ($first) return array_values($this->sideMenu)[0];
     return $this->sideMenu;
   }
 
@@ -172,6 +179,11 @@ final class Main {
     $this->setting = getSettingFile();
   }
 
+  /**
+   * Get one setting or array if have
+   * @param $key
+   * @return false|mixed|string
+   */
   public function getSettings($key) {
     if ($key === 'json') return json_encode($this->setting);
     if (isset($this->setting[$key])) return $this->setting[$key];

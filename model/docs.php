@@ -8,7 +8,8 @@
 
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
 $orderIds = isset($orderIds) ? json_decode($orderIds) : false;
-!$orderIds && $orderIds = isset($reportVal['orderIds']) && count($reportVal['orderIds']) === 1 ? $reportVal['orderIds'] : false;
+!$orderIds && $orderIds = isset($reportVal['orderIds']) ? json_decode($reportVal['orderIds']) : false;
+$orderIds = is_array($orderIds) && count($orderIds) === 1 ? $orderIds[0] : false;
 
 if ($orderIds) { // Отчет взять из базы
   require_once 'classes/Db.php';
@@ -41,7 +42,7 @@ if (isset($docsAction)) {
     case 'mail':
       $useDocs && $docsPath = $docs->getDocs('save');
       require_once 'classes/Mail.php';
-      $mail = new Mail();
+      $mail = new Mail($mailTpl);
       $param = [
         'name'  => isset($name) ? $name: '',
         'phone' => isset($tel) ? $tel : (isset($phone) ? $phone : ''),
@@ -51,7 +52,6 @@ if (isset($docsAction)) {
       ];
       isset($filesArray) && $mail->addOtherFile($filesArray);
       $mail->prepareMail($param);
-      //$mail->setSubject($pdfPath);
       $useDocs && $mail->addFile($docsPath);
       isset($email) && $mail->addMail($email);
       $result['mail'] = $mail->send();

@@ -48,6 +48,7 @@ if ($main->checkStatus('ok') && isset($db)) {
       $item['name'] = gTxt($item['name']);
       return $item;
     }, $dbTables);
+    Xml::checkXml($dbTables);
   }
 
 }

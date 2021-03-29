@@ -10,7 +10,7 @@ export class LoaderIcon {
   constructor(field, showNow = true, targetBlock = true, param = {}) {
     this.node = typeof field === 'string' ? f.qS(field) : field;
     if (!(this.node instanceof HTMLElement)) return;
-    this.block         = targetBlock;
+    //this.block         = targetBlock;
     this.customWrap    = param.wrap || false;
     this.customLoader  = param.loader || false;
     this.customLoaderS = param.loaderS || false;
@@ -407,7 +407,7 @@ export const Searching = () => {
 export class Valid {
   constructor(param) {
     let {
-          sendFunc = () => {},
+      sendFunc = () => {},
           formNode = false,
           formSelector = '#authForm',
           submitNode = false,
