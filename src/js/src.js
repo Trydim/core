@@ -67,6 +67,8 @@ const m = {
    *
    */
   InitSaveVisitorsOrder: module.SaveVisitorsOrder,
+
+  observer: new module.Observer(),
 };
 
 window.f = Object.assign(c, m, f);

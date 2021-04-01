@@ -1,13 +1,17 @@
 <?php
+/**
+ * Писать специально уникальные(новые) имена фукнций.
+ */
+
 
 /**
  * @param $number
  * @param $reportVal
  * @return false|string
  */
-function addCpNumber_func($number, $reportVal) {
+function addCpNumber_DefaultFunc($number, $reportVal) {
   $reportVal = json_decode($reportVal, true);
   $reportVal['global']['cpNumber'] = $number;
   return json_encode($reportVal);
 }
-addHook('addCpNumber', 'addCpNumber_func');
+addHook('addCpNumber', 'addCpNumber_DefaultFunc');

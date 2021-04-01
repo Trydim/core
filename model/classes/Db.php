@@ -419,8 +419,9 @@ class Db extends \R {
    */
   public function loadOrderById($id) {
 
-    $sql = "SELECT O.ID as 'ID', create_date, last_edit_date, users.name as 'name', C.name as 'C.name', total,
-	                 S.name AS 'Status', important_value, save_value, report_value
+    $sql = "SELECT O.ID as 'ID', create_date, last_edit_date, users.name as 'name', users.ID as 'userId',
+                   users.contacts as 'contacts', C.name as 'C.name', total, S.name AS 'Status', 
+                   important_value, save_value, report_value
             FROM orders O
             LEFT JOIN users ON user_id = users.ID
             LEFT JOIN customers C ON customer_id = C.ID
@@ -590,6 +591,18 @@ class Db extends \R {
   }
 
   /**
+   * @param $userId
+   *
+   * @return array|null
+   */
+  public function getUserById($userId) {
+    $result = self::getRow("SELECT * FROM users WHERE ID = :id", [':id' => $userId]);
+
+    if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
+    return $result;
+  }
+
+  /**
    * @param $id
    *
    * @return mixed
@@ -657,9 +670,10 @@ class Db extends \R {
   }
 
   public function checkUserHash($session) {
+    global $main;
     if (USE_DATABASE) {
       $user = self::getRow('SELECT hash, password, customization FROM users WHERE login = :login', [':login' => $session['login']]);
-      $onlyOne = isset(json_decode($user['customization'])->onlyOne);
+      $main->setSettings('onlyOne', isset(json_decode($user['customization'])->onlyOne));
     } else {
       if (!file_exists(SYSTEM_PATH)) file_put_contents(SYSTEM_PATH, 'admin|||123|||');
       $value = file(SYSTEM_PATH)[0];
@@ -669,10 +683,9 @@ class Db extends \R {
         'hash' => trim($value[2]),
       ];
     }
-    global $main;
-    $onlyOne = isset($onlyOne) || $main->getSettings('onlyOne');
-    if (!$onlyOne && isset($user['password']) && isset($_SESSION['password'])) {
-      $ok = $_SESSION['password'] === $user['password'];
+    if (!$main->getSettings('onlyOne') && isset($user['password']) && isset($_SESSION['password'])) {
+      $ok = USE_DATABASE ? password_verify($_SESSION['password'], $user['password'])
+                         : $_SESSION['password'] === $user['password'];
     }
     return $session['hash'] === $user['hash'] || (isset($ok) && $ok);
   }

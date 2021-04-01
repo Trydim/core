@@ -24,3 +24,7 @@ git submodule update --remote
    * Страница для доступа без регистрации: файл с таким именем должен быть в public/views/
    */
   'PUBLIC_PAGE' => 'calculator',
+
+
+Изменяя доступные страницы запустить createResourceFile из package.json
+Можно assets js удалить после

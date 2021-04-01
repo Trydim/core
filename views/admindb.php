@@ -19,12 +19,12 @@ $field['content'] = <<<main
 <div class="d-flex pb-4" style="justify-content: left">
   <div>
     <label title="Удобный для редактирования">
-      <input type="radio" name="adminType" value="form" checked data-action="adminType">
+      <input type="radio" name="adminType" value="form" data-action="adminType">
       Режим форм</label>
   </div>
   <div class="ml-1">
     <label title="Редактирования в режиме таблицы">
-      <input type="radio" name="adminType" value="table" data-action="adminType">
+      <input type="radio" name="adminType" value="table" checked data-action="adminType">
       Режим таблицы</label>
   </div>
   <div class="ml-1">

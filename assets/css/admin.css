@@ -253,9 +253,16 @@ textarea {
   width: 100%;
 }
 
+.d-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .flex-column {
   display: flex;
   flex-flow: column nowrap;
+  align-items: center;
 }
 
 .justify-center {

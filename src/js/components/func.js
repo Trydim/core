@@ -355,14 +355,13 @@ const func = {
   /**
    *
    * @param target HTML node (loading field)
-   * @param report object: send to pdf
+   * @param report {object}: send to pdf
+   * @param data {FormData}: object of formData to send in query Body
    * @param finishOk function
    * @param err function
    */
-  downloadPdf(target, report = {}, finishOk = () => {}, err = () => {}) {
+  downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
     if (!Object.keys(report).length) { err(); return; }
-
-    let data = new FormData();
 
     func.setLoading(target);
 

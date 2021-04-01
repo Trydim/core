@@ -179,6 +179,10 @@ final class Main {
     $this->setting = getSettingFile();
   }
 
+  public function setSettings($key, $value) {
+    $this->setting[$key] = $value;
+  }
+
   /**
    * Get one setting or array if have
    * @param $key

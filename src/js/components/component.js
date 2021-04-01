@@ -391,7 +391,6 @@ export const Searching = () => {
   }
 
   obj.clickResult = function (e, inputNode) {
-    console.log(+e.target.dataset.id, e.target);
     if(this.resultTmp === e.target) return;
     let index = +e.target.dataset.id;
 
@@ -880,5 +879,23 @@ export class SaveVisitorsOrder {
       let i = setInterval(() => this.cpNumber && res(this.cpNumber), 50);
       setTimeout(() => clearInterval(i) && err(''), 1000);
     });
+  }
+}
+
+export class Observer {
+  constructor() {
+    this.publisher = Object.create(null);
+  }
+  add(name, that) {
+    this.publisher[name] = that;
+  }
+  remove(name) {
+    delete this.publisher[name];
+  }
+  getListPublisher() {
+    return Object.keys(this.publisher);
+  }
+  subscribe(name) {
+    return this.publisher[name] || false;
   }
 }

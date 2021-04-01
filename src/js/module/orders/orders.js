@@ -1,6 +1,8 @@
 'use strict';
 
 // Orders list for search
+import {SelectedRow} from "./SelectedRow";
+
 class allOrdersList {
   constructor(param) {
     const {node = false} = param;
@@ -8,12 +10,12 @@ class allOrdersList {
 
     const data = this.getFormData(param);
 
-    this.node = node;
-    this.table = param.table;
-    this.data = [];
-    this.searchData = Object.create(null);
+    this.node            = node;
+    this.type           = param.tableType;
+    this.data            = [];
+    this.searchData      = Object.create(null);
     this.searchComponent = f.searchInit();
-    this.loader = new f.LoaderIcon(this.node);
+    this.loader          = new f.LoaderIcon(this.node);
 
     f.Post({data}).then(data => {
       data['orders'] && this.prepareSearchData(data['orders']);
@@ -41,7 +43,7 @@ class allOrdersList {
   }
 
   prepareSearchData(data) {
-    if (this.table === 'order') {
+    if (this.type === 'order') {
       this.data = data.reduce((r, i) => {
         this.searchData[i['O.ID']] = i['O.ID'] + i['C.name'] + i['name'];
         r[i['O.ID']] = i;
@@ -49,8 +51,8 @@ class allOrdersList {
       }, Object.create(null));
     } else {
       this.data = data.reduce((r, i) => {
-        this.searchData[i['ID']] = i['ID'] + i['cp_number'] + i['total'];
-        r[i['ID']] = i;
+        this.searchData[i['cp_number']] = i['cp_number'] + ' ' + i['create_date'] + ' ' + i['total'];
+        r[i['cp_number']] = i;
         return r;
       }, Object.create(null));
     }
@@ -74,68 +76,6 @@ class allOrdersList {
   }
 }
 
-// TODO сохранять в сессии потом, что бы можно было перезагрузить страницу
-class SelectedRow {
-  constructor(param) {
-    let {
-      table = f.qS(''),
-      type = false,
-        } = param;
-
-    if (!(table && type)) return;
-
-    this.table = table;
-    this.type = type;
-    this.clear();
-  }
-
-  clear() {
-    this.selectedId = new Set();
-  }
-
-  getSelectedList() {
-    let ids = [];
-    for( let id of this.selectedId.values()) ids.push(id);
-    return ids;
-  }
-  getSelectedSize() {
-    return this.selectedId.size;
-  }
-
-  // выбор заказа
-  clickRows(e) {
-    if (orders.currentTable !== this.type) return;
-    let input = e.target.closest('tr').querySelector('input'),
-        id = input.dataset.id;
-
-    if (input.checked) this.selectedId.delete(id);
-    else this.selectedId.add(id);
-
-    input.checked = !input.checked;
-    //this.checkBtnRows();
-  }
-
-  /* Кнопки показать скрыть
-  checkBtnRows() {
-    if (this.selectedId.size === 1) f.show(this.btnOneOrderOnly);
-    else f.hide(this.btnOneOrderOnly);
-    if (this.selectedId.size > 0) f.show(this.btnMoreZero);
-    else f.hide(this.btnMoreZero);
-  },*/
-
-  // Выделить выбранные Заказы
-  checkedRows() {
-    this.selectedId.forEach(id => {
-      let input = this.table.querySelector(`input[data-id="${id}"]`);
-      if (input) input.checked = true;
-    });
-  }
-
-  onTableEvent() {
-    this.table.onclick = (e) => this.clickRows(e);
-  }
-}
-
 export const orders = {
   M: f.initModal(),
   form: new FormData(),
@@ -150,7 +90,6 @@ export const orders = {
   },
   confirm: f.qS('#confirmField'),
   confirmMsg: false,
-  currentTable: 'order',
 
   queryParam: {
     mode        : 'DB',
@@ -174,11 +113,12 @@ export const orders = {
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
+    this.table.dataset.type = 'order';
     this.setTableTemplate('order');
 
     this.loaderTable = new f.LoaderIcon(this.table);
-    this.selected.order = new SelectedRow({table: this.table, type: 'order'});
-    this.selected.visit = new SelectedRow({table: this.table, type: 'visit'});
+    this.selected = new SelectedRow({table: this.table});
+
     this.query();
 
     this.onEvent();
@@ -218,13 +158,13 @@ export const orders = {
     })
 
     let html  = '',
-        tbody = this.template[this.currentTable].querySelector('tbody tr').outerHTML;
+        tbody = this.template[this.table.dataset.type].querySelector('tbody tr').outerHTML;
     data.length && (html += f.replaceTemplate(tbody, data));
     !data.length && search && (html = this.template.searchMsg);
     this.table.querySelector('tbody').innerHTML = html;
 
-    data.length && this.selected[this.currentTable].onTableEvent();
-    data.length && this.selected[this.currentTable].checkedRows();
+    //data.length && this.selected[this.currentTable].onTableEvent();
+    data.length && this.selected.checkedRows();
   },
 
   // Заполнить статусы
@@ -259,7 +199,7 @@ export const orders = {
     f.Post({data: this.form}).then(data => {
       if(this.needReload) {
         this.needReload = false;
-        this.selected[this.currentTable].clear();
+        this.selected.clear();
         this.queryParam.dbAction = 'loadOrders';
         this.queryParam.orderIds = '[]';
         this.query();
@@ -284,10 +224,10 @@ export const orders = {
     let hideActionWrap = true,
         target         = e.target,
         action         = target.dataset.action,
-        selectedSize   = this.selected[this.currentTable].getSelectedSize();
+        selectedSize   = this.selected.getSelectedSize();
 
     if (!selectedSize && !('orderType').includes(action)) { f.showMsg('Выберите заказ!'); return; }
-    this.queryParam.orderIds = JSON.stringify(this.selected[this.currentTable].getSelectedList());
+    this.queryParam.orderIds = JSON.stringify(this.selected.getSelectedList());
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
 
     let select = {
@@ -321,7 +261,7 @@ export const orders = {
         }
 
         let link = f.gI(f.ID.PUBLIC_PAGE),
-            query = this.currentTable === 'order' ? 'orderId=' : 'orderVisitorId=';
+            query = this.table.dataset.type === 'order' ? 'orderId=' : 'orderVisitorId=';
         link.href += '?' + query + JSON.parse(this.queryParam.orderIds)[0];
         link.click();
       },
@@ -353,9 +293,11 @@ export const orders = {
       'savePdf': () => {
         hideActionWrap = false;
         if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        let fd = new FormData();
+        fd.append('useUser', 'true');
         f.downloadPdf(target,
-          {orderIds: this.queryParam.orderIds},
-          () => target.blur()
+          {orderIds: this.queryParam.orderIds}, fd,
+          () => target.blur(),
           );
       },
       'sendOrder': () => {
@@ -412,17 +354,17 @@ export const orders = {
         if (this.orderType.toString() === 'visit') {
           this.queryParam.dbAction  = 'loadVisitorOrders';
           this.queryParam.tableName = 'client_orders';
-          this.currentTable = 'visit';
+          this.table.dataset.type = 'visit';
 
           f.hide(f.qS('#orderBtn'));
         } else {
           this.queryParam.dbAction  = 'loadOrders';
           this.queryParam.tableName = 'orders';
-          this.currentTable = 'order';
+          this.table.dataset.type = 'order';
           f.show(f.qS('#orderBtn'));
         }
 
-        this.setTableTemplate(this.currentTable);
+        this.setTableTemplate(this.table.dataset.type);
         this.query();
       },
     }
@@ -456,7 +398,7 @@ export const orders = {
                      ? 'loadOrders'
                      : 'loadVisitorOrders';
 
-    new allOrdersList({dbAction, node: e.target, table: orders.currentTable});
+    new allOrdersList({dbAction, node: e.target, tableType: orders.table.dataset.type});
   },
 
   // TODO bind events

@@ -1,6 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var array $main - global
  * @var array $dbConfig - config from public
  * @var string $docsAction
  * @var string $docType
@@ -11,11 +12,31 @@ $orderIds = isset($orderIds) ? json_decode($orderIds) : false;
 !$orderIds && $orderIds = isset($reportVal['orderIds']) ? json_decode($reportVal['orderIds']) : false;
 $orderIds = is_array($orderIds) && count($orderIds) === 1 ? $orderIds[0] : false;
 
-if ($orderIds) { // Отчет взять из базы
+$addManager = isset($addManager) || isset($useUser) || isset($addUser);
+
+if ($orderIds || $addManager) {
   require_once 'classes/Db.php';
   $db = new RedBeanPHP\Db($dbConfig);
+}
+
+if ($orderIds) { // Отчет взять из базы
   $reportVal = $db->loadOrderById($orderIds);
+  $userData = [
+    'name' => $reportVal['name'],
+    'userId' => $reportVal['userId'],
+    'contacts' => $reportVal['contacts'],
+  ];
   isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true);
+  $reportVal['userData'] = $userData;
+}
+
+if ($addManager) { // Данные о менеджере
+  if (isset($userData['name'])) {
+    $userData = $db->getUser($userData['name'], 'name, contacts');
+  } else if (isset($userData['userId'])) {
+    $userData = $db->getUserById($userData['userId']);
+  } else $userData = $db->getUserByOrderId($main->getLogin('id'));
+  if (count($userData)) $reportVal['userData'] = $userData;
 }
 
 !isset($docsAction) && $docsAction = $docType;

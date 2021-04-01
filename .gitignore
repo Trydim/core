@@ -1,3 +1,4 @@
 model/libs/vendor/
 !model/libs/vendor/composer**
 !model/libs/vendor/autoload.php
+/assets/js/
