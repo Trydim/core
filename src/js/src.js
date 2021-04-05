@@ -6,7 +6,8 @@ import {c} from "./components/const.js";
 import {f} from "./components/func.js";
 
 import * as module from './components/component.js';
-import { Modal } from './components/modal.js';
+import { Modal } from './components/Modal.js';
+import { CustomSelect } from './components/CustomSelect.js';
 import { shadowNode } from './components/shadownode.js';
 
 const m = {
@@ -69,6 +70,8 @@ const m = {
   InitSaveVisitorsOrder: module.SaveVisitorsOrder,
 
   observer: new module.Observer(),
+
+  CustomSelect: CustomSelect,
 };
 
 window.f = Object.assign(c, m, f);

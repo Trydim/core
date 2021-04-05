@@ -113,8 +113,6 @@ export const Modal = (param = {}) => {
     </div>`;
   }
 
-
-
   modal.setTemplate();
   //btnConfig && modal.btnConfig(btnConfig);
   modal.bindBtn();

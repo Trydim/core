@@ -22,6 +22,11 @@ module.exports = {
     //clean: true, // Clean the output directory before emit.
     path: path.resolve(__dirname, '../assets/'),
     filename: 'js/[name].js',
+
+    /*environment: {
+     dynamicImport: true,
+     module: true,
+     }*/
   },
   plugins: [
     new MiniCssExtractPlugin({
