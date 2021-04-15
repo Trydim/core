@@ -2,6 +2,8 @@
 
 namespace RedBeanPHP;
 
+use PHPMailer\PHPMailer\Exception;
+
 require 'rb.php';
 
 class Db extends \R {
@@ -675,9 +677,15 @@ class Db extends \R {
       $user = self::getRow('SELECT hash, password, customization FROM users WHERE login = :login', [':login' => $session['login']]);
       $main->setSettings('onlyOne', isset(json_decode($user['customization'])->onlyOne));
     } else {
-      if (!file_exists(SYSTEM_PATH)) file_put_contents(SYSTEM_PATH, 'admin|||123|||');
-      $value = file(SYSTEM_PATH)[0];
-      $value && $value = explode('|||', $value);
+      try {
+        if (!file_exists(SYSTEM_PATH)) throw new \ErrorException('error');
+        $value = file(SYSTEM_PATH);
+        $value && $value = explode('|||', $value[0]);
+        if (count($value) < 2) throw new \ErrorException('error');
+      } catch (\ErrorException $e) {
+        file_put_contents(SYSTEM_PATH, 'admin|||123|||');
+        return false;
+      }
       $user = [
         'password' => $value[1],
         'hash' => trim($value[2]),

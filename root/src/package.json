@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "description": "Public project",
+  "name": "my-webpack-project",
+  "scripts": {
+    "publicBuild": "webpack --mode development"
+  }
+}

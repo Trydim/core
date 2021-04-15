@@ -101,7 +101,7 @@ export const Modal = (param = {}) => {
     <div class="modal-overlay" id="${modalId}">
       <div class="modal p-15" data-role="window">
         <button type="button" class="close-modal">
-          <span class="close-icon">✖</span>
+          <div class="close-icon"></div>
         </button>
         <div class="modal-title" data-role="title">Title</div>
         <div class="w-100 pt-20" data-role="content"></div>

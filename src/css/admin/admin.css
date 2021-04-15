@@ -466,11 +466,8 @@ body {
 
 @media only screen and (min-width: 40em) {
   .modal-overlay {
-    display: -webkit-box;
     display: flex;
-    -webkit-box-align: center;
     align-items: center;
-    -webkit-box-pack: center;
     justify-content: center;
     position: fixed;
     top: 0;
@@ -481,9 +478,7 @@ body {
     background-color: rgba(0, 0, 0, 0.6);
     opacity: 0;
     visibility: hidden;
-    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    -webkit-transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
     transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
   }
 
@@ -496,12 +491,9 @@ body {
  * Modal
  */
 .modal {
-  display: -webkit-box;
   display: flex;
   flex-direction: column;
-  -webkit-box-align: center;
   align-items: center;
-  -webkit-box-pack: center;
   justify-content: space-between;
   position: relative;
   margin: 0 auto;
@@ -517,9 +509,7 @@ body {
   overflow-y: auto;
   visibility: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-transition: all 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   transition: all 0.3s cubic-bezier(0.55, 0, 0.1, 1);
 }
 
@@ -530,20 +520,13 @@ body {
   cursor: pointer;
   right: 15px;
   opacity: 0;
-  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1), -webkit-transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
-  transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1), -webkit-transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1), transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
-  transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1), transform 0.3s cubic-bezier(0.55, 0, 0.1, 1), -webkit-transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
-  -webkit-transition-delay: 0.3s;
   transition-delay: 0.3s;
 }
 
 .modal .close-modal .close-icon {
-  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!-- Generator: Adobe Illustrator 16.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 512 512' enable-background='new 0 0 512 512' xml:space='preserve'%3E%3Cg%3E%3C/g%3E%3Cpolygon points='479.996,95.997 416.004,32.003 256,192.007 95.997,32.003 32.004,95.997 192.008,256 32.004,416.004 95.997,479.996 256,319.992 416.004,479.996 479.996,416.004 319.992,256 '/%3E%3C/svg%3E%0A");
-  width: 15px;
-  height: 15px;
+  content: "✖";
 }
 
 .modal .close-modal svg {
@@ -560,11 +543,8 @@ body {
 
 .modal .modal-content {
   opacity: 0;
-  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
-  -webkit-transition-delay: 0.3s;
   transition-delay: 0.3s;
   border: none;
 }
@@ -579,7 +559,6 @@ body {
 .modal.active {
   visibility: visible;
   opacity: 1;
-  -webkit-transform: scale(1);
   transform: scale(1);
 }
 
@@ -588,7 +567,6 @@ body {
 }
 
 .modal.active .close-modal {
-  -webkit-transform: translateY(10px);
   transform: translateY(10px);
   opacity: 1;
 }
@@ -609,9 +587,7 @@ body {
     max-width: 100%;
     width: 100%;
     height: 100%;
-    -webkit-overflow-scrolling: touch;
     border-radius: 0;
-    -webkit-transform: scale(1.1);
     transform: scale(1.1);
   }
 
@@ -697,70 +673,6 @@ button.loading-st1:after {
 
 #columnValue input {
   width: 100%;
-}
-
-.select {
-  width: 100%;
-  position: relative;
-  z-index: 100;
-}
-.select.open .select__dropdown {
-  display: block;
-}
-.select.open .select__input {
-  border-bottom: none;
-}
-.select.open .select__backdrop {
-  display: block;
-}
-.select__input {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
-  cursor: pointer;
-}
-.select__dropdown {
-  display: none;
-  position: absolute;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  top: 46px;
-  left: 0;
-  right: 0;
-  max-height: 200px;
-  overflow-y: auto;
-  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.3);
-}
-.select__list {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.select__backdrop {
-  position: fixed;
-  display: none;
-  z-index: -1;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  background: transparent;
-}
-.select__item {
-  padding: 1rem;
-  border-bottom: 1px solid #ccc;
-}
-.select__item.selected {
-  background-color: bisque;
-}
-.select__item:hover {
-  background-color: #eee;
-  cursor: pointer;
-  transition: 0.15s background-color ease-in;
 }
 
 /*# sourceMappingURL=admin.css.map */
