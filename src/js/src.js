@@ -1,6 +1,6 @@
 "use strict";
 
-//import '../css/admin/admin.scss';
+import '../css/admin/admin.scss';
 
 import {c} from "./components/const.js";
 import {f} from "./components/func.js";

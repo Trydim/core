@@ -58,7 +58,6 @@ let acceptMenu = false, menu;
 
 if (!configRows.length) throw new Error('Not Found config');
 acceptMenu = configRows.filter((r) => r.includes('\'ACCESS_MENU\''));
-if (acceptMenu.length !== 1) throw new Error('Menu more one rows or not found');
 menu = acceptMenu[0].toLowerCase();
 
 // Администрирование БД

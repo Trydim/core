@@ -1,10 +1,13 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
 
+const dev = process.env['npm_lifecycle_script'].includes('development');
+
 module.exports = {
-  mode: 'development', // production / development
-  //watch: true, // слежка за изменениями файлов(или флаг при запуске)
+  mode: dev ? 'development' : 'production',
+  watch: dev, // слежка за изменениями файлов(или флаг при запуске)
   watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
   entry: {
     calculator: './js/calculator.js',
@@ -26,7 +29,10 @@ module.exports = {
   devtool: 'cheap-source-map', //source mapping
   optimization: {
     minimize: false,
-    minimizer: [new TerserPlugin({extractComments: false,}),], // Убрать комментарии
+    minimizer: [
+      new TerserPlugin({extractComments: false,}), // Убрать комментарии
+      new CssMinimizerPlugin(),
+    ],
     /*splitChunks: {
       chunks     : 'all', //maxSize: 1024,
       cacheGroups: {
@@ -44,7 +50,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename     : "[name].css",
+      filename     : "css/[name].css",
     }),
   ],
   module: {

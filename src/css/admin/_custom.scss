@@ -167,3 +167,8 @@ body {
 .sidebar .logo {
   padding: 4px 0!important;
 }
+
+.sidebar .nav li.active > a, .sidebar .nav li.active > a i {
+  color: #fff;
+  background: linear-gradient(180deg, #309DFF 0%, rgba(52, 152, 223) 10%);
+}

@@ -32,8 +32,6 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<?php if($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
-     <!-- Material Kit CSS -->
-    <link rel="stylesheet" href="<?= CORE_CSS?>libs/material-dashboard.min.css">
     <link rel="stylesheet" href="<?= CORE_CSS?>admin.css">
 	<?php } ?>
 

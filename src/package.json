@@ -3,10 +3,15 @@
   "description": "My webpack project",
   "name": "my-webpack-project",
   "scripts": {
-    "update": "git pull && npm run createResourceFile && npm run buildModule",
+    "update": "git pull && npm run buildProd && npm run createResourceFile && npm run buildModuleProd",
+
     "startLIVEReload": "webpack-dev-server",
+
     "createResourceFile": "node createResourceFile.js",
-    "build": "webpack --mode development --config ./webpack.config.js",
-    "buildModule": "webpack --mode development --config ./webpack.module.js"
+    "buildProd": "webpack --mode=production --config ./webpack.config.js",
+    "buildModuleProd": "webpack --mode=production --config ./webpack.module.js",
+
+    "buildDev": "webpack --mode=development --config ./webpack.config.js",
+    "buildModuleDev": "webpack --mode=development --config ./webpack.module.js"
   }
 }

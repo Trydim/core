@@ -44,7 +44,7 @@ XML;
     }
   }
 
-  // Поиск столбца ключей
+  // Поиск столбца ключей и описания
   static function findKeyCell($csv): array {
     $res = [];
     for ($i = 0; $i < 3; $i++) {

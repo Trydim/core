@@ -1,5 +1,6 @@
 "use strict";
 
+import '../../../css/module/admindb/handsontable.full.min.css';
 import {Handsontable} from './handsontable.full.min.js';
 
 const handsonOption = {
@@ -68,7 +69,7 @@ export const admindb = {
         this.setTableName();
         f.eraseNode(this.mainNode);
         if (data['csvValues'] && data['XMLValues']) {
-          FormVies.init();
+          FormViews.init();
         } else if (data['dbValues']) {
           this.handsontable && (this.handsontable.destroyEditor());
           this.showDbTable();
@@ -561,7 +562,7 @@ class Rows {
 
   setParam() {
     this.attr = this.row['@attributes'];
-    this.rowParam = this.row.params.param;
+    this.rowParam = this.row.params.param.length ? this.row.params.param : [this.row.params.param];
   }
 
   setTemplate() {
@@ -569,7 +570,7 @@ class Rows {
     this.rowNode.querySelector('[data-field="id"]').innerHTML = `(${this.row['@attributes'].id})`;
 
     this.params = [];
-    Object.entries(this.rowParam).forEach(([index, param]) => {
+    this.rowParam.forEach(([index, param]) => {
       const paramItem = this.paramNode.cloneNode(true);
       paramItem.querySelector('[data-field="key"]').innerHTML = param.key;
       paramItem.querySelector('[data-field="type"]').innerHTML = _(param['@attributes'].type);
@@ -747,7 +748,7 @@ const inputBlur = function () {
   this.value = checkInputValue(this, +this.value);
 };
 
-const FormVies = {
+const FormViews = {
   init() {
     this.relTarget = Object.create(null);
 
@@ -897,4 +898,4 @@ const FormVies = {
 
 TableValues.__proto__ = admindb;
 XMLTable.__proto__ = admindb;
-FormVies.__proto__ = admindb;
+FormViews.__proto__ = admindb;

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
 
 const absPath = '../../',
@@ -22,10 +23,12 @@ if (fs.existsSync(absPath + 'public/' + resFileName)) {
   entry  = JSON.parse(rd);
 } else return;
 
-module.exports = {
-  mode: 'development', // production / development
-  watch: true, // слежка за изменениями файлов(или флаг при запуске)
+const dev = process.env['npm_lifecycle_script'].includes('development');
 
+module.exports = {
+  mode: dev ? 'development' : 'production',
+  watch: dev, // слежка за изменениями файлов(или флаг при запуске)
+  watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
   entry, //файлы вхождения
 
   experiments: {
@@ -34,11 +37,13 @@ module.exports = {
 
   optimization: {
     minimize: false,
-    minimizer: [new TerserPlugin({extractComments: false,}),], // Убрать комментарии
+    minimizer: [
+      new TerserPlugin({extractComments: false,}),
+      new CssMinimizerPlugin(),
+    ], // Убрать комментарии
   },
 
   output: {
-    //clean: true, // Clean the output directory before emit.
     path: path.resolve(__dirname, '../assets/'),
     filename: 'js/module/[name]/[name].js',
     library: {
@@ -50,7 +55,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: "[name].css",
+      filename: "css/module/[name]/[name].css",
     }),
   ],
   //devtool: '',

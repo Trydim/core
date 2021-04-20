@@ -111,7 +111,7 @@ $field['footerContent'] = <<<temp
   <input type="button" value="Отменить" class="">
 </template>
 <template id="rowTemplate">
-  <div class="mb-2 border">
+  <div class="mb-2 border w-100">
     <div>
       <small data-field="id"></small>
       <span data-field="desc"></span>

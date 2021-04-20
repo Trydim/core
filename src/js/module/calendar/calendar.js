@@ -1,5 +1,6 @@
 'use strict';
 
+import '../../../css/module/calendar/calendar.css';
 import {FullCalendar} from './fullCalendar.js';
 
 /*const importLocale = async (locale) => {

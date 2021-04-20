@@ -1,11 +1,14 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
 
+const dev = process.env['npm_lifecycle_script'].includes('development');
+
 module.exports = {
-  mode: 'development', // production / development
-  watch: true, // слежка за изменениями файлов(или флаг при запуске)
-  //watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
+  mode: dev ? 'development' : 'production',
+  watch: dev, // слежка за изменениями файлов(или флаг при запуске)
+  watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
   //externals: { lodash: "_" } // подключение внешних библиотек
 
   entry: { //файлы вхождения
@@ -15,7 +18,10 @@ module.exports = {
 
   optimization: {
     minimize: false,
-    minimizer: [new TerserPlugin({extractComments: false,}),], // Убрать комментарии
+    minimizer: [
+      new TerserPlugin({extractComments: false,}),
+      new CssMinimizerPlugin(),
+    ], // Убрать комментарии
   },
 
   output: {
@@ -30,7 +36,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename     : "[name].css",
+      filename: "css/admin.css",
     }),
   ],
   /*resolve: {
@@ -39,15 +45,14 @@ module.exports = {
     }
   },*/
   //devtool: '',
-  devtool: 'cheap-source-map', //source mapping
+  devtool: 'source-map', //source mapping
   module: {
+    //noParse: (content) => /libs/.test(content),
     rules: [
       {
         test: /\.s[ac]ss$/i,
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
+          MiniCssExtractPlugin.loader,
           'css-loader',
           'sass-loader',
         ],
@@ -58,7 +63,7 @@ module.exports = {
           MiniCssExtractPlugin.loader,
           'css-loader',
         ],
-      }
+      },
     ],
   },
 };

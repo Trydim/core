@@ -3,7 +3,7 @@
 /**
  * @var array $vars extract param
  */
-$inline = OUTSIDE === 's';
+$inline = strtolower(OUTSIDE);
 
 if(isset($global)) $content = $global;
 else if (!isset($content)) $content = '';
@@ -49,10 +49,11 @@ $result = [
   'jsLinksArr'          => $jsLinksArr,
 ];
 
-if ($inline) {
+if ($inline === 's') {
   echo getPageAsString($result);
+} else if ($inline === 'i') {
+  echo $cssLinksArr . $globalWindowJsValue . $content . $footerContent . $jsLinksArr;
 } else {
   echo json_encode($result);
   die();
 }
-
