@@ -37,6 +37,7 @@ class SectionList {
 export const catalog = {
   M: f.initModal(),
 
+  table: f.qS('#elementsField'),
   field      : null,
   delayFunc  : () => {},
   sectionWrap: f.qS('#sectionWrap').content.children[0],
@@ -86,7 +87,7 @@ export const catalog = {
       query: this.query.bind(this),
     });
     new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
-    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
+    //new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.query();
 
     this.onEventNode(this.curSectionNode, this.clickSection);
@@ -107,16 +108,13 @@ export const catalog = {
     let form = new FormData();
     form.set('mode', 'DB');
 
-    if(sort) Object.entries(this.sortParam[sort]).map(param => {
-      form.set(param[0], param[1]);
-    })
+    if(sort) Object.entries(this.sortParam[sort]).map(param => form.set(param[0], param[1]));
 
-    Object.entries(this.queryParam).map(param => {
-      form.set(param[0], param[1]);
-    })
+    Object.entries(this.queryParam).map(param => form.set(param[0], param[1]));
 
     f.Post({data: form}).then(data => {
 
+      debugger
       if(this.reloadAction) {
         this.query(this.setReloadQueryParam());
         return;

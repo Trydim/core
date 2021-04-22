@@ -131,6 +131,7 @@ const component = {
       orders.template.orderContentBtn.dataset.id = order['O.ID'];
 
       calendar.M.show(title, div);
+      calendar.M.btnField.append(orders.template.orderContentBtn);
     }
   },
 
@@ -237,6 +238,7 @@ const orders = {
   },
 
   onEvent() {
+    calendar.M.btnField.append(orders.template.orderContentBtn);
     orders.template.orderContentBtn.onclick = function () {
       let link = f.gI(f.ID.PUBLIC_PAGE),
           query = 'orderId=';
