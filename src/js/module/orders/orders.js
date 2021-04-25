@@ -146,8 +146,9 @@ export const orders = {
 
         try {
           value = JSON.parse(item.important_value);
-          if(Object.values(value).length) {
-            Object.entries(value).forEach(([k, v]) => {value[k] = _(v);});
+          !Array.isArray(value) && (value = [value]);
+          if(value.length) {
+            value = value.map(i => { i.key = _(i.key); return i; });
             value = f.replaceTemplate(this.template.impValue, value);
           } else value = '';
         }

@@ -377,20 +377,20 @@ export const customers = {
 
     if(target.tagName === 'INPUT') return false;
 
-    while (target.tagName !== 'TR' || i > 4) {
+    while (target.tagName !== 'TR' && i < 4) {
       target = target.parentNode; i++;
     }
+    if (target.tagName !== 'TR') return;
     target.querySelector('input').click();
   },
 
-  // выбор пользоваетля
+  // выбор пользователя
   selectRows(e) {
     let input = e.target,
         id = input.getAttribute('data-id');
 
     if (input.checked) this.selectedId.add(id);
     else this.selectedId.delete(id);
-
   },
 
   // Выделить выбранных

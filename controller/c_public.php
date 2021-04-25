@@ -18,7 +18,7 @@ if ($authStatus && isset($_GET['orderId'])) {
   $orderId = $_GET['orderId'];
 
   if (is_finite($orderId)) {
-    $order = $db->loadOrderById([$orderId]);
+    $order = $db->loadOrderById($orderId);
 
     if ($order) {
       $customers = $db->loadCustomerByOrderId($order['ID']);

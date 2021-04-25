@@ -367,21 +367,6 @@ class Db extends \R {
   //------------------------------------------------------------------------------------------------------------------
 
   /**
-   * save order in calc
-   * @param -
-   */
-  public function saveOrder($param) {
-    $bean = self::xdispense('orders');
-    $bean->user_id = $this->currentUserID;
-    //$bean->create_date = date('Y-m-d G:i:s');
-    //$bean->last_edit_date = date('Y-m-d G:i:s');
-    foreach ($param as $key => $value) {
-      $bean->$key = $value;
-    }
-    self::store($bean);
-  }
-
-  /**
    * @param int $pageNumber
    * @param int $countPerPage
    * @param string $sortColumn
@@ -531,7 +516,7 @@ class Db extends \R {
 
   public function loadCustomerByOrderId($orderIds) {
 
-    $sql = "SELECT C.name as 'name', ITN, contacts FROM orders 
+    $sql = "SELECT C.ID as 'C.ID', C.name as 'name', ITN, contacts FROM orders 
         LEFT JOIN customers C ON C.ID = orders.customer_id
         WHERE orders.ID = $orderIds";
 

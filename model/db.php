@@ -88,44 +88,41 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (isset($saveVal)) {
         $db->setCurrentUserId();
 
-        isset($C_ID) && $id = $C_ID;
+        $customerId = isset($C_ID) && is_finite($C_ID) ? $C_ID : '';
+        $changeUser = isset($customerChange) ? $customerChange : false; // false/add/change
 
-        if (!isset($customerChange)) $changeUser = false;
-        else if ($customerChange === 'change') $changeUser = true;
-        else if ($customerChange === 'add') {
-          $changeUser = false;
-          $id = '';
-        }
-
-        if (!isset($id)) break;
-
-        if ($id === '' && isset($name) || $changeUser) {
+        if ($changeUser && $customerId && isset($name)) {
           $contacts = [];
           isset($phone) && $contacts['phone'] = $phone;
           isset($email) && $contacts['email'] = $email;
           isset($address) && $contacts['address'] = $address;
 
-          $param = [$id => []];
-          $param[$id]['name'] = $name;
-          isset($ITN) && $param[$id]['ITN'] = $ITN;
-          count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
+          $param = [$customerId => []];
+          $param[$customerId]['name'] = $name;
+          isset($ITN) && $param[$customerId]['ITN'] = $ITN;
+          count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);
 
-          $changeUser && $columns = $db->getColumnsTable('customers');
-          $db->insert($columns, 'customers', $param, $changeUser);
-          !$changeUser && $id = $db->getLastID('customers');
+          $columns = $db->getColumnsTable('customers');
+          $db->insert($columns, 'customers', $param, $changeUser === 'change');
+          $changeUser === 'add' && $customerId = $db->getLastID('customers');
         }
 
-        $idOrder = ((int)$db->getLastID('orders')) + 1;
+        $idOrder = isset($idOrder) ? $idOrder : false;
+        $idOrder = !$idOrder ? ((int)$db->getLastID('orders')) + 1 : $idOrder;
 
-        $param = [];
-        $param['save_value'] = $saveVal;
-        $param['customer_id'] = $id;
-        isset($importantVal) && $param['important_value'] = $importantVal;
-        isset($orderTotal) && is_finite($orderTotal) && $param['total'] = floatval($orderTotal);
-        isset($reportVal) && $param['report_value'] = addCpNumber($idOrder, $reportVal);
+        $param = [$idOrder => []];
+        $param[$idOrder]['save_value'] = $saveVal;
+        $param[$idOrder]['customer_id'] = $customerId;
+        $param[$idOrder]['user_id'] = $_SESSION['priority']; // TODO нет не пойдет
+        isset($importantVal) && $param[$idOrder]['important_value'] = $importantVal;
+        isset($orderTotal) && is_finite($orderTotal) && $param[$idOrder]['total'] = floatval($orderTotal);
+        isset($reportVal) && $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
+
+        $columns = $db->getColumnsTable('orders');
+        $db->insert($columns, 'orders', $param, !$idOrder);
 
         // status_id = ; по умолчанию сохранять из настроек
-        $db->saveOrder($param);
+        //$db->saveOrder($param, $idOrder);
         $result['orderID'] = $idOrder;
       }
       break;

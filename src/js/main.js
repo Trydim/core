@@ -14,7 +14,7 @@ const importModuleFunc = async (moduleName) => {
         .catch(err => reject(err));
     });
     return importModule.init() || false;
-  } catch (e) { console.log(e); f.showMsg(e, 'error', false); return false; }
+  } catch (e) { console.error(e); f.showMsg(e, 'error', false); return false; }
 }
 
 //Index.php page

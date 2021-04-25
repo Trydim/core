@@ -437,6 +437,7 @@ export class Valid {
         initMask && n.type === 'tel' && f.maskInit && f.maskInit(n, phoneMask);
       }
       n.addEventListener('blur', (e) => this.validate(e)); // может и не нужна
+      this.validate(n);
     });
 
     // Files
@@ -513,7 +514,7 @@ export class Valid {
   }
 
   validate(e, ignoreValue = false) {
-    let node = e.target || target, reg;
+    let node = e.target || e, reg;
     if (node.value.length > 0 || ignoreValue) {
       switch (node.name) {
         case 'name':

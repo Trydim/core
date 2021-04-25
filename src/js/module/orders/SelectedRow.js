@@ -49,11 +49,8 @@ export class SelectedRow {
   clickRows(e) {
     let input = e.target.closest('tr').querySelector('input'),
         id = input.dataset.id;
-
-    if (input.checked) this.deleteSelectedId(id);
-    else this.addSelectedId(id);
-
     input !== e.target && (input.checked = !input.checked);
+    input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
     //this.checkBtnRows();
     console.log(this.getSelectedList());
   }
