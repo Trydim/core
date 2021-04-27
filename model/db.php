@@ -108,7 +108,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         }
 
         $idOrder = isset($idOrder) ? $idOrder : false;
-        $idOrder = !$idOrder ? ((int)$db->getLastID('orders')) + 1 : $idOrder;
+        $newOrder = !$idOrder;
+        $idOrder = $newOrder ? ((int)$db->getLastID('orders')) + 1 : $idOrder;
 
         $param = [$idOrder => []];
         $param[$idOrder]['save_value'] = $saveVal;
@@ -119,7 +120,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         isset($reportVal) && $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
 
         $columns = $db->getColumnsTable('orders');
-        $db->insert($columns, 'orders', $param, !$idOrder);
+        $db->insert($columns, 'orders', $param, !$newOrder);
 
         // status_id = ; по умолчанию сохранять из настроек
         //$db->saveOrder($param, $idOrder);
@@ -184,7 +185,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['orders'] = $db->loadVisitorOrder($pageNumber, $countPerPage, $sortColumn, $sortDirect);
       break;
     case 'loadVisitorOrder': break;
-    case 'delVisitorOrders': break;
+    case 'delVisitorOrders':
+      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
+      if (count($orderIds)) $db->deleteItem('client_orders', $orderIds);
+      break;
 
     // Section
     case 'openSection':

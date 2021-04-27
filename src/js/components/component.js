@@ -818,7 +818,7 @@ export class SortColumns {
   }
 }
 
-// Сохрание заказво посетителей
+// Сохрание заказов посетителей
 export class SaveVisitorsOrder {
   constructor(cpNumber) {
     this.nodes = [];

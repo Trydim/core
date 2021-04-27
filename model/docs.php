@@ -39,6 +39,7 @@ if ($addManager) { // Данные о менеджере
   if (count($userData)) $reportVal['userData'] = $userData;
 }
 
+$docType = isset($docType) ? $docType : '';
 !isset($docsAction) && $docsAction = $docType;
 $useDocs = isset($usePdf) || in_array($docType, ['pdf', 'excel']);
 isset($fileTpl) ? $useDocs = true : $fileTpl = 'default';
@@ -50,6 +51,7 @@ if (count($_FILES)) {
 }
 
 if ($useDocs) {
+  !$docType && $docType = 'pdf';
   require_once 'classes/Docs.php';
   $docs = new Docs($docType, $reportVal, $fileTpl);
 }
