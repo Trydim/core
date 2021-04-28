@@ -43,12 +43,8 @@ if ($main->checkStatus('ok') && isset($db)) {
   if (DB_TABLE_IN_SIDEMENU) {
     $dbTables = [];
     CHANGE_DATABASE && USE_DATABASE && $dbTables = array_merge($dbTables, $db->getTables());
-    $dbTables = array_merge($dbTables, $db->scanDirCsv());
-    $dbTables = array_map(function ($item) {
-      $item['name'] = gTxt($item['name']);
-      return $item;
-    }, $dbTables);
-    Xml::checkXml($dbTables);
+    $dbTables = array_merge($dbTables, $db->scanDirCsv(PATH_CSV));
+    //Xml::checkXml($dbTables); // TODO временно отключил
   }
 
 }

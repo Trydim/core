@@ -66,10 +66,10 @@ const sideMenuExpanded = (e, node) => {
   e.preventDefault();
   if( node.getAttribute('aria-expanded') === 'true'){
     node.setAttribute('aria-expanded', 'false');
-    node.nextElementSibling.classList.add('d-none');
+    f.hide(node.nextElementSibling);
   } else {
     node.setAttribute('aria-expanded', 'true');
-    node.nextElementSibling.classList.remove('d-none');
+    f.show(node.nextElementSibling);
   }
 }
 
@@ -83,8 +83,9 @@ const onAuthEvent = () => {
 }
 
 const onClickSubmenu = () => {
-  let node = f.qS('#sideMenu a[href^="#"]');
-  node && node.addEventListener('click', (e) => sideMenuExpanded(e, node));
+  f.qA('#sideMenu a[href^="#"]').forEach(n =>
+    n.addEventListener('click', (e) => sideMenuExpanded(e, n))
+  );
 }
 
 // Entrance function

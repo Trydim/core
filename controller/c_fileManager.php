@@ -26,7 +26,9 @@ function tree($path) {
       foreach ($files as $file) {
         if (stream_resolve_include_path($path . $file)) {
           if (filetype($path . $file) === 'dir') {
-            sub($file, $path); // if folder
+            echo '<li><div id="' . $dir . '" data-fo="' . $path . $dir . '/' . '" class="fo closed">' . $dir . '</div>';
+            tree($path . $dir . '/');
+            echo '</li>';
           }
         }
       }
@@ -43,12 +45,6 @@ function tree($path) {
     }
     echo "</ul>";
   }
-}
-
-function sub($dir, $path) {
-  echo '<li><div id="' . $dir . '" data-fo="' . $path . $dir . '/' . '" class="fo closed">' . $dir . '</div>';
-  tree($path . $dir . '/');
-  echo '</li>';
 }
 
 $field = [

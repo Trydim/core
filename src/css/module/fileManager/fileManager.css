@@ -1754,11 +1754,11 @@ label {
 .ext-log {
     background: url(images/txt.png) left 50% no-repeat;
 }
-
+/*
 .ext-xls,
 .ext-xlsx {
     background: url(images/xls.png) left 50% no-repeat;
-}
+}*/
 
 .ext-zip,
 .ext-7z,

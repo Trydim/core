@@ -439,7 +439,7 @@ const func = {
    */
   parseNumber(v) {
     typeof v === 'string' && (v = v.replace(',', '.'));
-    !isFinite(v) && (v = parseFloat(v.match(/\d+|\.|\d+/g).join('')));
+    typeof v === 'string' && !isFinite(v) && (v = parseFloat(v.match(/\d+|\.|\d+/g).join('')));
     !isFinite(v) && (v = 0);
     return +v;
   },

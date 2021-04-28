@@ -723,16 +723,26 @@ trait MainCsv {
 
   /**
    * сделать поиск всех файлов, наверное. (хотя если их много переходить на БД, наверное)
+   * @param $path {string}
+   * @param $link {string}
    * @return mixed|null
    */
-  static function scanDirCsv() {
-    return array_reduce(scandir(PATH_CSV), function ($r, $item) {
+  static function scanDirCsv($path, $link = '') {
 
-      if (!($item === '.' || $item === '..' || !stripos($item, '.csv'))) {
-        $r[] = [
-          'fileName' => $item,
-          'name'     => $item, //str_replace('.csv', '', $item),
-        ];
+    return array_reduce(scandir($path), function ($r, $item) use ($link) {
+      if (!($item === '.' || $item === '..')) {
+        if (stripos($item, '.csv')) {
+          $r[] = [
+            'fileName' => $item,
+            'name'     => gTxt(str_replace('.csv', '', $item)),
+          ];
+        } else {
+          $link && $link .= '/';
+          if (filetype(PATH_CSV . $link . $item) === 'dir') {
+            global $db;
+            $r[$item] = $db::scanDirCsv(PATH_CSV . $link . $item, $link . $item);
+          }
+        }
       }
 
       return $r;

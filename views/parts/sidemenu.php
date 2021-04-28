@@ -1,5 +1,50 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
-global $main;
+global $main, $dbTables, $tableActive;
+
+$adminMenu = '';
+
+if(is_array($dbTables)) {
+
+  function subSideMenuItem($fileName, $name, $active) {
+    $sitePath = SITE_PATH . "admindb?tableName=" . $fileName;
+    return <<<item
+      <li class="nav-item $active">
+        <a class="nav-link pl-5" href="$sitePath">$name</a>
+      </li>
+item;
+  }
+
+  function subSideMenu($title, $item) {
+    return <<<menu
+      <a class="nav-link" href="#admindb">
+        <i class="fa fa-database" aria-hidden="true"></i>
+        <p>$title <b class="caret"></b></p>
+      </a>
+      <div class="d-none" id="DBTablesWrap">
+        <ul class="nav">$item</ul>
+      </div>
+menu;
+  }
+
+  function createMenu($title, $tables, $link = '') {
+    $items = '';
+    foreach ($tables as $key => $item) {
+      if (!is_numeric($key)) {
+        $items .= '<li class="nav-item">' . createMenu($key, $item, $link . '/' . $key) . '</li>';
+        continue;
+      }
+
+      global $tableActive;
+      !isset($item['fileName']) && $item['fileName'] = $item['name'];
+      $active = $tableActive === $item['fileName'] ? 'active' : '';
+      $items .= subSideMenuItem($link . '/' . $item['fileName'], $item['name'], $active);
+    }
+    return subSideMenu(gTxt($title), $items);
+  }
+
+  $adminMenu = createMenu('Администрирование', $dbTables);
+}
+
 ?>
 <div class="sidebar" data-background-color="white">
 
@@ -60,25 +105,9 @@ global $main;
             <?php break;
           case 'admindb': ?>
             <li class="nav-item">
-              <?php global $dbTables; if(is_array($dbTables)) { ?>
-                <a class="nav-link" href="#admindb">
-                  <i class="fa fa-database" aria-hidden="true"></i>
-                  <p>Администрирование <b class="caret"></b></p>
-                </a>
-                <div class="d-none" id="DBTablesWrap">
-                  <ul class="nav">
-                    <?php
-                    global $tableActive;
-                    foreach ($dbTables as $item) {
-                      !isset($item['fileName']) && $item['fileName'] = $item['name'];
-                      $active = $tableActive === $item['fileName'] ? 'active' : ''; ?>
-                      <li class="nav-item <?= $active ?>">
-                        <a class="nav-link pl-5" href="<?= SITE_PATH ?>admindb?tableName=<?= $item['fileName'] ?>"><?= $item['name'] ?></a>
-                      </li>
-                    <?php } ?>
-                  </ul>
-                </div>
-              <?php } else { ?>
+              <?php if($adminMenu) { ?>
+               <?= $adminMenu ?>
+               <? } else { ?>
                 <a class="nav-link" href="<?= SITE_PATH ?>admindb">
                   <i class="fa fa-database"></i>
                   <p>Администрирование</p>

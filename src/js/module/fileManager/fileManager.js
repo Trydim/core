@@ -1,3 +1,6 @@
+"use strict";
+
+import '../../../css/module/fileManager/fileManager.css';
 
 const t = (dir) => {
   //$("body").append('<div id="alerts" class="btn blue">загрузка..</div>');
