@@ -106,13 +106,14 @@ class Mail {
         $this->fromName = 'vistegra.by';
       }
 
-      $mail->addBCC($this->mailTarget);
-      if (in_array($this->mailTarget, $this->otherMail)) $this->otherMail = [];
+      $mail->addBCC($this->mailTarget || MAIL_TARGET_DEBUG);
       $mail->From = MAIL_FROM;
       $mail->FromName = $this->fromName;
 
-      foreach ($this->otherMail as $moreMail)
+      foreach ($this->otherMail as $moreMail) {
+        if ($moreMail === $this->otherMail) continue;
         $mail->addBCC($moreMail);
+      }
 
       // -----------------------
       // Mail Body
