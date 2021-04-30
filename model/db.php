@@ -77,7 +77,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
         $filePath = PATH_CSV . $fileName . '.xml';
         if (file_exists($filePath)) {
-          if (filesize($filePath) < 60) Xml::createXmlDefault($fileName);
+          if (filesize($filePath) < 6000) Xml::createXmlDefault($fileName);
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
         }
       }

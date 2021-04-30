@@ -43,13 +43,12 @@ function addEntry(path, mName, js = false) {
 }
 
 function addModule(mName) {
-  if (menu.includes(mName)) {
+  if (menu.includes(mName) || mName === 'setting') {
     //addImport(coreSrcCssModulePath, mName);
     addEntry(coreSrcJsModulePath, mName, true);
     console.log('Added module: ' + mName);
   }
 }
-
 
 const config = fs.readFileSync(absPath + configName, {encoding: 'utf8'}),
       configRows = config.split('\n');

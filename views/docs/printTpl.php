@@ -53,6 +53,5 @@
       </thead>
       <tbody></tbody>
     </table>
-    <div id="trussImg"></div>
   </div>
 </template>

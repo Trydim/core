@@ -1,5 +1,5 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
-global $main, $dbTables, $tableActive;
+global $main, $dbTables;
 
 $adminMenu = '';
 
@@ -14,32 +14,34 @@ if(is_array($dbTables)) {
 item;
   }
 
-  function subSideMenu($title, $item) {
+  function subSideMenu($title, $item, $root) {
+    $icon = $root ? 'fa-database' : 'fa-arrow-right';
+    $idWrap = $root ? 'id="DBTablesWrap"' : '';
     return <<<menu
       <a class="nav-link" href="#admindb">
-        <i class="fa fa-database" aria-hidden="true"></i>
+        <i class="fa $icon"></i>
         <p>$title <b class="caret"></b></p>
       </a>
-      <div class="d-none" id="DBTablesWrap">
+      <div class="d-none" $idWrap data-role="link">
         <ul class="nav">$item</ul>
       </div>
 menu;
   }
 
-  function createMenu($title, $tables, $link = '') {
+  function createMenu($title, $tables, $link = '', $root = true) {
     $items = '';
     foreach ($tables as $key => $item) {
       if (!is_numeric($key)) {
-        $items .= '<li class="nav-item">' . createMenu($key, $item, $link . '/' . $key) . '</li>';
+        $items .= '<li class="nav-item">' . createMenu($key, $item, $link . '/' . $key, false) . '</li>';
         continue;
       }
 
       global $tableActive;
       !isset($item['fileName']) && $item['fileName'] = $item['name'];
-      $active = $tableActive === $item['fileName'] ? 'active' : '';
+      $active = $tableActive === $link . '/' . $item['fileName'] ? 'active' : '';
       $items .= subSideMenuItem($link . '/' . $item['fileName'], $item['name'], $active);
     }
-    return subSideMenu(gTxt($title), $items);
+    return subSideMenu(gTxt($title), $items, $root);
   }
 
   $adminMenu = createMenu('Администрирование', $dbTables);

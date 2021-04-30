@@ -39,10 +39,12 @@ if ($addManager) { // Данные о менеджере
   if (count($userData)) $reportVal['userData'] = $userData;
 }
 
-$docType = isset($docType) ? $docType : '';
 !isset($docsAction) && $docsAction = $docType;
-$useDocs = isset($usePdf) || in_array($docType, ['pdf', 'excel']);
-isset($fileTpl) ? $useDocs = true : $fileTpl = 'default';
+$docType = isset($docType) ? $docType : false;
+isset($usePdf) && $docType = 'pdf';
+isset($useExcel) && $docType = 'excel';
+$docType === 'mail' && $docType = false;
+
 $mailTpl = isset($mailTpl) ? $mailTpl : 'mailTpl';
 
 if (count($_FILES)) {
@@ -50,20 +52,19 @@ if (count($_FILES)) {
   $filesArray = $_FILES;
 }
 
-if ($useDocs) {
-  !$docType && $docType = 'pdf';
+if ($docType !== 'mail') {
   require_once 'classes/Docs.php';
-  $docs = new Docs($docType, $reportVal, $fileTpl);
+  $docs = new Docs($docType, $reportVal, isset($fileTpl) ? $$fileTpl : 'default');
 }
 
 if (isset($docsAction)) {
   switch ($docsAction) {
     case 'excel':
     case 'pdf':
-      $useDocs && $result = $docs->getDocs($mailTpl);
+      $docType && $result = $docs->getDocs($mailTpl);
       break;
     case 'mail':
-      $useDocs && $docsPath = $docs->getDocs('save');
+      $docType && $docsPath = $docs->getDocs('save');
       require_once 'classes/Mail.php';
       $mail = new Mail($mailTpl);
       $param = [
@@ -75,7 +76,7 @@ if (isset($docsAction)) {
       ];
       isset($filesArray) && $mail->addOtherFile($filesArray);
       $mail->prepareMail($param);
-      $useDocs && $mail->addFile($docsPath);
+      $docType && $mail->addFile($docsPath);
       isset($email) && $mail->addMail($email);
       $result['mail'] = $mail->send();
       break;

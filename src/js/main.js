@@ -30,10 +30,20 @@ const init = (moduleName = 'default') => {
 }
 
 const setLinkMenu = (page) => {
-  for (let n of [...f.qA('a')]) {
+  let menu = f.qS('#sideMenu'),
+      links = [...menu.querySelectorAll('a')],
+      target = menu.querySelector('.nav-item.active');
+
+  while (target) {
+    let wrap = target.closest('[data-role="link"]');
+    if (!wrap) return;
+    target = wrap.previousElementSibling;
+    target.click();
+  }
+
+  for (let n of links) {
     let href = n.getAttribute('href') || '';
-    if (href.includes(page) && href.includes('#')) { n.click(); break; }
-    else if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
+    if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
   }
 }
 

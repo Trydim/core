@@ -424,8 +424,10 @@ const func = {
 
   // Border warning
   flashNode(item) {
-    let def                 = item.style.boxShadow;
-    item.style.boxShadow    = '0px 0px 4px 1px red';
+    let def                 = item.style.boxShadow,
+        boxShadow           = 'red 0px 0px 4px 1px';
+    def === boxShadow && (def = '');
+    item.style.boxShadow    = boxShadow;
     item.style.borderRadius = '4px';
     item.style.transition   = 'all 0.2s ease';
     setTimeout(() => {

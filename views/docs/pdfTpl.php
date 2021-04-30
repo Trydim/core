@@ -21,7 +21,7 @@ $listTotal = $this->data['subList'];
 						</td>
 						<td style="text-align: right; font-size: 15px; width:30%; vertical-align: middle">
 							<u>тел. +7 (499) 450-64-66</u>
-							<span style="font-size: 14px">www.masterovit.ru</span>
+							<span style="font-size: 14px">www.site.ru</span>
 						</td>
 					</tr>
 				</tbody>
@@ -41,7 +41,7 @@ $listTotal = $this->data['subList'];
       <?php } ?>
       </tbody>
     </table>
-    <h4>Смета навеса:</h4>
+    <h4>Смета:</h4>
 		<table border="1" cellpadding="0" cellspacing="0">
 			<thead>
 				<tr>
@@ -79,89 +79,6 @@ $listTotal = $this->data['subList'];
 				</tr>
 			</tfoot>
 		</table>
-		<h4>Расчет стоимости работ:</h4>
-		<table border="1" cellpadding="0" cellspacing="0">
-			<thead>
-				<tr>
-					<th>№</th>
-					<th>Наименование</th>
-					<th>Ед.изм.</th>
-					<th>Кол-во</th>
-					<th>Цена</th>
-					<th>Сумма</th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php $installName = '';
-          foreach ($listData['install'] as $rows) { $installName = $rows['mName']; $total += $rows['total']; } ?>
-        <tr>
-          <td style="width: 5%;">1</td>
-          <td style="width: 35%;">Монтаж <?= $installName ?></td>
-          <td style="width: 5%;">услуга</td>
-          <td style="width: 5%;"><?= $this->setNumFormat($rows['total']) ?></td>
-          <td style="width: 15%;"><?= $this->setNumFormat($rows['total']) ?></td>
-          <td style="width: 15%;"><?= $this->setNumFormat($rows['total']) ?></td>
-        </tr>
-			</tbody>
-			<tfoot>
-				<tr>
-					<td colspan="4">СТОИМОСТЬ МОНТАЖА:</td>
-          <td colspan="2" style="text-align: center;"><?= $this->setNumFormat($listTotal['install']['sTotal']) ?> руб.</td>
-				</tr>
-			</tfoot>
-		</table>
-		<h4>Доставка: </h4>
-		<table border="1" cellpadding="0" cellspacing="0">
-			<thead>
-				<tr>
-					<th>№</th>
-					<th>Наименование</th>
-					<th>Ед.изм.</th>
-					<th>Кол-во</th>
-					<th>Цена</th>
-					<th>Сумма</th>
-				</tr>
-			</thead>
-			<tbody>
-        <?php foreach ($listData['delivery'] as $key => $rows) { $total += $rows['total']; ?>
-          <tr>
-            <td style="width: 5%;"><?= $key + 1 ?></td>
-            <td style="width: 35%;">Доставка<!--?= $rows['mName'] ?--></td>
-            <td style="width: 5%;"><?= $rows['unit'] ?></td>
-            <td style="width: 5%;"><?= $rows['count'] ?></td>
-            <td style="width: 15%;"><?= $rows['value'] ?></td>
-            <td style="width: 15%;"><?= $this->setNumFormat($rows['total']) ?></td>
-          </tr>
-        <?php } ?>
-			</tbody>
-			<tfoot>
-				<tr>
-					<td colspan="4">СТОИМОСТЬ ДОСТАВКИ:</td>
-          <td colspan="2" style="text-align: center;"><?= $this->setNumFormat($listTotal['delivery']['sTotal']) ?> руб.</td>
-				</tr>
-			</tfoot>
-		</table>
-
-		<table class="result-block" border="0" cellpadding="0" cellspacing="0">
-			<tbody>
-				<tr>
-					<td style="text-align: left;  width:70%;">
-						ИТОГОВАЯ СТОИМОСТЬ ДОГОВОРА
-					</td>
-					<td style="text-align: right; width:30%;">
-						<u><?= $this->setNumFormat($total) ?> руб.</u>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<h4>Полезная информация: </h4>
-		<div class="text">
-			Далеко-далеко
-		</div>
-		<div class="footer">
-			<div  class="footer-item">С уважением,</div>
-			<div  class="footer-item">Менеджер по продажам<br></div>
-		</div>
 	</div>
 </body>
 
