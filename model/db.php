@@ -17,7 +17,7 @@ isset($tableName) && $dbTable = $tableName;
 
 if ($dbAction === 'tables') { // todo добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
-  $result['csvFiles'] = $db->scanDirCsv();
+  $result['csvFiles'] = $db->scanDirCsv(PATH_CSV);
 } else {
 
   $columns = [];
@@ -31,7 +31,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $sortDirect = isset($sortDirect) ? $sortDirect === 'true' : false;
 
   switch ($dbAction) {
-    // Table
+    // Tables
     case 'showTable':
       $result['columns'] = $columns;
       if (stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
@@ -58,8 +58,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadCVS': $db->fileForceDownload(); break;
     case 'loadFormConfig':
       if (isset($dbTable)) {
-        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
-        $filePath = PATH_CSV . $fileName . '.xml';
+        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath) && filesize($filePath) > 60) {
           $result['csvValues'] = $db->openCsv();
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -68,18 +67,23 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'saveXMLConfig':
       if (isset($dbTable) && isset($XMLConfig)) {
-        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
-        $result['error'] = Xml::saveXml($fileName, json_decode($XMLConfig, true));
+        $result['error'] = Xml::saveXml($dbTable, json_decode($XMLConfig, true));
       }
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
-        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
-        $filePath = PATH_CSV . $fileName . '.xml';
+        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath)) {
-          if (filesize($filePath) < 6000) Xml::createXmlDefault($fileName);
+          if (filesize($filePath) < 60) Xml::createXmlDefault($filePath, substr($dbTable, 1));
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
         }
+      }
+      break;
+    case 'refreshXMLConfig':
+      if (isset($dbTable)) {
+        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
+        Xml::createXmlDefault($filePath, substr($dbTable, 1));
+        $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
       }
       break;
 

@@ -183,7 +183,6 @@ function findkey($cell, $input) {
  * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
-	//$filename = str_replace('/', '//', PATH_CSV . $filename); // Зачем это
 	$filename = PATH_CSV . $filename;
   $result = [];
 

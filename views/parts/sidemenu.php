@@ -48,7 +48,7 @@ menu;
 }
 
 ?>
-<div class="sidebar" data-background-color="white">
+<div class="sidebar"> <!-- data-background-color="white"-->
 
   <div class="logo ml-3">
     <a href="/" class="simple-text logo-normal">Logo</a>

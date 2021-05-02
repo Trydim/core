@@ -32,15 +32,16 @@ XML;
     //chown()
   }
 
-  static function checkXml($cvs) {
-    $path = scandir(PATH_CSV);
-    if ((count($path) - 2) / 2 === count($cvs)) return;
+  static function checkXml($cvs, $link = '') {
+    $link !== '' && $link .= '/';
 
-    foreach ($cvs as $file) {
-      $file = pathinfo($file['fileName'], PATHINFO_FILENAME) . '.xml';
-      if (!file_exists(PATH_CSV . $file)) {
-        file_put_contents(PATH_CSV . $file, self::getXMLTemplate());
-      }
+    foreach ($cvs as $key => $file) {
+      if (!is_numeric($key)) { self::checkXml($file, $link . $key); continue; }
+
+      $file = '../xml/' . $link . pathinfo($file['fileName'], PATHINFO_FILENAME) . '.xml';
+      if (!file_exists(PATH_CSV . '../xml')) mkdir(PATH_CSV . '../xml');
+      if (!file_exists(PATH_CSV . '../xml/' . $link)) mkdir(PATH_CSV . '../xml/' . $link);
+      if (!file_exists(PATH_CSV . $file)) file_put_contents(PATH_CSV . $file, self::getXMLTemplate());
     }
   }
 
@@ -49,8 +50,8 @@ XML;
     $res = [];
     for ($i = 0; $i < 3; $i++) {
       foreach ($csv[$i] as $index => $cell) {
-        if (stripos($cell, 'key') !== false || stripos($cell, 'id') !== false) $res['index'] = $index;
-        else if (mb_stripos($cell, 'описа') !== false || stripos($cell, 'desc') !== false) $res['desc'] = $index;
+        if (preg_match('/(id)|(key)/i', $cell)) $res['index'] = $index;
+        else if (preg_match('/(опис)|(desc)/ui', $cell)) $res['desc'] = $index;
       }
       if (count($res)) {
         $res['row'] = $i;
@@ -60,8 +61,8 @@ XML;
     return $res;
   }
 
-  static function createXmlDefault($fileName) {
-    $csv = loadCVS([], $fileName . '.csv');
+  static function createXmlDefault($xmlFileName, $fileName) {
+    $csv = loadCVS([], $fileName);
     if (count($csv)) {
       $xml = new SimpleXMLElement(self::getXMLTemplate());
       $param = [];
@@ -82,7 +83,7 @@ XML;
         $xml->row[$r]->addChild('params');
         $params = &$xml->row[$r]->params;
         foreach ($row as $c => $cell) {
-          if ($c === $key || $c === $desc) continue;
+          if ($c === $key || $c === $desc || $param[$c] === '') continue;
           $params->addChild('param');
           $y = count($params->param) - 1;
           $params->param[$y]->addAttribute('type', 'string');
@@ -91,15 +92,16 @@ XML;
         }
       }
 
-      file_put_contents(PATH_CSV . $fileName . '.xml', $xml->asXML());
+      file_put_contents($xmlFileName, $xml->asXML());
     }
   }
 
-  static function saveXml($fileName, $data) {
+  static function saveXml($dbTable, $data) {
     $xml = new SimpleXMLElement(self::getXMLTemplate());
     try {
       self::arrayToXml($data, $xml);
-      file_put_contents(PATH_CSV . $fileName . '.xml', $xml->asXML());
+      $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
+      file_put_contents($filePath, $xml->asXML());
     } catch (Exception $e) {
       return $e->getMessage();
     }

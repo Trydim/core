@@ -3,6 +3,8 @@
 const addSlashes = (value) => value.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
 const removeSlashes = (value) => value.replaceAll('\\n', '\n').replaceAll('\\r', '\r');
 
+const changeRowCol = (that) => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
+
 export const handson = {
   option: {
     rowHeaders        : true,
@@ -15,6 +17,23 @@ export const handson = {
     width             : '100%',
     height            : 900,
     licenseKey        : 'non-commercial-and-evaluation',
+
+    afterChange(changes) {
+      if (!this.tableChanged && changes) {
+        for (const [row, prop, oldValue, newValue] of changes) {
+          if (oldValue !== newValue) {
+            this.admindb.enableBtnSave();
+            this.tableChanged = true;
+            break;
+          }
+        }
+      }
+    },
+
+    afterCreateCol() { changeRowCol(this) },
+    afterCreateRow() { changeRowCol(this) },
+    afterRemoveCol() { changeRowCol(this) },
+    afterRemoveRow() { changeRowCol(this) },
   },
 
   context: {
