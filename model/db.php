@@ -398,7 +398,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       $contacts = [];
       foreach ($user as $k => $v) {
-        if (in_array($k, ['login', 'password', 'name', 'permission_id'])) $param['0'][$k] = $v;
+        if (in_array($k, ['login', 'name', 'permission_id'])) $param['0'][$k] = $v;
+        else if ($k === 'password') $param['0'][$k] = password_hash($v, PASSWORD_BCRYPT);
         else $contacts[$k] = $v;
       }
 
@@ -417,8 +418,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $param[$id] = [];
           $contacts = [];
           foreach ($user as $k => $v) {
-            if (in_array($k, ['login', 'password', 'name', 'permission_id'])) $param[$id][$k] = $v;
-            else $contacts[$k] = $v;
+            if (in_array($k, ['login', 'name', 'permission_id'])) $param[$id][$k] = $v;
+            else if ($k !== 'permission_id') $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
         }

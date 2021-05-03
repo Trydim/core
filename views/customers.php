@@ -51,11 +51,11 @@ $field['footerContent'] = <<<footerContent
     </div-->
     
     <div class="form-group">
-      <label class="w-100">Адрес: <input type="text" id="name" name="address" value="test" class="form-control"></label>
+      <label class="w-100">Адрес: <input type="text" name="address" value="test" class="form-control"></label>
     </div>
     
     <div class="form-group intField">
-      <label class="w-100">ИНН: <input type="text" id="name" name="ITN" value="test" class="form-control"></label>
+      <label class="w-100">ИНН: <input type="text" name="ITN" value="test" class="form-control"></label>
     </div>
   </form>
 </template>

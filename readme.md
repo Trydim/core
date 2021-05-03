@@ -27,4 +27,3 @@ git submodule update --remote
 
 
 Изменяя доступные страницы запустить createResourceFile из package.json
-Можно assets js удалить после

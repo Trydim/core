@@ -146,11 +146,11 @@ export const orders = {
 
         try {
           value = JSON.parse(item.important_value);
-          !Array.isArray(value) && (value = [value]);
+          !Array.isArray(value) && (value = Object.values(value).length && [value]);
           if(value.length) {
             value = value.map(i => { i.key = _(i.key); return i; });
             value = f.replaceTemplate(this.template.impValue, value);
-          } else value = '';
+          } else value = '-';
         }
         catch (e) { console.log(`Заказ ID:${item['O.ID']} имеет не правильное значение`); }
         item.important_value = value;

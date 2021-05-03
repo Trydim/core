@@ -30,10 +30,10 @@ const init = (moduleName = 'default') => {
 }
 
 const setLinkMenu = (page) => {
-  let menu = f.qS('#sideMenu'),
-      links = [...menu.querySelectorAll('a')],
-      target = menu.querySelector('.nav-item.active');
+  let menu = f.qS('#sideMenu');
+  if (!menu) return;
 
+  let target = menu.querySelector('.nav-item.active');
   while (target) {
     let wrap = target.closest('[data-role="link"]');
     if (!wrap) return;
@@ -41,7 +41,7 @@ const setLinkMenu = (page) => {
     target.click();
   }
 
-  for (let n of links) {
+  for (let n of [...menu.querySelectorAll('a')]) {
     let href = n.getAttribute('href') || '';
     if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
   }
