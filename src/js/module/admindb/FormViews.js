@@ -103,6 +103,9 @@ export const FormViews = {
           input = paramItem.querySelector('input, select'),
           node;
 
+      input.dataset.col = index;
+      input.dataset.row = rowIndex;
+
       switch (paramAttr.type) {
         default:
         case 'string': break;
@@ -128,19 +131,61 @@ export const FormViews = {
           });
           break;
         case 'relationTable':
+          this.loaderTable(input, paramAttr, row[index]);
+          paramAttr.multiple && input.setAttribute('multiple', 'multiple');
           break;
         case 'checkbox':
           paramAttr.relTarget && (input.dataset.target = paramAttr.relTarget);
           input.checked = this.checkValue(row[index]) || false;
           break;
+        case 'textarea': break;
       }
 
-      input.dataset.col = index;
-      input.dataset.row = rowIndex;
-      input.value = row[index] || '';
+      !input.multiple && (input.value = row[index] || '');
 
       paramField.append(paramItem);
     });
+  },
+  loaderTable(input, paramAttr, value) {
+    const data = new FormData();
+    data.set('mode', 'DB');
+    data.set('dbAction', 'showTable');
+    data.set('tableName', paramAttr.dbTable);
+
+    f.Post({data}).then(data => {
+      data['csvValues'] && this.setLoadedTable(input, data['csvValues'], paramAttr, value);
+    });
+  },
+  setLoadedTable(input, data, paramAttr, value) {
+    let html = '',
+        col = {};
+
+    for (let i = 0; i < 3; i++) {
+      for (let item of data[i]) {
+        if (item === paramAttr.tableCol) {
+          col.id = data[i].indexOf(item);
+        } else if (/(desc|опис|name|наимен)/i.test(item)) {
+          col.desc = data[i].indexOf(item);
+        }
+      }
+
+      if (Object.values(col).length) {
+        col.row = i;
+        break;
+      }
+    }
+
+    if (!Object.values(col).length) return;
+    html = data.map((row, rowIndex) =>
+      row[col.id] && rowIndex !== col.row ? `<option value="${row[col.id]}">${row[col.id]} ${row[col.desc] || ''}</option>`
+                  : '').join('');
+    input.innerHTML = html;
+
+    if (paramAttr.multiple) {
+      value.split(' ').map(item => {
+        input.querySelector(`option[value="${item}"]`).selected = true;
+      })
+    }
   },
 
   // Сборка и вывод формы
@@ -191,7 +236,9 @@ export const FormViews = {
 
     if (!col || !row) { console.warn(e.target + 'index error'); return; }
 
-    this.csv[row][col] = target.value;
+    this.csv[row][col] = target.multiple
+        ? [...target.options].filter(i => i.selected).map(n => n.value).join(' ')
+        : target.value;
   },
 
   save() {

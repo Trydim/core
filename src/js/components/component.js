@@ -909,3 +909,25 @@ export class Observer {
     return this.publisher[name] || false;
   }
 }
+
+// Одноразовые функции
+export class OneTimeFunction {
+  constructor(funcName, func) {
+    this.func = Object.create(null);
+
+    funcName && this.add(funcName, func);
+  }
+
+  add(name, func) {
+    this.func[name] = func;
+  }
+
+  exec(name) {
+    this.func[name] && this.func[name]();
+    this.del(name);
+  }
+
+  del(name) {
+    this.func[name] && (delete this.func[name]);
+  }
+}

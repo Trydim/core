@@ -20,7 +20,7 @@ $field['content'] = <<<main
 <div class="text-center">
   <h2 id="tableNameField"></h2>
 </div>
-<div class="d-flex pb-4" style="justify-content: left">
+<div id="viewField" class="d-flex pb-4" style="justify-content: left">
   <div>
     <label title="Удобный для редактирования">
       <input type="radio" name="adminType" value="form" data-action="adminType">
@@ -68,13 +68,19 @@ $field['footerContent'] = <<<temp
       <button type="button" class="w-10 inputChange actionPlus">+</button>
     </div>
     <div data-type="simpleList" class="w-100 text-center">
-      <select name="" id="" class="w-90"></select>
+      <select class="w-90"></select>
+    </div>
+    <div data-type="relationTable" class="w-100 text-center">
+      <select class="w-90"></select>
     </div>
     <div data-type="checkbox" class="w-100 text-center">
       <input type="checkbox" class="w-90">
     </div>
     <div data-type="color" class="w-100 text-center">
       <input type="color" class="w-90">
+    </div>
+    <div data-type="textarea" class="w-100 text-center">
+      <textarea class="w-100" cols="5"></textarea>
     </div>
   </section>
 </template>
@@ -161,15 +167,15 @@ $field['footerContent'] = <<<temp
     <div class="relationTable">
       <div class="d-flex justify-content-between">
         <label>Таблица (файл)</label>
-        <select name="dbTable" data-field="dbTables">
-          <option value="">пока пусто</option>
-        </select>
+        <select name="dbTable" data-field="dbTables" data-action="selectDbTables"></select>
       </div>
       <div class="d-flex justify-content-between">
         <label>Поля зависимостей(колонка)</label>
-        <select name="dbTable" data-field="dbTables">
-          <option value="">пока пусто</option>
-        </select>
+        <select name="tableCol" data-field="tableCol"></select>
+      </div>
+      <div class="d-flex justify-content-between">
+        <label>Множественный</label>
+        <input type="checkbox" name="multiple" value="true">
       </div>
     </div>
     </div>

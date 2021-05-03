@@ -17,8 +17,8 @@ define('VIEW', CORE . 'views/');
 define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
 define('CORE_SCRIPT', SITE_PATH . CORE . 'assets/js/');
 
-define('SETTINGS_PATH', ABS_SITE_PATH . 'public/settingSave.json');
-define('SYSTEM_PATH', ABS_SITE_PATH . 'public/system.php');
+define('SETTINGS_PATH', ABS_SITE_PATH . 'shared/settingSave.json');
+define('SYSTEM_PATH', ABS_SITE_PATH . 'shared/system.php');
 
 !$publicConfig['PUBLIC_PAGE'] && define('ONLY_LOGIN', true);
 

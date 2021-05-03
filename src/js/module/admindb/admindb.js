@@ -39,6 +39,7 @@ export const admindb = {
     this.btnSave = f.qS('#btnSave');
     this.btnAddMore = f.qS('#btnAddMore');
     this.btnRefresh = f.qS('#btnRefresh');
+    this.viewsField = f.qS('#viewField');
 
     this.tableName = new URLSearchParams(location.search).get('tableName') || '';
     this.loaderTable = new f.LoaderIcon(this.mainNode, false, true, {small: false});

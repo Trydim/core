@@ -72,6 +72,12 @@ const m = {
   observer: new module.Observer(),
 
   CustomSelect: CustomSelect,
+
+  /**
+   * @param name {string}
+   * @param func {function}
+   */
+  OneTimeFunction: module.OneTimeFunction,
 };
 
 window.f = Object.assign(c, m, f);

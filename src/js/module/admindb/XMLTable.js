@@ -75,11 +75,15 @@ class Rows {
         form.querySelector('[name="listItems"]').value = JSON.parse(attr.values).join('\r\n');
         break;
       case 'relationTable':
+        form.querySelector('[name="dbTable"]').value = attr.dbTable;
+        form.querySelector('[name="tableCol"]').value = attr.tableCol;
+        form.querySelector('[name="multiple"]').checked = !!attr.multiple;
         break;
       case 'checkbox':
         form.querySelector('[name="relTarget"]').value = attr['relTarget'] || '';
         form.querySelector('[name="relativeWay"]').value = attr['relativeWay'] || '';
         break;
+      case 'textarea': break;
     }
 
     XMLTable.M.btnField.querySelector('.confirmYes').onclick = () => this.confirmChangeParam();
@@ -89,11 +93,9 @@ class Rows {
   confirmChangeParam() {
     const index = this.editParamIndex,
           form = new FormData(XMLTable.editParamNode),
-          attr = this.rowParam[index]['@attributes'];
+          attr = Object.create(null);
 
-    // Может удалить все значения?
     attr.type = form.get('type');
-
     switch (attr.type) {
       default:
       case 'color':
@@ -107,13 +109,18 @@ class Rows {
         attr.values = JSON.stringify(form.get('listItems').replaceAll('\r', '').split('\n'));
         break;
       case 'relationTable':
+        attr.dbTable = form.get('dbTable');
+        attr.tableCol = form.get('tableCol');
+        form.get('multiple') && (attr.multiple = true);
         break;
       case 'checkbox':
         attr['relTarget'] = form.get('relTarget');
         attr['relativeWay'] = form.get('relativeWay');
         break;
+      case 'textarea': break;
     }
 
+    this.rowParam[index]['@attributes'] = attr;
     this.render();
     XMLTable.enableBtnSave();
   }
@@ -140,10 +147,10 @@ export const XMLTable = {
       this.onEventEdit();
     }
 
-
     this.rows = this.queryResult['XMLValues'].row;
     this.XMLInit();
 
+    this.onceFunc = new f.OneTimeFunction('loadTables', this.loaderTables.bind(this));
     this.onEvent();
   },
   setStyle() {
@@ -159,6 +166,45 @@ export const XMLTable = {
 
     f.eraseNode(this.mainNode).append(div);
   },
+
+  loaderTables() {
+    let data = new FormData();
+
+    data.set('mode', 'DB');
+    data.set('dbAction', 'tables');
+
+    f.Post({data}).then(data => {
+      data['csvFiles'] && this.setLoadedTablesList(data['csvFiles'])
+    });
+  },
+  setLoadedTablesList(data) {
+    const flat = (d, link = '') => {
+      link && (link = '/' + link);
+      return Object.entries(d).reduce((r, [i, item]) => {
+        r += isFinite(+i) ? `<option value="${link + '/' + item.fileName}">${item.name}</option>`
+                          : flat(item, i + link);
+        return r;
+      }, '');
+    }
+
+    let html = flat(data),
+        node = this.editParamNode.querySelector('[data-field="dbTables"]');
+    node.innerHTML = html;
+    node.click();
+  },
+  setLoadedTable(data) {
+    let html = '',
+        col = data[0].length;
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < col; j++) {
+        data[i][j] && (html += `<option value="${data[i][j]}">${data[i][j]}</option>`);
+      }
+    }
+
+    this.editParamNode.querySelector('[data-field="tableCol"]').innerHTML = html;
+  },
+
 
   // Event function
   //--------------------------------------------------------------------------------------------------------------------
@@ -200,25 +246,25 @@ export const XMLTable = {
 
     const select = {
       'selectChange': () => this.changeSelectType(target),
+      'selectDbTables': () => this.changeSelectTables(target),
     }
 
     select[action] && select[action]();
   },
   changeSelectType(target) {
     if (target.value !== 'relationTable') return;
-
-    let data = new FormData();
-
+    this.onceFunc.exec('loadTables');
+  },
+  changeSelectTables(target) {
+    const data = new FormData();
     data.set('mode', 'DB');
-    data.set('dbAction', 'tables');
+    data.set('dbAction', 'showTable');
+    data.set('tableName', target.value);
 
     f.Post({data}).then(data => {
-      if (data['csvFiles']) {
-        // заполнить список файлов удалить прекратить эту загрузку
-      }
+      data['csvValues'] && this.setLoadedTable(data['csvValues']);
     });
   },
-
 
   // Event bind
   //--------------------------------------------------------------------------------------------------------------------
