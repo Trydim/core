@@ -148,6 +148,7 @@ export const admindb = {
     if (this.btnSaveEnable) {
       this.btnSave.setAttribute('disabled', 'disabled');
       this.btnSaveEnable = false;
+      this.handsontable.tableChanged = false;
       this.disWindowReload();
     }
   },

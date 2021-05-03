@@ -23,7 +23,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $columns = [];
   if ($dbTable) {
     USE_DATABASE && $columns = $db->getColumnsTable($dbTable);
-    $db->setCsvTable($dbTable);
+    $db->setCsvTable(substr($dbTable, 1));
   }
 
   $pageNumber = isset($currPage) ? $currPage : 0;

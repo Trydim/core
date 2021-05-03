@@ -72,7 +72,7 @@ class Rows {
         form.querySelector('[name="step"]').value = attr.step || 1;
         break;
       case 'simpleList':
-        attr.values = JSON.stringify(form.get('listItems').replaceAll('\r', '').split('\n'));
+        form.querySelector('[name="listItems"]').value = JSON.parse(attr.values).join('\r\n');
         break;
       case 'relationTable':
         break;

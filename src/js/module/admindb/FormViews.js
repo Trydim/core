@@ -121,7 +121,11 @@ export const FormViews = {
           node.dataset.input = input.name;
           break;
         case 'simpleList':
-          input.innerHTML = JSON.parse(paramAttr.values).map(i => `<option value="${i}">${i}</option>`);
+          let value = JSON.parse(paramAttr.values);
+          input.innerHTML = value.map(i => {
+            let [k, v] = i.includes('=') ? i.split('=') : [i, i];
+            return `<option value="${k}">${v}</option>`;
+          });
           break;
         case 'relationTable':
           break;
@@ -170,7 +174,7 @@ export const FormViews = {
 
     form.querySelectorAll('button.inputChange').forEach(n => n.addEventListener('click', inputBtnChangeClick));
     form.querySelectorAll('input[type="number"]').forEach(n => n.addEventListener('blur', inputBlur));
-    form.querySelectorAll('input').forEach(n => n.addEventListener('change', (e) => this.changeInputForm(e)));
+    form.querySelectorAll('input, select, textarea').forEach(n => n.addEventListener('change', (e) => this.changeInputForm(e)));
     //form.addEventListener('change', (e) => this.changeInputForm(e));
     this.mainNode.append(form);
     // Пока любой клик

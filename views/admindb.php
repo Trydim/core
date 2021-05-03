@@ -1,5 +1,9 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var $main {object} - global
+ */
+
 if (!DB_TABLE_IN_SIDEMENU) { // Если таблицы не в подменю
   $field['sideRight'] = <<<sideRight
 <ul id="DBTablesWrap"></ul>
@@ -45,9 +49,7 @@ main;
 
 $field['footerContent'] = <<<temp
 <template id="FormViesTmp">
-  <form action="#">
-    
-  </form>
+  <form action="#"></form>
 </template>
 <template id="FormRowTmp">
   <div class="d-flex justify-content-between">
@@ -151,7 +153,8 @@ $field['footerContent'] = <<<temp
     </div>
     <div class="d-flex flex-column simpleList">
       <p>В каждой строке 1 значение!</p>
-      <div class="d-flex justify-center">
+      <p>ключ=значение.</p>
+      <div class="d-fle x justify-center">
         <textarea name="listItems" cols="30" rows="5"></textarea>
       </div>  
     </div>
