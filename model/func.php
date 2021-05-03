@@ -5,10 +5,10 @@
  * @param int $die
  */
 function de($var, $die = 1) {
-	echo '<pre>';
-	var_dump($var);
-	echo '</pre>';
-	if($die) die();
+  echo '<pre>';
+  var_dump($var);
+  echo '</pre>';
+  if ($die) die();
 }
 
 /**
@@ -29,7 +29,7 @@ function addCpNumber($number, $reportVal) {
  * @return bool - true if error no
  */
 function checkError($var) {
-	return !( (is_array($var) && count($var)) || (is_string($var) && mb_strlen($var)) );
+  return !((is_array($var) && count($var)) || (is_string($var) && mb_strlen($var)));
 }
 
 /**
@@ -42,7 +42,7 @@ function checkAccess($target) {
   global $main;
   if (in_array($target, ['login', 'setting'])
       || (in_array($target, array_merge([HOME_PAGE], ACCESS_MENU))
-      && in_array($target, $main->getSideMenu()))) return $target;
+          && in_array($target, $main->getSideMenu()))) return $target;
   $target = $main->checkStatus('no') ? 'login' : $main->getSideMenu(true);
   reDirect(false, $target);
   die;
@@ -74,15 +74,15 @@ function reDirect($status, $target = '') {
  */
 function checkTemplate($tmpFile) {
   if ($tmpFile === 'public' && PUBLIC_PAGE
-      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE .".php")) {
+      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . ".php")) {
     return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
   } else if (file_exists(VIEW . "$tmpFile.php")) {
-		return VIEW . "$tmpFile.php";
-	} else if (file_exists(VIEW . $tmpFile . "/$tmpFile.php")) {
-		return VIEW . $tmpFile . "/$tmpFile.php";
-	} else {
-		return VIEW . '404.php';
-	}
+    return VIEW . "$tmpFile.php";
+  } else if (file_exists(VIEW . $tmpFile . "/$tmpFile.php")) {
+    return VIEW . $tmpFile . "/$tmpFile.php";
+  } else {
+    return VIEW . '404.php';
+  }
 }
 
 /**
@@ -91,8 +91,8 @@ function checkTemplate($tmpFile) {
  * @return mixed|string
  */
 function getTargetPage($get) {
-	return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage'])
-                                   : (OUTSIDE ? 'public' : '');
+  return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage'])
+    : (OUTSIDE ? 'public' : '');
 }
 
 /**
@@ -103,8 +103,8 @@ function getTargetPage($get) {
  * @return string
  */
 function template($path = 'base', $vars = []) {
-	extract($vars);
-	ob_start();
+  extract($vars);
+  ob_start();
   if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {
     include(ABS_SITE_PATH . 'public/views/' . "$path.php");
   } else if (file_exists(ABS_SITE_PATH . VIEW . "$path.php")) { // TODO два раза с нижним условием?
@@ -113,7 +113,7 @@ function template($path = 'base', $vars = []) {
     include(VIEW . "$path.php");
   }
 
-	return ob_get_clean();
+  return ob_get_clean();
 }
 
 /**
@@ -127,30 +127,30 @@ function template($path = 'base', $vars = []) {
  * @return integer or string - int: return index of position keyword in array
  */
 function findword($input, $cell, $inCharset = 'windows-1251', $index = false) {
-	$input        = mb_strtolower($input, 'UTF-8');
-	$shortest     = -1;
-	$gc           = false;
-	$nearest_word = null;
-	$limit        = getLimitLevenshtein($input); // Порог прохождения
-	foreach ($cell as $key => $item) {
-		$word = trim(mb_strtolower(iconv($inCharset, 'UTF-8', $item), 'UTF-8'));
-		$lev  = levenshtein($input, $word);
-		if ($lev === 0) {
-			$gc           = $key;
-			$nearest_word = $word;
-			break;
-		}
-		if ($lev < $limit && ($lev <= $shortest || $shortest < 0)) {
-			$gc           = $key;
-			$shortest     = $lev;
-			$nearest_word = $word;
-		}
-	}
-	if ($index) {
-		return $nearest_word;
-	}
+  $input = mb_strtolower($input, 'UTF-8');
+  $shortest = -1;
+  $gc = false;
+  $nearest_word = null;
+  $limit = getLimitLevenshtein($input); // Порог прохождения
+  foreach ($cell as $key => $item) {
+    $word = trim(mb_strtolower(iconv($inCharset, 'UTF-8', $item), 'UTF-8'));
+    $lev = levenshtein($input, $word);
+    if ($lev === 0) {
+      $gc = $key;
+      $nearest_word = $word;
+      break;
+    }
+    if ($lev < $limit && ($lev <= $shortest || $shortest < 0)) {
+      $gc = $key;
+      $shortest = $lev;
+      $nearest_word = $word;
+    }
+  }
+  if ($index) {
+    return $nearest_word;
+  }
 
-	return $gc;
+  return $gc;
 }
 
 /**
@@ -162,15 +162,15 @@ function findword($input, $cell, $inCharset = 'windows-1251', $index = false) {
  * @return string - keys or false
  */
 function findkey($cell, $input) {
-	$count = count($input); // теперь всегда 1
-	$input = '/(' . implode('|', $input) . ')/i';
-	foreach ($cell as $key => $item) {
-		if (preg_match_all($input, $key) === $count) {
-			return $key;
-		}
-	}
+  $count = count($input); // теперь всегда 1
+  $input = '/(' . implode('|', $input) . ')/i';
+  foreach ($cell as $key => $item) {
+    if (preg_match_all($input, $key) === $count) {
+      return $key;
+    }
+  }
 
-	return false;
+  return false;
 }
 
 /**
@@ -183,58 +183,58 @@ function findkey($cell, $input) {
  * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
-	//$filename = str_replace('/', '//', PATH_CSV . $filename); // Зачем это
-	$filename = PATH_CSV . $filename;
+  //$filename = str_replace('/', '//', PATH_CSV . $filename); // Зачем это
+  $filename = PATH_CSV . $filename;
   $result = [];
 
   if (!count($dict)) return loadFullCVS($filename);
 
-	if (($handle = fopen($filename, "r")) !== false) {
-		if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
-			$keyIndex = [];
+  if (($handle = fopen($filename, "r")) !== false) {
+    if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
+      $keyIndex = [];
 
       $inCharset = 'UTF-8'; //mb_detect_encoding(, ['windows-1251', 'UTF-8'], true);
 
-			foreach ($dict as $key => $word) {
-				$bool = is_array($word);
-				$keyWord = $bool ? $word[0] : $word;
-				$i = findword($keyWord, $data, $inCharset);
-				if ($i !== false) {
-					if($bool) $keyIndex[$key] = [$i, $word[1]];
-					else $keyIndex[$key] = $i;
-				}
-			}
-			if ($one_rang) {
+      foreach ($dict as $key => $word) {
+        $bool = is_array($word);
+        $keyWord = $bool ? $word[0] : $word;
+        $i = findword($keyWord, $data, $inCharset);
+        if ($i !== false) {
+          if ($bool) $keyIndex[$key] = [$i, $word[1]];
+          else $keyIndex[$key] = $i;
+        }
+      }
+      if ($one_rang) {
 
-				foreach ($keyIndex as $item) {
-				  $addpos = function ($data) use ($item) { return $data[$item]; };
-				}
+        foreach ($keyIndex as $item) {
+          $addpos = function ($data) use ($item) { return $data[$item]; };
+        }
 
-			} else {
+      } else {
 
-				$addpos = function ($data) use ($keyIndex, $inCharset) {
-					$arr = [];
-					foreach ($keyIndex as $key => $item) {
-						if (is_array($item)) {
-							$arr[$key] = trim(iconv($inCharset, 'UTF-8', $data[$item[0]]));
-							$arr[$key] = convert($item[1], $arr[$key]);
-						} else $arr[$key] = trim(iconv($inCharset, 'UTF-8', $data[$item]));
-					}
-					return $arr;
-				};
+        $addpos = function ($data) use ($keyIndex, $inCharset) {
+          $arr = [];
+          foreach ($keyIndex as $key => $item) {
+            if (is_array($item)) {
+              $arr[$key] = trim(iconv($inCharset, 'UTF-8', $data[$item[0]]));
+              $arr[$key] = convert($item[1], $arr[$key]);
+            } else $arr[$key] = trim(iconv($inCharset, 'UTF-8', $data[$item]));
+          }
+          return $arr;
+        };
 
-			}
+      }
 
-			while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER)) !== false) {
-				$result[] = $addpos($data);
-			}
-		}
-		fclose($handle);
-	} else {
-		return false; //файла нет
-	}
+      while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER)) !== false) {
+        $result[] = $addpos($data);
+      }
+    }
+    fclose($handle);
+  } else {
+    return false; //файла нет
+  }
 
-	return $result;
+  return $result;
 }
 
 /**
@@ -250,16 +250,17 @@ function loadFullCVS($path) {
     $emptyRow = 0;
     while ($emptyRow < 5) { // Пять пустрых строк характеристик считаем что больше нету
       if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
-        if (!mb_strlen(implode('', $data))) { $emptyRow++; continue; }
+        if (!mb_strlen(implode('', $data))) {
+          $emptyRow++;
+          continue;
+        }
         if ($emptyRow > 0) $emptyRow = 0;
 
         $result[] = $data;
-      }
-      else $emptyRow++;
+      } else $emptyRow++;
     }
     fclose($handle);
-  }
-  else return false;
+  } else return false;
 
   return $result;
 }
@@ -270,19 +271,23 @@ function loadFullCVS($path) {
  * @return false|float|int
  */
 function getLimitLevenshtein($word) {
-	if (iconv_strlen($word) <= 3) {
-		return iconv_strlen($word);
-	}
+  if (iconv_strlen($word) <= 3) {
+    return iconv_strlen($word);
+  }
 
-	return ceil(iconv_strlen($word) / 2);
+  return ceil(iconv_strlen($word) / 2);
 }
 
 function convert($type, $value) {
-	switch ($type) {
-		case 'int': case 'integer': return floor((integer) $value);
-		case 'float': case 'double': return floatval(str_replace(',', '.', $value));
-	}
-	return $value;
+  switch ($type) {
+    case 'int':
+    case 'integer':
+      return floor((integer)$value);
+    case 'float':
+    case 'double':
+      return floatval(str_replace(',', '.', $value));
+  }
+  return $value;
 }
 
 /**
@@ -309,12 +314,11 @@ function setUserLocale($lang = 'ru_RU') {
   putenv('LANGUAGE=ru_RU.UTF8');
   setlocale(LC_ALL, $lang . '.UTF8');
 
-  // TODO разобраться
   //putenv('LC_MESSAGES='.$locale);
   //setlocale(LC_MESSAGES, $locale);
 
   bindtextdomain($lang, './lang');
-  textdomain( $lang );
+  textdomain($lang);
 }
 
 function gTxt($str) {

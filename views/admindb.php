@@ -1,5 +1,9 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var $main {object} - global
+ */
+
 if (!DB_TABLE_IN_SIDEMENU) { // Если таблицы не в подменю
   $field['sideRight'] = <<<sideRight
 <ul id="DBTablesWrap"></ul>
@@ -37,6 +41,7 @@ $field['content'] = <<<main
   <div id="btnField">
     <input type="button" class="btn btn-primary d-none" value="Добавить" id="btnAddMore">
     <input type="button" class="btn btn-primary" value="Сохранить" id="btnSave" disabled>
+    <input type="button" class="btn btn-primary d-none" value="Обновить Конфиг" id="btnRefresh">
   </div>
 </div>
 <div id="insertToDB" style="min-height: 100px"></div>
@@ -44,34 +49,32 @@ main;
 
 $field['footerContent'] = <<<temp
 <template id="FormViesTmp">
-  <form action="#">
-    
-  </form>
+  <form action="#"></form>
 </template>
 <template id="FormRowTmp">
   <div class="d-flex justify-content-between">
-    <p data-field="description"></p>
-    <div data-field="params" class="d-flex justify-content-around"></div>
+    <p data-field="description" style="width: 30%"></p>
+    <div data-field="params" class="d-flex justify-content-around" style="width: 70%"></div>
   </div>
 </template>
 <template id="FormParamTmp">
   <section>
-    <div data-type="string">
-      <input type="text">
+    <div data-type="string" class="w-100 text-center">
+      <input type="text" class="w-90">
     </div>
-    <div data-type="number">
-      <button type="button" class="inputChange" data-change="-1" data-input="width">-</button>
-      <input type="number" class="" name="width">
-      <button type="button" class="inputChange" data-change="1" data-input="width">+</button>
+    <div data-type="number" class="w-100 text-center">
+      <button type="button" class="w-10 inputChange actionMinus">-</button>
+      <input type="number" class="w-70" name="number">
+      <button type="button" class="w-10 inputChange actionPlus">+</button>
     </div>
-    <div data-type="select">
-      <select name="" id=""></select>
+    <div data-type="simpleList" class="w-100 text-center">
+      <select name="" id="" class="w-90"></select>
     </div>
-    <div data-type="checkbox">
-      <input type="checkbox">
+    <div data-type="checkbox" class="w-100 text-center">
+      <input type="checkbox" class="w-90">
     </div>
-    <div data-type="color">
-      <input type="color">
+    <div data-type="color" class="w-100 text-center">
+      <input type="color" class="w-90">
     </div>
   </section>
 </template>
@@ -133,10 +136,11 @@ $field['footerContent'] = <<<temp
     <div data-field="setting" class="d-flex flex-column">
     <div class="d-flex w-100">
       <label>Тип:
-        <select class="useToggleOption" name="type">
+        <select class="useToggleOption" name="type" data-action="selectChange">
           <option value="string" data-target="">Строка</option>
           <option value="number" data-target="typeNumber">Число</option>
-          <option value="select" data-target="typeSelect">Список</option>
+          <option value="simpleList" data-target="simpleList">Простой Список</option>
+          <option value="relationTable" data-target="relationTable">Справочник</option>
           <option value="checkbox" data-target="typeCheckbox">Чекбокс</option>
           <option value="color" data-target="">Цвет</option>
         </select>
@@ -147,12 +151,27 @@ $field['footerContent'] = <<<temp
       <label>максимум<input type="number" value="1000000000" name="max"></label>
       <label>шаг<input type="number" value="1" name="step"></label>
     </div>
-    <div class="d-flex flex-column typeSelect">
-      <div class="d-flex justify-center">
-        <input type="button" value="+" data-action="add"> 
-        <input type="button" value="-" data-action="remove">
+    <div class="d-flex flex-column simpleList">
+      <p>В каждой строке 1 значение!</p>
+      <p>ключ=значение.</p>
+      <div class="d-fle x justify-center">
+        <textarea name="listItems" cols="30" rows="5"></textarea>
+      </div>  
+    </div>
+    <div class="relationTable">
+      <div class="d-flex justify-content-between">
+        <label>Таблица (файл)</label>
+        <select name="dbTable" data-field="dbTables">
+          <option value="">пока пусто</option>
+        </select>
       </div>
-      <div class="d-flex flex-column" data-field="option"></div>
+      <div class="d-flex justify-content-between">
+        <label>Поля зависимостей(колонка)</label>
+        <select name="dbTable" data-field="dbTables">
+          <option value="">пока пусто</option>
+        </select>
+      </div>
+    </div>
     </div>
     <div class="d-flex flex-column typeCheckbox">
       <label>Зависимое поле<input type="text" placeholder="ID зависимого поля" name="relTarget"></label>

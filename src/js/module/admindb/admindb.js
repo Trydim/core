@@ -4,6 +4,8 @@ import '../../../css/module/admindb/handsontable.full.min.css';
 import {Handsontable} from './handsontable.full.min.js';
 import {handson} from "./handsontable.option";
 
+import {XMLTable} from './XMLTable.js';
+import {FormViews} from './FormViews.js';
 
 /*const createRow = (innerHTML) => {
   let tr = document.createElement('tr');
@@ -19,12 +21,13 @@ import {handson} from "./handsontable.option";
  */
 const eraseTemplate = (tmpString) => tmpString.replace(/\$\{.+?\}/g, '');
 
+/* Проверка файла перед добавлением (не знаю что хотел проверить)
 const checkAddedFile = function (e) {
   let input = e.target;
   if (!input.value.includes('csv')) {
     //return;
   }
-}
+}*/
 
 export const admindb = {
   action     : '',
@@ -35,6 +38,7 @@ export const admindb = {
     this.btnField = f.qS('#btnField');
     this.btnSave = f.qS('#btnSave');
     this.btnAddMore = f.qS('#btnAddMore');
+    this.btnRefresh = f.qS('#btnRefresh');
 
     this.tableName = new URLSearchParams(location.search).get('tableName') || '';
     this.loaderTable = new f.LoaderIcon(this.mainNode, false, true, {small: false});
@@ -56,18 +60,16 @@ export const admindb = {
         this.queryResult = data;
         this.setTableName();
         f.eraseNode(this.mainNode);
+        this.handsontable && (this.handsontable.destroyEditor());
         if (data['csvValues'] && data['XMLValues']) {
           FormViews.init();
         } else if (data['dbValues']) {
-          this.handsontable && (this.handsontable.destroyEditor());
           this.showDbTable();
           TableValues.setData();
-          TableValues.tableType = 'db';
-          TableValues.init();
+          TableValues.init('db');
         } else if (data['csvValues']) {
           this.showCsvTable();
-          TableValues.tableType = 'csv';
-          TableValues.init();
+          TableValues.init('csv');
         } else if (data['XMLValues']) {
           XMLTable.init();
         }
@@ -136,6 +138,7 @@ export const admindb = {
     }));
 
     this.handsontable.updateSettings(handson.context);
+    this.handsontable.admindb = this;
   },
 
   checkBtnSave() {
@@ -145,13 +148,26 @@ export const admindb = {
     if (this.btnSaveEnable) {
       this.btnSave.setAttribute('disabled', 'disabled');
       this.btnSaveEnable = false;
+      this.handsontable.tableChanged = false;
+      this.disWindowReload();
     }
   },
   enableBtnSave() {
     if (!this.btnSaveEnable) {
       this.btnSave.removeAttribute('disabled');
       this.btnSaveEnable = true;
+      this.onWindowReload();
     }
+  },
+
+  checkSavedTableChange(e) {
+    if (this.btnSaveEnable && !confirm('Изменения будут потеряны, продолжить?')) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+    return true;
   },
 
   // DB event function
@@ -169,7 +185,7 @@ export const admindb = {
         action = target.dataset.action;
 
     let select = {
-      'adminType': () => this.changeAdminType(target),
+      'adminType': () => this.checkSavedTableChange(e) && this.changeAdminType(target),
     }
 
     select[action] && select[action]();
@@ -177,8 +193,12 @@ export const admindb = {
 
   changeAdminType(target) {
     switch (target.value) {
-      case 'form': this.dbAction('loadFormConfig'); break;
+      case 'form':
+        f.hide(this.btnRefresh);
+        this.dbAction('loadFormConfig');
+        break;
       case 'table':
+        f.hide(this.btnRefresh);
         if(this.tableName === '') {
           f.Get({data: 'mode=load&dbAction=tables'}).then(
             data => this.showTablesName(data),
@@ -188,8 +208,17 @@ export const admindb = {
           this.dbAction('showTable');
         }
         break;
-      case 'config': this.dbAction('loadXmlConfig'); break;
+      case 'config':
+        f.show(this.btnRefresh);
+        this.dbAction('loadXmlConfig');
+        break;
     }
+  },
+
+  clickDocument(e) {
+    let target = e.target,
+        checkedTarget = target.closest('#sideLeft, nav.navbar');
+    checkedTarget && this.checkSavedTableChange(e);
   },
 
   // DB event bind
@@ -211,8 +240,28 @@ export const admindb = {
     this.btnAddMore.addEventListener('click', () => TableValues.addValues());
 
     // Добавлен файл
-    let node = f.qS('#btnAddFileCsv');
-    node && node.addEventListener('change', checkAddedFile);
+    //let node = f.qS('#btnAddFileCsv');
+    //node && node.addEventListener('change', checkAddedFile);
+
+    // Проверка перехода
+    document.onclick = (e) => this.clickDocument(e);
+    f.qA('nav.navbar [data-action]').forEach(n => n.onclick = (e) => this.clickDocument(e));
+  },
+
+  onWindowReload() {
+    window.onbeforeunload = (e) => {
+      if (this.btnSaveEnable) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+      return true;
+    };
+  },
+
+  disWindowReload() {
+    window.onbeforeunload = () => {};
   },
 }
 
@@ -250,7 +299,6 @@ const createBtnCancel = function (tr, lastBtn = false) {
     clearTimeout(timer);
     clearInterval(int);
   });
-
   btn.addEventListener('clickSave', () => eventCancelDelete());
 
   return btn;
@@ -269,10 +317,10 @@ const TableValues = {
     return this.tableRowTemplate.cloneNode(true);
   },
 
-  init() {
+  init(tableType) {
     if(!this.btnCancelTmp) this.btnCancelTmp = f.qS('#btnDelCancel').content.children[0];
 
-    if(this.tableType === 'db') {
+    if(tableType === 'db') {
       this.added   = Object.create(null);
       this.changed = Object.create(null);
       this.deleted = new Set();
@@ -280,9 +328,9 @@ const TableValues = {
       f.show(this.btnAddMore);
       this.onSave(this.save);
     } else {
-      this.enableBtnSave();
       this.onSave(this.saveCsv);
     }
+    admindb.disableBtnSave();
   },
   setStyle() {
     document.body.style.overflow = 'hidden';
@@ -469,8 +517,7 @@ const TableValues = {
       data.set('deleted', JSON.stringify(del));
 
     admindb.query(data).then(data => {
-      this.disableBtnSave();
-      this.init();
+      this.init('db');
 
       if (data.hasOwnProperty('notAllowed') && data['notAllowed'].length) {
         let html = '';
@@ -503,7 +550,7 @@ const TableValues = {
     admindb.query(data).then(data => {
       f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
       f.removeLoading(e.target);
-      TableValues.init();
+      TableValues.init('csv');
     });
   },
 
@@ -520,355 +567,6 @@ const TableValues = {
   onSave(func) {
     // Сохранить изменения.
     this.btnSave.onclick = (e) => func.call(this, e);
-  }
-}
-
-class Rows {
-  constructor(row, rowNode, paramNode) {
-    this.row = row;
-    this.rowNode = rowNode;
-    this.paramNode = paramNode;
-
-    this.setParam();
-    this.setTemplate();
-    this.onEvent();
-
-    return this;
-  }
-
-  setParam() {
-    this.attr = this.row['@attributes'];
-    this.rowParam = this.row.params.param.length ? this.row.params.param : [this.row.params.param];
-  }
-
-  setTemplate() {
-    this.rowNode.querySelector('[data-field="desc"]').innerHTML = this.row.description;
-    this.rowNode.querySelector('[data-field="id"]').innerHTML = `(${this.row['@attributes'].id})`;
-
-    this.params = [];
-    this.rowParam.forEach(([index, param]) => {
-      const paramItem = this.paramNode.cloneNode(true);
-      paramItem.querySelector('[data-field="key"]').innerHTML = param.key;
-      paramItem.querySelector('[data-field="type"]').innerHTML = _(param['@attributes'].type);
-      paramItem.dataset.index = index.toString();
-      this.params.push(paramItem);
-      //Object.entries(param['@attributes']).forEach(([k, v]) => { param.dataset[k] = v });
-    })
-
-    f.eraseNode(this.rowNode.querySelector('[data-field="params"]')).append(...this.params);
-  }
-
-  // Event function
-
-  onEvent() {
-    this.rowNode.onclick = (e) => this.commonClick(e);
-  }
-
-  commonClick(e) {
-    let target = e.target,
-        action = target.dataset.field || target.dataset.action;
-
-    const select = {
-      'editField': () => this.clickEditField(target),
-    }
-
-    select[action] && select[action]();
-  }
-
-  clickEditField(target) {
-    const index = target.closest('[data-index]').dataset.index,
-          form = XMLTable.editParamTmp,
-          param = this.rowParam[index],
-          attr = param['@attributes'];
-
-    this.editParamIndex = index;
-    let node = form.querySelector('[name="type"]');
-    node.value = attr.type;
-    node.dispatchEvent(new Event('change'));
-
-    switch (attr.type) {
-      default:
-      case 'string': break;
-      case 'number':
-        form.querySelector('[name="min"]').value = attr.min || 0;
-        form.querySelector('[name="max"]').value = attr.max || 1000000000;
-        form.querySelector('[name="step"]').value = attr.step || 1;
-        break;
-      case 'select':
-
-        break;
-      case 'checkbox':
-        form.querySelector('[name="relTarget"]').value = attr['relTarget'] || '';
-        form.querySelector('[name="relativeWay"]').value = attr['relativeWay'] || '';
-        break;
-    }
-
-    XMLTable.M.btnField.querySelector('.confirmYes').onclick = () => this.confirmChangeParam();
-    XMLTable.M.show(_('EditParam') + ' ' + param.key, form);
-  }
-
-  confirmChangeParam() {
-    const index = this.editParamIndex,
-          form = new FormData(XMLTable.editParamTmp),
-          attr = this.rowParam[index]['@attributes'];
-
-    // Может удалить все значения?
-    attr.type = form.get('type');
-
-    switch (attr.type) {
-      default:
-      case 'color':
-      case 'string': break;
-      case 'number':
-        attr.min = form.get('min');
-        attr.max = form.get('max');
-        attr.step = form.get('step');
-        break;
-      case 'select': break;
-      case 'checkbox':
-        attr['relTarget'] = form.get('relTarget');
-        attr['relativeWay'] = form.get('relativeWay');
-        break;
-    }
-
-    this.render();
-    XMLTable.enableBtnSave();
-  }
-
-  render() {
-    this.setTemplate();
-  }
-
-  getRowNode() {
-    return this.rowNode;
-  }
-}
-
-const XMLTable = {
-  init() {
-    this.setStyle();
-    this.M = f.initModal();
-
-    !this.rowTmp && (this.rowTmp = f.gTNode('#rowTemplate'));
-    !this.paramTmp && (this.paramTmp = f.gTNode('#rowParamTemplate'));
-    !this.editParamTmp && (this.editParamTmp = f.gTNode('#editParamModal'));
-    f.relatedOption(this.editParamTmp);
-
-    this.rows = this.queryResult['XMLValues'].row;
-    this.XMLInit();
-
-    this.onSave(this.save);
-  },
-  setStyle() {
-    document.body.style.overflow = 'auto';
-  },
-
-  XMLInit() {
-    const div = document.createElement('div');
-    div.classList.add('d-flex', 'flex-column', 'justify-content-start');
-
-    this.rows = Object.values(this.rows).map(row => new Rows(row, this.rowTmp.cloneNode(true), this.paramTmp.cloneNode(true)));
-    this.rows.forEach(row => div.append(row.getRowNode()))
-
-    this.mainNode.append(div);
-  },
-
-  save() {
-    const data = new FormData();
-
-    data.set('mode', 'DB');
-    data.set('dbAction', 'saveXMLConfig');
-    data.set('tableName', this.tableName);
-
-    let row = this.rows.reduce((r, row) => {r.push(row.row); return r;}, []);
-    data.set('XMLConfig', JSON.stringify({row}));
-
-    f.Post({data}).then(data => {
-      f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
-      this.disableBtnSave();
-    });
-  },
-
-  onSave(func) {
-    this.btnSave.onclick = (e) => func.call(this, e);
-  },
-}
-
-const checkInputValue = (input, value) => {
-  let min = input.getAttribute('min'),
-      max = input.getAttribute('max');
-
-  if (min && value < +min) return +min;
-  if (max && value > +max) return +max;
-
-  return +value;
-}
-
-
-const inputBtnChangeClick = function (e) {
-  e.preventDefault();
-  let targetName = this.getAttribute('data-input'),
-      target     = f.qS('input[name="' + targetName + '"'),
-      change     = this.getAttribute('data-change');
-
-  if (target) {
-    let match    = /[?=\.](\d+)/.exec(change),
-        fixCount = (match && match[1].length) || 0,
-        value    = checkInputValue(target, (+target.value + +change).toFixed(fixCount));
-    target.value = value.toFixed(fixCount);
-    target.dispatchEvent(new Event('change'));
-  }
-};
-
-const inputBlur = function () {
-  this.value = checkInputValue(this, +this.value);
-};
-
-const FormViews = {
-  init() {
-    this.relTarget = Object.create(null);
-
-    this.formN  = f.gTNode('#FormViesTmp');
-    this.rowN   = f.gTNode('#FormRowTmp');
-    this.paramN = f.gTNode('#FormParamTmp');
-
-    this.csv = this.queryResult['csvValues'];
-    this.xml = this.prepareDataXml();
-
-    this.setParam();
-    if (this.cell.id === undefined) f.showMsg('Ключи таблицы не обнаружены', 'error');
-    this.render();
-    this.onEvent();
-  },
-
-  checkRelation(params) {
-     params.forEach(param => {
-       const attr = param['@attributes'],
-             type = attr.type;
-       if (['select', 'checkbox'].includes(type) && attr.relTarget) {
-         this.relTarget[attr.relTarget] = attr.relativeWay;
-       }
-     })
-  },
-  checkValue(value) {
-    return !(value === '0' || !value);
-  },
-
-  prepareDataXml() {
-    return Object.values(this.queryResult['XMLValues'].row).reduce((r, row) => {
-      const id = row['@attributes'].id;
-      row.params = Object.values(row.params.param);
-      this.checkRelation(row.params);
-      r[id] = row;
-      return r;
-    }, {});
-  },
-  // Определение индексов столбцов по их назначению this.cell
-  setParam() {
-    const params = Object.values(this.xml)[0].params;
-    this.cell = Object.create(null);
-
-    for (let i = 0; i < 3; i++) {
-      this.csv[i].forEach((cell, i) => {
-        if (cell.match(/(id|key)/i)) this.cell.id = i;
-        else {
-          let find = params.find(p => p.key === cell);
-          find && (this.cell[find.key] = i);
-        }
-      });
-
-      if (Object.values(this.cell).length) break;
-    }
-  },
-
-  // Добавление параметров записи
-  setRowParam(rowNode, row, config) {
-    const params = config.params,
-          paramField = rowNode.querySelector('[data-field="params"]'),
-          paramItems = this.paramN;
-
-    if (!params) return;
-
-    params.forEach(param => {
-      let index = this.cell[param.key],
-          paramAttr = param['@attributes'],
-          paramItem = paramItems.querySelector(`[data-type="${paramAttr.type}"]`).cloneNode(true),
-          input = paramItem.querySelector('input, select');
-
-      switch (paramAttr.type) {
-        default:
-        case 'string': break;
-        case 'number':
-          //input.name = param.key; переписать зависимости.
-          input.min = paramAttr.min || 0;
-          input.max = paramAttr.max || 1000000000;
-          input.step = paramAttr.step || 1;
-          break;
-        case 'select': break;
-        case 'checkbox':
-          paramAttr.relTarget && (input.dataset.target = paramAttr.relTarget);
-          input.checked = this.checkValue(row[index]) || false;
-          break;
-      }
-
-      input.dataset.cell = index;
-      input.value = row[index] || '';
-
-      paramField.append(paramItem);
-    });
-  },
-
-  // Сборка и вывод формы
-  render() {
-    let form = this.formN,
-        cell = this.cell;
-
-    this.csv.forEach(row => {
-      const rowNode = this.rowN.cloneNode(true),
-            id = row[cell.id],
-            config = this.xml[id] || false;
-
-      rowNode.id = id;
-
-      this.relTarget[id] && rowNode.classList.add(id);
-
-      if (config) {
-        config.description && (rowNode.querySelector('[data-field="description"]').innerHTML = config.description);
-        this.setRowParam(rowNode, row, config);
-      }
-
-      form.append(rowNode);
-    });
-
-    f.relatedOption(form);
-
-    form.querySelectorAll('button.inputChange').forEach(n => n.addEventListener('click', inputBtnChangeClick));
-    form.querySelectorAll('input[type="number"]').forEach(n => n.addEventListener('blur', inputBlur));
-    this.mainNode.append(form);
-  },
-
-  // DB event function
-  //--------------------------------------------------------------------------------------------------------------------
-
-  save() {
-    const data = new FormData();
-
-    data.set('mode', 'DB');
-    data.set('dbAction', 'saveTable');
-    data.set('tableName', this.tableName);
-    data.set('csvData', JSON.stringify(this.csv));
-
-    f.Post({data}).then(data => {
-      f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
-      this.disableBtnSave();
-    });
-  },
-
-  // DB event bind
-  //--------------------------------------------------------------------------------------------------------------------
-
-  onEvent() {
-    this.btnSave.addEventListener('click', () => this.save());
   }
 }
 

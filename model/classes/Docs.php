@@ -1,11 +1,9 @@
 <?php if (!defined('PDF_LIBRARY')) define('PDF_PDF_LIBRARY', 'mpdf');
 
 /* Папка  для временных файлов */
-define('RESULT_PATH', '/temp/');
+define('RESULT_PATH', 'shared/');
 
 class Docs {
-
-  //private const RESULT_PATH = '/temp/';
 
   // Create name for new pdf file (Work only if DESTINATION=save)
   // if position = 0, then will use not
@@ -102,13 +100,14 @@ class Docs {
     isset($header) && $this->excelHeader = $header;
   }
 
-  private function initPDF() {
+  private function initPdf() {
     require_once CORE . 'model/libs/vendor/autoload.php';
 
     switch (PDF_LIBRARY) {
       case 'mpdf':
         try {
           $this->docs = new Mpdf\Mpdf($this->pdfParam);
+          //$this->pdf->charset_in = 'cp1252';
           //$this->pdf->useOnlyCoreFonts = true;
           //$this->pdf->SetDisplayMode('fullpage');
 

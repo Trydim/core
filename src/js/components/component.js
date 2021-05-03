@@ -820,9 +820,9 @@ export class SortColumns {
 
 // Сохрание заказов посетителей
 export class SaveVisitorsOrder {
-  constructor(cpNumber) {
+  constructor(createCpNumber) {
     this.nodes = [];
-    this.createCpNumber = cpNumber || this.createCpNumberDefault;
+    this.createCpNumber = createCpNumber || this.createCpNumberDefault;
   }
 
   /**
@@ -837,8 +837,13 @@ export class SaveVisitorsOrder {
     const result = Object.create(null);
     collection = this.checkNewNodes(collection);
     collection.forEach(n => {
-      n.addEventListener(event, (e) => {
-        result.cpNumber = this.addOrder(e, report);
+      n.addEventListener(event, async () => {
+        await new Promise((res, err) => {
+          let i = setInterval(() => this.cpNumber && res(this.cpNumber), 0);
+          setTimeout(() => clearInterval(i) && err(''), 1000);
+        });
+        result.cpNumber = this.cpNumber;
+        this.emitAddOrder(report);
       });
     })
     return result;
@@ -854,15 +859,14 @@ export class SaveVisitorsOrder {
     return c.filter(n => !this.nodes.includes(n));
   }
 
-  addOrder(e, report) {
-    console.log('save');
+  addOrder(report) {
+    console.log('saved');
     typeof report === 'function' && (report = report());
 
     // Обязательно проверять есть ли вообще что сохранять
     if (!report || !Object.values(report).length) return;
 
     const data = new FormData();
-    this.cpNumber = this.createCpNumber();
 
     data.set('mode', 'DB');
     data.set('dbAction', 'saveVisitorOrder');
@@ -874,12 +878,17 @@ export class SaveVisitorsOrder {
     q.Post({data});
   }
 
-  /** return Promise use await */
-  async getCpNumber() {
-    return await new Promise((res, err) => {
-      let i = setInterval(() => this.cpNumber && res(this.cpNumber), 50);
+  async emitAddOrder(report) {
+    !this.cpNumber && await new Promise((res, err) => {
+      let i = setInterval(() => this.cpNumber && res(this.cpNumber), 0);
       setTimeout(() => clearInterval(i) && err(''), 1000);
     });
+    setTimeout(() => this.addOrder(report), 0);
+  }
+
+  getCpNumber() {
+    !this.cpNumber && (this.cpNumber = this.createCpNumber());
+    return this.cpNumber;
   }
 }
 

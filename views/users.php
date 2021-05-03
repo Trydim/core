@@ -22,7 +22,7 @@ foreach ($managerField as $k => $item) {
       break;
   }
 
-  $managerFieldHtml .= '<div class="form-group"><label class="w-100">' . $item['name'] . $input .'</label></div>';
+  $managerFieldHtml .= '<div class="form-group managerField"><label class="w-100">' . $item['name'] . $input .'</label></div>';
 }
 
 $field['footerContent'] = <<<footerContent

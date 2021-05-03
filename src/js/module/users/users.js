@@ -188,6 +188,16 @@ export const users = {
           }
         });
 
+        node = form.querySelectorAll('.managerField');
+        if (oneElements) {
+          node.forEach(n => {
+            let input = n.querySelector('input[name]'),
+                name = input.name;
+
+            users[name] && (input.value = users[name]);
+          });
+        } else node.forEach(n => n.remove());
+
         node = form.querySelector('[name="activity"]');
         node.checked = oneElements ? !!(+users['activity']) : true;
 

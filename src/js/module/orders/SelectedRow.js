@@ -45,15 +45,9 @@ export class SelectedRow {
     return this.selectedId[this.dataset.type].size;
   }
 
-  // выбор заказа
-  clickRows(e) {
-    let input = e.target.closest('tr').querySelector('input'),
-        id = input.dataset.id;
-    input !== e.target && (input.checked = !input.checked);
-    input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
-    //this.checkBtnRows();
-    console.log(this.getSelectedList());
-  }
+
+
+
 
   /* Кнопки показать скрыть
    checkBtnRows() {
@@ -72,7 +66,50 @@ export class SelectedRow {
     });
   }
 
+  // Event function
+
+  /*// выбор заказа
+  clickRows(e) {
+    let tr = e.target.closest('tr'),
+        input = tr && tr.querySelector('input'),
+        id = input && input.dataset.id;
+
+    if (!tr || !input || !id) return;
+    input !== e.target && (input.checked = !input.checked);
+    input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
+    //this.checkBtnRows();
+    console.log(this.getSelectedList());
+  }*/
+
+  mouseDown(e) {
+    let tr = e.target.closest('tr');
+    this.startClick = tr && tr.rowIndex;
+  }
+
+  mouseUp(e) {
+    let tr = e.target.closest('tr');
+    if (!tr) return;
+    let finishClick = tr.rowIndex,
+        start = Math.min(this.startClick, finishClick),
+        finish = Math.max(this.startClick, finishClick);
+
+    for (let i = start; i <= finish; i++) {
+      let input = this.table.rows[i].querySelector('input'),
+          id = input && input.dataset.id;
+
+      if (!input || !id) return;
+      input.checked = !input.checked;
+      input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
+    }
+
+    console.log(this.getSelectedList());
+    delete this.startClick;
+  }
+
+  // Bind event
   onTableEvent() {
-    this.table.onclick = (e) => this.clickRows(e);
+    //this.table.onclick = (e) => this.clickRows(e);
+    this.table.addEventListener('mousedown', (e) => this.mouseDown(e));
+    this.table.addEventListener('mouseup', (e) => this.mouseUp(e));
   }
 }

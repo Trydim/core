@@ -17,13 +17,13 @@ isset($tableName) && $dbTable = $tableName;
 
 if ($dbAction === 'tables') { // todo добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
-  $result['csvFiles'] = $db->scanDirCsv();
+  $result['csvFiles'] = $db->scanDirCsv(PATH_CSV);
 } else {
 
   $columns = [];
   if ($dbTable) {
     USE_DATABASE && $columns = $db->getColumnsTable($dbTable);
-    $db->setCsvTable($dbTable);
+    $db->setCsvTable(substr($dbTable, 1));
   }
 
   $pageNumber = isset($currPage) ? $currPage : 0;
@@ -31,7 +31,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $sortDirect = isset($sortDirect) ? $sortDirect === 'true' : false;
 
   switch ($dbAction) {
-    // Table
+    // Tables
     case 'showTable':
       $result['columns'] = $columns;
       if (stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
@@ -58,8 +58,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadCVS': $db->fileForceDownload(); break;
     case 'loadFormConfig':
       if (isset($dbTable)) {
-        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
-        $filePath = PATH_CSV . $fileName . '.xml';
+        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath) && filesize($filePath) > 60) {
           $result['csvValues'] = $db->openCsv();
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -68,18 +67,23 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'saveXMLConfig':
       if (isset($dbTable) && isset($XMLConfig)) {
-        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
-        $result['error'] = Xml::saveXml($fileName, json_decode($XMLConfig, true));
+        $result['error'] = Xml::saveXml($dbTable, json_decode($XMLConfig, true));
       }
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
-        $fileName = pathinfo($dbTable, PATHINFO_FILENAME);
-        $filePath = PATH_CSV . $fileName . '.xml';
+        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath)) {
-          if (filesize($filePath) < 6000) Xml::createXmlDefault($fileName);
+          if (filesize($filePath) < 60) Xml::createXmlDefault($filePath, substr($dbTable, 1));
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
         }
+      }
+      break;
+    case 'refreshXMLConfig':
+      if (isset($dbTable)) {
+        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
+        Xml::createXmlDefault($filePath, substr($dbTable, 1));
+        $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
       }
       break;
 
@@ -394,7 +398,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       $contacts = [];
       foreach ($user as $k => $v) {
-        if (in_array($k, ['login', 'password', 'name', 'permission_id'])) $param['0'][$k] = $v;
+        if (in_array($k, ['login', 'name', 'permission_id'])) $param['0'][$k] = $v;
+        else if ($k === 'password') $param['0'][$k] = password_hash($v, PASSWORD_BCRYPT);
         else $contacts[$k] = $v;
       }
 
@@ -413,8 +418,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $param[$id] = [];
           $contacts = [];
           foreach ($user as $k => $v) {
-            if (in_array($k, ['login', 'password', 'name', 'permission_id'])) $param[$id][$k] = $v;
-            else $contacts[$k] = $v;
+            if (in_array($k, ['login', 'name', 'permission_id'])) $param[$id][$k] = $v;
+            else if ($k !== 'permission_id') $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
         }
