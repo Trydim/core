@@ -365,6 +365,7 @@ const func = {
 
     func.setLoading(target);
 
+    let fileName = report.fileName || false;
     //data.set('dbAction', 'DB');
     data.set('mode', 'docs');
     data.set('docType', 'pdf');
@@ -374,7 +375,7 @@ const func = {
       func.removeLoading(target);
       if (data['pdfBody']) {
         f.saveFile({
-          name: data['name'],
+          name: fileName || data['name'],
           type: 'base64',
           blob: 'data:application/pdf;base64,' + data['pdfBody']
         });

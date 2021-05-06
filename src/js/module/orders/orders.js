@@ -395,7 +395,7 @@ export const orders = {
   },
 
   focusSearch(e) {
-    const dbAction = orders.currentTable === 'order'
+    const dbAction = orders.table.dataset.type === 'order'
                      ? 'loadOrders'
                      : 'loadVisitorOrders';
 

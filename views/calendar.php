@@ -17,7 +17,7 @@ $field['footerContent'] .= <<<footerContent
 		<span>Посл изменения: \${last_edit_date}</span><br>
 		<span>Менеджер: \${name}</span><br>
 		<span>Клиент: \${C.name}</span><br>
-		<span>\${important_value}</span><br>
+		<!--<span>\${important_value}</span><br>-->
 	</div>
 </template>
 <template id="orderBtnTemplate">

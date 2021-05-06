@@ -52,7 +52,7 @@ if (count($_FILES)) {
   $filesArray = $_FILES;
 }
 
-if ($docType !== 'mail') {
+if ($docType && $docType !== 'mail') {
   require_once 'classes/Docs.php';
   $docs = new Docs($docType, $reportVal, isset($fileTpl) ? $$fileTpl : 'default');
 }

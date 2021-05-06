@@ -107,7 +107,7 @@ class Docs {
       case 'mpdf':
         try {
           $this->docs = new Mpdf\Mpdf($this->pdfParam);
-          //$this->pdf->charset_in = 'cp1252';
+          //$this->docs->charset_in = 'cp1252';
           //$this->pdf->useOnlyCoreFonts = true;
           //$this->pdf->SetDisplayMode('fullpage');
 
