@@ -9,9 +9,6 @@ $field = [ 'pageTitle' => 'Пользователи' ];
 
 if (!isset($db)) die('db not defined');
 
-// получить конфиг текущего пользователя
-//$setting = $db->getUserSetting(/*login user*/);
-
 if(!isset($setting)) {
   $columns = $db->loadUsers(0, 1);
 

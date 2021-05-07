@@ -9,7 +9,8 @@ namespace cms;
 trait Authorization {
   private $id, $login, $name;
   private $status = 'no';
-  private $permission = [], $sideMenu = [];
+  private $sideMenu = [];
+  private $admin = true;
 
   /**
    * @param $field
@@ -50,27 +51,12 @@ trait Authorization {
     return $this;
   }
 
-  public function setPermission($permission) {
-    isset($permission['menuAccess']) && $permission['menuAccess'] = explode(',', $permission['menuAccess']);
-    count($permission) && $this->permission = $permission;
-  }
-
-  /**
-   * @param string $key
-   * @return array
-   */
-  public function getPermission($key = '') {
-    if (isset($this->permission[$key])) return $this->permission[$key];
-    if ($key) return ACCESS_MENU;
-    return $this->permission;
-  }
-
   public function setSideMenu() {
-    $this->sideMenu = isset($this->permission['menuAccess'])
-      ? $this->permission['menuAccess']
-      : ACCESS_MENU;
-
-    if (!USE_DATABASE) {
+    if (USE_DATABASE) {
+      $this->sideMenu = isset($this->getSettings('permission')['menuAccess'])
+        ? $this->getSettings('permission')['menuAccess']
+        : ACCESS_MENU;
+    } else {
       $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
       $this->sideMenu = array_filter($this->sideMenu, function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);

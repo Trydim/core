@@ -33,10 +33,8 @@ if ($main->checkStatus('no') && $target !== 'login'
 
 session_abort();
 
-
+// Установка всех параметров для аккаунта
 if ($main->checkStatus('ok') && isset($db)) {
-  // Права доступа для пользователя
-  USE_DATABASE && $main->setPermission($db->getPermissionById($main->getLogin('id')));
   // Меню
   $main->setSideMenu();
 

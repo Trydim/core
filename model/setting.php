@@ -72,10 +72,10 @@ if (isset($setAction)) {
   switch ($setAction) {
     case 'save':
       $usersId = isset($priority) ? $priority : false;
-      $columns = USE_DATABASE ? $db->getColumnsTable('users') : [];
 
       // Change Setting
       if (USE_DATABASE && $usersId) {
+        $columns = $db->getColumnsTable('users');
         $param[$usersId] = [
           'login'         => $login,
           'customization' => $customization,
@@ -84,6 +84,24 @@ if (isset($setAction)) {
         if ($password && $password === $passwordRepeat) $param[$usersId]['password'] = password_hash($password, PASSWORD_BCRYPT);
 
         $result['error'] = $db->insert($columns, 'users', $param, true);
+
+        // Доступы
+        if (isset($permIds)) {
+          $columns = $db->getColumnsTable('permission');
+          $param = [];
+
+          foreach (explode(',', $permIds) as $id) {
+            $param[$id]['access_val'] = [];
+            // Меню
+            if (isset($_REQUEST['permMenuAccess_' . $id])) {
+              $param[$id]['access_val']['menuAccess'] = 'admindb';
+            }
+
+            $param[$id]['access_val'] = json_encode($param[$id]['access_val']);
+          }
+
+          $result['error'] = $db->insert($columns, 'permission', $param, true);
+        }
       } else {
         $password = '123'; // default password
         $hash = '';

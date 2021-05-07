@@ -49,8 +49,10 @@ export const users = {
   fillTable(data) {
     this.contValue || (this.contValue = f.gT('#tableContactsValue'));
     data = data.map(item => {
-      if (item['P.name']) {
-        item['P.name'] = _(item['P.name']);
+      item['P.name'] && (item['P.name'] = _(item['P.name']));
+      if (item['activity']) {
+        item.activityValue = item['activity'] === "1";
+        item['activity'] = item.activityValue ? '+' : '-';
       }
 
       if (item['contacts']) {
@@ -199,7 +201,7 @@ export const users = {
         } else node.forEach(n => n.remove());
 
         node = form.querySelector('[name="activity"]');
-        node.checked = oneElements ? !!(+users['activity']) : true;
+        node.checked = oneElements ? users.activityValue : true;
 
         this.confirmMsg = 'Изменения сохранены';
         this.M.show('Изменение пользователей', form);

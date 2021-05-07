@@ -9,29 +9,29 @@
 $field = [
   'pageTitle' => 'Настройки',
 ];
+$param = [];
+$field['footerContent'] = '';
 
-$setAction = 'load';
-require CORE . 'model/setting.php';
+if ($main->getSettings('admin')) {
+  file_exists(SETTINGS_PATH) && $fileSetting = file_get_contents(SETTINGS_PATH);
 
-$param = [
-  'userId'         => $main->getLogin('id'),
-  'login'          => isset($result['user']['login']) ? $result['user']['login'] : '',
-  'orderMail'      => isset($result['setting']['orderMail']) ? $result['setting']['orderMail'] : '',
-  'orderMailCopy'  => isset($result['setting']['orderMailCopy']) ? $result['setting']['orderMailCopy'] : '',
-];
+  if (USE_DATABASE) {
+    $permissions = $db->loadTable('permission');
+    $permIds = [];
 
-if (USE_DATABASE) {
-  //$setAction = 'loadPermission';
-  //require CORE . 'php/setting.php';
-  $user = $db->getUser($main->getLogin(), 'permission_id, customization');
-  $admin = $user['permission_id'] === '1'; // || strtolower($admin['name']) === 'admin';
-  $customization = json_decode($user['customization'], true);
-  $param['onlyOne'] = isset($customization['onlyOne']);
-} else {
-  $admin = true;
-  $param['onlyOne'] = $main->getSettings('onlyOne');
+    $permissions = array_map(function ($row) use (&$permIds) {
+      $permIds[] = $row['ID'];
+      $row['name'] = gTxt($row['name']);
+      $row['accessVal'] = json_decode($row['access_val'], true);
+      unset($row['access_val']);
+      return $row;
+    }, $permissions);
+
+    $param['permIds'] = implode(',', $permIds);
+    $param['permStatus'] = $permissions;
+    $permissions = json_encode($permissions);
+  }
 }
-$param['admin'] = $admin;
 
 require $pathTarget;
 $html = template('base', $field);

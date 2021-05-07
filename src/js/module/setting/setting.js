@@ -3,10 +3,13 @@
 const getFieldNode = (p, field) => p.querySelector(`[data-field=${field}]`);
 
 export const setting = {
-  mailForm: f.qS('#mailForm'),
-  userForm: f.qS('#userForm'),
-  customForm: f.qS('#customForm'),
-  managerForm: f.qS('#managerForm'),
+  form: {
+    mail: f.qS('#mailForm'),
+    user: f.qS('#userForm'),
+    custom: f.qS('#customForm'),
+    manager: f.qS('#managerForm'),
+    permission: f.qS('#permission'),
+  },
 
   field   : Object.create(null),
   template: Object.create(null),
@@ -24,9 +27,8 @@ export const setting = {
   },
 
   setParam() {
-
-    if (this.managerForm) {
-      this.field.customField = getFieldNode(this.managerForm, 'customField');
+    if (this.form.manager) {
+      this.field.customField = getFieldNode(this.form.manager, 'customField');
       this.template.customField = f.gTNode('#customField');
     }
   },
@@ -43,21 +45,41 @@ export const setting = {
   },
 
   loadSetting() {
-    const node = f.qS('#userSetting'),
-          value = node ? JSON.parse(node.value) : '';
+    let node = f.qS('#userSetting'),
+        value = node ? JSON.parse(node.value) : '';
 
-    if (value) node.remove();
-    else return;
+    if (value) {
+      node.remove();
 
-    if (value['setting'] && value['setting']['managerSetting']) {
-      Object.values(value['setting']['managerSetting']).forEach((v) => {
-        this.addManagerField(v['name'], v['type']);
-      });
+      if (value['managerSetting']) {
+        Object.values(value['managerSetting']).forEach((v) => {
+          this.addManagerField(v['name'], v['type']);
+        });
+      }
+      //value.setting && (value.setting = JSON.parse(value.setting));
+      //value.user.customization && (value.user.customization = JSON.parse(value.user.customization));
     }
-    //value.setting && (value.setting = JSON.parse(value.setting));
-    //value.user.customization && (value.user.customization = JSON.parse(value.user.customization));
-  },
 
+    node = f.qS('#permissionSetting');
+    value = node ? JSON.parse(node.value) : '';
+    if (value) {
+      // todo убрать reduce не надо
+      this.permission = value.reduce((r, item) => {
+        let id = item.ID;
+        delete item.ID;
+
+        if (item['accessVal']['menuAccess']) {
+          let menus = item['accessVal']['menuAccess'].split(','),
+              node = this.form.permission.querySelector(`[name="permMenuAccess_${id}"]`);
+          menus.forEach(menu => {
+            node.querySelector(`[value="${menu}"]`).selected = true;
+          });
+        }
+        r[id] = item;
+        return r;
+      }, {});
+    }
+  },
 
   // bind events
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,10 +115,11 @@ export const setting = {
           customization = Object.create(null),
           setData = (f) => {for (const [k, v] of (new FormData(f)).entries()) form.set(k, v)};
 
-    this.mailForm && setData(this.mailForm);
-    this.customForm && setData(this.customForm);
-    this.userForm && setData(this.userForm);
-    this.managerForm && setData(this.managerForm);
+    this.form.mail && setData(this.form.mail);
+    this.form.custom && setData(this.form.custom);
+    this.form.user && setData(this.form.user);
+    this.form.manager && setData(this.form.manager);
+    this.form.permission && setData(this.form.permission);
 
     // Special field
     form.get('onlyOne') && (customization['onlyOne'] = true);
@@ -124,17 +147,17 @@ export const setting = {
 
   changePassword(e, nodes) {
     let value = [],
-        node = this.userForm.querySelector('[name="password"]');
+        node = this.form.user.querySelector('[name="password"]');
 
     value[0] = node.value;
     if (!value[0]) return;
 
-    node = this.userForm.querySelector('[name="passwordRepeat"]');
+    node = this.form.user.querySelector('[name="passwordRepeat"]');
     value[1] = node.value;
 
     if (!value[1]) return;
 
     if (value[0] !== value[1]) this.errorNode = f.showMsg('Пароли не совпадают', 'error');
     else if (this.errorNode) { this.errorNode.remove(); delete this.errorNode; }
-  }
+  },
 }

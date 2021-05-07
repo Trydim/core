@@ -526,15 +526,6 @@ class Db extends \R {
   // Permission
   //--------------------------------------------------------------------------------------------------------------------
 
-  public function getPermissionById($id) {
-    $permission = $this->selectQuery('permission', ['access_val'], 'ID = ' . $id);
-
-    if (count($permission) === 1) {
-      return json_decode($permission[0]['access_val'], true);
-    }
-    return [];
-  }
-
   // Users
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -583,10 +574,19 @@ class Db extends \R {
    * @return array|null
    */
   public function getUserById($userId) {
-    $result = self::getRow("SELECT * FROM users WHERE ID = :id", [':id' => $userId]);
+    return self::getRow("SELECT * FROM users WHERE ID = :id", [':id' => $userId]);
+  }
 
-    if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
-    return $result;
+  /**
+   * @param $login
+   * @return array|null
+   */
+  public function getUserByLogin($login) {
+    return self::getRow("SELECT hash, password, customization, 
+            p.ID as 'perm_id', p.name as 'perm_name', access_val as 'perm_val'
+            FROM users
+            LEFT JOIN permission p on users.permission_id = p.ID
+            WHERE login = :login", [':login' => $login]);
   }
 
   /**
@@ -659,8 +659,13 @@ class Db extends \R {
   public function checkUserHash($session) {
     global $main;
     if (USE_DATABASE) {
-      $user = self::getRow('SELECT hash, password, customization FROM users WHERE login = :login', [':login' => $session['login']]);
-      $main->setSettings('onlyOne', isset(json_decode($user['customization'])->onlyOne));
+      $user = $this->getUserByLogin($session['login']);
+      count($user) && $userParam = [
+        'onlyOne' => isset(json_decode($user['customization'])->onlyOne),
+        'admin' => $user['perm_id'] === 'admin' || $user['perm_id'] === '1',
+        'customization' => json_decode($user['customization'], true),
+        'permission' => json_decode($user['perm_val'], true),
+      ];
     } else {
       try {
         if (!file_exists(SYSTEM_PATH)) throw new \ErrorException('error');
@@ -675,7 +680,14 @@ class Db extends \R {
         'password' => $value[1],
         'hash' => trim($value[2]),
       ];
+      $userParam = [
+        'onlyOne' => true,
+        'admin' => true,
+      ];
     }
+
+    if (isset($userParam)) foreach ($userParam as $k => $v) $main->setSettings($k, $v);
+
     if (!$main->getSettings('onlyOne') && isset($user['password']) && isset($_SESSION['password'])) {
       $ok = USE_DATABASE ? password_verify($_SESSION['password'], $user['password'])
                          : $_SESSION['password'] === $user['password'];

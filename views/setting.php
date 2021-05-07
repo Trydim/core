@@ -1,6 +1,7 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var $main - global object
  * @var $param - from controller
  * @var $admin - from controller
  */
@@ -14,13 +15,11 @@ sideLeft;*/
 
 $field['content'] = template('parts/settingContent', $param);
 
-if (isset($result)) {
-  $result = json_encode($result);
-  $field['footerContent'] = "<input type='hidden' id='userSetting' value='$result'>";
-}
 
-if ($admin) {
+isset($fileSetting) && $field['footerContent'] .= "<input type='hidden' id='userSetting' value='$fileSetting'>";
+isset($permissions) && $field['footerContent'] .= "<input type='hidden' id='permissionSetting' value='$permissions'>";
+
+if ($main->getSettings('admin')) {
   $field['footerContent'] .= <<<footerContent
-
 footerContent;
 }

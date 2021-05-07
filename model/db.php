@@ -409,7 +409,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'changeUser':
       $usersId = isset($usersId) ? json_decode($usersId) : [];
-      $user = isset($authForm) ? json_decode($authForm, true) : [];
+      $authForm = isset($authForm) ? json_decode($authForm, true) : [];
 
       if (count($usersId)) {
         $param = [];
@@ -417,11 +417,12 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         foreach ($usersId as $id) {
           $param[$id] = [];
           $contacts = [];
-          foreach ($user as $k => $v) {
+          foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permission_id'])) $param[$id][$k] = $v;
             else if ($k !== 'permission_id') $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
+          $param[$id]['activity'] = isset($authForm['activity']) ? '1' : '0';
         }
 
         $result['error'] = $db->insert($columns, 'users', $param, true);
