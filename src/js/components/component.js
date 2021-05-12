@@ -922,9 +922,9 @@ export class OneTimeFunction {
     this.func[name] = func;
   }
 
-  exec(name) {
-    this.func[name] && this.func[name]();
-    this.del(name);
+  exec(name, ...arg) {
+    this.func[name] && this.func[name](...arg);
+    this.func[name] && this.del(name);
   }
 
   del(name) {

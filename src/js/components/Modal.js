@@ -58,6 +58,7 @@ export const Modal = (param = {}) => {
       document.body.style.paddingRight = '16px';
     }
 
+    this.wrap.style.display = 'flex';
     this.wrap.classList.add('active');
     this.window.classList.add('active');
     modal.onEvent();
@@ -68,6 +69,7 @@ export const Modal = (param = {}) => {
     this.window.classList.remove('active');
 
     setTimeout( () => {
+      this.wrap.style.display = 'none';
       document.body.style.overflow = data.bodyOver || 'initial';
       document.body.style.cssText = 'scroll-behavior: initial';
       window.scrollTo(0, data.scrollY);
@@ -77,6 +79,13 @@ export const Modal = (param = {}) => {
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
     }, 300);
     //c.eraseNode(modal.content);
+  }
+
+  modal.destroy = function () {
+    this.hide();
+    this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
+        .forEach(n => n.removeEventListener('click', () => this.hide()));
+    this.wrap.remove();
   }
 
   modal.setTemplate = function () {

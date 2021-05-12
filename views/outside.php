@@ -23,7 +23,8 @@ array_map(function($item) use (&$cssLinksArr, $inline) {
   if ($inline) {
     $global = '';
     if (stripos($item, 'global') !== false) $global = 'data-global="true"';
-    $cssLinksArr .= "<link rel=\"stylesheet\" $global data-href=\"$item\">";
+    $href = $inline === 'i' ? 'href' : 'data-href';
+    $cssLinksArr .= "<link rel=\"stylesheet\" $global $href=\"$item\">";
   }
   else $cssLinksArr[] = $item;
 }, $cssLinks);
