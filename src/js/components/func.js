@@ -446,6 +446,19 @@ const func = {
     !isFinite(v) && (v = 0);
     return +v;
   },
+
+  /**
+   * Get value
+   * @param selector {string|HTMLSelectElement}
+   * @return {boolean|array}
+   */
+  getMultiSelect(selector) {
+    const node = typeof selector === 'string' ? f.qS(selector) : selector;
+    if (node) {
+      return [...node.selectedOptions].reduce((r, option) => { r.push(option.value); return r}, []);
+    }
+    return false;
+  }
 }
 
 export const f = Object.assign(func, q);

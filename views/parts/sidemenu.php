@@ -135,7 +135,7 @@ menu;
             <?php break;
         }
       } ?>
-      <?php if (in_array('setting', ACCESS_MENU) || true) { ?>
+      <?php if (in_array('setting', $main->getSideMenu()) || $main->getSettings('admin')) { ?>
       <li class="nav-item">
         <a class="nav-link" href="<?= SITE_PATH ?>setting">
           <i class="material-icons">settings</i>

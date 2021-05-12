@@ -58,12 +58,22 @@ $admin = $main->getSettings('admin');
         <input type="hidden" name="permIds" value="<?= $permIds ?>">
       <? } ?>
       <div class="col-12 d-flex justify-content-between">
+        <div>Добавить тип доступа</div>
+        <div class="w-50">
+          <input type="text" class="w-80" name="permType">
+          <input type="button" value="+" data-action="addPermType">
+        </div>
+      </div>
+      <div class="col-12 d-flex justify-content-between mt-1">
         <div>Тип доступа</div>
-        <select class="w-50 useToggleOption">
-          <? foreach ($permStatus as $item) { ?>
-            <option value="<?= $item['ID'] ?>" data-target="perm<?= $item['ID'] ?>"><?= $item['name'] ?></option>
-          <? } ?>
-        </select>
+        <div class="w-50">
+          <select class="w-80 useToggleOption" data-field="permTypes">
+            <? foreach ($permStatus as $item) { ?>
+              <option value="<?= $item['ID'] ?>" data-target="perm<?= $item['ID'] ?>"><?= $item['name'] ?></option>
+            <? } ?>
+          </select>
+          <input type="button" value="x" data-action="removePermType">
+        </div>
       </div>
       <? foreach ($permStatus as $item) { ?>
       <div class="col-12 d-flex justify-content-between mt-1 perm<?= $item['ID'] ?>">

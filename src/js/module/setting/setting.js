@@ -34,13 +34,13 @@ export const setting = {
   },
 
   query(form) {
-
     Object.entries(this.queryParam).map(param => {
       form.set(param[0], param[1]);
     })
 
-    f.Post({data: form}).then(data => {
+    return f.Post({data: form}).then(data => {
       f.showMsg('Сохранено');
+      return data;
     });
   },
 
@@ -105,6 +105,10 @@ export const setting = {
       // Доп. поля для пользователей
       'addCustomManagerField': () => this.addManagerField(),
       'removeCustomManagerField': () => this.removeManagerField(),
+
+      // Права
+      'addPermType': () => this.addPermType(),
+      'removePermType': () => this.removePermType(),
     }
 
     select[action] && select[action]();
@@ -119,7 +123,15 @@ export const setting = {
     this.form.custom && setData(this.form.custom);
     this.form.user && setData(this.form.user);
     this.form.manager && setData(this.form.manager);
-    this.form.permission && setData(this.form.permission);
+
+    if (this.form.permission) {
+      let node = this.form.permission.querySelector('[name="permIds"]');
+      form.set(node.name, node.value);
+
+      this.form.permission.querySelectorAll('[multiple]').forEach(select => {
+        form.set(select.name, f.getMultiSelect(select).join(','));
+      });
+    }
 
     // Special field
     form.get('onlyOne') && (customization['onlyOne'] = true);
@@ -160,4 +172,29 @@ export const setting = {
     if (value[0] !== value[1]) this.errorNode = f.showMsg('Пароли не совпадают', 'error');
     else if (this.errorNode) { this.errorNode.remove(); delete this.errorNode; }
   },
+
+  addPermType() {
+    let node = this.form.permission.querySelector('[name="permType"]'),
+        value = node && node.value;
+
+    if (!node || !value || value.length < 3) return;
+
+    this.queryParam.setAction = 'addPermType';
+    this.queryParam.permType = value;
+    this.query(new FormData()).then(data => {
+      if (data['status']) Location.reload();
+    });
+  },
+  removePermType() {
+    let node = this.form.permission.querySelector('[data-field="permTypes"]'),
+        value = node && node.value;
+
+    if (!node || !value || !confirm('Удалить ' + value + '?')) return;
+
+    this.queryParam.setAction = 'removePermType';
+    this.queryParam.permId = value;
+    this.query(new FormData()).then(data => {
+      if (data['status']) Location.reload();
+    });
+  }
 }

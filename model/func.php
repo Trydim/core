@@ -40,11 +40,9 @@ function checkError($var) {
 function checkAccess($target) {
   if (PUBLIC_PAGE && in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
   global $main;
-  if (in_array($target, ['login', 'setting'])
-      || (in_array($target, array_merge([HOME_PAGE], ACCESS_MENU))
-          && in_array($target, $main->getSideMenu()))) return $target;
-  $target = $main->checkStatus('no') ? 'login' : $main->getSideMenu(true);
-  reDirect(false, $target);
+  if (in_array($target, $main->getSideMenu())) return $target;
+  if ($main->checkStatus('no')) return 'login';
+  else reDirect(false, $main->getSideMenu(true));
   die;
 }
 

@@ -53,17 +53,19 @@ trait Authorization {
 
   public function setSideMenu() {
     if (USE_DATABASE) {
-      $this->sideMenu = isset($this->getSettings('permission')['menuAccess'])
+      $menuAccess = isset($this->getSettings('permission')['menuAccess'])
         ? $this->getSettings('permission')['menuAccess']
-        : ACCESS_MENU;
+        : false;
+
+      $menuAccess = $menuAccess ? explode(',', $menuAccess) : [];
+      $this->sideMenu = count($menuAccess) ? $menuAccess : ACCESS_MENU;
     } else {
       $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
       $this->sideMenu = array_filter($this->sideMenu, function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);
       });
-      PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
     }
-    //if (!in_array('setting', $this->sideMenu)) $this->sideMenu[] = 'setting';
+    PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
   }
 
   public function getSideMenu($first = false) {

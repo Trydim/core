@@ -94,7 +94,7 @@ if (isset($setAction)) {
             $param[$id]['access_val'] = [];
             // Меню
             if (isset($_REQUEST['permMenuAccess_' . $id])) {
-              $param[$id]['access_val']['menuAccess'] = 'admindb';
+              $param[$id]['access_val']['menuAccess'] = $_REQUEST['permMenuAccess_' . $id];
             }
 
             $param[$id]['access_val'] = json_encode($param[$id]['access_val']);
@@ -136,6 +136,41 @@ if (isset($setAction)) {
       else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus('ok'));
 
       $result['setting'] = getSettingFile();
+      break;
+    case 'addPermType':
+      if (isset($permType)) {
+        $dbKey = translit($permType);
+
+        $permissions = $db->loadTable('permission');
+
+        foreach ($permissions as $item) {
+          if ($item['name'] === $dbKey) {
+            $result['error'] = "Запись $permType существует";
+            break;
+          }
+        }
+
+        if (!isset($result['error'])) {
+          $columns = $db->getColumnsTable('permission');
+          $param = ['0' => [
+            'name' => $dbKey,
+            'access_val' => '[]',
+          ]];
+          $result['error'] = $db->insert($columns, 'permission', $param);
+
+          $filePath = ABS_SITE_PATH . 'lang/dictionary.php';
+          if (!count($result['error']['result']) && file_exists($filePath)) {
+            $file = file($filePath);
+            $file[count($file) - 1] = "  '$dbKey' => '$permType',\r\n];\r\n";
+            file_put_contents($filePath, $file);
+          }
+        }
+      }
+      break;
+    case 'removePermType':
+      if (isset($permId)) {
+        $result['error'] = $db->deleteItem('permission', [$permId]);
+      }
       break;
   }
 }
