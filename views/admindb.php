@@ -20,7 +20,7 @@ $field['content'] = <<<main
 <div class="text-center">
   <h2 id="tableNameField"></h2>
 </div>
-<div id="viewField" class="d-flex pb-4" style="justify-content: left">
+<div id="viewField" class="d-flex" style="justify-content: left">
   <div>
     <label title="Удобный для редактирования">
       <input type="radio" name="adminType" value="form" data-action="adminType">

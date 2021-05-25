@@ -101,7 +101,7 @@ class Docs {
   }
 
   private function initPdf() {
-    require_once CORE . 'model/libs/vendor/autoload.php';
+    require_once CORE . 'libs/vendor/autoload.php';
 
     switch (PDF_LIBRARY) {
       case 'mpdf':

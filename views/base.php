@@ -62,7 +62,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     <section class="main-panel mx-auto" style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
       <?= $pageHeader; ?>
 
-      <div class="content mt-0">
+      <div class="content mt-0 pb-0">
         <div class="row justify-center"> <!-- возможно убрать justify-center -->
                                          <!-- стили временно-->
           <div class="col-12 <?= $sideRight ? 'col-xl-10' : '' ?>"><?= $content; ?></div>

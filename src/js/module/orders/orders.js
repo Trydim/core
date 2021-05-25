@@ -81,14 +81,6 @@ export const orders = {
   form: new FormData(),
 
   needReload: false,
-  table: f.qS('#commonTable'),
-  template: {
-    order    : f.gTNode('#orderTableTmp'),
-    visit    : f.gTNode('#orderVisitorTableTmp'),
-    impValue : f.gT('#tableImportantValue'),
-    searchMsg: f.gT('#noFoundSearchMsg'),
-  },
-  confirm: f.qS('#confirmField'),
   confirmMsg: false,
 
   queryParam: {
@@ -113,7 +105,7 @@ export const orders = {
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
-    this.table.dataset.type = 'order';
+    this.setParam();
     this.setTableTemplate('order');
 
     this.loaderTable = new f.LoaderIcon(this.table);
@@ -124,7 +116,22 @@ export const orders = {
     this.onEvent();
   },
 
+  setParam() {
+    this.table = f.qS('#commonTable');
+    this.confirm = f.qS('#confirmField');
+
+    this.template = {
+      order    : f.gTNode('#orderTableTmp'),
+      impValue : f.gT('#tableImportantValue'),
+      searchMsg: f.gT('#noFoundSearchMsg'),
+    }
+
+    let node = f.qS('#orderVisitorTableTmp');
+    node && (this.template.visit = node.content.children[0]);
+  },
+
   setTableTemplate(tmp) {
+    this.table.dataset.type = tmp;
     this.table.innerHTML = this.template[tmp].innerHTML;
     new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.onSearchFocus();

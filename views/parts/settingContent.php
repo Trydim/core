@@ -50,7 +50,7 @@ $admin = $main->getSettings('admin');
     </form>
   </div>
 
-  <? if ($admin) {
+  <? if ($admin && USE_DATABASE) {
     !isset($permStatus) && $permStatus = []; ?>
   <div class="col-6">
     <form action="#" class="row" id="permission">

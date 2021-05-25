@@ -53,7 +53,7 @@ export const Modal = (param = {}) => {
     data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
     document.body.style.overflow = 'hidden';
 
-    if (document.body.scrollHeight > window.innerHeight && window.innerWidth > 800) {
+    if (document.body.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
       data.bodyPaddingRight = document.body.style.paddingRight;
       document.body.style.paddingRight = '16px';
     }
@@ -100,6 +100,11 @@ export const Modal = (param = {}) => {
 
     if (btnConfig) this.btnConfig(btnConfig);
     else this.btnField && !showDefaultButton && f.eraseNode(this.btnField);
+
+    let btnY = this.wrap.querySelector('.confirmYes, [data-action="confirmYes"], [data-target="confirmBtn"]'),
+        btnN = this.wrap.querySelector('.closeBtn, [data-action="confirmNo"], [data-target="cancelBtn"]');
+    btnY && (this.btnConfirm = btnY);
+    btnN && (this.btnCancel = btnN);
 
     //document.head.insertAdjacentHTML('beforeend', `<link rel="stylesheet" href="${c.SITE_PATH}core/assets/css/libs/modal.css">`);
     document.body.append(node.children[0]);

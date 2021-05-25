@@ -21,6 +21,8 @@ if (!isset($setting->ordersColumnsSort)) {
       'name'   => gTxtDB('orders', $item),
     ];
   }, $columns);
+
+  $param['ordersColumns'] = $setting->ordersColumnsSort;
 }
 
 if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
@@ -32,10 +34,9 @@ if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
       'name'   => gTxtDB('visitorOrders', $item),
     ];
   }, $columns);
-}
 
-$param['ordersColumns'] = $setting->ordersColumnsSort;
-$param['ordersVisitorColumns'] = $setting->ordersVisitorColumnsSort;
+  $param['ordersVisitorColumns'] = $setting->ordersVisitorColumnsSort;
+}
 
 $main->exist('orderTemplate') && $field = doHook('orderTemplate', $field);
 require $pathTarget;

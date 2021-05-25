@@ -61,11 +61,12 @@ trait Authorization {
       $this->sideMenu = count($menuAccess) ? $menuAccess : ACCESS_MENU;
     } else {
       $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
-      $this->sideMenu = array_filter($this->sideMenu, function ($m) use ($filterMenu) {
+      $this->sideMenu = array_filter(ACCESS_MENU, function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);
       });
     }
     PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
+    $this->sideMenu[] = 'setting';
   }
 
   public function getSideMenu($first = false) {

@@ -19,7 +19,7 @@ define('MAIL_PASSWORD', '638ch1');
 //define('MAIL_FROM', 'commonserver@yandex.ru');
 //define('MAIL_PASSWORD', 'xmbxqxulvhwcqyta');
 
-require_once CORE . 'model/libs/vendor/autoload.php';
+require_once CORE . 'libs/vendor/autoload.php';
 
 class Mail {
   private $mailTpl    = '', $body = '', $docPath = '', $pdfFileName = '';

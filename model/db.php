@@ -112,13 +112,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         }
 
         $idOrder = isset($idOrder) ? $idOrder : false;
-        $newOrder = !$idOrder;
+        $newOrder = !$idOrder || !is_numeric($idOrder);
         $idOrder = $newOrder ? ((int)$db->getLastID('orders')) + 1 : $idOrder;
 
         $param = [$idOrder => []];
-        $param[$idOrder]['save_value'] = $saveVal;
         $param[$idOrder]['customer_id'] = $customerId;
         $param[$idOrder]['user_id'] = $_SESSION['priority']; // TODO нет не пойдет
+        isset($saveVal) && $param[$idOrder]['save_value'] = $saveVal;
         isset($importantVal) && $param[$idOrder]['important_value'] = $importantVal;
         isset($orderTotal) && is_finite($orderTotal) && $param[$idOrder]['total'] = floatval($orderTotal);
         isset($reportVal) && $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
