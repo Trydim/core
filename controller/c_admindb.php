@@ -18,5 +18,7 @@ if (DB_TABLE_IN_SIDEMENU) {
   }
 }
 
+if (PATH_LEGEND && file_exists(PATH_LEGEND)) require PATH_LEGEND;
+
 require $pathTarget;
 $html = template('base', $field);

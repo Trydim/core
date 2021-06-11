@@ -13,8 +13,6 @@ const absPath = '../../',
   css: Object.create(null),
 };*/
 
-//import '../css/libs/material-dashboard.min.css';
-
 //let content = 'const entry = {\n';
 let content = Object.create(null);
 

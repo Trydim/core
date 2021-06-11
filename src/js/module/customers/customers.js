@@ -70,7 +70,6 @@ const CustomersList = {
       }
     }, 300);
   },
-
 }
 
 const orders = {
@@ -192,6 +191,15 @@ export const customers = {
     data.length && this.onTableEvent();
     data.length && this.checkedRows();
   },
+  checkCustomers() {
+    for (const id of this.selectedId) {
+      if (this.usersList.get(id).orders) {
+        f.showMsg(`У Клиента ${id} имеются заказы!`, 'error');
+        return true;
+      }
+    }
+    return false;
+  },
 
   query() {
     Object.entries(this.queryParam).map(param => {
@@ -280,7 +288,8 @@ export const customers = {
         this.M.show('Изменение клиента', form);
       },
       'delCustomer': () => {
-        if (!this.selectedId.size) return;
+        if (!this.selectedId.size) { f.showMsg('Выберите клиента!', 'error'); return; }
+        if (this.checkCustomers()) return;
 
         this.queryParam.usersId = JSON.stringify(this.getSelectedList());
 

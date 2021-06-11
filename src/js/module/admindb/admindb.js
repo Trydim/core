@@ -44,6 +44,7 @@ export const admindb = {
     this.tableName = new URLSearchParams(location.search).get('tableName') || '';
     this.loaderTable = new f.LoaderIcon(this.mainNode, false, true, {small: false});
 
+    this.setPageStyle();
     this.onBtnEvent();
   },
   dbAction(e) {
@@ -171,7 +172,11 @@ export const admindb = {
     return true;
   },
 
-  // DB event function
+  setPageStyle() {
+    document.body.style.overflow = 'hidden';
+  },
+
+  // Event function
   //--------------------------------------------------------------------------------------------------------------------
 
   tableNameClick(e) {
@@ -222,6 +227,13 @@ export const admindb = {
     checkedTarget && this.checkSavedTableChange(e);
   },
 
+  clickShowLegend() {
+    let m = f.initModal({showDefaultButton: false}),
+        legend = f.qS('#dataTableLegend');
+
+    legend && m.show('Описание таблицы', legend.content.children[0].cloneNode(true));
+  },
+
   // DB event bind
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -247,6 +259,9 @@ export const admindb = {
     // Проверка перехода
     document.onclick = (e) => this.clickDocument(e);
     f.qA('nav.navbar [data-action]').forEach(n => n.onclick = (e) => this.clickDocument(e));
+
+    // Легенда
+    f.qS('#legend').addEventListener('click', this.clickShowLegend);
   },
 
   onWindowReload() {

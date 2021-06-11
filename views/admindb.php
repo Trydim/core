@@ -2,7 +2,13 @@
 
 /**
  * @var $main {object} - global
+ * @var $tableActive {string} - global
  */
+
+$legendHtml = '';
+if (PATH_LEGEND && isset($legend[$tableActive])) {
+  $legendHtml = "<template id='dataTableLegend'>" . $legend[$tableActive] . "</template>";
+}
 
 if (!DB_TABLE_IN_SIDEMENU) { // Если таблицы не в подменю
   $field['sideRight'] = <<<sideRight
@@ -17,37 +23,41 @@ sideRight;
 }
 
 $field['content'] = <<<main
-<div class="text-center">
-  <h2 id="tableNameField"></h2>
-</div>
-<div id="viewField" class="d-flex" style="justify-content: left">
-  <div>
-    <label title="Удобный для редактирования">
-      <input type="radio" name="adminType" value="form" data-action="adminType">
-      Режим форм</label>
+<div class="d-flex justify-content-around">
+  <div class="text-center mr-5">
+    <h2 id="tableNameField"></h2>
   </div>
-  <div class="ml-1">
-    <label title="Редактирования в режиме таблицы">
-      <input type="radio" name="adminType" value="table" checked data-action="adminType">
-      Режим таблицы</label>
-  </div>
-  <div class="ml-1">
-    <label title="Настройка режима форм">
-      <input type="radio" name="adminType" value="config" data-action="adminType">
-      Настройка формы (Для опытных)</label>
-  </div>
-</div>
-<div class="d-flex justify-center">
   <div id="btnField">
     <input type="button" class="btn btn-primary d-none" value="Добавить" id="btnAddMore">
     <input type="button" class="btn btn-primary" value="Сохранить" id="btnSave" disabled>
     <input type="button" class="btn btn-primary d-none" value="Обновить Конфиг" id="btnRefresh">
   </div>
+  <div id="viewField" class="d-flex" style="justify-content: left">
+    <div>
+      <label title="Удобный для редактирования">
+        <input type="radio" name="adminType" value="form" data-action="adminType">
+        Режим форм</label>
+    </div>
+    <div class="ml-1">
+      <label title="Редактирования в режиме таблицы">
+        <input type="radio" name="adminType" value="table" checked data-action="adminType">
+        Режим таблицы</label>
+    </div>
+    <div class="ml-1">
+      <label title="Настройка режима форм">
+        <input type="radio" name="adminType" value="config" data-action="adminType">
+        Настройка формы (Для опытных)</label>
+    </div>
+  </div>
 </div>
 <div id="insertToDB" style="min-height: 100px"></div>
+<div style="position: fixed; bottom: 0; right: 0">
+  <input type="button" id="legend" class="btn btn-primary btn-white" value="Помощь">
+</div>
 main;
 
 $field['footerContent'] = <<<temp
+$legendHtml
 <template id="FormViesTmp">
   <form action="#"></form>
 </template>
@@ -97,15 +107,6 @@ $field['footerContent'] = <<<temp
     <tbody id="columnValue">
     <tr>
       <td><input type="text" name="col_\${columnName}[]" data-column="\${columnName}" value="\${\${columnName}}"></td>
-    </tr>
-    </tbody>
-  </table>
-</template>
-<template id="tablesCsv">
-  <table>
-    <tbody id="columnValue">
-    <tr>
-      <td><input type="text" value=""></td>
     </tr>
     </tbody>
   </table>

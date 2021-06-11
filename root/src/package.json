@@ -3,6 +3,8 @@
   "description": "Public project",
   "name": "my-webpack-project",
   "scripts": {
-    "publicBuild": "webpack --mode development"
+    "publicBuildProd": "webpack --mode=production",
+
+    "publicBuildDev": "webpack --mode=development"
   }
 }

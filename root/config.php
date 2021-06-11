@@ -15,7 +15,8 @@ $publicConfig = [
   'CHANGE_DATABASE' => false,
 
   /** Папка с csv файлами */
-  'PATH_CSV' => ABS_SITE_PATH . 'csv/',
+  'PATH_LEGEND' => ABS_SITE_PATH . 'public/views/legend.php',
+  'PATH_CSV' => ABS_SITE_PATH . 'shared/csv/',
   'CSV_STRING_LENGTH' => '1000',
   'CSV_DELIMITER' => ';',
 
@@ -49,13 +50,6 @@ $publicConfig = [
   options - настройки
    */
   'ACCESS_MENU' => ['orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'fileManager', 'setting'],
-
-  /**
-   * Количество кнопок для печати.
-   * кнопки будут иметь тип и значение для перевода:
-   * printType1 - printType2 - ... - printTypeN
-   */
-  'PRINT_BTN' => 3,
 
   /** Папка по умолчанию для файлового менеджера */
   'SHARE_DIR' => 'public/images/',

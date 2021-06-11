@@ -1,0 +1,13 @@
+<?php
+
+$action = '';
+
+foreach ($_SERVER['argv'] as $arg) {
+    if (stripos($arg, 'make') === 0) {
+        $action = 'make';
+        $mode = explode(':', $arg)[1];
+    }
+}
+
+var_dump($action);
+var_dump($mode);

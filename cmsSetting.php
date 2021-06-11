@@ -27,16 +27,17 @@ foreach ($publicConfig as $k => $v) {
 }
 
 // Не использую цикл т.к. куча предупреждений
-if (!defined('DEBUG')) define('DEBUG', false);
-if (!defined('PUBLIC_PAGE')) define('PUBLIC_PAGE', false);
-if (!defined('ONLY_LOGIN')) define('ONLY_LOGIN', false);
-if (!defined('USERS_ORDERS')) define('USERS_ORDERS', false);
-if (!defined('USE_DATABASE')) define('USE_DATABASE', true);
-if (!defined('HOME_PAGE')) define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : ACCESS_MENU[0]);
-if (!defined('ACCESS_MENU')) define('ACCESS_MENU', []);
-if (!defined('PRINT_BTN')) define('PRINT_BTN', 1);
-if (!defined('SHARE_DIR')) define('SHARE_DIR', '/');
-if (!defined('OUTSIDE')) define('OUTSIDE', isset($_GET['outside']));
+!defined('DEBUG') && define('DEBUG', false);
+!defined('PUBLIC_PAGE') && define('PUBLIC_PAGE', false);
+!defined('ONLY_LOGIN') && define('ONLY_LOGIN', false);
+!defined('USERS_ORDERS') && define('USERS_ORDERS', false);
+!defined('PATH_LEGEND') && define('PATH_LEGEND', false);
+!defined('USE_DATABASE') && define('USE_DATABASE', true);
+!defined('HOME_PAGE') && define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : ACCESS_MENU[0]);
+!defined('ACCESS_MENU') && define('ACCESS_MENU', []);
+!defined('PRINT_BTN') && define('PRINT_BTN', 1);
+!defined('SHARE_DIR') && define('SHARE_DIR', '/');
+!defined('OUTSIDE') && define('OUTSIDE', isset($_GET['outside']));
 
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/classes/Main.php';

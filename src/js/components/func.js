@@ -246,7 +246,11 @@ const func = {
     });
   },
 
-  // Получить и скачать файл
+  /**
+   * Получить и скачать файл
+   * @param fileName
+   * @return {HTMLAnchorElement}
+   */
   createLink: (fileName) => {
     //let date = new Date();
     //fileName += '_' + date.getDate() + ("0" + (date.getMonth() + 1)).slice(-2) + (date.getYear() - 100) + '_' + date.getHours() + date.getMinutes() + date.getSeconds() + '.pdf';
