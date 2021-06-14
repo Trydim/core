@@ -85,7 +85,7 @@ class Mail {
 
   public function send() {
     $mail = new PHPMailer();
-    $mail->SMTPDebug = DEBUG;                // Enable verbose debug output
+    $mail->SMTPDebug = DEBUG !== false;          // Enable verbose debug output
     $mail->CharSet = "UTF-8";
 
     try {
