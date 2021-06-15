@@ -121,6 +121,7 @@ if (isset($setAction)) {
 
       // Global mail setting
       // Переписать и согласовать с mail.php загрузка пустые строки не сохранять
+      $setting = file_exists(SETTINGS_PATH) ? json_decode(file_get_contents(SETTINGS_PATH), true) : [];
       isset($orderMail) && $setting['orderMail'] = $orderMail;
       isset($orderMailCopy) && $setting['orderMailCopy'] = $orderMailCopy;
       !USE_DATABASE && $setting['onlyOne'] = isset($onlyOne);
@@ -172,5 +173,43 @@ if (isset($setAction)) {
         $result['error'] = $db->deleteItem('permission', [$permId]);
       }
       break;
+
+    case 'createProperty':
+      $propertySetting = [];
+      $setting = file_exists(SETTINGS_PATH) ? json_decode(file_get_contents(SETTINGS_PATH), true) : [];
+
+      $propName = isset($tableName) ? 'prop_' . translit($tableName) : false;
+      $dataType = isset($dataType) ? str_replace('s_', '', $dataType) : false;
+
+      isset($setting['propertySetting'][$propName]) && $result['error'] = 'Property exist' && $setting = false;
+
+      if ($setting !== false && $propName && $dataType) {
+        $setting['propertySetting'][$propName] = [
+          'name' => $tableName,
+          'type' => $dataType,
+        ];
+        file_put_contents(SETTINGS_PATH, json_encode($setting));
+      }
+      break;
+    case 'loadProperties':
+      if (file_exists(SETTINGS_PATH)) {
+        $setting = json_decode(file_get_contents(SETTINGS_PATH), true);
+        isset($setting['propertySetting']) && $result['propertiesTables'] = $setting['propertySetting'];
+      }
+      break;
+    case 'delProperty':
+      if (file_exists(SETTINGS_PATH) && isset($props)) {
+        $setting = json_decode(file_get_contents(SETTINGS_PATH), true);
+
+        if (isset($setting['propertySetting'])) {
+          $setting['propertySetting'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
+            return !in_array($item, $props);
+          }, ARRAY_FILTER_USE_KEY);
+
+          file_put_contents(SETTINGS_PATH, json_encode($setting));
+        }
+      }
+      break;
+
   }
 }

@@ -216,20 +216,19 @@ class Db extends \R {
   }
 
   /**
+   * @param string $like
    * @return mixed|null
-   * assoc array [
-   *  ['name' => 'table_name1']
-   *  ['name' => 'table_name2']
-   * ]
    */
-  public function getTables() {
-    return array_reduce($this::getCol('SHOW TABLES'), function ($acc, $item) {
+  public function getTables($like = '') {
+    $sql = "SHOW TABLES
+            FROM `$this->dbName`
+            WHERE `Tables_in_$this->dbName` LIKE '%$like%'";
 
+    return array_reduce($this::getCol($sql), function ($acc, $item) {
       $acc[] = [
         'tableName' => $item,
-        'name'      => $item
+        'name'      => $item,
       ];
-
       return $acc;
     }, []);
   }
@@ -348,20 +347,86 @@ class Db extends \R {
   // Options
   //------------------------------------------------------------------------------------------------------------------
 
-  public function loadOptions($elementID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'O.name', $sortDirect = false) {
+  public function loadOptions($elementID = false, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'O.name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT O.ID AS 'O.ID', O.name AS 'O.name', O.unit_id as 'O.unit_id', O.activity as 'O.activity', sort, last_edit_date, 
-       MI.name AS 'MI.name', MO.name AS 'MO.name', input_price, output_percent, output_price
-    FROM options_elements O
-    JOIN money MI on MI.ID = O.money_input_id
-    JOIN money MO on MO.ID = O.money_output_id
-    JOIN units U on U.ID = O.unit_id
-    WHERE O.element_id = $elementID
-		ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
+    $sql = "SELECT O.ID AS 'O.ID', O.name AS 'O.name', O.unit_id as 'O.unit_id', 
+                   O.activity as 'O.activity', sort, last_edit_date,                   
+                   MI.name AS 'MI.name', MO.name AS 'MO.name', properties, input_price, output_percent, output_price
+            FROM options_elements O
+            JOIN money MI on MI.ID = O.money_input_id
+            JOIN money MO on MO.ID = O.money_output_id
+            JOIN units U on U.ID = O.unit_id";
+
+    if ($elementID) {
+      $sql .= "WHERE O.element_id = $elementID
+      		ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
+    }
 
     return self::getAll($sql);
   }
+
+  public function loadAllOptions() {
+    $props = [];
+    $options = $this->loadOptions();
+
+    if (count($options)) {
+      foreach ($options as $option) {
+        if ($option['properties']) {
+          $prop = json_decode($option['properties'], true);
+
+          $option['properties'];
+
+        }
+      }
+
+      return $options;
+    }
+    return false;
+  }
+
+  // Property
+  //------------------------------------------------------------------------------------------------------------------
+
+  public function createPropertyTable($tableName, $param) {
+    $sql = "CREATE TABLE $tableName (
+            `ID` int(10) UNSIGNED NOT NULL,
+            `name` varchar(255) NOT NULL DEFAULT 'NoName'";
+
+    if (count($param)) {
+      function getParam($prop, $type) {
+        $str = ", `$prop` ";
+
+        switch ($type) {
+          case 'file':
+          case 'string': return $str . "varchar(255)";
+          case 'textarea': return $str . "varchar(1000)";
+          case 'double': return $str . "double NOT NULL DEFAULT 1";
+          case 'money': return $str . "decimal(10,4) NOT NULL DEFAULT 1.0000";
+          case 'date': return $str . "timestamp";
+          case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
+        }
+      }
+
+      foreach ($param as $prop => $type) {
+        $sql .= getParam($prop, $type);
+      }
+    }
+
+    $error = self::exec($sql . ')');
+    !$error && $error = self::exec("ALTER TABLE `$tableName`
+        ADD PRIMARY KEY (`ID`)");
+    return self::exec("ALTER TABLE `$tableName`
+        MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
+  }
+
+  public function getPropertyTable($tableName) {
+    $tableName = 'prop_' . $tableName;
+
+    return $this->loadTable($tableName);
+  }
+
+
 
   // ORDERS
   //------------------------------------------------------------------------------------------------------------------
@@ -475,8 +540,6 @@ class Db extends \R {
 
     return self::getAll($sql);
   }
-
-  //public function
 
   // Customers
   //--------------------------------------------------------------------------------------------------------------------

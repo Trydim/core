@@ -23,5 +23,4 @@ $field['footerContent'] .= <<<footerContent
 <template id="orderBtnTemplate">
   <input type="button" class="btn btn-success" value="Редактировать" data-action="openOrder">
 </template>
-
 footerContent;

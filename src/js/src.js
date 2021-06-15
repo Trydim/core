@@ -6,15 +6,54 @@ import {c} from "./components/const.js";
 import {f} from "./components/func.js";
 
 import * as module from './components/component.js';
-import { Modal } from './components/Modal.js';
-import { CustomSelect } from './components/CustomSelect.js';
-import { shadowNode } from './components/shadownode.js';
+import {Modal} from './components/Modal.js';
+import {CustomSelect} from './components/CustomSelect.js';
+import {shadowNode} from './components/shadownode.js';
+import {SelectedRow} from "./components/SelectedRow.js";
 
 const m = {
   initModal : Modal,
   initPrint : module.Print,
+  initShadow: (param) => new shadowNode(param),
+
+  observer: new module.Observer(),
 
   searchInit: module.Searching,
+
+  /**
+   *
+   */
+  InitSaveVisitorsOrder: module.SaveVisitorsOrder,
+
+  /**
+   *
+   */
+  CustomSelect: CustomSelect,
+
+  /**
+   *
+   */
+  LoaderIcon: module.LoaderIcon,
+
+  /**
+   * @param name {string}
+   * @param func {function}
+   */
+  OneTimeFunction: module.OneTimeFunction,
+
+  Pagination: module.Pagination,
+
+  SortColumns: module.SortColumns,
+
+  SelectedRow: SelectedRow,
+
+  /**
+   *
+   * @param msg
+   * @param type (success, warning, error)
+   * @param autoClose bool
+   */
+  showMsg: (msg, type, autoClose) => new module.MessageToast().show(msg, type, autoClose),
 
   /**
    * Validation component
@@ -45,39 +84,6 @@ const m = {
    */
   Valid : module.Valid,
   //initValid : (sendFunc, idForm, idSubmit) => module.valid.init(sendFunc, idForm, idSubmit),
-
-  Pagination: module.Pagination,
-
-  SortColumns: module.SortColumns,
-
-  /**
-   *
-   * @param msg
-   * @param type (success, warning, error)
-   * @param autoClose bool
-   */
-  showMsg: (msg, type, autoClose) => new module.MessageToast().show(msg, type, autoClose),
-  LoaderIcon: module.LoaderIcon,
-
-  /**
-   *
-   */
-  initShadow: (param) => new shadowNode(param),
-
-  /**
-   *
-   */
-  InitSaveVisitorsOrder: module.SaveVisitorsOrder,
-
-  observer: new module.Observer(),
-
-  CustomSelect: CustomSelect,
-
-  /**
-   * @param name {string}
-   * @param func {function}
-   */
-  OneTimeFunction: module.OneTimeFunction,
 };
 
 window.f = Object.assign(c, m, f);

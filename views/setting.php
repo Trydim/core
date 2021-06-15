@@ -21,5 +21,20 @@ isset($permissions) && $field['footerContent'] .= "<input type='hidden' id='perm
 
 if ($main->getSettings('admin')) {
   $field['footerContent'] .= <<<footerContent
+<template id="customField">
+  <div class="col-12 d-flex justify-content-between mt-1" data-field="customFieldItem">
+    <div class="col-6">
+      <input type="text" data-field="key">
+    </div>
+    <div class="col-6">
+      <select class="w-100" data-field="type">
+        <option value="string">Текст (~200 символов)</option>
+        <option value="textarea">Текст (много)</option>
+        <option value="number">Число</option>
+        <option value="date">Дата</option>
+      </select>
+    </div>
+  </div>
+</template>
 footerContent;
 }

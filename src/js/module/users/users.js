@@ -235,13 +235,11 @@ export const users = {
       },
     }
 
-    if(action === 'confirmYes') { // Закрыть подтверждение
-
+    if (action === 'confirmYes') { // Закрыть подтверждением
       this.delayFunc();
       this.delayFunc = () => {};
       this.needReload = {dbAction: 'loadUsers'};
       this.query();
-
     } else { // Открыть подтверждение
       this.queryParam.dbAction = action;
       select[action] && select[action]();

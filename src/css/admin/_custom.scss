@@ -172,3 +172,28 @@ body {
   color: #fff;
   background: linear-gradient(180deg, #309DFF 0%, rgba(52, 152, 223) 10%);
 }
+
+
+.bg-style-sheet {
+  background-color: Snow;
+  box-shadow: 1px 1px 5px silver;
+  padding: 15px;
+}
+
+#footerBtn.controlWrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+}
+
+.closeSection {
+  padding: 3px;
+}
+
+.list li {
+  border-bottom: 0.1px solid silver;
+}
+
+.list li:nth-child(2n) {
+  background-color: MintCream;
+}

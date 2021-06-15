@@ -2,6 +2,8 @@
 
 const getFieldNode = (p, field) => p.querySelector(`[data-field=${field}]`);
 
+import {Properties} from "./properties";
+
 export const setting = {
   form: {
     mail: f.qS('#mailForm'),
@@ -21,6 +23,8 @@ export const setting = {
   init() {
     this.setParam();
     this.loadSetting();
+
+    new Properties();
 
     this.onEvent();
     return this;

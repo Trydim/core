@@ -2,46 +2,46 @@
 $field['content']       = <<<content
 <div class="container-fluid">
   <div class="row">
-    <div class="col-3 overflow-auto">
+    <div class="col-3 overflow-auto bg-style-sheet">
       <div id="sectionField" class="openSection" data-id="0">Разделы</div>
       <div class="subSection"></div>
       <div class="controlWrap" id="footerBtn">
-        <input type="button" value="Создать раздел" data-action="createSection">
-        <input type="button" value="Открыть раздел" data-action="openSection">
-        <input type="button" value="Изменить раздел" data-action="changeSection">
-        <input type="button" value="Удалить раздел" data-action="delSection">
+        <input class="btn btn-success" type="button" value="Создать раздел" data-action="createSection">
+        <input class="btn btn-warning" type="button" value="Открыть раздел" data-action="openSection">
+        <input class="btn btn-warning" type="button" value="Изменить раздел" data-action="changeSection">
+        <input class="btn btn-danger" type="button" value="Удалить раздел" data-action="delSection">
       </div>
     </div>
     <div class="col-9">
-      <div class="d-none" id="elementsField" data-field="elements">
-        <table class="text-center">
+      <div class="d-none bg-style-sheet" id="elementsField" data-field="elements">
+        <table class="text-center table table-striped">
           <thead><tr></tr></thead>
           <tbody></tbody>
         </table>
         <div class="text-center pageWrap"></div>
         <div class="mt-1 controlWrap">
-          <input type="button" value="Создать элемент" data-action="createElements">
-          <input type="button" value="Открыть элемент" data-action="openElements">
-          <input type="button" value="Изменить элемент" data-action="changeElements">
-          <input type="button" value="Удалить элемент" data-action="delElements">
+          <input class="btn btn-success" type="button" value="Создать элемент" data-action="createElements">
+          <input class="btn btn-warning" type="button" value="Открыть элемент" data-action="openElements">
+          <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
+          <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
         </div>
       </div>
     </div>
   </div>
 </div>
 <hr>
-<div class="container-fluid d-none" id="optionsField" data-field="options">
+<div class="container-fluid d-none bg-style-sheet" id="optionsField" data-field="options">
   <div class="row">
-    <table  class="text-center">
+    <table  class="text-center table table-striped">
       <thead><tr></tr></thead>
       <tbody></tbody>
     </table>
   </div>
   <div class="text-center pageWrap"></div>
   <div class="mt-1 text-center controlWrap">
-    <input type="button" value="Добавить вариант" data-action="createOptions">
-    <input type="button" value="Изменить вариант" data-action="changeOptions">
-    <input type="button" value="Удалить вариант" data-action="delOptions">
+    <input class="btn btn-success" type="button" value="Добавить вариант" data-action="createOptions">
+    <input class="btn btn-warning" type="button" value="Изменить вариант" data-action="changeOptions">
+    <input class="btn btn-danger" type="button" value="Удалить вариант" data-action="delOptions">
   </div>
 </div>
 content;
@@ -57,7 +57,7 @@ $field['footerContent'] = <<<footerContent
   </li>
 </template>
 <template id="itemsTableHead">
-  <th><input type="button" value="\${name} ↑↓" data-ordercolumn="\${name}"></th>
+  <th><input type="button" class="btn btn-info btn-sm table-th" value="\${name} ↑↓" data-ordercolumn="\${name}"></th>
 </template>
 <template id="itemsTableRowsCheck">
   <td><input type="checkbox" data-id="\${ID}"></td>

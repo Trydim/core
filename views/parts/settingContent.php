@@ -1,6 +1,7 @@
 <?php
 global $main;
 $admin = $main->getSettings('admin');
+$catalogProperties = in_array('catalog', $main->getSideMenu());
 ?>
 <div class="row container m-auto" id="settingForm">
   <? if ($admin) { ?>
@@ -91,10 +92,10 @@ $admin = $main->getSettings('admin');
   <div class="col-6">
     <form action="#" id="managerForm" class="row">
       <div class="col-12 d-flex justify-content-between">
-        <p class="col-8">Дополнительные поля менеджеров</p>
-        <div class="col-4">
-          <input type="button" data-action="addCustomManagerField" value="+">
-          <input type="button" data-action="removeCustomManagerField" value="-">
+        <p class="col-7">Дополнительные поля менеджеров</p>
+        <div class="col-5">
+          <input type="button" data-action="addCol" value="+">
+          <input type="button" data-action="delCol" value="-">
         </div>
       </div>
       <div class="col-12 d-flex flex-wrap justify-content-between text-center" data-field="customField"></div>
@@ -103,20 +104,102 @@ $admin = $main->getSettings('admin');
   <? } ?>
 
   <input type="button" class="btn btn-primary" value="Сохранить" data-action="save">
+
+  <? if ($catalogProperties) { ?>
+    <div class="col-12" id="propertiesWrap">
+      <hr>
+      <details>
+        <summary data-action="loadProperties">
+          Редактировать параметры каталога
+        </summary>
+        <div>
+          <table id="propertiesTable" class="text-center table table-striped">
+            <thead>
+            <tr>
+              <th></th>
+              <th>Свойство</th>
+              <th>Тип</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td><input type="checkbox" class="" data-id="${property}"></td>
+              <td>${name}</td>
+              <td>${type}</td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="mt-1 text-center">
+            <input class="btn btn-success" type="button" value="Добавить" data-action="createProperty">
+            <input class="btn btn-warning" type="button" value="Изменить" data-action="changeProperty">
+            <input class="btn btn-danger" type="button" value="Удалить" data-action="delProperty">
+          </div>
+        </div>
+      </details>
+    </div>
+  <? } ?>
 </div>
 
-<template id="customField">
-  <div class="col-12 d-flex justify-content-between mt-1" data-field="customFieldItem">
-    <div class="col-6">
-      <input type="text" data-field="key">
+<? if ($catalogProperties) { ?>
+<template id="propertiesCreateTmp">
+  <form action="#">
+    <div class="form-group">
+      <label class="w-100">Название свойства: <input type="text" class="form-control" name="tableName"></label>
     </div>
-    <div class="col-6">
-      <select class="w-100" data-field="type">
-        <option value="string">Текст (~200 символов)</option>
-        <option value="textarea">Текст (много)</option>
-        <option value="number">Число</option>
-        <option value="date">Дата</option>
-      </select>
+    <div class="form-group">
+      <label class="w-100">Тип данных:
+        <select class="form-control useToggleOption" name="dataType" data-field="propertyType">
+          <optgroup label="Простые">
+            <option value="s_text" data-target="">Текст (~200 символов)</option>
+            <option value="s_textarea">Текст (много)</option>
+            <option value="s_number">Число</option>
+            <option value="s_date">Дата</option>
+          </optgroup>
+          <optgroup label="Составные">
+            <option value="h_select" data-target="selectField">Справочник</option>
+          </optgroup>
+        </select>
+      </label>
     </div>
-  </div>
+    <div class="form-group selectField">
+      <div class="col-12 d-flex justify-content-between">
+        <p class="col-5">Дополнительные поля параметра (имя есть)</p>
+        <div class="col-7">
+          <input class="btn btn-success" type="button" data-action="addCol" value="+">
+          <input class="btn btn-danger"  type="button" data-action="remCol" value="-">
+        </div>
+      </div>
+      <div class="col-12 d-flex flex-wrap justify-content-between text-center" data-field="propertiesCols">
+        <div class="col-12 d-flex justify-content-between mt-1" data-field="propertiesColItem">
+          <div class="col-6">
+            <input type="text" data-field="key">
+          </div>
+          <div class="col-6">
+            <select class="w-100" data-field="type">
+              <option value="string">Текст (~200 символов)</option>
+              <option value="textarea">Текст (много)</option>
+              <option value="double">Число</option>
+              <option value="money">Число</option>
+              <option value="date">Дата</option>
+              <option value="file">Файл</option>
+              <option value="bool">Флаг</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
 </template>
+<template id="propertiesCreateTmp">
+  <table class="text-center table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Имя</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</template>
+<? } ?>

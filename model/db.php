@@ -234,6 +234,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     // Elements
+    case 'loadOptions':
+      $result['options'] = $db->loadOptions();
+      break;
     case 'createElements':
       $param = ['0' => []];
       if (isset($sectionId)) $param['0']['section_parent_id'] = $sectionId;
@@ -274,6 +277,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     // Options
+    case 'loadOptions':
+      $result['options'] = $db->loadOptions();
+      break;
     case 'createOptions':
       $param = ['0' => []];
       if (isset($elementsId)) $param['0']['element_id'] = $elementsId;
@@ -315,6 +321,57 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $optionsId = isset($optionsId) ? json_decode($optionsId) : [];
       if (count($optionsId)) {
         $db->deleteItem('options_elements', $optionsId);
+      }
+      break;
+
+    // Options Properties
+    case 'loadProperties':
+      $setAction = 'loadProperties';
+      $result['propertiesTables'] = [];
+      require 'setting.php';
+
+      $dbPropertiesTables = $db->getTables('prop');
+
+      foreach ($dbPropertiesTables as $table) {
+        $result['propertiesTables'][$table['name']] = [
+          'name' => str_replace('prop_', '', $table['name']),
+          'type' => 'справочник',
+        ];
+      };
+      break;
+    /*case 'loadProperty':
+
+      break;*/
+    case 'createProperty':
+      if (isset($tableName) && isset($dataType)) {
+        // Простой или сложный параметр по префиксу
+        if (stripos($dataType, 's_') === 0) {
+          $setAction = 'createProperty';
+          require 'setting.php';
+        } else {
+          $tableName = 'prop_' . translit($tableName);
+
+          $param = [];
+          foreach ($_REQUEST as $key => $value) {
+            if (stripos($key, 'colName') !== false) {
+              $id = str_replace('colName', '', $key);
+
+              if (isset($_REQUEST['colType' . $id])) {
+                $param[translit($value)] = $_REQUEST['colType' . $id];
+              }
+            }
+          }
+
+          // проверить
+          $result['error'] = $db->createPropertyTable($tableName, $param);
+        }
+      }
+      break;
+    case 'delProperty':
+      if (isset($props)) {
+        $props = explode(',', $props);
+        $setAction = 'delProperty';
+        require 'setting.php';
       }
       break;
 

@@ -47,9 +47,9 @@ export const catalog = {
 
   changeSection: Object.create(null), // Узлы измений
 
-  sectionList: new Map(),
+  sectionList : new Map(),
   elementsList: new Map(),
-  optionsList: new Map(),
+  optionsList : new Map(),
 
   reloadAction: false,
   sortParam: {
@@ -113,8 +113,6 @@ export const catalog = {
     Object.entries(this.queryParam).map(param => form.set(param[0], param[1]));
 
     f.Post({data: form}).then(data => {
-
-      debugger
       if(this.reloadAction) {
         this.query(this.setReloadQueryParam());
         return;
@@ -123,11 +121,11 @@ export const catalog = {
       if (data['section']) this.appendSection(data['section']);
       if (data['elements']) {
         this.prepareElements(data);
-        if (data['countRowsElements'])  this.pElements.setCountPageBtn(data['countRowsElements']);
+        data['countRowsElements'] && this.pElements.setCountPageBtn(data['countRowsElements']);
       }
       if (data['options']) {
         this.prepareOptions(data);
-        if (data['countRowsOptions']) this.pOptions.setCountPageBtn(data['countRowsOptions']);
+        data['countRowsOptions'] && this.pOptions.setCountPageBtn(data['countRowsOptions']);
       }
     });
   },
@@ -234,7 +232,7 @@ export const catalog = {
     this.reloadAction = false;
   },
 
-  // TODO events function
+  // Events function
   //--------------------------------------------------------------------------------------------------------------------
 
   actionBtn(e) {
@@ -275,7 +273,7 @@ export const catalog = {
         this.reloadAction = {
           dbAction : 'loadSection',
           sectionId: this.getParentSection(this.queryParam.sectionId)};
-        },
+      },
       // Удалить секцию
       'delSection' : () => {
         this.queryParam.sectionId = this.curSectionNode.getAttribute('data-id') || false;
@@ -285,7 +283,7 @@ export const catalog = {
         this.reloadAction = {
           dbAction : 'loadSection',
           sectionId: this.getParentSection(this.queryParam.sectionId) };
-        },
+      },
       // Создать секцию
       'createSection' : () => {
         let form = f.gTNode('#sectionForm');
@@ -296,8 +294,7 @@ export const catalog = {
 
         this.M.show('Создание раздел', form);
         this.reloadAction = { dbAction : 'loadSection', sectionId: 0 };
-        },
-
+      },
       // Создать элемент
       'createElements' : () => {
         // Запросить типы элементов
@@ -371,7 +368,6 @@ export const catalog = {
         this.M.show('Удалить элемент', 'Удалить элемент и варианты?');
         this.reloadAction = { dbAction : 'openSection' };
       },
-
       // Добавить вариант
       'createOptions': () => {
         // Нужен запрос на ID валют
@@ -493,6 +489,10 @@ export const catalog = {
         this.M.show('Удалить вариант', 'Удалить выбранные варианты?');
         this.reloadAction = { dbAction : 'openElements' };
       },
+
+      'setupProperties': () => {
+
+      },
     }
 
     if(action === 'confirmYes') {
@@ -604,7 +604,7 @@ export const catalog = {
     this.query({sort: item});
   },
 
-  // TODO bind events
+  // Bind events
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
@@ -618,11 +618,11 @@ export const catalog = {
   onEvent() {
     // buttons
     //f.qA('#footerBtn input[data-action], #modalWrap input[data-action], #btnElementsWrap input[data-action]',
-    //f.qA('.controlWrap input[data-action]', 'click', (() => (e) => this.actionBtn.call(this, e))());
-    f.qA('input[data-action]', 'click', (() => (e) => this.actionBtn.call(this, e))());
+    //f.qA('.controlWrap input[data-action]', 'click', (e) => this.actionBtn.call(this, e);
+    f.qA('input[data-action]', 'click', (e) => this.actionBtn.call(this, e));
   },
 
-  // кнопки таблицы
+  // Кнопки таблицы
   onEventColumnTable(item) {
     this[item + 'Field'].querySelectorAll('thead input').forEach(n => {
       n.addEventListener('click', (e) => this.sortRows.call(this, e));

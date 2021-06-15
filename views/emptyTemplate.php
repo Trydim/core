@@ -1,5 +1,5 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
-$field['headContent']    = <<<headContent
+$field['headContent']   = <<<headContent
 headContent;
 $field['pageHeader']    = <<<pageHeader
 pageHeader;
@@ -12,6 +12,6 @@ content;
 $field['sideRight']     = <<<sideRight
 sideRight;
 $field['cssLinks']      = []; // file link
-//$field['jsLinks']       = []; // file link
+$field['jsLinks']       = []; // file link
 $field['footerContent'] = <<<footerContent
 footerContent;
