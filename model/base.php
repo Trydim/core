@@ -42,7 +42,7 @@ if ($main->checkStatus('ok') && isset($db)) {
     $dbTables = [];
     CHANGE_DATABASE && USE_DATABASE && $dbTables = array_merge($dbTables, $db->getTables());
     $dbTables = array_merge($dbTables, $db->scanDirCsv(PATH_CSV));
-    Xml::checkXml($dbTables);
+    //Xml::checkXml($dbTables);
   }
 
 }

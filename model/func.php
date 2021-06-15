@@ -187,7 +187,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
 
   if (!count($dict)) return loadFullCVS($filename);
 
-  if (($handle = fopen($filename, "r")) !== false) {
+  if (file_exists($filename) && ($handle = fopen($filename, "r")) !== false) {
     if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
       $keyIndex = [];
 
