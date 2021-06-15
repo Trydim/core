@@ -73,19 +73,19 @@ class Db extends \R {
   //------------------------------------------------------------------------------------------------------------------
 
   /**
-   * @param string $tableName name of table
+   * @param string $dbTable name of table
    * @param $columns array of columns, if count 1 return simple array
    * @param $filters string filter
    *
    * @return array
    */
-  public function selectQuery($tableName, $columns, $filters = '') {
-    if (!$tableName) return [];
+  public function selectQuery($dbTable, $columns, $filters = '') {
+    if (!$dbTable) return [];
     if (!is_array($columns)) $columns = [$columns];
     //if (!is_array($filters)) $filters = [$filters];
 
     $sql = 'SELECT ' . implode(',', $columns) .
-           ' FROM ' . $tableName;
+           ' FROM ' . $dbTable;
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
 
@@ -96,16 +96,16 @@ class Db extends \R {
    * Проверка таблицы перед добавлениями/изменениями
    *
    * @param $curTable
-   * @param $tableName
+   * @param $dbTable
    * @param $param - link
    * @param $count - link
    *
    * @return array $result
    */
-  public function checkTableBefore($curTable, $tableName, &$param) {
+  public function checkTableBefore($curTable, $dbTable, &$param) {
     $result = [];
 
-    array_map(function ($col) use (&$result, $tableName, &$param) {
+    array_map(function ($col) use (&$result, $dbTable, &$param) {
       // Если автоинкремент -> удалить все поля из $param
       if ($col['key'] === 'PRI' && strpos($col['extra'], 'auto') !== false) {
 
@@ -119,7 +119,7 @@ class Db extends \R {
       else if ($col['key'] === 'PRI' || $col['key'] === 'UNI') {
 
         foreach ($param as $k => $item) {
-          if (isset($item[$col['columnName']])) $queryResult = $this->checkHaveRows($tableName, $col['columnName'], $item[$col['columnName']]);
+          if (isset($item[$col['columnName']])) $queryResult = $this->checkHaveRows($dbTable, $col['columnName'], $item[$col['columnName']]);
           else $queryResult = [];
 
           if (count($queryResult)) {
@@ -168,41 +168,41 @@ class Db extends \R {
 
   /**
    * select all (*)
-   * @param $tableName
+   * @param $dbTable
    *
    * @return array|null
    */
-  public function loadTable($tableName) {
-    return self::getAll('SELECT * FROM ' . $tableName);
+  public function loadTable($dbTable) {
+    return self::getAll('SELECT * FROM ' . $dbTable);
   }
 
   /**
-   * @param $tableName
+   * @param $dbTable
    * @param $columnName
    * @param $value
    *
    * @return array|null
    */
-  public function checkHaveRows($tableName, $columnName, $value) {
-    return self::getCol('Select * FROM ' . $tableName . ' WHERE ' . $columnName . ' = :value', [':value' => $value]);
-    //return R::find($tableName , $columnName . ' = ' . $value);
+  public function checkHaveRows($dbTable, $columnName, $value) {
+    return self::getCol('Select * FROM ' . $dbTable . ' WHERE ' . $columnName . ' = :value', [':value' => $value]);
+    //return R::find($dbTable , $columnName . ' = ' . $value);
   }
 
   /**
-   * @param $tableName
+   * @param $dbTable
    * @param $ids
    *
    * @return array
    */
-  public function deleteItem($tableName, $ids) {
+  public function deleteItem($dbTable, $ids) {
     ob_start();
     if (count($ids) === 1) {
-      $bean = self::xdispense($tableName);
+      $bean = self::xdispense($dbTable);
       $bean->ID = $ids[0];
       $bean->id = $ids[0];
       self::trash($bean);
     } else {
-      $beans = self::xdispense($tableName, count($ids));
+      $beans = self::xdispense($dbTable, count($ids));
 
       for ($i = 0; $i < count($ids); $i++) {
         $beans[$i]->ID = $ids[$i];
@@ -226,8 +226,8 @@ class Db extends \R {
 
     return array_reduce($this::getCol($sql), function ($acc, $item) {
       $acc[] = [
-        'tableName' => $item,
-        'name'      => $item,
+        'dbTable' => $item,
+        'name'    => $item,
       ];
       return $acc;
     }, []);
@@ -235,32 +235,32 @@ class Db extends \R {
 
   /**
    * get columns table
-   * @param $tableName
+   * @param $dbTable
    *
    * @return mixed
    */
-  public function getColumnsTable($tableName) {
+  public function getColumnsTable($dbTable) {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
        COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
-		FROM information_schema.COLUMNS where TABLE_SCHEMA = :dbName AND  TABLE_NAME = :tableName',
+		FROM information_schema.COLUMNS where TABLE_SCHEMA = :dbName AND  TABLE_NAME = :dbTable',
       [':dbName'    => $this->dbName,
-       ':tableName' => $tableName
+       ':dbTable' => $dbTable
       ]);
   }
 
   /**
-   * @param $tableName
+   * @param $dbTable
    * @param $filters
    *
    * @return mixed
    */
-  public function getCountRows($tableName, $filters = '') {
-    $sql = "SELECT COUNT(*) as 'count' from $tableName";
+  public function getCountRows($dbTable, $filters = '') {
+    $sql = "SELECT COUNT(*) as 'count' from $dbTable";
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
 
     $result = self::getRow($sql);
-    //$result = self::getRow("SELECT COUNT(*) as 'count' from :tableName", [':tableName' => $tableName]);
+    //$result = self::getRow("SELECT COUNT(*) as 'count' from :dbTable", [':dbTable' => $dbTable]);
 
     if (count($result)) return $result['count'];
   }
@@ -269,16 +269,16 @@ class Db extends \R {
    * insert or change rows
    *
    * @param $curTable
-   * @param $tableName
+   * @param $dbTable
    * @param $param
    * @param bool $change
    *
    * @return array|int
    */
-  public function insert($curTable, $tableName, $param, $change = false) {
-    $result = $this->checkTableBefore($curTable, $tableName, $param);
+  public function insert($curTable, $dbTable, $param, $change = false) {
+    $result = $this->checkTableBefore($curTable, $dbTable, $param);
 
-    $beans = self::xdispense($tableName, count($param));
+    $beans = self::xdispense($dbTable, count($param));
 
     if (count($param) > 0) {
 
@@ -367,29 +367,48 @@ class Db extends \R {
   }
 
   public function loadAllOptions() {
-    $props = [];
-    $options = $this->loadOptions();
+    return array_map(function ($option){
+      // Проверка параметров
+      if ($option['properties']) {
+        $properties = json_decode($option['properties'], true);
 
-    if (count($options)) {
-      foreach ($options as $option) {
-        if ($option['properties']) {
-          $prop = json_decode($option['properties'], true);
-
-          $option['properties'];
-
+        $option['properties'] = [];
+        foreach ($properties as $property => $id) {
+          $propName = str_replace('prop_', '', $property);
+          $option['properties'][$propName] = $this->getPropertyTable($id, $property);
         }
       }
 
-      return $options;
-    }
-    return false;
+      // Перевести все имена в нормальный вид
+
+      return $option;
+    }, $this->loadOptions());
   }
 
   // Property
   //------------------------------------------------------------------------------------------------------------------
 
-  public function createPropertyTable($tableName, $param) {
-    $sql = "CREATE TABLE $tableName (
+  private function getPropertyTable($id, $propName) {
+    static $propTables, $props;
+
+    if (!$propTables) {
+      $propTables = $this->getTables('prop');
+      $props = [];
+      foreach ($propTables as $table) {
+        $props[$table['name']] = $this->loadTable($table['name']);
+      }
+    }
+
+    if (!isset($props[$propName]) || !is_array($props[$propName]) ) return ['name' => 'Prop table error'];
+
+    foreach ($props[$propName] as $item) {
+      if ($item['ID'] === $id) return $item;
+    }
+    return ['name' => 'db item not found!'];
+  }
+
+  public function createPropertyTable($dbTable, $param) {
+    $sql = "CREATE TABLE $dbTable (
             `ID` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
 
@@ -414,19 +433,11 @@ class Db extends \R {
     }
 
     $error = self::exec($sql . ')');
-    !$error && $error = self::exec("ALTER TABLE `$tableName`
+    !$error && $error = self::exec("ALTER TABLE `$dbTable`
         ADD PRIMARY KEY (`ID`)");
-    return self::exec("ALTER TABLE `$tableName`
+    return self::exec("ALTER TABLE `$dbTable`
         MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
   }
-
-  public function getPropertyTable($tableName) {
-    $tableName = 'prop_' . $tableName;
-
-    return $this->loadTable($tableName);
-  }
-
-
 
   // ORDERS
   //------------------------------------------------------------------------------------------------------------------

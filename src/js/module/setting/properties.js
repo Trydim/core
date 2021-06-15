@@ -79,6 +79,11 @@ export class Properties {
         this.showPropertiesTables(data['propertiesTables']);
       }
 
+      if (data['propertyValue']) {
+        this.setPropertyValue(data['propertyValue']);
+        this.showPropertyValue(data['propertyValue']);
+      }
+
       this.loader.stop();
     });
   }
@@ -125,7 +130,17 @@ export class Properties {
 
     this.M.show('Добавить новое свойство', this.tmp.create);
   }
-  changeProperty() {}
+  changeProperty() {
+    let props = this.selected.getSelectedList();
+    if (props.length !== 1) {
+      f.showMsg('Выберите 1 параметр', 'error');
+      return;
+    }
+
+    this.queryParam.props = props;
+    this.query();
+    this.M.show('Удалить параметр?', this.tmp.edit);
+  }
   delProperty() {
     let props = this.selected.getSelectedList();
     if (!props.length) {

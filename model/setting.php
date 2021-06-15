@@ -178,14 +178,14 @@ if (isset($setAction)) {
       $propertySetting = [];
       $setting = file_exists(SETTINGS_PATH) ? json_decode(file_get_contents(SETTINGS_PATH), true) : [];
 
-      $propName = isset($tableName) ? 'prop_' . translit($tableName) : false;
+      $propName = isset($dbTable) ? 'prop_' . translit($dbTable) : false;
       $dataType = isset($dataType) ? str_replace('s_', '', $dataType) : false;
 
       isset($setting['propertySetting'][$propName]) && $result['error'] = 'Property exist' && $setting = false;
 
       if ($setting !== false && $propName && $dataType) {
         $setting['propertySetting'][$propName] = [
-          'name' => $tableName,
+          'name' => $dbTable,
           'type' => $dataType,
         ];
         file_put_contents(SETTINGS_PATH, json_encode($setting));

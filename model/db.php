@@ -15,6 +15,8 @@ $db = new Db($dbConfig);
 isset($tableName) && $dbTable = $tableName;
 !isset($dbTable) && $dbTable = '';
 
+stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
+
 if ($dbAction === 'tables') { // todo добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
   $result['csvFiles'] = $db->scanDirCsv(PATH_CSV);
@@ -23,7 +25,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $columns = [];
   if ($dbTable) {
     USE_DATABASE && $columns = $db->getColumnsTable($dbTable);
-    $db->setCsvTable(substr($dbTable, 1));
+    $db->setCsvTable($dbTable);
   }
 
   $pageNumber = isset($currPage) ? $currPage : 0;
@@ -36,8 +38,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['columns'] = $columns;
       if (stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
       else {
-        if (!CHANGE_DATABASE && stripos($dbTable, 'csv') === false) reDirect(false, '404');
-        USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
+        if (!CHANGE_DATABASE) {
+          $dbTable = $db->getTables($dbTable);
+          count($dbTable) === 1 && $result['dbValues'] = $db->loadTable($dbTable[0]['tableName']);
+        } else {
+          //if (stripos($dbTable, 'csv') !== false) reDirect(false, '404');
+          USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
+        }
       }
       break;
     case 'saveTable':
@@ -234,9 +241,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     // Elements
-    case 'loadOptions':
-      $result['options'] = $db->loadOptions();
-      break;
     case 'createElements':
       $param = ['0' => []];
       if (isset($sectionId)) $param['0']['section_parent_id'] = $sectionId;
@@ -339,17 +343,19 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         ];
       };
       break;
-    /*case 'loadProperty':
-
-      break;*/
+    case 'loadProperty':
+      if (isset($props)) {
+        $result['propertyValue'] = $db->getColumnsTable($props);// todo загрузить просто
+      }
+      break;
     case 'createProperty':
-      if (isset($tableName) && isset($dataType)) {
+      if (isset($dbTable) && isset($dataType)) {
         // Простой или сложный параметр по префиксу
         if (stripos($dataType, 's_') === 0) {
           $setAction = 'createProperty';
           require 'setting.php';
         } else {
-          $tableName = 'prop_' . translit($tableName);
+          $dbTable = 'prop_' . translit($dbTable);
 
           $param = [];
           foreach ($_REQUEST as $key => $value) {
@@ -363,7 +369,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           }
 
           // проверить
-          $result['error'] = $db->createPropertyTable($tableName, $param);
+          $result['error'] = $db->createPropertyTable($dbTable, $param);
         }
       }
       break;
