@@ -355,7 +355,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $setAction = 'createProperty';
           require 'setting.php';
         } else {
-          $dbTable = 'prop_' . translit($dbTable);
+          $dbTable = isset($tableCode) ? $tableCode : 'prop_' . translit($dbTable);
 
           $param = [];
           foreach ($_REQUEST as $key => $value) {

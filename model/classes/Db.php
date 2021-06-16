@@ -3,6 +3,7 @@
 namespace RedBeanPHP;
 
 use PHPMailer\PHPMailer\Exception;
+use Symfony\Polyfill\Ctype\Ctype;
 
 require 'rb.php';
 
@@ -437,21 +438,46 @@ class Db extends \R {
   // Property
   //------------------------------------------------------------------------------------------------------------------
 
-  private function getPropertyTable($id, $propName) {
+  private function parseSimpleProperty($type, $value) {
+    switch ($type) {
+      default:
+      case 'text':
+      case 'textarea': return strval($value);
+      case 'number': return floatval($value);
+      //case 'date':
+      case 'bool': return boolval($value);
+    }
+  }
+
+  private function getPropertyTable($propValue, $propName) {
     static $propTables, $props;
 
     if (!$propTables) {
       $propTables = $this->getTables('prop');
       $props = [];
+      // Простые параметры
+      if (file_exists(SETTINGS_PATH)) {
+        $setting = json_decode(file_get_contents(SETTINGS_PATH), true);
+        if (isset($setting['propertySetting'])) {
+          foreach ($setting['propertySetting'] as $prop => $value) {
+            $props[$prop] = array_merge($value, ['simple' => true]);
+          }
+        }
+      }
+      // Параметры из таблиц БД
       foreach ($propTables as $table) {
         $props[$table['name']] = $this->loadTable($table['name']);
       }
     }
 
+    $prop = $props[$propName];
+
+    if (isset($prop['simple'])) return $this->parseSimpleProperty($prop['type'], $propValue);
+
     if (!isset($props[$propName]) || !is_array($props[$propName]) ) return ['name' => 'Prop table error'];
 
     foreach ($props[$propName] as $item) {
-      if ($item['ID'] === $id) return $item;
+      if ($item['ID'] === $propValue) return $item;
     }
     return ['name' => 'db item not found!'];
   }

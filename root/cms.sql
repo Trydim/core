@@ -118,6 +118,8 @@ INSERT INTO `files` (`ID`, `Name`, `Path`, `Format`) VALUES
 -- Структура таблицы `money`
 --
 
+UPDATE `options_elements` SET `images_ids` = '231', `properties` = '{\"prop_kod\":\"M-A658\",\"prop_tone\":\"9\",\"prop_cena_raboty\":75,\"prop_brand\":\"1\",\"prop_uzor\":0}', `sort` = '39', `input_price` = '109', `output_price` = '109' WHERE `options_elements`.`ID` = 4;
+
 CREATE TABLE `money` (
   `ID` int(10) UNSIGNED NOT NULL,
   `name` varchar(100) CHARACTER SET utf8 NOT NULL,

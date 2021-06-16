@@ -118,6 +118,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
             <tr>
               <th></th>
               <th>Свойство</th>
+              <th>Код</th>
               <th>Тип</th>
             </tr>
             </thead>
@@ -125,6 +126,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
             <tr>
               <td><input type="checkbox" class="" data-id="${property}"></td>
               <td>${name}</td>
+              <td>${property}</td>
               <td>${type}</td>
             </tr>
             </tbody>
@@ -147,6 +149,9 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       <label class="w-100">Название свойства: <input type="text" class="form-control" name="tableName"></label>
     </div>
     <div class="form-group">
+      <label class="w-100">Код свойства: <input type="text" class="form-control" name="tableCode"></label>
+    </div>
+    <div class="form-group">
       <label class="w-100">Тип данных:
         <select class="form-control useToggleOption" name="dataType" data-field="propertyType">
           <optgroup label="Простые">
@@ -154,6 +159,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
             <option value="s_textarea">Текст (много)</option>
             <option value="s_number">Число</option>
             <option value="s_date">Дата</option>
+            <option value="s_bool">Флаг (Да/Нет)</option>
           </optgroup>
           <optgroup label="Составные">
             <option value="h_select" data-target="selectField">Справочник</option>
