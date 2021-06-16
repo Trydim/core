@@ -255,7 +255,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       if (isset($elementsId) && is_finite($elementsId)) {
         $result['countRowsOptions'] = $db->getCountRows('options_elements', " element_id = $elementsId ");
-        $result['options'] = $db->loadOptions($elementsId, $pageNumber, $countPerPage, $sortColumn, $sortDirect);
+        $result['options'] = $db->openOptions($elementsId, $pageNumber, $countPerPage, $sortColumn, $sortDirect);
       }
       break;
     case 'changeElements':
