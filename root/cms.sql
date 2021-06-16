@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Ноя 02 2020 г., 17:51
+-- Время создания: Июн 16 2021 г., 10:56
 -- Версия сервера: 10.4.12-MariaDB
 -- Версия PHP: 7.3.17
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- База данных: `countertop`
+-- База данных: `cms`
 --
 
 -- --------------------------------------------------------
@@ -38,8 +38,7 @@ CREATE TABLE `codes` (
 
 INSERT INTO `codes` (`symbol_code`, `name`) VALUES
 ('door', 'дверь'),
-('stone', 'камень'),
-('Test2', 'Test3');
+('stone', 'камень');
 
 -- --------------------------------------------------------
 
@@ -53,6 +52,13 @@ CREATE TABLE `customers` (
   `ITN` varchar(15) DEFAULT NULL,
   `contacts` varchar(255) DEFAULT '{}'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `customers`
+--
+
+INSERT INTO `customers` (`ID`, `name`, `ITN`, `contacts`) VALUES
+(1, 'customers', NULL, '{}');
 
 -- --------------------------------------------------------
 
@@ -71,6 +77,13 @@ CREATE TABLE `elements` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- Дамп данных таблицы `elements`
+--
+
+INSERT INTO `elements` (`ID`, `element_type_code`, `section_parent_id`, `name`, `last_edit_date`, `activity`, `sort`) VALUES
+(2, 'stone', 2, 'Камень1', '2021-06-14 07:25:40', 1, 100);
+
+--
 -- Триггеры `elements`
 --
 DELIMITER $$
@@ -78,6 +91,26 @@ CREATE TRIGGER `InsertElement` AFTER INSERT ON `elements` FOR EACH ROW INSERT IN
 VALUES (NEW.ID, NEW.name)
 $$
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `files`
+--
+
+CREATE TABLE `files` (
+  `ID` int(10) UNSIGNED NOT NULL,
+  `Name` varchar(255) DEFAULT 'noName',
+  `Path` varchar(255) NOT NULL,
+  `Format` varchar(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `files`
+--
+
+INSERT INTO `files` (`ID`, `Name`, `Path`, `Format`) VALUES
+(1, 'image.jpg', 'image.jpg', 'jpg');
 
 -- --------------------------------------------------------
 
@@ -111,7 +144,7 @@ CREATE TABLE `options_elements` (
   `money_input_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
   `money_output_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
   `unit_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
-  `image_id` int(10) UNSIGNED DEFAULT NULL,
+  `images_ids` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT 'not name option',
   `properties` varchar(1000) CHARACTER SET utf8 DEFAULT NULL,
   `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -121,6 +154,14 @@ CREATE TABLE `options_elements` (
   `output_percent` double NOT NULL DEFAULT 1,
   `output_price` decimal(10,4) NOT NULL DEFAULT 1.0000
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Варианты элементов';
+
+--
+-- Дамп данных таблицы `options_elements`
+--
+
+INSERT INTO `options_elements` (`ID`, `element_id`, `money_input_id`, `money_output_id`, `unit_id`, `images_ids`, `name`, `properties`, `last_edit_date`, `activity`, `sort`, `input_price`, `output_percent`, `output_price`) VALUES
+(1, 2, 1, 1, 1, '1,1', 'Камень1', '{\"prop_brand\":\"1\"}', '2021-06-16 07:51:05', 1, 100, '1.0000', 1, '1.0000'),
+(2, 2, 1, 1, 1, '', 'Камень2', NULL, '2021-06-16 06:54:48', 1, 100, '1.0000', 1, '1.0000');
 
 -- --------------------------------------------------------
 
@@ -138,7 +179,7 @@ CREATE TABLE `orders` (
   `important_value` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '{}',
   `status_id` int(2) UNSIGNED NOT NULL DEFAULT 1,
   `save_value` varchar(500) CHARACTER SET utf8 NOT NULL DEFAULT '{}',
-  `report_value` varbinary(4000) DEFAULT NULL
+  `report_value` varbinary(2000) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -176,7 +217,28 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`ID`, `name`, `access_val`) VALUES
-(1, 'admin', '{}');
+(1, 'admin', '{\"menuAccess\":\"\"}');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `prop_brand`
+--
+
+CREATE TABLE `prop_brand` (
+  `ID` int(10) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL DEFAULT 'NoName',
+  `logo` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `prop_brand`
+--
+
+INSERT INTO `prop_brand` (`ID`, `name`, `logo`) VALUES
+(1, 'brand1', 'image.png'),
+(2, 'brand2', 'image.png'),
+(3, 'brand3', 'image.png');
 
 -- --------------------------------------------------------
 
@@ -191,6 +253,21 @@ CREATE TABLE `section` (
   `name` varchar(255) CHARACTER SET utf8 NOT NULL,
   `active` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `section`
+--
+
+INSERT INTO `section` (`ID`, `parent_ID`, `code`, `name`, `active`) VALUES
+(1, 0, 'root', 'камни', 1),
+(2, 1, 'dir1', 'красные', 1),
+(3, 1, 'dir2', 'синие', 1),
+(4, 0, 'dir3', 'дерево', 1),
+(5, 4, 'dir4', 'елки', 1),
+(6, 4, 'dir5', 'дубы', 1),
+(7, 5, 'dir6', 'искусственные', 1),
+(8, 5, 'dir6', 'натуральные', 1),
+(9, 0, 'sheep', 'овцы', 1);
 
 -- --------------------------------------------------------
 
@@ -237,7 +314,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`ID`, `permission_id`, `login`, `password`, `name`, `contacts`, `register_date`, `activity`, `customization`, `hash`) VALUES
-(1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'admin', '{}', '2020-07-28 21:00:00', 1, '{}', '$2y$10$.6zjMHBcGXGTOboKeQ4KluuT3HwQmEefZs1g/UFbOeoPlzAVDRDRm');
+(1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'admin', '{}', '2020-07-28 21:00:00', 1, '{}', '$2y$10$vXkh.0PCabVi9LWWiDtLX.5nlh2q71V6pCyootZYt1RbF6rRiGyra');
 
 --
 -- Индексы сохранённых таблиц
@@ -265,6 +342,12 @@ ALTER TABLE `elements`
   ADD KEY `element_type_id` (`element_type_code`);
 
 --
+-- Индексы таблицы `files`
+--
+ALTER TABLE `files`
+  ADD PRIMARY KEY (`ID`);
+
+--
 -- Индексы таблицы `money`
 --
 ALTER TABLE `money`
@@ -278,7 +361,6 @@ ALTER TABLE `options_elements`
   ADD KEY `element_id` (`element_id`),
   ADD KEY `money_id` (`money_input_id`),
   ADD KEY `unit_id` (`unit_id`),
-  ADD KEY `image_id` (`image_id`),
   ADD KEY `money_output_id` (`money_output_id`);
 
 --
@@ -302,6 +384,12 @@ ALTER TABLE `order_status`
 ALTER TABLE `permission`
   ADD PRIMARY KEY (`ID`),
   ADD UNIQUE KEY `permission_name_uindex` (`name`);
+
+--
+-- Индексы таблицы `prop_brand`
+--
+ALTER TABLE `prop_brand`
+  ADD PRIMARY KEY (`ID`);
 
 --
 -- Индексы таблицы `section`
@@ -331,61 +419,73 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT для таблицы `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `elements`
 --
 ALTER TABLE `elements`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT для таблицы `files`
+--
+ALTER TABLE `files`
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `money`
 --
 ALTER TABLE `money`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `options_elements`
 --
 ALTER TABLE `options_elements`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `order_status`
 --
 ALTER TABLE `order_status`
-  MODIFY `ID` int(2) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(2) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `permission`
 --
 ALTER TABLE `permission`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `prop_brand`
+--
+ALTER TABLE `prop_brand`
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `section`
 --
 ALTER TABLE `section`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `units`
 --
 ALTER TABLE `units`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

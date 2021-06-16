@@ -40,7 +40,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       else {
         if (!CHANGE_DATABASE) {
           $dbTable = $db->getTables($dbTable);
-          count($dbTable) === 1 && $result['dbValues'] = $db->loadTable($dbTable[0]['tableName']);
+          count($dbTable) === 1 && $result['dbValues'] = $db->loadTable($dbTable[0]['dbTable']);
         } else {
           //if (stripos($dbTable, 'csv') !== false) reDirect(false, '404');
           USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
@@ -255,7 +255,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       if (isset($elementsId) && is_finite($elementsId)) {
         $result['countRowsOptions'] = $db->getCountRows('options_elements', " element_id = $elementsId ");
-        $result['options'] = $db->loadOptions($elementsId, $pageNumber, $countPerPage, $sortColumn, $sortDirect);
+        $result['options'] = $db->openOptions($elementsId, $pageNumber, $countPerPage, $sortColumn, $sortDirect);
       }
       break;
     case 'changeElements':

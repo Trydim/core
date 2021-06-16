@@ -74,7 +74,7 @@ class Db extends \R {
 
   /**
    * @param string $dbTable name of table
-   * @param $columns array of columns, if count 1 return simple array
+   * @param array|string $columns of columns, if count 1 return simple array
    * @param $filters string filter
    *
    * @return array
@@ -328,7 +328,21 @@ class Db extends \R {
     return ['result' => $result,];
   }
 
-  // ELEMENTS
+  // Files
+  //------------------------------------------------------------------------------------------------------------------
+
+  /**
+   * @param mixed $ids - if sting use delimiter ","
+   *
+   * @return array
+   */
+  public function getFiles($ids = false) {
+    if (is_string($ids)) $ids = explode(',', $ids);
+    $filters = $ids ? ' ID = ' . implode(' or ', $ids) : '';
+    return $this->selectQuery('files', '*', $filters);
+  }
+
+  // Elements
   //------------------------------------------------------------------------------------------------------------------
 
   public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
@@ -347,28 +361,65 @@ class Db extends \R {
   // Options
   //------------------------------------------------------------------------------------------------------------------
 
-  public function loadOptions($elementID = false, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'O.name', $sortDirect = false) {
+  /**
+   * Для страницы Catalog
+   * @param false $elementID
+   * @param int $pageNumber
+   * @param int $countPerPage
+   * @param string $sortColumn
+   * @param false $sortDirect
+   * @return array|null
+   */
+  public function openOptions($elementID = false, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'O.name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT O.ID AS 'O.ID', O.name AS 'O.name', O.unit_id as 'O.unit_id', 
-                   O.activity as 'O.activity', sort, last_edit_date,                   
-                   MI.name AS 'MI.name', MO.name AS 'MO.name', properties, input_price, output_percent, output_price
+    $sql = "SELECT O.ID AS 'O.ID', O.name AS 'O.name', U.short_name as 'U.short_name', 
+                   O.activity as 'O.activity', sort, last_edit_date, images_ids,                   
+                   MI.name AS 'MI.name', MO.name AS 'MO.name', input_price, output_percent, output_price
             FROM options_elements O
             JOIN money MI on MI.ID = O.money_input_id
             JOIN money MO on MO.ID = O.money_output_id
             JOIN units U on U.ID = O.unit_id";
 
     if ($elementID) {
-      $sql .= "WHERE O.element_id = $elementID
+      $sql .= " WHERE O.element_id = $elementID
       		ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
     }
 
-    return self::getAll($sql);
+    $options = self::getAll($sql);
+
+    return array_map(function ($option) {
+      strlen($option['images_ids']) && $option['images'] = $this->getFiles($option['images_ids']);
+      return $option;
+    }, $options);
   }
 
-  public function loadAllOptions() {
-    return array_map(function ($option){
-      // Проверка параметров
+  /**
+   * Load for calculator
+   * @param false $elementID
+   * @return array|null
+   */
+  public function loadOptions($elementID = false) {
+    $sql = "SELECT O.ID AS 'id', O.name AS 'name',
+                   U.short_name as 'unit', O.activity as 'activity', 
+                   sort, last_edit_date as 'lastDate', properties, images_ids,
+                   MI.name AS 'moneyInput', MO.name AS 'moneyOutput',
+                   input_price, output_percent, output_price
+            FROM options_elements O
+            JOIN money MI on MI.ID = O.money_input_id
+            JOIN money MO on MO.ID = O.money_output_id
+            JOIN units U on U.ID = O.unit_id";
+
+    $elementID && $sql .= "WHERE O.element_id = $elementID";
+
+    $options = self::getAll($sql);
+
+    return array_map(function ($option) {
+      // set images
+      strlen($option['images_ids']) && $option['images'] = $this->getFiles($option['images_ids']);
+      unset($option['images_ids']);
+
+      // set properties
       if ($option['properties']) {
         $properties = json_decode($option['properties'], true);
 
@@ -379,10 +430,8 @@ class Db extends \R {
         }
       }
 
-      // Перевести все имена в нормальный вид
-
       return $option;
-    }, $this->loadOptions());
+    }, $options);
   }
 
   // Property
@@ -439,7 +488,7 @@ class Db extends \R {
         MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
   }
 
-  // ORDERS
+  // Orders
   //------------------------------------------------------------------------------------------------------------------
 
   /**
@@ -513,7 +562,7 @@ class Db extends \R {
     $this->insert($columns, $dbTable, $param, true);
   }
 
-  // ORDERS VISITORS
+  // Orders Visitors
   //------------------------------------------------------------------------------------------------------------------
 
   public function saveVisitorOrder($param) {
