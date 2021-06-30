@@ -24,7 +24,7 @@ class Docs {
 
   private $docsType, $fileTpl, $filePath;
   private $data = [], $excelHeader = []; // Отчет глобальный для вставки в шаблон
-  private $content, $footerPage = '', $imgPath;
+  private $content, $footerPage = '', $pathImg;
   private $pdfParam; // Param
   private $docs;
   private $fileName;
@@ -81,7 +81,7 @@ class Docs {
       'margin_footer' => 5,
     ];
 
-    $this->imgPath = $_SERVER['DOCUMENT_ROOT'] . PATH_IMG;
+    $this->pathImg = $_SERVER['DOCUMENT_ROOT'] . PATH_IMG;
   }
 
   private function prepareTemplate() {

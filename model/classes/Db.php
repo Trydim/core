@@ -419,6 +419,10 @@ class Db extends \R {
       // set images
       strlen($option['images_ids']) && $option['images'] = $this->getFiles($option['images_ids']);
       unset($option['images_ids']);
+      $option['images'] = array_map(function ($item) {
+        $item['path'] = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+        return $item;
+      }, $option['images']);
 
       // set properties
       if ($option['properties']) {
@@ -470,11 +474,10 @@ class Db extends \R {
       }
     }
 
+    if (!isset($props[$propName]) || !is_array($props[$propName])) return ['name' => 'Prop table error'];
     $prop = $props[$propName];
 
     if (isset($prop['simple'])) return $this->parseSimpleProperty($prop['type'], $propValue);
-
-    if (!isset($props[$propName]) || !is_array($props[$propName]) ) return ['name' => 'Prop table error'];
 
     foreach ($props[$propName] as $item) {
       if ($item['ID'] === $propValue) return $item;

@@ -8,14 +8,18 @@ if (!defined('MAIN_ACCESS')) die('access denied!');
 // General setting
 
 // To
-define('MAIL_TARGET_DEBUG', 'trydim@mail.ru');
+!defined('MAIL_TARGET_DEBUG') && define('MAIL_TARGET_DEBUG', 'trydim@mail.ru');
 define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта ' . $_SERVER['SERVER_NAME']);
 // From
 define('MAIL_SMTP', true);
-define('MAIL_HOST', 'smtp.yandex.ru');
+
 define('MAIL_PORT', 465);
+define('MAIL_HOST', 'smtp.yandex.ru');
 define('MAIL_FROM', 'noreplycalcby@yandex.ru');
 define('MAIL_PASSWORD', '638ch1');
+/*define('MAIL_HOST', 'smtp.mail.ru');
+define('MAIL_FROM', 'mail.common@list.ru');
+define('MAIL_PASSWORD', 'RAE^ysPypo22');*/
 //define('MAIL_FROM', 'commonserver@yandex.ru');
 //define('MAIL_PASSWORD', 'xmbxqxulvhwcqyta');
 
