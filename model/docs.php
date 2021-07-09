@@ -54,7 +54,7 @@ if (count($_FILES)) {
 
 if ($docType && $docType !== 'mail') {
   require_once 'classes/Docs.php';
-  $docs = new Docs($docType, $reportVal, isset($fileTpl) ? $$fileTpl : 'default');
+  $docs = new Docs($docType, $reportVal, isset($fileTpl) ? $fileTpl : 'default');
 }
 
 if (isset($docsAction)) {
@@ -79,6 +79,16 @@ if (isset($docsAction)) {
       $docType && $mail->addFile($docsPath);
       isset($email) && $mail->addMail($email);
       $result['mail'] = $mail->send();
+      break;
+
+    case 'getPrintStyle':
+      $fileTpl = isset($fileTpl) ? $fileTpl : 'printTpl.css';
+
+      if (file_exists(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl)) {
+        ob_start();
+        include(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl);
+        $result['style'] = ob_get_clean();
+      }
       break;
   }
 }

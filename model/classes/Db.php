@@ -2,9 +2,6 @@
 
 namespace RedBeanPHP;
 
-use PHPMailer\PHPMailer\Exception;
-use Symfony\Polyfill\Ctype\Ctype;
-
 require 'rb.php';
 
 class Db extends \R {

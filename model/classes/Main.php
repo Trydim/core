@@ -20,7 +20,8 @@ trait Authorization {
     return $this->$field;
   }
 
-  public function setLogin($session) {
+  public function setLogin($session = null) {
+    !$session && session_start() && $session = $_SESSION;
     $this->login = $session['login'];
     $this->name  = $session['name'];
     $this->id    = $session['priority'];
@@ -50,6 +51,8 @@ trait Authorization {
     $this->status = $status;
     return $this;
   }
+
+
 
   public function setSideMenu() {
     if (USE_DATABASE) {

@@ -445,8 +445,8 @@ const func = {
    * @val v string
    */
   parseNumber(v) {
-    typeof v === 'string' && (v = v.replace(',', '.'));
-    typeof v === 'string' && !isFinite(v) && (v = parseFloat(v.match(/\d+|\.|\d+/g).join('')));
+    typeof v === 'string' && (v = v.replace(',', '.'))
+    && !isFinite(v) && /\d/.test(v) && (v = parseFloat(v.match(/\d+|\.|\d+/g).join('')));
     !isFinite(v) && (v = 0);
     return +v;
   },

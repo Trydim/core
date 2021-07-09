@@ -12,7 +12,6 @@ export const c = {
   PATH_IMG     : (window['PATH_IMG'] || 'public/images/'),
   AUTH_STATUS  : !!(window['AUTH_STATUS'] || false),
 
-  CURRENT_EVENT: 'none',
   PHONE_MASK: '+7 (___) ___ __ __',
 
   // Global IDs
