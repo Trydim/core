@@ -275,13 +275,18 @@ export const Print = () => {
   }
 
   p.print = function (content, classList = []) {
-    const scrollY = window.pageYOffset;
-    let delay = this.setContent(content, classList);
-    setTimeout(() => {
-      document.body.append(this.frame);
-      this.frame.remove();
-      window.scrollTo(0, scrollY);
-    }, delay);
+    q.Get({data: 'mode=docs&docsAction=getPrintStyle'}).then(data => {
+      debugger
+      typeof data.style === 'string' && (content = `<style>${data.style}</style>` + content);
+      const scrollY = window.pageYOffset;
+      let delay = this.setContent(content, classList);
+
+      setTimeout(() => {
+        document.body.append(this.frame);
+        this.frame.remove();
+        window.scrollTo(0, scrollY);
+      }, delay);
+    });
   }
 
   p.orderPrint = async function (printFunc, data, type) {
