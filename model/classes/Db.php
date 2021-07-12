@@ -401,12 +401,13 @@ class Db extends \R {
    * @return array|null
    */
   public function loadOptions($elementID = false) {
-    $sql = "SELECT O.ID AS 'id', O.name AS 'name',
-                   U.short_name as 'unit', O.activity as 'activity', 
-                   sort, last_edit_date as 'lastDate', properties, images_ids,
+    $sql = "SELECT O.ID AS 'id', E.element_type_code AS 'type', O.name AS 'name',
+                   U.short_name as 'unit', O.activity AS 'activity',
+                   O.sort AS 'sort', O.last_edit_date as 'lastDate', properties, images_ids,
                    MI.name AS 'moneyInput', MO.name AS 'moneyOutput',
                    input_price, output_percent, output_price
             FROM options_elements O
+            JOIN elements E on E.ID = O.element_id
             JOIN money MI on MI.ID = O.money_input_id
             JOIN money MO on MO.ID = O.money_output_id
             JOIN units U on U.ID = O.unit_id";
