@@ -94,8 +94,8 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       <div class="col-12 d-flex justify-content-between">
         <p class="col-7">Дополнительные поля менеджеров</p>
         <div class="col-5">
-          <input type="button" data-action="addCol" value="+">
-          <input type="button" data-action="delCol" value="-">
+          <input type="button" data-action="addCustomManagerField" value="+">
+          <input type="button" data-action="removeCustomManagerField" value="-">
         </div>
       </div>
       <div class="col-12 d-flex flex-wrap justify-content-between text-center" data-field="customField"></div>
@@ -196,7 +196,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     </div>
   </form>
 </template>
-<template id="propertiesCreateTmp">
+<template id="propertiesCreateTmp23">
   <table class="text-center table table-striped">
     <thead>
       <tr>

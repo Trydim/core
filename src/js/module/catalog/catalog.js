@@ -82,10 +82,18 @@ export const catalog = {
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
+    this.elementsId = new f.SelectedRow({
+      table: f.qS('#elementsField table'),
+    });
+
     this.pOptions = new f.Pagination( '#optionsField .pageWrap',{
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
+    this.optionsId = new f.SelectedRow({
+      table: f.qS('#optionsField table'),
+    });
+
     new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     //new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.query();
@@ -223,8 +231,8 @@ export const catalog = {
     });
 
     f.eraseNode(tBody).append(...trNode);
-    this.checkedRows(param);
-    this.onEventElementsTable(itemsField);
+    //this.checkedRows(param);
+    //this.onEventElementsTable(itemsField);
   },
 
   setReloadQueryParam() {
@@ -295,6 +303,7 @@ export const catalog = {
         this.M.show('Создание раздел', form);
         this.reloadAction = { dbAction : 'loadSection', sectionId: 0 };
       },
+
       // Создать элемент
       'createElements' : () => {
         // Запросить типы элементов
@@ -314,23 +323,23 @@ export const catalog = {
       },
       // Открыть элемент
       'openElements': () => {
-        if (this.selectedId.elements.size !== 1) return;
+        if (this.elementsId.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
 
-        this.queryParam.elementsId = this.selectedId.elements.keys().next().value;
+        this.queryParam.elementsId = this.elementsId.getSelectedList()[0];
         this.query({sort: 'options'});
       },
       // Изменить элемент
       'changeElements': () => {
         // Нужен запрос на секции
-        if(!this.selectedId.elements.size) return;
+        if(!this.elementsId.getSelectedSize()) return;
 
-        let oneElements = this.selectedId.elements.size === 1,
+        let oneElements = this.elementsId.getSelectedSize() === 1,
             form = f.gTNode('#elementForm'),
-            id = this.getSelectedList('elements'),
+            id = this.elementsId.getSelectedList(),
             element = this.elementsList.get(id[0]);
 
         this.queryParam.elementsId = JSON.stringify(id);
-        this.delayFunc = () => this.eraseSelectedList('elements');
+        this.delayFunc = () => this.elementsId.clear();
 
         let node = form.querySelector('[name="elementType"]');
         node.value = element['C.name'];
@@ -368,6 +377,7 @@ export const catalog = {
         this.M.show('Удалить элемент', 'Удалить элемент и варианты?');
         this.reloadAction = { dbAction : 'openSection' };
       },
+
       // Добавить вариант
       'createOptions': () => {
         // Нужен запрос на ID валют
@@ -626,54 +636,6 @@ export const catalog = {
   onEventColumnTable(item) {
     this[item + 'Field'].querySelectorAll('thead input').forEach(n => {
       n.addEventListener('click', (e) => this.sortRows.call(this, e));
-    });
-  },
-
-  // TODO selected Rows
-  //--------------------------------------------------------------------------------------------------------------------
-
-  checkboxTmp: null,
-  selectedId: { // TODO сохранять в сессии потом, что бы можно было перезагрузить страницу
-    elements: new Set(),
-    options: new Set(),
-  },
-
-  getSelectedList(item) {
-    let ids = [];
-    for( let id of this.selectedId[item].values()) ids.push(id);
-    return ids;
-  },
-
-  eraseSelectedList(item) {
-    this.selectedId[item].clear();
-  },
-
-  // выбор элемента
-  selectRows(e) {
-    let input = e.target,
-        id = input.getAttribute('data-id'),
-        item = input && input.closest('[data-field]').getAttribute('data-field');
-
-    if (input.checked) this.selectedId[item].add(id);
-    else this.selectedId[item].delete(id);
-
-    //this.checkBtnRows();
-  },
-
-  // Выделить выбранные Заказы
-  checkedRows(param) {
-    let table = f.gI(param.fieldId);
-
-    this.selectedId[param.type].forEach(id => {
-      let input = table.querySelector(`input[data-id="${id}"]`);
-      if (input) input.checked = true;
-    });
-  },
-
-  onEventElementsTable(itemsField) {
-    // Checked rows
-    this[itemsField].querySelectorAll('tbody input').forEach(n => {
-      n.addEventListener('change', (e) => this.selectRows.call(this, e));
     });
   },
 }

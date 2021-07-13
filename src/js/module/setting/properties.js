@@ -149,7 +149,7 @@ export class Properties {
     }
 
     this.queryParam.props = props;
-    this.M.show('Удалить параметр?', 'show selected');
+    this.M.show('Удалить параметр?', props.join(', '));
   }
 
   addCol(keyValue = false, typeValue = false) {

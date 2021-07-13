@@ -355,7 +355,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $setAction = 'createProperty';
           require 'setting.php';
         } else {
-          $dbTable = isset($tableCode) ? $tableCode : 'prop_' . translit($dbTable);
+          $dbTable = 'prop_' . (isset($tableCode) ? $tableCode : translit($dbTable));
 
           $param = [];
           foreach ($_REQUEST as $key => $value) {
@@ -378,6 +378,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $props = explode(',', $props);
         $setAction = 'delProperty';
         require 'setting.php';
+        $db->delPropertyTable($props);
       }
       break;
 

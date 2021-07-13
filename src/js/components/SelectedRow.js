@@ -13,7 +13,7 @@ export class SelectedRow {
     this.dataset = this.table.dataset || {type: 'one'};
     this.initTable();
     this.onTableEvent();
-    f.observer.add(this.constructor.name, this);
+    f.observer.add(this.dataset.type, this); // TODO не это я хотел, не правильно работает
   }
 
   initTable() {
@@ -43,8 +43,6 @@ export class SelectedRow {
   getSelectedSize() {
     return this.selectedId[this.dataset.type].size;
   }
-
-
 
 
 
@@ -110,5 +108,6 @@ export class SelectedRow {
     //this.table.onclick = (e) => this.clickRows(e);
     this.table.addEventListener('mousedown', (e) => this.mouseDown(e));
     this.table.addEventListener('mouseup', (e) => this.mouseUp(e));
+    this.table.addEventListener('click', (e) => e.preventDefault());
   }
 }

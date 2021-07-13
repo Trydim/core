@@ -1,5 +1,28 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
-$field['content']       = <<<content
+
+
+// самое время подключить шаблонизатор
+$propertiesHtml = '';
+foreach ($properties as $propName => $prop) {
+  if (isset($prop['type'])) {
+    $name = $prop['name'];
+    $type = $prop['type'];
+    $propertiesHtml .= "<div><label>$name<input type='$type'></label></div>";
+  } else {
+    $propertiesHtml .= "<div><label>$propName<select>";
+
+    foreach ($prop as $opt) {
+      $id = $opt['ID'];
+      $name = $opt['name'];
+      $propertiesHtml .= "<option value=\"$id\">$name</option>";
+    }
+
+    $propertiesHtml .= "</select></label></div>";
+  }
+}
+
+
+$field['content'] = <<<content
 <div class="container-fluid">
   <div class="row">
     <div class="col-3 overflow-auto bg-style-sheet">
@@ -13,8 +36,8 @@ $field['content']       = <<<content
       </div>
     </div>
     <div class="col-9">
-      <div class="d-none bg-style-sheet" id="elementsField" data-field="elements">
-        <table class="text-center table table-striped">
+      <div class="d-none bg-style-sheet" id="elementsField">
+        <table class="text-center table table-striped" data-type="elements">
           <thead><tr></tr></thead>
           <tbody></tbody>
         </table>
@@ -30,9 +53,9 @@ $field['content']       = <<<content
   </div>
 </div>
 <hr>
-<div class="container-fluid d-none bg-style-sheet" id="optionsField" data-field="options">
+<div class="container-fluid d-none bg-style-sheet" id="optionsField">
   <div class="row">
-    <table  class="text-center table table-striped">
+    <table class="text-center table table-striped" data-type="options">
       <thead><tr></tr></thead>
       <tbody></tbody>
     </table>
@@ -46,7 +69,7 @@ $field['content']       = <<<content
 </div>
 content;
 
-$field['footerContent'] = <<<footerContent
+$field['footerContent'] .= <<<footerContent
 <template id="sectionWrap">
   <ul class="list" style="cursor: pointer"></ul>
 </template>
@@ -106,6 +129,19 @@ $field['footerContent'] = <<<footerContent
     <div id="changeField">
       <br><label>Активность: <input type="checkbox" name="optionActivity"></label>
       <br><label>Сортировка: <input type="number" name="optionSort"></label>
+    </div>
+    <div class="d-none" data-field="properties">
+      <table>
+      <thead>
+        <tr class="row">
+          <th class="col">Свойство значение</th>
+          <th class="col"></th>
+        </tr>
+      </thead>
+      <tbody class="">
+      </tbody>
+      </table>
+      $propertiesHtml
     </div>
   </form>
 </template>

@@ -1,7 +1,6 @@
 'use strict';
 
 // Orders list for search
-import {SelectedRow} from "./SelectedRow";
 
 class allOrdersList {
   constructor(param) {
@@ -11,7 +10,7 @@ class allOrdersList {
     const data = this.getFormData(param);
 
     this.node            = node;
-    this.type           = param.tableType;
+    this.type            = param.tableType;
     this.data            = [];
     this.searchData      = Object.create(null);
     this.searchComponent = f.searchInit();
@@ -109,7 +108,7 @@ export const orders = {
     this.setTableTemplate('order');
 
     this.loaderTable = new f.LoaderIcon(this.table);
-    this.selected = new SelectedRow({table: this.table});
+    this.selected = new f.SelectedRow({table: this.table});
 
     this.query();
 

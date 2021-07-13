@@ -228,7 +228,7 @@ class Db extends \R {
     return array_reduce($this::getCol($sql), function ($acc, $item) {
       $acc[] = [
         'dbTable' => $item,
-        'name'    => $item,
+        'name'    => str_replace('prop_', '', $item),
       ];
       return $acc;
     }, []);
@@ -513,6 +513,17 @@ class Db extends \R {
         ADD PRIMARY KEY (`ID`)");
     return self::exec("ALTER TABLE `$dbTable`
         MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
+  }
+
+  public function delPropertyTable($dbTables) {
+    $propTables = $this->getTables('prop');
+
+    foreach ($propTables as $prop) {
+      if (in_array($prop['dbTable'], $dbTables)) {
+        $table = $prop['dbTable'];
+        self::exec("DROP TABLE `$table`");
+      }
+    }
   }
 
   // Orders
