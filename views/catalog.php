@@ -1,5 +1,27 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var $units - from controller
+ * @var $money - from controller
+ * @var $properties - from controller
+ */
+
+
+$unitsOptionsHtml = '';
+foreach ($units as $opt) {
+  $id = $opt['ID'];
+  $name = $opt['short_name'];
+  $unitsOptionsHtml .= "<option value=\"$id\">$name</option>";
+}
+
+
+$moneyOptionsHtml = '';
+foreach ($money as $opt) {
+  $id = $opt['ID'];
+  $name = $opt['name'];
+  $moneyOptionsHtml .= "<option value=\"$id\">$name</option>";
+}
+
 
 // самое время подключить шаблонизатор
 $propertiesHtml = '';
@@ -7,9 +29,12 @@ foreach ($properties as $propName => $prop) {
   if (isset($prop['type'])) {
     $name = $prop['name'];
     $type = $prop['type'];
-    $propertiesHtml .= "<div><label>$name<input type='$type'></label></div>";
+    $propertiesHtml .= "<div class='row'>
+      <label class='col'>$name</label><div class='col'>
+      <input class='w-100' type='$type'></div>
+    </div>";
   } else {
-    $propertiesHtml .= "<div><label>$propName<select>";
+    $propertiesHtml .= "<div class='row'><label class='col'>$propName</label><div class='col'><select class='w-100'>";
 
     foreach ($prop as $opt) {
       $id = $opt['ID'];
@@ -17,7 +42,7 @@ foreach ($properties as $propName => $prop) {
       $propertiesHtml .= "<option value=\"$id\">$name</option>";
     }
 
-    $propertiesHtml .= "</select></label></div>";
+    $propertiesHtml .= "</select></div></div>";
   }
 }
 
@@ -54,7 +79,7 @@ $field['content'] = <<<content
 </div>
 <hr>
 <div class="container-fluid d-none bg-style-sheet" id="optionsField">
-  <div class="row">
+  <div class="row m-2" style="overflow: auto">
     <table class="text-center table table-striped" data-type="options">
       <thead><tr></tr></thead>
       <tbody></tbody>
@@ -105,42 +130,41 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="optionForm">
   <form action="#">
-    <label>Имя варианта: <input type="text" name="optionName"></label>
-    <br><label>Единица измерения: <select name="unitId">
-            <option value="1">Штука</option>
-            <option value="2">МП</option>
-          </select></label>
-    <div>Входная цена
-        <br><label> валюта:
-          <select name="moneyInputId">
-            <option value="1">USD</option>
-            <option value="2">RUB</option>
-          </select></label>
-        <br><label> сумма: <input type="number" name="moneyInput" value="0"></label>
+    <div class="row">
+      <label class="col">Имя варианта:</label>
+      <div class="col"><input class="w-100" type="text" name="optionName"></div>  
     </div>
-    <div>Розничная цена
-      <br><label> валюта: <select name="moneyOutputId">
-            <option value="1">USD</option>
-            <option value="2">RUB</option>
-          </select></label>
-      <br><label> наценка, %: <input type="number" name="outputPercent"></label>
-      <br><label> сумма: <input type="number" name="moneyOutput"></label>
+    
+    <div class="row">
+      <label class="col">Единица измерения:</label>
+      <div class="col"><select class="w-100" name="unitId">$unitsOptionsHtml</select></div>  
     </div>
+          
+    <div class="row">
+      <div class="col-12 text-center">Входная цена</div>
+      <div class="col">
+        <label>Валюта: <br><select name="moneyInputId">$moneyOptionsHtml</select></label>
+      </div>
+      <div class="col">
+        <label>Сумма: <br><input type="number" name="moneyInput" value="0"></label>
+      </div>
+    </div>
+    
+    <div>
+      <div class="col text-center">Розничная цена</div>
+      <div class="col row">
+        <label class="col">Валюта: <br><select name="moneyOutputId">$moneyOptionsHtml</select></label>
+        <label class="col">Наценка, %:<br><input type="number" name="outputPercent"></label>
+        <label class="col">Сумма:<br><input type="number" name="moneyOutput" value="0"></label>
+      </div>
+    </div>
+    
     <div id="changeField">
       <br><label>Активность: <input type="checkbox" name="optionActivity"></label>
       <br><label>Сортировка: <input type="number" name="optionSort"></label>
     </div>
-    <div class="d-none" data-field="properties">
-      <table>
-      <thead>
-        <tr class="row">
-          <th class="col">Свойство значение</th>
-          <th class="col"></th>
-        </tr>
-      </thead>
-      <tbody class="">
-      </tbody>
-      </table>
+    <div data-field="properties">
+      <div class="col-12 text-center">Параметры</div>
       $propertiesHtml
     </div>
   </form>

@@ -15,10 +15,6 @@ sideLeft;*/
 
 $field['content'] = template('parts/settingContent', $param);
 
-
-isset($fileSetting) && $field['footerContent'] .= "<input type='hidden' id='userSetting' value='$fileSetting'>";
-isset($permissions) && $field['footerContent'] .= "<input type='hidden' id='permissionSetting' value='$permissions'>";
-
 if ($main->getSettings('admin')) {
   $field['footerContent'] .= <<<footerContent
 <template id="customField">

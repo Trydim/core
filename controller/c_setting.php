@@ -8,12 +8,13 @@
 
 $field = [
   'pageTitle' => 'Настройки',
+  'footerContent' => '',
 ];
 $param = [];
-$field['footerContent'] = '';
 
 if ($main->getSettings('admin')) {
-  file_exists(SETTINGS_PATH) && $fileSetting = file_get_contents(SETTINGS_PATH);
+  $fileSetting = getSettingFile(false);
+  $field['footerContent'] .= "<input type='hidden' id='userSetting' value='$fileSetting'>";
 
   if (USE_DATABASE) {
     $permissions = $db->loadTable('permission');
@@ -30,6 +31,7 @@ if ($main->getSettings('admin')) {
     $param['permIds'] = implode(',', $permIds);
     $param['permStatus'] = $permissions;
     $permissions = json_encode($permissions);
+    $field['footerContent'] .= "<input type='hidden' id='permissionSetting' value='$permissions'>";
   }
 }
 

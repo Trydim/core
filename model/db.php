@@ -355,7 +355,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $setAction = 'createProperty';
           require 'setting.php';
         } else {
-          $dbTable = 'prop_' . (isset($tableCode) ? $tableCode : translit($dbTable));
+          $tableCode = 'prop_' . (isset($tableCode) ? $tableCode : translit($dbTable));
 
           $param = [];
           foreach ($_REQUEST as $key => $value) {
@@ -368,8 +368,15 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             }
           }
 
-          // проверить
-          $result['error'] = $db->createPropertyTable($dbTable, $param);
+          $setting = getSettingFile();
+          if (!isset($setting['propertySetting'][$tableCode])) {
+            $setting['propertySetting'][$tableCode]['name'] = $dbTable;
+            setSettingFile($setting);
+
+            $result['error'] = $db->createPropertyTable($tableCode, $param);
+          } else {
+            $result['error'] = 'Property exist';
+          }
         }
       }
       break;

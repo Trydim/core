@@ -454,32 +454,27 @@ class Db extends \R {
     static $propTables, $props;
 
     if (!$propTables) {
-      $propTables = $this->getTables('prop');
       $props = [];
       // Простые параметры
-      if (file_exists(SETTINGS_PATH)) {
-        $setting = json_decode(file_get_contents(SETTINGS_PATH), true);
-        if (isset($setting['propertySetting'])) {
-          foreach ($setting['propertySetting'] as $prop => $value) {
-            $props[$prop] = array_merge($value, ['simple' => true]);
-          }
+      if (($setting = getSettingFile()) && isset($setting['propertySetting'])) {
+        foreach ($setting['propertySetting'] as $prop => $value) {
+          $props[$prop] = array_merge($value, ['simple' => true]);
         }
       }
+
       // Параметры из таблиц БД
+      $propTables = $this->getTables('prop');
       foreach ($propTables as $table) {
-        $props[$table['name']] = $this->loadTable($table['name']);
+        $props[$table['dbTable']] = $this->loadTable($table['dbTable']);
       }
     }
+
+    if (!isset($props[$propName]) || !is_array($props[$propName]) ) return ['name' => 'Property table error'];
 
     $prop = $props[$propName];
 
     if (isset($prop['simple'])) return $this->parseSimpleProperty($prop['type'], $propValue);
-
-    if (!isset($props[$propName]) || !is_array($props[$propName]) ) return ['name' => 'Prop table error'];
-
-    foreach ($props[$propName] as $item) {
-      if ($item['ID'] === $propValue) return $item;
-    }
+    foreach ($props[$propName] as $item) if ($item['ID'] === $propValue) return $item;
     return ['name' => 'db item not found!'];
   }
 

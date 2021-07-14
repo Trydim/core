@@ -104,6 +104,12 @@ trait Page {
  * @package cms
  */
 trait Dictionary {
+
+  /**
+   * @var string
+   */
+  private $dictionaryPath = ABS_SITE_PATH . 'lang/dictionary.php';
+
   private function includeFromSetting() {
     if (isset($this->setting['managerSetting'])) {
       $list = $this->setting['managerSetting'];
@@ -117,7 +123,7 @@ trait Dictionary {
 
   public function initDictionary() {
     $mess = [];
-    include ABS_SITE_PATH . 'lang/dictionary.php';
+    include $this->dictionaryPath;
     $mess = array_merge($mess, $this->includeFromSetting());
     $mess = json_encode($mess);
     return $mess ? "<input type='hidden' id='dictionaryData' value='$mess'>" : '';
@@ -125,7 +131,7 @@ trait Dictionary {
 }
 
 /**
- * Trait dictionary
+ * Trait hooks
  * @package cms
  */
 trait Hooks {

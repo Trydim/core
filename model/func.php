@@ -385,6 +385,12 @@ function getSettingFile($decode = true, $assoc = true) {
     $setting = file_get_contents(SETTINGS_PATH);
     return $decode ? json_decode($setting, $assoc) : $setting;
   }
+  return [];
+}
+
+function setSettingFile($content) {
+  is_array($content) && $content = json_encode($content);
+  file_put_contents(SETTINGS_PATH, $content);
 }
 
 /**
