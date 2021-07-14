@@ -359,6 +359,14 @@ class Db extends \R {
   // Options
   //------------------------------------------------------------------------------------------------------------------
 
+  private function setImages($imagesIds) {
+    $images = $this->getFiles($imagesIds);
+    return array_map(function ($item) {
+      $item['path'] = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+      return $item;
+    }, $images);
+  }
+
   /**
    * Для страницы Catalog
    * @param false $elementID
@@ -371,9 +379,9 @@ class Db extends \R {
   public function openOptions($elementID = false, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'O.name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT O.ID AS 'O.ID', O.name AS 'O.name', U.short_name as 'U.short_name', 
-                   O.activity as 'O.activity', sort, last_edit_date, images_ids,                   
-                   MI.name AS 'MI.name', MO.name AS 'MO.name', input_price, output_percent, output_price
+    $sql = "SELECT O.ID AS 'O.ID', U.ID as 'U.ID', MI.ID AS 'MI.ID', MO.ID AS 'MO.ID', images_ids, properties,
+                   O.name AS 'O.name', last_edit_date, O.activity as 'O.activity', sort, 
+                   input_price, output_percent, output_price
             FROM options_elements O
             JOIN money MI on MI.ID = O.money_input_id
             JOIN money MO on MO.ID = O.money_output_id
@@ -387,7 +395,7 @@ class Db extends \R {
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
-      strlen($option['images_ids']) && $option['images'] = $this->getFiles($option['images_ids']);
+      strlen($option['images_ids']) && $option['images'] = $this->setImages($option['images_ids']);
       return $option;
     }, $options);
   }
@@ -415,12 +423,10 @@ class Db extends \R {
 
     return array_map(function ($option) {
       // set images
-      strlen($option['images_ids']) && $option['images'] = $this->getFiles($option['images_ids']);
-      unset($option['images_ids']);
-      $option['images'] = array_map(function ($item) {
-        $item['path'] = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
-        return $item;
-      }, $option['images']);
+      if (strlen($option['images_ids'])) {
+        $option['images'] = $this->setImages($option['images_ids']);
+        unset($option['images_ids']);
+      }
 
       // set properties
       if ($option['properties']) {

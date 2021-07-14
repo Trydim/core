@@ -1,46 +1,12 @@
 'use strict';
 
-/*
-function Node(node = {}) {
-  this.nameNode = node.NAME;
-  this.codeNode = node.CODE;
-  this.childList = {};
-
-  this.setNode = function (node) {
-    if(!this.nameNode) {
-      this.nameNode = node.NAME;
-      this.codeNode = node.CODE;
-    }
-  };
-
-  this.addChild = function (value) {
-    if(this.childList[value]) return this;
-    this.childList[value] = new Node();
-  }
-}
-
-class SectionList {
-
-  constructor(section) {
-    this.name      = section.name || 'root';
-    this.parentId  = section.parentId || 0;
-    this.childList = [];
-  }
-
-  addChild(section) {
-    this.childList.push(new SectionList(section));
-  }
-
-}
-*/
-
 export const catalog = {
   M: f.initModal(),
 
   table: f.qS('#elementsField'),
   field      : null,
   delayFunc  : () => {},
-  sectionWrap: f.qS('#sectionWrap').content.children[0],
+  sectionWrap: f.gTNode('#sectionWrap'),
   section    : f.gT('#section'),
 
   curSectionNode: f.qS('#sectionField'),
@@ -98,17 +64,42 @@ export const catalog = {
     //new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.query();
 
+    this.setData();
+    this.setNodes();
     this.onEventNode(this.curSectionNode, this.clickSection);
-    //this.setNodes();
     this.onEvent();
     return this;
   },
 
-  /*setNodes() {
-    this.changeSection.wrap = f.gI('changeSection');
+  setData() {
+    this.db = {
+      units: JSON.parse(f.qS('#dataUnits').value),
+      money: JSON.parse(f.qS('#dataMoney').value),
+    }
+    this.setting = {
+      elementsCol: f.qS('#elementsColumn').value.split(','),
+      optionsCol: f.qS('#optionsColumn').value.split(','),
+    }
+
+  },
+  setNodes() {
+    const elements = f.qS('#elementsField'),
+          options = f.qS('#optionsField');
+    this.node = {
+      elements,
+      elementsTBody: elements.querySelector('tbody'),
+      options,
+      optionsTBody: options.querySelector('tbody'),
+    }
+    this.tmp = {
+      tHead: f.gT('#itemsTableHead'),
+      checkbox: f.gT('#itemsTableRowsCheck'),
+
+    }
+    /*this.changeSection.wrap = f.gI('changeSection');
     this.changeSection.name = this.changeSection.wrap.querySelector('input[name=sectionName]');
-    this.changeSection.parentName = this.changeSection.wrap.querySelector('input[name=sectionParent]');
-  },*/
+    this.changeSection.parentName = this.changeSection.wrap.querySelector('input[name=sectionParent]');*/
+  },
 
   query(param = {}) {
     let {sort = false} = param;
@@ -128,16 +119,17 @@ export const catalog = {
 
       if (data['section']) this.appendSection(data['section']);
       if (data['elements']) {
-        this.prepareElements(data);
+        this.prepareItems(data['elements'], 'elements');
         data['countRowsElements'] && this.pElements.setCountPageBtn(data['countRowsElements']);
       }
       if (data['options']) {
-        this.prepareOptions(data);
+        this.prepareItems(data['options'], 'options');
         data['countRowsOptions'] && this.pOptions.setCountPageBtn(data['countRowsOptions']);
       }
     });
   },
 
+  // Sections
   appendSection(sections) {
     this.addSectionList(sections);
 
@@ -156,7 +148,6 @@ export const catalog = {
       this.onEventNode(n, this.loadSection, {once: true}, 'dblclick');
     });
   },
-
   addSectionList(sections) {
     let parent = this.sectionList.get(this.queryParam.sectionId) || {ID: 0};
 
@@ -165,74 +156,55 @@ export const catalog = {
     }
     sections.forEach(i => this.sectionList.set(i.ID, Object.assign(i, {parent: parent})));
   },
-
   getParentSection(id) {
     let parent = this.sectionList.get(id);
     return parent.id ? parent.id : 0;
   },
 
-  prepareElements(data) {
-    let param = {
-      type: 'elements',
-      fieldId: 'elementsField', // Ид таблицы вывода
-    };
-
-    this.setElementsList(data, param.type);
-    this.showTableItems(data[param.type], param);
-    f.show(f.gI(param.fieldId));
+  setItemsList(data, type) {
+    this[type + 'List'] = new Map();
+    data.forEach(i => this[type + 'List'].set(i.ID || i['O.ID'], i));
   },
-  prepareOptions(data) {
-    let param = {
-      type: 'options', // тип данных
-      fieldId: 'optionsField', // Ид таблицы вывода
-    };
+  setTablesHeaders(type) {
+    this.sortParam[type].sortColumn = 'O.ID';
 
-    this.setElementsList(data, param.type);
-    this.showTableItems(data[param.type], param);
-    f.show(f.gI(param.fieldId));
+    let html = '<tr><th></th>';
+    this.setting[type + 'Col'].map(i => {
+      html += f.replaceTemplate(this.tmp.tHead, {name: i});
+    });
+    this.node[type].querySelector('tr').innerHTML = html + '</tr>';
   },
+  showTablesItems(data, type) {
+    this.sortParam[type].sortColumn || this.setTablesHeaders(type);
 
-  setElementsList(data, typeList) {
-    this[typeList + 'List'] = new Map();
-    data[typeList].forEach(i => this[typeList + 'List'].set(i.ID || i['O.ID'], i));
-  },
+    const trNode = [],
+          colSelect = {
+            'activity': v => !!+v ? '<td>+</td>' : '<td>-</td>',
+            'O.activity': v => !!+v ? '<td>+</td>' : '<td>-</td>',
 
-  setTableHead(column, param) {
-    let itemsField = param.type + 'Field',
-        tmp = f.gT('#itemsTableHead'), html = '<th></th>';
-    this.sortParam[param.type].sortColumn = column[0] || false;
+            'ex': v => '<td></td>',
+            'images': v => '<td>Изображения</td>',
 
-    column.map(i => html += tmp.replace(/\${name}/g, i));
+            'U.ID': v => `<td>${this.db.units[v]['short_name']}</td>`,
+            'MI.ID': v => `<td>${this.db.money[v].name}</td>`,
+            'MO.ID': v => `<td>${this.db.money[v].name}</td>`,
+          };
 
-    this[itemsField].querySelector('tr').innerHTML = html;
-    this.onEventColumnTable(param.type);
-  },
-  showTableItems(elements, param) {
-    let selParam = 'selected' + param.type + 'Id',
-        itemsField = param.type + 'Field';
-
-    this[selParam] = new Set();
-    this[itemsField] || (this[itemsField] = f.gI(param.fieldId));
-    this.checkboxTmp || (this.checkboxTmp = f.gT('#itemsTableRowsCheck'))
-    this.sortParam[param.type].sortColumn || (this.setTableHead(Object.keys(elements[0]), param));
-
-    let trNode = [],
-        tBody = this[itemsField].querySelector('tbody');
-
-    elements.map(row => {
-      let idField = Object.keys(row).find(i => i.toLowerCase().includes('id')),
-          tr = document.createElement('tr');
-      tr.innerHTML = this.checkboxTmp.replace('${ID}', row[idField]);
-      Object.entries(row).map(i => {
-        if(i[0] === 'activity') tr.innerHTML += !!+i[1] ? '<td>+</td>' : '<td>-</td>';
-        else tr.innerHTML += `<td>${i[1]}</td>`;
+    data.map(row => {
+      let tr = document.createElement('tr');
+      tr.innerHTML = f.replaceTemplate(this.tmp.checkbox, {id: row['ID'] || row['O.ID']});
+      this.setting[type + 'Col'].forEach(col => {
+        tr.innerHTML += (colSelect[col] && colSelect[col](row[col])) || `<td>${row[col]}</td>`;
       });
       trNode.push(tr);
     });
 
-    f.eraseNode(tBody).append(...trNode);
-    //this.checkedRows(param);
-    //this.onEventElementsTable(itemsField);
+    f.eraseNode(this.node[type + 'TBody']).append(...trNode);
+  },
+  prepareItems(data, type) {
+    this.setItemsList(data, type);
+    this.showTablesItems(data, type);
+    f.show(this.node[type]);
   },
 
   setReloadQueryParam() {
@@ -380,18 +352,9 @@ export const catalog = {
 
       // Добавить вариант
       'createOptions': () => {
-        // Нужен запрос на ID валют
-        // Нужен запрос на ID единиц измерения
         let form = f.gTNode('#optionForm');
 
-        //if(!this.queryParam.optionId) { this.M.hide(); return; }
-
         this.onEventNode(form.querySelector('[name="optionName"]'), this.changeTextInput, {}, 'blur');
-
-        // валюта по умолчанию, заменить на select // Временно
-        let node = form.querySelector('[name="moneyInputId"]');
-        this.onEventNode(node, this.changeSelectInput, {}, 'blur');
-        node.dispatchEvent(new Event('blur'));
 
         let nodeInput = form.querySelector('[name="moneyInput"]');
         let nodePercent = form.querySelector('[name="outputPercent"]');
@@ -399,16 +362,6 @@ export const catalog = {
 
         this.onEventNode(nodeInput, (e) => this.changeMoneyInput.apply(this, [e, nodePercent, nodeOutput]), {}, 'blur');
         nodeInput.value = 0;
-
-        // Временно
-        node = form.querySelector('[name="unitId"]');
-        this.onEventNode(node,  this.changeSelectInput, {}, 'blur');
-        node.dispatchEvent(new Event('blur'));
-
-        // Временно
-        node = form.querySelector('[name="moneyOutputId"]');
-        this.onEventNode(node,  this.changeSelectInput, {}, 'blur');
-        node.dispatchEvent(new Event('blur'));
 
         this.onEventNode(nodePercent, (e) => this.changeOutputPercent.apply(this, [e, nodeInput, nodeOutput]), {}, 'blur');
         nodePercent.value = 30;
@@ -422,67 +375,42 @@ export const catalog = {
       },
       // Изменить вариант
       'changeOptions': () => {
-        if (!this.selectedId.options.size) return;
-        // Нужен запрос на ID валют
-        // Нужен запрос на ID единиц измерения
-        let oneElements = this.selectedId.options.size === 1,
+        if (!this.optionsId.getSelectedSize()) { f.showMsg('Выберите варианты', 'error'); return; }
+
+        let oneElements = this.optionsId.getSelectedSize() === 1,
             form = f.gTNode('#optionForm'), node,
-            id = this.getSelectedList('options'),
+            id = this.optionsId.getSelectedList(),
             options = this.optionsList.get(id[0]);
 
         this.queryParam.optionsId = JSON.stringify(id);
-        this.delayFunc = () => this.eraseSelectedList('options');
-
-        node = form.querySelector('[name="optionName"]');
-        if (oneElements) {
-          this.onEventNode(node, this.changeTextInput, {}, 'blur');
-          node.value = options['O.name'];
-        } else node.remove();
-
-        // валюта по умолчанию, заменить на select // Временно
-        node = form.querySelector('[name="moneyInputId"]');
-        this.onEventNode(node, this.changeSelectInput, {}, 'blur');
-        // из списка найти валюту, выбрать
-        //node.value = 1; options['MI.name'];
-
-        let nodeInput = form.querySelector('[name="moneyInput"]');
-        let nodePercent = form.querySelector('[name="outputPercent"]');
-        let nodeOutput = form.querySelector('[name="moneyOutput"]');
+        this.delayFunc = () => this.optionsId.clean();
 
         if (oneElements) {
-          this.onEventNode(nodeInput, (e) => this.changeMoneyInput.apply(this, [e, nodePercent, nodeOutput]), {}, 'blur');
-          nodeInput.value = options['input_price'];
-        } else nodeInput.remove();
+          const prop = Object.assign({}, options, (options['properties'] && JSON.parse(options['properties'])));
 
-        // Временно
-        node = form.querySelector('[name="unitId"]');
-        this.onEventNode(node, this.changeSelectInput, {}, 'blur');
-        // из списка найти валюту, выбрать
-        //node.value = 1; options['O.unit_id'];
+          Object.entries(prop).forEach(([k, v]) => {
+            node = form.querySelector(`[name="${k}"]`);
+            node && (node.type !== 'checkbox'
+                    ? node.value = v
+                    : node.checked = !!+v);
+          });
 
-        // Временно
-        node = form.querySelector('[name="moneyOutputId"]');
-        this.onEventNode(node, this.changeSelectInput, {}, 'blur');
-        // из списка найти валюту, выбрать
-        //node.value = 1; options['MO.name'];
+          //this.onEventNode(node, this.changeTextInput, {}, 'blur');
+        } else {
+          ['O.name'].forEach(n => {
+            node = form.querySelector(`[name="${n}"]`);
+            node && node.remove();
+          })
+        }
 
-        if (oneElements) {
-          this.onEventNode(nodePercent, (e) => this.changeOutputPercent.apply(this, [e, nodeInput, nodeOutput]), {}, 'blur');
-          nodePercent.value = options['output_percent'];
-        } this.onEventNode(nodePercent, this.changeNumberInput, {}, 'blur');
+        let nodeInput = form.querySelector('[name="input_price"]');
+        let nodePercent = form.querySelector('[name="output_percent"]');
+        let nodeOutput = form.querySelector('[name="output_price"]');
 
-        if (oneElements) {
-          this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput.apply(this, [e, nodeInput, nodePercent]), {}, 'blur');
-          nodeOutput.value = options['output_price'];
-        } else nodeOutput.remove();
-
-        node = form.querySelector('[name="optionActivity"]');
-        node.checked = oneElements ? !!(+options['O.activity']) : true;
-        this.onEventNode(node, this.changeCheckInput, {}, 'change');
-
-        node = form.querySelector('[name="optionSort"]');
-        node.value = oneElements ? options['sort'] : 100;
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
+        this.onEventNode(nodeInput, e => this.changeMoneyInput.apply(this, [e, nodePercent, nodeOutput]), {}, 'blur');
+        if (oneElements) this.onEventNode(nodePercent, (e) => this.changeOutputPercent.apply(this, [e, nodeInput, nodeOutput]), {}, 'blur');
+        else this.onEventNode(nodePercent, this.changeNumberInput, {}, 'blur');
+        this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput.apply(this, [e, nodeInput, nodePercent]), {}, 'blur');
 
         this.M.show('Изменение вариантов', form);
         this.reloadAction = { dbAction : 'openElements' };
@@ -564,9 +492,6 @@ export const catalog = {
     if (isNaN(e.target.value)) { e.target.value = 0; return; }
     this.queryParam[e.target.name] = e.target.value;
   },
-  changeSelectInput(e) {
-    this.queryParam[e.target.name] = e.target.value;
-  },
   changeMoneyInput(e, nodePercent, nodeOutput) {
     this.changeNumberInput(e);
 
@@ -596,8 +521,10 @@ export const catalog = {
   // сортировка Элементов
   sortRows(e) {
     let input = e.target,
-        colSort = input.getAttribute('data-ordercolumn'),
-        item = input && input.closest('[data-field]').getAttribute('data-field');
+        colSort = input.dataset.ordercolumn,
+        item = colSort && input.closest('[data-field]').dataset.field;
+
+    if (!colSort) return;
 
     this[item + 'Field'].querySelector(`input[data-ordercolumn="${colSort}"]`)
       .classList.remove(f.CLASS_NAME.SORT_BTN_CLASS);
@@ -630,12 +557,9 @@ export const catalog = {
     //f.qA('#footerBtn input[data-action], #modalWrap input[data-action], #btnElementsWrap input[data-action]',
     //f.qA('.controlWrap input[data-action]', 'click', (e) => this.actionBtn.call(this, e);
     f.qA('input[data-action]', 'click', (e) => this.actionBtn.call(this, e));
-  },
 
-  // Кнопки таблицы
-  onEventColumnTable(item) {
-    this[item + 'Field'].querySelectorAll('thead input').forEach(n => {
-      n.addEventListener('click', (e) => this.sortRows.call(this, e));
-    });
+    // Кнопки сортировки
+    this.node.elements.addEventListener('click', e => this.sortRows(e));
+    this.node.options.addEventListener('click', e => this.sortRows(e));
   },
 }
