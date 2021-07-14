@@ -17,7 +17,7 @@ module.exports = {
   },
 
   optimization: {
-    minimize: false,
+    minimize: !dev,
     minimizer: [
       new TerserPlugin({extractComments: false,}),
       new CssMinimizerPlugin(),
