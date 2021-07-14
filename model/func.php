@@ -181,7 +181,6 @@ function findkey($cell, $input) {
  * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
-  //$filename = str_replace('/', '//', PATH_CSV . $filename); // Зачем это
   $filename = PATH_CSV . $filename;
   $result = [];
 
@@ -378,7 +377,7 @@ function getPageAsString($data, $wrapId = 'wrapCalcNode') {
  *
  * @param bool $decode
  * @param bool $assoc
- * @return false|mixed|string
+ * @return string|array
  */
 function getSettingFile($decode = true, $assoc = true) {
   if (file_exists(SETTINGS_PATH)) {
@@ -409,4 +408,26 @@ function translit($value) {
   ];
 
   return strtr(mb_strtolower($value), $converter);
+}
+
+/**
+ * @param $dir {string} - path without slash on the end
+ * @param $fileName {string} - only file name without slash
+ * @return false|string
+ */
+function findingFile($dir, $fileName) {
+  $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $dir;
+  if (file_exists($absolutePath . '/' . $fileName)) return $dir . '/' . $fileName;
+
+  $arrDir = array_values(array_filter(scandir($absolutePath), function ($dir) use ($absolutePath) {
+    return !($dir === '.' || $dir === '..' || is_file($absolutePath . '/' . $dir));
+  }));
+
+  $length = count($arrDir);
+  for ($i = 0; $i < $length; $i++) {
+    $result = findingFile($dir . '/' . $arrDir[$i], $fileName);
+    if ($result) return $result;
+  }
+
+  return false;
 }

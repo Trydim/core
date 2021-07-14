@@ -2,7 +2,8 @@
 
 $publicConfig = [
   // Любое значение включает режим отладки
-  'DEBUG' => 'true',
+  //'DEBUG' => true,
+  //'MAIL_TARGET_DEBUG' => 'trydim@mail.ru',
 
   'PATH_CSS' => SITE_PATH . 'public/css/',
   'PATH_IMG' => SITE_PATH . 'public/images/',
@@ -49,7 +50,7 @@ $publicConfig = [
   заказы     календарь   клиенты   менеджеры статистика администрирование каталог настройки файловый менеджер
   options - настройки
    */
-  'ACCESS_MENU' => ['orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'fileManager', 'setting'],
+  'ACCESS_MENU' => ['orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'fileManager'],
 
   /** Папка по умолчанию для файлового менеджера */
   'SHARE_DIR' => 'public/images/',

@@ -100,16 +100,16 @@ DELIMITER ;
 
 CREATE TABLE `files` (
   `ID` int(10) UNSIGNED NOT NULL,
-  `Name` varchar(255) DEFAULT 'noName',
-  `Path` varchar(255) NOT NULL,
-  `Format` varchar(10) DEFAULT NULL
+  `name` varchar(255) DEFAULT 'noName',
+  `path` varchar(255) NOT NULL,
+  `format` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `files`
 --
 
-INSERT INTO `files` (`ID`, `Name`, `Path`, `Format`) VALUES
+INSERT INTO `files` (`ID`, `name`, `path`, `format`) VALUES
 (1, 'image.jpg', 'image.jpg', 'jpg');
 
 -- --------------------------------------------------------

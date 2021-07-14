@@ -2,9 +2,6 @@
 
 namespace RedBeanPHP;
 
-use PHPMailer\PHPMailer\Exception;
-use Symfony\Polyfill\Ctype\Ctype;
-
 require 'rb.php';
 
 class Db extends \R {
@@ -420,6 +417,10 @@ class Db extends \R {
       // set images
       strlen($option['images_ids']) && $option['images'] = $this->getFiles($option['images_ids']);
       unset($option['images_ids']);
+      $option['images'] = array_map(function ($item) {
+        $item['path'] = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+        return $item;
+      }, $option['images']);
 
       // set properties
       if ($option['properties']) {

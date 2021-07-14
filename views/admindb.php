@@ -7,7 +7,7 @@
 
 $legendHtml = '';
 if (PATH_LEGEND && isset($legend[$tableActive])) {
-  $legendHtml = "<template id='dataTableLegend'>" . $legend[$tableActive] . "</template>";
+  $legendHtml = "<template id='dataTableLegend'><div>" . $legend[$tableActive] . "</div></template>";
 }
 
 if (!DB_TABLE_IN_SIDEMENU) { // Если таблицы не в подменю

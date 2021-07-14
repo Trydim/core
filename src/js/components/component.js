@@ -279,6 +279,7 @@ export const Print = () => {
       typeof data.style === 'string' && (content = `<style>${data.style}</style>` + content);
       const scrollY = window.pageYOffset;
       let delay = this.setContent(content, classList);
+
       setTimeout(() => {
         document.body.append(this.frame);
         this.frame.remove();

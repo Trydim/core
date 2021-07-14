@@ -52,6 +52,8 @@ trait Authorization {
     return $this;
   }
 
+
+
   public function setSideMenu() {
     if (USE_DATABASE) {
       $menuAccess = isset($this->getSettings('permission')['menuAccess'])
