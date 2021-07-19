@@ -194,7 +194,9 @@ if (isset($setAction)) {
       break;
     case 'loadProperties':
       if (($setting = getSettingFile()) && isset($setting['propertySetting'])) {
-         $result['propertiesTables'] = $setting['propertySetting'];
+         $result['propertiesTables'] = array_filter($setting['propertySetting'],
+           function ($prop) { return isset($prop['type']);}
+         );
       }
       break;
     case 'delProperty':

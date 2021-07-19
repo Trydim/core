@@ -1,10 +1,27 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var $types - from controller
+ * @var $section - from controller
  * @var $units - from controller
  * @var $money - from controller
  * @var $properties - from controller
  */
+
+$typeElementsHtml = '';
+foreach ($types as $opt) {
+  $code = $opt['symbol_code'];
+  $name = $opt['name'];
+  $typeElementsHtml .= "<option value=\"$code\">$name</option>";
+}
+
+
+$sectionElementsHtml = '';
+foreach ($section as $opt) {
+  $id = $opt['ID'];
+  $name = $opt['name'];
+  $sectionElementsHtml .= "<option value=\"$id\">$name</option>";
+}
 
 
 $unitsOptionsHtml = '';
@@ -25,17 +42,20 @@ foreach ($money as $opt) {
 
 $propertiesHtml = '';
 foreach ($properties as $propName => $prop) {
+  $name = $prop['name'];
   if (isset($prop['type'])) {
-    $name = $prop['name'];
     $type = $prop['type'];
     $propertiesHtml .= "<div class='row'>
       <label class='col'>$name</label><div class='col'>
       <input class='w-100' type='$type' name='$propName'></div>
     </div>";
   } else {
-    $propertiesHtml .= "<div class='row'><label class='col'>$propName</label>"
-                       . "<div class='col'><select class='w-100' name='$propName'>"
-                       . "<option value='no'>-</option>";
+    $defOption = '';
+    if (isset($prop['values'])) $defOption = "<option value='no'>-</option>";
+    else $prop['values'] = [['ID' => false, 'name' => 'table empty']];
+
+    $propertiesHtml .= "<div class='row'><label class='col'>$name</label>"
+                       . "<div class='col'><select class='w-100' name='$propName'>" . $defOption;
 
     foreach ($prop['values'] as $opt) {
       $id = $opt['ID'];
@@ -120,12 +140,16 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="elementForm">
   <form action="#">
-    <label>Тип элемента: <input type="text" name="elementType"></label>
-    <br><label>Имя элемента: <input type="text" name="elementName"></label>
+    <label>Тип элемента: 
+      <select type="text" name="C.symbol_code">$typeElementsHtml</select>
+    </label>
+    <br><label>Имя элемента: <input type="text" name="E.name"></label>
     <div id="changeField">
-      <br><label>Родительский раздел(*): <input type="text" name="sectionParent"></label>
-      <br><label>Активность: <input type="checkbox" name="elementActivity"></label>
-      <br><label>Сортировка: <input type="number" name="elementSort"></label>
+      <br><label>Родительский раздел(*):
+        <select type="text" name="sectionParent">$sectionElementsHtml</select>
+      </label>
+      <br><label>Активность: <input type="checkbox" name="activity"></label>
+      <br><label>Сортировка: <input type="number" name="sort"></label>
     </div>
   </form>
 </template>
@@ -181,3 +205,6 @@ $field['footerContent'] .= <<<footerContent
   <input type="button" value="\${pageValue}" class="ml-1 mr-1" data-action="page" data-page="\${page}">
 </template>
 footerContent;
+
+unset($typeElementsHtml, $types, $sectionElementsHtml, $section);
+unset($unitsOptionsHtml, $units, $moneyOptionsHtml, $money, $propertiesHtml, $properties);

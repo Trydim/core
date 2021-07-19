@@ -282,7 +282,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Options
     case 'loadOptions':
-      $result['options'] = $db->loadOptions();
+      $result['options'] = $db->loadOptions(isset($filter) ? json_decode($filter, true) : []);
       break;
     case 'createOptions':
       $param = ['0' => []];
@@ -382,7 +382,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'delProperty':
       if (isset($props)) {
-        $props = explode(',', $props);
+        $props = array_map(function ($prop) {return 'prop_' . $prop;}, explode(',', $props));
         $setAction = 'delProperty';
         require 'setting.php';
         $db->delPropertyTable($props);

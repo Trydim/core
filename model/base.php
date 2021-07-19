@@ -40,8 +40,15 @@ if ($main->checkStatus('ok') && isset($db)) {
 
   if (DB_TABLE_IN_SIDEMENU) {
     $dbTables = [];
-    if (CHANGE_DATABASE) USE_DATABASE && $dbTables = array_merge($dbTables, $db->getTables());
-    else USE_DATABASE && $dbTables = array_merge($dbTables, $db->getTables('prop'));
+    if (USE_DATABASE) {
+      if (CHANGE_DATABASE) {
+        $dbTables = array_merge($dbTables, $db->getTables());
+      } else
+        if (in_array('catalog', ACCESS_MENU)) {
+          $props = array_merge([['prop_brand' => 'codes', 'name' => 'codes']], $db->getTables('prop'));
+          $dbTables = array_merge($dbTables, ['z_prop' => $props]);
+      }
+    }
     $dbTables = array_merge($dbTables, $db->scanDirCsv(PATH_CSV));
     //Xml::checkXml($dbTables);
   }

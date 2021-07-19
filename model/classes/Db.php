@@ -77,7 +77,7 @@ class Db extends \R {
    *
    * @return array
    */
-  public function selectQuery($dbTable, $columns, $filters = '') {
+  public function selectQuery($dbTable, $columns = '*', $filters = '') {
     if (!$dbTable) return [];
     if (!is_array($columns)) $columns = [$columns];
     //if (!is_array($filters)) $filters = [$filters];
@@ -346,7 +346,8 @@ class Db extends \R {
   public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT ID, C.name AS 'C.name', E.name AS 'E.name', activity, sort, last_edit_date
+    $sql = "SELECT ID, E.name AS 'E.name', activity, sort, last_edit_date,
+                   C.symbol_code AS 'C.symbol_code', C.name AS 'C.name'
     FROM elements E
     JOIN codes C on C.symbol_code = E.element_type_code
     WHERE E.section_parent_id = $sectionID
@@ -365,6 +366,11 @@ class Db extends \R {
       $item['path'] = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
       return $item;
     }, $images);
+  }
+  private function getAlias($table) {
+    $tables = ['codes.', 'money.', 'elements.', 'options_elements.', 'units.'];
+    $alias = ['C.', 'M.', 'E.', 'O.', 'U.'];
+    return str_replace($tables, $alias, $table);
   }
 
   /**
@@ -402,10 +408,10 @@ class Db extends \R {
 
   /**
    * Load for calculator
-   * @param false $elementID
+   * @param array $filter
    * @return array|null
    */
-  public function loadOptions($elementID = false) {
+  public function loadOptions($filter = []) {
     $sql = "SELECT O.ID AS 'id', E.element_type_code AS 'type', O.name AS 'name',
                    U.short_name as 'unit', O.activity AS 'activity',
                    O.sort AS 'sort', O.last_edit_date as 'lastDate', properties, images_ids,
@@ -417,14 +423,20 @@ class Db extends \R {
             JOIN money MO on MO.ID = O.money_output_id
             JOIN units U on U.ID = O.unit_id";
 
-    $elementID && $sql .= "WHERE O.element_id = $elementID";
+    if (count($filter)) {
+      $sql .= ' WHERE';
+      foreach ($filter as $k => $v) {
+        $k = $this->getAlias($k);
+        $sql .= " $k = '$v'";
+      }
+    }
 
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
       // set images
       if (strlen($option['images_ids'])) {
-        $option['images'] = $this->setImages($option['images_ids']);
+        //$option['images'] = $this->setImages($option['images_ids']);
         unset($option['images_ids']);
       }
 

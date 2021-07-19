@@ -44,6 +44,10 @@ export const catalog = {
   },
 
   init() {
+    /*this.sectionId = new f.SelectedRow({
+      table: f.qS('.subSection'),
+    });*/
+
     this.pElements = new f.Pagination( '#elementsField .pageWrap',{
       queryParam: this.queryParam,
       query: this.query.bind(this),
@@ -224,6 +228,11 @@ export const catalog = {
       'openSection' : () => {
         this.queryParam.sectionId = this.curSectionNode.getAttribute('data-id') || false;
         if(!this.queryParam.sectionId) return;
+
+        this.elementsId.clear();
+        this.optionsId.clear();
+        f.hide(this.node.options);
+
         this.query();
       },
       // Изменить секцию
@@ -313,25 +322,20 @@ export const catalog = {
         this.queryParam.elementsId = JSON.stringify(id);
         this.delayFunc = () => this.elementsId.clear();
 
-        let node = form.querySelector('[name="elementType"]');
-        node.value = element['C.name'];
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
+        let node = form.querySelector('[name="C.symbol_code"]');
+        if (oneElements) node.value = element['C.symbol_code'];
+        else node.parentNode.remove();
 
-        if(oneElements) {
-          node       = form.querySelector('[name="elementName"]');
-          node.value = element['E.name'];
-          this.onEventNode(node, this.changeTextInput, {}, 'blur');
-        } else form.querySelector('[name="elementName"]').parentNode.remove();
+        node = form.querySelector('[name="E.name"]');
+        if (oneElements) node.value = element['E.name'];
+        else node.parentNode.remove();
 
-        node = form.querySelector('[name="elementActivity"]');
+        node = form.querySelector('[name="activity"]');
         node.checked = oneElements ? !!(+element['activity']) : true;
-        this.onEventNode(node, this.changeCheckInput, {}, 'change');
 
-        node = form.querySelector('[name="elementSort"]');
-        node.value = oneElements ? element['sort'] : 100;
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
-
-        //form.querySelector('[name="sectionParent"]').value = element[''];
+        node = form.querySelector('[name="sort"]');
+        if (oneElements) node.value = element['sort'];
+        else node.parentNode.remove();
 
         this.M.show('Изменение элемента', form);
         this.reloadAction = { dbAction : 'openSection' };
