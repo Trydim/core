@@ -71,10 +71,10 @@ foreach ($properties as $propName => $prop) {
 $field['content'] = <<<content
 <div class="container-fluid">
   <div class="row">
-    <div class="col-3 overflow-auto bg-style-sheet">
-      <div id="sectionField" class="openSection" data-id="0">Разделы</div>
+    <div id="sectionField" class="col-3 overflow-auto bg-style-sheet">
+      <div class="openSection" data-action="clickSection" data-id="0">Разделы</div>
       <div class="subSection"></div>
-      <div class="controlWrap" id="footerBtn">
+      <div class="controlWrap">
         <input class="btn btn-success" type="button" value="Создать раздел" data-action="createSection">
         <input class="btn btn-warning" type="button" value="Открыть раздел" data-action="openSection">
         <input class="btn btn-warning" type="button" value="Изменить раздел" data-action="changeSection">
@@ -121,7 +121,7 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="section">
   <li style="cursor: pointer">
-    <div class="closeSection border-dark" data-id="\${ID}">\${ID} - \${name}</div>
+    <div class="closeSection border-dark" data-action="clickSection" data-id="\${ID}">\${ID} - \${name}</div>
     <div class="subSection"></div>
   </li>
 </template>
@@ -133,9 +133,18 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="sectionForm">
   <form action="#">
-    <label>Имя раздела: <br><input type="text" name="sectionName"></label>
-    <br><label>Символьный код раздела: <br><input type="text" name="sectionCode"></label>
-    <br><label>Родительский раздел:<br><input type="text" name="sectionParent"></label>
+    <div class="row mb-1">
+      <div class="col">Имя раздела:</div>
+      <div class="col"><input class="w-100" type="text" name="name"></div>  
+    </div>
+    <div class="row mb-1">
+      <div class="col">Символьный код раздела:</div>
+      <div class="col"><input class="w-100" type="text" name="code"></div>
+    </div>
+    <div class="row">
+      <div class="col">Родительский раздел:</div>
+      <div class="col"><select class="w-100" type="text" name="parentId">$sectionElementsHtml</select></div>
+    </div>
   </form>
 </template>
 <template id="elementForm">

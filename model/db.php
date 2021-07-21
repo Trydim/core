@@ -202,25 +202,25 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     // Section
+    case 'createSection':
+      $param = ['0' => []];
+      if (isset($parentId)) $param['0']['parent_ID'] = $parentId;
+      if (isset($name) && isset($code)) {
+        $param['0']['name'] = $name;
+        $param['0']['code'] = $code;
+        $result['error'] = $db->insert([], 'section', $param);
+      }
+      break;
     case 'openSection':
       !isset($sortColumn) && $sortColumn = 'C.name';
       if (isset($sectionId) && is_finite($sectionId)) {
-        $result['countRowsElements'] = $db->getCountRows('elements', " section_parent_id = $sectionId ");
+        $result['countRowsElements'] = $db->getCountRows('elements', " section_parent_id = $sectionId");
         $result['elements'] = $db->loadElements($sectionId, $pageNumber, $countPerPage, $sortColumn, $sortDirect);
       }
       break;
     case 'loadSection':
       if (isset($sectionId) && is_finite($sectionId)) {
         $result['section'] = $db->selectQuery('section', ['ID', 'name'], " parent_ID = $sectionId");
-      }
-      break;
-    case 'createSection':
-      $param = ['0' => []];
-      if (isset($sectionParentId)) $param['0']['parent_ID'] = $sectionParentId;
-      if (isset($sectionName) && isset($sectionCode)) {
-        $param['0']['name'] = $sectionName;
-        $param['0']['code'] = $sectionCode;
-        $result['error'] = $db->insert([], 'section', $param);
       }
       break;
     case 'changeSection':

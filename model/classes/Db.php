@@ -436,7 +436,7 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images_ids'])) {
-        //$option['images'] = $this->setImages($option['images_ids']);
+        $option['images'] = $this->setImages($option['images_ids']);
         unset($option['images_ids']);
       }
 

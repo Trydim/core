@@ -1,23 +1,15 @@
 'use strict';
 
+import {Section} from "./Section";
+
 export const catalog = {
-  M: f.initModal(),
 
   table: f.qS('#elementsField'),
-  field      : null,
   delayFunc  : () => {},
-  sectionWrap: f.gTNode('#sectionWrap'),
-  section    : f.gT('#section'),
 
-  curSectionNode: f.qS('#sectionField'),
-
-  changeSection: Object.create(null), // Узлы измений
-
-  sectionList : new Map(),
   elementsList: new Map(),
   optionsList : new Map(),
 
-  reloadAction: false,
   sortParam: {
     elements: {
       sortDirect: true, // true = DESC, false
@@ -34,19 +26,12 @@ export const catalog = {
     }
   },
 
-  queryParam: {
-    tableName      : 'section',
-    dbAction       : 'loadSection',
-    sectionId      : 0,
-    sectionName    : '',
-    sectionCode    : '',
-    sectionParentId: 0,
-  },
-
   init() {
-    /*this.sectionId = new f.SelectedRow({
-      table: f.qS('.subSection'),
-    });*/
+    this.section = new Section();
+
+
+    this.section.loadSection();
+    return;
 
     this.pElements = new f.Pagination( '#elementsField .pageWrap',{
       queryParam: this.queryParam,
@@ -65,27 +50,13 @@ export const catalog = {
     });
 
     new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
-    //new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
-    this.query();
 
-    this.setData();
     this.setNodes();
-    this.onEventNode(this.curSectionNode, this.clickSection);
     this.onEvent();
     return this;
   },
 
-  setData() {
-    this.db = {
-      units: JSON.parse(f.qS('#dataUnits').value),
-      money: JSON.parse(f.qS('#dataMoney').value),
-    }
-    this.setting = {
-      elementsCol: f.qS('#elementsColumn').value.split(','),
-      optionsCol: f.qS('#optionsColumn').value.split(','),
-    }
 
-  },
   setNodes() {
     const elements = f.qS('#elementsField'),
           options = f.qS('#optionsField');
@@ -98,71 +69,7 @@ export const catalog = {
     this.tmp = {
       tHead: f.gT('#itemsTableHead'),
       checkbox: f.gT('#itemsTableRowsCheck'),
-
     }
-    /*this.changeSection.wrap = f.gI('changeSection');
-    this.changeSection.name = this.changeSection.wrap.querySelector('input[name=sectionName]');
-    this.changeSection.parentName = this.changeSection.wrap.querySelector('input[name=sectionParent]');*/
-  },
-
-  query(param = {}) {
-    let {sort = false} = param;
-
-    let form = new FormData();
-    form.set('mode', 'DB');
-
-    if(sort) Object.entries(this.sortParam[sort]).map(param => form.set(param[0], param[1]));
-
-    Object.entries(this.queryParam).map(param => form.set(param[0], param[1]));
-
-    f.Post({data: form}).then(data => {
-      if(this.reloadAction) {
-        this.query(this.setReloadQueryParam());
-        return;
-      }
-
-      if (data['section']) this.appendSection(data['section']);
-      if (data['elements']) {
-        this.prepareItems(data['elements'], 'elements');
-        data['countRowsElements'] && this.pElements.setCountPageBtn(data['countRowsElements']);
-      }
-      if (data['options']) {
-        this.prepareItems(data['options'], 'options');
-        data['countRowsOptions'] && this.pOptions.setCountPageBtn(data['countRowsOptions']);
-      }
-    });
-  },
-
-  // Sections
-  appendSection(sections) {
-    this.addSectionList(sections);
-
-    let wrap = this.sectionWrap.cloneNode(true);
-    wrap.innerHTML = f.replaceTemplate(this.section, sections);
-
-    /*ВРЕМЕННО*/
-    let id = sections[0].parent.ID;
-    let section = f.qS(`#sectionField`);
-    let cursec = section.parentNode.querySelector(`[data-id="${id}"] + .subSection`);
-    /*ВРЕМЕННО*/
-    f.eraseNode(cursec).append(wrap);
-    //f.eraseNode(this.curSectionNode.parentNode.querySelector('.subSection')).append(wrap);
-    wrap.querySelectorAll('[data-id]').forEach(n => {
-      this.onEventNode(n, this.clickSection);
-      this.onEventNode(n, this.loadSection, {once: true}, 'dblclick');
-    });
-  },
-  addSectionList(sections) {
-    let parent = this.sectionList.get(this.queryParam.sectionId) || {ID: 0};
-
-    for(let i of this.sectionList.entries()) { // обновление секции
-      if(i[1].parent.ID === parent.ID) this.sectionList.delete(i[0]);
-    }
-    sections.forEach(i => this.sectionList.set(i.ID, Object.assign(i, {parent: parent})));
-  },
-  getParentSection(id) {
-    let parent = this.sectionList.get(id);
-    return parent.id ? parent.id : 0;
   },
 
   setItemsList(data, type) {
@@ -211,11 +118,6 @@ export const catalog = {
     f.show(this.node[type]);
   },
 
-  setReloadQueryParam() {
-    this.queryParam = Object.assign(this.queryParam, this.reloadAction);
-    this.reloadAction = false;
-  },
-
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -224,67 +126,6 @@ export const catalog = {
         action = target.dataset.action;
 
     let select = {
-      // Открыть секцию
-      'openSection' : () => {
-        this.queryParam.sectionId = this.curSectionNode.getAttribute('data-id') || false;
-        if(!this.queryParam.sectionId) return;
-
-        this.elementsId.clear();
-        this.optionsId.clear();
-        f.hide(this.node.options);
-
-        this.query();
-      },
-      // Изменить секцию
-      'changeSection' : () => {
-        let form = f.gTNode('#sectionForm'), node;
-
-        this.queryParam.sectionId = this.curSectionNode.getAttribute('data-id') || false;
-        if(!this.queryParam.sectionId) { this.M.hide(); return; }
-
-        let parentName = 'корень',
-            section = this.sectionList.get(this.queryParam.sectionId);
-
-        node = form.querySelector('[name="sectionName"]');
-        node.value = section.name;
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
-
-        /*node = form.querySelector('[name="sectionCode"]');
-        node.value = section.name;
-        this.onEventNode(node, this.changeSectionInput, {}, 'blur');*/
-
-        section.parent.name && (parentName = section.parent.name);
-        node = form.querySelector('[name="sectionParent"]');
-        node.value = parentName;
-        this.onEventNode(node, this.changeParentSection, {}, 'blur');
-
-        this.M.show('Изменить раздел', form);
-        this.reloadAction = {
-          dbAction : 'loadSection',
-          sectionId: this.getParentSection(this.queryParam.sectionId)};
-      },
-      // Удалить секцию
-      'delSection' : () => {
-        this.queryParam.sectionId = this.curSectionNode.getAttribute('data-id') || false;
-        if(!this.queryParam.sectionId) { this.M.hide(); return; }
-
-        this.M.show('Удалить раздел', 'Удалятся вложенные элементы');
-        this.reloadAction = {
-          dbAction : 'loadSection',
-          sectionId: this.getParentSection(this.queryParam.sectionId) };
-      },
-      // Создать секцию
-      'createSection' : () => {
-        let form = f.gTNode('#sectionForm');
-
-        this.onEventNode(form.querySelector('[name="sectionName"]'), this.changeTextInput, {}, 'blur');
-        this.onEventNode(form.querySelector('[name="sectionCode"]'), this.changeTextInput, {}, 'blur');
-        this.onEventNode(form.querySelector('[name="sectionParent"]'), this.changeParentSection, {}, 'blur');
-
-        this.M.show('Создание раздел', form);
-        this.reloadAction = { dbAction : 'loadSection', sectionId: 0 };
-      },
-
       // Создать элемент
       'createElements' : () => {
         // Запросить типы элементов
@@ -437,13 +278,13 @@ export const catalog = {
       },
     }
 
-    if(action === 'confirmYes') {
+    if (action === 'confirmYes') {
       if (this.queryParam.dbAction.includes('Section')) this.queryParam.tableName = 'section';
       else if (this.queryParam.dbAction.includes('Element')) this.queryParam.tableName = 'elements';
       else if (this.queryParam.dbAction.includes('Option')) this.queryParam.tableName = 'options_elements';
 
       this.delayFunc();
-      this.delayFunc = () => {}
+      this.delayFunc = () => {};
       this.query();
     } else if (action === 'confirmNo') {
       this.reloadAction = false;
@@ -451,40 +292,6 @@ export const catalog = {
       this.queryParam.dbAction = action;
       select[action] && select[action]();
     }
-  },
-
-  loadSection(e) {
-    let target = e.target;
-
-    for (let i = 0; i<3,target.tagName !== 'LI'; i++, target = target.parentNode) {
-      if (target.hasAttribute('data-id')) break;
-    }
-
-    target.classList.remove('closeSection');
-
-    target.classList.add('openSection');
-    this.onEventNode(target, this.clickSection);
-    this.onEventNode(target, this.dbClickSection, {}, 'dblclick');
-
-    this.queryParam.sectionId = target.getAttribute('data-id');
-    this.queryParam.dbAction  = 'loadSection';
-    this.query();
-  },
-
-  clickSection(e) {
-    let target = e.target;
-
-    this.curSectionNode.classList.remove('focused');
-    this.curSectionNode = target;
-
-    target.classList.add('focused');
-  },
-
-  dbClickSection(e) {
-    let target = e.target;
-
-    target.classList.toggle('closeSection');
-    target.classList.toggle('openSection');
   },
 
   changeTextInput(e) {
@@ -545,21 +352,7 @@ export const catalog = {
     this.query({sort: item});
   },
 
-  // Bind events
-  //--------------------------------------------------------------------------------------------------------------------
-
-  /**
-   * @param node
-   * @param func
-   */
-  onEventNode(node, func, options = {}, eventType = 'click') {
-    node.addEventListener(eventType, (e) => func.call(this, e), options);
-  },
-
   onEvent() {
-    // buttons
-    //f.qA('#footerBtn input[data-action], #modalWrap input[data-action], #btnElementsWrap input[data-action]',
-    //f.qA('.controlWrap input[data-action]', 'click', (e) => this.actionBtn.call(this, e);
     f.qA('input[data-action]', 'click', (e) => this.actionBtn.call(this, e));
 
     // Кнопки сортировки
