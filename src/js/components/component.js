@@ -188,7 +188,7 @@ export class MessageToast {
   }
 
   checkMsq(msg, type) {
-    if(!type) {
+    if (!type) {
       this.setMessage(type);
       this.setColor('error');
     } else {
@@ -651,7 +651,7 @@ export class Pagination {
         } = param,
         field = f.qS(fieldSelector);
 
-    if (!(field && param.query && Object.values(queryParam).length)) return;
+    if (!(field && param.query)) return;
     this.activeClass    = ACTIVE_CLASS;
     this.node           = field;
     this.node.innerHTML = this.template();
@@ -899,18 +899,33 @@ export class SaveVisitorsOrder {
 export class Observer {
   constructor() {
     this.publisher = Object.create(null);
+    this.listeners = Object.create(null);
   }
-  add(name, that) {
-    this.publisher[name] = that;
+  addArgument(name, object) {
+    this.publisher[name] = object;
   }
   remove(name) {
     delete this.publisher[name];
+    delete this.listeners[name];
   }
   getListPublisher() {
-    return Object.keys(this.publisher);
+    return {
+      publisher: Object.keys(this.publisher),
+      listeners: Object.keys(this.listeners),
+    };
   }
-  subscribe(name) {
+  subscribe(name, func) {
+    if (!func) console.alarm('Function must have!');
+    !this.listeners[name] && (this.listeners[name] = []);
+    this.listeners[name].push(func);
     return this.publisher[name] || false;
+  }
+  fire(name, ...arg) {
+    if (Array.isArray(this.listeners[name])) {
+      this.listeners[name].forEach(listener => listener(...arg, this.publisher[name]));
+      return true;
+    }
+    return false;
   }
 }
 
@@ -927,8 +942,10 @@ export class OneTimeFunction {
   }
 
   exec(name, ...arg) {
-    this.func[name] && this.func[name](...arg);
-    this.func[name] && this.del(name);
+    if (this.func[name]) {
+      this.func[name](...arg);
+      this.del(name);
+    }
   }
 
   del(name) {

@@ -1,37 +1,36 @@
 'use strict';
 
 export class Catalog {
-  constructor() {
-    this.M = f.initModal();
+  constructor(type, props = {}) {
+    this.M = props.modal || f.initModal();
     this.delayFunc = () => {};
 
     this.reloadAction = false;
+    this.type         = type;
+    this.sortParam    = Object.create(null);
+    this.node         = Object.create(null);
+    this.tmp          = Object.create(null);
+
     this.setQueryParam();
-    this.setData();
+    this.setData(props.db);
+    this.onMainEvent();
   }
 
   setQueryParam() {
     this.queryParam = Object.create(null);
-
-
-  }
-
-  setData() {
-    this.db = {
-      units: JSON.parse(f.qS('#dataUnits').value),
-      money: JSON.parse(f.qS('#dataMoney').value),
-    };
-    this.setting = {
-      elementsCol: f.qS('#elementsColumn').value.split(','),
-      optionsCol: f.qS('#optionsColumn').value.split(','),
-    };
+    //this.queryParam.countPerPage = 20;
 
     Object.defineProperty(this.queryParam, 'form', {
       enumerable: false,
       writable: true,
     });
   }
+  setData(db) {
+    let node = f.qS(`#${this.type}Column`);
+    node && (this.setting = node.value.split(','));
 
+    this.db = db;
+  }
   setReloadQueryParam() {
     this.queryParam = Object.assign(this.queryParam, this.reloadAction);
     this.reloadAction = false;
@@ -58,19 +57,29 @@ export class Catalog {
 
       return data;
     });
+  }
 
+  // Events function
+  //--------------------------------------------------------------------------------------------------------------------
 
-      /*if (data['section']) this.section.appendSection(data['section']);
-      if (data['elements']) {
-        this.prepareItems(data['elements'], 'elements');
-        data['countRowsElements'] && this.pElements.setCountPageBtn(data['countRowsElements']);
-      }
-      if (data['options']) {
-        this.prepareItems(data['options'], 'options');
-        data['countRowsOptions'] && this.pOptions.setCountPageBtn(data['countRowsOptions']);
-      }
-    });*/
+  commonEvent(e) {
+    let target = e.target,
+        action = target.dataset.action;
 
+    if (action === 'confirmYes') {
+      if (this.queryParam.dbAction.includes('Section')) this.queryParam.tableName = 'section';
+      else if (this.queryParam.dbAction.includes('Element')) this.queryParam.tableName = 'elements';
+      else if (this.queryParam.dbAction.includes('Option')) this.queryParam.tableName = 'options_elements';
+
+      this.delayFunc();
+      this.delayFunc = () => {};
+      this.query();
+    } else if (action === 'confirmNo') {
+      this.reloadAction = false;
+    } else {
+      this.queryParam.dbAction = action;
+      this[action] && this[action](target);
+    }
   }
 
   // Bind events
@@ -84,5 +93,111 @@ export class Catalog {
    */
   onEventNode(node, func, options = {}, eventType = 'click') {
     node.addEventListener(eventType, (e) => func.call(this, e), options);
+  }
+
+  onMainEvent() {
+    this.M.btnConfirm.addEventListener('click', e => this.commonEvent(e));
+  }
+}
+
+// Elements+Sections
+export class Common extends Catalog {
+  constructor(type, props) {
+    super(type, props);
+    this.setCommonParam();
+  }
+
+  setCommonParam() {
+    this.itemList = new Map();
+
+    this.sortParam = {
+      sortDirect: true, // true = DESC, false
+      currPage: 0,
+      countPerPage: 20,
+      pageCount: 0,
+    };
+  }
+  setNodes(field, tmp) {
+    this.node = {
+      field,
+      fieldT: field.querySelector('table'),
+      fieldTBody: field.querySelector('tbody'),
+    };
+    this.tmp = {
+      tHead: tmp.tHead,
+      checkbox: tmp.checkbox,
+      form: f.gTNode(`#${this.type}Form`),
+    };
+  }
+  setItemsList(data) {
+    this.itemList = new Map();
+    data.forEach(i => this.itemList.set(i.ID || i['O.ID'], i));
+  }
+  setTablesHeaders() {
+    this.sortParam.sortColumn = 'O.ID';
+
+    let html = '<tr><th></th>';
+    this.setting.map(i => {
+      html += f.replaceTemplate(this.tmp.tHead, {name: i});
+    });
+    this.node.field.querySelector('tr').innerHTML = html + '</tr>';
+  }
+  showTablesItems(data) {
+    this.sortParam.sortColumn || this.setTablesHeaders();
+
+    const trNode = [],
+          colSelect = {
+            'activity': v => !!+v ? '<td>+</td>' : '<td>-</td>',
+            'O.activity': v => !!+v ? '<td>+</td>' : '<td>-</td>',
+
+            'ex': v => '<td></td>',
+            'images': v => '<td>Изображения</td>',
+
+            'U.ID': v => `<td>${this.db.units[v]['short_name']}</td>`,
+            'MI.ID': v => `<td>${this.db.money[v].name}</td>`,
+            'MO.ID': v => `<td>${this.db.money[v].name}</td>`,
+          };
+
+    data.map(row => {
+      let tr = document.createElement('tr');
+      tr.innerHTML = f.replaceTemplate(this.tmp.checkbox, {id: row['ID'] || row['O.ID']});
+      this.setting.forEach(col => {
+        tr.innerHTML += (colSelect[col] && colSelect[col](row[col])) || `<td>${row[col]}</td>`;
+      });
+      trNode.push(tr);
+    });
+
+    f.eraseNode(this.node.fieldTBody).append(...trNode);
+  }
+  prepareItems(data) {
+    this.setItemsList(data);
+    this.showTablesItems(data);
+    f.show(this.node.field);
+  }
+
+  // сортировка Элементов
+  sortRows(e) {
+    let input = e.target,
+        colSort = input.dataset.ordercolumn;
+
+    if (!colSort) return;
+
+    this.node.field.querySelector(`input[data-ordercolumn="${colSort}"]`)
+                   .classList.remove(f.CLASS_NAME.SORT_BTN_CLASS);
+    input.classList.add(f.CLASS_NAME.SORT_BTN_CLASS);
+
+    if(this.sortParam.sortColumn === colSort) {
+      this.sortParam.sortDirect = !this.sortParam.sortDirect;
+    } else {
+      this.sortParam.sortColumn = colSort;
+      this.sortParam.sortDirect = false;
+    }
+
+    this.queryParam.dbAction = this.type === 'elements' ? 'openSection' : 'openElements';
+    this.query({sort: this.type});
+  }
+  onCommonEvent() {
+    // Кнопки сортировки
+    this.node.field.addEventListener('click', e => this.sortRows(e));
   }
 }

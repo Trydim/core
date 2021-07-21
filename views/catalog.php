@@ -41,29 +41,31 @@ foreach ($money as $opt) {
 
 
 $propertiesHtml = '';
-foreach ($properties as $propName => $prop) {
-  $name = $prop['name'];
-  if (isset($prop['type'])) {
-    $type = $prop['type'];
-    $propertiesHtml .= "<div class='row'>
-      <label class='col'>$name</label><div class='col'>
-      <input class='w-100' type='$type' name='$propName'></div>
-    </div>";
-  } else {
-    $defOption = '';
-    if (isset($prop['values'])) $defOption = "<option value='no'>-</option>";
-    else $prop['values'] = [['ID' => false, 'name' => 'table empty']];
+if ($properties) {
+  foreach ($properties as $propName => $prop) {
+    $name = $prop['name'];
+    if (isset($prop['type'])) {
+      $type = $prop['type'];
+      $propertiesHtml .= "<div class='row'>
+        <label class='col'>$name</label><div class='col'>
+        <input class='w-100' type='$type' name='$propName'></div>
+      </div>";
+    } else {
+      $defOption = '';
+      if (isset($prop['values'])) $defOption = "<option value='no'>-</option>";
+      else $prop['values'] = [['ID' => false, 'name' => 'table empty']];
 
-    $propertiesHtml .= "<div class='row'><label class='col'>$name</label>"
-                       . "<div class='col'><select class='w-100' name='$propName'>" . $defOption;
+      $propertiesHtml .= "<div class='row'><label class='col'>$name</label>"
+                         . "<div class='col'><select class='w-100' name='$propName'>" . $defOption;
 
-    foreach ($prop['values'] as $opt) {
-      $id = $opt['ID'];
-      $name = $opt['name'];
-      $propertiesHtml .= "<option value=\"$id\">$name</option>";
+      foreach ($prop['values'] as $opt) {
+        $id = $opt['ID'];
+        $name = $opt['name'];
+        $propertiesHtml .= "<option value=\"$id\">$name</option>";
+      }
+
+      $propertiesHtml .= "</select></div></div>";
     }
-
-    $propertiesHtml .= "</select></div></div>";
   }
 }
 
@@ -83,7 +85,7 @@ $field['content'] = <<<content
     </div>
     <div class="col-9">
       <div class="d-none bg-style-sheet" id="elementsField">
-        <table class="text-center table table-striped" data-type="elements">
+        <table class="text-center table table-striped" style="cursor: pointer" data-type="elements">
           <thead><tr></tr></thead>
           <tbody></tbody>
         </table>
@@ -101,7 +103,7 @@ $field['content'] = <<<content
 <hr>
 <div class="container-fluid d-none bg-style-sheet" id="optionsField">
   <div class="row m-2" style="overflow: auto">
-    <table class="text-center table table-striped" data-type="options">
+    <table class="text-center table table-striped" style="cursor: pointer" data-type="options">
       <thead><tr></tr></thead>
       <tbody></tbody>
     </table>
@@ -147,7 +149,7 @@ $field['footerContent'] .= <<<footerContent
     </div>
   </form>
 </template>
-<template id="elementForm">
+<template id="elementsForm">
   <form action="#">
     <label>Тип элемента: 
       <select type="text" name="C.symbol_code">$typeElementsHtml</select>
@@ -162,7 +164,7 @@ $field['footerContent'] .= <<<footerContent
     </div>
   </form>
 </template>
-<template id="optionForm">
+<template id="optionsForm">
   <form action="#">
     <div class="row">
       <label class="col">Имя варианта:</label>

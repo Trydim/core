@@ -49,7 +49,7 @@ foreach ($db->getTables('prop') as $table) {
     'values' => $db->loadTable($table['dbTable']),
   ];
 }
-$properties = array_merge([], $properties);
+//$properties = array_merge([], $properties); //бредовая строка
 
 unset($optionsColumn, $elementsColumn, $propSetting);
 require $pathTarget;

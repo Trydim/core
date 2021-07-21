@@ -13,7 +13,7 @@ export class SelectedRow {
     this.dataset = this.table.dataset || {type: 'one'};
     this.initTable();
     this.onTableEvent();
-    f.observer.add(this.dataset.type, this); // TODO не это я хотел, не правильно работает
+    f.observer.addArgument(this.dataset.type, this);
   }
 
   initTable() {

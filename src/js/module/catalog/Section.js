@@ -4,11 +4,11 @@ import {Catalog} from "./Main";
 
 export class Section extends Catalog {
   constructor() {
-    super();
+    super('section');
     this.setParam();
     this.setNodes();
     this.onEvent();
-    f.observer.add('section', this);
+
   }
 
   setParam() {
@@ -19,19 +19,20 @@ export class Section extends Catalog {
       dbAction : 'loadSection',
       sectionId: 0,
     };
+    this.oneFunc = new f.OneTimeFunction('msgEmpty', this.showMsgEmpty);
   }
   setNodes() {
     this.node = {
       main: f.qS('#sectionField'),
+      cSection: document.createElement('div'),
     };
     this.tmp = {
       sectionWrap: f.gTNode('#sectionWrap'),
       section    : f.gT('#section'),
     };
   }
-
-  getQueryParam() {
-    return Object.assign({}, this.queryParam);
+  showMsgEmpty(sections) {
+    if (!sections.length) f.showMsg('Создайте свой первый раздел!', 'warning');
   }
 
   addSectionList(sections) {
@@ -43,6 +44,8 @@ export class Section extends Catalog {
     sections.forEach(i => this.sectionList.set(i.ID, Object.assign(i, {parent: parent})));
   }
   appendSection(sections) {
+    this.oneFunc.exec('msgEmpty', sections);
+    if (!sections.length) return;
     this.addSectionList(sections);
 
     let wrap = this.tmp.sectionWrap.cloneNode(true);
@@ -67,20 +70,13 @@ export class Section extends Catalog {
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
-
-  commonEvent(e) {
-    let target = e.target,
-        action = target.dataset.action;
-    this.queryParam.dbAction = action;
-    this[action] && this[action](target);
-  }
   // Выбрать
   clickSection(target) {
-    this.node.cSection && this.node.cSection.classList.remove('focused');
+    this.node.cSection.classList.remove('focused');
     this.node.cSection = target;
     target.classList.add('focused');
   }
-  // Создать секцию
+  // Создать
   createSection() {
     let form         = f.gTNode('#sectionForm'),
         parentId     = this.node.cSection.dataset.id || false,
@@ -97,7 +93,7 @@ export class Section extends Catalog {
       sectionId: 0
     };
   }
-  // Открыть секцию
+  // Открыть
   openSection() {
     this.queryParam.sectionId = this.node.cSection.dataset.id || false;
     if (!this.queryParam.sectionId) return;
@@ -106,9 +102,9 @@ export class Section extends Catalog {
     //this.optionsId.clear();
     f.hide(this.node.options);
 
-    this.query()
+    this.query().then(data => f.observer.fire('loadElements', data));
   }
-  // Изменить секцию
+  // Изменить
   changeSection() {
     let form = f.gTNode('#sectionForm'), node;
 
@@ -136,7 +132,7 @@ export class Section extends Catalog {
       sectionId: this.getParentSection(this.queryParam.sectionId)
     };
   }
-  // Удалить секцию
+  // Удалить
   delSection() {
     this.queryParam.sectionId = this.node.cSection.dataset.id || false;
     if (!this.queryParam.sectionId) { this.M.hide(); return; }
@@ -147,14 +143,15 @@ export class Section extends Catalog {
       sectionId: this.getParentSection(this.queryParam.sectionId)
     };
   }
-
-  // Открыть подуровень
+  // Открыть нижний уровень
   dbClickSection(e) {
     let target = e.target;
+    !target.dataset.id && (target = target.closest(['data-id']));
+    if (!target) return;
+
     target.classList.toggle('closeSection');
     target.classList.toggle('openSection');
 
-    !target.dataset.id && (target = target.closest(['data-id']));
     this.queryParam.sectionId = target.dataset.id;
     this.queryParam.dbAction  = 'loadSection';
     this.loadSection();
