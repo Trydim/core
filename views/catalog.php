@@ -85,7 +85,7 @@ $field['content'] = <<<content
     </div>
     <div class="col-9">
       <div class="d-none bg-style-sheet" id="elementsField">
-        <table class="text-center table table-striped" style="cursor: pointer" data-type="elements">
+        <table class="text-center table table-striped" style="cursor: pointer; user-select: none">
           <thead><tr></tr></thead>
           <tbody></tbody>
         </table>
@@ -94,7 +94,10 @@ $field['content'] = <<<content
           <input class="btn btn-success" type="button" value="Создать элемент" data-action="createElements">
           <input class="btn btn-warning" type="button" value="Открыть элемент" data-action="openElements">
           <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
+          <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElements">
           <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
+          <input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
+          <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
         </div>
       </div>
     </div>
@@ -103,7 +106,7 @@ $field['content'] = <<<content
 <hr>
 <div class="container-fluid d-none bg-style-sheet" id="optionsField">
   <div class="row m-2" style="overflow: auto">
-    <table class="text-center table table-striped" style="cursor: pointer" data-type="options">
+    <table class="text-center table table-striped" style="cursor: pointer">
       <thead><tr></tr></thead>
       <tbody></tbody>
     </table>
@@ -112,6 +115,7 @@ $field['content'] = <<<content
   <div class="mt-1 text-center controlWrap">
     <input class="btn btn-success" type="button" value="Добавить вариант" data-action="createOptions">
     <input class="btn btn-warning" type="button" value="Изменить вариант" data-action="changeOptions">
+    <input class="btn btn-warning" type="button" value="Копировать вариант" data-action="copyOptions">
     <input class="btn btn-danger" type="button" value="Удалить вариант" data-action="delOptions">
   </div>
 </div>
@@ -151,16 +155,27 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="elementsForm">
   <form action="#">
-    <label>Тип элемента: 
-      <select type="text" name="C.symbol_code">$typeElementsHtml</select>
-    </label>
-    <br><label>Имя элемента: <input type="text" name="E.name"></label>
-    <div id="changeField">
-      <br><label>Родительский раздел(*):
-        <select type="text" name="sectionParent">$sectionElementsHtml</select>
-      </label>
-      <br><label>Активность: <input type="checkbox" name="activity"></label>
-      <br><label>Сортировка: <input type="number" name="sort"></label>
+    <div class="row mb-1 formRow">
+      <div class="col">Тип элемента:</div>
+      <div class="col"><select class="w-100" name="type">$typeElementsHtml</select></div>
+    </div>
+    <div class="row mb-1 formRow">
+      <div class="col">Имя элемента:</div>
+      <div class="col"><input type="text" class="w-100" name="name"></div>
+    </div>
+    <div id="multiChangeField">
+      <div class="row mb-1 formRow">
+        <div class="col">Родительский раздел(*):</div>
+        <div class="col"><select class="w-100" name="parentId">$sectionElementsHtml</select></div>
+      </div>
+      <div class="row mb-1 align-items-center formRow">
+        <div class="col">Активность:</div>
+        <label class="col text-center h-100"><input type="checkbox" name="activity" checked></label>
+      </div>
+      <div class="row mb-1 formRow">
+        <div class="col">Сортировка:</div>
+        <div class="col"><input type="number" class="w-100" name="sort" value="100"></div>
+      </div>
     </div>
   </form>
 </template>
@@ -168,41 +183,41 @@ $field['footerContent'] .= <<<footerContent
   <form action="#">
     <div class="row">
       <label class="col">Имя варианта:</label>
-      <div class="col"><input class="w-100" type="text" name="O.name"></div>  
+      <div class="col"><input class="w-100" type="text" name="name"></div>  
     </div>
     
     <div class="row">
       <label class="col">Единица измерения:</label>
-      <div class="col"><select class="w-100" name="U.ID">$unitsOptionsHtml</select></div>  
+      <div class="col"><select class="w-100" name="unitId">$unitsOptionsHtml</select></div>  
     </div>
           
     <div class="row">
       <div class="col-12 text-center">Входная цена</div>
       <div class="col">
-        <label>Валюта: <br><select name="MI.ID">$moneyOptionsHtml</select></label>
+        <label>Валюта: <br><select name="moneyInId">$moneyOptionsHtml</select></label>
       </div>
       <div class="col">
-        <label>Сумма: <br><input type="number" name="input_price" value="0"></label>
+        <label>Сумма: <br><input type="number" name="inputPrice" value="0"></label>
       </div>
     </div>
     
     <div>
       <div class="col text-center">Розничная цена</div>
       <div class="col row">
-        <label class="col">Валюта: <br><select name="MO.ID">$moneyOptionsHtml</select></label>
-        <label class="col">Наценка, %:<br><input type="number" name="output_percent"></label>
-        <label class="col">Сумма:<br><input type="number" name="output_price" value="0"></label>
+        <label class="col">Валюта: <br><select name="moneyOutId">$moneyOptionsHtml</select></label>
+        <label class="col">Наценка, %:<br><input type="number" name="outputPercent"></label>
+        <label class="col">Сумма:<br><input type="number" name="outputPrice" value="0"></label>
       </div>
     </div>
     
     <div id="changeField">
       <div class="row">
         <label class="col">Активность:</label>
-        <div class="col"><input class="w-100" type="checkbox" name="O.activity"></div>     
+        <div class="col"><input class="w-100" type="checkbox" name="activity" checked></div>     
       </div>
       <div class="row">
         <label class="col">Сортировка:</label>
-        <div class="col"><input class="w-100" type="number" name="sort"></div>     
+        <div class="col"><input class="w-100" type="number" name="sort" value="100"></div>     
       </div>
     </div>
     

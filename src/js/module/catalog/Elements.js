@@ -8,6 +8,7 @@ export class Elements extends Common {
 
     const field = f.qS(`#${this.type}Field`);
 
+    this.queryParam.tableName = this.type;
     this.setNodes(field, props.tmp);
 
     this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
@@ -17,6 +18,7 @@ export class Elements extends Common {
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
     f.observer.subscribe(`loadElements`, d => this.load(d));
+    f.observer.subscribe(`openSection`, d => this.openSection(d));
     this.onEvent();
   }
 
@@ -24,75 +26,154 @@ export class Elements extends Common {
     data['elements'] && this.prepareItems(data['elements']);
     data['countRowsElements'] && this.paginator.setCountPageBtn(data['countRowsElements']);
   }
+  openSection(id) {
+    this.queryParam.sectionId = id || false;
+
+  }
+  checkSection() {
+    if (!this.queryParam.sectionId) { f.showMsg('Ошибка раздела', 'error'); return true; }
+    return false;
+  }
+
+  getPopularType() {
+    let obj = {}, count = -1, key;
+
+    for (let item of this.itemList.values()) {
+      let code = item['C.symbol_code'];
+      !obj[code] && (obj[code] = 0);
+      obj[code]++;
+
+      if (count < obj[code]) {
+        count = obj[code];
+        key = code;
+      }
+    }
+
+    return key;
+  }
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
   // Создать элемент
   createElements() {
-    let form = f.gTNode('#elementForm');
+    if (this.checkSection()) return;
 
-    this.queryParam.sectionId = this.curSectionNode.dataset.id || false;
-    if (!this.queryParam.sectionId) {
-      this.M.hide();
-      return;
-    }
+    let form = this.tmp.form.cloneNode(true);
+    let node = form.querySelector('[name="type"]');
+    node.value = this.getPopularType();
 
-    //this.onEventNode(form.querySelector('[name="sectionParent"]'), this.changeParentSection, {}, 'blur');
+    node = form.querySelector('[name="parentId"]');
+    node.value = this.queryParam.sectionId;
+    node.disabled = true;
 
-    form.querySelector('#changeField').remove();
+    this.queryParam.form = form;
     this.M.show('Создание элемента', form);
-    this.reloadAction = {dbAction: 'openSection'};
+    form.querySelector('[name="name"]').focus();
+    this.reloadAction = {
+      dbAction: 'openSection',
+      callback: data => {
+        this.id.clear();
+        this.load(data);
+      },
+    };
   }
   // Открыть элемент
   openElements() {
     if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
 
     this.queryParam.elementsId = this.id.getSelectedList()[0];
+    f.observer.fire('openElements', this.queryParam.elementsId);
     this.query({sort: 'options'}).then(data => data && f.observer.fire('loadOptions', data));
   }
   // Изменить элемент
   changeElements() {
-    // Нужен запрос на секции
-    if (!this.id.getSelectedSize()) return;
+    if (!this.id.getSelectedSize() || this.checkSection()) { f.showMsg('Выберите минимум 1 элемент', 'error'); return; }
 
-    let oneElements = this.id.getSelectedSize() === 1,
-        form        = f.gTNode('#elementForm'),
+    let form        = this.tmp.form.cloneNode(true),
+        oneElements = this.id.getSelectedSize() === 1,
         id          = this.id.getSelectedList(),
-        element     = this.elementsList.get(id[0]);
+        element     = this.itemList.get(id[0]);
 
-    this.queryParam.id = JSON.stringify(id);
-    this.delayFunc     = () => this.id.clear();
+    this.queryParam.elementsId = JSON.stringify(id);
+    this.delayFunc = () => this.id.clear();
 
-    let node = form.querySelector('[name="C.symbol_code"]');
+    let node = form.querySelector('[name="type"]');
     if (oneElements) node.value = element['C.symbol_code'];
-    else node.parentNode.remove();
+    else node.closest('.formRow').remove();
 
-    node = form.querySelector('[name="E.name"]');
+    node = form.querySelector('[name="name"]');
     if (oneElements) node.value = element['E.name'];
-    else node.parentNode.remove();
+    else node.closest('.formRow').remove();
+
+    node = form.querySelector('[name="parentId"]');
+    node.value = this.queryParam.sectionId;
 
     node = form.querySelector('[name="activity"]');
     node.checked = oneElements ? !!(+element['activity']) : true;
 
     node = form.querySelector('[name="sort"]');
     if (oneElements) node.value = element['sort'];
-    else node.parentNode.remove();
+    else node.closest('.formRow').remove();
 
+    this.queryParam.form = form;
     this.M.show('Изменение элемента', form);
-    this.reloadAction = {dbAction: 'openSection'};
+    this.reloadAction = {
+      dbAction: 'openSection',
+      callback: data => {
+        this.id.clear();
+        this.load(data);
+      },
+    };
+  }
+  // Копировать Элемент
+  copyElements() {
+    if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
+
+    let form = this.tmp.form.cloneNode(true),
+        id          = this.id.getSelectedList(),
+        element     = this.itemList.get(id[0]);
+
+    let node = form.querySelector('[name="type"]');
+    node.value = this.getPopularType();
+
+    node = form.querySelector('[name="name"]');
+    node.value = element['E.name'];
+    node.focus();
+
+    node = form.querySelector('[name="parentId"]');
+    node.value = this.queryParam.sectionId;
+    node.disabled = true;
+
+    this.queryParam.form = form;
+    this.M.show('Копирование элемента', form);
+    this.reloadAction = {
+      dbAction: 'openSection',
+      callback: data => {
+        this.id.clear();
+        this.load(data);
+      },
+    };
   }
   // Удалить элемент
   delElements() {
     if (!this.id.getSelectedSize()) return;
-
-    this.queryParam.id = JSON.stringify(this.getSelectedList('elements'));
-    this.delayFunc = () => {
-      this.id.clear();
-      f.hide(this.node.field);
-    }
+    this.queryParam.elementsId = JSON.stringify(this.id.getSelectedList());
 
     this.M.show('Удалить элемент', 'Удалить элемент и варианты?');
-    this.reloadAction = {dbAction: 'openSection'};
+    this.reloadAction = {
+      dbAction: 'openSection',
+      callback: data => {
+        this.id.clear();
+        this.load(data);
+      },
+    };
+  }
+
+  selectedAll() {
+    this.id.checkedAll();
+  }
+  clearId() {
+    this.id.clear();
   }
 
   // Bind events

@@ -204,11 +204,16 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Section
     case 'createSection':
       $param = ['0' => []];
-      if (isset($parentId)) $param['0']['parent_ID'] = $parentId;
-      if (isset($name) && isset($code)) {
-        $param['0']['name'] = $name;
-        $param['0']['code'] = $code;
-        $result['error'] = $db->insert([], 'section', $param);
+      $param['0']['parent_ID'] = $parentId ?? 0;
+      if (isset($name) && isset($code) && !empty($name)) {
+        $haveSection = $db->selectQuery('section', 'name', " parent_ID = $parentId");
+        if (in_array($name, $haveSection)) {
+          $result['error'] = 'section_exist';
+        } else {
+          $param['0']['name'] = $name;
+          $param['0']['code'] = $code;
+          $result['error'] = $db->insert([], 'section', $param);
+        }
       }
       break;
     case 'openSection':
@@ -229,24 +234,37 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $id = $sectionId;
         $param[$id] = [];
 
-        if (isset($sectionName) && $sectionName !== '') $param[$id]['name'] = $sectionName; else break;
-        if (isset($sectionCode) && $sectionCode !== '') $param[$id]['code'] = $sectionCode;
-        if (isset($sectionParentId) && is_finite($sectionParentId)) $param[$id]['parent_ID'] = $sectionParentId;
+        if (isset($name) && !empty($name)) $param[$id]['name'] = $name;
+        else { $result['error'] = 'name_error'; break; }
+        if (isset($code) && $code !== '') $param[$id]['code'] = $code;
+        if (isset($parentId) && is_finite($parentId)) $param[$id]['parent_ID'] = $parentId;
 
-        $db->insert($columns, $dbTable, $param, true);
+        $result['error'] = $db->insert($columns, $dbTable, $param, true);
       }
       break;
     case 'delSection':
-      if (isset($sectionId)) $db->deleteItem('section', [$sectionId]);
+      if (isset($sectionId)) {
+        $ids = [$sectionId];
+        $ids = array_merge($ids, $db->selectQuery('section', 'ID', " parent_ID = $sectionId "));
+        $db->deleteItem('section', [$sectionId]);
+      }
       break;
 
     // Elements
     case 'createElements':
+    case 'copyElements':
       $param = ['0' => []];
-      if (isset($sectionId)) $param['0']['section_parent_id'] = $sectionId;
-      if (isset($elementName) && isset($elementType)) {
-        $param['0']['name'] = $elementName;
-        $param['0']['element_type_code'] = $elementType;
+      if (!isset($sectionId)) { $result['error'] = 'section_id_error'; break; }
+
+      $param['0']['section_parent_id'] = $sectionId;
+      if (isset($name) && isset($type) && !empty($name)) {
+        $haveElements = $db->selectQuery('elements', 'name', " name = '$name' ");
+        if (count($haveElements)) { $result['error'] = 'element_name_exist'; break; }
+
+        $param['0']['name'] = $name;
+        $param['0']['element_type_code'] = $type;
+        $param['0']['activity'] = (integer) isset($activity);
+        $param['0']['sort'] = $sort ?? 100;
         $result['error'] = $db->insert($columns, 'elements', $param);
       }
       break;
@@ -263,11 +281,20 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (count($elementsId)) {
         $param = [];
 
+        if (count($elementsId) === 1 && isset($name)) {
+          $elements = $db->selectQuery('elements', ['ID', 'name'], " name = '$name' ");
+          if (count($elements) > 1 || empty($name)
+              || (count($elements) === 1 && $elements[0]['ID'] !== $elementsId[0])) {
+            $result['error'] = 'element_name_exist';
+            break;
+          }
+        }
+
         foreach ($elementsId as $id) {
-          isset($sectionParent) && ($param[$id]['section_parent_id'] = $sectionParent);
-          isset($elementName) && ($param[$id]['name'] = $elementName);
-          isset($elementActivity) && ($param[$id]['activity'] = $elementActivity);
-          isset($elementSort) && ($param[$id]['sort'] = $elementSort);
+          isset($parentId) && ($param[$id]['section_parent_id'] = $parentId);
+          isset($name) && ($param[$id]['name'] = $name);
+          $param[$id]['activity'] = (integer) isset($activity);
+          $param[$id]['sort'] = $sort ?? 100;
         }
 
         $result['error'] = $db->insert($columns, $dbTable, $param, true);
@@ -286,17 +313,28 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'createOptions':
       $param = ['0' => []];
-      if (isset($elementsId)) $param['0']['element_id'] = $elementsId;
-      if (isset($optionName)) {
-        $param['0']['name'] = $optionName;
-        $param['0']['money_input_id'] = isset($moneyInputId) ? $moneyInputId : 1;
-        $param['0']['input_price'] = isset($moneyInput) ? $moneyInput : 0;
-        $param['0']['money_output_id'] = isset($moneyOutputId) ? $moneyOutputId : 1;
-        $param['0']['output_percent'] = isset($outputPercent) ? $outputPercent : 0;
-        $param['0']['output_price'] = isset($moneyOutput) ? $moneyOutput : 0;
-        $param['0']['unit_id'] = isset($unitId) ? $unitId : 1;
+      if (isset($name) && isset($elementsId) && !empty($name)) {
+        $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementsId' and name = '$name' ");
+        if (count($haveOption)) { $result['error'] = 'option_name_exist'; break; }
+
+        $param['0']['element_id'] = $elementsId;
+        $param['0']['name'] = $name;
+        $param['0']['money_input_id'] = $moneyInId ?? 1;
+        $param['0']['input_price'] = $inputPrice ?? 0;
+        $param['0']['money_output_id'] = $moneyOutId ?? 1;
+        $param['0']['output_percent'] = $outputPercent ?? 0;
+        $param['0']['output_price'] = $outputPrice ?? 0;
+        $param['0']['unit_id'] = $unitId ?? 1;
+        $param['0']['activity'] = isset($activity);
+        $param['0']['sort'] = $sort ?? 100;
         //$param['0']['image_id'] = $imageId;
-        //$param['0']['properties'] = json_encode($properties);
+
+        $properties = [];
+        foreach ($_REQUEST as $key => $value) {
+          if (stripos($key, 'prop_') !== false
+              && !empty($value)) $properties[$key] = $value;
+        }
+        $param['0']['properties'] = json_encode($properties);
 
         $result['error'] = $db->insert($columns, 'options_elements', $param);
       }
@@ -349,7 +387,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'createProperty':
-      if (isset($dbTable) && isset($dataType)) {
+      if (isset($dbTable) && isset($dataType) && !empty($dbTable)) {
         // Простой или сложный параметр по префиксу
         if (stripos($dataType, 's_') === 0) {
           $setAction = 'createProperty';
@@ -411,7 +449,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'addCustomer':
       $param = ['0' => []];
-      if (isset($name)) {
+      if (isset($name) && !empty($name)) {
         $param['0']['name'] = $name;
         $param['0']['ITN'] = isset($ITN) ? $ITN : '';
 

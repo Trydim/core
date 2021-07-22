@@ -8,6 +8,7 @@ export class Options extends Common {
 
     const field = f.qS(`#${this.type}Field`);
 
+    this.queryParam.tableName = 'options_elements';
     this.setNodes(field, props.tmp);
 
     this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
@@ -17,6 +18,7 @@ export class Options extends Common {
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
     f.observer.subscribe(`loadOptions`, d => this.load(d));
+    f.observer.subscribe(`openElements`, d => this.openElements(d));
     this.onEvent();
   }
 
@@ -24,47 +26,67 @@ export class Options extends Common {
     data['options'] && this.prepareItems(data['options']);
     data['countRowsOptions'] && this.paginator.setCountPageBtn(data['countRowsOptions']);
   }
+  openElements(id) {
+    this.queryParam.elementsId = id;
+  }
+  checkElements() {
+    if (!this.queryParam.elementsId) { f.showMsg('Ошибка элемента', 'error'); return true; }
+    return false;
+  }
+  changeMoneyInput(e, nodePercent, nodeOutput) {
+    nodeOutput.value = +e.target.value * (1 + +nodePercent.value / 100);
+    this.queryParam[nodeOutput.name] = nodeOutput.value;
+  }
+  changeOutputPercent(e, nodeInputM, nodeMoney) {
+    nodeMoney.value = +nodeInputM.value * (1 + +e.target.value / 100);
+    this.queryParam[nodeMoney.name] = nodeMoney.value;
+  }
+  changeMoneyOutput(e, nodeInputM, nodePercent) {
+    nodePercent.value = (+e.target.value / +nodeInputM.value - 1) * 100;
+    this.queryParam[nodePercent.name] = nodePercent.value;
+  }
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
   // Добавить вариант
   createOptions() {
-    let form = f.gTNode('#optionForm');
+    let form = this.tmp.form.cloneNode(true);
 
-    this.onEventNode(form.querySelector('[name="optionName"]'), this.changeTextInput, {}, 'blur');
-
-    let nodeInput   = form.querySelector('[name="moneyInput"]');
+    let nodeInput   = form.querySelector('[name="inputPrice"]');
     let nodePercent = form.querySelector('[name="outputPercent"]');
-    let nodeOutput  = form.querySelector('[name="moneyOutput"]');
+    let nodeOutput  = form.querySelector('[name="outputPrice"]');
 
-    this.onEventNode(nodeInput, (e) => this.changeMoneyInput.apply(this, [e, nodePercent, nodeOutput]), {}, 'blur');
+    this.onEventNode(nodeInput, (e) => this.changeMoneyInput(e, nodePercent, nodeOutput), {}, 'blur');
     nodeInput.value = 0;
 
-    this.onEventNode(nodePercent, (e) => this.changeOutputPercent.apply(this, [e, nodeInput, nodeOutput]), {}, 'blur');
+    this.onEventNode(nodePercent, (e) => this.changeOutputPercent(e, nodeInput, nodeOutput), {}, 'blur');
     nodePercent.value = 30;
 
-    this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput.apply(this, [e, nodeInput, nodePercent]), {}, 'blur');
+    this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput(e, nodeInput, nodePercent), {}, 'blur');
     nodeOutput.dispatchEvent(new Event('blur'));
 
-    form.querySelector('#changeField').remove();
-    this.M.show('Создание вариантов', form);
-    this.reloadAction = {dbAction: 'openElements'};
+    this.queryParam.form = form;
+    this.M.show('Добавить вариант', form);
+    form.querySelector('[name="name"]').focus();
+    this.reloadAction = {
+      dbAction: 'openElements',
+      callback: data => {
+        this.id.clear();
+        this.load(data);
+      },
+    };
   }
   // Изменить вариант
   changeOptions() {
-    if (!this.optionsId.getSelectedSize()) {
-      f.showMsg('Выберите варианты', 'error');
-      return;
-    }
+    if (!this.id.getSelectedSize()) { f.showMsg('Выберите варианты', 'error'); return; }
 
-    let oneElements = this.optionsId.getSelectedSize() === 1,
-        form        = f.gTNode('#optionForm'),
-        node,
-        id          = this.optionsId.getSelectedList(),
+    let form        = this.tmp.form.cloneNode(true),
+        oneElements = this.id.getSelectedSize() === 1, node,
+        id          = this.id.getSelectedList(),
         options     = this.optionsList.get(id[0]);
 
-    this.queryParam.optionsId = JSON.stringify(id);
-    this.delayFunc            = () => this.optionsId.clean();
+    this.queryParam.id = JSON.stringify(id);
+    this.delayFunc            = () => this.id.clean();
 
     if (oneElements) {
       const prop = Object.assign({}, options, (options['properties'] && JSON.parse(options['properties'])));
@@ -92,14 +114,24 @@ export class Options extends Common {
       nodePercent, this.changeNumberInput, {}, 'blur');
     this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput.apply(this, [e, nodeInput, nodePercent]), {}, 'blur');
 
+    this.queryParam.form = form;
     this.M.show('Изменение вариантов', form);
     this.reloadAction = {dbAction: 'openElements'};
+  }
+  // Копировать вариант
+  copyOptions() {
+    if (!this.id.getSelectedSize()) { f.showMsg('Выберите варианты', 'error'); return; }
+
+    let form = this.tmp.form.cloneNode(true);
+
+    this.queryParam.form = form;
+    this.M.show('Копировать вариантов', form);
   }
   // Удалить вариант
   delOptions() {
     if (!this.id.getSelectedSize()) return;
 
-    this.queryParam.optionsId = JSON.stringify(this.id.getSelectedList());
+    this.queryParam.id = JSON.stringify(this.id.getSelectedList());
     this.delayFunc = () => this.id.clear();
 
     this.M.show('Удалить вариант', 'Удалить выбранные варианты?');

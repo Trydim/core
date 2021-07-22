@@ -29,7 +29,14 @@ function addCpNumber($number, $reportVal) {
  * @return bool - true if error no
  */
 function checkError($var) {
-  return !((is_array($var) && count($var)) || (is_string($var) && mb_strlen($var)));
+  if (is_array($var)) {
+    foreach ($var as $item) {
+      $error = checkError($item);
+      if (!$error) return false;
+    }
+    return true;
+  }
+  return empty($var);
 }
 
 /**

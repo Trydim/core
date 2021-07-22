@@ -20,44 +20,18 @@ export const catalog = {
     this.options = new Options({db, tmp});
 
     //new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
-
     this.section.loadSection();
+
+    setTimeout(() => {
+      document.querySelector("#sectionField [data-id='9']").click();
+      document.querySelector("#sectionField > div.controlWrap > input:nth-child(2)").click();
+
+      setTimeout(() => {
+        this.elements.id.addSelectedId('241');
+        document.querySelector("#elementsField > div.mt-1.controlWrap > input:nth-child(2)").click();
+      }, 500);
+
+    }, 500);
     return this;
   },
-
-  changeTextInput(e) {
-    if (e.target.value.length === 0) return;
-    else if (e.target.value.length <= 2) { e.target.value = 'Ошибка Названия'; return; }
-    this.queryParam[e.target.name] = e.target.value;
-  },
-  changeNumberInput(e) {
-    if (isNaN(e.target.value)) { e.target.value = 0; return; }
-    this.queryParam[e.target.name] = e.target.value;
-  },
-  changeMoneyInput(e, nodePercent, nodeOutput) {
-    this.changeNumberInput(e);
-
-    nodeOutput.value = +e.target.value * ( 1 + +nodePercent.value / 100);
-    this.queryParam[nodeOutput.name] = nodeOutput.value;
-  },
-  changeOutputPercent(e, nodeInputM, nodeMoney) {
-    this.changeNumberInput(e);
-
-    nodeMoney.value = +nodeInputM.value * ( 1 + +e.target.value / 100);
-    this.queryParam[nodeMoney.name] = nodeMoney.value;
-  },
-  changeMoneyOutput(e, nodeInputM, nodePercent) {
-    this.changeNumberInput(e);
-
-    nodePercent.value = (+e.target.value / +nodeInputM.value - 1) * 100;
-    this.queryParam[nodePercent.name] = nodePercent.value;
-  },
-  changeCheckInput(e) {
-    this.queryParam[e.target.name] = e.target.checked;
-  },
-  changeParentSection(e) {
-    this.queryParam.sectionParentId = e.target.value;
-    this.reloadAction.sectionId = e.target.value;
-  },
-
 }

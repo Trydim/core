@@ -24,7 +24,6 @@ try {
       break;
   }
 
-  // $result['error'] должен содержать сообщение
   $result['status'] = isset($result['error']) ? checkError($result['error']) : true;
 
 } catch (\mysql_xdevapi\Exception $e) {

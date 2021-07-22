@@ -32,29 +32,32 @@ export class Catalog {
     this.db = db;
   }
   setReloadQueryParam() {
+    delete this.reloadAction.callback;
     this.queryParam = Object.assign(this.queryParam, this.reloadAction);
     this.reloadAction = false;
   }
 
-  query(param = {}) {
-    let {sort = {}} = param,
-        queryForm = this.queryParam.form || document.createElement('form');
+  query() {
+    let queryForm = this.queryParam.form || document.createElement('form');
 
-    let form = new FormData(queryForm);
+    let data = new FormData(queryForm);
 
-    form.set('mode', 'DB');
+    data.set('mode', 'DB');
 
-    Object.entries(Object.assign({}, this.queryParam, sort))
-          .map(param => form.set(param[0], param[1]));
+    Object.entries(Object.assign({}, this.queryParam, this.sortParam))
+          .map(param => data.set(param[0], param[1]));
 
     this.queryParam.form = false;
 
-    return f.Post({data: form}).then(data => {
-      if(this.reloadAction) {
-        this.query(this.setReloadQueryParam());
-        return;
+    return f.Post({data}).then(async data => {
+      if (this.reloadAction) {
+        let cbFunc = this.reloadAction.callback || false;
+        this.setReloadQueryParam();
+        let cbData = await this.query();
+        data.status && cbFunc && cbFunc(cbData);
       }
 
+      if (data.status === false && data.error) f.showMsg(data.error, 'error');
       return data;
     });
   }
@@ -67,10 +70,6 @@ export class Catalog {
         action = target.dataset.action;
 
     if (action === 'confirmYes') {
-      if (this.queryParam.dbAction.includes('Section')) this.queryParam.tableName = 'section';
-      else if (this.queryParam.dbAction.includes('Element')) this.queryParam.tableName = 'elements';
-      else if (this.queryParam.dbAction.includes('Option')) this.queryParam.tableName = 'options_elements';
-
       this.delayFunc();
       this.delayFunc = () => {};
       this.query();
@@ -116,6 +115,10 @@ export class Common extends Catalog {
       countPerPage: 20,
       pageCount: 0,
     };
+
+    this.oneFunc = new f.OneTimeFunction('setTablesHeaders',
+      () => this.setTablesHeaders()
+    );
   }
   setNodes(field, tmp) {
     this.node = {
@@ -134,7 +137,6 @@ export class Common extends Catalog {
     data.forEach(i => this.itemList.set(i.ID || i['O.ID'], i));
   }
   setTablesHeaders() {
-    this.sortParam.sortColumn = 'O.ID';
 
     let html = '<tr><th></th>';
     this.setting.map(i => {
@@ -143,7 +145,7 @@ export class Common extends Catalog {
     this.node.field.querySelector('tr').innerHTML = html + '</tr>';
   }
   showTablesItems(data) {
-    this.sortParam.sortColumn || this.setTablesHeaders();
+    this.oneFunc.exec('setTablesHeaders');
 
     const trNode = [],
           colSelect = {

@@ -72,22 +72,25 @@ class Db extends \R {
 
   /**
    * @param string $dbTable name of table
-   * @param array|string $columns of columns, if count 1 return simple array
+   * @param array|string $columns of columns, if size of array is 1 (except all column '*') return simple array,
    * @param $filters string filter
    *
    * @return array
    */
   public function selectQuery($dbTable, $columns = '*', $filters = '') {
+    $simple = false;
     if (!$dbTable) return [];
-    if (!is_array($columns)) $columns = [$columns];
-    //if (!is_array($filters)) $filters = [$filters];
+    if (!is_array($columns)) {
+      $simple = $columns !== '*';
+      $columns = [$columns];
+    }
 
     $sql = 'SELECT ' . implode(',', $columns) .
            ' FROM ' . $dbTable;
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
 
-    return self::getAll($sql);
+    return $simple ? self::getCol($sql) : self::getAll($sql);
   }
 
   /**
@@ -323,7 +326,7 @@ class Db extends \R {
       }
     }
 
-    return ['result' => $result,];
+    return $result;
   }
 
   // Files
