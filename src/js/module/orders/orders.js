@@ -50,8 +50,8 @@ class allOrdersList {
       }, Object.create(null));
     } else {
       this.data = data.reduce((r, i) => {
-        this.searchData[i['cp_number']] = i['cp_number'] + ' ' + i['create_date'] + ' ' + i['total'];
-        r[i['cp_number']] = i;
+        this.searchData[i['cpNumber']] = i['cpNumber'] + ' ' + i['createDate'] + ' ' + i['total'];
+        r[i['cpNumber']] = i;
         return r;
       }, Object.create(null));
     }
@@ -138,7 +138,7 @@ export const orders = {
 
   fillTable(data, search = false) {
     data = data.map(item => {
-      if(item.important_value) {
+      if(item.importantValue) {
         let value = '';
 
         if(false /* TODO настройки вывода даты*/) {
@@ -151,7 +151,7 @@ export const orders = {
         }
 
         try {
-          value = JSON.parse(item.important_value);
+          value = JSON.parse(item.importantValue);
           !Array.isArray(value) && (value = Object.values(value).length && [value]);
           if(value.length) {
             value = value.map(i => { i.key = _(i.key); return i; });
@@ -159,7 +159,7 @@ export const orders = {
           } else value = '-';
         }
         catch (e) { console.log(`Заказ ID:${item['O.ID']} имеет не правильное значение`); }
-        item.important_value = value;
+        item.importantValue = value;
       }
       return item;
     })
@@ -190,7 +190,7 @@ export const orders = {
     let tmp = f.gT('#orderOpenForm'),
         html = document.createElement('div');
 
-    data['order']['important_value'] = JSON.parse(data['order']['important_value'])[0];
+    data['order']['importantValue'] = JSON.parse(data['order']['importantValue'])[0];
 
     html.innerHTML = f.replaceTemplate(tmp, data['order']);
 
@@ -234,7 +234,7 @@ export const orders = {
         selectedSize   = this.selected.getSelectedSize();
 
     if (!selectedSize && !('orderType').includes(action)) { f.showMsg('Выберите заказ!'); return; }
-    this.queryParam.orderIds = JSON.stringify(this.selected.getSelectedList());
+    this.queryParam.orderIds = JSON.stringify(this.selected.getSelected());
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
 
     let select = {
@@ -352,7 +352,7 @@ export const orders = {
         if (this.orderType === target.value) return;
         this.orderType = target.value;
 
-        this.queryParam.sortColumn = 'create_date';
+        this.queryParam.sortColumn = 'createDate';
         this.queryParam.sortDirect = false;
         this.queryParam.currPage   = 0;
         this.queryParam.pageCount  = 0;

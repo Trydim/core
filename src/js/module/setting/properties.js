@@ -131,7 +131,7 @@ export class Properties {
     this.M.show('Добавить новое свойство', this.tmp.create);
   }
   changeProperty() {
-    let props = this.selected.getSelectedList();
+    let props = this.selected.getSelected();
     if (props.length !== 1) {
       f.showMsg('Выберите 1 параметр', 'error');
       return;
@@ -142,7 +142,7 @@ export class Properties {
     this.M.show('Удалить параметр?', this.tmp.edit);
   }
   delProperty() {
-    let props = this.selected.getSelectedList();
+    let props = this.selected.getSelected();
     if (!props.length) {
       f.showMsg('Выберите параметр', 'error');
       return;

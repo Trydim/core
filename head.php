@@ -11,7 +11,7 @@ else {
   $target = getTargetPage($_GET);
 
   !PUBLIC_PAGE && !$target && $target = ACCESS_MENU[0];
-  $target === PUBLIC_PAGE && reDirect(null, 'public');
+  ($target === PUBLIC_PAGE || $target === '404') && reDirect(null, 'public');
   $target && $pathTarget = checkTemplate($target);
   if ($target && strstr($pathTarget, '404')) require CORE . 'controller/c_404.php';
   else {

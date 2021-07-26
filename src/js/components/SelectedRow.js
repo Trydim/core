@@ -5,10 +5,7 @@ import {catalog} from "../module/catalog/catalog";
 
 export class SelectedRow {
   constructor(param) {
-    let {
-          table = f.qS('#table'),
-        } = param;
-
+    let {table = f.qS('#table')} = param;
     if (!table) return;
 
     this.table = table;
@@ -28,7 +25,7 @@ export class SelectedRow {
     this.selectedId.delete(id);
   }
 
-  getSelectedList() {
+  getSelected() {
     let ids = [];
     for (let id of this.selectedId.values()) ids.push(id);
     return ids;
@@ -73,7 +70,6 @@ export class SelectedRow {
     input !== e.target && (input.checked = !input.checked);
     input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
     //this.checkBtnRows();
-    console.log(this.getSelectedList());
   }*/
 
   mouseOver(e) {
@@ -101,7 +97,7 @@ export class SelectedRow {
       input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
     }
 
-    console.log(this.getSelectedList());
+    console.log(this.getSelected());
     delete this.startClick;
     this.table.querySelectorAll('.mouseSelected')
         .forEach(tr => tr.classList.remove('mouseSelected'));

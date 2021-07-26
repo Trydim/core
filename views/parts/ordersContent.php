@@ -18,7 +18,7 @@
   </div>
 </div>
 <div class="d-none pb-4" id="confirmField">
-  <select id="selectStatus" class="d-none custom-select select-status" name="status_id"></select>
+  <select id="selectStatus" class="d-none custom-select select-status" name="statusId"></select>
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>

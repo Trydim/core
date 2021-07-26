@@ -39,7 +39,7 @@ $field['footerContent'] = <<<footerContent
     </div>
     <div class="form-group">
       <label class="w-100">Доступ: 
-        <select class="form-control" name="permission_id">$permission</select>
+        <select class="form-control" name="permissionId">$permission</select>
       </label>
     </div>
     <div class="form-group">

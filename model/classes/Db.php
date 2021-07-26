@@ -2,6 +2,8 @@
 
 namespace RedBeanPHP;
 
+use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+
 require 'rb.php';
 
 class Db extends \R {
@@ -67,6 +69,11 @@ class Db extends \R {
     if (isset($_SESSION['priority'])) $this->currentUserID = $_SESSION['priority'];
   }
 
+  public function setQueryAs($varName) {
+    return AQueryWriter::camelsSnake($varName) . " AS '$varName'";
+  }
+
+
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
 
@@ -85,10 +92,9 @@ class Db extends \R {
       $columns = [$columns];
     }
 
-    $sql = 'SELECT ' . implode(',', $columns) .
-           ' FROM ' . $dbTable;
-
-    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
+    $columns[0] !== '*' && $columns = array_map(function ($item) { return $this->setQueryAs($item); }, $columns);
+    $sql = 'SELECT ' . implode(', ',  $columns) . ' FROM ' . $dbTable;
+    if (strlen($filters)) $sql .= ' WHERE ' . AQueryWriter::camelsSnake($filters);
 
     return $simple ? self::getCol($sql) : self::getAll($sql);
   }
@@ -99,8 +105,6 @@ class Db extends \R {
    * @param $curTable
    * @param $dbTable
    * @param $param - link
-   * @param $count - link
-   *
    * @return array $result
    */
   public function checkTableBefore($curTable, $dbTable, &$param) {
@@ -196,7 +200,6 @@ class Db extends \R {
    * @return array
    */
   public function deleteItem($dbTable, $ids) {
-    ob_start();
     if (count($ids) === 1) {
       $bean = self::xdispense($dbTable);
       $bean->ID = $ids[0];
@@ -212,7 +215,6 @@ class Db extends \R {
 
       self::trashAll($beans);
     }
-    $temp = ob_get_clean();
     return [];
   }
 
@@ -349,8 +351,8 @@ class Db extends \R {
   public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT ID, E.name AS 'E.name', activity, sort, last_edit_date,
-                   C.symbol_code AS 'C.symbol_code', C.name AS 'C.name'
+    $sql = "SELECT ID, E.name AS 'E.name', activity, sort, last_edit_date AS 'lastEditDate',
+                   C.symbol_code AS 'symbolCode', C.name AS 'C.name'
     FROM elements E
     JOIN codes C on C.symbol_code = E.element_type_code
     WHERE E.section_parent_id = $sectionID
@@ -373,7 +375,10 @@ class Db extends \R {
   private function getAlias($table) {
     $tables = ['codes.', 'money.', 'elements.', 'options_elements.', 'units.'];
     $alias = ['C.', 'M.', 'E.', 'O.', 'U.'];
-    return str_replace($tables, $alias, $table);
+    $table = str_replace($tables, $alias, $table);
+    $cols = ['.id', '.type', '.unit', '.lastDate'];
+    $alias = ['.ID', '.element_type_code', '.short_name', '.last_edit_date'];
+    return str_replace($cols, $alias, $table);
   }
 
   /**
@@ -385,26 +390,24 @@ class Db extends \R {
    * @param false $sortDirect
    * @return array|null
    */
-  public function openOptions($elementID = false, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'O.name', $sortDirect = false) {
+  public function openOptions($elementID = false, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT O.ID AS 'O.ID', U.ID as 'U.ID', MI.ID AS 'MI.ID', MO.ID AS 'MO.ID', images_ids, properties,
-                   O.name AS 'O.name', last_edit_date, O.activity as 'O.activity', sort, 
-                   input_price, output_percent, output_price
-            FROM options_elements O
-            JOIN money MI on MI.ID = O.money_input_id
-            JOIN money MO on MO.ID = O.money_output_id
-            JOIN units U on U.ID = O.unit_id";
+    $sql = "SELECT ID, money_input_id AS 'moneyInputId', money_output_id as 'moneyOutputId',
+                   images_ids AS 'images', properties,
+                   name, unit_id AS 'unitId', last_edit_date AS 'lastEditDate', activity, sort,
+                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
+            FROM options_elements";
 
     if ($elementID) {
-      $sql .= " WHERE O.element_id = $elementID
+      $sql .= " WHERE element_id = $elementID
       		ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
     }
 
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
-      strlen($option['images_ids']) && $option['images'] = $this->setImages($option['images_ids']);
+      strlen($option['images']) && $option['images'] = $this->setImages($option['images']);
       return $option;
     }, $options);
   }
@@ -417,9 +420,9 @@ class Db extends \R {
   public function loadOptions($filter = []) {
     $sql = "SELECT O.ID AS 'id', E.element_type_code AS 'type', O.name AS 'name',
                    U.short_name as 'unit', O.activity AS 'activity',
-                   O.sort AS 'sort', O.last_edit_date as 'lastDate', properties, images_ids,
+                   O.sort AS 'sort', O.last_edit_date as 'lastDate', properties, images_ids AS 'images',
                    MI.name AS 'moneyInput', MO.name AS 'moneyOutput',
-                   input_price, output_percent, output_price
+                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
             FROM options_elements O
             JOIN elements E on E.ID = O.element_id
             JOIN money MI on MI.ID = O.money_input_id
@@ -427,20 +430,22 @@ class Db extends \R {
             JOIN units U on U.ID = O.unit_id";
 
     if (count($filter)) {
-      $sql .= ' WHERE';
+      $filterArr = [];
       foreach ($filter as $k => $v) {
-        $k = $this->getAlias($k);
-        $sql .= " $k = '$v'";
+        $k = $this->getAlias(AQueryWriter::camelsSnake($k));
+        $filterArr[] = "$k LIKE '$v'";
       }
+
+      $sql .= ' WHERE ' . implode(' AND ', $filterArr);
+      unset($filter, $filterArr);
     }
 
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
       // set images
-      if (strlen($option['images_ids'])) {
-        $option['images'] = $this->setImages($option['images_ids']);
-        unset($option['images_ids']);
+      if (strlen($option['images'])) {
+        $option['images'] = $this->setImages($option['images']);
       }
 
       // set properties

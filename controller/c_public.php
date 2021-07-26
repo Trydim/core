@@ -40,7 +40,7 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
   $orderId = $_GET['orderVisitorId'];
 
   if (is_finite($orderId)) {
-    $order = $db->selectQuery('client_orders', ['*'], ' cp_number = ' . $orderId . ' ');
+    $order = $db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
 
     if (count($order) === 1) {
       $order = $order[0];

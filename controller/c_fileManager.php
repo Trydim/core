@@ -26,8 +26,8 @@ function tree($path) {
       foreach ($files as $file) {
         if (stream_resolve_include_path($path . $file)) {
           if (filetype($path . $file) === 'dir') {
-            echo '<li><div id="' . $dir . '" data-fo="' . $path . $dir . '/' . '" class="fo closed">' . $dir . '</div>';
-            tree($path . $dir . '/');
+            echo '<li><div id="' . $file . '" data-fo="' . $path . $file . '/' . '" class="fo closed">' . $file . '</div>';
+            tree($path . $file . '/');
             echo '</li>';
           }
         }

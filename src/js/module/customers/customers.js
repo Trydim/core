@@ -252,7 +252,7 @@ export const customers = {
         if (this.selectedId.size !== 1) { f.showMsg('Выберите клиента!'); return; }
 
         let form = f.gTNode('#customerForm'), node,
-            id = this.getSelectedList(),
+            id = this.getSelected(),
             customer = this.usersList.get(id[0]);
 
         this.queryParam.usersId = id[0];
@@ -291,7 +291,7 @@ export const customers = {
         if (!this.selectedId.size) { f.showMsg('Выберите клиента!', 'error'); return; }
         if (this.checkCustomers()) return;
 
-        this.queryParam.usersId = JSON.stringify(this.getSelectedList());
+        this.queryParam.usersId = JSON.stringify(this.getSelected());
 
         this.confirmMsg = 'Успешно удалено';
         this.M.show('Удалить', 'Удалить выбранных клиентов?');
@@ -374,7 +374,7 @@ export const customers = {
 
   selectedId: new Set(), // TODO сохранять в сессии/локальном хранилище потом, что бы можно было перезагрузить страницу
 
-  getSelectedList() {
+  getSelected() {
     let ids = [];
     for( let id of this.selectedId.values()) ids.push(id);
     return ids;

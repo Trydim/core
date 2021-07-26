@@ -21,18 +21,18 @@ $field = [
 
 // Загрузка настройки столбцов
 $setting = getSettingFile();
-$elementsColumn = $setting['optionsColumn'] ?? 'ID,C.name,E.name,activity,sort,last_edit_date';
+$elementsColumn = $setting['optionsColumn'] ?? 'ID,C.name,E.name,activity,sort,lastEditDate';
 $field['footerContent'] .= "<input type='hidden' id='elementsColumn' value='$elementsColumn'>";
-$optionsColumn = $setting['elementsColumn'] ?? 'O.ID,images,O.name,U.ID,O.activity,sort,last_edit_date,MI.ID,input_price,MO.ID,output_percent,output_price';
+$optionsColumn = $setting['elementsColumn'] ?? 'ID,images,name,unitId,activity,sort,lastEditDate,moneyInputId,inputPrice,moneyOutputId,outputPercent,outputPrice';
 $field['footerContent'] .= "<input type='hidden' id='optionsColumn' value='$optionsColumn'>";
 
 // Типы товаров
-$types = $db->selectQuery('codes', ['symbol_code', 'name']);
+$types = $db->selectQuery('codes', ['symbolCode', 'name']);
 $section = $db->selectQuery('section', ['ID', 'name']);
 
 
 // Валют и единиц измерения
-$units = $db->selectQuery('units', ['ID', 'short_name']);
+$units = $db->selectQuery('units', ['ID', 'shortName']);
 $field['footerContent'] .= "<input type='hidden' id='dataUnits' value='" . prepareData($units) . "'>";
 $money = $db->selectQuery('money', ['ID', 'name']);
 $field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($money) . "'>";

@@ -10,13 +10,13 @@
 
 $typeElementsHtml = '';
 foreach ($types as $opt) {
-  $code = $opt['symbol_code'];
+  $code = $opt['symbolCode'];
   $name = $opt['name'];
   $typeElementsHtml .= "<option value=\"$code\">$name</option>";
 }
 
 
-$sectionElementsHtml = '';
+$sectionElementsHtml = '<option value="0">Верхний уровень</option>';
 foreach ($section as $opt) {
   $id = $opt['ID'];
   $name = $opt['name'];
@@ -27,7 +27,7 @@ foreach ($section as $opt) {
 $unitsOptionsHtml = '';
 foreach ($units as $opt) {
   $id = $opt['ID'];
-  $name = $opt['short_name'];
+  $name = $opt['shortName'];
   $unitsOptionsHtml .= "<option value=\"$id\">$name</option>";
 }
 
@@ -52,7 +52,7 @@ if ($properties) {
       </div>";
     } else {
       $defOption = '';
-      if (isset($prop['values'])) $defOption = "<option value='no'>-</option>";
+      if (isset($prop['values'])) $defOption = "<option value=''>-</option>";
       else $prop['values'] = [['ID' => false, 'name' => 'table empty']];
 
       $propertiesHtml .= "<div class='row'><label class='col'>$name</label>"
@@ -181,7 +181,7 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="optionsForm">
   <form action="#">
-    <div class="row">
+    <div class="row onlyOne">
       <label class="col">Имя варианта:</label>
       <div class="col"><input class="w-100" type="text" name="name"></div>  
     </div>
@@ -194,34 +194,37 @@ $field['footerContent'] .= <<<footerContent
     <div class="row">
       <div class="col-12 text-center">Входная цена</div>
       <div class="col">
-        <label>Валюта: <br><select name="moneyInId">$moneyOptionsHtml</select></label>
+        <label>Валюта: <br><select name="moneyInputId">$moneyOptionsHtml</select></label>
       </div>
-      <div class="col">
-        <label>Сумма: <br><input type="number" name="inputPrice" value="0"></label>
+      <div class="col onlyOne">
+        <label>Цена: <br><input type="number" name="inputPrice" value="0"></label>
       </div>
     </div>
     
     <div>
       <div class="col text-center">Розничная цена</div>
       <div class="col row">
-        <label class="col">Валюта: <br><select name="moneyOutId">$moneyOptionsHtml</select></label>
-        <label class="col">Наценка, %:<br><input type="number" name="outputPercent"></label>
-        <label class="col">Сумма:<br><input type="number" name="outputPrice" value="0"></label>
+        <label class="col">Валюта: <br><select name="moneyOutputId">$moneyOptionsHtml</select></label>
+        <label class="col">Наценка, %:<br><input type="number" name="outputPercent" value="30"></label>
+        <label class="col onlyOne">Сумма:<br><input type="number" name="outputPrice" value="0"></label>
       </div>
     </div>
     
-    <div id="changeField">
-      <div class="row">
-        <label class="col">Активность:</label>
-        <div class="col"><input class="w-100" type="checkbox" name="activity" checked></div>     
-      </div>
-      <div class="row">
-        <label class="col">Сортировка:</label>
-        <div class="col"><input class="w-100" type="number" name="sort" value="100"></div>     
-      </div>
+    <div class="row">
+      <label class="col">Активность:</label>
+      <div class="col"><input class="w-100" type="checkbox" name="activity" checked></div>     
+    </div>
+    <div class="row">
+      <label class="col">Сортировка:</label>
+      <div class="col"><input class="w-100" type="number" name="sort" value="100"></div>     
     </div>
     
-    <div data-field="properties">
+    <div class="row onlyMany">
+      <label class="col">Открыть параметры (*):</label>
+      <div class="col"><input class="w-100" type="checkbox" id="properties"></div>     
+    </div>
+    
+    <div data-field="properties" class="d-none">
       <div class="col-12 text-center">Параметры</div>
       $propertiesHtml
     </div>

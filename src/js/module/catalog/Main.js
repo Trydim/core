@@ -150,14 +150,13 @@ export class Common extends Catalog {
     const trNode = [],
           colSelect = {
             'activity': v => !!+v ? '<td>+</td>' : '<td>-</td>',
-            'O.activity': v => !!+v ? '<td>+</td>' : '<td>-</td>',
 
             'ex': v => '<td></td>',
             'images': v => '<td>Изображения</td>',
 
-            'U.ID': v => `<td>${this.db.units[v]['short_name']}</td>`,
-            'MI.ID': v => `<td>${this.db.money[v].name}</td>`,
-            'MO.ID': v => `<td>${this.db.money[v].name}</td>`,
+            'unitId': v => `<td>${this.db.units[v]['shortName']}</td>`,
+            'moneyInputId': v => `<td>${this.db.money[v].name}</td>`,
+            'moneyOutputId': v => `<td>${this.db.money[v].name}</td>`,
           };
 
     data.map(row => {

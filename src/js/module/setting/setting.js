@@ -72,12 +72,11 @@ export const setting = {
         let id = item.ID;
         delete item.ID;
 
-        if (item['accessVal']['menuAccess']) {
+        if (item['accessVal'] && item['accessVal']['menuAccess']) {
           let menus = item['accessVal']['menuAccess'].split(','),
               node = this.form.permission.querySelector(`[name="permMenuAccess_${id}"]`);
-          menus.forEach(menu => {
-            node.querySelector(`[value="${menu}"]`).selected = true;
-          });
+
+          menus.forEach(menu => node.querySelector(`[value="${menu}"]`).selected = true);
         }
         r[id] = item;
         return r;

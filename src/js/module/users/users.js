@@ -4,13 +4,13 @@ export const users = {
   form: new FormData(),
 
   needReload: false,
-  table: f.gI('usersTable'),
+  table: f.qS('#usersTable'),
   tbody: '',
   impValue: '',
-  confirm: f.gI('confirmField'),
+  confirm: f.qS('#confirmField'),
   confirmMsg: false,
 
-  template: {
+  tmp: {
     form: f.gTNode('#userForm'),
   },
 
@@ -18,7 +18,7 @@ export const users = {
     mode        : 'DB',
     tableName   : 'users',
     dbAction    : 'loadUsers',
-    sortColumn  : 'register_date',
+    sortColumn  : 'registerDate',
     sortDirect  : false, // true = DESC, false
     currPage    : 0,
     countPerPage: 20,
@@ -35,6 +35,7 @@ export const users = {
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
+    this.id = new f.SelectedRow({table: this.table});
     new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.M = f.initModal();
     this.query();
@@ -129,7 +130,7 @@ export const users = {
     });
   },
 
-  // TODO events function
+  // Events function
   //--------------------------------------------------------------------------------------------------------------------
 
   // кнопки открыть закрыть и т.д.
@@ -150,27 +151,27 @@ export const users = {
 
     let select = {
       'addUser': () => {
-        form = this.template.form.cloneNode(true);
+        form = this.tmp.form.cloneNode(true);
         form.querySelector('#changeField').remove();
         this.confirmMsg = 'Новый пользователь добавлен';
         this.M.show('Добавление пользователя', form);
       },
       'changeUser': () => {
-        if (!this.selectedId.size) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
+        if (!this.id.getSelectedSize()) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
 
-        let oneElements = this.selectedId.size === 1, node,
-            id = this.getSelectedList(),
+        let oneElements = this.id.getSelectedSize() === 1, node,
+            id = this.id.getSelected(),
             users = this.usersList.get(id[0]);
-        form = this.template.form.cloneNode(true);
+        form = this.tmp.form.cloneNode(true);
 
-        this.queryParam.usersId = JSON.stringify(this.getSelectedList());
+        this.queryParam.usersId = JSON.stringify(id);
 
         node = form.querySelector('[name="name"]');
         if (oneElements) node.value = users['U.name'];
         else node.parentNode.remove();
 
-        node = form.querySelector('[name="permission_id"]');
-        if (oneElements) node.value = users['permission_id'];
+        node = form.querySelector('[name="permissionId"]');
+        if (oneElements) node.value = users['permissionId'];
         else node.value = 1;
 
         node = form.querySelector('[name="login"]');
@@ -207,13 +208,13 @@ export const users = {
         this.M.show('Изменение пользователей', form);
       },
       'changeUserPassword': () => { // TODO доработать изменение пароля
-        if (this.selectedId.size !== 1) return;
+        if (this.id.getSelectedSize() !== 1) return;
 
-        let id = this.getSelectedList(),
+        let id   = this.id.getSelected(),
             user = this.usersList.get(id[0]),
             form = f.gTNode('#userChangePassForm');
 
-        this.queryParam.usersId = JSON.stringify(this.getSelectedList());
+        this.queryParam.usersId = JSON.stringify(id);
 
         let newPass = form.querySelector('[name="newPass"]'),
             repeatPass = form.querySelector('[name="repeatPass"]');
@@ -225,10 +226,10 @@ export const users = {
         this.M.show('Изменить пароль пользователя ' + user['U.name'], form);
       },
       'delUser': () => {
-        if (!this.selectedId.size) return;
+        if (!this.id.getSelectedSize()) return;
 
-        this.queryParam.usersId = JSON.stringify(this.getSelectedList());
-        this.delayFunc = () => this.selectedId.clear();
+        this.queryParam.usersId = JSON.stringify(this.id.getSelected());
+        this.delayFunc = () => this.id.clear();
 
         this.confirmMsg = 'Удаление успешно';
         this.M.show('Удалить', 'Удалить выбранных пользователя?');
@@ -240,7 +241,9 @@ export const users = {
       this.delayFunc = () => {};
       this.needReload = {dbAction: 'loadUsers'};
       this.query();
-    } else { // Открыть подтверждение
+    } else if (action === 'confirmNo') {
+      this.reloadAction = false;
+    } else {
       this.queryParam.dbAction = action;
       select[action] && select[action]();
     }
@@ -258,12 +261,14 @@ export const users = {
     this.queryParam['validPass'] = e.target.value;
   },
 
-  // TODO bind events
+  // Bind events
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
    * @param node
    * @param func
+   * @param options
+   * @param eventType
    */
   onEventNode(node, func, options = {}, eventType = 'click') {
     node.addEventListener(eventType, (e) => func.call(this, e), options);
@@ -283,49 +288,4 @@ export const users = {
       n.addEventListener('focus', (e) => this.focusInput(e));
     });
   },*/
-
-  selectedId: new Set(), // TODO сохранять в сессии/локальном хранилище потом, что бы можно было перезагрузить страницу
-
-  getSelectedList() {
-    let ids = [];
-    for( let id of this.selectedId.values()) ids.push(id);
-    return ids;
-  },
-
-  clickRows(e) {
-    let target = e.target,
-        i = 0;
-
-    if(target.tagName === 'INPUT') return false;
-
-    while (target.tagName !== 'TR' || i > 4) {
-      target = target.parentNode; i++;
-    }
-    target.querySelector('input').click();
-  },
-
-  // выбор пользоваетля
-  selectRows(e) {
-    let input = e.target,
-        id = input.getAttribute('data-id');
-
-    if (input.checked) this.selectedId.add(id);
-    else this.selectedId.delete(id);
-
-  },
-
-  // Выделить выбранных Пользователей
-  checkedRows() {
-    this.selectedId.forEach(id => {
-      let input = this.table.querySelector(`input[data-id="${id}"]`);
-      if (input) input.checked = true;
-    });
-  },
-
-  onTableEvent() {
-    // Checked rows
-    this.table.querySelectorAll('tbody input').forEach(n => {
-      n.addEventListener('change', (e) => this.selectRows.call(this, e));
-    });
-  },
 }

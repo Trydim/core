@@ -98,7 +98,7 @@ export class Section extends Catalog {
         nodeParentId = form.querySelector('[name="parentId"]');
 
     // TODO Добавить проверку раздела
-    parentId && (nodeParentId.value = parentId);
+    nodeParentId.value = parentId || 0;
     // TODO обновлять список разделов
 
     this.queryParam.form = form;

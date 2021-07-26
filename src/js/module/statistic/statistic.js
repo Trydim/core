@@ -38,18 +38,10 @@ export const statistic = {
 
   addOrder(order) {},
 
-  /*O.ID: "16"
-S.name: "Заказ сформирован"
-create_date: "2020-09-11 14:38:52"
-customer: "quest"
-important_value: "[{"key":"Сумма","fieldName":"total","value":72901.73724000002}]"
-last_edit_date: "2020-09-02 14:38:52"
-name: "admin"*/
-
   clickOrder(info) {
     let order = orders.getOrder(info.event['_def'].publicId);
     if(order) {
-      order.important_value = orders.formatImportant(order.important_value);
+      order.importantValue = orders.formatImportant(order.importantValue);
 
       let title   = 'Закак №' + order['O.ID'],
           content = f.replaceTemplate(orders.tmp, order);
@@ -88,12 +80,12 @@ const orders = {
     Object.entries(this.data).map(o => {
       let item, title, temp;
 
-      o[1].important_value && (temp = this.formatImportant(o[1].important_value));
+      o[1].importantValue && (temp = this.formatImportant(o[1].importantValue));
 
       title = o[0] + ' ';
       title += temp;
 
-      item = { id: o[0], title, start: o[1]['create_date'] };
+      item = { id: o[0], title, start: o[1]['createDate'] };
 
       calendar.addOrder(item);
     })

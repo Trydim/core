@@ -45,25 +45,29 @@ export class Options extends Common {
     nodePercent.value = (+e.target.value / +nodeInputM.value - 1) * 100;
     this.queryParam[nodePercent.name] = nodePercent.value;
   }
+  initMoneyControl(form, option = {}) {
+    let nodeInput   = form.querySelector('[name="inputPrice"]');
+    let nodePercent = form.querySelector('[name="outputPercent"]');
+    let nodeOutput  = form.querySelector('[name="outputPrice"]');
+
+    this.onEventNode(nodeInput, (e) => this.changeMoneyInput(e, nodePercent, nodeOutput), {}, 'blur');
+    this.onEventNode(nodePercent, (e) => this.changeOutputPercent(e, nodeInput, nodeOutput), {}, 'blur');
+    this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput(e, nodeInput, nodePercent), {}, 'blur');
+    nodeInput.value = option['moneyInput'] || 0;
+    nodePercent.value = option['outputPercent'] || 30;
+    nodeOutput.value = option['moneyOutput'] || 0;
+    //nodeOutput.dispatchEvent(new Event('blur'));
+  }
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
   // Добавить вариант
   createOptions() {
     let form = this.tmp.form.cloneNode(true);
+    form.querySelectorAll('.onlyMany').forEach(n => n.remove());
+    f.show(form.querySelector('[data-field="properties"]'));
 
-    let nodeInput   = form.querySelector('[name="inputPrice"]');
-    let nodePercent = form.querySelector('[name="outputPercent"]');
-    let nodeOutput  = form.querySelector('[name="outputPrice"]');
-
-    this.onEventNode(nodeInput, (e) => this.changeMoneyInput(e, nodePercent, nodeOutput), {}, 'blur');
-    nodeInput.value = 0;
-
-    this.onEventNode(nodePercent, (e) => this.changeOutputPercent(e, nodeInput, nodeOutput), {}, 'blur');
-    nodePercent.value = 30;
-
-    this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput(e, nodeInput, nodePercent), {}, 'blur');
-    nodeOutput.dispatchEvent(new Event('blur'));
+    this.initMoneyControl(form);
 
     this.queryParam.form = form;
     this.M.show('Добавить вариант', form);
@@ -80,43 +84,58 @@ export class Options extends Common {
   changeOptions() {
     if (!this.id.getSelectedSize()) { f.showMsg('Выберите варианты', 'error'); return; }
 
-    let form        = this.tmp.form.cloneNode(true),
-        oneElements = this.id.getSelectedSize() === 1, node,
-        id          = this.id.getSelectedList(),
-        options     = this.optionsList.get(id[0]);
+    const form       = this.tmp.form.cloneNode(true),
+          oneElement = this.id.getSelectedSize() === 1,
+          id         = this.id.getSelected(),
+          option     = this.itemList.get(id[0]),
+          initParam  = (option, skip = []) => {
+            Object.entries(option).forEach(([k, v]) => {
+              if (skip.includes(k)) return;
+              let node = form.querySelector(`[name="${k}"]`);
+              node && (node.type === 'checkbox' ? node.checked = !!+v : node.value = v);
+            });
+          };
 
-    this.queryParam.id = JSON.stringify(id);
-    this.delayFunc            = () => this.id.clean();
+    let nodeProp = form.querySelector('[data-field="properties"]');
 
-    if (oneElements) {
-      const prop = Object.assign({}, options, (options['properties'] && JSON.parse(options['properties'])));
+    /*activity: "1"
+     images: null
+     inputPrice: "1.0000"
+     lastEditDate: "2021-07-21 12:17:01"
+     moneyInputId: "1"
+     moneyOutputId: "1"
+     name: "мойка9"
+     outputPercent: "1"
+     outputPrice: "1.0000"
+     properties: "{\"prop_brand\":\"2\",\"prop_sink_type\":\"1\",\"prop_material\":\"3\",\"prop_model\":\"1\"}"
+     sort: "100"
+     */
 
-      Object.entries(prop).forEach(([k, v]) => {
-        node = form.querySelector(`[name="${k}"]`);
-        node && (node.type !== 'checkbox' ? node.value = v : node.checked = !!+v);
-      });
+    if (oneElement) {
+      form.querySelectorAll('.onlyMany').forEach(n => n.remove());
+      f.show(nodeProp);
 
-      //this.onEventNode(node, this.changeTextInput, {}, 'blur');
+      initParam(option, ['properties']);
+      option.properties && initParam(JSON.parse(option.properties));
+      this.initMoneyControl(form, option);
     } else {
-      ['O.name'].forEach(n => {
-        node = form.querySelector(`[name="${n}"]`);
-        node && node.remove();
-      })
+      form.querySelectorAll('.onlyOne').forEach(n => n.remove());
+      form.querySelector('#properties').addEventListener('change', () => {
+        f.show(nodeProp);
+        option.properties && initParam(JSON.parse(option.properties));
+      });
     }
 
-    let nodeInput   = form.querySelector('[name="input_price"]');
-    let nodePercent = form.querySelector('[name="output_percent"]');
-    let nodeOutput  = form.querySelector('[name="output_price"]');
-
-    this.onEventNode(nodeInput, e => this.changeMoneyInput.apply(this, [e, nodePercent, nodeOutput]), {}, 'blur');
-    if (oneElements) this.onEventNode(nodePercent,
-      (e) => this.changeOutputPercent.apply(this, [e, nodeInput, nodeOutput]), {}, 'blur'); else this.onEventNode(
-      nodePercent, this.changeNumberInput, {}, 'blur');
-    this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput.apply(this, [e, nodeInput, nodePercent]), {}, 'blur');
-
     this.queryParam.form = form;
+    this.queryParam.optionsId = JSON.stringify(id);
     this.M.show('Изменение вариантов', form);
-    this.reloadAction = {dbAction: 'openElements'};
+    this.reloadAction = {
+      dbAction: 'openElements',
+      callback: data => {
+        this.id.clear();
+        this.load(data);
+      },
+    };
   }
   // Копировать вариант
   copyOptions() {
@@ -131,7 +150,7 @@ export class Options extends Common {
   delOptions() {
     if (!this.id.getSelectedSize()) return;
 
-    this.queryParam.id = JSON.stringify(this.id.getSelectedList());
+    this.queryParam.id = JSON.stringify(this.id.getSelected());
     this.delayFunc = () => this.id.clear();
 
     this.M.show('Удалить вариант', 'Удалить выбранные варианты?');

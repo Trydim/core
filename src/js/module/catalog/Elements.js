@@ -39,7 +39,7 @@ export class Elements extends Common {
     let obj = {}, count = -1, key;
 
     for (let item of this.itemList.values()) {
-      let code = item['C.symbol_code'];
+      let code = item['symbolCode'];
       !obj[code] && (obj[code] = 0);
       obj[code]++;
 
@@ -81,7 +81,7 @@ export class Elements extends Common {
   openElements() {
     if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
 
-    this.queryParam.elementsId = this.id.getSelectedList()[0];
+    this.queryParam.elementsId = this.id.getSelected()[0];
     f.observer.fire('openElements', this.queryParam.elementsId);
     this.query({sort: 'options'}).then(data => data && f.observer.fire('loadOptions', data));
   }
@@ -91,14 +91,14 @@ export class Elements extends Common {
 
     let form        = this.tmp.form.cloneNode(true),
         oneElements = this.id.getSelectedSize() === 1,
-        id          = this.id.getSelectedList(),
+        id          = this.id.getSelected(),
         element     = this.itemList.get(id[0]);
 
     this.queryParam.elementsId = JSON.stringify(id);
     this.delayFunc = () => this.id.clear();
 
     let node = form.querySelector('[name="type"]');
-    if (oneElements) node.value = element['C.symbol_code'];
+    if (oneElements) node.value = element['symbolCode'];
     else node.closest('.formRow').remove();
 
     node = form.querySelector('[name="name"]');
@@ -130,7 +130,7 @@ export class Elements extends Common {
     if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
 
     let form = this.tmp.form.cloneNode(true),
-        id          = this.id.getSelectedList(),
+        id          = this.id.getSelected(),
         element     = this.itemList.get(id[0]);
 
     let node = form.querySelector('[name="type"]');
@@ -157,7 +157,7 @@ export class Elements extends Common {
   // Удалить элемент
   delElements() {
     if (!this.id.getSelectedSize()) return;
-    this.queryParam.elementsId = JSON.stringify(this.id.getSelectedList());
+    this.queryParam.elementsId = JSON.stringify(this.id.getSelected());
 
     this.M.show('Удалить элемент', 'Удалить элемент и варианты?');
     this.reloadAction = {

@@ -269,7 +269,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'openElements':
-      !isset($sortColumn) && $sortColumn = 'O.name';
+      !isset($sortColumn) && $sortColumn = 'name';
 
       if (isset($elementsId) && is_finite($elementsId)) {
         $result['countRowsOptions'] = $db->getCountRows('options_elements', " element_id = $elementsId ");
@@ -319,9 +319,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
         $param['0']['element_id'] = $elementsId;
         $param['0']['name'] = $name;
-        $param['0']['money_input_id'] = $moneyInId ?? 1;
+        $param['0']['money_input_id'] = $moneyInputId ?? 1;
         $param['0']['input_price'] = $inputPrice ?? 0;
-        $param['0']['money_output_id'] = $moneyOutId ?? 1;
+        $param['0']['money_output_id'] = $moneyOutputId ?? 1;
         $param['0']['output_percent'] = $outputPercent ?? 0;
         $param['0']['output_price'] = $outputPrice ?? 0;
         $param['0']['unit_id'] = $unitId ?? 1;
@@ -345,12 +345,12 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param = [];
 
         foreach ($optionsId as $id) {
-          isset($optionName) && ($param[$id]['name'] = $optionName);
+          isset($name) && ($param[$id]['name'] = $name);
           isset($moneyInputId) && ($param[$id]['money_input_id'] = $moneyInputId);
           isset($moneyInput) && ($param[$id]['input_price'] = $moneyInput);
           isset($moneyOutputId) && ($param[$id]['money_output_id'] = $moneyOutputId);
           isset($outputPercent) && ($param[$id]['output_percent'] = $outputPercent);
-          isset($output_price) && ($param[$id]['output_price'] = $output_price);
+          isset($outputPrice) && ($param[$id]['output_price'] = $outputPrice);
           isset($unitId) && ($param[$id]['unit_id'] = $unitId);
           isset($imageId) && ($param[$id]['image_id'] = $imageId);
           isset($properties) && ($param[$id]['properties'] = json_encode($properties));

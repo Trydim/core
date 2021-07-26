@@ -289,7 +289,7 @@ export const Print = () => {
   }
 
   p.orderPrint = async function (printFunc, data, type) {
-    let report = JSON.parse(data.order['report_value']);
+    let report = JSON.parse(data.order['reportValue']);
     this.print(await printFunc(type, report));
   }
 
