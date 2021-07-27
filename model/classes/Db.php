@@ -255,7 +255,7 @@ class Db extends \R {
    * @param $dbTable
    * @param $filters
    *
-   * @return mixed
+   * @return integer
    */
   public function getCountRows($dbTable, $filters = '') {
     $sql = "SELECT COUNT(*) as 'count' from $dbTable";
@@ -266,6 +266,7 @@ class Db extends \R {
     //$result = self::getRow("SELECT COUNT(*) as 'count' from :dbTable", [':dbTable' => $dbTable]);
 
     if (count($result)) return $result['count'];
+    return 0;
   }
 
   /**
@@ -897,7 +898,7 @@ class Db extends \R {
       if ($columns === 'customization') return json_decode($result[0]['customization']);
       if (count(explode(',', $columns)) === 1) return $result[$columns];
     }
-    return new class {};
+    return json_decode('{}');
   }
 
   use MainCsv;

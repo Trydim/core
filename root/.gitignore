@@ -1,11 +1,11 @@
 *.jpg
 *.png
+.editorconfig
 .idea/
+.vscode/
 node_modules/
 dist/
-.editorconfig
 /public/images
-/public/fonts
 **font**/
 **fonts**/
 **vendor/

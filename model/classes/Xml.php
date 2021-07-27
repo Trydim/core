@@ -19,7 +19,7 @@ class Array2XML {
 class Xml {
   static $xml;
 
-  static function getXMLTemplate(): string {
+  static function getXMLTemplate() {
     return <<<XML
 <?xml version="1.0" encoding="UTF-8" ?>
 <root></root>
@@ -46,7 +46,7 @@ XML;
   }
 
   // Поиск столбца ключей и описания
-  static function findKeyCell($csv): array {
+  static function findKeyCell($csv) {
     $res = [];
     for ($i = 0; $i < 3; $i++) {
       foreach ($csv[$i] as $index => $cell) {
