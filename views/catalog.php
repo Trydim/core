@@ -180,51 +180,62 @@ $field['footerContent'] .= <<<footerContent
   </form>
 </template>
 <template id="optionsForm">
-  <form action="#">
-    <div class="row onlyOne">
-      <label class="col">Имя варианта:</label>
-      <div class="col"><input class="w-100" type="text" name="name"></div>  
-    </div>
-    
-    <div class="row">
-      <label class="col">Единица измерения:</label>
-      <div class="col"><select class="w-100" name="unitId">$unitsOptionsHtml</select></div>  
-    </div>
-          
-    <div class="row">
-      <div class="col-12 text-center">Входная цена</div>
-      <div class="col">
-        <label>Валюта: <br><select name="moneyInputId">$moneyOptionsHtml</select></label>
+  <form action="#" class="row">
+    <div class="col">
+      <div class="row onlyOne">
+        <label class="col">Имя варианта:</label>
+        <div class="col"><input class="w-100" type="text" name="name"></div>  
       </div>
-      <div class="col onlyOne">
-        <label>Цена: <br><input type="number" name="inputPrice" value="0"></label>
+      
+      <div class="row">
+        <label class="col">Единица измерения:</label>
+        <div class="col"><select class="w-100" name="unitId">$unitsOptionsHtml</select></div>  
+      </div>
+            
+      <div class="row">
+        <div class="col-12 text-center">Входная цена</div>
+        <div class="col">
+          <label>Валюта: <br><select name="moneyInputId">$moneyOptionsHtml</select></label>
+        </div>
+        <div class="col onlyOne">
+          <label>Цена: <br><input type="number" name="inputPrice" value="0"></label>
+        </div>
+      </div>
+      
+      <div>
+        <div class="col text-center">Розничная цена</div>
+        <div class="col row">
+          <label class="col">Валюта: <br><select name="moneyOutputId">$moneyOptionsHtml</select></label>
+          <label class="col">Наценка, %:<br><input type="number" name="outputPercent" value="30"></label>
+          <label class="col onlyOne">Сумма:<br><input type="number" name="outputPrice" value="0"></label>
+        </div>
+      </div>
+      
+      <div class="row">
+        <label class="col">Активность:</label>
+        <div class="col"><input class="w-100" type="checkbox" name="activity" checked></div>     
+      </div>
+      <div class="row">
+        <label class="col">Сортировка:</label>
+        <div class="col"><input class="w-100" type="number" name="sort" value="100"></div>     
+      </div>
+      
+      <div class="row onlyMany">
+        <label class="col">Открыть параметры (*):</label>
+        <div class="col"><input class="w-100" type="checkbox" id="properties"></div>     
+      </div>
+      
+      <div class="row onlyOne">
+        <div class="col">
+          <input type="file" class="d-none" name="file" id="uploadFile" multiple>
+          <label class="btn btn-warning" for="uploadFile">Загрузить</label>
+          <input type="button" class="btn btn-warning" name="chooseFile" value="Выбрать">
+        </div>
+        <div class="col" id="fileField"></div>
       </div>
     </div>
     
-    <div>
-      <div class="col text-center">Розничная цена</div>
-      <div class="col row">
-        <label class="col">Валюта: <br><select name="moneyOutputId">$moneyOptionsHtml</select></label>
-        <label class="col">Наценка, %:<br><input type="number" name="outputPercent" value="30"></label>
-        <label class="col onlyOne">Сумма:<br><input type="number" name="outputPrice" value="0"></label>
-      </div>
-    </div>
-    
-    <div class="row">
-      <label class="col">Активность:</label>
-      <div class="col"><input class="w-100" type="checkbox" name="activity" checked></div>     
-    </div>
-    <div class="row">
-      <label class="col">Сортировка:</label>
-      <div class="col"><input class="w-100" type="number" name="sort" value="100"></div>     
-    </div>
-    
-    <div class="row onlyMany">
-      <label class="col">Открыть параметры (*):</label>
-      <div class="col"><input class="w-100" type="checkbox" id="properties"></div>     
-    </div>
-    
-    <div data-field="properties" class="d-none">
+    <div data-field="property" class="col d-none">
       <div class="col-12 text-center">Параметры</div>
       $propertiesHtml
     </div>

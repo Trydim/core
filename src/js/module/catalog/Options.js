@@ -11,18 +11,27 @@ export class Options extends Common {
     this.queryParam.tableName = 'options_elements';
     this.setNodes(field, props.tmp);
 
+    this.setFileModal();
     this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
       queryParam: this.queryParam,
       query: this.query.bind(this),
     });
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
-    f.observer.subscribe(`loadOptions`, d => this.load(d));
+    f.observer.subscribe(`loadElements`, () => this.loadElements());
+    f.observer.subscribe(`loadOptions`, d => this.loadOptions(d));
     f.observer.subscribe(`openElements`, d => this.openElements(d));
     this.onEvent();
   }
 
-  load(data) {
+  setFileModal() {
+    this.fModal = f.initModal({ /*template: f.*/ });
+  }
+  loadElements() {
+    f.hide(this.node.field);
+    this.id.clear();
+  }
+  loadOptions(data) {
     data['options'] && this.prepareItems(data['options']);
     data['countRowsOptions'] && this.paginator.setCountPageBtn(data['countRowsOptions']);
   }
@@ -58,6 +67,11 @@ export class Options extends Common {
     nodeOutput.value = option['moneyOutput'] || 0;
     //nodeOutput.dispatchEvent(new Event('blur'));
   }
+  initChooseFile(form) {
+    const node = form.querySelector('[name="chooseFile"]');
+
+    node.addEventListener('click', () => {this.fModal.show()});
+  }
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,9 +79,10 @@ export class Options extends Common {
   createOptions() {
     let form = this.tmp.form.cloneNode(true);
     form.querySelectorAll('.onlyMany').forEach(n => n.remove());
-    f.show(form.querySelector('[data-field="properties"]'));
+    f.show(form.querySelector('[data-field="property"]'));
 
     this.initMoneyControl(form);
+    this.initChooseFile(form);
 
     this.queryParam.form = form;
     this.M.show('Добавить вариант', form);
@@ -96,7 +111,7 @@ export class Options extends Common {
             });
           };
 
-    let nodeProp = form.querySelector('[data-field="properties"]');
+    let nodeProp = form.querySelector('[data-field="property"]');
 
     /*activity: "1"
      images: null
@@ -106,8 +121,8 @@ export class Options extends Common {
      moneyOutputId: "1"
      name: "мойка9"
      outputPercent: "1"
-     outputPrice: "1.0000"
-     properties: "{\"prop_brand\":\"2\",\"prop_sink_type\":\"1\",\"prop_material\":\"3\",\"prop_model\":\"1\"}"
+      price: "1.0000"
+     property: "{\"prop_brand\":\"2\",\"prop_sink_type\":\"1\",\"prop_material\":\"3\",\"prop_model\":\"1\"}"
      sort: "100"
      */
 
@@ -115,14 +130,14 @@ export class Options extends Common {
       form.querySelectorAll('.onlyMany').forEach(n => n.remove());
       f.show(nodeProp);
 
-      initParam(option, ['properties']);
-      option.properties && initParam(JSON.parse(option.properties));
+      initParam(option, ['property']);
+      option.property && initParam(JSON.parse(option.property));
       this.initMoneyControl(form, option);
     } else {
       form.querySelectorAll('.onlyOne').forEach(n => n.remove());
-      form.querySelector('#properties').addEventListener('change', () => {
+      form.querySelector('#property').addEventListener('change', () => {
         f.show(nodeProp);
-        option.properties && initParam(JSON.parse(option.properties));
+        option.property && initParam(JSON.parse(option.property));
       });
     }
 
