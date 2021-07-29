@@ -369,7 +369,8 @@ class Db extends \R {
   private function setImages($imagesIds) {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
-      $item['path'] = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+      $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+      $item['path'] = $path ? $path : $item['path'];
       return $item;
     }, $images);
   }
@@ -495,6 +496,19 @@ class Db extends \R {
       $propTables = $this->getTables('prop');
       foreach ($propTables as $table) {
         $props[$table['dbTable']] = $this->loadTable($table['dbTable']);
+
+        // TODO временно
+        if ($table['dbTable'] === 'prop_brand') {
+          $tmp = array_map(function ($it) {
+            if($it['logo_ids']) {
+              $it['logo_ids'] = $this->setImages($it['logo_ids']);
+              $it['logo'] = $it['logo_ids'][0]['path'];
+            }
+            return $it;
+          }, $props[$table['dbTable']]);
+
+          $props[$table['dbTable']] = $tmp;
+        }
       }
     }
 
@@ -517,7 +531,7 @@ class Db extends \R {
         $str = ", `$prop` ";
 
         switch ($type) {
-          case 'file':
+          case 'file': return ", `$prop". "_ids` varchar(255)";
           case 'string': return $str . "varchar(255)";
           case 'textarea': return $str . "varchar(1000)";
           case 'double': return $str . "double NOT NULL DEFAULT 1";
