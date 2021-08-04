@@ -23,12 +23,12 @@ export class Elements extends Common {
   }
 
   load(data) {
+    this.id.clear();
     data['elements'] && this.prepareItems(data['elements']);
     data['countRowsElements'] && this.paginator.setCountPageBtn(data['countRowsElements']);
   }
   openSection(id) {
     this.queryParam.sectionId = id || false;
-
   }
   checkSection() {
     if (!this.queryParam.sectionId) { f.showMsg('Ошибка раздела', 'error'); return true; }
@@ -82,6 +82,7 @@ export class Elements extends Common {
     if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
 
     this.queryParam.elementsId = this.id.getSelected()[0];
+    this.id.clear();
     f.observer.fire('openElements', this.queryParam.elementsId);
     this.query({sort: 'options'}).then(data => data && f.observer.fire('loadOptions', data));
   }

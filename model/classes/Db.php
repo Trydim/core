@@ -246,7 +246,7 @@ class Db extends \R {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
        COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
 		FROM information_schema.COLUMNS where TABLE_SCHEMA = :dbName AND  TABLE_NAME = :dbTable',
-      [':dbName'    => $this->dbName,
+      [':dbName'  => $this->dbName,
        ':dbTable' => $dbTable
       ]);
   }
@@ -369,7 +369,8 @@ class Db extends \R {
   private function setImages($imagesIds) {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
-      $item['path'] = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+      $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+      $item['path'] = $path ? $path : $item['path'];
       return $item;
     }, $images);
   }
@@ -395,7 +396,7 @@ class Db extends \R {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT ID, money_input_id AS 'moneyInputId', money_output_id as 'moneyOutputId',
-                   images_ids AS 'images', properties,
+                   images_ids AS 'images', property,
                    name, unit_id AS 'unitId', last_edit_date AS 'lastEditDate', activity, sort,
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
             FROM options_elements";
@@ -421,9 +422,9 @@ class Db extends \R {
   public function loadOptions($filter = []) {
     $sql = "SELECT O.ID AS 'id', E.element_type_code AS 'type', O.name AS 'name',
                    U.short_name as 'unit', O.activity AS 'activity',
-                   O.sort AS 'sort', O.last_edit_date as 'lastDate', properties, images_ids AS 'images',
+                   O.sort AS 'sort', O.last_edit_date as 'lastDate', property, images_ids AS 'images',
                    MI.name AS 'moneyInput', MO.name AS 'moneyOutput',
-                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
+                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
             FROM options_elements O
             JOIN elements E on E.ID = O.element_id
             JOIN money MI on MI.ID = O.money_input_id
@@ -446,17 +447,18 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = $this->setImages($option['images']);
+        $option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
+        //$option['images'] = $this->setImages($option['images']);
       }
 
-      // set properties
-      if ($option['properties']) {
-        $properties = json_decode($option['properties'], true);
+      // set property
+      if ($option['property']) {
+        $properties = json_decode($option['property'], true);
 
-        $option['properties'] = [];
+        $option['property'] = [];
         foreach ($properties as $property => $id) {
           $propName = str_replace('prop_', '', $property);
-          $option['properties'][$propName] = $this->getPropertyTable($id, $property);
+          $option['property'][$propName] = $this->getPropertyTable($id, $property);
         }
       }
 
@@ -494,6 +496,19 @@ class Db extends \R {
       $propTables = $this->getTables('prop');
       foreach ($propTables as $table) {
         $props[$table['dbTable']] = $this->loadTable($table['dbTable']);
+
+        // TODO временно
+        if ($table['dbTable'] === 'prop_brand') {
+          $tmp = array_map(function ($it) {
+            if($it['logo_ids']) {
+              $it['logo_ids'] = $this->setImages($it['logo_ids']);
+              $it['logo'] = $it['logo_ids'][0]['path'];
+            }
+            return $it;
+          }, $props[$table['dbTable']]);
+
+          $props[$table['dbTable']] = $tmp;
+        }
       }
     }
 
@@ -516,7 +531,7 @@ class Db extends \R {
         $str = ", `$prop` ";
 
         switch ($type) {
-          case 'file':
+          case 'file': return ", `$prop". "_ids` varchar(255)";
           case 'string': return $str . "varchar(255)";
           case 'textarea': return $str . "varchar(1000)";
           case 'double': return $str . "double NOT NULL DEFAULT 1";

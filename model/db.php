@@ -330,12 +330,12 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['sort'] = $sort ?? 100;
         //$param['0']['image_id'] = $imageId;
 
-        $properties = [];
+        $property = [];
         foreach ($_REQUEST as $key => $value) {
           if (stripos($key, 'prop_') !== false
-              && !empty($value)) $properties[$key] = $value;
+              && !empty($value)) $property[$key] = $value;
         }
-        $param['0']['properties'] = json_encode($properties);
+        $param['0']['property'] = json_encode($property);
 
         $result['error'] = $db->insert($columns, 'options_elements', $param);
       }
@@ -354,7 +354,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           isset($outputPrice) && ($param[$id]['output_price'] = $outputPrice);
           isset($unitId) && ($param[$id]['unit_id'] = $unitId);
           isset($imageId) && ($param[$id]['image_id'] = $imageId);
-          isset($properties) && ($param[$id]['properties'] = json_encode($properties));
+          isset($property) && ($param[$id]['property'] = json_encode($property));
         }
 
         $result['error'] = $db->insert($columns, $dbTable, $param, true);
@@ -367,7 +367,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
 
-    // Options Properties
+    // Options property
     case 'loadProperties':
       $setAction = 'loadProperties';
       $result['propertiesTables'] = [];
