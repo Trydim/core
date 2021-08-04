@@ -5,8 +5,11 @@ define('RESULT_PATH', 'shared/');
 
 class Docs {
 
-  // Create name for new pdf file (Work only if DESTINATION=save)
-  // if position = 0, then will use not
+  /**
+   * Create name for new pdf file (Work only if DESTINATION=save)
+   * if position = 0, then will use not
+   * @var array
+   */
   private $FILE_NAME = [
     'name'      => [
       'position' => 0,
@@ -22,12 +25,20 @@ class Docs {
     ],
   ];
 
-  private $docsType, $fileTpl, $filePath;
-  private $data = [], $excelHeader = []; // Отчет глобальный для вставки в шаблон
-  private $content, $footerPage = '', $imgPath;
-  private $pdfParam; // Param
+  /**
+   * @var array
+   */
+  private $data = [], $excelHeader = [], $pdfParam;
+
+  /**
+   * @var string
+   */
+  private $docsType, $fileTpl, $filePath, $content, $footerPage = '', $imgPath, $fileName;
+
+  /**
+   * @var object
+   */
   private $docs;
-  private $fileName;
 
   public function __construct($docsType, $data, $fileTpl = 'default') {
     $this->docsType = $docsType;
@@ -60,7 +71,7 @@ class Docs {
 
   private function setFileTpl($fileTpl) {
     $this->fileTpl = $fileTpl !== 'default' ? $fileTpl
-      : (($this->docsType === 'pdf' || $this->docsType === 'print') ? 'pdfTpl' : 'excelTpl');
+      : (in_array($this->docsType, ['pdf', 'print']) ? 'pdfTpl' : 'excelTpl');
 
     foreach ([ABS_SITE_PATH . "public/views/docs/$this->fileTpl.php",
               CORE . "views/docs/$this->fileTpl.php"] as $path) {
@@ -82,7 +93,7 @@ class Docs {
       'margin_footer' => 5,
     ];
 
-    $this->imgPath = $this->docsType !== 'print' ? $_SERVER['DOCUMENT_ROOT'] . PATH_IMG : PATH_IMG;
+    $this->imgPath = ($this->docsType !== 'print' ? $_SERVER['DOCUMENT_ROOT'] : '') . PATH_IMG;
   }
 
   private function prepareTemplate() {
@@ -102,12 +113,12 @@ class Docs {
   }
 
   private function initPdf() {
-    require_once CORE . 'libs/MPDF57/mpdf.php';
+    require_once CORE . 'libs/vendor/autoload.php';
 
     switch (PDF_LIBRARY) {
       case 'mpdf':
         try {
-          $this->docs = new mPDF($this->pdfParam);
+          $this->docs = new Mpdf\Mpdf($this->pdfParam);
           //$this->docs->charset_in = 'cp1252';
           //$this->pdf->useOnlyCoreFonts = true;
           //$this->pdf->SetDisplayMode('fullpage');
@@ -188,7 +199,6 @@ class Docs {
     }
     return false;
   }
-
 
   /**
    * What do with pdf file:
