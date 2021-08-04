@@ -915,7 +915,7 @@ export class Observer {
     };
   }
   subscribe(name, func) {
-    if (!func) console.alarm('Function must have!');
+    if (!func) console.warn('Function must have!');
     !this.listeners[name] && (this.listeners[name] = []);
     this.listeners[name].push(func);
     return this.publisher[name] || false;

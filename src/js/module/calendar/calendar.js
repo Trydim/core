@@ -173,11 +173,11 @@ const orders = {
   },
 
   init() {
-    let node = f.gI('ordersStatusValue');
+    let node = f.qS('#ordersStatusValue');
     node && node.innerText && this.setStatus(JSON.parse(node.innerText));
     node && node.remove();
 
-    node = f.gI('ordersValue');
+    node = f.qS('#ordersValue');
     node && node.innerText && this.setOrders(JSON.parse(node.innerText));
     node && node.remove();
 
@@ -209,19 +209,19 @@ const orders = {
   },
 
   showOrders() { // TODO привязать к настройкам
-    Object.entries(this.data).map(o => {
-      if (this.orderIds.has(o[0])) return;
-      this.orderIds.add(o[0]);
+    Object.entries(this.data).map(([id, o]) => {
+      if (this.orderIds.has(id)) return;
+      this.orderIds.add(id);
 
       let title, temp;
 
       //o[1].importantValue && (temp = this.formatImportant(o[1].importantValue));
 
-      title = o[0] + ' / ' + o[1].total + ' руб.';
+      title = id + ' / ' + o.total + ' руб.';
       //title += temp;
 
       // Мой статус для цвета кружка
-      component.addOrder({id: o[0], title, start: o[1]['createDate'], status: 'ok'});
+      component.addOrder({id: id, title, start: o['createDate'], status: 'ok'});
     })
   },
 

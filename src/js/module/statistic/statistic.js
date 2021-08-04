@@ -8,7 +8,7 @@ const initCharts = (dataPoints) => {
     animationEnabled: true,
     theme: "light2",
     title:{
-      text: "Line Chart"
+      text: "Статистика"
     },
     axisY:{
       includeZero: false

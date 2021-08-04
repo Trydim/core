@@ -99,10 +99,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (isset($saveVal)) {
         $db->setCurrentUserId();
 
-        $customerId = isset($C_ID) && is_finite($C_ID) ? $C_ID : '';
+        $customerId = isset($customerId) ? $customerId : '0';
         $changeUser = isset($customerChange) ? $customerChange : false; // false/add/change
 
-        if ($changeUser && $customerId && isset($name)) {
+        if ($changeUser && isset($name)) {
           $contacts = [];
           isset($phone) && $contacts['phone'] = $phone;
           isset($email) && $contacts['email'] = $email;
@@ -114,7 +114,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);
 
           $columns = $db->getColumnsTable('customers');
-          $db->insert($columns, 'customers', $param, $changeUser === 'change');
+          $result['error'] = $db->insert($columns, 'customers', $param, $changeUser === 'change');
           $changeUser === 'add' && $customerId = $db->getLastID('customers');
         }
 
@@ -131,10 +131,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         isset($reportVal) && $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
 
         $columns = $db->getColumnsTable('orders');
-        $db->insert($columns, 'orders', $param, !$newOrder);
+        $result['error'] = $db->insert($columns, 'orders', $param, !$newOrder);
 
         // status_id = ; по умолчанию сохранять из настроек
         //$db->saveOrder($param, $idOrder);
+        $result['customerId'] = $customerId;
         $result['orderID'] = $idOrder;
       }
       break;
@@ -157,13 +158,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (count($orderIds) === 1) $result['order'] = $db->loadOrderById($orderIds[0]);
       break;
     case 'changeStatusOrder':
-      if (isset($commonValues) && isset($status_id) && count($columns)) {
+      if (isset($commonValues) && isset($statusId) && count($columns)) {
 
-        if (!is_finite($status_id)) break;
+        if (!is_finite($statusId)) break;
 
         $commonValues = json_decode($commonValues);
 
-        $db->changeOrders($columns, $dbTable, $commonValues, $status_id);
+        $db->changeOrders($columns, $dbTable, $commonValues, $statusId);
       }
       break;
     case 'delOrders':
@@ -507,7 +508,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       $contacts = [];
       foreach ($user as $k => $v) {
-        if (in_array($k, ['login', 'name', 'permission_id'])) $param['0'][$k] = $v;
+        if (in_array($k, ['login', 'name', 'permissionId'])) $param['0'][$k] = $v;
         else if ($k === 'password') $param['0'][$k] = password_hash($v, PASSWORD_BCRYPT);
         else $contacts[$k] = $v;
       }

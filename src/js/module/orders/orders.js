@@ -233,7 +233,7 @@ export const orders = {
         action         = target.dataset.action,
         selectedSize   = this.selected.getSelectedSize();
 
-    if (!selectedSize && !('orderType').includes(action)) { f.showMsg('Выберите заказ!'); return; }
+    if (!selectedSize && !('orderType').includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
     this.queryParam.orderIds = JSON.stringify(this.selected.getSelected());
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
 
@@ -255,7 +255,7 @@ export const orders = {
       },
       'loadOrder': () => {
         hideActionWrap = false;
-        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
         this.form.set('dbAction', action);
         this.form.set( 'orderIds', this.queryParam.orderIds);
@@ -264,7 +264,7 @@ export const orders = {
       },
       'openOrder': () => {
         if (selectedSize !== 1) {
-          hideActionWrap = false; f.showMsg('Выберите 1 заказ!'); return;
+          hideActionWrap = false; f.showMsg('Выберите 1 заказ!', 'warning'); return;
         }
 
         let link = f.gI(f.ID.PUBLIC_PAGE),
@@ -274,12 +274,12 @@ export const orders = {
       },
       'printOrder': () => {
         if(selectedSize !== 1) {
-          hideActionWrap = false; f.showMsg('Выберите 1 заказ!'); return;
+          hideActionWrap = false; f.showMsg('Выберите 1 заказ!', 'warning'); return;
         }
         f.show(f.qS('#printTypeField'));
       },
       'printReport': () => {
-        if(selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if(selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
         let P = f.initPrint(),
             type = target.dataset.type || false,
             fd = new FormData();
@@ -299,7 +299,7 @@ export const orders = {
       },
       'savePdf': () => {
         hideActionWrap = false;
-        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
         let fd = new FormData();
         fd.append('useUser', 'true');
         f.downloadPdf(target,
@@ -309,7 +309,7 @@ export const orders = {
       },
       'sendOrder': () => {
         hideActionWrap = false;
-        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!'); return; }
+        if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
         let form = f.gTNode('#sendMailTmp');
 
         let fd = new FormData();

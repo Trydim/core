@@ -11,14 +11,14 @@ CONTENT;
 $field['footerContent'] .= '<a id="publicPageLink" href="public" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="orderTemplate">
-	<div>
-		<span>Статус заказа: \${S.name}</span><br>
-		<span>Создан: \${create_date}</span><br>
-		<span>Посл изменения: \${last_edit_date}</span><br>
-		<span>Менеджер: \${name}</span><br>
-		<span>Клиент: \${C.name}</span><br>
-		<!--<span>\${important_value}</span><br>-->
-	</div>
+  <div>
+    <span>Статус заказа: \${S.name}</span><br>
+    <span>Создан: \${createDate}</span><br>
+    <span>Посл изменения: \${lastEditDate}</span><br>
+    <span>Менеджер: \${name}</span><br>
+    <span>Клиент: \${C.name}</span><br>
+    <!--<span>\${importantValue}</span><br>-->
+  </div>
 </template>
 <template id="orderBtnTemplate">
   <input type="button" class="btn btn-success" value="Редактировать" data-action="openOrder">

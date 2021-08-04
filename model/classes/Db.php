@@ -565,12 +565,14 @@ class Db extends \R {
   public function loadOrder($pageNumber = 0, $countPerPage = 20, $sortColumn = 'last_edit_date', $sortDirect = false, $dateRange = [], $ids = []) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT O.ID AS 'O.ID', create_date, last_edit_date, users.name, C.name as 'C.name', total,
-		           important_value, S.name AS 'S.name'
-			FROM orders O
-			LEFT JOIN users ON user_id = users.ID
-			LEFT JOIN customers C ON customer_id = C.ID
-			JOIN order_status S ON status_id = S.ID\n";
+    /*important_value AS 'importantValue', */
+    $sql = "SELECT O.ID AS 'O.ID', create_date AS 'createDate',
+            last_edit_date AS 'lastEditDate', users.name, C.name as 'C.name', total,
+            S.name AS 'S.name'
+      FROM orders O
+      LEFT JOIN users ON user_id = users.ID
+      LEFT JOIN customers C ON customer_id = C.ID
+      JOIN order_status S ON status_id = S.ID\n";
 
     if (count($dateRange)) $sql .= "WHERE O.last_edit_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
     if (count($ids)) {
@@ -592,9 +594,11 @@ class Db extends \R {
    */
   public function loadOrderById($id) {
 
-    $sql = "SELECT O.ID as 'ID', create_date, last_edit_date, users.name as 'name', users.ID as 'userId',
-                   users.contacts as 'contacts', C.name as 'C.name', total, S.name AS 'Status', 
-                   important_value, save_value, report_value
+    $sql = "SELECT O.ID AS 'ID', create_date AS 'createDate', last_edit_date AS 'lastEditDate',
+                   users.name AS 'name', users.ID AS 'userId',
+                   users.contacts AS 'contacts', C.name AS 'C.name', total, S.name AS 'Status', 
+                   important_value AS 'importantValue', save_value AS 'saveValue',
+                   report_value AS 'reportValue'
             FROM orders O
             LEFT JOIN users ON user_id = users.ID
             LEFT JOIN customers C ON customer_id = C.ID
@@ -605,8 +609,8 @@ class Db extends \R {
 
     if (count($res)) {
       $res = $res[0];
-      $res['report_value'] = gzuncompress($res['report_value']);
-      if (!$res['report_value']) $res['report_value'] = false;
+      $res['reportValue'] = gzuncompress($res['reportValue']);
+      if (!$res['reportValue']) $res['reportValue'] = false;
     }
     return $res;
   }
@@ -681,7 +685,7 @@ class Db extends \R {
   public function loadCustomers($pageNumber = 0, $countPerPage = 20, $sortColumn = 'name', $sortDirect = false, $ids = []) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT C.ID as 'C.ID', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
+    $sql = "SELECT C.ID as 'id', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
      FROM customers C
      LEFT JOIN orders O on C.ID = O.customer_id\n";
 
@@ -700,7 +704,7 @@ class Db extends \R {
 
   public function loadCustomerByOrderId($orderIds) {
 
-    $sql = "SELECT C.ID as 'C.ID', C.name as 'name', ITN, contacts FROM orders 
+    $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts FROM orders 
         LEFT JOIN customers C ON C.ID = orders.customer_id
         WHERE orders.ID = $orderIds";
 
@@ -767,7 +771,7 @@ class Db extends \R {
    */
   public function getUserByLogin($login) {
     return self::getRow("SELECT hash, password, customization, 
-            p.ID as 'perm_id', p.name as 'perm_name', access_val as 'perm_val'
+            p.ID as 'permId', p.name as 'permName', access_val as 'permVal'
             FROM users
             LEFT JOIN permission p on users.permission_id = p.ID
             WHERE login = :login", [':login' => $login]);
@@ -846,9 +850,9 @@ class Db extends \R {
       $user = $this->getUserByLogin($session['login']);
       count($user) && $userParam = [
         'onlyOne' => isset(json_decode($user['customization'])->onlyOne),
-        'admin' => $user['perm_id'] === 'admin' || $user['perm_id'] === '1',
+        'admin' => $user['permId'] === 'admin' || $user['permId'] === '1',
         'customization' => json_decode($user['customization'], true),
-        'permission' => json_decode($user['perm_val'], true),
+        'permission' => json_decode($user['permVal'], true),
       ];
     } else {
       try {

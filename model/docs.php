@@ -26,7 +26,7 @@ if ($orderIds) { // Отчет взять из базы
     'userId' => $reportVal['userId'],
     'contacts' => $reportVal['contacts'],
   ];
-  isset($reportVal['report_value']) && $reportVal = json_decode($reportVal['report_value'], true);
+  isset($reportVal['reportValue']) && $reportVal = json_decode($reportVal['reportValue'], true);
   $reportVal['userData'] = $userData;
 }
 
