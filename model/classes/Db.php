@@ -357,7 +357,7 @@ class Db extends \R {
     FROM elements E
     JOIN codes C on C.symbol_code = E.element_type_code
     WHERE E.section_parent_id = $sectionID
-		ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
+    ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
     //return self::getAll($sql, [':sectionID', $sectionID]);

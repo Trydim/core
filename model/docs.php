@@ -61,6 +61,7 @@ if (isset($docsAction)) {
   switch ($docsAction) {
     case 'excel':
     case 'pdf':
+    case 'print':
       $docType && $result = $docs->getDocs($mailTpl);
       break;
     case 'mail':

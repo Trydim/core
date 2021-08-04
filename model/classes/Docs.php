@@ -36,7 +36,7 @@ class Docs {
     $this->setFileTpl($fileTpl);
     $this->setDefaultParam();
     $this->getFileName();
-    $docsType === 'pdf' && $this->prepareTemplate();
+    in_array($docsType, ['pdf', 'print']) && $this->prepareTemplate();
     $docsType === 'excel' && $this->setExcelDate();
 
     $func = 'init' . $this->getFunc();
@@ -59,7 +59,8 @@ class Docs {
   }
 
   private function setFileTpl($fileTpl) {
-    $this->fileTpl = $fileTpl !== 'default' ? $fileTpl : ($this->docsType === 'pdf' ? 'pdfTpl' : 'excelTpl');
+    $this->fileTpl = $fileTpl !== 'default' ? $fileTpl
+      : (($this->docsType === 'pdf' || $this->docsType === 'print') ? 'pdfTpl' : 'excelTpl');
 
     foreach ([ABS_SITE_PATH . "public/views/docs/$this->fileTpl.php",
               CORE . "views/docs/$this->fileTpl.php"] as $path) {
@@ -81,7 +82,7 @@ class Docs {
       'margin_footer' => 5,
     ];
 
-    $this->imgPath = $_SERVER['DOCUMENT_ROOT'] . PATH_IMG;
+    $this->imgPath = $this->docsType !== 'print' ? $_SERVER['DOCUMENT_ROOT'] . PATH_IMG : PATH_IMG;
   }
 
   private function prepareTemplate() {
@@ -101,12 +102,12 @@ class Docs {
   }
 
   private function initPdf() {
-    require_once CORE . 'libs/vendor/autoload.php';
+    require_once CORE . 'libs/MPDF57/mpdf.php';
 
     switch (PDF_LIBRARY) {
       case 'mpdf':
         try {
-          $this->docs = new Mpdf\Mpdf($this->pdfParam);
+          $this->docs = new mPDF($this->pdfParam);
           //$this->docs->charset_in = 'cp1252';
           //$this->pdf->useOnlyCoreFonts = true;
           //$this->pdf->SetDisplayMode('fullpage');
@@ -147,6 +148,8 @@ class Docs {
     }
   }
 
+  private function initPrint() { }
+
   private function initExcel() {
     require_once 'Xlsxwriter.php';
     $this->docs = new XLSXWriter();
@@ -180,17 +183,12 @@ class Docs {
   private function getFunc() {
     switch ($this->docsType) {
       case 'pdf': return 'Pdf';
+      case 'print': return 'Print';
       case 'excel': return 'Excel';
     }
     return false;
   }
 
-  public function getDocs($dest = 'S') {
-    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
-    if (!is_dir($path)) mkdir($path);
-    $func = 'get' . $this->getFunc();
-    return $this->$func($path, $dest);
-  }
 
   /**
    * What do with pdf file:
@@ -201,7 +199,7 @@ class Docs {
    *
    * @return mixed
    */
-  public function getPdf($path, $dest) {
+  private function getPdf($path, $dest) {
 
     switch (PDF_LIBRARY) {
       case 'mpdf':
@@ -248,7 +246,21 @@ class Docs {
     return false;
   }
 
-  public function getExcel($path, $dest) {
+  private function getPrint($path, $dest) {
+    switch ($dest) {
+      case 'save':
+        file_put_contents($path . $this->fileName, $this->content);
+        return $path . $this->fileName;
+      case 'S':
+      default:
+        return [
+          'name'      => $this->fileName,
+          'printBody' => $this->content,
+        ];
+    }
+  }
+
+  private function getExcel($path, $dest) {
     switch ($dest) {
       case 'save':
         $this->docs->writeToFile($path . $this->fileName);
@@ -260,6 +272,13 @@ class Docs {
           'excelBody' => base64_encode($this->docs->writeToString()),
         ];
     }
+  }
+
+  public function getDocs($dest = 'S') {
+    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
+    if (!is_dir($path)) mkdir($path);
+    $func = 'get' . $this->getFunc();
+    return $this->$func($path, $dest);
   }
 
   /**

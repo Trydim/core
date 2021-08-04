@@ -252,42 +252,68 @@ export const Print = () => {
     this.contentWindow.print();
   }
 
-  p.setContent = function (content, classList = []) {
+  p.loadImage = link => new Promise(resolve => {
+    fetch(link).then(data => data.blob()).then(data => {
+      let reader = new FileReader();
+
+      reader.onloadend = () => {
+        let img = document.createElement('img');
+        img.style.width = '100%';
+        img.src = reader.result;
+        resolve(img);
+      }
+
+      reader.readAsDataURL(data);
+    });
+  });
+
+  p.prepareContent = async function (container) {
+    let nodes = container.querySelectorAll('img'),
+        imagesPromise = [];
+
+    nodes.forEach(n => {
+      imagesPromise.push(this.loadImage(n.src));
+    })
+
+    await Promise.all([...imagesPromise])
+                 .then(value => {
+                   nodes.forEach((n, i) => n.src = value[i].src);
+                 });
+
+    return container;
+  }
+
+  p.setContent = async function (content, classList = []) {
     let container = document.createElement('div'), cloneN, delay = 0,
         haveImg = content.includes('<img');
     classList.map(i => container.classList.add(i));
     container.innerHTML = content;
     if(haveImg) {
-      cloneN = container.cloneNode(true);
-      document.body.append(cloneN);
-      delay = 100;
+      container = await this.prepareContent(container);
     }
-
     this.data = container;
-
-    if (haveImg) {
-      setTimeout(() => {
-        cloneN.remove();
-      }, 200);
-    }
-
-    return delay;
   }
 
   p.print = function (content, classList = []) {
-    q.Get({data: 'mode=docs&docsAction=getPrintStyle'}).then(data => {
-      typeof data.style === 'string' && (content = `<style>${data.style}</style>` + content);
+    q.Get({data: 'mode=docs&docsAction=getPrintStyle'}).then(async data => {
       const scrollY = window.pageYOffset;
-      let delay = this.setContent(content, classList);
 
-      setTimeout(() => {
-        document.body.append(this.frame);
-        this.frame.remove();
-        window.scrollTo(0, scrollY);
-      }, delay);
+      typeof data.style === 'string' && (content = `<style>${data.style}</style>` + content);
+      await this.setContent(content, classList);
+
+      document.body.append(this.frame);
+      this.frame.remove();
+      window.scrollTo(0, scrollY);
     });
   }
 
+  /**
+   * Печатать используя фукнцию
+   * @param printFunc
+   * @param data
+   * @param type
+   * @return {Promise<void>}
+   */
   p.orderPrint = async function (printFunc, data, type) {
     let report = JSON.parse(data.order['reportValue']);
     this.print(await printFunc(type, report));

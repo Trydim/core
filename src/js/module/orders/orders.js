@@ -273,7 +273,7 @@ export const orders = {
         link.click();
       },
       'printOrder': () => {
-        if(selectedSize !== 1) {
+        if (selectedSize !== 1) {
           hideActionWrap = false; f.showMsg('Выберите 1 заказ!', 'warning'); return;
         }
         f.show(f.qS('#printTypeField'));
@@ -282,14 +282,19 @@ export const orders = {
         if(selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
         let P = f.initPrint(),
             type = target.dataset.type || false,
-            fd = new FormData();
+            data = new FormData();
 
-        fd.set('mode', 'DB');
-        fd.set('dbAction', 'loadOrder');
-        fd.set('orderIds', this.queryParam.orderIds);
-        f.Post({data: fd})
-          .then((data) => {
-            try { data && P.orderPrint(f.printReport, data, type); }
+        data.set('mode', 'docs');
+        data.set('docType', 'print');
+        data.set('fileTpl', 'pdfTpl'); // ToDO сделать по умолчанию?
+        data.set('orderIds', this.queryParam.orderIds);
+
+        /*data.set('mode', 'DB');
+         data.set('dbAction', 'loadOrder');
+         data.set('orderIds', this.queryParam.orderIds);*/
+        f.Post({data}).then((data) => {
+            try { data && P.print(data['printBody']); }
+            //try { data && P.print(f.printReport, data, type); }
             catch (e) { console.log(e.message); }
           });
 
@@ -300,10 +305,10 @@ export const orders = {
       'savePdf': () => {
         hideActionWrap = false;
         if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
-        let fd = new FormData();
-        fd.append('useUser', 'true');
+        let data = new FormData();
+        data.append('useUser', 'true');
         f.downloadPdf(target,
-          {orderIds: this.queryParam.orderIds}, fd,
+          {orderIds: this.queryParam.orderIds}, data,
           () => target.blur(),
           );
       },
