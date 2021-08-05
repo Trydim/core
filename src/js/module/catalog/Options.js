@@ -67,10 +67,58 @@ export class Options extends Common {
     nodeOutput.value = option['moneyOutput'] || 0;
     //nodeOutput.dispatchEvent(new Event('blur'));
   }
-  initChooseFile(form) {
-    const node = form.querySelector('[name="chooseFile"]');
 
-    node.addEventListener('click', () => {this.fModal.show()});
+
+  clearFiles(node) {
+    let input = document.createElement('input');
+    input.type = 'file';
+    node.files = input.files;
+  }
+  getFileTemplate(file, i) {
+    return `<div class="attach__item ${file.fileError ? this.cssClass.error : ''}">
+        <span class="bold">${file.name}</span>
+        <span class="table-basket__cross"
+              data-id="${i}"
+              data-action="removeFile"></span></div>`;
+  }
+  showFiles(fileField) {
+    let html = '';
+
+    Object.entries(this.queryFiles).forEach(([i, file]) => {
+      html += this.getFileTemplate(file, i);
+    });
+
+    fileField.innerHTML = html;
+  }
+  initChooseFile(form) {
+    const inputN = form.querySelector('input[type="file"]'),
+          fileField = form.querySelector('#fileField'),
+          btnN = form.querySelector('[name="chooseFile"]'),
+          data = new FormData();
+
+    inputN.addEventListener('change', () => {
+      for (const file of Object.values(inputN.files)) {
+        let id = Math.random() * 10000 | 0;
+
+        file.fileError = file.size > 1024*1024;
+        //if (file.fileError && !error) error = true;
+
+        this.queryFiles[id] && (id += '1');
+        this.queryFiles[id] = file;
+      }
+      this.clearFiles(inputN);
+      this.showFiles(fileField);
+    })
+
+    data.set('mode', 'DB');
+    data.set('dbAction', 'loadFiles');
+
+    btnN.addEventListener('click', () => {
+      f.Post({data}).then(data => {
+        debugger
+        this.fModal.show('Выбор файлов');
+      })
+    });
   }
 
   // Events function
@@ -113,19 +161,6 @@ export class Options extends Common {
 
     let nodeProp = form.querySelector('[data-field="property"]');
 
-    /*activity: "1"
-     images: null
-     inputPrice: "1.0000"
-     lastEditDate: "2021-07-21 12:17:01"
-     moneyInputId: "1"
-     moneyOutputId: "1"
-     name: "мойка9"
-     outputPercent: "1"
-      price: "1.0000"
-     property: "{\"prop_brand\":\"2\",\"prop_sink_type\":\"1\",\"prop_material\":\"3\",\"prop_model\":\"1\"}"
-     sort: "100"
-     */
-
     if (oneElement) {
       form.querySelectorAll('.onlyMany').forEach(n => n.remove());
       f.show(nodeProp);
@@ -133,6 +168,8 @@ export class Options extends Common {
       initParam(option, ['property']);
       option.property && initParam(JSON.parse(option.property));
       this.initMoneyControl(form, option);
+      //this.initImages(form, option.images);
+      this.initChooseFile(form);
     } else {
       form.querySelectorAll('.onlyOne').forEach(n => n.remove());
       form.querySelector('#property').addEventListener('change', () => {

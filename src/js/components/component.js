@@ -521,8 +521,7 @@ export class Valid {
       this.files[id] && (id += '1');
       this.files[id] = file;
     }
-    this.fileInput.files = this.createInput().files;
-
+    this.clearInput(this.fileInput.files);
     this.showFiles();
 
     if (error) {
@@ -652,10 +651,10 @@ export class Valid {
     this.fileInput && this.fileInput.addEventListener('change', this.checkFileInput.bind(this));
   }
 
-  createInput() {
+  clearInput(node) {
     let input = document.createElement('input');
     input.type = 'file';
-    return input;
+    node.files = input.files;
   }
 
   getFileTemplate(file, i) {

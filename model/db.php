@@ -328,7 +328,37 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['unit_id'] = $unitId ?? 1;
         $param['0']['activity'] = isset($activity);
         $param['0']['sort'] = $sort ?? 100;
-        //$param['0']['image_id'] = $imageId;
+
+        if (isset($_FILES) && count($_FILES)) {
+          $uploadDir = SHARE_DIR . 'upload/';
+          $imageIds = [];
+          if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+          foreach ($_FILES as $file) {
+            // Проверить все
+            if (!$file['size']) continue;
+
+            // Если файл существует
+            if (file_exists($uploadDir . $file['name'])) {
+              !isset($result['fileExist']) && $result['fileExist'] = [];
+              $result['fileExist'][] = $file['name'];
+              continue;
+            }
+
+            move_uploaded_file($file['tmp_name'], $uploadDir . $file['name']);
+
+            $fparam = ['0' => [
+              'name' => $file['name'],
+              'path' => 'upload/' . $file['name'],
+              'format' => pathinfo($uploadDir . $file['name'], PATHINFO_EXTENSION),
+            ]];
+            $db->insert([], 'files', $fparam);
+            $imageIds[] = $db->getLastID('files');
+          }
+          $param['0']['images_ids'] = implode(',', $imageIds);
+        }
+
+        // проверить просто id;
 
         $property = [];
         foreach ($_REQUEST as $key => $value) {
@@ -555,6 +585,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
 
+    // Files
+    case 'loadFiles':
+      $result['files'] = $db->selectQuery('files');
+      break;
 
     case 'openOrders': /* TODO когда это отправляется */
       break;

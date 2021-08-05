@@ -18,6 +18,7 @@ export class Catalog {
 
   setQueryParam() {
     this.queryParam = Object.create(null);
+    this.queryFiles = Object.create(null);
     //this.queryParam.countPerPage = 20;
 
     Object.defineProperty(this.queryParam, 'form', {
@@ -47,6 +48,12 @@ export class Catalog {
     Object.entries(Object.assign({}, this.queryParam, this.sortParam))
           .map(param => data.set(param[0], param[1]));
 
+    Object.entries(this.queryFiles).forEach(([id, file]) => {
+      data.append('files' + id, file, file.name);
+    });
+    data.delete('files');
+
+    this.queryFiles = Object.create(null);
     this.queryParam.form = false;
 
     return f.Post({data}).then(async data => {
@@ -129,6 +136,8 @@ export class Common extends Catalog {
     this.tmp = {
       tHead: tmp.tHead,
       checkbox: tmp.checkbox,
+      imgCell: tmp.imgCell,
+      img: tmp.img,
       form: f.gTNode(`#${this.type}Form`),
     };
   }
@@ -137,12 +146,22 @@ export class Common extends Catalog {
     data.forEach(i => this.itemList.set(i.ID || i['O.ID'], i));
   }
   setTablesHeaders() {
-
     let html = '<tr><th></th>';
     this.setting.map(i => {
       html += f.replaceTemplate(this.tmp.tHead, {name: i});
     });
     this.node.field.querySelector('tr').innerHTML = html + '</tr>';
+  }
+  setImage(i) {
+    if (!i.reduce) return [];
+    return i.reduce((r, i) => {
+      r.push({
+        src   : i.path,
+        name  : i.name,
+        format: i.format,
+      });
+      return r;
+    }, []);
   }
   showTablesItems(data) {
     this.oneFunc.exec('setTablesHeaders');
@@ -152,7 +171,11 @@ export class Common extends Catalog {
             'activity': v => !!+v ? '<td>+</td>' : '<td>-</td>',
 
             'ex': v => '<td></td>',
-            'images': v => '<td>Изображения</td>',
+            'images': v => {
+              const td = this.tmp.imgCell.cloneNode(true);
+              td.innerHTML = f.replaceTemplate(this.tmp.img, this.setImage(v));
+              return td.outerHTML;
+            },
 
             'unitId': v => `<td>${this.db.units[v]['shortName']}</td>`,
             'moneyInputId': v => `<td>${this.db.money[v].name}</td>`,

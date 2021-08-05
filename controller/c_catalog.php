@@ -28,6 +28,7 @@ $field['footerContent'] .= "<input type='hidden' id='optionsColumn' value='$opti
 
 // Типы товаров
 $types = $db->selectQuery('codes', ['symbolCode', 'name']);
+// Разделы
 $section = $db->selectQuery('section', ['ID', 'name']);
 
 

@@ -342,7 +342,7 @@ class Db extends \R {
    */
   public function getFiles($ids = false) {
     if (is_string($ids)) $ids = explode(',', $ids);
-    $filters = $ids ? ' ID = ' . implode(' or ', $ids) : '';
+    $filters = $ids ? ' ID = ' . implode(' or ID = ', $ids) : '';
     return $this->selectQuery('files', '*', $filters);
   }
 
@@ -409,7 +409,9 @@ class Db extends \R {
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
+      // set images
       strlen($option['images']) && $option['images'] = $this->setImages($option['images']);
+
       return $option;
     }, $options);
   }

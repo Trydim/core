@@ -134,6 +134,12 @@ $field['footerContent'] .= <<<footerContent
 <template id="itemsTableHead">
   <th><input type="button" class="btn btn-info btn-sm table-th" value="\${name} ↑↓" data-ordercolumn="\${name}"></th>
 </template>
+<template id="imageTableCell">
+  <td class="d-flex flex-wrap" style="max-height: 80px; overflow-y: auto"></td>
+</template>
+<template id="imageTableItem">
+  <div class="col-6"><img src="\${src}" title="\${name} \${format}" style="width: 100%; height: auto"></div>
+</template>
 <template id="itemsTableRowsCheck">
   <td><input type="checkbox" data-id="\${id}"></td>
 </template>
@@ -227,9 +233,10 @@ $field['footerContent'] .= <<<footerContent
       
       <div class="row onlyOne">
         <div class="col">
-          <input type="file" class="d-none" name="file" id="uploadFile" multiple>
+          <input type="file" class="d-none" name="files" id="uploadFile" multiple>
           <label class="btn btn-warning" for="uploadFile">Загрузить</label>
           <input type="button" class="btn btn-warning" name="chooseFile" value="Выбрать">
+          <div id="fileField"></div>
         </div>
         <div class="col" id="fileField"></div>
       </div>

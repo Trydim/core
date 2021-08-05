@@ -13,6 +13,8 @@ export const catalog = {
     const tmp = {
       tHead: f.gT('#itemsTableHead'),
       checkbox: f.gT('#itemsTableRowsCheck'),
+      imgCell: f.gTNode('#imageTableCell'),
+      img: f.gT('#imageTableItem'),
     }
 
     this.section = new Section();

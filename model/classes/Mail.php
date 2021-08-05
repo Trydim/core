@@ -122,14 +122,13 @@ class Mail {
       // -----------------------
       // Mail Body
       // -----------------------
-      $mail->isHTML(true);
 
       if (isset($resource))
         for ($i = 1; $i <= count($resource); $i++)
           $mail->AddEmbeddedImage($resource[$i - 1], "pict$i.jpg", "pict$i.jpg", 'base64', 'image/jpeg');
 
       $mail->Subject = $this->subject;
-      $mail->Body = $this->body;
+      $mail->MsgHTML($this->body);
       $mail->AltBody = 'Тестовое сообщение.';
 
       // Attachment files
