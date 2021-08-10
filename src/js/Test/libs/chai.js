@@ -4948,7 +4948,7 @@
      *
      * Determines if an object or an array matches
      * criteria to be inspected in-line for error
-     * messages or should be truncated.
+     * this.messages or should be truncated.
      *
      * @param {Mixed} javascript object to inspect
      * @name objDisplay
