@@ -175,21 +175,25 @@ if (isset($setAction)) {
       break;
 
     case 'createProperty':
-      $propertySetting = [];
-      $setting = getSettingFile();
+      if (isset($dbTable)) {
+        $propertySetting = [];
+        $setting = getSettingFile();
 
-      $propName = isset($dbTable) ? 'prop_' . translit($dbTable) : false;
-      $dataType = isset($dataType) ? str_replace('s_', '', $dataType) : false;
+        $propName = 'prop_' . (isset($tableCode) ? $tableCode : translit($dbTable));
+        $dataType = isset($dataType) ? str_replace('s_', '', $dataType) : false;
 
-      if (!isset($setting['propertySetting'][$propName])
-          && $propName && $dataType) {
-        $setting['propertySetting'][$propName] = [
-          'name' => $dbTable,
-          'type' => $dataType,
-        ];
-        setSettingFile($setting);
+        if (!isset($setting['propertySetting'][$propName])
+            && $propName && $dataType) {
+          $setting['propertySetting'][$propName] = [
+            'name' => $dbTable,
+            'type' => $dataType,
+          ];
+          setSettingFile($setting);
+        } else {
+          $result['error'] = 'Property exist';
+        }
       } else {
-        $result['error'] = 'Property exist';
+        $result['error'] = 'Property name not exist';
       }
       break;
     case 'loadProperties':
