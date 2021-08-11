@@ -454,14 +454,11 @@ class Db extends \R {
       }
 
       // set property
-      if ($option['property']) {
-        $properties = json_decode($option['property'], true);
-
-        $option['property'] = [];
-        foreach ($properties as $property => $id) {
-          $propName = str_replace('prop_', '', $property);
-          $option['property'][$propName] = $this->getPropertyTable($id, $property);
-        }
+      $properties = $option['property'] ? json_decode($option['property'], true) : [];
+      $option['property'] = [];
+      foreach ($properties as $property => $id) {
+        $propName = str_replace('prop_', '', $property);
+        $option['property'][$propName] = $this->getPropertyTable($id, $property);
       }
 
       return $option;
