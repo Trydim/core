@@ -153,7 +153,7 @@ export class Common extends Catalog {
     this.node.field.querySelector('tr').innerHTML = html + '</tr>';
   }
   setImage(i) {
-    if (!i.reduce) return [];
+    if (!Array.isArray(i)) return [];
     return i.reduce((r, i) => {
       r.push({
         src   : i.path,

@@ -229,15 +229,15 @@ const func = {
       }
       else {
         let target = ga(node, 'data-target'),
-            nodeTL = qs(`.${target}`),
-            nodeTlNo = qs(`.${target}No`);
+            nodeTl = qs(`.${target}`),
+            nodeTlNo = qs(`.${target}No`),
 
         node.onchange = () => {
           if (node.checked) {
-            nodeTL.forEach(i => show(i));
+            nodeTl.forEach(i => show(i));
             nodeTlNo.forEach(i => hide(i));
           } else {
-            nodeTL.forEach(i => hide(i));
+            nodeTl.forEach(i => hide(i));
             nodeTlNo.forEach(i => show(i));
           }
         };
