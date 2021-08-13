@@ -5,7 +5,7 @@ const absPath = '../../',
       publicSrcPath = absPath + 'public/src/',
       coreSrcCssModulePath = './css/module/',
       coreSrcJsModulePath = './js/module/',
-      resFileName = 'webpackModule.js',
+      resFileName = 'webpackModule.json',
       configName = 'config.php';
 
 /*let json = {

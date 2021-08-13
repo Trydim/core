@@ -5,7 +5,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
 
 const absPath = '../../',
-      resFileName = 'webpackModule.js';
+      resFileName = 'webpackModule.json';
 
 let entry;
 function copyFile(source, target) {
