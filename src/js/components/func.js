@@ -137,41 +137,115 @@ const func = {
   },
 
   /**
-   * Переписан без JQuery.(не зависим)
-   * Селекторы должны иметь класс useToggleOption
-   * Input-ы будут открывать зависимые поля когда активен(checked)
-   * Если добавить класс "opposite", то будут скрывать когда активен
-   * цель data-target="name", у цели добавить в класс
-   * опции селектора могут иметь data-target="name"
-   * Если в классе цели добавить No, например nameNo, цель будет скрываться когда input выбран
+   * Input будет показывать цели, когда активен(checked)
+   * для определения цели добавить input-у data-target="targetClass"
+   * Цели добавить в класс
+   * Если Input добавить класс "opposite", то цели будут скрывать когда активен(checked)
+   * Если в классе цели добавить No, например targetClassNo, цель будет скрываться когда input активен(checked)
    *
-   * (в разработке)
-   * Если цель зависима от нескольких полей в атрибуте data-toggle,
-   *   перечистиль название целей через пробел.
+   * Селекторы должны иметь класс useToggleOption
+   * Опциям селектора добавить data-target="targetClass"
    *
    *
    */
   relatedOption: (node = document) => {
-    const qs = (s) => node.querySelectorAll(s),
+    const qs = s => node.querySelectorAll(s),
           ga = (i, a) => i.getAttribute(a),
-          hide = (n) => n.classList.add('d-none'),
-          show = (n) => n.classList.remove('d-none'),
-          getOtherTarget = (cur, toggle) => toggle.split(' ').filter(i => i !== cur),
-          setTarget = (n, t) => n.dataset[t] = '+';
+          show = n => n.classList.remove('d-none'),
+          hide = n => n.classList.add('d-none'),
+          checkTarget = n => n.dataset.toggle && n.dataset.toggle.length ? show(n) : hide(n),
+          setTarget = (n, t) => n.dataset[t] = '+',
+          delTarget = (n, t) => delete n.dataset[t],
+          setToggle = (n, v) => n.dataset.toggle = v.join('_'),
+          getToggle = n => n.dataset.toggle ? n.dataset.toggle.split('_') : [];
 
+    //getToggle = (cur, toggle) => toggle.split(' ').filter(i => i !== cur);
 
-    const checkTarget = (n, t) => {
-      if (!n.dataset.toggle) return;
-      delete n.dataset[t];
+    const addToggle = (n, t) => {
+      let toggle = getToggle(n);
+      toggle.push(t);
+      setToggle(n, toggle);
+    }
 
-      for (const elem of getOtherTarget(t, n.dataset.toggle)) {
-        if (n.dataset[elem]) return true;
+    const delToggle = (n, t) => {
+      let toggle = getToggle(n);
+      toggle.splice(toggle.indexOf(t), 1);
+      setToggle(n, toggle);
+    }
+
+    const setShow = (n, tClass) => {
+      if (!n.dataset[tClass] || n.classList.contains('d-none')) {
+        setTarget(n, tClass);
+        addToggle(n, tClass);
+        checkTarget(n);
       }
     }
+
+    const setHide = (n, tClass) => {
+      if (n.dataset[tClass] || !n.classList.contains('d-none')) {
+        delTarget(n, tClass);
+        delToggle(n, tClass);
+        checkTarget(n);
+      }
+    }
+
+    // Возможно стоит добавить загрузку если целей слишком много! (опередлить практическим путем)
+    qs('input[data-target]').forEach(node => {
+      const target = ga(node, 'data-target'); // Для радио не будет работать
+
+      if (!target) { console.warn('Initialisation relatedOption: target is empty' + target); return; }
+
+      const nodesT = qs(`[data-relation*="${target}"]`);
+
+      let nameGroup;
+      if (node.type === 'radio' && node.name) {
+        nameGroup = qs(`input[name="${node.name}"]`);
+        nameGroup.forEach(n => {
+          !n.dataset.target
+          && n.addEventListener('change', () => node.dispatchEvent(new Event('change')));
+        });
+      }
+
+      node.addEventListener('change', () => {
+        const checked = node.checked,
+              reg = new RegExp(/([a-zA-Z0-9]+)/, 'g');
+
+        nodesT.forEach(node => {
+          let relation  = node.dataset.relation.replaceAll(' ', ''),
+              relationT = [];
+
+          let match;
+          while ((match = reg.exec(relation))) {
+            relationT.push(match[0]);
+          }
+
+          relationT.forEach(t => {
+            let nodes = f.qA(`input[data-target="${t}"]`)
+            // вывводить что не найден элемент
+            if (nodes) {
+              const checked = !![...nodes].find(item => // Находим в группе хоть 1 включенный (или противоположный выключенный)
+                item.classList.contains('opposite') ? !item.checked : item.checked
+              );
+
+              relation = relation.replace(t, checked ? 'true' : 'false');
+            }
+          })
+
+          if (eval(relation)) {
+            show(node);
+            } else {
+            hide(node);
+          }
+        });
+      });
+
+      node.dispatchEvent(new Event('change'));
+    });
 
     const selectChange = function (check = false) {
       let opList = Object.values(this.options);
 
+      console.error('error optionrealation');
       for (let item of opList) { //Скрыть все
         let t = item.getAttribute('data-target'),
             nodeTL = t && qs(`.${t}, .${t}No`);
@@ -188,7 +262,7 @@ const func = {
 
         if (item.selected && nodeTL) nodeTL.forEach(i => {
           if (i.dataset.toggle) {
-            const arr = getOtherTarget(t, i.dataset.toggle);
+            const arr = getToggle(t, i.dataset.toggle);
           }
           show(i);
         });
@@ -204,47 +278,6 @@ const func = {
         })
       }
     };
-
-    qs('input[data-target]').forEach(node => {
-      let nameAttr = node.name ? `[name="${node.name}"]` : '';
-
-      if (nameAttr) {
-        let items = qs(`input${nameAttr}`);
-
-        node.onchange = () => {
-          items.forEach(item => { // Скрываем все зависимые поля
-            let t = ga(item, 'data-target');
-            //if (t) $('.' + t).hide().addClass('hidden');
-            if (t) qs(`.${t}, .${t}No`).forEach(i => hide(i));
-          });
-
-          items.forEach(item => { // Открываем все зависимые поля
-            //if (t && item.checked) $('.' + t).show().removeClass('hidden');
-            let t = ga(item, 'data-target'),
-                flag = item.classList.contains('opposite') ? !item.checked : item.checked;
-            if (t && flag) qs(`.${t}`).forEach(i => show(i));
-            if (t && !flag) qs(`.${t}No`).forEach(i => show(i));
-          });
-        };
-      }
-      else {
-        let target = ga(node, 'data-target'),
-            nodeTl = qs(`.${target}`),
-            nodeTlNo = qs(`.${target}No`),
-
-        node.onchange = () => {
-          if (node.checked) {
-            nodeTl.forEach(i => show(i));
-            nodeTlNo.forEach(i => hide(i));
-          } else {
-            nodeTl.forEach(i => hide(i));
-            nodeTlNo.forEach(i => show(i));
-          }
-        };
-      }
-
-      node.dispatchEvent(new Event('change'));
-    });
 
     qs('select.useToggleOption').forEach(node => {
       node.onchange = selectChange;
