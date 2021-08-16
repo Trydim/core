@@ -517,7 +517,7 @@ class Db extends \R {
 
     if (isset($prop['simple'])) return $this->parseSimpleProperty($prop['type'], $propValue);
     foreach ($props[$propName] as $item) if ($item['ID'] === $propValue) return $item;
-    return ['name' => 'db item not found!'];
+    return ['name' => "Prop item: $propValue in $propName - not found!"];
   }
 
   public function createPropertyTable($dbTable, $param) {

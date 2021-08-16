@@ -137,151 +137,112 @@ const func = {
   },
 
   /**
-   * Input будет показывать цели, когда активен(checked)
+   * Input будет давать true, когда активен(checked)
    * для определения цели добавить input-у data-target="targetClass"
-   * Цели добавить в класс
-   * Если Input добавить класс "opposite", то цели будут скрывать когда активен(checked)
-   * Если в классе цели добавить No, например targetClassNo, цель будет скрываться когда input активен(checked)
+   * Цели добавить в data-relation в виде логического выражения
+   * Истина будет показывать цель.
+   * Например: data-target="target" -> data-relation="target"
    *
    * Селекторы должны иметь класс useToggleOption
    * Опциям селектора добавить data-target="targetClass"
    *
-   *
    */
   relatedOption: (node = document) => {
-    const qs = s => node.querySelectorAll(s),
-          ga = (i, a) => i.getAttribute(a),
+    const reg = new RegExp(/([\w\d_-]+)/, 'g'),
+          qs = s => node.querySelectorAll(s),
           show = n => n.classList.remove('d-none'),
-          hide = n => n.classList.add('d-none'),
-          checkTarget = n => n.dataset.toggle && n.dataset.toggle.length ? show(n) : hide(n),
-          setTarget = (n, t) => n.dataset[t] = '+',
-          delTarget = (n, t) => delete n.dataset[t],
-          setToggle = (n, v) => n.dataset.toggle = v.join('_'),
-          getToggle = n => n.dataset.toggle ? n.dataset.toggle.split('_') : [];
+          hide = n => n.classList.add('d-none');
 
-    //getToggle = (cur, toggle) => toggle.split(' ').filter(i => i !== cur);
+    const targetNodes = Object.create(null);
 
-    const addToggle = (n, t) => {
-      let toggle = getToggle(n);
-      toggle.push(t);
-      setToggle(n, toggle);
+    const setInputMember = nodeT => {
+      let match, relationT = [],
+          relation = nodeT.dataset.relation.replaceAll(' ', '');
+
+      while ((match = reg.exec(relation))) relationT.push(match[0]);
+      !nodeT.id && (nodeT.id = 'target' + (Math.random() * 10000 | 0));
+
+      targetNodes[nodeT.id] = {relation, relationT, nodesT: Object.create(null)};
+
+      return targetNodes[nodeT.id];
     }
+    const setSelectMembers = key => {
+      const targetsN = [...qs(`[data-relation*="${key}"]`)];
+      targetNodes[key] = [];
 
-    const delToggle = (n, t) => {
-      let toggle = getToggle(n);
-      toggle.splice(toggle.indexOf(t), 1);
-      setToggle(n, toggle);
-    }
+      if (targetsN.length) {
+        qs(`[data-relation*="${key}"]`).forEach(targetN => {
+          let match,
+              relationT = [],
+              relation  = targetN.dataset.relation.replaceAll(' ', '');
 
-    const setShow = (n, tClass) => {
-      if (!n.dataset[tClass] || n.classList.contains('d-none')) {
-        setTarget(n, tClass);
-        addToggle(n, tClass);
-        checkTarget(n);
+          while ((match = reg.exec(relation))) relationT.push(match[0]);
+
+          targetNodes[key].push({targetN, relation, relationT, nodesT: Object.create(null)});
+        });
+      } else console.warn('Event relatedOption: target not found' + key);
+
+      return targetNodes[key];
+      }
+    const checkedTarget = (node, member) => {
+      let {relation, relationT} = member;
+
+      relationT.forEach(t => {
+        !member.nodesT[t] && (member.nodesT[t] = [...f.qA(`input[data-target="${t}"], select [data-target="${t}"]`)]);
+
+        if (member.nodesT[t].length) {
+          let checked = !!member.nodesT[t].find(item => item.checked || item.selected); // Находим в группе хоть 1 включенный (или противоположный выключенный)
+          relation = relation.replace(t, checked.toString());
+        } else console.warn('Event relatedOption: target not found' + t);
+      });
+
+      try {
+        eval(relation) ? show(node) : hide(node);
+      } catch (e) {
+        console.error('Event relatedOption: relation string is not valid logic expression');
       }
     }
 
-    const setHide = (n, tClass) => {
-      if (n.dataset[tClass] || !n.classList.contains('d-none')) {
-        delTarget(n, tClass);
-        delToggle(n, tClass);
-        checkTarget(n);
-      }
-    }
-
-    // Возможно стоит добавить загрузку если целей слишком много! (опередлить практическим путем)
-    qs('input[data-target]').forEach(node => {
-      const target = ga(node, 'data-target'); // Для радио не будет работать
+    // Возможно стоит добавить загрузку если целей слишком много! (определить практическим путем)
+    qs('input[data-target]').forEach(eNode => {
+      const target = eNode.dataset.target;
+      let nodesT = false;
 
       if (!target) { console.warn('Initialisation relatedOption: target is empty' + target); return; }
 
-      const nodesT = qs(`[data-relation*="${target}"]`);
-
-      let nameGroup;
-      if (node.type === 'radio' && node.name) {
-        nameGroup = qs(`input[name="${node.name}"]`);
-        nameGroup.forEach(n => {
-          !n.dataset.target
-          && n.addEventListener('change', () => node.dispatchEvent(new Event('change')));
+      if (eNode.type === 'radio' && eNode.name) {
+        qs(`input[name="${eNode.name}"]`).forEach(n => {
+          !n.dataset.target && n.addEventListener('change', () => eNode.dispatchEvent(new Event('change')));
         });
       }
 
-      node.addEventListener('change', () => {
-        const checked = node.checked,
-              reg = new RegExp(/([a-zA-Z0-9]+)/, 'g');
+      eNode.addEventListener('change', () => {
+        nodesT = nodesT || qs(`[data-relation*="${target}"]`);
 
-        nodesT.forEach(node => {
-          let relation  = node.dataset.relation.replaceAll(' ', ''),
-              relationT = [];
-
-          let match;
-          while ((match = reg.exec(relation))) {
-            relationT.push(match[0]);
-          }
-
-          relationT.forEach(t => {
-            let nodes = f.qA(`input[data-target="${t}"]`)
-            // вывводить что не найден элемент
-            if (nodes) {
-              const checked = !![...nodes].find(item => // Находим в группе хоть 1 включенный (или противоположный выключенный)
-                item.classList.contains('opposite') ? !item.checked : item.checked
-              );
-
-              relation = relation.replace(t, checked ? 'true' : 'false');
-            }
-          })
-
-          if (eval(relation)) {
-            show(node);
-            } else {
-            hide(node);
-          }
+        nodesT.forEach(nodeT => {
+          let member = targetNodes[nodeT.id];
+          !member && (member = setInputMember(nodeT));
+          checkedTarget(nodeT, member);
         });
       });
 
-      node.dispatchEvent(new Event('change'));
+      eNode.dispatchEvent(new Event('change'));// очень затратно наверное
     });
+    qs('select.useToggleOption').forEach(eNode => {
+      eNode.addEventListener('change', () => {
+        [...eNode.options].forEach(opt => {
+          const target = opt.dataset.target;
+          let members;
+          if (!target) return;
 
-    const selectChange = function (check = false) {
-      let opList = Object.values(this.options);
+          members = targetNodes[target];
+          !members && (members = setSelectMembers(target));
 
-      console.error('error optionrealation');
-      for (let item of opList) { //Скрыть все
-        let t = item.getAttribute('data-target'),
-            nodeTL = t && qs(`.${t}, .${t}No`);
-
-        if (nodeTL) nodeTL.forEach(i => {
-          if (checkTarget(i, t)) return;
-          hide(i);
+          members.forEach(member => checkedTarget(member.targetN, member));
         });
-      }
+      });
 
-      for (let item of opList) {// Открыть нужные
-        let t = item.getAttribute('data-target'),
-            nodeTL = t && qs(`.${t}`);
-
-        if (item.selected && nodeTL) nodeTL.forEach(i => {
-          if (i.dataset.toggle) {
-            const arr = getToggle(t, i.dataset.toggle);
-          }
-          show(i);
-        });
-      }
-
-      for (let item of opList) {// Открыть противоположные
-        let t = item.getAttribute('data-target'),
-            nodeTL = t && qs(`.${t}No`);
-
-        if (!item.selected && nodeTL) nodeTL.forEach(i => {
-          if (i.dataset.toggle) setTarget(i, t);
-          show(i);
-        })
-      }
-    };
-
-    qs('select.useToggleOption').forEach(node => {
-      node.onchange = selectChange;
-      node.dispatchEvent(new Event('change'));
+      eNode.dispatchEvent(new Event('change'));// очень затратно наверное
     });
   },
 
