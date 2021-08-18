@@ -1,7 +1,4 @@
-
 // TODO сохранять в сессии потом, что бы можно было перезагрузить страницу
-
-import {catalog} from "../module/catalog/catalog";
 
 export class SelectedRow {
   constructor(param) {

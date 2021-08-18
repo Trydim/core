@@ -197,7 +197,7 @@ const func = {
       });
 
       try {
-        eval(relation) ? show(node) : hide(node);
+        new Function('return ' + relation)() ? show(node) : hide(node);
       } catch (e) {
         console.error('Event relatedOption: relation string is not valid logic expression');
       }
