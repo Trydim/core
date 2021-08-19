@@ -325,14 +325,18 @@ const func = {
     });
   },
 
-  // Добавить иконку загрузки
+  /** Добавить иконку загрузки */
   setLoading: (node) => {
     if(!node) return;
     node.classList.add(c.CLASS_NAME.LOADING);
   },
+  /** Удалить иконку загрузки */
+  removeLoading: (node) => {
+    node && node.classList.remove(c.CLASS_NAME.LOADING);
+  },
 
   /**
-   * Функция по умолчанию
+   * Функция печати по умолчанию
    * @param report
    * @param number
    * @returns {string}
@@ -351,11 +355,6 @@ const func = {
     return table.outerHTML;
   },
 
-  // Удалить иконку загрузки
-  removeLoading: (node) => {
-    node && node.classList.remove(c.CLASS_NAME.LOADING);
-  },
-
   /**
    *
    * @param target HTML node (loading field)
@@ -368,6 +367,7 @@ const func = {
     if (!Object.keys(report).length) { err(); return; }
 
     func.setLoading(target);
+    target.setAttribute('disabled', 'disabled');
 
     let fileName = report.fileName || false;
     //data.set('dbAction', 'DB');
@@ -377,6 +377,7 @@ const func = {
 
     q.Post({data}).then(data => {
       func.removeLoading(target);
+      target.removeAttribute('disabled');
       if (data['pdfBody']) {
         f.saveFile({
           name: fileName || data['name'],

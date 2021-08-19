@@ -272,13 +272,12 @@ export const Print = () => {
         imagesPromise = [];
 
     nodes.forEach(n => {
-      imagesPromise.push(this.loadImage(n.src));
+      !n.src.includes('base64') && imagesPromise.push(this.loadImage(n.src));
     })
 
-    await Promise.all([...imagesPromise])
-                 .then(value => {
-                   nodes.forEach((n, i) => n.src = value[i].src);
-                 });
+    imagesPromise.length
+    && await Promise.all([...imagesPromise])
+                    .then(value => nodes.forEach((n, i) => n.src = value[i].src));
 
     return container;
   }
@@ -294,8 +293,10 @@ export const Print = () => {
     this.data = container;
   }
 
-  p.print = function (content, classList = []) {
-    q.Get({data: 'mode=docs&docsAction=getPrintStyle'}).then(async data => {
+  p.print = function (content, printStyleTpl = 'printTpl.css', classList = []) {
+    q.Get({
+      data: 'mode=docs&docsAction=getPrintStyle&fileTpl=' + printStyleTpl
+    }).then(async data => {
       const scrollY = window.pageYOffset;
 
       typeof data.style === 'string' && (content = `<style>${data.style}</style>` + content);
