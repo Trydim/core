@@ -35,8 +35,8 @@ export const admindb = {
   mainNode: f.qS('#insertToDB'),
 
   init() {
-    this.btnField = f.qS('#btnField');
-    this.btnSave = f.qS('#btnSave');
+    this.btnField   = f.qS('#btnField');
+    this.btnSave    = f.qS('#btnSave');
     this.btnAddMore = f.qS('#btnAddMore');
     this.btnRefresh = f.qS('#btnRefresh');
     this.viewsField = f.qS('#viewField');
@@ -150,7 +150,7 @@ export const admindb = {
     if (this.btnSaveEnable) {
       this.btnSave.setAttribute('disabled', 'disabled');
       this.btnSaveEnable = false;
-      this.handsontable.tableChanged = false;
+      this.handsontable && (this.handsontable.tableChanged = false);
       this.disWindowReload();
     }
   },
@@ -342,11 +342,13 @@ const TableValues = {
       this.deleted = new Set();
 
       f.show(this.btnAddMore);
+      f.hide(this.viewsField);
       this.onSave(this.save);
     } else {
+      f.show(this.viewsField);
       this.onSave(this.saveCsv);
     }
-    admindb.disableBtnSave();
+    this.disableBtnSave();
   },
   setStyle() {
     document.body.style.overflow = 'hidden';
@@ -358,7 +360,7 @@ const TableValues = {
         Object.assign(this.columns[item.columnName], item);
       });
     }
-    this.data = this.queryResult.dbValues || this.queryResult.csvValues || {};
+    this.data = this.queryResult['dbValues'] || this.queryResult['csvValues'] || {};
     this.showList();
   },
 
@@ -403,10 +405,7 @@ const TableValues = {
       }
     }
 
-    if (this.columns[columnName].null === 'NO') {
-      if(!value) return true;
-    }
-
+    if (this.columns[columnName]['null'] === 'NO' && !value) return true;
     return key;
   },
 
@@ -511,13 +510,14 @@ const TableValues = {
     // Показать подсказку по типу и ограничению
   },
 
-  save() {
+  save(e) {
+    f.setLoading(e.target);
     if(this.lastBtn) this.lastBtn.dispatchEvent(new Event('clickSave'));
 
-    admindb.action = 'saveTable';
+    this.action = 'saveTable';
 
     let data = new FormData(),
-        del = [];
+        del  = [];
 
     for (let item of this.deleted.values()) {
       if(this.added[item]) delete this.added[item];
@@ -525,34 +525,25 @@ const TableValues = {
       del.push(item);
     }
 
-    if(Object.values(this.added).length)
-      data.set('added', JSON.stringify(this.added));
-    if(Object.values(this.changed).length)
-      data.set('changed', JSON.stringify(this.changed));
-    if(del.length)
-      data.set('deleted', JSON.stringify(del));
+    if(Object.values(this.added).length) data.set('added', JSON.stringify(this.added));
+    if(Object.values(this.changed).length) data.set('changed', JSON.stringify(this.changed));
+    del.length && data.set('deleted', JSON.stringify(del));
 
-    admindb.query(data).then(data => {
+    this.query(data).then(data => {
       this.init('db');
+      f.removeLoading(e.target);
 
-      if (data.hasOwnProperty('notAllowed') && data['notAllowed'].length) {
+      if (data.status) {
+        f.showMsg('Сохранено');
+
+      } else if (data.hasOwnProperty('notAllowed') && data['notAllowed'].length) {
         let html = '';
-        data.notAllowed.map(item => {
-          for (let i in item) {
-            html += i + ' ' + item[i];
-          }
+        data['notAllowed'].map(item => {
+          Object.entries(item).forEach((k, v) => html += k + ' ' + v);
           html += '<br>';
         });
 
         f.gI('errors').innerHTML = html;
-
-        /*switch (data.status) {
-          case true:
-            //Выводить сообщение обнулить таблицу
-            break;
-          case false:
-          //Выводить сообщение вывести строки которые не добавлены.
-        }*/
       }
     });
   },
@@ -582,7 +573,7 @@ const TableValues = {
 
   onSave(func) {
     // Сохранить изменения.
-    this.btnSave.onclick = (e) => func.call(this, e);
+    this.btnSave.onclick = e => func.call(this, e);
   }
 }
 

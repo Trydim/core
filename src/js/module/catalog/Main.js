@@ -38,7 +38,7 @@ export class Catalog {
     this.reloadAction = false;
   }
 
-  query() {
+  query(action = '') {
     let queryForm = this.queryParam.form || document.createElement('form');
 
     let data = new FormData(queryForm);
@@ -47,6 +47,7 @@ export class Catalog {
 
     Object.entries(Object.assign({}, this.queryParam, this.sortParam))
           .map(param => data.set(param[0], param[1]));
+    action && data.set('dbAction', action);
 
     Object.entries(this.queryFiles).forEach(([id, file]) => {
       data.append('files' + id, file, file.name);
@@ -217,8 +218,8 @@ export class Common extends Catalog {
       this.sortParam.sortDirect = false;
     }
 
-    this.queryParam.dbAction = this.type === 'elements' ? 'openSection' : 'openElements';
-    this.query({sort: this.type});
+    this.queryParam.dbAction = this.type === 'elements' ? 'openSection' : 'openElement';
+    this.query().then(data => f.observer.fire('sortEvent', data));
   }
   onCommonEvent() {
     // Кнопки сортировки

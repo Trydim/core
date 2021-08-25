@@ -422,8 +422,9 @@ class Db extends \R {
    * @return array|null
    */
   public function loadOptions($filter = []) {
-    $sql = "SELECT O.ID AS 'id', element_id as 'elementId', E.element_type_code AS 'type', O.name AS 'name',
-                   U.short_name as 'unit', O.activity AS 'activity',
+    $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
+                   E.element_type_code AS 'type', E.sort AS 'elementSort',
+                   O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
                    O.sort AS 'sort', O.last_edit_date as 'lastDate', property, images_ids AS 'images',
                    MI.name AS 'moneyInput', MO.name AS 'moneyOutput',
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
@@ -431,7 +432,8 @@ class Db extends \R {
             JOIN elements E on E.ID = O.element_id
             JOIN money MI on MI.ID = O.money_input_id
             JOIN money MO on MO.ID = O.money_output_id
-            JOIN units U on U.ID = O.unit_id";
+            JOIN units U on U.ID = O.unit_id
+            WHERE E.activity <> 0 AND O.activity <> 0";
 
     if (count($filter)) {
       $filterArr = [];
@@ -440,7 +442,7 @@ class Db extends \R {
         $filterArr[] = "$k LIKE '$v'";
       }
 
-      $sql .= ' WHERE ' . implode(' AND ', $filterArr);
+      $sql .= ' AND ' . implode(' AND ', $filterArr);
       unset($filter, $filterArr);
     }
 
@@ -449,8 +451,8 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
-        //$option['images'] = $this->setImages($option['images']);
+        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
+        $option['images'] = $this->setImages($option['images']);
       }
 
       // set property

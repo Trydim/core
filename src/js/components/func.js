@@ -327,8 +327,7 @@ const func = {
 
   /** Добавить иконку загрузки */
   setLoading: (node) => {
-    if(!node) return;
-    node.classList.add(c.CLASS_NAME.LOADING);
+    node && node.classList.add(c.CLASS_NAME.LOADING);
   },
   /** Удалить иконку загрузки */
   removeLoading: (node) => {

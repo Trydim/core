@@ -24,8 +24,17 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
   $columns = [];
   if ($dbTable) {
-    USE_DATABASE && $columns = $db->getColumnsTable($dbTable);
-    $db->setCsvTable($dbTable);
+    if (stripos($dbTable, '.csv')) $db->setCsvTable($dbTable);
+    else if (USE_DATABASE) {
+      $columns = $db->getColumnsTable($dbTable);
+      if (!count($columns)) {
+        $dbTable = $db->getTables($dbTable);
+        if (count($dbTable)) {
+          $dbTable = $dbTable[0]['dbTable'];
+          $columns = $db->getColumnsTable($dbTable);
+        }
+      }
+    }
   }
 
   $pageNumber = isset($currPage) ? $currPage : 0;
@@ -36,14 +45,14 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Tables
     case 'showTable':
       $result['columns'] = $columns;
-      if (stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
+      if (is_string($dbTable) && stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
       else {
-        if (!CHANGE_DATABASE) {
-          $dbTable = $db->getTables($dbTable);
-          count($dbTable) === 1 && $result['dbValues'] = $db->loadTable($dbTable[0]['dbTable']);
-        } else {
+        if (CHANGE_DATABASE) {
           //if (stripos($dbTable, 'csv') !== false) reDirect(false, '404');
           USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
+        } else {
+          $dbTable = $db->getTables($dbTable);
+          count($dbTable) && $result['dbValues'] = $db->loadTable($dbTable[0]['dbTable']);
         }
       }
       break;
@@ -252,8 +261,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     // Elements
-    case 'createElements':
-    case 'copyElements':
+    case 'createElement':
+    case 'copyElement':
       $param = ['0' => []];
       if (!isset($sectionId)) { $result['error'] = 'section_id_error'; break; }
 
@@ -269,7 +278,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $result['error'] = $db->insert($columns, 'elements', $param);
       }
       break;
-    case 'openElements':
+    case 'openElement':
       !isset($sortColumn) && $sortColumn = 'name';
 
       if (isset($elementsId) && is_finite($elementsId)) {
@@ -312,7 +321,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadOptions':
       $result['options'] = $db->loadOptions(isset($filter) ? json_decode($filter, true) : []);
       break;
-    case 'createOptions':
+    case 'copyOption':
+    case 'createOption':
       $param = ['0' => []];
       if (isset($name) && isset($elementsId) && !empty($name)) {
         $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementsId' and name = '$name' ");
@@ -376,15 +386,24 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param = [];
 
         foreach ($optionsId as $id) {
-          isset($name) && ($param[$id]['name'] = $name);
-          isset($moneyInputId) && ($param[$id]['money_input_id'] = $moneyInputId);
-          isset($moneyInput) && ($param[$id]['input_price'] = $moneyInput);
-          isset($moneyOutputId) && ($param[$id]['money_output_id'] = $moneyOutputId);
-          isset($outputPercent) && ($param[$id]['output_percent'] = $outputPercent);
-          isset($outputPrice) && ($param[$id]['output_price'] = $outputPrice);
-          isset($unitId) && ($param[$id]['unit_id'] = $unitId);
-          isset($imageId) && ($param[$id]['image_id'] = $imageId);
-          isset($property) && ($param[$id]['property'] = json_encode($property));
+          isset($name) && $param[$id]['name'] = $name;
+          isset($moneyInputId) && $param[$id]['money_input_id'] = $moneyInputId;
+          isset($inputPrice) && $param[$id]['input_price'] = $inputPrice;
+          isset($moneyOutputId) && $param[$id]['money_output_id'] = $moneyOutputId;
+          isset($outputPercent) && $param[$id]['output_percent'] = $outputPercent;
+          isset($outputPrice) && $param[$id]['output_price'] = $outputPrice;
+          isset($unitId) && $param[$id]['unit_id'] = $unitId;
+          isset($sort) && $param[$id]['sort'] = $sort;
+
+          $param[$id]['activity'] = isset($activity);
+
+          $property = [];
+          foreach ($_REQUEST as $k => $v) {
+            stripos($k, 'prop_') === 0 && !empty($v) && $property[$k] = $v;
+          }
+          $param[$id]['property'] = json_encode($property);
+
+          //isset($imageId) && ($param[$id]['images_id'] = $imageId);
         }
 
         $result['error'] = $db->insert($columns, $dbTable, $param, true);

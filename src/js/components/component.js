@@ -672,27 +672,32 @@ const ACTIVE_CLASS = 'active';
 export class Pagination {
   constructor(fieldSelector = 'paginatorWrap', param) {
     let {
-      queryParam = {}, // ссылка на объект отправляемый с функцией запроса
-      query, // функция запроса со страницы
+      dbAction,       // Принудительное Событие запроса
+      sortParam = {}, // ссылка на объект отправляемый с функцией запроса
+      query,          // функция запроса со страницы
         } = param,
         field = f.qS(fieldSelector);
 
     if (!(field && param.query)) return;
-    this.activeClass    = ACTIVE_CLASS;
+
     this.node           = field;
     this.node.innerHTML = this.template();
-    this.prevBtn        = {node: this.node.querySelector('[data-action="prev"]')};
-    this.onePageBtnNode = this.node.querySelector('[data-btnwrap]');
-    this.nextBtn        = {node: this.node.querySelector('[data-action="next"]')};
     this.node.onclick   = this.onclick.bind(this);
-    this.queryParam     = queryParam;
-    this.query          = query;
+
+    this.prevBtn = {node: this.node.querySelector('[data-action="prev"]')};
+    this.nextBtn = {node: this.node.querySelector('[data-action="next"]')};
+    this.onePageBtnNode = this.node.querySelector('[data-btnwrap]');
+
+    this.query       = query;
+    this.dbAction    = dbAction;
+    this.sortParam   = sortParam;
+    this.activeClass = ACTIVE_CLASS;
   }
 
   setCountPageBtn(count) {
-    let pageCount = Math.ceil(+count / this.queryParam.countPerPage );
+    let pageCount = Math.ceil(+count / this.sortParam.countPerPage );
 
-    if(+this.queryParam.pageCount !== +pageCount) this.queryParam.pageCount = +pageCount;
+    if(+this.sortParam.pageCount !== +pageCount) this.sortParam.pageCount = +pageCount;
     else return;
 
     if (pageCount === 1) {
@@ -707,7 +712,7 @@ export class Pagination {
   }
 
   checkBtn() {
-    let currPage = +this.queryParam.currPage;
+    let currPage = +this.sortParam.currPage;
     if (currPage === 0 && !this.prevBtn.hidden) {
       this.prevBtn.hidden = true;
       f.hide(this.prevBtn.node);
@@ -716,7 +721,7 @@ export class Pagination {
       f.show(this.prevBtn.node);
     }
 
-    let pageCount = this.queryParam.pageCount - 1;
+    let pageCount = this.sortParam.pageCount - 1;
     if (currPage === pageCount && !this.nextBtn.hidden) {
       this.nextBtn.hidden = true;
       f.hide(this.nextBtn.node);
@@ -752,22 +757,22 @@ export class Pagination {
 
     switch (key) {
       case 'prev':
-        this.queryParam.currPage--;
+        this.sortParam.currPage--;
         break;
       case 'next':
-        this.queryParam.currPage++;
+        this.sortParam.currPage++;
         break;
-      case 'page': this.queryParam.currPage = btn.dataset.page; break;
+      case 'page': this.sortParam.currPage = btn.dataset.page; break;
       case 'count':
-        if (this.queryParam.countPerPage === +e.target.value) return;
-        this.queryParam.countPerPage = +e.target.value;
-        this.queryParam.currPage = 0;
+        if (this.sortParam.countPerPage === +e.target.value) return;
+        this.sortParam.countPerPage = +e.target.value;
+        this.sortParam.currPage = 0;
         break;
     }
 
     //this.l = new LoaderIcon(this.node);
     this.checkBtn();
-    this.query();
+    this.query(this.dbAction);
   }
 
   template() {
@@ -794,12 +799,12 @@ export class Pagination {
 
 // Сортировка столбцов
 export class SortColumns {
-  constructor(thead, query, queryParam) {
-    if (!thead || !query || !queryParam) return;
+  constructor(thead, query, sortParam) {
+    if (!thead || !query || !sortParam) return;
     let activeClass = c.CLASS_NAME.SORT_BTN_CLASS;
     this.thead = thead;
     this.query = query;
-    this.queryParam = queryParam;
+    this.sortParam = sortParam;
     this.arrow = {
       notActive: '↑↓',
       arrowDown: '↓',
@@ -811,7 +816,7 @@ export class SortColumns {
       n.addEventListener('click', (e) => this.sortRows.call(this, e));
       n.value += ' ' + this.arrow.notActive;
 
-      if (n.dataset.ordercolumn === this.queryParam.sortColumn) {
+      if (n.dataset.ordercolumn === this.sortParam.sortColumn) {
         n.classList.add(activeClass);
         n.value = n.value.replace(this.arrow.notActive, this.arrow.arrowDown);
       }
@@ -827,11 +832,11 @@ export class SortColumns {
         {notActive, arrowDown, arrowUp} = this.arrow,
         arrowReg = new RegExp(`${notActive}|${arrowDown}|${arrowUp}`);
 
-    if(this.queryParam.sortColumn === colSort) {
-      this.queryParam.sortDirect = !this.queryParam.sortDirect;
+    if(this.sortParam.sortColumn === colSort) {
+      this.sortParam.sortDirect = !this.sortParam.sortDirect;
     } else {
-      this.queryParam.sortColumn = colSort;
-      this.queryParam.sortDirect = false;
+      this.sortParam.sortColumn = colSort;
+      this.sortParam.sortDirect = false;
     }
 
     let node = this.thead.querySelector(`input.${activeClass}`);
@@ -841,10 +846,10 @@ export class SortColumns {
       input.classList.add(activeClass);
     }
 
-    if (this.queryParam.sortDirect) input.value = input.value.replace(arrowReg, arrowUp);
+    if (this.sortParam.sortDirect) input.value = input.value.replace(arrowReg, arrowUp);
     else input.value = input.value.replace(arrowReg, arrowDown);
 
-    this.query();
+    this.query(this.dbAction);
   }
 }
 

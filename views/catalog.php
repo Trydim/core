@@ -91,10 +91,10 @@ $field['content'] = <<<content
         </table>
         <div class="text-center pageWrap"></div>
         <div class="mt-1 controlWrap">
-          <input class="btn btn-success" type="button" value="Создать элемент" data-action="createElements">
-          <input class="btn btn-warning" type="button" value="Открыть элемент" data-action="openElements">
+          <input class="btn btn-success" type="button" value="Создать элемент" data-action="createElement">
+          <input class="btn btn-warning" type="button" value="Открыть элемент" data-action="openElement">
           <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
-          <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElements">
+          <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElement">
           <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
           <input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
           <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
@@ -113,9 +113,9 @@ $field['content'] = <<<content
   </div>
   <div class="text-center pageWrap"></div>
   <div class="mt-1 text-center controlWrap">
-    <input class="btn btn-success" type="button" value="Добавить вариант" data-action="createOptions">
+    <input class="btn btn-success" type="button" value="Добавить вариант" data-action="createOption">
     <input class="btn btn-warning" type="button" value="Изменить вариант" data-action="changeOptions">
-    <input class="btn btn-warning" type="button" value="Копировать вариант" data-action="copyOptions">
+    <input class="btn btn-warning" type="button" value="Копировать вариант" data-action="copyOption">
     <input class="btn btn-danger" type="button" value="Удалить вариант" data-action="delOptions">
   </div>
 </div>

@@ -12,11 +12,13 @@ export class Elements extends Common {
     this.setNodes(field, props.tmp);
 
     this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
-      queryParam: this.queryParam,
-      query: this.query.bind(this),
+      dbAction : 'openSection',
+      sortParam: this.sortParam,
+      query    : action => this.query(action).then(d => this.load(d)),
     });
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
+    f.observer.subscribe(`sortEvent`, d => this.load(d));
     f.observer.subscribe(`loadElements`, d => this.load(d));
     f.observer.subscribe(`openSection`, d => this.openSection(d));
     this.onEvent();
@@ -55,7 +57,7 @@ export class Elements extends Common {
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
   // Создать элемент
-  createElements() {
+  createElement() {
     if (this.checkSection()) return;
 
     let form = this.tmp.form.cloneNode(true);
@@ -78,13 +80,13 @@ export class Elements extends Common {
     };
   }
   // Открыть элемент
-  openElements() {
+  openElement() {
     if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
 
     this.queryParam.elementsId = this.id.getSelected()[0];
     this.id.clear();
-    f.observer.fire('openElements', this.queryParam.elementsId);
-    this.query({sort: 'options'}).then(data => data && f.observer.fire('loadOptions', data));
+    f.observer.fire('openElement', this.queryParam.elementsId);
+    this.query().then(data => data && f.observer.fire('loadOptions', data));
   }
   // Изменить элемент
   changeElements() {
@@ -127,7 +129,7 @@ export class Elements extends Common {
     };
   }
   // Копировать Элемент
-  copyElements() {
+  copyElement() {
     if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
 
     let form = this.tmp.form.cloneNode(true),

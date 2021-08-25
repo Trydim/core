@@ -37,9 +37,9 @@ menu;
       }
 
       global $tableActive;
-      !isset($item['fileName']) && $item['fileName'] = $item['name'];
-      $active = $tableActive === $link . '/' . $item['fileName'] ? 'active' : '';
-      $items .= subSideMenuItem($link . '/' . $item['fileName'], $item['name'], $active);
+      $linkTarget = $item['fileName'] ?? $item['dbTable'] ?? $item['name'];
+      $active = $tableActive === $link . '/' . $linkTarget ? 'active' : '';
+      $items .= subSideMenuItem($link . '/' . $linkTarget, $item['name'], $active);
     }
     return subSideMenu(gTxt($title), $items, $root);
   }
