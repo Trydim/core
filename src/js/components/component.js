@@ -782,9 +782,8 @@ export class Pagination {
       <div class="col"><button type="button" class="btn-arrow" data-action="next">&raquo;</i></button></div>
 
       <div class="col"><select class="select-width custom-select" data-action="count">
-        <option value="1">1 запись</option>
-        <option value="2">2 записи</option>
-        <option value="5">5 записей</option>
+        <option value="5">5 запись</option>
+        <option value="10">10 записей</option>
         <option value="20" selected>20 записей</option>
       </select></div>
     </div>`;
@@ -799,11 +798,20 @@ export class Pagination {
 
 // Сортировка столбцов
 export class SortColumns {
-  constructor(thead, query, sortParam) {
+  constructor(param) {
+    const {
+            thead,     // Тег заголовка с кнопками сортировки
+            query,     // Функния запроса
+            dbAction,  // Событие ДБ
+            sortParam, // Объект Параметров
+          } = param;
+
     if (!thead || !query || !sortParam) return;
+
     let activeClass = c.CLASS_NAME.SORT_BTN_CLASS;
     this.thead = thead;
     this.query = query;
+    this.dbAction = dbAction || '';
     this.sortParam = sortParam;
     this.arrow = {
       notActive: '↑↓',
@@ -816,7 +824,7 @@ export class SortColumns {
       n.addEventListener('click', (e) => this.sortRows.call(this, e));
       n.value += ' ' + this.arrow.notActive;
 
-      if (n.dataset.ordercolumn === this.sortParam.sortColumn) {
+      if (n.dataset.column === this.sortParam.sortColumn) {
         n.classList.add(activeClass);
         n.value = n.value.replace(this.arrow.notActive, this.arrow.arrowDown);
       }
@@ -827,7 +835,7 @@ export class SortColumns {
   // сортировка
   sortRows(e) { /*↑↓*/
     let input = e.target,
-        colSort = input.getAttribute('data-ordercolumn'),
+        colSort = input.dataset.column,
         activeClass = c.CLASS_NAME.SORT_BTN_CLASS,
         {notActive, arrowDown, arrowUp} = this.arrow,
         arrowReg = new RegExp(`${notActive}|${arrowDown}|${arrowUp}`);

@@ -43,6 +43,21 @@ const m = {
 
   Pagination: module.Pagination,
 
+  /**
+   * @param param {{thead: HTMLElement,
+   * query: function,
+   * dbAction: string,
+   * sortParam: object}}
+   * @param param.thead - element with sort button, button must have data-column
+   * @param param.query - exec func with param dbAction
+   * @param param.dbAction - action for db, send whit query
+   * @param param.sortParam = {
+   *   sortDirect: boolean, true = DESC
+   *   currPage: integer,
+   *   countPerPage: integer,
+   *   pageCount: integer,
+   * } - param as page, sort and other
+   */
   SortColumns: module.SortColumns,
 
   SelectedRow: SelectedRow,

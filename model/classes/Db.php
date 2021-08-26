@@ -433,7 +433,7 @@ class Db extends \R {
             JOIN money MI on MI.ID = O.money_input_id
             JOIN money MO on MO.ID = O.money_output_id
             JOIN units U on U.ID = O.unit_id
-            WHERE E.activity <> 0 AND O.activity <> 0";
+            WHERE E.activity <> 0 OR O.activity <> 0";
 
     if (count($filter)) {
       $filterArr = [];

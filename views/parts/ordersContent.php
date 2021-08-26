@@ -59,7 +59,7 @@
           <th></th>
           <?php foreach ($ordersColumns as $item) { ?>
             <th>
-              <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-ordercolumn="<?= $item['dbName']; ?>">
+              <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
             </th>
           <?php } ?>
         </tr>
@@ -83,7 +83,7 @@
         <th></th>
         <?php foreach ($ordersVisitorColumns as $item) { ?>
           <th>
-            <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-ordercolumn="<?= $item['dbName']; ?>">
+            <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
           </th>
         <?php } ?>
       </tr>

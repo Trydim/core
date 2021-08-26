@@ -9,19 +9,19 @@ export const catalog = {
     const db = {
       units: JSON.parse(f.qS('#dataUnits').value),
       money: JSON.parse(f.qS('#dataMoney').value),
+      lang : JSON.parse(f.qS('#dataDbLang').value),
     };
     const tmp = {
-      tHead: f.gT('#itemsTableHead'),
+      tHead   : f.gT('#itemsTableHead'),
       checkbox: f.gT('#itemsTableRowsCheck'),
-      imgCell: f.gTNode('#imageTableCell'),
-      img: f.gT('#imageTableItem'),
-    }
+      imgCell : f.gTNode('#imageTableCell'),
+      img     : f.gT('#imageTableItem'),
+    };
 
-    this.section = new Section();
+    this.section  = new Section();
     this.elements = new Elements({db, tmp});
-    this.options = new Options({db, tmp});
+    this.options  = new Options({db, tmp});
 
-    //new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.section.loadSection();
 
     setTimeout(() => {

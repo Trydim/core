@@ -52,6 +52,10 @@ foreach ($db->getTables('prop') as $table) {
 }
 //$properties = array_merge([], $properties); //бредовая строка
 
-unset($optionsColumn, $elementsColumn, $propSetting);
+$mess = [];
+include ABS_SITE_PATH . 'lang/dbDictionary.php';
+$field['footerContent'] .= "<input type='hidden' id='dataDbLang' value='" . json_encode($mess) . "'>";
+
+unset($optionsColumn, $elementsColumn, $propSetting, $mess);
 require $pathTarget;
 $html = template('base', $field);

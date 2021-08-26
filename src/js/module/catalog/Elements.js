@@ -19,18 +19,19 @@ export class Elements extends Common {
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
     f.observer.subscribe(`sortEvent`, d => this.load(d));
-    f.observer.subscribe(`loadElements`, d => this.load(d));
-    f.observer.subscribe(`openSection`, d => this.openSection(d));
+    f.observer.subscribe(`openSection`, d => this.open(d));
     this.onEvent();
   }
 
+  open(id) {
+    this.queryParam.sectionId = id || false;
+    this.queryParam.dbAction = 'openSection';
+    this.query().then(d => this.load(d));
+  }
   load(data) {
     this.id.clear();
     data['elements'] && this.prepareItems(data['elements']);
     data['countRowsElements'] && this.paginator.setCountPageBtn(data['countRowsElements']);
-  }
-  openSection(id) {
-    this.queryParam.sectionId = id || false;
   }
   checkSection() {
     if (!this.queryParam.sectionId) { f.showMsg('Ошибка раздела', 'error'); return true; }
@@ -86,7 +87,6 @@ export class Elements extends Common {
     this.queryParam.elementsId = this.id.getSelected()[0];
     this.id.clear();
     f.observer.fire('openElement', this.queryParam.elementsId);
-    this.query().then(data => data && f.observer.fire('loadOptions', data));
   }
   // Изменить элемент
   changeElements() {
@@ -183,7 +183,6 @@ export class Elements extends Common {
   //--------------------------------------------------------------------------------------------------------------------
 
   onEvent() {
-    this.node.field.addEventListener('click', (e) => this.commonEvent(e));
-    this.onCommonEvent();
+    this.node.field.addEventListener('click', e => this.commonEvent(e));
   }
 }

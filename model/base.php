@@ -51,7 +51,7 @@ if ($main->checkStatus('ok') && isset($db)) {
         ]], $db->getTables('prop'));
 
         $props = array_map(function ($prop) use ($main) {
-          $setting = $main->getSettings('propertySetting')[$prop['dbTable']];
+          $setting = $main->getSettings('propertySetting')[$prop['dbTable']] ?? false;
           $setting && $setting['name'] && $prop['name'] = $setting['name'];
           return $prop;
         }, $props);

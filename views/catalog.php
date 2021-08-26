@@ -132,7 +132,7 @@ $field['footerContent'] .= <<<footerContent
   </li>
 </template>
 <template id="itemsTableHead">
-  <th><input type="button" class="btn btn-info btn-sm table-th" value="\${name} ↑↓" data-ordercolumn="\${name}"></th>
+  <th><input type="button" class="btn btn-info btn-sm table-th" value="\${name}" data-column="\${column}"></th>
 </template>
 <template id="imageTableCell">
   <td class="d-flex flex-wrap" style="max-height: 80px; overflow-y: auto"></td>
@@ -228,7 +228,7 @@ $field['footerContent'] .= <<<footerContent
       
       <div class="row onlyMany">
         <label class="col">Открыть параметры (*):</label>
-        <div class="col"><input class="w-100" type="checkbox" id="properties"></div>     
+        <div class="col"><input class="w-100" type="checkbox" id="property"></div>     
       </div>
       
       <div class="row onlyOne">

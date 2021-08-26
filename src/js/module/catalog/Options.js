@@ -19,9 +19,7 @@ export class Options extends Common {
     });
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
-    f.observer.subscribe(`loadElements`, () => this.loadElements());
-    f.observer.subscribe(`loadOptions`, d => this.load(d));
-    f.observer.subscribe(`openElement`, d => this.openElement(d));
+    f.observer.subscribe(`openElement`, d => this.open(d));
     f.observer.subscribe(`sortEvent`, d => this.load(d));
     this.onEvent();
   }
@@ -29,16 +27,16 @@ export class Options extends Common {
   setFileModal() {
     this.fModal = f.initModal({ /*template: f.*/ });
   }
-  loadElements() {
-    f.hide(this.node.field);
-    this.id.clear();
+  open(id) {
+    this.queryParam.elementsId = id;
+    this.queryParam.dbAction = 'openElement';
+    this.query().then(d => this.load(d));
   }
   load(data) {
+    f.hide(this.node.field);
+    this.id.clear();
     data['options'] && this.prepareItems(data['options']);
     data['countRowsOptions'] && this.paginator.setCountPageBtn(data['countRowsOptions']);
-  }
-  openElement(id) {
-    this.queryParam.elementsId = id;
   }
   checkElements() {
     if (!this.queryParam.elementsId) { f.showMsg('Ошибка элемента', 'error'); return true; }
@@ -169,11 +167,14 @@ export class Options extends Common {
       //this.initImages(form, option.images);
       this.initChooseFile(form);
     } else {
-      form.querySelectorAll('.onlyOne').forEach(n => n.remove());
-      form.querySelector('#property').addEventListener('change', () => {
+      const node = form.querySelector('#property');
+      node.addEventListener('change', () => {
         f.show(nodeProp);
         option.property && initParam(JSON.parse(option.property));
-      });
+        node.remove();
+      }, {once: true});
+
+      form.querySelectorAll('.onlyOne').forEach(n => n.remove());
     }
 
     this.queryParam.form = form;
@@ -211,7 +212,6 @@ export class Options extends Common {
   //--------------------------------------------------------------------------------------------------------------------
 
   onEvent() {
-    this.node.field.addEventListener('click', (e) => this.commonEvent(e));
-    this.onCommonEvent();
+    this.node.field.addEventListener('click', e => this.commonEvent(e));
   }
 }

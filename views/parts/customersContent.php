@@ -28,8 +28,9 @@
       <?php if (isset($columns)) {
         foreach ($columns as $item) { ?>
           <th>
-            <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>"
-                   data-ordercolumn="<?= $item['dbName']; ?>">
+            <input type="button" class="btn btn-info btn-sm table-th"
+                   value="<?= $item['name']; ?>"
+                   data-column="<?= $item['dbName']; ?>">
           </th>
         <?php }
       } ?>

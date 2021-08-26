@@ -114,6 +114,10 @@ export class Common extends Catalog {
     this.setCommonParam();
   }
 
+  getLang(name) {
+    return this.db.lang[this.type][name] || name;
+  }
+
   setCommonParam() {
     this.itemList = new Map();
 
@@ -147,11 +151,21 @@ export class Common extends Catalog {
     data.forEach(i => this.itemList.set(i.ID || i['O.ID'], i));
   }
   setTablesHeaders() {
-    let html = '<tr><th></th>';
-    this.setting.map(i => {
-      html += f.replaceTemplate(this.tmp.tHead, {name: i});
+    let html = '<tr><th></th>',
+        node = this.node.field.querySelector('thead');
+
+    this.setting.map(column => {
+      html += f.replaceTemplate(this.tmp.tHead, {name: this.getLang(column), column});
     });
-    this.node.field.querySelector('tr').innerHTML = html + '</tr>';
+
+    node.innerHTML = html + '</tr>';
+
+    new f.SortColumns({
+      thead: node,
+      query: action => this.query(action).then(data => f.observer.fire('sortEvent', data)),
+      dbAction: this.type === 'elements' ? 'openSection' : 'openElement',
+      sortParam: this.sortParam,
+    });
   }
   setImage(i) {
     if (!Array.isArray(i)) return [];
@@ -198,31 +212,5 @@ export class Common extends Catalog {
     this.setItemsList(data);
     this.showTablesItems(data);
     f.show(this.node.field);
-  }
-
-  // сортировка Элементов
-  sortRows(e) {
-    let input = e.target,
-        colSort = input.dataset.ordercolumn;
-
-    if (!colSort) return;
-
-    this.node.field.querySelector(`input[data-ordercolumn="${colSort}"]`)
-                   .classList.remove(f.CLASS_NAME.SORT_BTN_CLASS);
-    input.classList.add(f.CLASS_NAME.SORT_BTN_CLASS);
-
-    if(this.sortParam.sortColumn === colSort) {
-      this.sortParam.sortDirect = !this.sortParam.sortDirect;
-    } else {
-      this.sortParam.sortColumn = colSort;
-      this.sortParam.sortDirect = false;
-    }
-
-    this.queryParam.dbAction = this.type === 'elements' ? 'openSection' : 'openElement';
-    this.query().then(data => f.observer.fire('sortEvent', data));
-  }
-  onCommonEvent() {
-    // Кнопки сортировки
-    this.node.field.addEventListener('click', e => this.sortRows(e));
   }
 }

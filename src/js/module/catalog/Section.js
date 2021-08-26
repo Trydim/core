@@ -8,7 +8,6 @@ export class Section extends Catalog {
     this.setParam();
     this.setNodes();
     this.onEvent();
-
   }
 
   setParam() {
@@ -124,7 +123,6 @@ export class Section extends Catalog {
     this.queryParam.sectionId = this.node.cSection.dataset.id || false;
     if (!this.queryParam.sectionId) return;
     f.observer.fire('openSection', this.queryParam.sectionId);
-    this.query().then(data => f.observer.fire('loadElements', data));
   }
   // Изменить
   changeSection() {
@@ -194,7 +192,7 @@ export class Section extends Catalog {
   //--------------------------------------------------------------------------------------------------------------------
 
   onEvent() {
-    this.node.main.addEventListener('click', (e) => this.commonEvent(e));
-    this.node.main.addEventListener('dblclick', (e) => this.dbClickSection(e));
+    this.node.main.addEventListener('click', e => this.commonEvent(e));
+    this.node.main.addEventListener('dblclick', e => this.dbClickSection(e));
   }
 }
