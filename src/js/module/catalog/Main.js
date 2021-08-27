@@ -89,6 +89,22 @@ export class Catalog {
     }
   }
 
+  // Двойной клик (изменить)
+  dblClick(e) {
+    debugger
+    let id = e.target.closest('tr').querySelector('[data-id]').dataset.id,
+        module = this['id'],
+        selectedIds = module.getSelected();
+
+    //module.clear();
+    module.addSelectedId(id);
+    e.target.dataset.action = this.type === 'elements' ? 'changeElements' : 'changeOptions';
+    this.commonEvent(e);
+
+    //module.addSelectedId(selectedIds);
+    delete e.target.dataset.action;
+  }
+
   // Bind events
   //--------------------------------------------------------------------------------------------------------------------
 

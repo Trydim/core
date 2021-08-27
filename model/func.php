@@ -294,6 +294,13 @@ function convert($type, $value) {
   return $value;
 }
 
+function convertToArray($value) {
+  if (is_array($value)) return $value;
+  if (is_string($value)) {
+    return array_map(function ($item) { return trim($item); }, explode(',', $value));
+  }
+}
+
 /**
  * @param string $lang
  */

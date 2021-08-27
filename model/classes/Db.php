@@ -433,26 +433,34 @@ class Db extends \R {
             JOIN money MI on MI.ID = O.money_input_id
             JOIN money MO on MO.ID = O.money_output_id
             JOIN units U on U.ID = O.unit_id
-            WHERE E.activity <> 0 OR O.activity <> 0";
+            WHERE (E.activity <> 0 OR O.activity <> 0)";
 
     if (count($filter)) {
       $filterArr = [];
-      foreach ($filter as $k => $v) {
+      foreach ($filter as $k => $values) {
         $k = $this->getAlias(AQueryWriter::camelsSnake($k));
-        $filterArr[] = "$k LIKE '$v'";
+        $values = convertToArray($values);
+        $str = '(';
+        foreach($values as $index => $v) {
+          $index > 0 && $str .= " OR ";
+          $str .= "$k LIKE '$v'";
+        }
+        $filterArr[] = $str . ')';
       }
 
       $sql .= ' AND ' . implode(' AND ', $filterArr);
-      unset($filter, $filterArr);
+      unset($filterArr, $filter, $k, $values, $str, $index);
     }
+
+    $sql .= ' ORDER BY E.sort, O.sort';
 
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
-        $option['images'] = $this->setImages($option['images']);
+        $option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
+        //$option['images'] = $this->setImages($option['images']);
       }
 
       // set property

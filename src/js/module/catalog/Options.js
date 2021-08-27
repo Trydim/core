@@ -213,5 +213,6 @@ export class Options extends Common {
 
   onEvent() {
     this.node.field.addEventListener('click', e => this.commonEvent(e));
+    this.node.field.addEventListener('dblclick', e => this.dblClick(e));
   }
 }
