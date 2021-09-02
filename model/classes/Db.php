@@ -417,7 +417,8 @@ class Db extends \R {
   }
 
   /**
-   * @param array $filter
+   * Load for calculator
+   * @param array  $filter
    * @param int    $pageNumber
    * @param int    $countPerPage
    * @param string $sortColumn
