@@ -59,15 +59,15 @@ export class Elements extends Common {
   //--------------------------------------------------------------------------------------------------------------------
   // Создать элемент
   createElement() {
-    if (this.checkSection()) return;
-
     let form = this.tmp.form.cloneNode(true);
     let node = form.querySelector('[name="type"]');
     node.value = this.getPopularType();
 
     node = form.querySelector('[name="parentId"]');
-    node.value = this.queryParam.sectionId;
-    node.disabled = true;
+    if (this.queryParam.sectionId) {
+      node.value    = this.queryParam.sectionId;
+      node.disabled = true;
+    }
 
     this.queryParam.form = form;
     this.M.show('Создание элемента', form);
@@ -166,6 +166,7 @@ export class Elements extends Common {
     this.reloadAction = {
       dbAction: 'openSection',
       callback: data => {
+        f.observer.fire('delElements', this.id.getSelected());
         this.id.clear();
         this.load(data);
       },

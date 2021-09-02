@@ -2,7 +2,7 @@
 
 export class Catalog {
   constructor(type, props = {}) {
-    this.M = props.modal || f.initModal();
+    this.M = props['modal'] || f.initModal();
     this.delayFunc = () => {};
 
     this.reloadAction = false;
@@ -50,7 +50,8 @@ export class Catalog {
     action && data.set('dbAction', action);
 
     Object.entries(this.queryFiles).forEach(([id, file]) => {
-      data.append('files' + id, file, file.name);
+      if (file instanceof File) data.append('files' + id, file, file.name);
+      else data.set('files' + id, JSON.stringify(file));
     });
     data.delete('files');
 
@@ -119,7 +120,9 @@ export class Catalog {
   }
 
   onMainEvent() {
-    this.M.btnConfirm.addEventListener('click', e => this.commonEvent(e));
+    [this.M.btnConfirm, this.M.btnCancel].forEach(n => {
+      n.addEventListener('click', e => this.commonEvent(e));
+    });
   }
 }
 
@@ -151,15 +154,18 @@ export class Common extends Catalog {
   setNodes(field, tmp) {
     this.node = {
       field,
-      fieldT: field.querySelector('table'),
+      tableWrap : field.querySelector('[data-field="tableWrap"]'),
+      fieldT    : field.querySelector('table'),
       fieldTBody: field.querySelector('tbody'),
+      btnWrap   : field.querySelector('[data-field="btnWrap"]'),
     };
     this.tmp = {
-      tHead: tmp.tHead,
+      tHead   : tmp.tHead,
       checkbox: tmp.checkbox,
-      imgCell: tmp.imgCell,
-      img: tmp.img,
-      form: f.gTNode(`#${this.type}Form`),
+      imgCell : tmp.imgCell,
+      img     : tmp.img,
+      form    : f.gTNode(`#${this.type}Form`),
+      chooseFile: f.gT('#chooseFileTmp'),
     };
   }
   setItemsList(data) {
@@ -226,7 +232,12 @@ export class Common extends Catalog {
   }
   prepareItems(data) {
     this.setItemsList(data);
-    this.showTablesItems(data);
-    f.show(this.node.field);
+    if (data.length) {
+      this.showTablesItems(data);
+      f.show(this.node.tableWrap, this.node.btnWrap);
+    } else {
+      f.showMsg('Раздел пустой');
+      f.hide(this.node.tableWrap, this.node.btnWrap);
+    }
   }
 }

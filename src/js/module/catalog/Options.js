@@ -21,11 +21,12 @@ export class Options extends Common {
 
     f.observer.subscribe(`openElement`, d => this.open(d));
     f.observer.subscribe(`sortEvent`, d => this.load(d));
+    f.observer.subscribe(`delElements`, d => this.checkElements(d));
     this.onEvent();
   }
 
   setFileModal() {
-    this.fModal = f.initModal({ /*template: f.*/ });
+    this.fModal = f.initModal();
   }
   open(id) {
     this.queryParam.elementsId = id;
@@ -33,14 +34,13 @@ export class Options extends Common {
     this.query().then(d => this.load(d));
   }
   load(data) {
-    f.hide(this.node.field);
+    f.hide(this.node.tableWrap);
     this.id.clear();
     data['options'] && this.prepareItems(data['options']);
     data['countRowsOptions'] && this.paginator.setCountPageBtn(data['countRowsOptions']);
   }
-  checkElements() {
-    if (!this.queryParam.elementsId) { f.showMsg('Ошибка элемента', 'error'); return true; }
-    return false;
+  checkElements(id) {
+    id.includes(this.queryParam.elementsId) && f.hide(this.node.field);
   }
   changeMoneyInput(e, nodePercent, nodeOutput) {
     nodeOutput.value = +e.target.value * (1 + +nodePercent.value / 100);
@@ -70,30 +70,36 @@ export class Options extends Common {
     input.type = 'file';
     node.files = input.files;
   }
-  getFileTemplate(file, i) {
-    return `<div class="attach__item ${file.fileError ? this.cssClass.error : ''}">
-        <span class="bold">${file.name}</span>
-        <span class="table-basket__cross"
-              data-id="${i}"
-              data-action="removeFile"></span></div>`;
-  }
   showFiles(fileField) {
     let html = '';
 
-    Object.entries(this.queryFiles).forEach(([i, file]) => {
-      html += this.getFileTemplate(file, i);
+    Object.entries(this.queryFiles).forEach(([index, file]) => {
+      html += f.replaceTemplate(this.tmp.chooseFile, {
+        index,
+        name : file.name,
+        error: file.fileError ? this.cssClass.error : '',
+      });
     });
 
     fileField.innerHTML = html;
   }
-  initChooseFile(form) {
+  initChooseFile(form, option) {
     const inputN = form.querySelector('input[type="file"]'),
           fileField = form.querySelector('#fileField'),
           btnN = form.querySelector('[name="chooseFile"]'),
           data = new FormData();
 
+    data.set('mode', 'DB');
+    data.set('dbAction', 'loadFiles');
+
+    btnN.addEventListener('click', () => {
+      f.Post({data}).then(data => {
+        this.fModal.show('Выбор файлов');
+      });
+    });
+
     inputN.addEventListener('change', () => {
-      for (const file of Object.values(inputN.files)) {
+      Object.values(inputN.files).forEach(file => {
         let id = Math.random() * 10000 | 0;
 
         file.fileError = file.size > 1024*1024;
@@ -101,20 +107,17 @@ export class Options extends Common {
 
         this.queryFiles[id] && (id += '1');
         this.queryFiles[id] = file;
-      }
+      });
       this.clearFiles(inputN);
       this.showFiles(fileField);
-    })
-
-    data.set('mode', 'DB');
-    data.set('dbAction', 'loadFiles');
-
-    btnN.addEventListener('click', () => {
-      f.Post({data}).then(data => {
-        debugger
-        this.fModal.show('Выбор файлов');
-      })
     });
+
+    if (option.images.length) {
+      option.images.forEach(img => {
+        this.queryFiles[img.ID] = {name: img.name, path: img.path};
+      });
+      this.showFiles(fileField);
+    }
   }
 
   // Events function
@@ -165,7 +168,7 @@ export class Options extends Common {
       option.property && initParam(JSON.parse(option.property));
       this.initMoneyControl(form, option);
       //this.initImages(form, option.images);
-      this.initChooseFile(form);
+      this.initChooseFile(form, option);
     } else {
       const node = form.querySelector('#property');
       node.addEventListener('change', () => {

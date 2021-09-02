@@ -84,39 +84,49 @@ $field['content'] = <<<content
       </div>
     </div>
     <div class="col-9">
-      <div class="d-none bg-style-sheet" id="elementsField">
-        <table class="text-center table table-striped" style="cursor: pointer; user-select: none">
-          <thead><tr></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div class="text-center pageWrap"></div>
+      <div class="bg-style-sheet" id="elementsField">
+        <div class="d-none" data-field="tableWrap">
+          <table class="table table-striped text-center" style="cursor: pointer; user-select: none">
+            <thead><tr></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="text-center pageWrap"></div>
+        </div>
         <div class="mt-1 controlWrap">
           <input class="btn btn-success" type="button" value="Создать элемент" data-action="createElement">
-          <input class="btn btn-warning" type="button" value="Открыть элемент" data-action="openElement">
-          <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
-          <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElement">
-          <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
-          <input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
-          <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
+          <span class="d-none" data-field="btnWrap">
+            <input class="btn btn-warning" type="button" value="Открыть элемент" data-action="openElement">
+            <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
+            <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElement">
+            <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
+            <input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
+            <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
+          </span>
         </div>
       </div>
     </div>
   </div>
 </div>
 <hr>
-<div class="container-fluid d-none bg-style-sheet" id="optionsField">
-  <div class="row m-2" style="overflow: auto">
+<div class="container-fluid bg-style-sheet" id="optionsField">
+  <div class="d-none" data-field="tableWrap">
+    <div class="row m-2" style="overflow: auto">
     <table class="text-center table table-striped" style="cursor: pointer">
       <thead><tr></tr></thead>
       <tbody></tbody>
     </table>
   </div>
-  <div class="text-center pageWrap"></div>
+    <div class="text-center pageWrap"></div>
+  </div>
   <div class="mt-1 text-center controlWrap">
     <input class="btn btn-success" type="button" value="Добавить вариант" data-action="createOption">
-    <input class="btn btn-warning" type="button" value="Изменить вариант" data-action="changeOptions">
-    <input class="btn btn-warning" type="button" value="Копировать вариант" data-action="copyOption">
-    <input class="btn btn-danger" type="button" value="Удалить вариант" data-action="delOptions">
+    <span class="d-none" data-field="btnWrap">
+      <input class="btn btn-warning" type="button" value="Изменить вариант" data-action="changeOptions">
+      <input class="btn btn-warning" type="button" value="Копировать вариант" data-action="copyOption">
+      <input class="btn btn-danger" type="button" value="Удалить вариант" data-action="delOptions">
+      <input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
+      <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
+    </span>
   </div>
 </div>
 content;
@@ -247,6 +257,12 @@ $field['footerContent'] .= <<<footerContent
       $propertiesHtml
     </div>
   </form>
+</template>
+<template id="chooseFileTmp">
+  <div class="attach__item d-flex justify-content-around \${error}">
+    <span class="bold">\${name}</span>
+    <span class="table-basket__cross btn btn-sm btn-danger" data-id="\${index}" data-action="removeFile">x</span>
+  </div> 
 </template>
 <template id="onePageInput">
   <input type="button" value="\${pageValue}" class="ml-1 mr-1" data-action="page" data-page="\${page}">

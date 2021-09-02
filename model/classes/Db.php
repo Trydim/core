@@ -417,11 +417,14 @@ class Db extends \R {
   }
 
   /**
-   * Load for calculator
    * @param array $filter
-   * @return array|null
+   * @param int    $pageNumber
+   * @param int    $countPerPage
+   * @param string $sortColumn
+   * @param false  $sortDirect
+   * @return array
    */
-  public function loadOptions($filter = []) {
+  public function loadOptions($filter = [], int $pageNumber = 0, $countPerPage = -1, $sortColumn = ['name'], $sortDirect = false) {
     $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
                    O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
@@ -435,6 +438,7 @@ class Db extends \R {
             JOIN units U on U.ID = O.unit_id
             WHERE (E.activity <> 0 OR O.activity <> 0)";
 
+    // Filter
     if (count($filter)) {
       $filterArr = [];
       foreach ($filter as $k => $values) {
@@ -451,16 +455,21 @@ class Db extends \R {
       $sql .= ' AND ' . implode(' AND ', $filterArr);
       unset($filterArr, $filter, $k, $values, $str, $index);
     }
-
+    // Sorting
     $sql .= ' ORDER BY E.sort, O.sort';
+    // Paginate
+    if ($countPerPage !== -1) {
+      $pageNumber *= $countPerPage;
+      $sql .= " LIMIT $countPerPage OFFSET $pageNumber";
+    }
 
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
-        //$option['images'] = $this->setImages($option['images']);
+        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
+        $option['images'] = $this->setImages($option['images']);
       }
 
       // set property

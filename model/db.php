@@ -276,6 +276,18 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['activity'] = (integer) isset($activity);
         $param['0']['sort'] = $sort ?? 100;
         $result['error'] = $db->insert($columns, 'elements', $param);
+
+        // Проверка на срабатываение триггера
+        $haveOptions = $db->selectQuery('options_elements', 'ID', " name = '$name' ");
+        if (!count($haveOptions)) {
+          $columns = $db->getColumnsTable('options_elements');
+          $elementsId = $db->getLastID('elements');
+          $param = ['0' => [
+            'element_id' => $elementsId,
+            'name'       => $name,
+          ]];
+          $result['error'] = $db->insert($columns, 'options_elements', $param);
+        }
       }
       break;
     case 'openElement':
@@ -369,7 +381,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         }
 
         // проверить просто id;
-
         $property = [];
         foreach ($_REQUEST as $key => $value) {
           if (stripos($key, 'prop_') !== false
