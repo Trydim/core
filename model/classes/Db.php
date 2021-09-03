@@ -503,8 +503,8 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
-        $option['images'] = $this->setImages($option['images']);
+        $option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
+        //$option['images'] = $this->setImages($option['images']);
       }
 
       // set property
