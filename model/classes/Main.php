@@ -52,8 +52,6 @@ trait Authorization {
     return $this;
   }
 
-
-
   public function setSideMenu() {
     if (USE_DATABASE) {
       $menuAccess = isset($this->getSettings('permission')['menuAccess'])
@@ -70,6 +68,10 @@ trait Authorization {
     }
     PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
     $this->sideMenu[] = 'setting';
+  }
+
+  public function isAdmin() {
+    return $this->admin;
   }
 
   public function getSideMenu($first = false) {

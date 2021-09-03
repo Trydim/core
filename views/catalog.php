@@ -242,7 +242,7 @@ $field['footerContent'] .= <<<footerContent
       </div>
       
       <div class="row onlyOne">
-        <div class="col">
+        <div class="col-12">
           <input type="file" class="d-none" name="files" id="uploadFile" multiple>
           <label class="btn btn-warning" for="uploadFile">Загрузить</label>
           <input type="button" class="btn btn-warning" name="chooseFile" value="Выбрать">
@@ -259,10 +259,19 @@ $field['footerContent'] .= <<<footerContent
   </form>
 </template>
 <template id="chooseFileTmp">
-  <div class="attach__item d-flex justify-content-around \${error}">
+  <div class="d-flex justify-content-between border-bottom \${error}">
     <span class="bold">\${name}</span>
     <span class="table-basket__cross btn btn-sm btn-danger" data-id="\${index}" data-action="removeFile">x</span>
-  </div> 
+  </div>
+</template>
+<template id="chooseLoadedFileTmp">
+  <div class="text-center">
+    <img src="\${image}" alt="" class="img-fluid">
+    <div>
+      <input type="checkbox" name="files[]" value="\${id}">
+      <span class="bold">\${name}</span>
+    </div>
+  </div>
 </template>
 <template id="onePageInput">
   <input type="button" value="\${pageValue}" class="ml-1 mr-1" data-action="page" data-page="\${page}">

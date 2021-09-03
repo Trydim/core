@@ -346,6 +346,40 @@ class Db extends \R {
     return $this->selectQuery('files', '*', $filters);
   }
 
+  public function setFiles(&$result, $imageIds) {
+    $uploadDir = SHARE_DIR . 'upload/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+    if (isset($_FILES) && count($_FILES)) {
+      foreach ($_FILES as $file) {
+        $uploadFile = $uploadDir . $file['name'];
+        // Проверить все
+        if (!$file['size']) continue;
+
+        // Если файл существует
+        if (file_exists($uploadFile)) {
+          !isset($result['fileExist']) && $result['fileExist'] = [];
+          $result['fileExist'][] = $file['name'];
+          continue;
+        }
+
+        if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
+          $this->insert([], 'files', ['0' => [
+            'name' => $file['name'],
+            'path' => $uploadFile,
+            'format' => $file['type'],
+          ]]);
+          $imageIds[] = $this->getLastID('files');
+        } else {
+          $result['error'] = 'Mover file error: ' . $file['name'];
+        }
+
+      }
+    }
+
+    return implode(',', $imageIds);
+  }
+
   // Elements
   //------------------------------------------------------------------------------------------------------------------
 
@@ -425,7 +459,7 @@ class Db extends \R {
    * @param false  $sortDirect
    * @return array
    */
-  public function loadOptions($filter = [], int $pageNumber = 0, $countPerPage = -1, $sortColumn = ['name'], $sortDirect = false) {
+  public function loadOptions($filter = [], int $pageNumber = 0, $countPerPage = -1) {
     $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
                    O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',

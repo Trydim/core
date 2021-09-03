@@ -307,8 +307,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $elements = $db->selectQuery('elements', ['ID', 'name'], " name = '$name' ");
           if (count($elements) > 1 || empty($name)
               || (count($elements) === 1 && $elements[0]['ID'] !== $elementsId[0])) {
-            $result['error'] = 'element_name_exist';
-            break;
+            $result['error'] = 'element_name_exist'; break;
           }
         }
 
@@ -351,42 +350,15 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['activity'] = isset($activity);
         $param['0']['sort'] = $sort ?? 100;
 
-        if (isset($_FILES) && count($_FILES)) {
-          $uploadDir = SHARE_DIR . 'upload/';
-          $imageIds = [];
-          if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-
-          foreach ($_FILES as $file) {
-            // Проверить все
-            if (!$file['size']) continue;
-
-            // Если файл существует
-            if (file_exists($uploadDir . $file['name'])) {
-              !isset($result['fileExist']) && $result['fileExist'] = [];
-              $result['fileExist'][] = $file['name'];
-              continue;
-            }
-
-            move_uploaded_file($file['tmp_name'], $uploadDir . $file['name']);
-
-            $fparam = ['0' => [
-              'name' => $file['name'],
-              'path' => 'upload/' . $file['name'],
-              'format' => pathinfo($uploadDir . $file['name'], PATHINFO_EXTENSION),
-            ]];
-            $db->insert([], 'files', $fparam);
-            $imageIds[] = $db->getLastID('files');
-          }
-          $param['0']['images_ids'] = implode(',', $imageIds);
-        }
-
-        // проверить просто id;
         $property = [];
-        foreach ($_REQUEST as $key => $value) {
-          if (stripos($key, 'prop_') !== false
-              && !empty($value)) $property[$key] = $value;
+        $imageIds = [];
+        $param['0']['property'] = json_encode($property);
+        foreach ($_REQUEST as $k => $v) {
+          stripos($k, 'prop_') === 0 && !empty($v) && $property[$k] = $v;
+          stripos($k, 'files') === 0 && $param['0']['images_id'][] = $v;
         }
         $param['0']['property'] = json_encode($property);
+        $param['0']['images_ids'] = $db->setFiles($result, $imageIds);
 
         $result['error'] = $db->insert($columns, 'options_elements', $param);
       }
@@ -409,12 +381,14 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $param[$id]['activity'] = isset($activity);
 
           $property = [];
+          $imageIds = [];
           foreach ($_REQUEST as $k => $v) {
             stripos($k, 'prop_') === 0 && !empty($v) && $property[$k] = $v;
+            stripos($k, 'files') === 0 && $imageIds[] = $v;
           }
           $param[$id]['property'] = json_encode($property);
 
-          //isset($imageId) && ($param[$id]['images_id'] = $imageId);
+          $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
         }
 
         $result['error'] = $db->insert($columns, $dbTable, $param, true);
@@ -618,6 +592,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Files
     case 'loadFiles':
       $result['files'] = $db->selectQuery('files');
+      $result['files'] = array_map(function ($files) {
+        $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($files['path']));
+        $files['path'] = $path ? $path : $files['path'];
+        return $files;
+      }, $result['files']);
       break;
 
     case 'openOrders': /* TODO когда это отправляется */

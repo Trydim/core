@@ -70,6 +70,19 @@ export class Options extends Common {
     input.type = 'file';
     node.files = input.files;
   }
+  showLoadedFiles(data) {
+    let html = '';
+
+    data.forEach(file => {
+      html += f.replaceTemplate(this.tmp.chooseLoadedFile, {
+        id: file.ID,
+        name : file.name,
+        image: file.path,
+      });
+    });
+
+    this.fModal.show('Выбор файлов', html);
+  }
   showFiles(fileField) {
     let html = '';
 
@@ -86,16 +99,13 @@ export class Options extends Common {
   initChooseFile(form, option) {
     const inputN = form.querySelector('input[type="file"]'),
           fileField = form.querySelector('#fileField'),
-          btnN = form.querySelector('[name="chooseFile"]'),
-          data = new FormData();
+          btnN = form.querySelector('[name="chooseFile"]');
 
-    data.set('mode', 'DB');
-    data.set('dbAction', 'loadFiles');
+    this.queryFiles = Object.create(null);
 
     btnN.addEventListener('click', () => {
-      f.Post({data}).then(data => {
-        this.fModal.show('Выбор файлов');
-      });
+      f.Get({data: 'mode=DB&dbAction=loadFiles'})
+       .then(data => data['files'] && this.showLoadedFiles(data['files']));
     });
 
     inputN.addEventListener('change', () => {
@@ -110,6 +120,16 @@ export class Options extends Common {
       });
       this.clearFiles(inputN);
       this.showFiles(fileField);
+    });
+
+    fileField.addEventListener('click', e => {
+      e.preventDefault();
+      const action = e.target.dataset.action;
+
+      if (action === 'removeFile') {
+        delete this.queryFiles[e.target.dataset.id];
+        this.showFiles(fileField);
+      }
     });
 
     if (option.images.length) {

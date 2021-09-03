@@ -51,7 +51,7 @@ export class Catalog {
 
     Object.entries(this.queryFiles).forEach(([id, file]) => {
       if (file instanceof File) data.append('files' + id, file, file.name);
-      else data.set('files' + id, JSON.stringify(file));
+      else data.set('files' + id, id);
     });
     data.delete('files');
 
@@ -92,7 +92,6 @@ export class Catalog {
 
   // Двойной клик (изменить)
   dblClick(e) {
-    debugger
     let id = e.target.closest('tr').querySelector('[data-id]').dataset.id,
         module = this['id'],
         selectedIds = module.getSelected();
@@ -165,7 +164,8 @@ export class Common extends Catalog {
       imgCell : tmp.imgCell,
       img     : tmp.img,
       form    : f.gTNode(`#${this.type}Form`),
-      chooseFile: f.gT('#chooseFileTmp'),
+      chooseFile      : f.gT('#chooseFileTmp'),
+      chooseLoadedFile: f.gT('#chooseLoadedFileTmp'),
     };
   }
   setItemsList(data) {

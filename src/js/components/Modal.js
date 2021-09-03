@@ -47,7 +47,11 @@ export const Modal = (param = {}) => {
    */
   modal.show = function (title, content = '') {
     this.title && title !== undefined && f.eraseNode(this.title).append(title);
-    this.content && content && f.eraseNode(this.content).append(content);
+    if (this.content && content) {
+      f.eraseNode(this.content);
+      typeof content === 'string' ? this.content.insertAdjacentHTML('afterbegin', content)
+                                  : this.content.append(content);
+    }
 
     data.bodyOver = document.body.style.overflow;
     data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
