@@ -1,8 +1,6 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 require_once basename( __DIR__ ) . '/cmsSetting.php';
-//setUserLocale('ru_RU');
-//$main = new cms\Main();
 
 if(isset($_REQUEST['mode'])) require 'model/main.php';
 else {

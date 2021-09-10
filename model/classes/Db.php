@@ -347,33 +347,47 @@ class Db extends \R {
   }
 
   public function setFiles(&$result, $imageIds) {
-    $uploadDir = SHARE_DIR . 'upload/';
+    $dbDir = 'upload/';
+    $uploadDir = SHARE_DIR . $dbDir;
+
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
     if (isset($_FILES) && count($_FILES)) {
       foreach ($_FILES as $file) {
+        $dbFile = $dbDir . $file['name'];
         $uploadFile = $uploadDir . $file['name'];
+
         // Проверить все
         if (!$file['size']) continue;
 
         // Если файл существует
         if (file_exists($uploadFile)) {
           !isset($result['fileExist']) && $result['fileExist'] = [];
+
           $result['fileExist'][] = $file['name'];
-          continue;
+          if (filesize($uploadFile) === $file['size']) {
+            $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
+            if (count($id) === 1) { $imageIds[] = $id[0]; continue;
+            } else unlink($uploadFile);
+
+          } else {
+            $name = pathinfo($file['name'], PATHINFO_BASENAME) . '_' . rand();
+            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $file['name'] = $name . $ext;
+
+            $dbFile = $dbDir . $file['name'];
+            $uploadFile = $uploadDir . $file['name'];
+          }
         }
 
         if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
           $this->insert([], 'files', ['0' => [
-            'name' => $file['name'],
-            'path' => $uploadFile,
+            'name'   => $file['name'],
+            'path'   => $dbFile,
             'format' => $file['type'],
           ]]);
           $imageIds[] = $this->getLastID('files');
-        } else {
-          $result['error'] = 'Mover file error: ' . $file['name'];
-        }
-
+        } else $result['error'] = 'Mover file error: ' . $file['name'];
       }
     }
 

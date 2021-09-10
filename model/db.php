@@ -388,7 +388,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           }
           $param[$id]['property'] = json_encode($property);
 
-          $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
+          count($optionsId) === 1 && $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
         }
 
         $result['error'] = $db->insert($columns, $dbTable, $param, true);

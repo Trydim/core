@@ -103,20 +103,17 @@ if (isset($setAction)) {
           $result['error'] = $db->insert($columns, 'permission', $param, true);
         }
       } else {
-        $password = '123'; // default password
         $hash = '';
 
-        if ($password && $password === $passwordRepeat) $param['password'] = $password;
+        if (isset($password) && isset($passwordRepeat) && $password === $passwordRepeat)
+          $hash = password_hash($password, PASSWORD_BCRYPT);
 
-        if(file_exists(SYSTEM_PATH)) {
-          $param = explode('|||', file_get_contents(SYSTEM_PATH))[2];
-
-          $password = $param[1];
-          $hash = $param[2];
+        if(!isset($passwordRepeat) && !file_exists(SYSTEM_PATH)) {
+          $password = '123';
+          $hash = password_hash($password, PASSWORD_BCRYPT);
         }
 
-        $fileData = implode('|||', [$login, $password, $hash]);
-        file_put_contents(SYSTEM_PATH, $fileData);
+        file_put_contents(SYSTEM_PATH, implode('|||', [$login, $password, $hash]));
       }
 
       // Global mail setting

@@ -16,7 +16,7 @@ if (!$main->checkStatus('error') && isset($_SESSION['hash']) && $_SESSION['id'] 
   $db = new RedBeanPHP\Db($dbConfig);
   if ($db->checkUserHash($_SESSION)) {
     $main->setLogin($_SESSION);
-    $target === '' && reDirect(true);
+    $target === '' && reDirect(true, HOME_PAGE);
   } else {
     $main->setLoginStatus('no');
   }

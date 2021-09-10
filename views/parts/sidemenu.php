@@ -51,7 +51,7 @@ menu;
 <div class="sidebar"> <!-- data-background-color="white"-->
 
   <div class="logo ml-3">
-    <a href="/" class="simple-text logo-normal">Logo</a>
+    <a href="<?= SITE_PATH ?>" class="simple-text logo-normal">Logo</a>
   </div>
   <div class="sidebar-wrapper">
     <ul id="sideMenu" class="nav">

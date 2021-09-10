@@ -40,6 +40,12 @@ class Docs {
    */
   private $docs;
 
+  /**
+   * temp files path, unlink after make pdf
+   * @var array
+   */
+  private $tmpFiles = [];
+
   public function __construct($docsType, $data, $fileTpl = 'default') {
     $this->docsType = $docsType;
     $this->data = $data;
@@ -284,11 +290,19 @@ class Docs {
     }
   }
 
+  /**
+   * @param string $dest
+   * @return mixed
+   */
   public function getDocs($dest = 'S') {
     $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
     if (!is_dir($path)) mkdir($path);
+
     $func = 'get' . $this->getFunc();
-    return $this->$func($path, $dest);
+    $result = $this->$func($path, $dest);
+
+    $this->unlinkTmpFiles();
+    return $result;
   }
 
   /**
@@ -301,5 +315,21 @@ class Docs {
   public function setNumFormat($total, $spacer = ' ', $precision = 0) {
     is_numeric($total) && $total = round(floatval($total), $precision);
     return preg_replace('/\B(?=(\d{3})+(?!\d))/', $spacer, $total);
+  }
+
+  /**
+   * @param $path
+   */
+  public function setTmpFile($path) {
+    $this->tmpFiles[] = $path;
+  }
+
+  /**
+   * remove temporary files added during creation pdf
+   */
+  public function unlinkTmpFiles() {
+    array_map(function ($path) {
+      unlink($path);
+    }, $this->tmpFiles);
   }
 }
