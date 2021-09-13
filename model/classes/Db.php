@@ -411,6 +411,27 @@ class Db extends \R {
     //return self::getAll($sql, [':sectionID', $sectionID]);
   }
 
+  public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
+    $pageNumber *= $countPerPage;
+    $searchValue = str_replace(' ', '%', $searchValue);
+
+    $sql = "SELECT ID, E.name AS 'E.name', activity, sort, last_edit_date AS 'lastEditDate',
+                   C.symbol_code AS 'symbolCode', C.name AS 'C.name'
+    FROM elements E
+    JOIN codes C on C.symbol_code = E.element_type_code
+    WHERE E.name LIKE '%$searchValue%'
+    ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
+
+    //$countPerPage OFFSET $pageNumber;
+
+    $res = self::getAll($sql);
+
+    return [
+      'elements'          => array_slice($res, $pageNumber, $countPerPage),
+      'countRowsElements' => count($res)
+    ];
+  }
+
   // Options
   //------------------------------------------------------------------------------------------------------------------
 

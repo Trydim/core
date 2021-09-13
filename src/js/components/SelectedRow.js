@@ -2,11 +2,15 @@
 
 export class SelectedRow {
   constructor(param) {
-    let {table = f.qS('#table')} = param;
+    let {
+      table = f.qS('#table'),
+      //selectedField = f.qS('#')
+    } = param;
     if (!table) return;
 
     this.table = table;
     this.selectedId = new Set();
+    this.onTableMutator();
     this.onTableEvent();
     f.observer.addArgument(param.type || 'selectedRow', this);
   }
@@ -31,14 +35,6 @@ export class SelectedRow {
     return this.selectedId.size;
   }
 
-  /* Кнопки показать скрыть
-   checkBtnRows() {
-   if (this.selectedId.size === 1) f.show(this.btnOneOrderOnly);
-   else f.hide(this.btnOneOrderOnly);
-   if (this.selectedId.size > 0) f.show(this.btnMoreZero);
-   else f.hide(this.btnMoreZero);
-   },*/
-
   // Выделить выбранные Заказы
   checkedRows(check = true) {
     this.selectedId.forEach(id => {
@@ -55,20 +51,20 @@ export class SelectedRow {
         });
   }
 
+  handle() {
+    this.checkedRows();
+  }
+
+  onTableMutator() {
+    const observer = new MutationObserver(this.handle.bind(this));
+
+    observer.observe(this.table, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
   // Event function
-
-  /*// выбор заказа
-  clickRows(e) {
-    let tr = e.target.closest('tr'),
-        input = tr && tr.querySelector('input'),
-        id = input && input.dataset.id;
-
-    if (!tr || !input || !id) return;
-    input !== e.target && (input.checked = !input.checked);
-    input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
-    //this.checkBtnRows();
-  }*/
-
   mouseOver(e) {
     let tr = e.target.closest('tr');
     if (e.buttons) tr.classList.add('mouseSelected');
@@ -94,7 +90,7 @@ export class SelectedRow {
       input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
     }
 
-    console.log(this.getSelected());
+    f.observer.fire('selectedRow', this.getSelected(), this.getSelectedSize());
     delete this.startClick;
     this.table.querySelectorAll('.mouseSelected')
         .forEach(tr => tr.classList.remove('mouseSelected'));
@@ -102,7 +98,6 @@ export class SelectedRow {
 
   // Bind event
   onTableEvent() {
-    //this.table.onclick = (e) => this.clickRows(e);
     this.table.addEventListener('mouseover', (e) => this.mouseOver(e));
     this.table.addEventListener('mousedown', (e) => this.mouseDown(e));
     this.table.addEventListener('mouseup', (e) => this.mouseUp(e));

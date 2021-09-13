@@ -14,12 +14,14 @@ export class Elements extends Common {
     this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
       dbAction : 'openSection',
       sortParam: this.sortParam,
-      query    : action => this.query(action).then(d => this.load(d)),
+      query    : action => this.query(action).then(d => this.load(d, false)),
     });
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
-    f.observer.subscribe(`sortEvent`, d => this.load(d));
+    f.observer.subscribe(`sortEvent`, d => this.load(d, false));
     f.observer.subscribe(`openSection`, d => this.open(d));
+    f.observer.subscribe(`searchInput`, (d, c) => this.searchEvent(d, c));
+    f.observer.subscribe(`selectedRow`, (a, b, c) => this.selectedRow(a, b, c));
     this.onEvent();
   }
 
@@ -28,11 +30,29 @@ export class Elements extends Common {
     this.queryParam.dbAction = 'openSection';
     this.query().then(d => this.load(d));
   }
-  load(data) {
-    this.id.clear();
+  load(data, idClear = true) {
+    idClear && this.id.clear();
     data['elements'] && this.prepareItems(data['elements']);
     data['countRowsElements'] && this.paginator.setCountPageBtn(data['countRowsElements']);
   }
+  searchEvent(p, clearSearch) {
+    this.sortParam.pageNumber = 0;
+
+    if (clearSearch) {
+      this.paginator.setQueryAction('openSection');
+      this.load({elements: [], countRowsElements: 0});
+    } else {
+      this.queryParam.searchValue = p.value;
+      this.paginator.setQueryAction('searchElements');
+      this.load(p.data);
+    }
+  }
+  selectedRow(a, b, c) {
+    this.node.selectedList.innerHTML = a.map(id => this.itemList.get(id))
+                                        .map(item => `<div>${item['E.name']}</div>`)
+                                        .join('');
+  }
+
   checkSection() {
     if (!this.queryParam.sectionId) { f.showMsg('Ошибка раздела', 'error'); return true; }
     return false;
@@ -182,7 +202,6 @@ export class Elements extends Common {
 
   // Bind events
   //--------------------------------------------------------------------------------------------------------------------
-
   onEvent() {
     this.node.field.addEventListener('click', e => this.commonEvent(e));
     this.node.field.addEventListener('dblclick', e => this.dblClick(e));

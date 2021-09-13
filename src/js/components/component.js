@@ -694,6 +694,9 @@ export class Pagination {
     this.activeClass = ACTIVE_CLASS;
   }
 
+  setQueryAction(action) {
+    this.dbAction = action;
+  }
   setCountPageBtn(count) {
     let pageCount = Math.ceil(+count / this.sortParam.countPerPage );
 

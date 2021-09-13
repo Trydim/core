@@ -3,6 +3,7 @@
 import {Section} from "./Section";
 import {Elements} from "./Elements";
 import {Options} from "./Options";
+import {Search} from "./Search";
 
 export const catalog = {
   init() {
@@ -21,6 +22,7 @@ export const catalog = {
     this.section  = new Section();
     this.elements = new Elements({db, tmp});
     this.options  = new Options({db, tmp});
+    this.serch    = new Search();
 
     this.section.loadSection();
 
@@ -28,10 +30,10 @@ export const catalog = {
       document.querySelector("#sectionField [data-id='9']").click();
       document.querySelector("#sectionField > div.controlWrap > input:nth-child(2)").click();
 
-      setTimeout(() => {
+      /*setTimeout(() => {
         this.elements.id.addSelectedId('241');
         document.querySelector("#elementsField > div.mt-1.controlWrap > input:nth-child(2)").click();
-      }, 500);
+      }, 500);*/
 
     }, 500);
     return this;

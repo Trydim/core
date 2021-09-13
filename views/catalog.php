@@ -73,6 +73,14 @@ if ($properties) {
 $field['content'] = <<<content
 <div class="container-fluid">
   <div class="row">
+    <div id="searchField" class="bg-style-sheet form-group col-12">
+      <label class="w-100">Поиск:
+        <input type="text" data-field="search" name="search" value="" class="form-control" autocomplete="off">
+      </label>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
     <div id="sectionField" class="col-3 overflow-auto bg-style-sheet">
       <div class="openSection" data-action="clickSection" data-id="0">Разделы</div>
       <div class="subSection"></div>
@@ -83,14 +91,14 @@ $field['content'] = <<<content
         <input class="btn btn-danger" type="button" value="Удалить раздел" data-action="delSection">
       </div>
     </div>
-    <div class="col-9">
-      <div class="bg-style-sheet" id="elementsField">
+    <div id="elementsField" class="col">
+      <div class="bg-style-sheet">
         <div class="d-none" data-field="tableWrap">
           <table class="table table-striped text-center" style="cursor: pointer; user-select: none">
             <thead><tr></tr></thead>
             <tbody></tbody>
           </table>
-          <div class="text-center pageWrap"></div>
+          <div class="pageWrap"></div>
         </div>
         <div class="mt-1 controlWrap">
           <input class="btn btn-success" type="button" value="Создать элемент" data-action="createElement">
@@ -99,11 +107,12 @@ $field['content'] = <<<content
             <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
             <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElement">
             <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
-            <input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
+            <input class="btn btn-dark" type="button" value="Выделить все" data-action="selectedAll">
             <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
           </span>
         </div>
       </div>
+      <div class="position-fixed bg-style-sheet" data-field="selectedList" style="right: 0; bottom: 0"></div>
     </div>
   </div>
 </div>
@@ -111,12 +120,12 @@ $field['content'] = <<<content
 <div class="container-fluid bg-style-sheet" id="optionsField">
   <div class="d-none" data-field="tableWrap">
     <div class="row m-2" style="overflow: auto">
-    <table class="text-center table table-striped" style="cursor: pointer">
-      <thead><tr></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-    <div class="text-center pageWrap"></div>
+      <table class="text-center table table-striped" style="cursor: pointer">
+        <thead><tr></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="pageWrap"></div>
   </div>
   <div class="mt-1 text-center controlWrap">
     <input class="btn btn-success" type="button" value="Добавить вариант" data-action="createOption">

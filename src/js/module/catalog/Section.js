@@ -8,6 +8,8 @@ export class Section extends Catalog {
     this.setParam();
     this.setNodes();
     this.onEvent();
+
+    f.observer.subscribe('searchInput', (d, c) => this.searchEvent(c));
   }
 
   setParam() {
@@ -19,15 +21,12 @@ export class Section extends Catalog {
     this.oneFunc = new f.OneTimeFunction('msgEmpty', this.showMsgEmpty);
   }
   setNodes() {
-    this.node = {
-      main: f.qS('#sectionField'),
-      cSection: document.createElement('div'),
-    };
-    this.tmp = {
-      sectionWrap: f.gTNode('#sectionWrap'),
-      section    : f.gT('#section'),
-      form       : f.gTNode('#sectionForm'),
-    };
+    this.node.main     = f.qS('#sectionField');
+    this.node.cSection = document.createElement('div');
+
+    this.tmp.sectionWrap = f.gTNode('#sectionWrap');
+    this.tmp.section     = f.gT('#section');
+    this.tmp.form        = f.gTNode('#sectionForm');
   }
   showMsgEmpty(sections) {
     if (!sections.length) f.showMsg('Создайте свой первый раздел!', 'warning');
@@ -79,6 +78,10 @@ export class Section extends Catalog {
   getParentSection(id) {
     let section = this.sectionList.get(id);
     return (section.parent && section.parent['ID']) || 0;
+  }
+
+  searchEvent(clearSearch) {
+    clearSearch ? f.show(this.node.main) : f.hide(this.node.main);
   }
 
   // Events function

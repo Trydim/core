@@ -7,7 +7,6 @@ export class Catalog {
 
     this.reloadAction = false;
     this.type         = type;
-    this.sortParam    = Object.create(null);
     this.node         = Object.create(null);
     this.tmp          = Object.create(null);
 
@@ -18,6 +17,7 @@ export class Catalog {
 
   setQueryParam() {
     this.queryParam = Object.create(null);
+    this.sortParam  = Object.create(null);
     this.queryFiles = Object.create(null);
     //this.queryParam.countPerPage = 20;
 
@@ -151,22 +151,15 @@ export class Common extends Catalog {
     );
   }
   setNodes(field, tmp) {
-    this.node = {
-      field,
-      tableWrap : field.querySelector('[data-field="tableWrap"]'),
-      fieldT    : field.querySelector('table'),
-      fieldTBody: field.querySelector('tbody'),
-      btnWrap   : field.querySelector('[data-field="btnWrap"]'),
-    };
-    this.tmp = {
-      tHead   : tmp.tHead,
-      checkbox: tmp.checkbox,
-      imgCell : tmp.imgCell,
-      img     : tmp.img,
-      form    : f.gTNode(`#${this.type}Form`),
-      chooseFile      : f.gT('#chooseFileTmp'),
-      chooseLoadedFile: f.gT('#chooseLoadedFileTmp'),
-    };
+    this.node.field = field;
+    this.node.tableWrap  = field.querySelector('[data-field="tableWrap"]');
+    this.node.fieldT     = field.querySelector('table');
+    this.node.fieldTBody = field.querySelector('tbody');
+    this.node.btnWrap    = field.querySelector('[data-field="btnWrap"]');
+    this.node.selectedList = field.querySelector('[data-field="selectedList"]');
+
+    this.tmp = tmp;
+    this.tmp.form = f.gTNode(`#${this.type}Form`);
   }
   setItemsList(data) {
     this.itemList = new Map();

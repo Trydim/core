@@ -9,19 +9,23 @@ export class Options extends Common {
     const field = f.qS(`#${this.type}Field`);
 
     this.queryParam.tableName = 'options_elements';
+
+    props.tmp.chooseFile       = f.gT('#chooseFileTmp');
+    props.tmp.chooseLoadedFile = f.gT('#chooseLoadedFileTmp');
     this.setNodes(field, props.tmp);
 
     this.setFileModal();
     this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
       dbAction : 'openElement',
       sortParam: this.sortParam,
-      query    : action => this.query(action).then(d => this.load(d)),
+      query    : action => this.query(action).then(d => this.load(d, false)),
     });
     this.id = new f.SelectedRow({table: this.node.fieldT});
 
     f.observer.subscribe(`openElement`, d => this.open(d));
-    f.observer.subscribe(`sortEvent`, d => this.load(d));
+    f.observer.subscribe(`sortEvent`, d => this.load(d, false));
     f.observer.subscribe(`delElements`, d => this.checkElements(d));
+    f.observer.subscribe('searchInput', (d, c) => this.searchEvent(d, c));
     this.onEvent();
   }
 
@@ -33,14 +37,17 @@ export class Options extends Common {
     this.queryParam.dbAction = 'openElement';
     this.query().then(d => this.load(d));
   }
-  load(data) {
+  load(data, idClear = true) {
     f.hide(this.node.tableWrap);
-    this.id.clear();
+    idClear && this.id.clear();
     data['options'] && this.prepareItems(data['options']);
     data['countRowsOptions'] && this.paginator.setCountPageBtn(data['countRowsOptions']);
   }
   checkElements(id) {
     id.includes(this.queryParam.elementsId) && f.hide(this.node.field);
+  }
+  searchEvent(data, clearSearch) {
+    f.hide(this.node.tableWrap, this.node.btnWrap);
   }
   changeMoneyInput(e, nodePercent, nodeOutput) {
     nodeOutput.value = +e.target.value * (1 + +nodePercent.value / 100);
@@ -54,7 +61,7 @@ export class Options extends Common {
     nodePercent.value = (+e.target.value / +nodeInputM.value - 1) * 100;
     this.queryParam[nodePercent.name] = nodePercent.value;
   }
-  initMoneyControl(form, option = {}) {
+  initMoneyControl(form) {
     let nodeInput   = form.querySelector('[name="inputPrice"]');
     let nodePercent = form.querySelector('[name="outputPercent"]');
     let nodeOutput  = form.querySelector('[name="outputPrice"]');

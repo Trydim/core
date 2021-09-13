@@ -327,6 +327,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $db->deleteItem('elements', $elementsId);
       }
       break;
+    case 'searchElements':
+      if (isset($searchValue)) {
+        $result = $db->searchElements($searchValue, $pageNumber, $countPerPage, $sortColumn ?? 'ID', $sortDirect);
+      }
+      break;
 
     // Options
     case 'loadOptions':
