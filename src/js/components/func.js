@@ -20,10 +20,8 @@ const func = {
    * @param node
    * @return {HTMLElement | {}}
    */
-  qS: (selector = '', node = c.calcWrap) => {
-    node = node || document;
-    return node.querySelector(selector) || document.querySelector(selector) || func.log(selector);
-  },
+  qS: (selector = '', node = c.calcWrap) =>
+    (c.calcWrap || document).querySelector(selector) || func.log(selector),
 
   /**
    *
@@ -33,8 +31,7 @@ const func = {
    * @return NodeListOf<HTMLElementTagNameMap[*]>|object
    */
   qA: (selector, nodeKey = null, value = null) => {
-    let  node = c.calcWrap || document,
-         nodeList = node.querySelectorAll(selector);
+    let nodeList = (c.calcWrap || document).querySelectorAll(selector);
     if (!nodeList) return {};
     if (nodeKey && value) nodeList.forEach((item) => {
       if(typeof value === 'function') {
@@ -61,6 +58,42 @@ const func = {
    * @returns {Node}
    */
   gTNode: (selector) => func.qS(selector).content.children[0].cloneNode(true),
+
+  getData(selector) {
+    const node = func.qS(selector),
+          json = node && (JSON.parse(node.value));
+    if (!node) return false;
+    else node.remove();
+    return json;
+  },
+
+  /**
+   * get Object like associative arrays
+   * @param selector
+   * @return object
+   */
+  getDataAsAssoc: selector => {
+    const arr      = func.getData(selector) || [],
+          fItem    = arr[0],
+          fKeys    = Object.keys(fItem);
+
+    let oneValue = false;
+
+    if (fKeys.length === 2 && (fItem['id'] || fItem['key'])) {
+      const res = fKeys.filter(k => !['id', 'key'].includes(k));
+      res.length === 1 && (oneValue = res[0]);
+    }
+
+    return arr.reduce((r, i, index) => {
+      let idKey = i['id'] || i['key'] || Math.random() * 1000 | 0;
+      r[idKey] && (idKey += index.toString());
+      r[idKey] = oneValue ? i[oneValue] : i;
+      return r;
+    }, Object.create(null));
+  },
+  getDataAsMap: selector => new Map(Object.entries(func.getDataAsAssoc(selector) || {})),
+  getDataAsSet: selector => new Set(Object.values(func.getData(selector) || [])),
+  getDataAsArray : selector => Object.values(func.getData(selector) || []),
 
   // перевод в число
   toNumber: (input) => +(input.replace(/(\s|\D)/g, '')),

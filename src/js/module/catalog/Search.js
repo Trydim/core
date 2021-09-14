@@ -36,13 +36,13 @@ export class Search {
     this.timeOut && clearTimeout(this.timeOut);
     this.timeOut = setTimeout(() => {
       const value = e.target.value;
-      if (value) {
+      if (value.length > 1) {
         this.queryParam.searchValue = value;
         this.query().then(data => f.observer.fire('searchInput', {data, value}));
       } else {
         f.observer.fire('searchInput', {}, true);
       }
-    }, 200);
+    }, 500);
   }
 
   onEvent() {

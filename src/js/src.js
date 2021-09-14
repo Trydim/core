@@ -6,12 +6,19 @@ import {c} from "./components/const.js";
 import {f} from "./components/func.js";
 
 import * as module from './components/component.js';
+import {Debugger} from "./components/Debugger";
 import {Modal} from './components/Modal.js';
 import {CustomSelect} from './components/CustomSelect.js';
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
 
 const m = {
+  /**
+   * Debugger
+   */
+  Debugger,
+
+
   initModal : Modal,
   initPrint : module.Print,
   initShadow: (param) => new shadowNode(param),
