@@ -22,7 +22,7 @@ export class Debugger {
 
   clear() {
     this.dataArr = [];
-    this.data    = Object.create(null);
+    this.data    = new Map();
   }
 
   setShowEach(flag) {
@@ -35,8 +35,8 @@ export class Debugger {
     if (Array.isArray(key)) { this.addAsArray(key); return this;}
     if (typeof key === 'object') { this.addAsObject(key); return this;}
 
-    this.data[key] = {key, value, comment};
-    this.dataArr.push(f.replaceTemplate('${key}: ${value} ${comment}', this.data[key]));
+    this.data.set(key, {key, value, comment});
+    this.dataArr.push(f.replaceTemplate('${key}: ${value} ${comment}', this.data.get(key)));
     return this;
   }
   addAsArray(arr) {
@@ -49,7 +49,7 @@ export class Debugger {
   }
 
   getTable() {
-    console.table(this.data);
+    console.table([...this.data.values()]);
   }
 
   getObject() {

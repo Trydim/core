@@ -499,7 +499,7 @@ class Db extends \R {
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
                    O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
                    O.sort AS 'sort', O.last_edit_date as 'lastDate', property, images_ids AS 'images',
-                   MI.name AS 'moneyInput', MO.name AS 'moneyOutput',
+                   MI.code AS 'moneyInput', MO.code AS 'moneyOutput',
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
             FROM options_elements O
             JOIN elements E on E.ID = O.element_id
@@ -812,6 +812,35 @@ class Db extends \R {
         WHERE orders.ID = $orderIds";
 
     return self::getRow($sql);
+  }
+
+  // Money
+  //--------------------------------------------------------------------------------------------------------------------
+
+  public function getMoney() {
+    $queryRes = $this->selectQuery('money');
+
+    $res = [];
+    foreach ($queryRes as $item) {
+      $item['shortName'] = $item['short_name'];
+      unset($item['short_name']);
+      $item['lastEditDate'] = $item['last_edit_date'];
+      unset($item['last_edit_date']);
+      $item['rate'] = floatval($item['rate']);
+
+      $res[$item['code']] = $item;
+    }
+
+    return $res;
+  }
+
+  public function setMoney($rate) {
+    $beans = self::xdispense('money', 1);
+    foreach ($rate as $currency) {
+      $beans->id = $currency['ID'];
+      $beans->rate = $currency['rate'];
+      self::store($beans);
+    }
   }
 
   // Permission

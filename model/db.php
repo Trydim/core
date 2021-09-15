@@ -531,6 +531,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Permission
     case 'loadPermission': break;
 
+    // Rate
+    case 'loadRate':
+      $result['rate'] = $db->getMoney();
+      break;
+
     // Users
     case 'loadUsers':
       !isset($sortColumn) && $sortColumn = 'create_date';

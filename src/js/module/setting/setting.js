@@ -11,6 +11,7 @@ export const setting = {
     custom: f.qS('#customForm'),
     manager: f.qS('#managerForm'),
     permission: f.qS('#permission'),
+    rate: f.qS('#rateForm'),
   },
 
   field   : Object.create(null),
@@ -24,25 +25,31 @@ export const setting = {
     this.setParam();
     this.loadSetting();
 
-    new Properties();
+    new Properties(this.M);
 
     this.onEvent();
     return this;
   },
 
   setParam() {
+    this.M = f.initModal();
+
     if (this.form.manager) {
       this.field.customField = getFieldNode(this.form.manager, 'customField');
       this.template.customField = f.gTNode('#customField');
     }
+
+    if (this.form.rate) {
+      this.template.rateModal = f.gTNode('#rateModalTmp');
+    }
   },
 
-  query(form) {
+  query(data) {
     Object.entries(this.queryParam).map(param => {
-      form.set(param[0], param[1]);
+      data.set(param[0], param[1]);
     })
 
-    return f.Post({data: form}).then(data => {
+    return f.Post({data}).then(data => {
       f.showMsg('Сохранено');
       return data;
     });
@@ -88,7 +95,7 @@ export const setting = {
   //--------------------------------------------------------------------------------------------------------------------
 
   onEvent() {
-    f.qS('#settingForm').addEventListener('click', (e) => this.commonClick(e));
+    f.qS('#settingForm').addEventListener('click', e => this.commonClick(e));
     f.qA('[type="password"]').forEach(n => n.addEventListener('change', (e) => this.changePassword(e)))
   },
 
@@ -112,6 +119,9 @@ export const setting = {
       // Права
       'addPermType': () => this.addPermType(),
       'removePermType': () => this.removePermType(),
+
+      // Курсы
+      'loadRate': () => this.loadRate(),
     }
 
     select[action] && select[action]();
@@ -199,5 +209,26 @@ export const setting = {
     this.query(new FormData()).then(data => {
       if (data['status']) Location.reload();
     });
-  }
+  },
+
+  loadRate() {
+    const data = new FormData();
+    data.set('mode', 'DB');
+    data.set('dbAction', 'loadRate');
+    f.Post({data}).then(data => {
+      if (data['rate']) {
+        const body = this.template.rateModal.querySelector('tbody');
+
+        body.innerHTML = Object.values(data['rate']).map(c =>
+          '<tr>' + Object.entries(c).map(([k, v]) => {
+            if (k === 'ID') return '';
+            else if (k === 'main') return `<td><input type="checkbox" name="${k}" ${+v && 'checked'}></td>`;
+            else return `<td><input type="text" name="${k}" value="${v}"></td>`;
+          }).join('') + '</tr>'
+        ).join('');
+
+        this.M.show('Курсы валют', this.template.rateModal);
+      } else f.showMsg('', 'error');
+    })
+  },
 }

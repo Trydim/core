@@ -4,7 +4,7 @@ $admin = $main->getSettings('admin');
 $catalogProperties = in_array('catalog', $main->getSideMenu());
 ?>
 <div class="row container m-auto" id="settingForm">
-  <? if ($admin) { ?>
+  <?php if ($admin) { ?>
   <div class="col-6">
     <form action="#" id="mailForm" class="row">
       <div class="col-12 d-flex justify-content-between">
@@ -25,7 +25,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       </div>
     </form>
   </div>
-  <? } ?>
+  <?php } ?>
 
   <div class="col-6">
     <form action="#" id="userForm">
@@ -51,13 +51,13 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     </form>
   </div>
 
-  <? if ($admin && USE_DATABASE) {
+  <?php if ($admin && USE_DATABASE) {
     !isset($permStatus) && $permStatus = []; ?>
   <div class="col-6">
     <form action="#" class="row" id="permission">
-      <? if (isset($permIds)) { ?>
+      <?php if (isset($permIds)) { ?>
         <input type="hidden" name="permIds" value="<?= $permIds ?>">
-      <? } ?>
+      <?php } ?>
       <div class="col-12 d-flex justify-content-between">
         <div>Добавить тип доступа</div>
         <div class="w-50">
@@ -69,23 +69,23 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
         <div>Тип доступа</div>
         <div class="w-50">
           <select class="w-80 useToggleOption" data-field="permTypes">
-            <? foreach ($permStatus as $item) { ?>
+            <?php foreach ($permStatus as $item) { ?>
               <option value="<?= $item['ID'] ?>" data-target="perm<?= $item['ID'] ?>"><?= $item['name'] ?></option>
-            <? } ?>
+            <?php } ?>
           </select>
           <input type="button" value="x" data-action="removePermType">
         </div>
       </div>
-      <? foreach ($permStatus as $item) { ?>
-      <div class="col-12 d-flex justify-content-between mt-1 perm<?= $item['ID'] ?>">
+      <?php foreach ($permStatus as $item) { ?>
+      <div class="col-12 d-flex justify-content-between mt-1" data-relation="perm<?= $item['ID'] ?>">
         <div>Доступные меню</div>
         <select name="permMenuAccess_<?= $item['ID'] ?>" multiple size="5" class="w-50">
-          <? foreach ($main->getSideMenu() as $menu) { ?>
+          <?php foreach ($main->getSideMenu() as $menu) { ?>
             <option value="<?= $menu ?>"><?= gTxt($menu) ?></option>
-          <? } ?>
+          <?php } ?>
         </select>
       </div>
-      <? } ?>
+      <?php } ?>
     </form>
   </div>
 
@@ -101,11 +101,30 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       <div class="col-12 d-flex flex-wrap justify-content-between text-center" data-field="customField"></div>
     </form>
   </div>
-  <? } ?>
+  <?php } ?>
 
-  <input type="button" class="btn btn-primary" value="Сохранить" data-action="save">
+  <?php if ($admin && USE_DATABASE) { ?>
+    <div class="col-6">
+      <form action="#" id="rateForm" class="row">
+        <div class="col-12 d-flex justify-content-between">
+          <p class="mt-1">Автоматически обновлять курсы</p>
+          <label class="d-block w-50 text-center">
+            <input class="mt-1" type="checkbox" name="autoRefresh" checked
+                   data-target="manualRefresh">
+          </label>
+        </div>
+        <div class="col-12 text-center" data-relation="!manualRefresh">
+          <input type="button" class="btn btn-primary" value="Редактировать курсы" data-action="loadRate">
+        </div>
+      </form>
+    </div>
+  <?php } ?>
 
-  <? if ($catalogProperties) { ?>
+  <div class="col-12">
+    <input type="button" class="btn btn-primary" value="Сохранить" data-action="save">
+  </div>
+
+  <?php if ($catalogProperties) { ?>
     <div class="col-12" id="propertiesWrap">
       <hr>
       <details>
@@ -139,12 +158,12 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
         </div>
       </details>
     </div>
-  <? } ?>
+  <?php } ?>
 </div>
 
-<? if ($catalogProperties) { ?>
+<?php if ($catalogProperties) { ?>
 <template id="propertiesCreateTmp">
-  <form action="#">
+  <form action="#" id="temp">
     <div class="form-group">
       <label class="w-100">Название свойства: <input type="text" class="form-control" name="tableName"></label>
     </div>
@@ -167,12 +186,12 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
         </select>
       </label>
     </div>
-    <div class="form-group selectField">
+    <div class="form-group" data-relation="selectField">
       <div class="col-12 d-flex justify-content-between">
         <p class="col-5">Дополнительные поля параметра (имя есть)</p>
         <div class="col-7">
           <input class="btn btn-success" type="button" data-action="addCol" value="+">
-          <input class="btn btn-danger"  type="button" data-action="remCol" value="-">
+          <input class="btn btn-danger" type="button" data-action="remCol" value="-">
         </div>
       </div>
       <div class="col-12 d-flex flex-wrap justify-content-between text-center" data-field="propertiesCols">
@@ -196,16 +215,4 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     </div>
   </form>
 </template>
-<template id="propertiesCreateTmp23">
-  <table class="text-center table table-striped">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Имя</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-</template>
-<? } ?>
+<?php } ?>

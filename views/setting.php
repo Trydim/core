@@ -32,5 +32,21 @@ if ($main->getSettings('admin')) {
     </div>
   </div>
 </template>
+
+<template id="rateModalTmp">
+  <table class="text-center table table-striped">
+    <thead>
+      <tr>
+        <th>Код</th>
+        <th>Имя</th>
+        <th>Курс</th>
+        <th>Основная</th>
+        <th>Обозначение</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</template>
 footerContent;
 }

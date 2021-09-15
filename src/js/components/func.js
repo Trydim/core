@@ -73,7 +73,7 @@ const func = {
    * @return object
    */
   getDataAsAssoc: selector => {
-    const arr      = func.getData(selector) || [],
+    const arr      = Object.values(func.getData(selector) || []),
           fItem    = arr[0],
           fKeys    = Object.keys(fItem);
 

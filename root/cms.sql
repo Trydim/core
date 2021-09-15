@@ -137,7 +137,9 @@ CREATE TABLE `money` (
   `ID` int(10) UNSIGNED NOT NULL,
   `name` varchar(100) CHARACTER SET utf8 NOT NULL,
   `short_name` varchar(5) CHARACTER SET utf8 NOT NULL,
-  `rate` decimal(10,4) NOT NULL DEFAULT 1.0000
+  `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `rate` decimal(10,4) NOT NULL DEFAULT 1.0000,
+  `main` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --

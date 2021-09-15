@@ -57,7 +57,7 @@ export const Modal = (param = {}) => {
     data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
     document.body.style.overflow = 'hidden';
 
-    if (document.body.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
+    if (document.documentElement.clientHeight > window.innerHeight && window.innerWidth > 800) {
       data.bodyPaddingRight = document.body.style.paddingRight;
       document.body.style.paddingRight = '16px';
     }

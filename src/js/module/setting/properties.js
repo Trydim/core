@@ -3,18 +3,18 @@
 const getFieldNode = (p, field) => p.querySelector(`[data-field=${field}]`);
 
 export class Properties {
-  constructor() {
+  constructor(modal) {
     this.form = f.qS('#propertiesTable');
     if (!this.form) return;
 
-    this.setParam();
+    this.setParam(modal);
     //this.tmp = f.gTNode('#properties');
 
     this.onEvent();
   }
 
-  setParam() {
-    this.M = f.initModal();
+  setParam(modal) {
+    this.M = modal;
 
     this.needReload = false;
     this.delayFunc = () => {};
