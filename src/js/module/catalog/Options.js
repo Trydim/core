@@ -15,6 +15,7 @@ export class Options extends Common {
     this.setNodes(field, props.tmp);
 
     this.setFileModal();
+    this.setParam();
     this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
       dbAction : 'openElement',
       sortParam: this.sortParam,
@@ -31,6 +32,9 @@ export class Options extends Common {
 
   setFileModal() {
     this.fModal = f.initModal();
+  }
+  setParam() {
+    this.mainMoney = Object.values(this.db.money).find(m => +m.main === 1); // не используется.
   }
   open(id) {
     this.queryParam.elementsId = id;
@@ -49,26 +53,38 @@ export class Options extends Common {
   searchEvent(data, clearSearch) {
     f.hide(this.node.tableWrap, this.node.btnWrap);
   }
-  changeMoneyInput(e, nodePercent, nodeOutput) {
-    nodeOutput.value = +e.target.value * (1 + +nodePercent.value / 100);
-    this.queryParam[nodeOutput.name] = nodeOutput.value;
-  }
-  changeOutputPercent(e, nodeInputM, nodeMoney) {
-    nodeMoney.value = +nodeInputM.value * (1 + +e.target.value / 100);
-    this.queryParam[nodeMoney.name] = nodeMoney.value;
-  }
-  changeMoneyOutput(e, nodeInputM, nodePercent) {
-    nodePercent.value = (+e.target.value / +nodeInputM.value - 1) * 100;
-    this.queryParam[nodePercent.name] = nodePercent.value;
-  }
-  initMoneyControl(form) {
-    let nodeInput   = form.querySelector('[name="inputPrice"]');
-    let nodePercent = form.querySelector('[name="outputPercent"]');
-    let nodeOutput  = form.querySelector('[name="outputPrice"]');
+  getRate(nInputM, nOutputM) {
+    const inRate = this.db.money[nInputM.value].rate,
+          outRate = this.db.money[nOutputM.value].rate;
 
-    this.onEventNode(nodeInput, (e) => this.changeMoneyInput(e, nodePercent, nodeOutput), {}, 'blur');
-    this.onEventNode(nodePercent, (e) => this.changeOutputPercent(e, nodeInput, nodeOutput), {}, 'blur');
-    this.onEventNode(nodeOutput, (e) => this.changeMoneyOutput(e, nodeInput, nodePercent), {}, 'blur');
+    return inRate/outRate;
+  }
+  changeMoneyInput(t, nPercent, nOutput, rate) {
+    const v = +t.value * (1 + +nPercent.value / 100) * rate;
+    nOutput.value = v.toFixed(2);
+  }
+  changeMoneyInputId(t) { t.dispatchEvent(new Event('change')) }
+  changeOutputPercent(t, nInputM, nOutput, rate) {
+    const v = +nInputM.value * (1 + +t.value / 100) * rate;
+    nOutput.value = v.toFixed(2);
+  }
+  changeMoneyOutput(t, nInputM, nPercent, rate) {
+    const v = (+t.value / rate / +nInputM.value - 1) * 100;
+    nPercent.value = v.toFixed(2);
+  }
+  changeMoneyOutputId(t) { t.dispatchEvent(new Event('change')) }
+  initMoneyControl(form) {
+    let nInput   = form.querySelector('[name="inputPrice"]'),
+        nInputM = form.querySelector('[name="moneyInputId"]'),
+        nPercent = form.querySelector('[name="outputPercent"]'),
+        nOutput  = form.querySelector('[name="outputPrice"]'),
+        nOutputM = form.querySelector('[name="moneyOutputId"]');
+
+    nInput.addEventListener('change', e => this.changeMoneyInput(e.target, nPercent, nOutput, this.getRate(nInputM, nOutputM)));
+    nInputM.addEventListener('change', () => this.changeMoneyInputId(nInput));
+    nPercent.addEventListener('change', e => this.changeOutputPercent(e.target, nInput, nOutput, this.getRate(nInputM, nOutputM)));
+    nOutput.addEventListener('change', e => this.changeMoneyOutput(e.target, nInput, nPercent, this.getRate(nInputM, nOutputM)));
+    nOutputM.addEventListener('change', () => this.changeMoneyOutputId(nInput));
   }
 
 

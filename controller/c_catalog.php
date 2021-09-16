@@ -35,7 +35,7 @@ $section = $db->selectQuery('section', ['ID', 'name']);
 // Валют и единиц измерения
 $units = $db->selectQuery('units', ['ID', 'shortName']);
 $field['footerContent'] .= "<input type='hidden' id='dataUnits' value='" . prepareData($units) . "'>";
-$money = $db->selectQuery('money', ['ID', 'name']);
+$money = $db->getMoney();
 $field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($money) . "'>";
 
 // Все свойства
