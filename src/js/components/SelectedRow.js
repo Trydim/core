@@ -1,35 +1,108 @@
 // TODO сохранять в сессии потом, что бы можно было перезагрузить страницу
 
+class SelectedId {
+  constructor(key) {
+    this.key = key;
+    this.id = new Set();
+  }
+
+  add(id) {
+    if (!Array.isArray(id)) id = [id];
+    id.forEach(id => this.id.add(id));
+    this.fire();
+    return this;
+  }
+
+  delete(id) {
+    this.id.delete(id);
+    this.fire();
+    return this;
+  }
+
+  clear() {
+    this.id = new Set();
+    this.fire();
+    return this;
+  }
+
+  get size() {
+    return this.id.size;
+  }
+
+  getAsArray() {
+    let ids = [];
+    for (let id of this.id.values()) ids.push(id);
+    return ids;
+  }
+
+  forEach(func) {
+    this.id.forEach(func);
+  }
+
+  fire() {
+    this.timeOut && clearTimeout(this.timeOut);
+    this.timeOut = setTimeout(() => {
+      clearTimeout(this.timeOut);
+      f.observer.fire(this.key, this.getAsArray(), this.size);
+    }, 10);
+  }
+}
+
 export class SelectedRow {
+  /**
+   * @param {object} param
+   * @param {HTMLElement} param.table
+   */
   constructor(param) {
     let {
       table = f.qS('#table'),
       //selectedField = f.qS('#')
     } = param;
-    if (!table) return;
 
+
+    if (!table) return;
     this.table = table;
-    this.selectedId = new Set();
+    this.observerKey = 'selected' + (Math.random() * 10000 | 0);
+    this.setSelectedId();
     this.onTableMutator();
     this.onTableEvent();
-    f.observer.addArgument(param.type || 'selectedRow', this);
+    f.observer.addArgument(this.observerKey, this);
   }
 
+  setSelectedId() {
+    this.selectedId = new SelectedId(this.observerKey);
+  }
   clear() {
     this.checkedRows(false);
-    this.selectedId = new Set();
+    this.selectedId.clear();
   }
-  addSelectedId(id) {
+  add(id) {
     this.selectedId.add(id);
+    return this;
   }
-  deleteSelectedId(id) {
+  remove(id) {
     this.selectedId.delete(id);
+    return this;
+  }
+
+  // Observer func
+  /**
+   * @return {string} - use observerKey in fire function as name
+   */
+  getObserverKey() {
+    return this.observerKey;
+  }
+  /**
+   * @param {function(string[], int, , SelectedRow)} func - fired function(selectedIds, count, any, SelectedRow)
+   *
+   * @param {any} arg - add argument
+   */
+  subscribe(func, ...arg) {
+    f.observer.subscribe(this.observerKey, (selectedIds, b, c) => func(selectedIds, b, ...arg, c));
   }
 
   getSelected() {
-    let ids = [];
-    for (let id of this.selectedId.values()) ids.push(id);
-    return ids;
+    return this.selectedId.getAsArray();
   }
   getSelectedSize() {
     return this.selectedId.size;
@@ -46,9 +119,21 @@ export class SelectedRow {
   checkedAll() {
     this.table.querySelectorAll(`input[data-id]`)
         .forEach(i => {
-          this.addSelectedId(i.dataset.id);
+          this.add(i.dataset.id);
           i.checked = true;
         });
+  }
+
+  /**
+   * @param {string|id} id
+   * @param {boolean} check
+   * @return {SelectedRow}
+   */
+  checkedById(id, check = true) {
+    let input = this.table.querySelector(`input[data-id="${id}"]`);
+    input && (input.checked = check);
+    this.remove(id);
+    return this;
   }
 
   handle() {
@@ -87,10 +172,9 @@ export class SelectedRow {
 
       if (!input || !id) return;
       input.checked = !input.checked;
-      input.checked ? this.addSelectedId(id) : this.deleteSelectedId(id);
+      input.checked ? this.add(id) : this.remove(id);
     }
 
-    f.observer.fire('selectedRow', this.getSelected(), this.getSelectedSize());
     delete this.startClick;
     this.table.querySelectorAll('.mouseSelected')
         .forEach(tr => tr.classList.remove('mouseSelected'));
@@ -98,9 +182,9 @@ export class SelectedRow {
 
   // Bind event
   onTableEvent() {
-    this.table.addEventListener('mouseover', (e) => this.mouseOver(e));
-    this.table.addEventListener('mousedown', (e) => this.mouseDown(e));
-    this.table.addEventListener('mouseup', (e) => this.mouseUp(e));
-    this.table.addEventListener('click', (e) => e.preventDefault());
+    this.table.addEventListener('mouseover', e => this.mouseOver(e));
+    this.table.addEventListener('mousedown', e => this.mouseDown(e));
+    this.table.addEventListener('mouseup', e => this.mouseUp(e));
+    this.table.addEventListener('click', e => e.preventDefault());
   }
 }

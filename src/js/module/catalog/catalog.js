@@ -19,6 +19,7 @@ export const catalog = {
       img     : f.gT('#imageTableItem'),
     };
 
+
     this.section  = new Section();
     this.elements = new Elements({db, tmp});
     this.options  = new Options({db, tmp});

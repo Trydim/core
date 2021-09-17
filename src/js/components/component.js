@@ -943,6 +943,11 @@ export class Observer {
     this.publisher = Object.create(null);
     this.listeners = Object.create(null);
   }
+  /**
+   * add fixed argument with each fired function
+   * @param {string} name
+   * @param {object} object - pass object
+   */
   addArgument(name, object) {
     this.publisher[name] = object;
   }

@@ -2,7 +2,7 @@
 
 export class Catalog {
   constructor(type, props = {}) {
-    this.M = props['modal'] || f.initModal();
+    this.M = f.initModal();
     this.delayFunc = () => {};
 
     this.reloadAction = false;
@@ -30,7 +30,7 @@ export class Catalog {
     let node = f.qS(`#${this.type}Column`);
     node && (this.setting = node.value.split(','));
 
-    this.db = db;
+    typeof db === 'object' && (this.db = Object.create(db));
   }
   setReloadQueryParam() {
     delete this.reloadAction.callback;
@@ -96,12 +96,14 @@ export class Catalog {
         module = this['id'],
         selectedIds = module.getSelected();
 
-    //module.clear();
-    module.addSelectedId(id);
+    module.clear();
+    module.add(id);
     e.target.dataset.action = this.type === 'elements' ? 'changeElements' : 'changeOptions';
     this.commonEvent(e);
 
-    //module.addSelectedId(selectedIds);
+    module.clear();
+    module.add(selectedIds);
+    module.checkedRows();
     delete e.target.dataset.action;
   }
 
@@ -151,14 +153,14 @@ export class Common extends Catalog {
     );
   }
   setNodes(field, tmp) {
-    this.node.field = field;
-    this.node.tableWrap  = field.querySelector('[data-field="tableWrap"]');
-    this.node.fieldT     = field.querySelector('table');
-    this.node.fieldTBody = field.querySelector('tbody');
-    this.node.btnWrap    = field.querySelector('[data-field="btnWrap"]');
+    this.node.field        = field;
+    this.node.tableWrap    = field.querySelector('[data-field="tableWrap"]');
+    this.node.fieldT       = field.querySelector('table');
+    this.node.fieldTBody   = field.querySelector('tbody');
+    this.node.btnWrap      = field.querySelector('[data-field="btnWrap"]');
     this.node.selectedList = field.querySelector('[data-field="selectedList"]');
 
-    this.tmp = tmp;
+    this.tmp = Object.create(tmp);
     this.tmp.form = f.gTNode(`#${this.type}Form`);
   }
   setItemsList(data) {
@@ -208,8 +210,8 @@ export class Common extends Catalog {
             },
 
             'unitId': v => `<td>${this.db.units[v]['shortName']}</td>`,
-            'moneyInputId': v => `<td>${this.db.money[v].name}</td>`,
-            'moneyOutputId': v => `<td>${this.db.money[v].name}</td>`,
+            'moneyInputId': v => `<td>${this.db.money[v].code}</td>`,
+            'moneyOutputId': v => `<td>${this.db.money[v].code}</td>`,
           };
 
     data.map(row => {
@@ -232,5 +234,17 @@ export class Common extends Catalog {
       f.showMsg('Раздел пустой');
       f.hide(this.node.tableWrap, this.node.btnWrap);
     }
+  }
+
+  selectedRow(a, size, obj) {
+    if (this.node.fieldT !== obj.table) return;
+
+    const func = item => {
+      const name = item['E.name'] || item['name'];
+      return name ? `<div style="cursor: pointer" data-id="${item.ID}" data-action="removeSelected">${name}</div>` : '';
+    }
+
+    this.node.selectedList.innerHTML = a.map(id => this.itemList.get(id)).map(func).join('')
+                                       || '<div>Ничего не выбрано!</div>';
   }
 }

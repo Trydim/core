@@ -17,11 +17,11 @@ export class Elements extends Common {
       query    : action => this.query(action).then(d => this.load(d, false)),
     });
     this.id = new f.SelectedRow({table: this.node.fieldT});
+    this.id.subscribe(this.selectedRow.bind(this));
 
     f.observer.subscribe(`sortEvent`, d => this.load(d, false));
     f.observer.subscribe(`openSection`, d => this.open(d));
     f.observer.subscribe(`searchInput`, (d, c) => this.searchEvent(d, c));
-    f.observer.subscribe(`selectedRow`, (a, b, c) => this.selectedRow(a, b, c));
     this.onEvent();
   }
 
@@ -46,11 +46,6 @@ export class Elements extends Common {
       this.paginator.setQueryAction('searchElements');
       this.load(p.data);
     }
-  }
-  selectedRow(a, b, c) {
-    this.node.selectedList.innerHTML = a.map(id => this.itemList.get(id))
-                                        .map(item => `<div>${item['E.name']}</div>`)
-                                        .join('');
   }
 
   checkSection() {
@@ -198,6 +193,11 @@ export class Elements extends Common {
   }
   clearId() {
     this.id.clear();
+  }
+  // Удалить из выбора
+  removeSelected(t) {
+    const id = t.dataset.id;
+    id && this.id.checkedById(id, false);
   }
 
   // Bind events

@@ -22,6 +22,7 @@ export class Options extends Common {
       query    : action => this.query(action).then(d => this.load(d, false)),
     });
     this.id = new f.SelectedRow({table: this.node.fieldT});
+    this.id.subscribe(this.selectedRow.bind(this));
 
     f.observer.subscribe(`openElement`, d => this.open(d));
     f.observer.subscribe(`sortEvent`, d => this.load(d, false));
@@ -53,6 +54,7 @@ export class Options extends Common {
   searchEvent(data, clearSearch) {
     f.hide(this.node.tableWrap, this.node.btnWrap);
   }
+  // Money function
   getRate(nInputM, nOutputM) {
     const inRate = this.db.money[nInputM.value].rate,
           outRate = this.db.money[nOutputM.value].rate;

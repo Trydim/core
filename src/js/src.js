@@ -67,13 +67,20 @@ const m = {
    */
   SortColumns: module.SortColumns,
 
+  /**
+   * @param {object} param {{
+   *   table: HTMLElement,
+   * }}
+   *
+   * @param param.table - DOM node element consist data-id as elements Rows
+   * @default param.table - f.qS('#table')
+   */
   SelectedRow: SelectedRow,
 
   /**
-   *
-   * @param msg
-   * @param type (success, warning, error)
-   * @param autoClose bool
+   * @param {string} msg
+   * @param {string} type (success, warning, error)
+   * @param {boolean} autoClose
    */
   showMsg: (msg, type, autoClose) => new module.MessageToast().show(msg, type, autoClose),
 

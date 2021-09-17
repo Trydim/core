@@ -92,7 +92,7 @@ $field['content'] = <<<content
       </div>
     </div>
     <div id="elementsField" class="col">
-      <div class="bg-style-sheet">
+      <div class="bg-style-sheet position-relative">
         <div class="d-none" data-field="tableWrap">
           <table class="table table-striped text-center" style="cursor: pointer; user-select: none">
             <thead><tr></tr></thead>
@@ -107,12 +107,24 @@ $field['content'] = <<<content
             <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
             <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElement">
             <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
-            <input class="btn btn-dark" type="button" value="Выделить все" data-action="selectedAll">
+            <br><input class="btn btn-dark" type="button" value="Выделить все" data-action="selectedAll">
             <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
+            <label class="btn btn-dark float-right">
+              Показать выбранные
+              <input type="checkbox" id="elementsSelected" hidden data-target="elementsSelected">        
+            </label>
           </span>
         </div>
+
+        <div class="position-absolute bg-style-sheet" 
+             data-relation="elementsSelected"
+             style="right: 0; bottom: 0; min-width: 230px">
+          <div class="position-relative" style="padding-top: 20px">
+            <label class="position-absolute" style="right: 0; top: 0" for="elementsSelected">Закрыть</label>
+            <div data-field="selectedList"></div>
+          </div>
+        </div>
       </div>
-      <div class="position-fixed bg-style-sheet" data-field="selectedList" style="right: 0; bottom: 0"></div>
     </div>
   </div>
 </div>
@@ -133,10 +145,24 @@ $field['content'] = <<<content
       <input class="btn btn-warning" type="button" value="Изменить вариант" data-action="changeOptions">
       <input class="btn btn-warning" type="button" value="Копировать вариант" data-action="copyOption">
       <input class="btn btn-danger" type="button" value="Удалить вариант" data-action="delOptions">
-      <input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
+      <br><input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
       <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
+      <label class="btn btn-dark float-right">
+        Показать выбранные
+        <input type="checkbox" id="optionsSelected" hidden data-target="optionsSelected">        
+      </label>
     </span>
   </div>
+
+  <div class="position-absolute bg-style-sheet"
+       data-relation="optionsSelected"
+       style="right: 0; bottom: 0; min-width: 230px">
+    <div class="position-relative" style="padding-top: 20px">
+      <label class="position-absolute" style="right: 0; top: 0" for="optionsSelected">Закрыть</label>
+      <div data-field="selectedList"></div>
+    </div>
+  </div>
+
 </div>
 content;
 
