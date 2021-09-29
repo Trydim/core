@@ -335,7 +335,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Options
     case 'loadOptions':
-      $result['options'] = $db->loadOptions(isset($filter) ? json_decode($filter, true) : []);
+      $countPerPage = $countPerPage === 20 ? -1 : $countPerPage;
+      $result['options'] = $db->loadOptions(
+        isset($filter) ? json_decode($filter, true) : [],
+        $pageNumber ?? 0, $countPerPage
+      );
       break;
     case 'copyOption':
     case 'createOption':

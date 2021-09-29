@@ -491,14 +491,12 @@ class Db extends \R {
 
   /**
    * Load for calculator
-   * @param array  $filter
-   * @param int    $pageNumber
-   * @param int    $countPerPage
-   * @param string $sortColumn
-   * @param false  $sortDirect
+   * @param array $filter
+   * @param int   $pageNumber
+   * @param int   $countPerPage
    * @return array
    */
-  public function loadOptions($filter = [], int $pageNumber = 0, $countPerPage = -1) {
+  public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
     $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
                    O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
@@ -542,8 +540,8 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
-        //$option['images'] = $this->setImages($option['images']);
+        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']]; TODO удалить
+        $option['images'] = $this->setImages($option['images']);
       }
 
       // set property
