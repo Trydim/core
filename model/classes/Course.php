@@ -9,7 +9,7 @@ class Course {
    * @var string[]
    */
   private $source = [
-    'RUS' => "http://www.cbr.ru/scripts/XML_daily.asp",
+    'RUS' => "https://www.cbr.ru/scripts/XML_daily.asp",
     'BYN' => "https://www.nbrb.by/services/xmlexrates.aspx",
   ];
 
@@ -39,7 +39,8 @@ class Course {
   private function searchRate($code) {
     foreach ($this->xml as $c) {
       if (strval($c->CharCode) === $code) {
-        return round((float) str_replace(",", ".", (string) $c->Value), 4);
+        $rate = $c->Value ? strval($c->Value) : strval($c->Rate);
+        return round((float) str_replace(",", ".", $rate), 4);
       }
     }
     return false;

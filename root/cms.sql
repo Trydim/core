@@ -135,6 +135,7 @@ INSERT INTO `files` (`ID`, `name`, `path`, `format`) VALUES
 
 CREATE TABLE `money` (
   `ID` int(10) UNSIGNED NOT NULL,
+  `code` varchar(10) CHARACTER SET utf8 NOT NULL,
   `name` varchar(100) CHARACTER SET utf8 NOT NULL,
   `short_name` varchar(5) CHARACTER SET utf8 NOT NULL,
   `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
