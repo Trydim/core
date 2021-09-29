@@ -105,7 +105,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Orders
     case 'saveOrder':
-      if (isset($saveVal)) {
+      if (isset($reportVal)) {
         $db->setCurrentUserId();
 
         $customerId = isset($customerId) ? $customerId : '0';
@@ -137,7 +137,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         isset($saveVal) && $param[$idOrder]['save_value'] = $saveVal;
         isset($importantVal) && $param[$idOrder]['important_value'] = $importantVal;
         isset($orderTotal) && is_finite($orderTotal) && $param[$idOrder]['total'] = floatval($orderTotal);
-        isset($reportVal) && $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
+        $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
 
         $columns = $db->getColumnsTable('orders');
         $result['error'] = $db->insert($columns, 'orders', $param, !$newOrder);
