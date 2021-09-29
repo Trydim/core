@@ -16,7 +16,6 @@ class Course {
   private $db;
   private $xml;
   private $dataFile;
-  private $refreshTime;
 
 
   /**
@@ -46,7 +45,7 @@ class Course {
     return false;
   }
 
-  private function notNeedRefresh() {
+  private function notNeedRefresh(): bool {
     $time = time() - $this::REFRESH_INTERVAL;
     foreach ($this->rate as $currency) {
       if ($time > strtotime($currency['lastEditDate'])) return false;
@@ -77,13 +76,12 @@ class Course {
       serialize(["refresh_time" => time(), 'curs' => $this->rate]));
   }
 
-  private function readFromCbr() {
+  private function readFromCbr(): void {
     $mainCurrency = $this->getMainCurrency();
 
     $linkSource = $this->source[$mainCurrency['code']];
 
-    if (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM)) return false;
-    //$curs['date'] = strtotime($xml->attributes()->Date);
+    if (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM)) return;
 
     foreach ($this->rate as $code => $currency) {
       if ($currency === $mainCurrency) continue;
@@ -92,7 +90,7 @@ class Course {
     }
   }
 
-  public function refresh() {
+  public function refresh(): Course {
     if ($this->notNeedRefresh()) return $this;
 
     $this->readFromCbr();
@@ -101,11 +99,11 @@ class Course {
     return $this;
   }
 
-  public function getRate($fields = []) {
+  public function getRate(): array {
     return array_map(function ($c) {
       return [
         'id' => $c['code'],
-        'value' => $c['rate']
+        'value' => $c['rate'] || 1,
       ];
     }, $this->rate);
   }
