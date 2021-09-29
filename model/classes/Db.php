@@ -69,10 +69,14 @@ class Db extends \R {
     if (isset($_SESSION['priority'])) $this->currentUserID = $_SESSION['priority'];
   }
 
+  /**
+   * What does this function do?
+   * @param $varName
+   * @return string
+   */
   public function setQueryAs($varName) {
     return AQueryWriter::camelsSnake($varName) . " AS '$varName'";
   }
-
 
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
@@ -948,10 +952,11 @@ class Db extends \R {
    * @param string $sortColumn
    * @param bool $sortDirect
    *
-   * @return mixed
+   * @return array
    */
-  public function loadUsers($pageNumber = 0, $countPerPage = 20, $sortColumn = 'register_date', $sortDirect = false) {
+  public function loadUsers(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'register_date', bool $sortDirect = false) {
     $pageNumber *= $countPerPage;
+    $sortColumn = AQueryWriter::camelsSnake($sortColumn);
 
     $sql = "SELECT U.ID AS 'U.ID', permission_id, P.name AS 'P.name', login, U.name AS 'U.name', contacts, register_date, activity
     FROM users U

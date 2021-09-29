@@ -390,14 +390,14 @@ function getPageAsString($data, $wrapId = 'wrapCalcNode') {
  *
  * @param bool $decode
  * @param bool $assoc
- * @return string|array
+ * @return string
  */
-function getSettingFile($decode = true, $assoc = true) {
+function getSettingFile(bool $decode = true, bool $assoc = true) {
   if (file_exists(SETTINGS_PATH)) {
     $setting = file_get_contents(SETTINGS_PATH);
     return $decode ? json_decode($setting, $assoc) : $setting;
   }
-  return [];
+  return $decode ? json_decode('[]', $assoc) : '[]';
 }
 
 function setSettingFile($content) {
