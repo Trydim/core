@@ -15,6 +15,7 @@ $dbError = isset($_REQUEST['dbError']);
   <a href="/">Home</a>
   <h2>Not found</h2>
 <?php } else { ?>
+  <a href="/">Home</a>
   <h2>Data Base connect or other error!!</h2>
 <?php } ?>
 </body>
