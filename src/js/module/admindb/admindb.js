@@ -558,6 +558,7 @@ const TableValues = {
       f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
       f.removeLoading(e.target);
       TableValues.init('csv');
+      data['status'] && admindb.disableBtnSave();
     });
   },
 

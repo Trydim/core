@@ -954,7 +954,7 @@ class Db extends \R {
    *
    * @return array
    */
-  public function loadUsers(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'register_date', bool $sortDirect = false) {
+  public function loadUsers(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'register_date', bool $sortDirect = false): array {
     $pageNumber *= $countPerPage;
     $sortColumn = AQueryWriter::camelsSnake($sortColumn);
 

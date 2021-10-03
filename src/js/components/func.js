@@ -239,17 +239,11 @@ const func = {
     // Возможно стоит добавить загрузку если целей слишком много! (определить практическим путем)
     qs('input[data-target]').forEach(eNode => {
       const target = eNode.dataset.target;
-      let nodesT = false;
+      if (!target) { console.warn('Initialisation relatedOption: ' + target + ' is empty '); return; }
 
-      if (!target) { console.warn('Initialisation relatedOption: target is empty' + target); return; }
-
-      if (eNode.type === 'radio' && eNode.name) {
-        qs(`input[name="${eNode.name}"]`).forEach(n => {
-          !n.dataset.target && n.addEventListener('change', () => eNode.dispatchEvent(new Event('change')));
-        });
-      }
-
-      eNode.addEventListener('change', () => {
+      let nodesT = false,
+          nodesR = [],
+          changeEvent = (relation = true) => {
         nodesT = nodesT || qs(`[data-relation*="${target}"]`);
 
         nodesT.forEach(nodeT => {
@@ -257,8 +251,20 @@ const func = {
           !member && (member = setInputMember(nodeT));
           checkedTarget(nodeT, member);
         });
-      });
 
+            relation && nodesR.forEach(n => n.dispatchEvent(new Event('changeR')));
+          };
+
+      if (eNode.type === 'radio' && eNode.name) {
+        qs(`input[name="${eNode.name}"]`).forEach(n => {
+          if (eNode !== n && n.dataset.target) {
+            nodesR.push(n);
+            n.addEventListener('changeR', () => changeEvent(false));
+          }
+        });
+      }
+
+      eNode.addEventListener('change', () => changeEvent());
       eNode.dispatchEvent(new Event('change'));// очень затратно наверное
     });
     qs('select.useToggleOption').forEach(eNode => {
