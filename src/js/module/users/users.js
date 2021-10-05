@@ -51,9 +51,9 @@ export const users = {
     this.contValue || (this.contValue = f.gT('#tableContactsValue'));
     data = data.map(item => {
       item['P.name'] && (item['P.name'] = _(item['P.name']));
-      if (item['activity']) {
-        item.activityValue = item['activity'] === "1";
-        item['activity'] = item.activityValue ? '+' : '-';
+      if (item.activity) {
+        item.activityValue = !!item.activity;
+        item.activity = item.activityValue ? '+' : '-';
       }
 
       if (item['contacts']) {
@@ -88,9 +88,6 @@ export const users = {
     this.tbody || (this.tbody = this.table.querySelector('tbody tr').outerHTML);
     html += f.replaceTemplate(this.tbody, data);
     this.table.querySelector('tbody').innerHTML = html;
-
-    this.onTableEvent();
-    this.checkedRows();
   },
 
   setPermission(data) {
@@ -208,7 +205,7 @@ export const users = {
         this.M.show('Изменение пользователей', form);
       },
       'changeUserPassword': () => { // TODO доработать изменение пароля
-        if (this.id.getSelectedSize() !== 1) return;
+        if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только одного пользователя', 'error'); return; }
 
         let id   = this.id.getSelected(),
             user = this.usersList.get(id[0]),
@@ -219,8 +216,8 @@ export const users = {
         let newPass = form.querySelector('[name="newPass"]'),
             repeatPass = form.querySelector('[name="repeatPass"]');
 
-        this.onEventNode(newPass, this.changeTextInput, {}, 'change');
-        this.onEventNode(repeatPass, (e) => this.changePassword.apply(this, [e, newPass]), {}, 'change');
+        this.onEventNode(newPass, e => this.changeTextInput(e, repeatPass), {}, 'change');
+        this.onEventNode(repeatPass, e => this.changePassword(e, newPass), {}, 'change');
 
         this.confirmMsg = 'Новый пароль сохранен';
         this.M.show('Изменить пароль пользователя ' + user['U.name'], form);
@@ -249,16 +246,20 @@ export const users = {
     }
   },
 
-  changeTextInput(e) {
+  changeTextInput(e, repeatPass) {
     if (e.target.value.length <= 2) e.target.value = '';
-    //this.queryParam[e.target.name] = e.target.value;
+    repeatPass.value = '';
   },
   changeCheckInput(e) {
     this.queryParam[e.target.name] = e.target.checked;
   },
   changePassword(e, newPass) {
-    if(e.target.value !== newPass.value) { e.target.value = 'Ошибка'; return; }
-    this.queryParam['validPass'] = e.target.value;
+    if (e.target.value !== newPass.value) {
+      e.target.value = newPass.value = '';
+      f.showMsg('Пароли не совпадают', 'error');
+      return;
+    }
+    this.queryParam.validPass = e.target.value;
   },
 
   // Bind events

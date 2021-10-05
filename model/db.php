@@ -505,7 +505,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'changeCustomer':
-      if (isset($usersId) && is_finite($usersId)) {
+      if (isset($customerId) && is_finite($customerId)) {
         $param = [];
 
         $contacts = [];
@@ -521,7 +521,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'delCustomer':
-      $usersId = isset($usersId) ? json_decode($usersId) : [];
+      $usersId = isset($customerId) ? json_decode($customerId) : [];
 
       if (count($usersId)) {
         $result['customers'] = $db->deleteItem('customers', $usersId);

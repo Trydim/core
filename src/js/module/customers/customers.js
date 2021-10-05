@@ -237,8 +237,6 @@ export const customers = {
       'addCustomer': () => {
         let form = f.gTNode('#customerForm');
 
-        //this.onEventNode(form.querySelector('[name="name"]'), this.changeTextInput, {}, 'blur');
-
         ['name', 'phone', 'email', 'address', 'ITN'].map(i => {
           let node = form.querySelector(`[name="${i}"]`);
           i === 'phone' && f.maskInit(node);
@@ -246,6 +244,7 @@ export const customers = {
         });
 
         this.confirmMsg = 'Клиент добавлен';
+        this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Добавление пользователя', form);
       },
       'changeCustomer': () => {
@@ -255,7 +254,7 @@ export const customers = {
             id = this.getSelected(),
             customer = this.usersList.get(id[0]);
 
-        this.queryParam.usersId = id[0];
+        this.queryParam.customerId = id[0];
         node = form.querySelector('[name="name"]');
         this.onEventNode(node, this.changeTextInput, {}, 'blur');
         node.value = customer['name'];
@@ -285,15 +284,17 @@ export const customers = {
         });
 
         this.confirmMsg = 'Изменения сохранены';
+        this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Изменение клиента', form);
       },
       'delCustomer': () => {
         if (!this.selectedId.size) { f.showMsg('Выберите клиента!', 'error'); return; }
         if (this.checkCustomers()) return;
 
-        this.queryParam.usersId = JSON.stringify(this.getSelected());
+        this.queryParam.customerId = JSON.stringify(this.getSelected());
 
         this.confirmMsg = 'Успешно удалено';
+        this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Удалить', 'Удалить выбранных клиентов?');
       },
       'openOrders': () => {

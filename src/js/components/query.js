@@ -3,8 +3,12 @@ import {c} from "./const.js";
 // Query Object -----------------------------------------------------------------------------------------------------------------
 
 const checkJSON = (data) => {
-  try { return JSON.parse(data); }
-  catch (e) { f.showMsg(data, 'error', false); return {status: false} }
+  try {
+    const response = JSON.parse(data);
+    if (response['error']) throw response['error']; // TODO что за ошибка
+    return response;
+  }
+  catch (e) { f.showMsg(e['xdebug_message'] || e.message || data, 'error', false); return {status: false}; }
 };
 
 const downloadBody = async (data) => {
