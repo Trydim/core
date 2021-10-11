@@ -86,7 +86,7 @@ export const orders = {
     mode        : 'DB',
     dbAction    : 'loadOrders',
     tableName   : 'orders',
-    sortColumn  : 'create_date',
+    sortColumn  : 'createDate',
     sortDirect  : false, // true = DESC, false
     currPage    : 0,
     countPerPage: 20,
@@ -101,12 +101,19 @@ export const orders = {
 
   init() {
     this.p = new f.Pagination( '#paginator', {
-      queryParam: this.queryParam,
+      dbAction : 'loadOrders',
+      sortParam: this.queryParam,
       query: this.query.bind(this),
     });
     this.setParam();
     this.setTableTemplate('order');
 
+    new f.SortColumns({
+      thead: this.table.querySelector('thead'),
+      query: this.query.bind(this),
+      dbAction : 'loadOrders',
+      sortParam: this.queryParam,
+    });
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
 
@@ -132,16 +139,15 @@ export const orders = {
   setTableTemplate(tmp) {
     this.table.dataset.type = tmp;
     this.table.innerHTML = this.template[tmp].innerHTML;
-    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.onSearchFocus();
   },
 
   fillTable(data, search = false) {
     data = data.map(item => {
-      if(item.importantValue) {
+      if (item.importantValue) {
         let value = '';
 
-        if(false /* TODO настройки вывода даты*/) {
+        if (false /* TODO настройки вывода даты*/) {
           for (let i in item) {
             if(i.includes('date')) {
               //let date = new Date(item[i]);
@@ -161,6 +167,8 @@ export const orders = {
         catch (e) { console.log(`Заказ ID:${item['O.ID']} имеет не правильное значение`); }
         item.importantValue = value;
       }
+
+      item.total = (+item.total).toFixed(2) || 0;
       return item;
     })
 
@@ -223,7 +231,7 @@ export const orders = {
     });
   },
 
-  // TODO events function
+  // Events function
   //--------------------------------------------------------------------------------------------------------------------
 
   // кнопки открыть закрыть и т.д.
@@ -257,7 +265,7 @@ export const orders = {
         hideActionWrap = false;
         if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
-        this.form.set('dbAction', action);
+        this.form.set('dbAction', 'loadOrder');
         this.form.set( 'orderIds', this.queryParam.orderIds);
         f.Post({data: this.form})
           .then((data) => this.showOrder(data));
@@ -269,7 +277,7 @@ export const orders = {
 
         let link = f.gI(f.ID.PUBLIC_PAGE),
             query = this.table.dataset.type === 'order' ? 'orderId=' : 'orderVisitorId=';
-        link.href += '?' + query + JSON.parse(this.queryParam.orderIds)[0];
+        link.href += '?' + query + this.selected.getSelected()[0];
         link.click();
       },
       'printOrder': () => {
@@ -288,10 +296,8 @@ export const orders = {
         data.set('docType', 'print');
         data.set('fileTpl', 'pdfTpl'); // ToDO сделать по умолчанию?
         data.set('orderIds', this.queryParam.orderIds);
+        data.set('useUser', 'true');
 
-        /*data.set('mode', 'DB');
-         data.set('dbAction', 'loadOrder');
-         data.set('orderIds', this.queryParam.orderIds);*/
         f.Post({data}).then((data) => {
             try { data && P.print(data['printBody']); }
             //try { data && P.print(f.printReport, data, type); }
@@ -305,12 +311,12 @@ export const orders = {
       'savePdf': () => {
         hideActionWrap = false;
         if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+
         let data = new FormData();
-        data.append('useUser', 'true');
-        f.downloadPdf(target,
-          {orderIds: this.queryParam.orderIds}, data,
-          () => target.blur(),
-          );
+        data.set('useUser', 'true');
+        data.set('orderIds', this.queryParam.orderIds);
+
+        f.downloadPdf(target, {}, data, () => target.blur());
       },
       'sendOrder': () => {
         hideActionWrap = false;
@@ -413,7 +419,7 @@ export const orders = {
     new allOrdersList({dbAction, node: e.target, tableType: orders.table.dataset.type});
   },
 
-  // TODO bind events
+  // Bind events
   //--------------------------------------------------------------------------------------------------------------------
 
   /**

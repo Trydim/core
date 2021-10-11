@@ -108,7 +108,7 @@ export class SelectedRow {
     return this.selectedId.size;
   }
 
-  // Выделить выбранные Заказы
+  // Выделить выбранные строки
   checkedRows(check = true) {
     this.selectedId.forEach(id => {
       let input = this.table.querySelector(`input[data-id="${id}"]`);

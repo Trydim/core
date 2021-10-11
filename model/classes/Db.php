@@ -886,7 +886,7 @@ class Db extends \R {
    * @return array|null
    */
   public function getUser($login, $column = 'ID') {
-    $result = self::getRow("SELECT $column FROM users WHERE login = :login", [':login' => $login]);
+    $result = self::getRow("SELECT $column FROM users WHERE name = :name", [':name' => $login]);
 
     if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
     return $result;

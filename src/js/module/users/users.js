@@ -32,11 +32,17 @@ export const users = {
 
   init() {
     this.p = new f.Pagination( '#paginator',{
-      queryParam: this.queryParam,
+      dbAction : 'loadUsers',
+      sortParam: this.queryParam,
       query: this.query.bind(this),
     });
     this.id = new f.SelectedRow({table: this.table});
-    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
+    new f.SortColumns({
+      thead: this.table.querySelector('thead'),
+      query: this.query.bind(this),
+      dbAction : 'loadUsers',
+      sortParam: this.queryParam,
+    });
     this.M = f.initModal();
     this.query();
 

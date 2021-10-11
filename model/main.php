@@ -24,7 +24,9 @@ try {
       break;
   }
 
-  $result['status'] = isset($result['error']) ? checkError($result['error']) : true;
+
+  if (isset($result['error']) && checkError($result['error'])) unset($result['error']);
+  $result['status'] = !isset($result['error']);
 
 } catch (\mysql_xdevapi\Exception $e) {
   echo $e->getMessage();

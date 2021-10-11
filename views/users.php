@@ -8,7 +8,7 @@
  */
 
 $field['content'] = template('parts/usersContent', $param);
-$field['pageFooter'] = '<div id="paginator"></div>';
+$field['pageFooter'] = '<div id="paginator" class="w-100"></div>';
 
 // Users/Manager custom field
 $managerFieldHtml = '';

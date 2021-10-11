@@ -488,37 +488,21 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['customers'] = $db->loadCustomers($pageNumber, $countPerPage, $sortColumn, $sortDirect, $customerIds);
       break;
     case 'addCustomer':
-      $param = ['0' => []];
-      if (isset($name) && !empty($name)) {
-        $param['0']['name'] = $name;
-        $param['0']['ITN'] = isset($ITN) ? $ITN : '';
-
-        $contacts = [];
-        isset($phone) && $contacts['phone'] = $phone;
-        isset($email) && $contacts['email'] = $email;
-        isset($address) && $contacts['address'] = $address;
-        count($contacts) && $param['0']['contacts'] = json_encode($contacts);
-
-        // TODO обработка ошибки не верна
-        //$result['error'] = $db->insert($columns, 'customers', $param);
-        $db->insert($columns, 'customers', $param);
-      }
-      break;
     case 'changeCustomer':
-      if (isset($customerId) && is_finite($customerId)) {
-        $param = [];
+      $newCustomer = (isset($customerId) && is_finite($customerId));
+      $customerId = $customerId ?? 0;
+      $param = [$customerId => []];
+      $customer = isset($authForm) ? json_decode($authForm, true) : [];
 
-        $contacts = [];
-        isset($phone) && $contacts['phone'] = $phone;
-        isset($email) && $contacts['email'] = $email;
-        isset($address) && $contacts['address'] = $address;
-
-        isset($name) && $param[$usersId]['name'] = $name;
-        isset($ITN) && $param[$usersId]['ITN'] = $ITN;
-        count($contacts) && $param[$usersId]['contacts'] = json_encode($contacts);
-
-        $db->insert($columns, 'customers', $param, true);
+      $contacts = [];
+      foreach ($customer as $k => $v) {
+        if ($k === 'cType') continue;
+        if (in_array($k, ['name', 'ITN'])) $param[$customerId][$k] = $v;
+        else $contacts[$k] = $v;
       }
+      count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);
+
+      $db->insert($columns, 'customers', $param, $newCustomer);
       break;
     case 'delCustomer':
       $usersId = isset($customerId) ? json_decode($customerId) : [];

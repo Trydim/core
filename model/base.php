@@ -41,8 +41,10 @@ if ($main->checkStatus('ok') && isset($db)) {
   if (DB_TABLE_IN_SIDEMENU) {
     $dbTables = [];
     if (USE_DATABASE) {
+
+
       if (CHANGE_DATABASE) {
-        $dbTables = array_merge($dbTables, $db->getTables());
+        $dbTables = $db->getTables();
       } else if (in_array('catalog', ACCESS_MENU)) {
 
         $props = array_merge([[
@@ -55,8 +57,19 @@ if ($main->checkStatus('ok') && isset($db)) {
           $setting && $setting['name'] && $prop['name'] = $setting['name'];
           return $prop;
         }, $props);
-        $dbTables = array_merge($dbTables, ['z_prop' => $props]);
+        $dbTables = ['z_prop' => $props];
       }
+
+      if (in_array('orders', ACCESS_MENU)) {
+        $props = [[
+          'dbTable' => 'order_status',
+          'name' => gTxtDB('order_status', 'order_status')
+        ]];
+
+        if (isset($dbTables['z_prop'])) $dbTables['z_prop'] = $props;
+        else $dbTables = ['z_prop' => $props];
+      }
+
     }
     $dbTables = array_merge($dbTables, $db->scanDirCsv(PATH_CSV));
     //Xml::checkXml($dbTables);

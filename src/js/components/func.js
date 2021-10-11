@@ -241,9 +241,9 @@ const func = {
       const target = eNode.dataset.target;
       if (!target) { console.warn('Initialisation relatedOption: ' + target + ' is empty '); return; }
 
-      let nodesT = false,
-          nodesR = [],
-          changeEvent = (relation = true) => {
+      let nodesT = false, nodesR = [];
+
+      const changeEvent = (relation = true) => {
         nodesT = nodesT || qs(`[data-relation*="${target}"]`);
 
         nodesT.forEach(nodeT => {
@@ -252,8 +252,8 @@ const func = {
           checkedTarget(nodeT, member);
         });
 
-            relation && nodesR.forEach(n => n.dispatchEvent(new Event('changeR')));
-          };
+        relation && nodesR.forEach(n => n.dispatchEvent(new Event('changeR')));
+      };
 
       if (eNode.type === 'radio' && eNode.name) {
         qs(`input[name="${eNode.name}"]`).forEach(n => {
@@ -402,8 +402,6 @@ const func = {
    * @param err function
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
-    if (!Object.keys(report).length) { err(); return; }
-
     func.setLoading(target);
     target.setAttribute('disabled', 'disabled');
 

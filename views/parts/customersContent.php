@@ -38,7 +38,7 @@
     </thead>
     <tbody>
     <tr>
-      <td><input type="checkbox" class="" data-id="${C.ID}"></td>
+      <td><input type="checkbox" class="" data-id="${id}"></td>
       <?php if (isset($columns)) {
         foreach ($columns as $item) { ?>
           <td>${<?= $item['dbName']; ?>}</td>

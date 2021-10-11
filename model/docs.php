@@ -7,6 +7,8 @@
  * @var string $docType
  */
 
+$data = [];
+
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
 $orderIds = isset($orderIds) ? json_decode($orderIds) : false;
 !$orderIds && $orderIds = isset($reportVal['orderIds']) ? json_decode($reportVal['orderIds']) : false;
@@ -19,24 +21,38 @@ if ($orderIds || $addManager) {
   $db = new RedBeanPHP\Db($dbConfig);
 }
 
-if ($orderIds) { // Отчет взять из базы
+// Отчет загрузить из БД по ИД
+if ($orderIds) {
   $reportVal = $db->loadOrderById($orderIds);
-  $userData = [
-    'name' => $reportVal['name'],
-    'userId' => $reportVal['userId'],
-    'contacts' => $reportVal['contacts'],
+
+  $reportVal['id']           = $reportVal['ID'];
+  $reportVal['customerName'] = $reportVal['C.name'];
+
+  $reportVal['contacts']       = json_decode($reportVal['contacts'], true);
+  $reportVal['importantValue'] = json_decode($reportVal['importantValue'], true);
+  $reportVal['saveValue']      = json_decode($reportVal['saveValue'], true);
+  $reportVal['reportValue']    = json_decode($reportVal['reportValue'], true);
+
+  $data = [
+    'order'       => $reportVal,
+    'reportValue' => &$reportVal['reportValue'],
   ];
-  isset($reportVal['reportValue']) && $reportVal = json_decode($reportVal['reportValue'], true);
-  $reportVal['userData'] = $userData;
 }
 
-if ($addManager) { // Данные о менеджере
-  if (isset($userData['name'])) {
-    $userData = $db->getUser($userData['name'], 'name, contacts');
-  } else if (isset($userData['userId'])) {
-    $userData = $db->getUserById($userData['userId']);
-  } else $userData = $db->getUserByOrderId($main->getLogin('id'));
-  if (count($userData)) $reportVal['userData'] = $userData;
+// Данные о менеджере
+if ($addManager) {
+  if (isset($reportVal['name'])) {
+    $userData = $db->getUser($reportVal['name'], 'name, contacts');
+  } else if (isset($reportVal['userId'])) {
+    $userData = $db->getUserById($reportVal['userId']);
+  } else {
+    $userData = $db->getUserByOrderId($main->getLogin('id'));
+  }
+
+  if (count($userData)) {
+    $userData['contacts']  = json_decode($userData['contacts'], true);
+    $data['userData'] = $userData;
+  }
 }
 
 !isset($docsAction) && $docsAction = $docType;
@@ -54,7 +70,7 @@ if (count($_FILES)) {
 
 if ($docType && $docType !== 'mail') {
   require_once 'classes/Docs.php';
-  $docs = new Docs($docType, $reportVal, isset($fileTpl) ? $fileTpl : 'default');
+  $docs = new Docs($docType, $data, isset($fileTpl) ? $fileTpl : 'default');
 }
 
 if (isset($docsAction)) {
@@ -73,7 +89,7 @@ if (isset($docsAction)) {
         'phone' => isset($tel) ? $tel : (isset($phone) ? $phone : ''),
         'email' => isset($email) ? $email : '',
         'info'  => isset($info) ? $info : '',
-        'data'  => $reportVal,
+        'data'  => $data,
       ];
       isset($filesArray) && $mail->addOtherFile($filesArray);
       $mail->prepareMail($param);

@@ -103,7 +103,7 @@ class Course {
     return array_map(function ($c) {
       return [
         'id' => $c['code'],
-        'value' => $c['rate'] || 1,
+        'value' => $c['rate'] ?? 1,
       ];
     }, $this->rate);
   }
