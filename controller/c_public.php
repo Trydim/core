@@ -21,15 +21,14 @@ if ($authStatus && isset($_GET['orderId'])) {
     $order = $db->loadOrderById($orderId);
 
     if ($order) {
-      $customers = $db->loadCustomerByOrderId($order['ID']);
+      $customer = $db->loadCustomerByOrderId($order['ID']);
 
-      $dbContent .= "<input type='hidden' id='orderSaveValue' value='$order[saveValue]'>" .
-                    "<input type='hidden' id='orderReport' value='$order[reportValue]'>" .
-                    "<input type='hidden' id='orderImportantValue' value='$order[importantValue]'>";
+      $order = json_encode($order);
+      $dbContent .= "<input type='hidden' id='dataOrder' value='$order'>";
 
-      if ($customers) {
-        $customers = json_encode($customers);
-        $dbContent .= "<input type='hidden' id='customerLoadOrders' value='$customers'>";
+      if ($customer) {
+        $customer = json_encode($customer);
+        $dbContent .= "<input type='hidden' id='dataCustomer' value='$customer'>";
       }
     }
   }
@@ -43,14 +42,8 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
     $order = $db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
 
     if (count($order) === 1) {
-      $order = $order[0];
-
-      $oldData = json_encode([
-        'date'  => $order['createDate'],
-        'total' => $order['total'],
-      ]);
-      $dbContent .= "<input type='hidden' id='orderSaveValue' value='$order[inputValue]'>" .
-                    "<input type='hidden' id='orderOldTotal' value='$oldData'>";
+      $order = json_encode($order[0]);
+      $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='$order'>";
     }
   }
 }

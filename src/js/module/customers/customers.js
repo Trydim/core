@@ -221,7 +221,7 @@ export const customers = {
         return;
       }
 
-      data.status && this.confirmMsg && f.showMsg(this.confirmMsg);
+      data.status && this.confirmMsg && f.showMsg(this.confirmMsg) && delete this.confirmMsg;
 
       if(data['customers']) { this.setUsers(data['customers']); this.fillTable(data['customers']); }
       if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
@@ -254,7 +254,7 @@ export const customers = {
 
         ['name', 'phone', 'email', 'address', 'ITN'].map(i => {
           let node = form.querySelector(`[name="${i}"]`);
-          i === 'phone' && f.maskInit(node);
+          i === 'phone' && f.maskInit(node, '+375 (__) ___ __ __');
           i === 'ITN' && f.maskInit(node, '_________');
         });
 
@@ -280,7 +280,7 @@ export const customers = {
         let {phone = '', email = '', address = ''} = customer['contactsParse'];
 
         node = form.querySelector(`[name="phone"]`);
-        f.maskInit(node);
+        f.maskInit(node, '+375 (__) ___ __ __');
         node.value = phone;
 
         node = form.querySelector(`[name="email"]`);

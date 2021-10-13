@@ -37,6 +37,8 @@ if ($orderIds) {
     'order'       => $reportVal,
     'reportValue' => &$reportVal['reportValue'],
   ];
+} else if ($reportVal) {
+  $data['reportValue'] = $reportVal;
 }
 
 // Данные о менеджере

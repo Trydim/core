@@ -127,25 +127,26 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $changeUser === 'add' && $customerId = $db->getLastID('customers');
         }
 
-        $idOrder = isset($idOrder) ? $idOrder : false;
-        $newOrder = !$idOrder || !is_numeric($idOrder);
-        $idOrder = $newOrder ? ((int)$db->getLastID('orders')) + 1 : $idOrder;
+        $orderId = isset($orderId) ? $orderId : false;
+        $newOrder = !$orderId || !is_numeric($orderId);
+        $orderId = $newOrder ? ((int)$db->getLastID('orders')) + 1 : $orderId;
 
-        $param = [$idOrder => []];
-        $param[$idOrder]['customer_id'] = $customerId;
-        $param[$idOrder]['user_id'] = $_SESSION['priority']; // TODO нет не пойдет
-        isset($saveVal) && $param[$idOrder]['save_value'] = $saveVal;
-        isset($importantVal) && $param[$idOrder]['important_value'] = $importantVal;
-        isset($orderTotal) && is_finite($orderTotal) && $param[$idOrder]['total'] = floatval($orderTotal);
-        $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
+        $param = [$orderId => []];
+        $param[$orderId]['customer_id'] = $customerId;
+        $param[$orderId]['user_id'] = $_SESSION['priority']; // TODO нет не пойдет
+        isset($saveVal) && $param[$orderId]['save_value'] = $saveVal;
+        isset($importantVal) && $param[$orderId]['important_value'] = $importantVal;
+        isset($orderTotal) && is_finite($orderTotal) && $param[$orderId]['total'] = floatval($orderTotal);
+        $param[$orderId]['report_value'] = addCpNumber($orderId, $reportVal);
 
         $columns = $db->getColumnsTable('orders');
         $result['error'] = $db->insert($columns, 'orders', $param, !$newOrder);
 
         // status_id = ; по умолчанию сохранять из настроек
-        //$db->saveOrder($param, $idOrder);
+        //$db->saveOrder($param, $orderId);
         $result['customerId'] = $customerId;
-        $result['orderID'] = $idOrder;
+        $result['orderId'] = $orderId;
+        $result['saveDate'] = date('Y-m-d H:i:s');
       }
       break;
     case 'loadOrders':

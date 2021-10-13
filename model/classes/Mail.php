@@ -68,10 +68,10 @@ class Mail {
     $this->otherMail[] = $email;
   }
 
-  public function addFile($docPath, $fileName = "") {
+  public function addFile(string $docPath, string $fileName = '') {
+    $fileName = !empty($fileName) ? $fileName : basename($docPath);
     $this->docPath = $docPath;
-    $this->pdfFileName = $fileName !== '' ? $fileName : uniqid() . '.pdf';
-    //'КП_' . $this->cpNumber . '_' . date('dmY') . '.pdf';
+    $this->pdfFileName = empty($fileName) ? uniqid() . '.pdf' : $fileName;
   }
 
   public function addOtherFile($files) {
@@ -127,7 +127,7 @@ class Mail {
         for ($i = 1; $i <= count($resource); $i++)
           $mail->AddEmbeddedImage($resource[$i - 1], "pict$i.jpg", "pict$i.jpg", 'base64', 'image/jpeg');
 
-      $mail->Subject = $this->subject;
+      $mail->Subject = $this->subject ?? MAIL_SUBJECT_DEFAULT;
       $mail->MsgHTML($this->body);
       $mail->AltBody = 'Тестовое сообщение.';
 
