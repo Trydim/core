@@ -840,9 +840,11 @@ class Db extends \R {
 
   public function setMoney($rate) {
     $beans = self::xdispense('money', 1);
+    $date = date('Y-m-d h:i:s');
     foreach ($rate as $currency) {
       $beans->id = $currency['ID'];
       $beans->rate = $currency['rate'];
+      $beans->lastEditDate = $date;
       self::store($beans);
     }
   }

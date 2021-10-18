@@ -32,7 +32,11 @@ class Course {
 
   private function getMainCurrency() {
     $res = array_filter($this->rate, function ($c) { return boolval($c['main']); });
-    return count($res) ? array_values($res)[0] : $this->rate[$this::DEFAULT_CURRENCY];
+    if (count($res)) return array_values($res)[0];
+
+    return isset($this->rate[self::DEFAULT_CURRENCY])
+      ? $this->rate[self::DEFAULT_CURRENCY]
+      : array_values($this->rate)[0];
   }
 
   private function searchRate($code) {
@@ -79,9 +83,9 @@ class Course {
   private function readFromCbr(): void {
     $mainCurrency = $this->getMainCurrency();
 
-    $linkSource = $this->source[$mainCurrency['code']];
+    $linkSource = $this->source[$mainCurrency['code']] ?? false;
 
-    if (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM)) return;
+    if (!$linkSource || (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM))) return;
 
     foreach ($this->rate as $code => $currency) {
       if ($currency === $mainCurrency) continue;

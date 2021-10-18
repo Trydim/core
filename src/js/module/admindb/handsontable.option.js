@@ -15,7 +15,7 @@ export const handson = {
     manualRowResize   : true,
     stretchH          : 'all',
     width             : '100%',
-    height            : 1100, // Must be computed
+    height            : window.innerHeight * 0.8,
     licenseKey        : 'non-commercial-and-evaluation',
 
     afterChange(changes) {
