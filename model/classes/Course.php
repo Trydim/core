@@ -24,15 +24,22 @@ class Course {
   public $rate;
 
   public function __construct(&$db, $dataFile = PATH_CSV . 'exchange_rate.bin') {
+
     if (is_object($db)) $this->getRateFromDb($db);
     else $this->getRateFromFile($dataFile);
 
     $this->refresh();
   }
 
+  private function checkTableMoney() {
+    // проверить есть ли в Таблице базовая валюта
+  }
+
   private function getMainCurrency() {
     $res = array_filter($this->rate, function ($c) { return boolval($c['main']); });
-    return count($res) ? array_values($res)[0] : $this->rate[$this::DEFAULT_CURRENCY];
+    if (count($res)) return array_values($res)[0];
+
+    return $this->rate[self::DEFAULT_CURRENCY] ?? array_values($this->rate)[0];
   }
 
   private function searchRate($code) {
@@ -55,6 +62,7 @@ class Course {
 
   private function getRateFromDb($db) {
     $this->db = $db;
+    if (DEBUG) $this->checkTableMoney();
     $this->rate = $db->getMoney();
   }
 
@@ -79,9 +87,9 @@ class Course {
   private function readFromCbr(): void {
     $mainCurrency = $this->getMainCurrency();
 
-    $linkSource = $this->source[$mainCurrency['code']];
+    $linkSource = $this->source[$mainCurrency['code']] ?? false;
 
-    if (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM)) return;
+    if (!$linkSource || (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM))) return;
 
     foreach ($this->rate as $code => $currency) {
       if ($currency === $mainCurrency) continue;
@@ -103,7 +111,7 @@ class Course {
     return array_map(function ($c) {
       return [
         'id' => $c['code'],
-        'value' => $c['rate'] || 1,
+        'value' => $c['rate'] ?? 1,
       ];
     }, $this->rate);
   }

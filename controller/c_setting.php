@@ -17,7 +17,7 @@ if ($main->getSettings('admin')) {
   $field['footerContent'] .= "<input type='hidden' id='userSetting' value='$fileSetting'>";
 
   if (USE_DATABASE) {
-    $permissions = $db->loadTable('permission');
+    $permissions = $main->db->loadTable('permission');
     $permIds = [];
 
     $permissions = array_map(function ($row) use (&$permIds) {

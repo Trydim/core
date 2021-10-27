@@ -56,7 +56,7 @@ const cancelFormSubmit = () => {
   });
 }
 
-// TODO event function
+// Event function
 // ---------------------------------------------------------------------------------------------------------------------
 
 const authEvent = function(e) {
@@ -64,7 +64,7 @@ const authEvent = function(e) {
       action = this.getAttribute('data-action');
 
   let select = {
-    'exit' : () => {
+    'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
     }
   }
@@ -83,13 +83,14 @@ const sideMenuExpanded = (e, node) => {
   }
 }
 
-// TODO event bind
+// Event bind
 // -------------------------------------------------------------------------------------------------------------------
 
 // Block Authorization
 const onAuthEvent = () => {
   let node = f.gI(f.ID.AUTH_BLOCK);
-  node && node.querySelectorAll('[data-action]').forEach(n => n.onclick = authEvent );
+  node && node.querySelectorAll('[data-action]')
+              .forEach(n => n.addEventListener('click', authEvent));
 }
 
 const onClickSubmenu = () => {

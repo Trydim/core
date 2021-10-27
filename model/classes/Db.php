@@ -32,9 +32,9 @@ class Db extends \R {
    * db constructor
    *
    * @param array $dbConfig
-   * @param bool $freeze
+   * @param bool  $freeze
    */
-  public function __construct($dbConfig = [], $freeze = true) {
+  public function __construct(array $dbConfig = [], bool $freeze = true) {
     if (USE_DATABASE) {
       if (!count($dbConfig)) {
         require ABS_SITE_PATH . 'config.php';
@@ -840,9 +840,11 @@ class Db extends \R {
 
   public function setMoney($rate) {
     $beans = self::xdispense('money', 1);
+    $date = date('Y-m-d h:i:s');
     foreach ($rate as $currency) {
       $beans->id = $currency['ID'];
       $beans->rate = $currency['rate'];
+      $beans->lastEditDate = $date;
       self::store($beans);
     }
   }
@@ -886,7 +888,7 @@ class Db extends \R {
    * @return array|null
    */
   public function getUser($login, $column = 'ID') {
-    $result = self::getRow("SELECT $column FROM users WHERE login = :login", [':login' => $login]);
+    $result = self::getRow("SELECT $column FROM users WHERE name = :name", [':name' => $login]);
 
     if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
     return $result;
@@ -1064,7 +1066,7 @@ trait MainCsv {
    * @param $link {string}
    * @return mixed|null
    */
-  static function scanDirCsv($path, $link = '') {
+  static function scanDirCsv(string $path, string $link = '') {
 
     return array_reduce(scandir($path), function ($r, $item) use ($link) {
       if (!($item === '.' || $item === '..')) {
@@ -1076,8 +1078,7 @@ trait MainCsv {
         } else {
           $link && $link .= '/';
           if (filetype(PATH_CSV . $link . $item) === 'dir') {
-            global $db;
-            $r[$item] = $db::scanDirCsv(PATH_CSV . $link . $item, $link . $item);
+            $r[$item] = self::scanDirCsv(PATH_CSV . $link . $item, $link . $item);
           }
         }
       }

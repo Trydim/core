@@ -40,8 +40,8 @@ const CustomersList = {
       try { phone = JSON.parse(i['contacts'])['phone'].replace(/ |-|_|\(|\)|@/g, ''); }
       catch { phone = ''; }
 
-      this.searchData[i['C.ID']] = i['name'] + i['ITN'] + phone;
-      r[i['C.ID']] = i;
+      this.searchData[i.id] = i['name'] + i['ITN'] + phone;
+      r[i.id] = i;
       return r;
     }, Object.create(null));
   },
@@ -128,12 +128,20 @@ export const customers = {
   usersList: new Map(),
 
   init() {
-    this.p = new f.Pagination( '#paginator',{
-      queryParam: this.queryParam,
-      query: this.query.bind(this),
-    });
-    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
     this.M = f.initModal();
+    this.p = new f.Pagination( '#paginator',{
+      dbAction : 'loadCustomers',
+      query: this.query.bind(this),
+      sortParam: this.queryParam,
+    });
+    new f.SortColumns({
+      thead: this.table.querySelector('thead'),
+      query: this.query.bind(this),
+      dbAction : 'loadCustomers',
+      sortParam: this.queryParam,
+    });
+    this.selected = new f.SelectedRow({table: this.table});
+
     this.query();
 
     this.onEvent();
@@ -141,7 +149,7 @@ export const customers = {
 
   setUsers(data) {
     this.usersList = new Map();
-    data.forEach(i => this.usersList.set(i['C.ID'], i));
+    data.forEach(i => this.usersList.set(i.id, i));
   },
   fillTable(data, search = false) {
     this.contValue || (this.contValue = f.gT('#tableContactsValue'));
@@ -161,7 +169,7 @@ export const customers = {
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
         } catch (e) {
-          console.log(`Заказ ID:${item['U.ID']} имеет не правильное значение`);
+          console.log(`Клиент ID: ${item.id} имеет не правильное значение`);
         }
         item['contacts'] = value;
       }
@@ -175,8 +183,8 @@ export const customers = {
       }*/
 
       if (item['orders']) {
-        orders.setData(item['C.ID'], item['orders'])
-        item['orders'] = f.replaceTemplate(this.orderBtn, {'C.ID': item['C.ID']});
+        orders.setData(item.id, item['orders'])
+        item['orders'] = f.replaceTemplate(this.orderBtn, {id: item.id});
       }
 
       return item;
@@ -187,12 +195,9 @@ export const customers = {
     data.length && (html += f.replaceTemplate(this.tbody, data));
     !data.length && search && (html = this.searchMsg);
     this.table.querySelector('tbody').innerHTML = html;
-
-    data.length && this.onTableEvent();
-    data.length && this.checkedRows();
   },
   checkCustomers() {
-    for (const id of this.selectedId) {
+    for (const id of this.selected.getSelected()) {
       if (this.usersList.get(id).orders) {
         f.showMsg(`У Клиента ${id} имеются заказы!`, 'error');
         return true;
@@ -211,14 +216,13 @@ export const customers = {
 
       if (this.needReload) {
         this.needReload = false;
-        this.selectedId = new Set();
         this.queryParam.dbAction = 'loadCustomers';
         this.queryParam.orderIds = '[]';
         this.query();
         return;
       }
 
-      data.status && this.confirmMsg && f.showMsg(this.confirmMsg);
+      data.status && this.confirmMsg && f.showMsg(this.confirmMsg) && delete this.confirmMsg;
 
       if(data['customers']) { this.setUsers(data['customers']); this.fillTable(data['customers']); }
       if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
@@ -230,72 +234,82 @@ export const customers = {
 
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
-    let target = e.target,
+    let target = e.target, form,
         action = target.getAttribute('data-action');
+
+    if (!action) return;
+
+    if (['addCustomer', 'changeCustomer'].includes(action)) {
+      this.delayFunc = () => {
+        const f = new FormData(form), res = {};
+        for (const [k, v] of f.entries()) {
+          res[k] = v;
+        }
+        this.queryParam.authForm = JSON.stringify(res);
+      };
+    }
 
     let select = {
       'addCustomer': () => {
-        let form = f.gTNode('#customerForm');
+        form = f.gTNode('#customerForm');
 
         ['name', 'phone', 'email', 'address', 'ITN'].map(i => {
           let node = form.querySelector(`[name="${i}"]`);
-          i === 'phone' && f.maskInit(node);
-          node && this.onEventNode(node, this.changeTextInput, {}, 'blur');
+          i === 'phone' && f.maskInit(node, '+375 (__) ___ __ __');
+          i === 'ITN' && f.maskInit(node, '_________');
         });
 
         this.confirmMsg = 'Клиент добавлен';
         this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Добавление пользователя', form);
+        f.relatedOption(form);
       },
       'changeCustomer': () => {
-        if (this.selectedId.size !== 1) { f.showMsg('Выберите клиента!'); return; }
+        if (this.selected.getSelectedSize() !== 1) { f.showMsg('Выберите клиента!'); return; }
 
-        let form = f.gTNode('#customerForm'), node,
-            id = this.getSelected(),
+        let node,
+            id = this.selected.getSelected(),
             customer = this.usersList.get(id[0]);
+
+        form = f.gTNode('#customerForm');
 
         this.queryParam.customerId = id[0];
         node = form.querySelector('[name="name"]');
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
         node.value = customer['name'];
 
         // Contacts
         let {phone = '', email = '', address = ''} = customer['contactsParse'];
 
         node = form.querySelector(`[name="phone"]`);
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
-        f.maskInit(node);
+        f.maskInit(node, '+375 (__) ___ __ __');
         node.value = phone;
 
         node = form.querySelector(`[name="email"]`);
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
         node.value = email;
 
         node = form.querySelector(`[name="address"]`);
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
         node.value = address;
 
         node = form.querySelector(`[name="ITN"]`);
-        this.onEventNode(node, this.changeTextInput, {}, 'blur');
+        f.maskInit(node, '_________');
         node.value = customer['ITN'];
-
-        form.querySelectorAll('input').forEach(n => {
-          n.dispatchEvent(new Event('blur'));
-        });
 
         this.confirmMsg = 'Изменения сохранены';
         this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Изменение клиента', form);
+        f.relatedOption(form);
       },
       'delCustomer': () => {
-        if (!this.selectedId.size) { f.showMsg('Выберите клиента!', 'error'); return; }
+        if (!this.selected.getSelectedSize()) { f.showMsg('Выберите клиента!', 'error'); return; }
         if (this.checkCustomers()) return;
 
-        this.queryParam.customerId = JSON.stringify(this.getSelected());
+        this.queryParam.customerId = JSON.stringify(this.selected.getSelected());
 
         this.confirmMsg = 'Успешно удалено';
         this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Удалить', 'Удалить выбранных клиентов?');
+
+        this.delayFunc = () => this.selected.clear();
       },
       'openOrders': () => {
         let id = target.dataset.id,
@@ -330,20 +344,11 @@ export const customers = {
     }
   },
 
-  changeTextInput(e) {
-    if (e.target.value.length === 0) return;
-    else if (e.target.value.length <= 2) { e.target.value = 'Ошибка'; return; }
-    this.queryParam[e.target.name] = e.target.value;
-  },
-  changeCheckInput(e) {
-    this.queryParam[e.target.name] = e.target.checked;
-  },
-
   focusSearch(e) {
     CustomersList.setData(e.target);
   },
 
-  // TODO bind events
+  // Bind events
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
@@ -358,64 +363,11 @@ export const customers = {
 
   onEvent() {
     // Action buttons
-    f.qA('input[data-action]', 'click', (e) => this.actionBtn(e));
-    // Click on row for selected
-    this.onEventNode(this.table.querySelector('tbody'), (e) => this.clickRows(e));
+    f.qA('input[data-action]', 'click', e => this.actionBtn(e));
+    // Click show orders
+    this.table.addEventListener('click', e => this.actionBtn(e));
 
     // Focus Search Init
     this.onEventNode(f.gI('search'), this.focusSearch, {once: true}, 'focus');
-  },
-
-  /*onCheckEdit(node) {
-    node.querySelectorAll('input').forEach(n => {
-      n.addEventListener('blur', (e) => this.blurInput(e));
-      n.addEventListener('focus', (e) => this.focusInput(e));
-    });
-  },*/
-
-  selectedId: new Set(), // TODO сохранять в сессии/локальном хранилище потом, что бы можно было перезагрузить страницу
-
-  getSelected() {
-    let ids = [];
-    for( let id of this.selectedId.values()) ids.push(id);
-    return ids;
-  },
-
-  clickRows(e) {
-    let target = e.target,
-        i = 0;
-
-    if(target.tagName === 'INPUT') return false;
-
-    while (target.tagName !== 'TR' && i < 4) {
-      target = target.parentNode; i++;
-    }
-    if (target.tagName !== 'TR') return;
-    target.querySelector('input').click();
-  },
-
-  // выбор пользователя
-  selectRows(e) {
-    let input = e.target,
-        id = input.getAttribute('data-id');
-
-    if (input.checked) this.selectedId.add(id);
-    else this.selectedId.delete(id);
-  },
-
-  // Выделить выбранных
-  checkedRows() {
-    this.selectedId.forEach(id => {
-      let input = this.table.querySelector(`input[data-id="${id}"]`);
-      if (input) input.checked = true;
-    });
-  },
-
-  onTableEvent() {
-    // Checked rows
-    this.table.querySelectorAll('tbody input').forEach(n => {
-      if (n.type === 'checkbox') n.addEventListener('change', (e) => this.selectRows(e));
-      else if (n.type === 'button') n.addEventListener('click', (e) => this.actionBtn(e));
-    });
   },
 }

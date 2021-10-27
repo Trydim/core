@@ -5,7 +5,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
 ?>
 <div class="row container m-auto" id="settingForm">
   <?php if ($admin) { ?>
-  <div class="col-6">
+  <div class="col-6 border">
     <form action="#" id="mailForm" class="row">
       <div class="col-12 d-flex justify-content-between">
         <p>Почта для получения заказов</p>
@@ -27,7 +27,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   </div>
   <?php } ?>
 
-  <div class="col-6">
+  <div class="col-6 border">
     <form action="#" id="userForm">
       <input type="hidden" name="priority" value="<?= $main->getLogin('id') ?>">
       <div class="col-12 d-flex justify-content-between">
@@ -53,7 +53,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
 
   <?php if ($admin && USE_DATABASE) {
     !isset($permStatus) && $permStatus = []; ?>
-  <div class="col-6">
+  <div class="col-6 border">
     <form action="#" class="row" id="permission">
       <?php if (isset($permIds)) { ?>
         <input type="hidden" name="permIds" value="<?= $permIds ?>">
@@ -89,7 +89,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     </form>
   </div>
 
-  <div class="col-6">
+  <div class="col-6 border">
     <form action="#" id="managerForm" class="row">
       <div class="col-12 d-flex justify-content-between">
         <p class="col-7">Дополнительные поля менеджеров</p>
@@ -104,7 +104,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <?php } ?>
 
   <?php if ($admin && USE_DATABASE) { ?>
-    <div class="col-6">
+    <div class="col-6 border">
       <form action="#" id="rateForm" class="row">
         <div class="col-12 d-flex justify-content-between">
           <p class="mt-1">Автоматически обновлять курсы</p>
@@ -119,6 +119,17 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       </form>
     </div>
   <?php } ?>
+
+  <?php if ($admin && false) { ?>
+    <div class="col-6 border">
+      <div class="col-12 text-center">Статусы</div>
+      <div class="col-12">
+        <select name="">
+
+        </select>
+      </div>
+    </div>
+  <? } ?>
 
   <div class="col-12">
     <input type="button" class="btn btn-primary" value="Сохранить" data-action="save">

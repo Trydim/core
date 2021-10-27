@@ -1,19 +1,15 @@
-<?php use RedBeanPHP\Db;
+<?php
 
 /**
  * @var $main {class} - global from
+ * @var $db {class} - global db
  */
 
 if (!defined('MAIN_ACCESS')) die('access denied!');
 
-require_once 'classes/Db.php';
-$db = new Db();
-
 !isset($authAction) && ($authAction = 'noAuthAction');
 !isset($login) && ($login = '');
 !isset($password) && ($password = '');
-
-session_start();
 
 switch ($authAction) {
   case 'login':

@@ -32,11 +32,17 @@ export const users = {
 
   init() {
     this.p = new f.Pagination( '#paginator',{
-      queryParam: this.queryParam,
+      dbAction : 'loadUsers',
+      sortParam: this.queryParam,
       query: this.query.bind(this),
     });
     this.id = new f.SelectedRow({table: this.table});
-    new f.SortColumns(this.table.querySelector('thead'), this.query.bind(this), this.queryParam);
+    new f.SortColumns({
+      thead: this.table.querySelector('thead'),
+      query: this.query.bind(this),
+      dbAction : 'loadUsers',
+      sortParam: this.queryParam,
+    });
     this.M = f.initModal();
     this.query();
 
@@ -152,6 +158,7 @@ export const users = {
         form.querySelector('#changeField').remove();
         this.confirmMsg = 'Новый пользователь добавлен';
         this.M.show('Добавление пользователя', form);
+        f.maskInit(form.querySelector('[name="phone"]'));
       },
       'changeUser': () => {
         if (!this.id.getSelectedSize()) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
@@ -250,9 +257,6 @@ export const users = {
     if (e.target.value.length <= 2) e.target.value = '';
     repeatPass.value = '';
   },
-  changeCheckInput(e) {
-    this.queryParam[e.target.name] = e.target.checked;
-  },
   changePassword(e, newPass) {
     if (e.target.value !== newPass.value) {
       e.target.value = newPass.value = '';
@@ -278,15 +282,5 @@ export const users = {
   onEvent() {
     // Action buttons
     f.qA('input[data-action]', 'click', (() => (e) => this.actionBtn.call(this, e))());
-
-    // Click on row for selected
-    this.onEventNode(this.table.querySelector('tbody'), (e) => this.clickRows(e));
   },
-
-  /*onCheckEdit(node) {
-    node.querySelectorAll('input').forEach(n => {
-      n.addEventListener('blur', (e) => this.blurInput(e));
-      n.addEventListener('focus', (e) => this.focusInput(e));
-    });
-  },*/
 }

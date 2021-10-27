@@ -1,7 +1,7 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $db
+ * @var object $main
  * @var string $pathTarget
  */
 
@@ -11,7 +11,7 @@ $field = [ 'pageTitle' => 'Клиенты' ];
 //$setting = $db->getUserSetting(/*login user*/);
 
 if(!isset($setting)) {
-  $columns = $db->loadCustomers(0, 1);
+  $columns = $main->db->loadCustomers(0, 1);
 
 	if(count($columns)) {
     $columns = array_keys($columns[0]) ?: [];

@@ -3,6 +3,7 @@
 import '../../../css/module/admindb/handsontable.full.min.css';
 import {Handsontable} from './handsontable.full.min.js';
 import {handson} from "./handsontable.option";
+import mustache from 'mustache';
 
 import {XMLTable} from './XMLTable.js';
 import {FormViews} from './FormViews.js';
@@ -92,7 +93,9 @@ export const admindb = {
   setTableName() {
     let node = f.qS('#tableNameField'),
         name = this.tableName.substring(this.tableName.lastIndexOf("/") + 1).replace('.csv', '');
-    node && (node.innerHTML = _(name));
+    name = _(name);
+    node && (node.innerHTML = name);
+    document.title = name;
   },
   showTablesName: (data) => {
     if (!data.hasOwnProperty('tables') && !data.hasOwnProperty('csvFiles')) {
@@ -137,8 +140,10 @@ export const admindb = {
 
     this.handsontable = new Handsontable(div, Object.assign(handson.option, {
       data: handson.removeSlashesData(this.queryResult['csvValues']),
+      colHeaders: this.queryResult['csvValues'][0],
     }));
 
+    //this.handsontable.
     this.handsontable.updateSettings(handson.context);
     this.handsontable.admindb = this;
   },
@@ -162,6 +167,12 @@ export const admindb = {
     }
   },
 
+  checkTemplate(val) {
+    try {mustache.parse(val);}
+    catch (e) {
+      f.showMsg(`Ошибка в шаблоне (${e.message})` , 'warning');
+    }
+  },
   checkSavedTableChange(e) {
     if (this.btnSaveEnable && !confirm('Изменения будут потеряны, продолжить?')) {
       e.preventDefault();

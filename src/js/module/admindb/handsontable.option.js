@@ -1,9 +1,9 @@
 "use strict";
 
-const addSlashes = (value) => value.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
-const removeSlashes = (value) => value.replaceAll('\\n', '\n').replaceAll('\\r', '\r');
+const addSlashes = value => value.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
+const removeSlashes = value => value.replaceAll('\\n', '\n').replaceAll('\\r', '\r');
 
-const changeRowCol = (that) => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
+const changeRowCol = that => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
 
 export const handson = {
   option: {
@@ -15,16 +15,17 @@ export const handson = {
     manualRowResize   : true,
     stretchH          : 'all',
     width             : '100%',
-    height            : 1100, // Must be computed
+    height            : window.innerHeight * 0.8,
     licenseKey        : 'non-commercial-and-evaluation',
+    hiddenRows        : {rows: [0]}, // Не показывать заголовок
 
     afterChange(changes) {
-      if (!this.tableChanged && changes) {
+      if (changes) {
         for (const [row, prop, oldValue, newValue] of changes) {
           if (oldValue !== newValue) {
+            if (this.getColHeader(prop).includes('template')) this.admindb.checkTemplate(newValue);
             this.admindb.enableBtnSave();
-            this.tableChanged = true;
-            break;
+            !this.tableChanged && (this.tableChanged = true);
           }
         }
       }

@@ -1,5 +1,9 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var $main - global
+ */
+
 require_once basename( __DIR__ ) . '/cmsSetting.php';
 
 if(isset($_REQUEST['mode'])) require 'model/main.php';
@@ -13,7 +17,11 @@ else {
   $target && $pathTarget = checkTemplate($target);
   if ($target && strstr($pathTarget, '404')) require CORE . 'controller/c_404.php';
   else {
-    if (!OUTSIDE) require CORE . "model/base.php";
+    if (!OUTSIDE) {
+      $main->checkAuth($target)
+           ->applyAuth($target)
+           ->setAccount();
+    }
 
     $target = checkAccess($target);
     $target !== 'public' && $pathTarget = checkTemplate($target);

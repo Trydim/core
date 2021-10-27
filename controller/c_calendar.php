@@ -1,10 +1,14 @@
-<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php use RedBeanPHP\Db;
+
+if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var object $main - global
- * @var object $db - global
+ * @var Db $db - global
  * @var string $pathTarget
  */
+
+$db = $main->db;
 
 $curMonth = date('Y-m');
 $dateRange = ["$curMonth-01 00:00:01", "$curMonth-31 23:59:59"];

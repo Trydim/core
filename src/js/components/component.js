@@ -461,13 +461,13 @@ export class Valid {
     this.inputNodes = this.form.querySelectorAll('input[required]');
     this.inputNodes.forEach(n => {
       this.countNodes++;
-      if (n.type === 'checkbox') n.addEventListener('click', (e) => this.validate(e));
+      if (n.type === 'checkbox') n.addEventListener('click', e => this.validate(e));
       else {
-        n.addEventListener('keyup', (e) => this.keyEnter(e));
+        n.addEventListener('keyup', e => this.keyEnter(e));
 
         initMask && n.type === 'tel' && f.maskInit && f.maskInit(n, phoneMask);
       }
-      n.addEventListener('blur', (e) => this.validate(e)); // может и не нужна
+      n.addEventListener('blur', e => this.validate(e)); // может и не нужна
       this.validate(n);
     });
 
@@ -479,9 +479,9 @@ export class Valid {
     }
 
     // Send Btn
-    this.btn.onclick = (e) => this.confirm(e, sendFunc);
+    this.btn.onclick = e => this.confirm(e, sendFunc);
     if (this.countNodes === 0 || this.debug) this.btnActivate();
-    else this.btnDisabled();
+    else if (this.valid.size < this.countNodes) this.btnDisabled();
 
     this.onEventForm();
   }
@@ -824,7 +824,7 @@ export class SortColumns {
 
     // Sort Btn
     this.thead.querySelectorAll('input').forEach(n => {
-      n.addEventListener('click', (e) => this.sortRows.call(this, e));
+      n.addEventListener('click', e => this.sortRows.call(this, e));
       n.value += ' ' + this.arrow.notActive;
 
       if (n.dataset.column === this.sortParam.sortColumn) {

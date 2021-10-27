@@ -1,5 +1,5 @@
 <?php global $main;
-if($main && $main->checkStatus('ok')) { ?>
+if ($main && $main->checkStatus('ok')) { ?>
 <nav class="navbar navbar-expand-lg navbar-transparent border-bottom">
   <div class="container-fluid">
     <!--<button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,9 +19,9 @@ if($main && $main->checkStatus('ok')) { ?>
           </a>
         </li>-->
         <li class="nav-item"><?= $main->getLogin('name') ?></li>
-        <li class="nav-item" data-action="exit">
-          <span class="exit-icon d-flex">
-            <i class="material-icons font-blue">login_out</i>
+        <li class="nav-item">
+          <span class="exit-icon d-flex" data-action="exit">
+            <i class="material-icons font-blue" data-action="exit">login_out</i>
           </span>
         </li>
       </ul>
@@ -29,5 +29,7 @@ if($main && $main->checkStatus('ok')) { ?>
   </div>
 </nav>
 <?php } else { ?>
-  <?= template('parts/authBlock') ?>
+  <div class="auth-block">
+    <a href="<?= SITE_PATH?>login">Войти</a>
+  </div>
 <?php } ?>

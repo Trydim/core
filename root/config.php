@@ -1,6 +1,7 @@
 <?php
 
 $publicConfig = [
+  'PROJECT_TITLE' => 'My project',
   // Любое значение включает режим отладки
   //'DEBUG' => true,
   //'MAIL_TARGET_DEBUG' => 'trydim@mail.ru',
