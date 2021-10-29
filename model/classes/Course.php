@@ -24,7 +24,6 @@ class Course {
   public $rate;
 
   public function __construct(&$db, $dataFile = PATH_CSV . 'exchange_rate.bin') {
-
     if (is_object($db)) $this->getRateFromDb($db);
     else $this->getRateFromFile($dataFile);
 

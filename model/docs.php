@@ -49,7 +49,7 @@ if ($addManager) {
     $userData = $db->getUserById($reportVal['userId']);
   } else {
     $userData = $db->getUserByOrderId($main->getLogin('id'));
-}
+  }
 
   if (count($userData)) {
     $userData['contacts']  = json_decode($userData['contacts'], true);

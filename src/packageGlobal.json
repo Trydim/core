@@ -1,9 +1,11 @@
 {
   "dependencies": {
+    "@vue/compiler-sfc": "^3.2.20",
     "css-loader": "^5.2.2",
     "css-minimizer-webpack-plugin": "^2.0.0",
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^1.5.0",
+    "mustache": "^4.2.0",
     "sass": "^1.32.10",
     "sass-loader": "^11.0.1",
     "scss": "^0.2.4",
@@ -11,7 +13,8 @@
     "terser-webpack-plugin": "^5.1.1",
     "vue": "^3.0.11",
     "vue-cli": "^2.9.6",
-    "vue-loader": "^15.9.6",
+    "vue-loader": "^16.2.0",
+    "vue-template-compiler": "^2.6.12",
     "vuex": "^4.0.0",
     "webpack": "^5.33.2",
     "webpack-cli": "^4.6.0"

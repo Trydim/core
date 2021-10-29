@@ -140,7 +140,7 @@ export const admindb = {
 
     this.handsontable = new Handsontable(div, Object.assign(handson.option, {
       data: handson.removeSlashesData(this.queryResult['csvValues']),
-      colHeaders: this.queryResult['csvValues'][0],
+      colHeaders: this.queryResult['csvValues'][0].map(h => _(h)),
     }));
 
     //this.handsontable.

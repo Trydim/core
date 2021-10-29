@@ -131,7 +131,7 @@ export const customers = {
     this.M = f.initModal();
     this.p = new f.Pagination( '#paginator',{
       dbAction : 'loadCustomers',
-      query: this.query.bind(this),
+      query    : this.query.bind(this),
       sortParam: this.queryParam,
     });
     new f.SortColumns({
@@ -143,7 +143,6 @@ export const customers = {
     this.selected = new f.SelectedRow({table: this.table});
 
     this.query();
-
     this.onEvent();
   },
 
@@ -294,6 +293,10 @@ export const customers = {
         f.maskInit(node, '_________');
         node.value = customer['ITN'];
 
+        form.querySelectorAll('input').forEach(n => {
+          n.dispatchEvent(new Event('blur'));
+        });
+
         this.confirmMsg = 'Изменения сохранены';
         this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Изменение клиента', form);
@@ -332,12 +335,11 @@ export const customers = {
       }
     }
 
-    if(action === 'confirmYes') { // Закрыть подтверждение
+    if (action === 'confirmYes') { // Закрыть подтверждение
       this.delayFunc();
       this.delayFunc = () => {};
       this.needReload = {dbAction: 'loadCustomers'};
       this.query();
-
     } else { // Открыть подтверждение
       this.queryParam.dbAction = action;
       select[action] && select[action]();
