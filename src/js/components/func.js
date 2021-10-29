@@ -252,8 +252,8 @@ const func = {
           checkedTarget(nodeT, member);
         });
 
-            relation && nodesR.forEach(n => n.dispatchEvent(new Event('changeR')));
-          };
+        relation && nodesR.forEach(n => n.dispatchEvent(new Event('changeR')));
+      };
 
       if (eNode.type === 'radio' && eNode.name) {
         qs(`input[name="${eNode.name}"]`).forEach(n => {

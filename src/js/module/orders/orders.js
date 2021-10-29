@@ -144,10 +144,10 @@ export const orders = {
 
   fillTable(data, search = false) {
     data = data.map(item => {
-      if(item.importantValue) {
+      if (item.importantValue) {
         let value = '';
 
-        if(false /* TODO настройки вывода даты*/) {
+        if (false /* TODO настройки вывода даты*/) {
           for (let i in item) {
             if(i.includes('date')) {
               //let date = new Date(item[i]);
@@ -311,6 +311,7 @@ export const orders = {
       'savePdf': () => {
         hideActionWrap = false;
         if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+
         let data = new FormData();
         data.set('useUser', 'true');
         data.set('orderIds', this.queryParam.orderIds);

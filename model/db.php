@@ -507,7 +507,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (isset($customerId) && is_finite($customerId)) {
         $param = [];
 
-        $contacts = [];
+      $contacts = [];
         isset($phone) && $contacts['phone'] = $phone;
         isset($email) && $contacts['email'] = $email;
         isset($address) && $contacts['address'] = $address;
