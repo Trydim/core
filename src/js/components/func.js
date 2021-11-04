@@ -6,14 +6,14 @@ const func = {
   // Simple and often used function
   // ------------------------------------------------------------------------------------------------
 
-  log: (msg) => c.DEBUG && console.log('Error:' + msg),
+  log: msg => c.DEBUG && console.log('Error:' + msg),
 
   /**
    * deprecated wrap for f.qS
    * @param id
    * @return {HTMLElement | {}}
    */
-  gI: (id) => func.qS('#' + id),
+  gI: id => func.qS('#' + id),
 
   /**
    * @param selector
@@ -50,16 +50,16 @@ const func = {
    * @param selector {string}
    * @return {string}
    */
-  gT: (selector) => { let node = func.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + id},
+  gT: selector => { let node = func.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + id},
 
   /**
    * Получить Node шаблона
    * @param selector {string}
    * @returns {Node}
    */
-  gTNode: (selector) => func.qS(selector).content.children[0].cloneNode(true),
+  gTNode: selector => func.qS(selector).content.children[0].cloneNode(true),
 
-  getData(selector) {
+  getData: selector => {
     const node = func.qS(selector),
           json = node && (JSON.parse(node.value));
     if (!node) return false;
@@ -96,10 +96,12 @@ const func = {
   getDataAsArray : selector => Object.values(func.getData(selector) || []),
 
   // перевод в число
-  toNumber: (input) => +(input.replace(/(\s|\D)/g, '')),
+  toNumber: input => +(input.replace(/(\s|\D)/g, '')),
 
-  // Формат цифр (разделение пробелом)
-  setFormat: (num) => (num.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g, " "),
+  /**
+   * Формат цифр (разделение пробелом)
+   */
+  setFormat: num => (num.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g, " "),
 
   /** Показать элементы, аргументы коллекции NodeList */
   show: (...collection) => { collection.map(nodes => {
@@ -123,7 +125,7 @@ const func = {
    * @param node
    * @returns {*}
    */
-  eraseNode: (node) => {
+  eraseNode: node => {
     let n;
     while ((n = node.firstChild)) n.remove();
     return node;
@@ -134,7 +136,7 @@ const func = {
    * @param value
    * @return {void | string}
    */
-  replaceLetter: (value) => {
+  replaceLetter: value => {
     let cyrillic = 'УКЕНХВАРОСМТ',
         latin    = 'YKEHXBAPOCMT',
         replacer = (match) => cyrillic.charAt(latin.indexOf(match)),
@@ -290,7 +292,7 @@ const func = {
    * @param fileName
    * @return {HTMLAnchorElement}
    */
-  createLink: (fileName) => {
+  createLink: fileName => {
     //let date = new Date();
     //fileName += '_' + date.getDate() + ("0" + (date.getMonth() + 1)).slice(-2) + (date.getYear() - 100) + '_' + date.getHours() + date.getMinutes() + date.getSeconds() + '.pdf';
     let a = document.createElement('a');
@@ -307,7 +309,7 @@ const func = {
    * type: 'base64',
    * blob: 'data:application/pdf;base64,' + data['pdfBody']}
    */
-  saveFile: (data) => {
+  saveFile: data => {
     const {name = 'download.file', blob} = data;
     let link = func.createLink(name);
     if (data.type === 'base64') link.href = blob;
@@ -320,7 +322,7 @@ const func = {
     if (!node) return;
     const minValue = 2;
 
-    const mask = (e) => {
+    const mask = e => {
       let target = e.target, i = 0,
           matrix = phoneMask || c.PHONE_MASK,
           def = matrix.replace(/\D/g, ""),
@@ -365,11 +367,11 @@ const func = {
   },
 
   /** Добавить иконку загрузки */
-  setLoading: (node) => {
+  setLoading: node => {
     node && node.classList.add(c.CLASS_NAME.LOADING);
   },
   /** Удалить иконку загрузки */
-  removeLoading: (node) => {
+  removeLoading: node => {
     node && node.classList.remove(c.CLASS_NAME.LOADING);
   },
 

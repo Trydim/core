@@ -29,6 +29,7 @@ foreach ($publicConfig as $k => $v) {
 // Не использую цикл т.к. куча предупреждений
 !defined('PROJECT_TITLE') && define('PROJECT_TITLE', false);
 !defined('DEBUG') && define('DEBUG', false);
+!defined('CSV_DEVELOP') && define('CSV_DEVELOP', false);
 !defined('PUBLIC_PAGE') && define('PUBLIC_PAGE', false);
 !defined('ONLY_LOGIN') && define('ONLY_LOGIN', false);
 !defined('USERS_ORDERS') && define('USERS_ORDERS', false);

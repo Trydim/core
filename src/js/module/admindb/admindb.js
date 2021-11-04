@@ -20,7 +20,7 @@ import {FormViews} from './FormViews.js';
  * @param tmpString
  * @return {string}
  */
-const eraseTemplate = (tmpString) => tmpString.replace(/\$\{.+?\}/g, '');
+const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
 
 /* Проверка файла перед добавлением (не знаю что хотел проверить)
 const checkAddedFile = function (e) {
@@ -93,11 +93,12 @@ export const admindb = {
   setTableName() {
     let node = f.qS('#tableNameField'),
         name = this.tableName.substring(this.tableName.lastIndexOf("/") + 1).replace('.csv', '');
+
     name = _(name);
     node && (node.innerHTML = name);
     document.title = name;
   },
-  showTablesName: (data) => {
+  showTablesName: data => {
     if (!data.hasOwnProperty('tables') && !data.hasOwnProperty('csvFiles')) {
       throw Error('Error load DB');
     }
@@ -143,7 +144,6 @@ export const admindb = {
       colHeaders: this.queryResult['csvValues'][0].map(h => _(h)),
     }));
 
-    //this.handsontable.
     this.handsontable.updateSettings(handson.context);
     this.handsontable.admindb = this;
   },
@@ -471,7 +471,7 @@ const TableValues = {
     node.classList.add('btn-danger');
   },
 
-  // TODO events function
+  // Events function
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
@@ -573,7 +573,7 @@ const TableValues = {
     });
   },
 
-  // TODO bind events
+  // Bind events
   //--------------------------------------------------------------------------------------------------------------------
   // Проверка ввода
   onCheckEdit(node) {

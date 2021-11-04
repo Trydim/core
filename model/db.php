@@ -487,37 +487,21 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['customers'] = $db->loadCustomers($pageNumber, $countPerPage, $sortColumn, $sortDirect, $customerIds);
       break;
     case 'addCustomer':
-      $param = ['0' => []];
-      if (isset($name) && !empty($name)) {
-        $param['0']['name'] = $name;
-        $param['0']['ITN'] = isset($ITN) ? $ITN : '';
-
-        $contacts = [];
-        isset($phone) && $contacts['phone'] = $phone;
-        isset($email) && $contacts['email'] = $email;
-        isset($address) && $contacts['address'] = $address;
-        count($contacts) && $param['0']['contacts'] = json_encode($contacts);
-
-        // TODO обработка ошибки не верна
-        //$result['error'] = $db->insert($columns, 'customers', $param);
-        $db->insert($columns, 'customers', $param);
-      }
-      break;
     case 'changeCustomer':
-      if (isset($customerId) && is_finite($customerId)) {
-        $param = [];
+      $newCustomer = isset($customerId) && is_finite($customerId);
+      $customerId = $customerId ?? 0;
+      $param = [$customerId => []];
+      $customer = isset($authForm) ? json_decode($authForm, true) : [];
 
       $contacts = [];
-        isset($phone) && $contacts['phone'] = $phone;
-        isset($email) && $contacts['email'] = $email;
-        isset($address) && $contacts['address'] = $address;
-
-        isset($name) && $param[$usersId]['name'] = $name;
-        isset($ITN) && $param[$usersId]['ITN'] = $ITN;
-        count($contacts) && $param[$usersId]['contacts'] = json_encode($contacts);
-
-        $db->insert($columns, 'customers', $param, true);
+      foreach ($customer as $k => $v) {
+        if ($k === 'cType') continue;
+        if (in_array($k, ['name', 'ITN'])) $param[$customerId][$k] = $v;
+        else $contacts[$k] = $v;
       }
+      count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);
+
+      $db->insert($columns, 'customers', $param, $newCustomer);
       break;
     case 'delCustomer':
       $usersId = isset($customerId) ? json_decode($customerId) : [];
@@ -545,18 +529,16 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     //case 'loadUser': break; // Вероятно для загрузки пароля
     case 'addUser':
-      $param = ['0' => []];
-
+      $param = [0 => []];
       $user = isset($authForm) ? json_decode($authForm, true) : [];
 
       $contacts = [];
       foreach ($user as $k => $v) {
-        if (in_array($k, ['login', 'name', 'permissionId'])) $param['0'][$k] = $v;
-        else if ($k === 'password') $param['0'][$k] = password_hash($v, PASSWORD_BCRYPT);
+        if (in_array($k, ['login', 'name', 'permissionId'])) $param[0][$k] = $v;
+        else if ($k === 'password') $param[0][$k] = password_hash($v, PASSWORD_BCRYPT);
         else $contacts[$k] = $v;
       }
-
-      count($contacts) && $param['0']['contacts'] = json_encode($contacts);
+      $param[0]['contacts'] = json_encode($contacts);
 
       $result['error'] = $db->insert($columns, 'users', $param);
       break;
@@ -572,7 +554,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $contacts = [];
           foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permission_id'])) $param[$id][$k] = $v;
-            else if ($k !== 'permission_id') $contacts[$k] = $v;
+            else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
           $param[$id]['activity'] = isset($authForm['activity']) ? '1' : '0';

@@ -3,6 +3,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
+const webpack = require('webpack');
 
 const absPath = '../../',
       resFileName = 'webpackModule.json';
@@ -35,37 +36,57 @@ module.exports = {
     outputModule: true,
   },
 
-  optimization: {
-    minimize: !dev,
-    minimizer: [
-      new TerserPlugin({extractComments: false,}),
-      new CssMinimizerPlugin(),
-    ], // Убрать комментарии
-  },
-
   output: {
     path: path.resolve(__dirname, '../assets/'),
     filename: 'js/module/[name]/[name].js',
     library: {
       type: 'module',
     },
+    module: true,
+    libraryTarget: 'module',
     /*filename: function (o) {
       return o.chunk.entryModule.rawRequest;
     },*/ // [contenthas] - для обхода кеширования
+  },
+
+  resolve: {
+    alias: {
+      vue: dev ? 'vue/dist/vue.esm-browser.js' : 'vue/dist/vue.esm-browser.prod.js'
+    }
+  },
+  //devtool: '',
+  devtool     : 'cheap-source-map', //source mapping
+  optimization: {
+    minimize: !dev,
+    minimizer: [
+      new TerserPlugin({extractComments: false,}), // Убрать комментарии
+      new CssMinimizerPlugin(),
+    ],
   },
   plugins: [
     new MiniCssExtractPlugin({
       filename: "css/module/[name]/[name].css",
     }),
+    //new VueLoaderPlugin(),
+
+    // Define Bundler Build Feature Flags
+    new webpack.DefinePlugin({
+      // Drop Options API from bundle
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: true,
+    }),
   ],
-  //devtool: '',
-  devtool: 'cheap-source-map', //source mapping
+
   module: {
     rules: [
       {
+        test: /\.vue$/,
+        loader: "vue-loader"
+      },
+      {
         test: /\.s[ac]ss$/i,
         use: [
-          MiniCssExtractPlugin.loader,
+          {loader: MiniCssExtractPlugin.loader},
           'css-loader',
           'sass-loader',
         ],

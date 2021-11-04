@@ -4,14 +4,9 @@ const addSlashes = value => value.replaceAll('\n', '\\n').replaceAll('\r', '\\r'
 const removeSlashes = value => value.replaceAll('\\n', '\n').replaceAll('\\r', '\r');
 
 const changeRowCol = that => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
-/*
-const options = {
-  col: [],
-  option: [],
-}*/
 
 export const handson = {
-  option: {
+  option: Object.assign({
     rowHeaders        : true,
     colHeaders        : true, //filters   : true,
     columnSorting     : false,
@@ -23,38 +18,6 @@ export const handson = {
     width             : '100%',
     height            : window.innerHeight * 0.8,
     licenseKey        : 'non-commercial-and-evaluation',
-    hiddenRows        : {rows: [0, 1]}, // Не показывать заголовок
-
-    // Перебор всех ячеек
-    cells(row, col) {
-      //console.log(this.instance.getSelected() && this.instance.getSelected()[0]);
-      if (row === 0 || this.hasOwnProperty('readOnly')) return; // Первую строку пропускаем
-      const cell = this.instance.getDataAtCell(row, col), res = {};
-
-      /*if (options.col.includes(col)) {
-        res.editor = 'select';
-        res.selectOptions = options.option[0];
-      }*/
-      if (!cell) return res;
-
-      /*if (cell.includes('c_selectOption_')) {
-        options.col.push(this.instance.getData()[0].indexOf(cell.replace('c_selectOption_', '')));
-        options.option.push(this.instance.getDataAtCell(row, 1).split(','));
-        return; // как-то скрыть строку
-      }*/
-
-      res.readOnly = /^(c_|d_)/i.test(cell);
-      if (cell === '+' || cell === '-') {
-        res.type = 'checkbox';
-        res.checkedTemplate = '+';
-        res.uncheckedTemplate = '-';
-      }
-      else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
-
-      return res;
-    },
-
-
 
     afterChange(changes) {
       if (changes) {
@@ -73,6 +36,54 @@ export const handson = {
     afterRemoveCol() { changeRowCol(this) },
     afterRemoveRow() { changeRowCol(this) },
   },
+  f.CSV_DEVELOP ?
+  /**
+   * Настройки для разработки
+   * */
+  {} :
+  /**
+   * Продакшн настройки
+   * */
+  {
+    hiddenRows: {rows: [0]}, // Не показывать заголовок
+
+    beforeRemoveCol(ind, count, columns) {
+      for (const cIndex of columns) {
+        const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
+        if (important) {
+          f.showMsg('Ключевые значения нельзя удалить');
+          throw new Error('try to delete important values!');
+        }
+      }
+    },
+    beforeRemoveRow(ind, count, rows) {
+      for (const rIndex of rows) {
+        const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
+        if (important) {
+          f.showMsg('Ключевые значения нельзя удалить');
+          throw new Error('try to delete important values!');
+        }
+      }
+    },
+
+    // Перебор всех ячеек
+    cells(row, col) {
+      if (row === 0 || this.hasOwnProperty('readOnly')) return; // Первую строку пропускаем
+      const cell = this.instance.getDataAtCell(row, col), res = {readOnly: false};
+
+      if (!cell) return res;
+
+      res.readOnly = /^(c_|d_)/i.test(cell);
+      if (cell === '+' || cell === '-') {
+        res.type = 'checkbox';
+        res.checkedTemplate = '+';
+        res.uncheckedTemplate = '-';
+      }
+      else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
+
+      return res;
+    },
+  }),
 
   context: {
     contextMenu: {

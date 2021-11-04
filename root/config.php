@@ -16,11 +16,13 @@ $publicConfig = [
   /** Возможность прямого редактирования БД из админки */
   'CHANGE_DATABASE' => false,
 
+  /** Любое значение отключает защитный режим */
+  //'CSV_DEVELOP' => true,
   /** Папка с csv файлами */
-  'PATH_LEGEND' => ABS_SITE_PATH . 'public/views/legend.php',
-  'PATH_CSV' => ABS_SITE_PATH . 'shared/csv/',
+  'PATH_LEGEND'       => ABS_SITE_PATH . 'public/views/legend.php',
+  'PATH_CSV'          => ABS_SITE_PATH . 'shared/csv/',
   'CSV_STRING_LENGTH' => '1000',
-  'CSV_DELIMITER' => ';',
+  'CSV_DELIMITER'     => ';',
 
   /** Отображать таблицы в меню */
   'DB_TABLE_IN_SIDEMENU' => true,

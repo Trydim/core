@@ -5,6 +5,7 @@
  */
 export const c = {
   DEBUG        : window['DEBUG'] || false,
+  CSV_DEVELOP  : !!window['CSV_DEVELOP'] || false,
   OUTSIDE      : window['CL_OUTSIDE'],
   SITE_PATH    : window['SITE_PATH'] || '/',
   MAIN_PHP_PATH: (window['SITE_PATH'] || '/') + 'index.php',

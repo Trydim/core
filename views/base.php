@@ -41,6 +41,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 
   <script>
     window.DEBUG         = '<?= DEBUG ?>';
+    window.CSV_DEVELOP   = '<?= CSV_DEVELOP ?>';
     window.SITE_PATH     = '<?= SITE_PATH ?>';
     window.MAIN_PHP_PATH = '<?= SITE_PATH ?>index.php';
     window.PUBLIC_PAGE   = '<?= PUBLIC_PAGE ?>';

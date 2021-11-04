@@ -2,10 +2,10 @@ import {c} from "./const.js";
 
 // Query Object -----------------------------------------------------------------------------------------------------------------
 
-const checkJSON = (data) => {
+const checkJSON = data => {
   try {
     const response = JSON.parse(data);
-    if (response['error']) throw response['error']; // TODO что за ошибка
+    if (response['error']) throw response['error'];
     return response;
   }
   catch (e) { f.showMsg(e['xdebug_message'] || e.message || data, 'error', false); return {status: false}; }

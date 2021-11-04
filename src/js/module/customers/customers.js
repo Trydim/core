@@ -293,10 +293,6 @@ export const customers = {
         f.maskInit(node, '_________');
         node.value = customer['ITN'];
 
-        form.querySelectorAll('input').forEach(n => {
-          n.dispatchEvent(new Event('blur'));
-        });
-
         this.confirmMsg = 'Изменения сохранены';
         this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
         this.M.show('Изменение клиента', form);

@@ -198,7 +198,7 @@ export const users = {
         node = form.querySelectorAll('.managerField');
         if (oneElements) {
           node.forEach(n => {
-            let input = n.querySelector('input[name]'),
+            let input = n.querySelector('input[name], textarea[name]'),
                 name = input.name;
 
             users[name] && (input.value = users[name]);
