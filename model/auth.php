@@ -2,7 +2,6 @@
 
 /**
  * @var $main {class} - global from
- * @var $db {class} - global db
  */
 
 if (!defined('MAIN_ACCESS')) die('access denied!');
@@ -13,7 +12,7 @@ if (!defined('MAIN_ACCESS')) die('access denied!');
 
 switch ($authAction) {
   case 'login':
-    if ($user = $db->checkPassword($login, $password)) {
+    if ($user = $main->db->checkPassword($login, $password)) {
       $_SESSION['login']    = $login;
       $_SESSION['password'] = $password;
       $_SESSION['name']     = $user['name'];
@@ -21,7 +20,7 @@ switch ($authAction) {
       $_SESSION['id']       = $_COOKIE['PHPSESSID'];
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
-      /*$main->getSettings('onlyOne') && */$db->setUserHash($user['ID'], $_SESSION['hash']);
+      /*$main->getSettings('onlyOne') && */$main->db->setUserHash($user['ID'], $_SESSION['hash']);
 
       reDirect(true, (isset($clientPageTarget) && $clientPageTarget !== 'login') ? $clientPageTarget : '');
     } else reDirect(false, "login?status=error&login=$login&password=$password");
@@ -29,7 +28,7 @@ switch ($authAction) {
   case 'exit':
     if (isset($_SESSION['priority'])) {
       $hash = password_hash(uniqid(), PASSWORD_BCRYPT);
-      /*$main->getSettings('onlyOne') &&*/$db->setUserHash($_SESSION['priority'], $hash);
+      /*$main->getSettings('onlyOne') &&*/$main->db->setUserHash($_SESSION['priority'], $hash);
       $_SESSION['password'] = uniqid();
       $_SESSION['target'] = '';
       reDirect(false);

@@ -149,7 +149,7 @@ CREATE TABLE `money` (
 
 INSERT INTO `money` (`ID`, `code`, `name`, `short_name`, `rate`, `main`) VALUES
 (1, 'USD', 'United State Dollar', '$', '1.0000', null),
-(1, 'RUB', 'Российский рубль', 'руб.', '1.0000', 1);
+(2, 'RUB', 'Российский рубль', 'руб.', '1.0000', 1);
 
 -- --------------------------------------------------------
 
