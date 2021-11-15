@@ -1,0 +1,28 @@
+@charset "UTF-8";
+
+// Core Bootstrap
+@import "bootstrap/bootstrap";
+
+// icons
+@import "icons/icons";
+
+// Admin
+@import "admin/utilities";
+
+// Theme
+@import './variable';
+@import "./admin/abstracts/abstracts";
+
+@import "admin/preloader";
+
+@import "admin/base/common";
+
+@import "admin/layout/layout";
+
+@import "admin/pages";
+
+
+
+
+
+
