@@ -22,7 +22,7 @@
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>
 <div class="res-table">
-<table id="usersTable" class="text-center table table-striped">
+  <table id="usersTable" class="text-center table table-striped">
 	<thead>
 	<tr>
     <th></th>
@@ -44,3 +44,4 @@
 	<tfoot><tr></tr></tfoot>
 </table>
 </div>
+<div id="paginator" class="w-100"></div>

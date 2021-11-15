@@ -1,0 +1,5 @@
+.content-center {
+  @extend .d-flex;
+  @extend .justify-content-center;
+  @extend .align-items-center;
+}

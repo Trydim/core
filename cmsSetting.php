@@ -14,6 +14,7 @@ require ABS_SITE_PATH . 'config.php'; // Public config
 define('CORE', basename( __DIR__ ) . '/');
 define('VIEW', CORE . 'views/');
 
+
 define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
 define('CORE_SCRIPT', SITE_PATH . CORE . 'assets/js/');
 

@@ -1,10 +1,8 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $db
+ * @var object $main
  */
-
-if (!isset($main)) $main = new cms\Main();
 
 $dbContent = "";
 $field = [];
@@ -18,10 +16,10 @@ if ($authStatus && isset($_GET['orderId'])) {
   $orderId = $_GET['orderId'];
 
   if (is_finite($orderId)) {
-    $order = $db->loadOrderById($orderId);
+    $order = $main->db->loadOrderById($orderId);
 
     if ($order) {
-      $customer = $db->loadCustomerByOrderId($order['ID']);
+      $customer = $main->db->loadCustomerByOrderId($order['ID']);
 
       $order = json_encode($order);
       $dbContent .= "<input type='hidden' id='dataOrder' value='$order'>";
@@ -39,7 +37,7 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
   $orderId = $_GET['orderVisitorId'];
 
   if (is_finite($orderId)) {
-    $order = $db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
+    $order = $main->db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
 
     if (count($order) === 1) {
       $order = json_encode($order[0]);

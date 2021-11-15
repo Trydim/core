@@ -3,8 +3,8 @@
   "description": "Public project",
   "name": "my-webpack-project",
   "scripts": {
-    "publicBuildProd": "webpack --mode=production",
+    "publicBuildProd": "webpack --env production --config ./webpack/webpack.config.js && node ./webpack/updateVersion.js",
 
-    "publicBuildDev": "webpack --mode=development"
+    "publicBuildDev": "webpack --config ./webpack/webpack.config.js"
   }
 }

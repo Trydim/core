@@ -3,7 +3,7 @@
 /**
  * @var array $vars extract param
  */
-// Todo временно
+
 global $main, $target;
 
 if(!isset($pageTitle)) $pageTitle = '';
@@ -22,6 +22,8 @@ if(!isset($footerContent)) $footerContent = '';
 if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase');
 
 ?>
+<!doctype html>
+<html lang="en">
 <head>
 	<meta name="viewport"
 	      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -30,8 +32,6 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 	<title><?= $pageTitle; ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
 	<?php if($main->checkStatus('ok') || $target === 'login') { ?>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
     <link rel="stylesheet" href="<?= CORE_CSS?>admin.css">
 	<?php } ?>
 
@@ -50,34 +50,51 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
   </script>
 </head>
 
-<body>
+<!-- dark -->
+<!-- horizontal -->
+<body
+    data-theme-version="light"
+    data-layout="vertical"
+>
+
+<div id="preloader">
+  <div class="sk-three-bounce">
+    <div class="sk-child sk-bounce1"></div>
+    <div class="sk-child sk-bounce2"></div>
+    <div class="sk-child sk-bounce3"></div>
+  </div>
+</div>
 
 <?php if(!isset($global)) { ?>
-<main class="container-fluid mx-auto">
-  <section class="wrapper">
+<main class="main-wrapper mx-auto" id="mainWrapper">
+  <div class="nav-header">
+    <a href="<?= SITE_PATH ?>" class="brand-logo">
+      <img class="logo-abbr" src="./images/logo.png" alt="">
+      <span class="brand-title">title</span>
+    </a>
 
-    <?php if($sideLeft) { ?>
-      <aside id="sideLeft"><?= $sideLeft; ?></aside>
-		<?php } ?>
-
-    <section class="main-panel mx-auto" style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
-      <?= $pageHeader; ?>
-
-      <div class="content mt-0 p-1">
-        <div class="row justify-center"> <!-- возможно убрать justify-center -->
-                                         <!-- стили временно-->
-          <div class="col-12 <?= $sideRight ? 'col-xl-10' : '' ?>"><?= $content; ?></div>
-
-          <?php if($sideRight) { ?>
-            <aside id="right" class="col-12 col-md-2"><?= $sideRight; ?></aside>
-          <?php } ?>
-
-        </div>
+    <div class="nav-control" role="button">
+      <div>
+        <i class="pi pi-caret-left"></i>
       </div>
-      <footer class="footer"><?= $pageFooter; ?></footer>
-    </section>
+    </div>
+  </div>
+  <?= $pageHeader; ?>
 
-  </section>
+  <div class="content-body">
+    <?php if($sideLeft) { ?>
+      <?= $sideLeft; ?>
+    <?php } ?>
+    <section class="position-relative col"
+             style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
+      <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content; ?></div>
+      <?= $pageFooter; ?>
+    </section>
+    <?php if($sideRight) { ?>
+      <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight; ?></section>
+    <?php } ?>
+  </div>
+
 </main>
 <?php } else echo $global; ?>
 

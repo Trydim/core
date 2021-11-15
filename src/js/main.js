@@ -1,6 +1,6 @@
 "use strict";
 
-const importModuleFunc = async (moduleName) => {
+const importModuleFunc = async moduleName => {
   let link;
   if (moduleName === 'public') {
     link = `${f.SITE_PATH}public/js/${f.PUBLIC_PAGE}.js`;
@@ -29,11 +29,11 @@ const init = (moduleName = 'default') => {
   return module;
 }
 
-const setLinkMenu = (page) => {
-  let menu = f.qS('#sideMenu');
+const setLinkMenu = page => {
+  let menu = f.qS('#sidebarMenu');
   if (!menu) return;
 
-  let target = menu.querySelector('.nav-item.active');
+  let target = menu.querySelector('.active');
   while (target) {
     let wrap = target.closest('[data-role="link"]');
     if (!wrap) return;
@@ -43,7 +43,7 @@ const setLinkMenu = (page) => {
 
   for (let n of [...menu.querySelectorAll('a')]) {
     let href = n.getAttribute('href') || '';
-    if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
+    if(href.includes(page)) { n.classList.add('active'); break; }
   }
 }
 
@@ -54,6 +54,19 @@ const cancelFormSubmit = () => {
       return false;
     }
   });
+}
+
+const stopPreloader = () => {
+  f.gI('preloader').remove();
+  f.gI('mainWrapper').classList.add('show');
+}
+
+const setParentHeight = (target, height) => {
+  const n = target.closest("ul[aria-expanded=\"false\"]");
+  if (n) {
+    n.style.height = (n.offsetHeight + height) + 'px';
+    setParentHeight(n.parentNode, height);
+  }
 }
 
 // Event function
@@ -74,12 +87,18 @@ const authEvent = function(e) {
 
 const sideMenuExpanded = (e, node) => {
   e.preventDefault();
-  if( node.getAttribute('aria-expanded') === 'true'){
+
+  const count = node.nextElementSibling.childElementCount,
+        height = count * 50;//e.target.parentNode.offsetHeight;
+
+  if (node.getAttribute('aria-expanded') === 'true') {
     node.setAttribute('aria-expanded', 'false');
-    f.hide(node.nextElementSibling);
+    setParentHeight(node, node.nextElementSibling.offsetHeight * -1);
+    node.nextElementSibling.style.height = '0';
   } else {
     node.setAttribute('aria-expanded', 'true');
-    f.show(node.nextElementSibling);
+    node.nextElementSibling.style.height = height + 'px';
+    setParentHeight(node, height);
   }
 }
 
@@ -94,7 +113,7 @@ const onAuthEvent = () => {
 }
 
 const onClickSubmenu = () => {
-  f.qA('#sideMenu a[href^="#"]').forEach(n =>
+  f.qA('#sidebarMenu [role="button"]').forEach(n =>
     n.addEventListener('click', (e) => sideMenuExpanded(e, n))
   );
 }
@@ -113,6 +132,8 @@ const onClickSubmenu = () => {
   setLinkMenu(page || '/');
   if(page) init(page);
   else initIndex();
+
+  stopPreloader();
 
   setTimeout(() => { // todo разобраться с синхронизацией
     f.initShadow(); // todo убрать отсюда

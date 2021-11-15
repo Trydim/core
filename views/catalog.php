@@ -308,9 +308,6 @@ $field['footerContent'] .= <<<footerContent
     </div>
   </div>
 </template>
-<template id="onePageInput">
-  <input type="button" value="\${pageValue}" class="ml-1 mr-1" data-action="page" data-page="\${page}">
-</template>
 footerContent;
 
 unset($typeElementsHtml, $types, $sectionElementsHtml, $section);

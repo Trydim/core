@@ -1,47 +1,58 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+
+/**
+ * @var $wrongPass
+ * @var $login
+ */
+
 !isset($pageTarget) && $pageTarget = '';
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="notification-container error" role="alert">Неправильный логин или пароль</div><br>' : '';
 
-$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a href="/' . PUBLIC_PAGE . '">Открытая страница</a>' : '';
+$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="/' . PUBLIC_PAGE . '">Открытая страница</a>' : '';
 
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global
-<main class="container-fluid mx-auto">
-  <section class="h-100 d-flex justify-content-center align-items-center">
-    <div class="col-xl-4 col-lg-6 col-md-10 mx-auto mt-5">
-      <form id="authForm" action="$actionLink" method="POST" class="m-1">
-        <div class="card wow fadeIn animated" data-wow-delay="0.3s"
-          style="visibility: visible; animation-name: fadeIn; animation-delay: 0.3s;">
-            <div class="card-body">
-              <div class="form-header bg-blue">
-                <h3 class="font-weight-500 my-2 py-1"><i class="fas fa-user"></i> Авторизация:</h3>
-              </div>
-             
-              <div class="md-form mb-4">
-                <input name="login" type="text" id="orangeForm-name" class="form-control" value="$login" placeholder="Логин" required"> 
-                <label for="orangeForm-name" class=""></label>
-              </div>
-
-              <div class="md-form mb-4">
-                <input name="password" type="password" id="orangeForm-pass" class="form-control" value="$pass" placeholder="Пароль" required">
-                <label for="orangeForm-pass"></label>
-              </div>
-
-              <div class="text-center">
-                <button class="btn btn-info bg-blue btn-lg">Войти</button>
-              </div>
-                          
-              <input name="mode" type="hidden" value="auth">
-              <input name="authAction" type="hidden" value="login">
-              <input name="clientPageTarget" type="hidden" value="$pageTarget">
-              $publicLink
-            </div>
+<main class="position-fixed h-100 w-100">
+  <section class="content-center h-100">
+    <div class="authincation-content auth-form col-md-5">
+      <h4 class="text-center mb-4"><i class="pi pi-user"></i> Авторизация</h4>
+      <form action="$actionLink" method="POST">
+        <div class="form-group">
+          <label><strong>Логин</strong></label>
+          <input name="login" type="text" class="form-control" value="$login">
         </div>
+        <div class="form-group mt-1">
+          <label><strong>Пароль</strong></label>
+          <input name="password" type="password" class="form-control" value="">
+        </div>
+        <div class="form-row d-flex justify-content-between mt-4 mb-2">
+          <div class="form-group">
+            <div class="form-check ml-2">
+              <input class="form-check-input" type="checkbox" name="remember" id="basic_checkbox_1">
+              <label class="form-check-label" for="basic_checkbox_1">Запомнить меня</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <a href="forgot">Забыли пароль?</a>
+          </div>
+        </div>
+        $wrongString
+        
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-block">Подтвердить</button>
+        </div>
+        
+        <input name="mode" type="hidden" value="auth">
+        <input name="authAction" type="hidden" value="login">
+        <input name="clientPageTarget" type="hidden" value="$pageTarget">
       </form>
-      <br>
-      $wrongString
+      <div class="new-account mt-3">
+        <p>$publicLink</p>
+      </div>
+      
     </div>
   </section>
 </main>
 global;
+

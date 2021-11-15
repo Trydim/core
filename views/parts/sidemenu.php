@@ -9,23 +9,24 @@ if(is_array($dbTables)) {
   function subSideMenuItem($fileName, $name, $active) {
     $sitePath = SITE_PATH . "admindb?tableName=" . $fileName;
     return <<<item
-      <li class="nav-item $active">
-        <a class="nav-link pl-5" href="$sitePath">$name</a>
+      <li>
+        <a class="nav-item pl-5 $active" href="$sitePath">
+          <i class="pi pi-file-excel"></i>
+          <span class="nav-text">$name</span>
+        </a>
       </li>
 item;
   }
 
-  function subSideMenu($title, $item, $root) {
-    $icon = $root ? 'fa-database' : 'fa-arrow-right';
+  function subSideMenu($title, $items, $root) {
+    $icon = $root ? 'pi-book' : 'pi-folder';
     $idWrap = $root ? 'id="DBTablesWrap"' : '';
     return <<<menu
-      <a class="nav-link" href="#admindb">
-        <i class="fa $icon"></i>
-        <p>$title <b class="caret"></b></p>
-      </a>
-      <div class="d-none" $idWrap data-role="link">
-        <ul class="nav">$item</ul>
-      </div>
+      <span class="nav-item has-arrow" role="button" aria-expanded="false">
+        <i class="pi $icon"></i>
+        <span class="nav-text">$title</span>
+      </span>
+      <ul aria-expanded="false" class="ms-3 overflow-hidden" $idWrap data-role="link" style="height: 0">$items</ul>
 menu;
   }
 
@@ -33,7 +34,7 @@ menu;
     $items = '';
     foreach ($tables as $key => $item) {
       if (!is_numeric($key)) {
-        $items .= '<li class="nav-item">' . createMenu($key, $item, $link . '/' . $key, false) . '</li>';
+        $items .= '<li>' . createMenu($key, $item, $link . '/' . $key, false) . '</li>';
         continue;
       }
 
@@ -47,103 +48,99 @@ menu;
 
   $adminMenu = createMenu('Администрирование', $dbTables);
 }
-
 ?>
-<div class="sidebar"> <!-- data-background-color="white"-->
-
-  <div class="logo ml-3">
-    <a href="<?= SITE_PATH ?>" class="simple-text logo-normal">Logo</a>
-  </div>
-  <div class="sidebar-wrapper">
-    <ul id="sideMenu" class="nav">
+<aside id="sideLeft" class="sidebar col-md-3 col-lg-2 d-md-block"> <!-- data-background-color="white"-->
+  <div class="position-sticky top-0">
+    <ul class="sidebar-menu show" id="sidebarMenu">
+      <li class="nav-label">Main Menu</li>
       <?php if (PUBLIC_PAGE) { ?>
-        <li class="nav-item">
-          <a class="nav-link" href="<?= SITE_PATH ?>public">
-            <i class="material-icons">calculate</i>
-            <p>Калькулятор</p>
+        <li>
+          <a class="nav-item" href="<?= SITE_PATH ?>public" aria-expanded="false">
+            <i class="pi pi-globe"></i>
+            <span class="nav-text">Калькулятор</span>
           </a>
         </li>
       <?php } ?>
       <?php foreach ($main->getSideMenu() as $item) {
         switch ($item) {
           case 'orders': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>orders">
-                <i class="material-icons">table_chart</i>
-                <p>Заказы</p>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>orders" aria-expanded="false">
+                <i class="pi pi-inbox"></i>
+                <span class="nav-text">Заказы</span>
               </a>
             </li>
             <?php break;
           case 'calendar': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH?>calendar">
-                <i class="material-icons">date_range</i>
-                <p>Календарь</p>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>calendar" aria-expanded="false">
+                <i class="pi pi-table"></i>
+                <span class="nav-text">Календарь</span>
               </a>
             </li>
             <?php break;
           case 'customers': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>customers">
-                <i class="material-icons">assignment_ind</i>
-                <p>Клиенты</p>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>customers" aria-expanded="false">
+                <i class="pi pi-dollar"></i>
+                <span class="nav-text">Клиенты</span>
               </a>
             </li>
             <?php break;
           case 'users': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>users">
-                <i class="material-icons">supervisor_account</i>
-                <p>Менеджеры</p>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>users" aria-expanded="false">
+                <i class="pi pi-users"></i>
+                <span class="nav-text">Менеджеры</span>
               </a>
             </li>
             <?php break;
           case 'statistic': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>statistic">
-                <i class="material-icons">timeline</i>
-                <p>Статистика</p>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>statistic" aria-expanded="false">
+                <i class="pi pi-chart-line"></i>
+                <span class="nav-text">Статистика</span>
               </a>
             </li>
             <?php break;
           case 'admindb': ?>
-            <li class="nav-item">
+            <li>
               <?php if($adminMenu) { ?>
-               <?= $adminMenu ?>
-               <? } else { ?>
-                <a class="nav-link" href="<?= SITE_PATH ?>admindb">
-                  <i class="fa fa-database"></i>
-                  <p>Администрирование</p>
+                <?= $adminMenu ?>
+              <? } else { ?>
+                <a class="nav-item" href="<?= SITE_PATH ?>admindb" aria-expanded="false">
+                  <i class="pi pi-user"></i>
+                  <span class="nav-text">Администрирование</span>
                 </a>
               <?php } ?>
             </li>
             <?php break;
           case 'catalog': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>catalog">
-                <i class="material-icons">view_list</i>
-                <p>Каталог</p>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>catalog" aria-expanded="false">
+                <i class="pi pi-user"></i>
+                <span class="nav-text">Каталог</span>
               </a>
             </li>
             <?php break;
           case 'fileManager': ?>
-            <li class="nav-item">
-              <a class="nav-link" href="<?= SITE_PATH ?>fileManager">
-                <i class="material-icons">view_list</i>
-                <p>Файловый менеджер</p>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>fileManager" aria-expanded="false">
+                <i class="pi pi-folder-open"></i>
+                <span class="nav-text">Файловый менеджер</span>
               </a>
             </li>
             <?php break;
         }
       } ?>
       <?php if (in_array('setting', $main->getSideMenu()) || $main->getSettings('admin')) { ?>
-      <li class="nav-item">
-        <a class="nav-link" href="<?= SITE_PATH ?>setting">
-          <i class="material-icons">settings</i>
-          <p>Настройки</p>
-        </a>
-      </li>
+        <li>
+          <a class="nav-item" href="<?= SITE_PATH ?>setting" aria-expanded="false">
+            <i class="pi pi-sliders-h"></i>
+            <span class="nav-text">Настройки</span>
+          </a>
+        </li>
       <?php } ?>
     </ul>
   </div>
-</div>
+</aside>

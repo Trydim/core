@@ -1,5 +1,6 @@
-// Модальное окно
-//----------------------------------------------------------------------------------------------------------------------
+'use strict';
+
+import './_modal.scss';
 
 import {c} from "./const.js";
 import {f} from "./func.js";
@@ -117,7 +118,7 @@ export const Modal = (param = {}) => {
   const templatePopup = () => {
     return `
     <div class="modal-overlay" id="${modalId}">
-      <div class="modal p-15" data-role="window">
+      <div class="modal p-3" data-role="window">
         <button type="button" class="close-modal">
           <div class="close-icon"></div>
         </button>

@@ -17,10 +17,10 @@
     <input type="button" class="btn btn-danger" value="Удалить" data-action="delOrders">
   </div>
 </div>
-<div class="d-none pb-4" id="confirmField">
-  <select id="selectStatus" class="d-none custom-select select-status" name="statusId"></select>
+<div class="pb-4 d-none" id="confirmField">
+  <select id="selectStatus" class="d-none d-inline-block w-25 form-select" name="statusId"></select>
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
-  <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
+  <input type="button" class="btn btn-warning ms-1" value="Отмена" data-action="confirmNo">
 </div>
 <div class="pb-4 d-none" id="printTypeField">
 <? for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
@@ -32,22 +32,25 @@
 </div>
 <? if (USERS_ORDERS) { ?>
   <div class="d-flex pb-4" style="justify-content: left">
-    <div>
-      <label title="Заказы сохраненные Менеджерами">
-        <input type="radio" name="orderType" value="order" checked data-action="orderType">
-        Сохраненные заказы</label>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="orderType" value="order" id="orderTypeO" checked data-action="orderType">
+      <label class="form-check-label" for="orderTypeO" title="Заказы сохраненные Менеджерами">
+        Сохраненные заказы
+      </label>
     </div>
-    <div class="ml-1">
-      <label title="Уникальные расчеты посетителей">
-        <input type="radio" name="orderType" value="visit" data-action="orderType">
-        Пользовательские заказы</label>
+    <div class="form-check ms-1">
+      <input class="form-check-input" type="radio" name="orderType" value="visit" id="orderTypeV" data-action="orderType">
+      <label class="form-check-label" for="orderTypeV" title="Уникальные расчеты посетителей">
+        Пользовательские заказы
+      </label>
     </div>
   </div>
 <? } ?>
 <div class="res-table">
 
-  <div class="form-group">
-    <label class="w-100">Поиск: <input type="text" id="search" name="search" value="" class="form-control" autocomplete="off"></label>
+  <div class="input-group">
+    <span class="input-group-text">Поиск:</span>
+    <input type="text" id="search" class="form-control" value="" autocomplete="off">
   </div>
 
   <table id="commonTable" class="text-center table table-striped"></table>
@@ -100,3 +103,4 @@
   </template>
   <? } ?>
 </div>
+<div id="paginator" class="w-100"></div>
