@@ -35,9 +35,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     }
   }
 
-  $pageNumber = isset($currPage) ? $currPage : 0;
+  $pageNumber = $currPage ?? 0;
   !isset($countPerPage) && $countPerPage = 20;
-  $sortDirect = isset($sortDirect) ? $sortDirect === 'true' : false;
+  $sortDirect = isset($sortDirect) && $sortDirect === 'true';
 
   switch ($dbAction) {
     // Tables
@@ -195,7 +195,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'loadVisitorOrders':
-      !isset($sortColumn) && $sortColumn = 'create_date';
+      !isset($sortColumn) && $sortColumn = 'createDate';
 
       $search = isset($search);
       // Значит нужны все заказы (поиск)
@@ -426,13 +426,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'createProperty':
-      if (isset($dbTable) && isset($dataType) && !empty($dbTable)) {
+      if (isset($tableName) && isset($dataType) && !empty($tableName)) {
         // Простой или сложный параметр по префиксу
         if (stripos($dataType, 's_') === 0) {
           $setAction = 'createProperty';
           require 'setting.php';
         } else {
-          $tableCode = 'prop_' . (isset($tableCode) ? $tableCode : translit($dbTable));
+          $tableCode = 'prop_' . ($tableCode ?? translit($dbTable));
 
           $param = [];
           foreach ($_REQUEST as $key => $value) {
@@ -451,11 +451,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             setSettingFile($setting);
 
             $result['error'] = $db->createPropertyTable($tableCode, $param);
-          } else {
-            $result['error'] = 'Property exist';
-          }
+          } else $result['error'] = 'Property exist';
         }
-      }
+      } else $result['error'] = 'Property name error!';
       break;
     case 'delProperty':
       if (isset($props)) {

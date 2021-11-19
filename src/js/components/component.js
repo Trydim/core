@@ -201,7 +201,7 @@ export class MessageToast {
 
   setMessage(msg) {
     this.messageBlock.innerHTML = `<div class="row">
-      <div class="col-11 text-center">${msg}</div>
+      <div class="col-11 text-center">${msg || 'Текст сообщения пустой'}</div>
       <button type="button" class="col-1 btn-close btn-close-white m-auto"></button>
     </div>`;
   }

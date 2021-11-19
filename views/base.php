@@ -10,11 +10,11 @@ if(!isset($pageTitle)) $pageTitle = '';
 if(!isset($headContent)) $headContent = '';
 
 if(!isset($global)) {
-	if (!isset($pageHeader)) $pageHeader = template('parts/header');
-	if (!isset($pageFooter)) $pageFooter = template('parts/footer');
-	if (!isset($sideLeft)) $sideLeft = template('parts/sidemenu');
-	if (!isset($content)) $content = '';
-	if (!isset($sideRight)) $sideRight = '';
+  if (!isset($pageHeader)) $pageHeader = template('parts/header');
+  if (!isset($pageFooter)) $pageFooter = template('parts/footer');
+  if (!isset($sideLeft)) $sideLeft = template('parts/sidemenu');
+  if (!isset($content)) $content = '';
+  if (!isset($sideRight)) $sideRight = '';
 }
 if(!isset($cssLinks)) $cssLinks = [];
 if(!isset($jsLinks)) $jsLinks = [];
@@ -25,19 +25,19 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 <!doctype html>
 <html lang="en">
 <head>
-	<meta name="viewport"
-	      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <?= $headContent ?>
-	<title><?= $pageTitle; ?></title>
+  <title><?= $pageTitle; ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
-	<?php if($main->checkStatus('ok') || $target === 'login') { ?>
+  <?php if($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="<?= CORE_CSS?>admin.css">
-	<?php } ?>
+  <?php } ?>
 
-	<?php array_map(function($item) { ?>
+  <?php array_map(function($item) { ?>
     <link rel="stylesheet" href="<?= str_replace('//', '/', $item); ?>">
-	<?php }, $cssLinks); ?>
+  <?php }, $cssLinks); ?>
 
   <script>
     window.DEBUG         = '<?= DEBUG ?>';
@@ -66,36 +66,36 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 </div>
 
 <?php if(!isset($global)) { ?>
-<main class="main-wrapper mx-auto" id="mainWrapper">
-  <div class="nav-header">
-    <a href="<?= SITE_PATH ?>" class="brand-logo">
-      <img class="logo-abbr" src="./images/logo.png" alt="">
-      <span class="brand-title">title</span>
-    </a>
+  <main class="main-wrapper mx-auto" id="mainWrapper">
+    <div class="nav-header">
+      <a href="<?= SITE_PATH ?>" class="brand-logo">
+        <img class="logo-abbr" src="./images/logo.png" alt="">
+        <span class="brand-title">title</span>
+      </a>
 
-    <div class="nav-control" role="button">
-      <div>
-        <i class="pi pi-caret-left"></i>
+      <div class="nav-control" role="button">
+        <div>
+          <i class="pi pi-caret-left"></i>
+        </div>
       </div>
     </div>
-  </div>
-  <?= $pageHeader; ?>
+    <?= $pageHeader; ?>
 
-  <div class="content-body">
-    <?php if($sideLeft) { ?>
-      <?= $sideLeft; ?>
-    <?php } ?>
-    <section class="position-relative col"
-             style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
-      <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content; ?></div>
-      <?= $pageFooter; ?>
-    </section>
-    <?php if($sideRight) { ?>
-      <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight; ?></section>
-    <?php } ?>
-  </div>
+    <div class="content-body">
+      <?php if($sideLeft) { ?>
+        <?= $sideLeft; ?>
+      <?php } ?>
+      <section class="position-relative col"
+               style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
+        <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content; ?></div>
+        <?= $pageFooter; ?>
+      </section>
+      <?php if($sideRight) { ?>
+        <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight; ?></section>
+      <?php } ?>
+    </div>
 
-</main>
+  </main>
 <?php } else echo $global; ?>
 
 <script defer type="module" src="<?= CORE_SCRIPT?>src.js"></script>

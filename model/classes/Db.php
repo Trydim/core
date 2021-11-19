@@ -257,11 +257,11 @@ class Db extends \R {
 
   /**
    * @param $dbTable
-   * @param $filters
+   * @param string $filters
    *
    * @return integer
    */
-  public function getCountRows($dbTable, $filters = '') {
+  public function getCountRows($dbTable, string $filters = ''): int {
     $sql = "SELECT COUNT(*) as 'count' from $dbTable";
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
@@ -283,7 +283,7 @@ class Db extends \R {
    *
    * @return array|int
    */
-  public function insert($curTable, $dbTable, $param, $change = false) {
+  public function insert($curTable, $dbTable, $param, bool $change = false) {
     $result = $this->checkTableBefore($curTable, $dbTable, $param);
 
     $beans = self::xdispense($dbTable, count($param));
@@ -756,7 +756,7 @@ class Db extends \R {
    *
    * @return array|null
    */
-  public function loadVisitorOrder($pageNumber = 0, $countPerPage = 20, $sortColumn = 'create_date', $sortDirect = false, $dateRange = [], $ids = []) {
+  public function loadVisitorOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'createDate', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT cp_number, create_date, important_value, total FROM client_orders\n";
@@ -768,6 +768,7 @@ class Db extends \R {
       else $sql .= implode(' OR ID = ', $ids) . " ";
     }
 
+    $sortColumn = AQueryWriter::camelsSnake($sortColumn);
     $sql .= "ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
