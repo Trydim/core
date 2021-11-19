@@ -7,11 +7,11 @@
 
     "startLIVEReload": "webpack-dev-server",
 
-    "createResourceFile": "node createResourceFile.js",
-    "coreProd": "webpack --mode=production --config ./webpack.config.js",
-    "coreModuleProd": "webpack --mode=production --config ./webpack.module.js",
+    "createResourceFile": "node ./webpack/createResourceFile.js",
+    "coreProd": "webpack --env production --config ./webpack/webpack.config.js",
+    "coreModuleProd": "webpack --env production --config ./webpack/webpack.module.js",
 
-    "coreDev": "webpack --mode=development --config ./webpack.config.js",
-    "coreModuleDev": "webpack --mode=development --config ./webpack.module.js"
+    "coreDev": "webpack --config ./webpack/webpack.config.js",
+    "coreModuleDev": "webpack --config ./webpack/webpack.module.js"
   }
 }

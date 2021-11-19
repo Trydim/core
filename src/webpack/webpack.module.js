@@ -1,94 +1,107 @@
-const path    = require('path');
+const fs = require('fs');
+const path = require('path');
 const webpack = require('webpack');
 //const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //const CssMinimizerPlugin   = require('css-minimizer-webpack-plugin');
 //const TerserPlugin         = require("terser-webpack-plugin");
+// const webpack = require('webpack'); // вроде не обязательно
+
+const absPath = '../../',
+      resFileName = 'webpackModule.json';
+
+let entry;
+
+if (fs.existsSync(absPath + 'public/' + resFileName)) {
+  let rd = fs.readFileSync(absPath + 'public/' + resFileName, {encoding: 'utf8'});
+  entry  = JSON.parse(rd);
+} else return;
+
 
 module.exports = env => {
   const dev = !env.production;
   //process.env.NODE_ENV = dev ? 'development' : 'production'; // зачем это
 
   return {
-    mode        : dev ? 'development' : 'production',
+  mode: dev ? 'development' : 'production',
     watch       : dev, // слежка за изменениями файлов
-    watchOptions: {aggregateTimeout: 300}, // задержка оценки изменений в мс
-    entry       : {
-      main: './js/main.js',
-      src: './js/src.js',
-    },
+  watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
+    entry,
 
-    experiments: {
-      outputModule: true,
-    },
+  experiments: {
+    outputModule: true,
+  },
 
-    output : {
-      path         : path.resolve(__dirname, '../../assets/'),
-      filename     : 'js/[name].js',
-      chunkFilename: 'js/[name].chunk.js',
+  output: {
+      path    : path.resolve(__dirname, '../../assets/'),
+    filename: 'js/module/[name]/[name].js',
+    library: {
+      type: 'module',
+    },
       scriptType   : 'module',
-      module       : true,
-      libraryTarget: 'module',
-    },
-    resolve: {
-      alias: {
+    module: true,
+    libraryTarget: 'module',
+  },
+
+  resolve: {
+    alias: {
         vue: dev ? 'vue/dist/vue.esm-bundler.js' : 'vue/dist/vue.esm-browser.prod.js',
-      }
-    },
+    }
+  },
 
     devtool: dev ? 'source-map' : false, //source mapping
-    optimization: {
-      minimize : !dev,
-
-      minimizer: [
+  optimization: {
+    minimize: !dev,
+    minimizer: [
         /*new TerserPlugin({
-         extractComments: false // Убрать комментарии
-         }),*/
+          extractComments: false // Убрать комментарии
+        }),*/
         `...`,
         /*new CssMinimizerPlugin({
-         minimizerOptions: {
-         preset: [
-         "default",
-         {discardComments: { removeAll: true }},
-         ],
-         },
-         }),*/
+          minimizerOptions: {
+          preset: [
+            "default",
+            {discardComments: { removeAll: true }},
+    ],
+  },
+          }),*/
       ],
       /*
-       splitChunks: {
-       chunks: 'all', //maxSize: 1024,
-       cacheGroups: {
-       commons: {
-       test: /[\\/]node_modules[\\/]/, // cacheGroupKey here is `commons` as the key of the cacheGroup
-       name(module, chunks, cacheGroupKey) {
-       const moduleFileName = module.identifier().split('/').reduceRight(item => item);
-       const allChunksNames = chunks.map((item) => item.name).join('~');
-       return `js/${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
-       },
-       }
-       },
-       },*/
+      splitChunks: {
+        chunks: 'all', //maxSize: 1024,
+        cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/, // cacheGroupKey here is `commons` as the key of the cacheGroup
+          name(module, chunks, cacheGroupKey) {
+            const moduleFileName = module.identifier().split('/').reduceRight(item => item);
+            const allChunksNames = chunks.map((item) => item.name).join('~');
+            return `js/${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
+          },
+        }
+      },
+      },*/
     },
-    plugins: [
-      new MiniCssExtractPlugin({
-        filename: "css/admin.css",
-      }),
-      //new VueLoaderPlugin(),
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "css/module/[name]/[name].css",
+    }),
+    //new VueLoaderPlugin(),
 
       /*new HtmlWebpackPlugin({
-       title: 'html',
-       filename: 'view/content.php',
-       template: `content.php`,
-       }),*/
+        title: 'yrdy',
+        filename: 'view/content.php',
+        template: `content.php`,
+      }),*/
 
-      new webpack.DefinePlugin({
-        // Drop Options API from bundle
+    new webpack.DefinePlugin({
+      // Drop Options API from bundle
         __VUE_OPTIONS_API__  : 'true',
         __VUE_PROD_DEVTOOLS__: 'false',
-      }),
-    ],
-    module: {
-      rules: [
+    }),
+  ],
+
+  module: {
+    rules: [
         getVueRules(),
         getScssRules(),
         getCssRules(),
@@ -118,8 +131,8 @@ const generator = {
  * @returns Object
  */
 const getVueRules = () => ({
-  test  : /\.vue$/,
-  loader: "vue-loader"
+        test: /\.vue$/,
+        loader: "vue-loader"
 });
 
 /**
@@ -127,12 +140,12 @@ const getVueRules = () => ({
  * @returns Object
  */
 const getScssRules = () => ({
-  test: /\.s[ac]ss$/i,
-  use : [
+        test: /\.s[ac]ss$/i,
+        use: [
     MiniCssExtractPlugin.loader,
-    'css-loader',
-    'sass-loader',
-  ],
+          'css-loader',
+          'sass-loader',
+        ],
 });
 
 /**
@@ -140,11 +153,11 @@ const getScssRules = () => ({
  * @returns Object
  */
 const getCssRules = () => ({
-  test: /\.css$/i,
-  use : [
-    MiniCssExtractPlugin.loader,
-    'css-loader',
-  ],
+        test: /\.css$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+        ],
 });
 
 /**
@@ -153,7 +166,7 @@ const getCssRules = () => ({
  * @returns Object
  */
 const getImageRules = () => ({
-  test   : /\.(png|jpe?g|gif|webp)$/i,
+        test: /\.(png|jpe?g|gif|webp)$/i,
   type   : 'asset',
   generator: {
     filename: 'image/[name][ext]',
@@ -163,7 +176,7 @@ const getImageRules = () => ({
     dataUrlCondition: {
       maxSize: 8196, // 8kb
     }
-  },
+        },
 });
 
 /**
@@ -177,7 +190,7 @@ const getSVGRules = () => ({
   generator: {
     filename: 'svg/[name][ext]',
     publicPath: generator.publicPath,
-  },
+      },
   parser: {
     dataUrlCondition: {
       maxSize: 8196, // 8kb

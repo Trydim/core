@@ -9,11 +9,11 @@ const func = {
   log: msg => c.DEBUG && console.log('Error:' + msg),
 
   /**
-   * deprecated wrap for f.qS
+   * Get Element by id from document or shadow DOM
    * @param id
    * @return {HTMLElement | {}}
    */
-  gI: id => func.qS('#' + id),
+  gI: id => (c.calcWrap || document).getElementById(id) || func.log('not found note by id -' + id),
 
   /**
    * @param selector
@@ -21,7 +21,7 @@ const func = {
    * @return {HTMLElement | {}}
    */
   qS: (selector = '', node = c.calcWrap) =>
-    (c.calcWrap || document).querySelector(selector) || func.log(selector),
+    (node || document).querySelector(selector) || func.log(selector),
 
   /**
    *
@@ -228,7 +228,7 @@ const func = {
         if (member.nodesT[t].length) {
           let checked = !!member.nodesT[t].find(item => item.checked || item.selected); // Находим в группе хоть 1 включенный (или противоположный выключенный)
           relation = relation.replace(t, checked.toString());
-        } else console.warn('Event relatedOption: target not found' + t);
+        } else console.warn('Event relatedOption: target not found ' + t);
       });
 
       try {

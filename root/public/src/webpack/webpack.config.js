@@ -5,6 +5,22 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //const CssMinimizerPlugin   = require('css-minimizer-webpack-plugin');
 //const TerserPlugin         = require("terser-webpack-plugin");
 
+/**
+ * Шрифты
+ * для ускорения сборки шрифты прописывать в отдельном файле.
+ * перед строкой с правилом содержащим url вставить как комментарий " webpackIgnore: true ",
+ * путь относительно собранного файла css
+ */
+
+/**
+ * Получить результирующую папку в зависимости от расположения папки src
+ * @returns string
+ */
+const getOutputPath = () => {
+  const outputPath = '../../' + (path.basename(path.resolve(__dirname, '../../')) !== 'public' ? 'public/' : '');
+  return path.resolve(__dirname, outputPath);
+}
+
 module.exports = env => {
   const dev = !env.production;
   //process.env.NODE_ENV = dev ? 'development' : 'production'; // зачем это
@@ -14,8 +30,7 @@ module.exports = env => {
     watch       : dev, // слежка за изменениями файлов
     watchOptions: {aggregateTimeout: 300}, // задержка оценки изменений в мс
     entry       : {
-      main: './js/main.js',
-      src: './js/src.js',
+      calculator: './js/calculator.js', //function: './js/function.js',
     },
 
     experiments: {
@@ -23,7 +38,7 @@ module.exports = env => {
     },
 
     output : {
-      path         : path.resolve(__dirname, '../../assets/'),
+      path         : getOutputPath(),
       filename     : 'js/[name].js',
       chunkFilename: 'js/[name].chunk.js',
       scriptType   : 'module',
@@ -42,44 +57,44 @@ module.exports = env => {
 
       minimizer: [
         /*new TerserPlugin({
-         extractComments: false // Убрать комментарии
-         }),*/
+          extractComments: false // Убрать комментарии
+        }),*/
         `...`,
         /*new CssMinimizerPlugin({
-         minimizerOptions: {
-         preset: [
-         "default",
-         {discardComments: { removeAll: true }},
-         ],
-         },
-         }),*/
+          minimizerOptions: {
+          preset: [
+            "default",
+            {discardComments: { removeAll: true }},
+          ],
+          },
+          }),*/
       ],
       /*
-       splitChunks: {
-       chunks: 'all', //maxSize: 1024,
-       cacheGroups: {
-       commons: {
-       test: /[\\/]node_modules[\\/]/, // cacheGroupKey here is `commons` as the key of the cacheGroup
-       name(module, chunks, cacheGroupKey) {
-       const moduleFileName = module.identifier().split('/').reduceRight(item => item);
-       const allChunksNames = chunks.map((item) => item.name).join('~');
-       return `js/${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
-       },
-       }
-       },
-       },*/
+      splitChunks: {
+        chunks: 'all', //maxSize: 1024,
+        cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/, // cacheGroupKey here is `commons` as the key of the cacheGroup
+          name(module, chunks, cacheGroupKey) {
+            const moduleFileName = module.identifier().split('/').reduceRight(item => item);
+            const allChunksNames = chunks.map((item) => item.name).join('~');
+            return `js/${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
+          },
+        }
+      },
+      },*/
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "css/admin.css",
+        filename: "css/style.css",
       }),
       //new VueLoaderPlugin(),
 
       /*new HtmlWebpackPlugin({
-       title: 'html',
-       filename: 'view/content.php',
-       template: `content.php`,
-       }),*/
+        title: 'yrdy',
+        filename: 'view/content.php',
+        template: `content.php`,
+      }),*/
 
       new webpack.DefinePlugin({
         // Drop Options API from bundle

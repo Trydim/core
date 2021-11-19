@@ -35,7 +35,7 @@ $field['footerContent'] = <<<footerContent
         
       </div>
       
-      <div class="saveOrderField modal-content__form grid-block margin-top">
+      <div class="modal-content__form grid-block margin-top">
         <div class="modal-content__field">
           <label class="radio">
             <input type="radio" class="custom-radio style-circle" name="customerType" value="i" data-target checked>
@@ -64,7 +64,7 @@ $field['footerContent'] = <<<footerContent
         <input type="checkbox" id="politic" name="politic" checked>
         <label for="politic" class="modal-content__label">Согласен с политикой конфидециальности</label>
       </div-->
-      <div class="saveOrderField modal-content__form grid-block margin-top d-none" id="customerChange">
+      <div class="modal-content__form grid-block margin-top d-none" id="customerChange">
         <div class="modal-content__field">
           <label class="radio">
             <input type="radio" class="custom-radio style-circle" name="customerChange" value="change" checked>

@@ -1,6 +1,6 @@
 "use strict";
 
-const importModuleFunc = async (moduleName) => {
+const importModuleFunc = async moduleName => {
   let link;
   if (moduleName === 'public') {
     link = `${f.SITE_PATH}public/js/${f.PUBLIC_PAGE}.js`;
@@ -29,7 +29,7 @@ const init = (moduleName = 'default') => {
   return module;
 }
 
-const setLinkMenu = (page) => {
+const setLinkMenu = page => {
   let menu = f.qS('#sideMenu');
   if (!menu) return;
 
@@ -54,6 +54,19 @@ const cancelFormSubmit = () => {
       return false;
     }
   });
+}
+
+const stopPreloader = () => {
+  f.gI('preloader').remove();
+  f.gI('mainWrapper').classList.add('show');
+}
+
+const setParentHeight = (target, height) => {
+  const n = target.closest("ul[aria-expanded=\"false\"]");
+  if (n) {
+    n.style.height = (n.offsetHeight + height) + 'px';
+    setParentHeight(n.parentNode, height);
+  }
 }
 
 // Event function

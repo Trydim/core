@@ -3,7 +3,7 @@
 /**
  * @var array $vars extract param
  */
-// Todo временно
+
 global $main, $target;
 
 if(!isset($pageTitle)) $pageTitle = '';
@@ -22,6 +22,8 @@ if(!isset($footerContent)) $footerContent = '';
 if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase');
 
 ?>
+<!doctype html>
+<html lang="en">
 <head>
 	<meta name="viewport"
 	      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
