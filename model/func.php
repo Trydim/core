@@ -103,11 +103,11 @@ function getTargetPage($get) {
 /**
  * get template from directory view
  * @param string $path whit out
- * @param array $vars
+ * @param array  $vars
  *
  * @return string
  */
-function template($path = 'base', $vars = []) {
+function template(string $path = 'base', array $vars = []): string {
   extract($vars);
   ob_start();
   if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {
