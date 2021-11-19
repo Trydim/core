@@ -107,7 +107,7 @@ function getTargetPage($get) {
  *
  * @return string
  */
-function template($path = 'base', $vars = []) {
+function template(string $path = 'base', array $vars = []): string {
   extract($vars);
   ob_start();
   if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {

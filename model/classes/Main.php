@@ -41,7 +41,7 @@ trait Authorization {
     return $this->$field;
   }
 
-  public function setLogin($session) {
+  public function setLogin($session): Main {
     $this->login = $session['login'];
     $this->name  = $session['name'];
     $this->id    = $session['priority'];
@@ -50,15 +50,15 @@ trait Authorization {
   }
 
   /**
-   * @param $status
+   * @param string $status
    *
    * @return bool
    */
-  public function checkStatus($status) {
+  public function checkStatus(string $status = 'ok'): bool {
     return $this->status === $status;
   }
 
-  public function setLoginStatus($status) {
+  public function setLoginStatus($status): Main {
     $this->status = $status;
     return $this;
   }
