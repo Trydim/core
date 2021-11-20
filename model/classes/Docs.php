@@ -1,7 +1,9 @@
-<?php if (!defined('PDF_LIBRARY')) define('PDF_PDF_LIBRARY', 'mpdf');
+<?php
 
-/* Папка  для временных файлов */
-define('RESULT_PATH', 'shared/');
+/* Папка для временных файлов */
+const RESULT_PATH = 'shared/';
+!defined('PDF_LIBRARY') && define('PDF_LIBRARY', 'mpdf');
+!defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
 
@@ -28,7 +30,7 @@ class Docs {
   /**
    * @var array
    */
-  private $data = [], $excelHeader = [], $pdfParam;
+  private $data, $excelHeader = [], $pdfParam;
 
   /**
    * @var string
@@ -294,7 +296,7 @@ class Docs {
    * @param string $dest
    * @return mixed
    */
-  public function getDocs($dest = 'S') {
+  public function getDocs(string $dest = 'S') {
     $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
     if (!is_dir($path)) mkdir($path);
 
@@ -306,15 +308,14 @@ class Docs {
   }
 
   /**
-   * @param $total
-   * @param string $spacer
-   * @param int $precision
-   *
-   * @return string|string[]|null
+   * @param        $number
+   * @param int    $decimals
+   * @param string $decimalSeparator
+   * @param string $thousandsSeparator
+   * @return string
    */
-  public function setNumFormat($total, $spacer = ' ', $precision = 0) {
-    is_numeric($total) && $total = round(floatval($total), $precision);
-    return preg_replace('/\B(?=(\d{3})+(?!\d))/', $spacer, $total);
+  public function numFormat($number, int $decimals = 0, string $decimalSeparator = '.', string $thousandsSeparator = ' '): string {
+    return number_format(floatval($number), $decimals, $decimalSeparator, $thousandsSeparator);
   }
 
   /**
