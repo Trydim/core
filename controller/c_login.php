@@ -12,8 +12,8 @@ $field['content']       = '';
 $field['sideRight']     = '';
 
 $wrongPass = isset($main) && $main->checkStatus('error');
-$login = isset($_REQUEST['login']) ? $_REQUEST['login'] : '';
-$pass = isset($_REQUEST['password']) ? $_REQUEST['password'] : '';
+$login = $_REQUEST['login'] ?? '';
+$pass = $_REQUEST['password'] ?? '';
 
 require $pathTarget;
 $html = template('base', $field);
