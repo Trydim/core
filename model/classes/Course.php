@@ -1,5 +1,7 @@
 <?php
 
+!defined('PATH_CSV') && define('PATH_CSV', $_SERVER['DOCUMENT_ROOT'] . '/csv');
+
 class Course {
   const REFRESH_INTERVAL = 36000;
   const LINK_PARAM = '';

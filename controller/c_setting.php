@@ -2,7 +2,6 @@
 
 /**
  * @var object $main
- * @var object $db
  * @var string $pathTarget
  */
 

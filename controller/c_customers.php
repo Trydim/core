@@ -8,7 +8,7 @@
 $field = [ 'pageTitle' => 'Клиенты' ];
 
 // получить конфиг текущего пользователя
-//$setting = $db->getUserSetting(/*login user*/);
+//$setting = $main->db->getUserSetting(/*login user*/);
 
 if(!isset($setting)) {
   $columns = $main->db->loadCustomers(0, 1);
