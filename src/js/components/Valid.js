@@ -2,6 +2,8 @@
 
 import './_valid.scss';
 
+import {c} from "./const";
+
 // Валидация
 export class Valid {
   constructor(param) {
