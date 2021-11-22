@@ -96,7 +96,7 @@ export class Options extends Common {
     node.files = input.files;
   }
   showLoadedFiles(data) {
-    let html = '';
+    let html = '<div class="row overflow-auto" style="max-height: 80vh">';
 
     data.forEach(file => {
       html += f.replaceTemplate(this.tmp.chooseLoadedFile, {
@@ -124,7 +124,7 @@ export class Options extends Common {
   initChooseFile(form, option) {
     const inputN = form.querySelector('input[type="file"]'),
           fileField = form.querySelector('#fileField'),
-          btnN = form.querySelector('[name="chooseFile"]');
+          btnN = form.querySelector('.chooseFile');
 
     this.queryFiles = Object.create(null);
 
@@ -157,7 +157,7 @@ export class Options extends Common {
       }
     });
 
-    if (option.images.length) {
+    if (option && option.images.length) {
       option.images.forEach(img => {
         this.queryFiles[img.ID] = {name: img.name, path: img.path};
       });

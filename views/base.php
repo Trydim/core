@@ -66,14 +66,14 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 </div>
 
 <?php if(!isset($global)) { ?>
-  <main class="main-wrapper mx-auto" id="mainWrapper">
+  <main class="main-wrapper mx-auto menu-toggle" id="mainWrapper">
     <div class="nav-header">
       <a href="<?= SITE_PATH ?>" class="brand-logo">
         <img class="logo-abbr" src="./images/logo.png" alt="">
         <span class="brand-title">title</span>
       </a>
 
-      <div class="nav-control" role="button">
+      <div class="nav-control" role="button" data-action="menuToggle" data-bs-toggle="tooltip">
         <div>
           <i class="pi pi-caret-left"></i>
         </div>
@@ -81,12 +81,11 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
     </div>
     <?= $pageHeader; ?>
 
-    <div class="content-body">
+    <div class="container-content">
       <?php if($sideLeft) { ?>
         <?= $sideLeft; ?>
       <?php } ?>
-      <section class="position-relative col"
-               style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
+      <section class="content-body">
         <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content; ?></div>
         <?= $pageFooter; ?>
       </section>

@@ -1,6 +1,3 @@
-@import "../../abstracts/_mixin";
-@import "../../abstracts/_variable";
-
 @include customMedia($min: 768px) {
 
     [data-sidebar-style="mini"] {

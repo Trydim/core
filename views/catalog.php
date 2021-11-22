@@ -46,17 +46,17 @@ if ($properties) {
     $name = $prop['name'];
     if (isset($prop['type'])) {
       $type = $prop['type'];
-      $propertiesHtml .= "<div class='row'>
-        <label class='col'>$name</label><div class='col'>
-        <input class='w-100' type='$type' name='$propName'></div>
+      $propertiesHtml .= "<div class='input-group mb-3'>
+        <span class='input-group-text w-50'>$name</span>
+        <input class='form-control' type='$type' name='$propName'>
       </div>";
     } else {
       $defOption = '';
       if (isset($prop['values'])) $defOption = "<option value=''>-</option>";
       else $prop['values'] = [['ID' => false, 'name' => 'table empty']];
 
-      $propertiesHtml .= "<div class='row'><label class='col'>$name</label>"
-                         . "<div class='col'><select class='w-100' name='$propName'>" . $defOption;
+      $propertiesHtml .= "<div class='input-group mb-3'><span class='input-group-text w-50'>$name</span>"
+                         . "<select class='form-select w-50' name='$propName'>" . $defOption;
 
       foreach ($prop['values'] as $opt) {
         $id = $opt['ID'];
@@ -64,7 +64,7 @@ if ($properties) {
         $propertiesHtml .= "<option value=\"$id\">$name</option>";
       }
 
-      $propertiesHtml .= "</select></div></div>";
+      $propertiesHtml .= "</select></div>";
     }
   }
 }
@@ -72,55 +72,79 @@ if ($properties) {
 
 $field['content'] = <<<content
 <div class="container-fluid">
-  <div class="row">
-    <div id="searchField" class="bg-style-sheet form-group col-12">
-      <label class="w-100">Поиск:
-        <input type="text" data-field="search" name="search" value="" class="form-control" autocomplete="off">
-      </label>
-    </div>
+  <div id="searchField" class="input-group">
+    <span class="input-group-text">Поиск:</span>
+    <input type="text" class="form-control" name="search" autocomplete="off" data-field="search">
   </div>
   <hr>
   <div class="row">
-    <div id="sectionField" class="col-3 overflow-auto bg-style-sheet">
-      <div class="openSection" data-action="clickSection" data-id="0">Разделы</div>
-      <div class="subSection"></div>
-      <div class="controlWrap">
-        <input class="btn btn-success" type="button" value="Создать раздел" data-action="createSection">
-        <input class="btn btn-warning" type="button" value="Открыть раздел" data-action="openSection">
-        <input class="btn btn-warning" type="button" value="Изменить раздел" data-action="changeSection">
-        <input class="btn btn-danger" type="button" value="Удалить раздел" data-action="delSection">
+    <div id="sectionField" class="col-3 overflow-auto">
+      <div class="openSection" role="button" data-action="clickSection" data-id="0">Разделы</div>
+      <div class="subSection" role="button" data-action="clickSection"></div>
+      <div class="controlWrap p-1">
+        <button type="button" class="btn btn-success" data-action="createSection" title="Создать раздел">
+          <i class="pi pi-plus-circle align-text-bottom" data-action="createSection"></i>
+        </button>
+        <button type="button" class="btn btn-warning" data-action="openSection" title="Открыть раздел">
+          <i class="pi pi-folder-open align-text-bottom" data-action="openSection"></i>
+        </button>
+        <button type="button" class="btn btn-warning" data-action="changeSection" title="Изменить раздел">
+          <i class="pi pi-cog align-text-bottom" data-action="changeSection"></i>
+        </button>
+        <button type="button" class="btn btn-danger" data-action="delSection" title="Удалить раздел">
+          <i class="pi pi-trash align-text-bottom" data-action="delSection"></i>
+        </button>
       </div>
     </div>
     <div id="elementsField" class="col">
-      <div class="bg-style-sheet position-relative">
+      <div class="position-relative">
         <div class="d-none" data-field="tableWrap">
-          <table class="table table-striped text-center" style="cursor: pointer; user-select: none">
+          <table class="table table-striped table-hover text-center user-select-none" role="button">
             <thead><tr></tr></thead>
             <tbody></tbody>
           </table>
           <div class="pageWrap"></div>
         </div>
         <div class="mt-1 controlWrap">
-          <input class="btn btn-success" type="button" value="Создать элемент" data-action="createElement">
+          <button type="button" class="btn btn-success" data-action="createElement" title="Создать элемент">
+            <i class="pi pi-plus-circle align-text-bottom" data-action="createElement"></i>
+          </button>
           <span class="d-none" data-field="btnWrap">
-            <input class="btn btn-warning" type="button" value="Открыть элемент" data-action="openElement">
-            <input class="btn btn-warning" type="button" value="Изменить элемент" data-action="changeElements">
-            <input class="btn btn-warning" type="button" value="Копировать элемент" data-action="copyElement">
-            <input class="btn btn-danger" type="button" value="Удалить элемент" data-action="delElements">
-            <br><input class="btn btn-dark" type="button" value="Выделить все" data-action="selectedAll">
-            <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
-            <label class="btn btn-dark float-right">
-              Показать выбранные
-              <input type="checkbox" id="elementsSelected" hidden data-target="elementsSelected">        
-            </label>
+            <button type="button" class="btn btn-warning" data-action="openElement" title="Открыть элемент">
+              <i class="pi pi-inbox align-text-bottom" data-action="openElement"></i>
+            </button>
+            <button type="button" class="btn btn-warning" data-action="changeElements" title="Изменить элемент">
+              <i class="pi pi-cog align-text-bottom" data-action="changeElements"></i>
+            </button>
+            <button type="button" class="btn btn-warning" data-action="copyElement" title="Копировать элемент">
+              <i class="pi pi-copy align-text-bottom" data-action="copyElement"></i>
+            </button>
+            <button type="button" class="btn btn-danger" data-action="delElements" title="Удалить элемент">
+              <i class="pi pi-trash align-text-bottom" data-action="delElements"></i>
+            </button>
+
+            <span class="float-end">
+              <button type="button" class="btn btn-dark" data-action="selectedAll" title="Выделить все">
+                <i class="pi pi-check align-text-bottom" data-action="selectedAll"></i>
+              </button>
+              <button type="button" class="btn btn-dark" data-action="clearId" title="Снять выделение">
+                <i class="pi pi-times align-text-bottom" data-action="clearId"></i>
+              </button>
+              <label class="btn btn-dark" title="Показать выбранные">
+                <input type="checkbox" id="elementsSelected" hidden data-target="elementsSelected">
+                <i class="pi pi-bars align-text-bottom"></i>        
+              </label>
+            </span>
           </span>
         </div>
 
-        <div class="position-absolute bg-style-sheet" 
+        <div class="position-absolute bottom-0 end-0 bg-light p-1 border rounded"
              data-relation="elementsSelected"
-             style="right: 0; bottom: 0; min-width: 230px">
-          <div class="position-relative" style="padding-top: 20px">
-            <label class="position-absolute" style="right: 0; top: 0" for="elementsSelected">Закрыть</label>
+             style="min-width: 230px">
+          <div class="position-relative pt-5">
+            <label class="btn btn-outline-dark position-absolute top-0 end-0" for="elementsSelected">
+              <i class="pi pi-times align-text-bottom"></i>
+            </label>
             <div data-field="selectedList"></div>
           </div>
         </div>
@@ -129,10 +153,10 @@ $field['content'] = <<<content
   </div>
 </div>
 <hr>
-<div class="container-fluid bg-style-sheet" id="optionsField">
+<div class="container-fluid" id="optionsField">
   <div class="d-none" data-field="tableWrap">
-    <div class="row m-2" style="overflow: auto">
-      <table class="text-center table table-striped" style="cursor: pointer">
+    <div class="row overflow-auto m-2">
+      <table class="table table-striped table-hover text-center user-select-none" role="button">
         <thead><tr></tr></thead>
         <tbody></tbody>
       </table>
@@ -140,25 +164,42 @@ $field['content'] = <<<content
     <div class="pageWrap"></div>
   </div>
   <div class="mt-1 text-center controlWrap">
-    <input class="btn btn-success" type="button" value="Добавить вариант" data-action="createOption">
+    <button type="button" class="btn btn-success" data-action="createOption" title="Добавить вариант">
+      <i class="pi pi-plus-circle align-text-bottom" data-action="createOption"></i>
+    </button>
     <span class="d-none" data-field="btnWrap">
-      <input class="btn btn-warning" type="button" value="Изменить вариант" data-action="changeOptions">
-      <input class="btn btn-warning" type="button" value="Копировать вариант" data-action="copyOption">
-      <input class="btn btn-danger" type="button" value="Удалить вариант" data-action="delOptions">
-      <br><input class="btn btn-dark" type="button" value="Выделенить все" data-action="selectedAll">
-      <input class="btn btn-dark" type="button" value="Снять выделение" data-action="clearId">
-      <label class="btn btn-dark float-right">
-        Показать выбранные
-        <input type="checkbox" id="optionsSelected" hidden data-target="optionsSelected">        
-      </label>
+      <button type="button" class="btn btn-warning" data-action="changeOptions" title="Изменить вариант">
+        <i class="pi pi-cog align-text-bottom" data-action="changeOptions"></i>
+      </button>
+      <button type="button" class="btn btn-warning" data-action="copyOption" title="Копировать вариант">
+        <i class="pi pi-copy align-text-bottom" data-action="copyOption"></i>
+      </button>
+      <button type="button" class="btn btn-danger" data-action="delOptions" title="Удалить вариант">
+        <i class="pi pi-trash align-text-bottom" data-action="delOptions"></i>
+      </button>
+      
+      <span class="float-end">
+        <button type="button" class="btn btn-dark" data-action="selectedAll" title="Выделить все">
+          <i class="pi pi-check align-text-bottom" data-action="selectedAll"></i>
+        </button>
+        <button type="button" class="btn btn-dark" data-action="clearId" title="Снять выделение">
+          <i class="pi pi-times align-text-bottom" data-action="clearId"></i>
+        </button>
+        <label class="btn btn-dark" title="Показать выбранные">
+          <input type="checkbox" id="optionsSelected" hidden data-target="optionsSelected">
+          <i class="pi pi-bars align-text-bottom"></i>        
+        </label>
+      </span>
     </span>
   </div>
 
-  <div class="position-absolute bg-style-sheet"
+  <div class="position-absolute bottom-0 end-0 bg-light p-1 border rounded"
        data-relation="optionsSelected"
-       style="right: 0; bottom: 0; min-width: 230px">
-    <div class="position-relative" style="padding-top: 20px">
-      <label class="position-absolute" style="right: 0; top: 0" for="optionsSelected">Закрыть</label>
+       style="min-width: 230px">
+    <div class="position-relative pt-5">
+      <label class="btn btn-outline-dark position-absolute top-0 end-0" for="optionsSelected">
+        <i class="pi pi-times align-text-bottom"></i>
+      </label>
       <div data-field="selectedList"></div>
     </div>
   </div>
@@ -168,10 +209,10 @@ content;
 
 $field['footerContent'] .= <<<footerContent
 <template id="sectionWrap">
-  <ul class="list" style="cursor: pointer"></ul>
+  <ul class="list"></ul>
 </template>
 <template id="section">
-  <li style="cursor: pointer">
+  <li>
     <div class="closeSection border-dark" data-action="clickSection" data-id="\${ID}">\${ID} - \${name}</div>
     <div class="subSection"></div>
   </li>
@@ -190,42 +231,54 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="sectionForm">
   <form action="#">
-    <div class="row mb-1">
-      <div class="col">Имя раздела:</div>
-      <div class="col"><input class="w-100" type="text" name="name"></div>  
+    <div class="form-floating my-3">
+      <input type="text" class="form-control" id="sName" placeholder="Имя раздела" name="name">
+      <label for="sName">Имя раздела</label>
     </div>
-    <div class="row mb-1">
-      <div class="col">Символьный код раздела:</div>
-      <div class="col"><input class="w-100" type="text" name="code"></div>
+
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="sCode" placeholder="Символьный код раздела" name="code">
+      <label for="sCode">Символьный код раздела</label>
     </div>
-    <div class="row">
-      <div class="col">Родительский раздел:</div>
-      <div class="col"><select class="w-100" type="text" name="parentId">$sectionElementsHtml</select></div>
+
+    <div class="form-floating mb-3">
+      <select class="form-select" id="parentId" name="parentId">$sectionElementsHtml</select>
+      <label for="parentId">Родительский раздел</label>
     </div>
   </form>
 </template>
 <template id="elementsForm">
   <form action="#">
-    <div class="row mb-1 formRow">
-      <div class="col">Тип элемента:</div>
-      <div class="col"><select class="w-100" name="type">$typeElementsHtml</select></div>
+    <div class="form-floating my-3 formRow">
+      <select class="form-select" id="eType" name="type">$typeElementsHtml</select>
+      <label for="eType">Тип элемента</label>
     </div>
-    <div class="row mb-1 formRow">
-      <div class="col">Имя элемента:</div>
-      <div class="col"><input type="text" class="w-100" name="name"></div>
+
+    <div class="form-floating mb-3 formRow">
+      <input type="text" class="form-control" id="eName" placeholder="Имя" name="name">
+      <label for="eName">Имя элемента</label>
     </div>
+
     <div id="multiChangeField">
-      <div class="row mb-1 formRow">
-        <div class="col">Родительский раздел(*):</div>
-        <div class="col"><select class="w-100" name="parentId">$sectionElementsHtml</select></div>
+      <div class="form-floating mb-3 formRow">
+        <select class="form-select" id="eParentId" name="parentId">$sectionElementsHtml</select>
+        <label for="eParentId">Родительский раздел(*)</label>
       </div>
-      <div class="row mb-1 align-items-center formRow">
-        <div class="col">Активность:</div>
-        <label class="col text-center h-100"><input type="checkbox" name="activity" checked></label>
+
+      <div class="row">
+        <div class="col-6 ps-4">
+          <label class="w-100" for="eActivity" role="button">Активность:</label>
+        </div>
+        <div class="col-6">
+          <div class="form-check form-switch mb-3 formRow text-center">
+            <input class="form-check-input float-none" type="checkbox" role="switch" name="activity" id="eActivity">
+          </div>
+        </div>
       </div>
-      <div class="row mb-1 formRow">
-        <div class="col">Сортировка:</div>
-        <div class="col"><input type="number" class="w-100" name="sort" value="100"></div>
+
+      <div class="form-floating mb-3 formRow">
+        <input type="text" class="form-control" id="eSort" placeholder="Сортировка" name="sort">
+        <label for="eSort">Сортировка</label>
       </div>
     </div>
   </form>
@@ -233,78 +286,82 @@ $field['footerContent'] .= <<<footerContent
 <template id="optionsForm">
   <form action="#" class="row">
     <div class="col">
-      <div class="row onlyOne">
-        <label class="col">Имя варианта:</label>
-        <div class="col"><input class="w-100" type="text" name="name"></div>  
+      <div class="input-group my-3 onlyOne">
+        <span class="input-group-text">Имя варианта</span>
+        <input type="text" class="form-control" name="name">
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">Единица измерения</span>
+        <select class="form-select" name="unitId">$unitsOptionsHtml</select>
+      </div>
+
+      <div class="form-label text-center">Входная цена</div>
+      <div class="input-group mb-3">
+        <span class="input-group-text">Валюта</span>
+        <select class="form-select" name="moneyInputId">$moneyOptionsHtml</select>
+        <span class="input-group-text onlyOne">Цена</span>
+        <input type="number" class="form-control onlyOne" name="inputPrice" value="0">
+      </div>
+
+      <div class="form-label text-center">Розничная цена</div>
+      <div class="input-group mb-3">
+        <span class="input-group-text">Валюта</span>
+        <select class="form-select" name="moneyOutputId">$moneyOptionsHtml</select>
+        <span class="input-group-text">Наценка, %</span>
+        <input type="number" class="form-control" name="outputPercent" value="30">
+        <span class="input-group-text onlyOne">Цена</span>
+        <input type="number" class="form-control onlyOne" name="outputPrice" value="0">
       </div>
       
-      <div class="row">
-        <label class="col">Единица измерения:</label>
-        <div class="col"><select class="w-100" name="unitId">$unitsOptionsHtml</select></div>  
-      </div>
-            
-      <div class="row">
-        <div class="col-12 text-center">Входная цена</div>
-        <div class="col">
-          <label>Валюта: <br><select name="moneyInputId">$moneyOptionsHtml</select></label>
+      <div class="input-group mb-3">
+        <span class="input-group-text">Сортировка</span>
+        <input type="text" class="form-control" name="sort" value="100">
+        <span class="input-group-text">Активность</span>
+        <div class="input-group-text">
+          <input class="form-check-input mt-0" type="checkbox" name="activity">
         </div>
-        <div class="col onlyOne">
-          <label>Цена: <br><input type="number" name="inputPrice" value="0"></label>
+        <span class="input-group-text onlyMany">Открыть параметры (*)</span>
+        <div class="input-group-text onlyMany">
+          <input type="checkbox" class="form-check-input mt-0" id="property">
         </div>
-      </div>
-      
-      <div>
-        <div class="col text-center">Розничная цена</div>
-        <div class="col row">
-          <label class="col">Валюта: <br><select name="moneyOutputId">$moneyOptionsHtml</select></label>
-          <label class="col">Наценка, %:<br><input type="number" name="outputPercent" value="30"></label>
-          <label class="col onlyOne">Сумма:<br><input type="number" name="outputPrice" value="0"></label>
-        </div>
-      </div>
-      
-      <div class="row">
-        <label class="col">Активность:</label>
-        <div class="col"><input class="w-100" type="checkbox" name="activity" checked></div>     
-      </div>
-      <div class="row">
-        <label class="col">Сортировка:</label>
-        <div class="col"><input class="w-100" type="number" name="sort" value="100"></div>     
-      </div>
-      
-      <div class="row onlyMany">
-        <label class="col">Открыть параметры (*):</label>
-        <div class="col"><input class="w-100" type="checkbox" id="property"></div>     
       </div>
       
       <div class="row onlyOne">
         <div class="col-12">
           <input type="file" class="d-none" name="files" id="uploadFile" multiple>
           <label class="btn btn-warning" for="uploadFile">Загрузить</label>
-          <input type="button" class="btn btn-warning" name="chooseFile" value="Выбрать">
-          <div id="fileField"></div>
+          <input type="button" class="btn btn-warning chooseFile" value="Выбрать">
+          <div id="fileField" class="overflow-auto" style="max-height: 300px"></div>
         </div>
         <div class="col" id="fileField"></div>
       </div>
     </div>
     
-    <div data-field="property" class="col d-none">
-      <div class="col-12 text-center">Параметры</div>
+    <div data-field="property" class="col d-none overflow-auto" style="max-height: 90vh">
+      <div class="form-label text-center mb-3">Параметры</div>
       $propertiesHtml
     </div>
   </form>
 </template>
 <template id="chooseFileTmp">
-  <div class="d-flex justify-content-between border-bottom \${error}">
-    <span class="bold">\${name}</span>
-    <span class="table-basket__cross btn btn-sm btn-danger" data-id="\${index}" data-action="removeFile">x</span>
+  <div class="d-flex my-1 justify-content-between border-bottom \${error}">
+    <span class="flex-fill bold text-center">\${name}</span>
+    <span class="table-basket__cross btn btn-sm btn-danger" data-id="\${index}" data-action="removeFile">
+      <i class="pi pi-times align-text-bottom" data-action="removeFile"></i>
+    </span>
   </div>
 </template>
 <template id="chooseLoadedFileTmp">
-  <div class="text-center">
-    <img src="\${image}" alt="" class="img-fluid">
-    <div>
-      <input type="checkbox" name="files[]" value="\${id}">
-      <span class="bold">\${name}</span>
+  <div class="col-12 col-lg-4 card">
+    <label class="w-100" role="button" for="files-\${id}">
+      <img class="card-img-top img-fluid" src="\${image}" alt="\${name}">
+    </label>
+    <div class="card-body d-flex">
+      <div class="form-check mx-auto">
+        <input class="form-check-input" type="checkbox" name="files[]" value="\${id}" id="files-\${id}">
+        <label class="form-check-label" for="files-\${id}" role="button">\${name}</label>
+      </div>
     </div>
   </div>
 </template>

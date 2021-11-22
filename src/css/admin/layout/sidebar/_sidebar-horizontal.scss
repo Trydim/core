@@ -1,14 +1,12 @@
-@import "../../abstracts/variable";
-
 ////////////////////
 // Horizontal Nav
 ////////////////////
 @media (min-width: 1199px) {
     [data-layout="horizontal"] {
-        
+
         .nav-header {
             width: 9.0625rem;
-            
+
             .nav-control {
                 display: none;
             }
@@ -65,7 +63,7 @@
                             display: block;
                         }
                     }
-                    
+
                     &>ul {
                         position: absolute;
                         height: auto !important;
@@ -78,25 +76,25 @@
                         padding: 1rem 0;
                         display: none;
                         box-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
-                        
+
                         @at-root [data-theme-version="dark"]#{&} {
                             box-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
                         }
 
                         li {
                             padding: 0.1rem 1.25rem;
-    
+
                             a {
                                 transition: all .4s ease-in-out;
                                 padding: 0.625rem 0.9375rem 0.625rem 0.9375rem;
                                 margin-left: -.1rem;
-    
+
                                 &:hover {
                                     border-radius: .4rem;
                                 }
                             }
                         }
-                        
+
                         ul {
                             left: 100%;
                             top: 0;
@@ -112,7 +110,7 @@
                 &>li {
                     flex: 0 0 auto;
                     position: relative;
-                    
+
                     &:not(:last-child) {
                         border-right: 1px solid $border;
 
@@ -130,16 +128,16 @@
                             border-right: 0;
                         }
 
-                        
+
 
                         @at-root [data-theme-version="dark"]#{&} {
                             border-color: $d-border;
                         }
                     }
-                    
+
                     &>a {
                         padding: 0.8125rem 1.75rem;
-                        
+
                         i{
                             padding: 0 0.4375rem 0 0;
 
@@ -163,7 +161,7 @@
                             height: auto !important;
                         }
                     }
-                    
+
                     &>ul {
                         &>li {
                             &:hover {
@@ -281,7 +279,7 @@
         .page-titles {
             margin-top: 0;
         }
-        
+
         .quixnav {
             .metismenu {
 
@@ -309,7 +307,7 @@
         .nav-header {
             width: 3.75rem;
         }
-    
+
         .header {
             width: 100%;
             padding-left: 3.75rem;

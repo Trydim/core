@@ -78,13 +78,7 @@
                             position: absolute;
                             content: "\f764";
                             right: 1.75rem;
-                            font-family:"Material Design Icons";
                             font-size: 13px;
-
-                            @at-root [direction="rtl"]#{&} {
-                                right: auto;
-                                left: 1.75rem;
-                            }
                         }
                     }
                 }
@@ -92,11 +86,6 @@
                 .has-arrow {
                     &::after {
                         right: 5rem;
-
-                        @at-root [direction="rtl"]#{&} {
-                            right: auto;
-                            left: 5rem;
-                        }
                     }
                 }
             }

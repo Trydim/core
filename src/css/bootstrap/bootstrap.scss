@@ -36,9 +36,9 @@
 @import "progress";
 //@import "list-group";
 @import "close";
-@import "toasts"; /* маленькое модальное окно */
-@import "modal";
-@import "tooltip";
+//@import "toasts"; /* маленькое модальное окно */
+//@import "modal"; /* пока используем свое */
+@import "tooltip"; /* какие-то библиотеки надо подключать */
 //@import "popover";
 //@import "carousel";
 @import "spinners";
@@ -51,4 +51,3 @@
 // Utilities
 @import "utilities/api";
 // scss-docs-end import-stack
-

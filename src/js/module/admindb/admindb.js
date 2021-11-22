@@ -296,7 +296,7 @@ const createBtnRow = () => {
   let td  = document.createElement('td'),
       btn = f.qS('#btnRow').cloneNode(true).content.children[0];
 
-  btn.addEventListener('click', (e) => TableValues.delValues(e));
+  btn.addEventListener('click', e => TableValues.delValues(e));
   td.appendChild(btn);
   return td;
 }
@@ -307,12 +307,12 @@ const createBtnCancel = function (tr, lastBtn = false) {
     this.lastBtn = false;
   }
 
-  let btn = this.btnCancelTmp.cloneNode(true),
-      backTime = (time) => { btn.value = 'Отменить ' + time},
-      int   = setInterval(() => backTime(time--), 1000),
+  let btn      = this.btnCancelTmp.cloneNode(true),
+      backTime = time => { btn.value = 'Отменить ' + time},
+      int      = setInterval(() => backTime(time--), 1000),
       eventCancelDelete = () => { this.lastBtn = false; btn.remove(); tr.remove(); clearInterval(int); },
       timer = setTimeout(eventCancelDelete, 5000),
-      time = 4;
+      time  = 4;
   btn.value = 'Отменить ' + time;
 
   btn.addEventListener('click', () => {

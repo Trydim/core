@@ -22,7 +22,6 @@ $field['footerContent'] = <<<footerContent
 </template>
 <template id="customerForm">
   <form class="was-validated" action="#">
-  
     <div class="form-floating my-3">
       <input type="text" class="form-control" id="cName" placeholder="Имя" name="name" value="">
       <label for="cName">Имя</label>

@@ -1,5 +1,5 @@
 .sidebar {
-  width: $theme-sidebar-width;
+  width: var(--theme-sidebar-width);
   top: $theme-header-height;
   z-index: +1;
   background-color: $l-theme-sidebar-color;
@@ -15,12 +15,14 @@
   //     left: 6rem;
   // }
 
-  @include customMedia($min: 800px, $max: 1350px) {
-    width: $theme-sidebar-width * 0.75;
+
+
+  /*@include customMedia($min: 800px, $max: 1350px) {
+    width: var(--theme-sidebar-width) * 0.75;
   }
   @include customMedia($min: 350px, $max: 800px) {
     width: 100%;
-  }
+  }*/
 
   .sidebar-menu {
     display: flex;
@@ -142,6 +144,55 @@
     }
     &::-webkit-scrollbar-button:horizontal:end:increment {
       display: none;
+    }
+  }
+}
+
+/* Компактное меню */
+.menu-toggle {
+  .nav-label {
+    display: none;
+  }
+
+  .nav-item {
+    padding: 0.8125rem;
+  }
+
+  /*.sidebar {
+    width: 3.5rem;
+  }*/
+
+
+  .sidebar-menu {
+    align-items: center;
+    overflow: visible;
+
+    > li {
+      position: relative;
+
+      > .nav-item > .nav-text {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: calc(100% - 0.4rem);
+        padding-left: 1rem;
+        width: $theme-sidebar-width;
+        background-color: $l-theme-sidebar-color;
+      }
+
+      > ul {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: calc(100% - 1.4rem);
+        width: $theme-sidebar-width;
+        background-color: #1c0f54;
+      }
+
+      &:hover > .nav-item > .nav-text,
+      &:hover > ul {
+        display: block;
+      }
     }
   }
 }

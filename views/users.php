@@ -39,37 +39,43 @@ $field['footerContent'] = <<<footerContent
       <input type="text" class="form-control" id="pName" placeholder="Имя" name="name">
       <label for="pName">Имя</label>
     </div>
-    
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Доступ</span>
-      <select class="form-control form-select" name="permissionId">$permission</select>
+
+    <div class="form-floating mb-3">
+      <select class="form-select" id="permissionId" name="permissionId">$permission</select>
+      <label for="permissionId">Доступ</label>
     </div>
-    
+
     <div class="form-floating mb-3">
       <input type="text" class="form-control" id="pLogin" placeholder="Логин" name="login">
       <label for="pLogin">Логин</label>
     </div>
-    
+
     <div class="form-floating mb-3">
       <input type="password" class="form-control" id="pPassword" placeholder="Пароль" name="password">
       <label for="pPassword">Пароль</label>
     </div>
-    
+
     <div class="form-floating mb-3">
       <input type="tel" class="form-control" id="pPhone" placeholder="Телефон" name="phone">
       <label for="pPhone">Телефон</label>
     </div>
-    
+
     <div class="form-floating mb-3">
       <input type="email" class="form-control" id="pEmail" placeholder="Почта" name="email">
       <label for="pEmail">Почта</label>
     </div>
-    
+
     $managerFieldHtml
-    
-    <div id="changeField" class="form-check">
-      <input class="form-check-input" type="checkbox"  name="activity" id="pActivity">
-      <label class="form-check-label" for="pActivity">Активность</label>
+
+    <div id="changeField" class="row">
+      <div class="col-6 ps-4">
+        <label class="w-100" for="pActivity" role="button">Активность:</label>
+      </div>
+      <div class="col-6">
+        <div class="form-check form-switch mb-3 formRow text-center">
+          <input class="form-check-input float-none" type="checkbox" role="switch" name="activity" id="pActivity">
+        </div>
+      </div>
     </div>
   </form>
 </template>
@@ -80,7 +86,7 @@ $field['footerContent'] = <<<footerContent
       <input type="password" class="form-control" id="changePassword" placeholder="Новый пароль" name="newPass">
       <label for="changePassword">Новый пароль</label>
     </div>
-    
+
     <div class="form-floating mb-3">
       <input type="password" class="form-control" id="changePassword" placeholder="Повторить пароль" name="repeatPass">
       <label for="changePassword">Повторить пароль</label>

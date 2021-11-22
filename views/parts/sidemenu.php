@@ -49,7 +49,7 @@ menu;
   $adminMenu = createMenu('Администрирование', $dbTables);
 }
 ?>
-<aside id="sideLeft" class="sidebar col-md-3 col-lg-2 d-md-block"> <!-- data-background-color="white"-->
+<aside id="sideLeft" class="sidebar"> <!-- data-background-color="white"-->
   <div class="position-sticky top-0">
     <ul class="sidebar-menu show" id="sidebarMenu">
       <li class="nav-label">Main Menu</li>

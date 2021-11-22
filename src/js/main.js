@@ -72,50 +72,65 @@ const setParentHeight = (target, height) => {
 // Event function
 // ---------------------------------------------------------------------------------------------------------------------
 
-const authEvent = function(e) {
-  let target = e.target,
-      action = this.getAttribute('data-action');
+const cmsEvent = function() {
+  let action = this.getAttribute('data-action');
 
   let select = {
+    'menuToggle': () => {
+      f.gI('mainWrapper').classList.toggle('menu-toggle');
+    },
     'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
     }
-  }
+  };
 
-  select[action]();
+  select[action] && select[action]();
 };
 
 const sideMenuExpanded = (e, node) => {
   e.preventDefault();
 
-  const count = node.nextElementSibling.childElementCount,
+  const nodeS  = node.nextElementSibling,
+        count  = nodeS.childElementCount,
         height = count * 50;//e.target.parentNode.offsetHeight;
 
   if (node.getAttribute('aria-expanded') === 'true') {
     node.setAttribute('aria-expanded', 'false');
-    setParentHeight(node, node.nextElementSibling.offsetHeight * -1);
-    node.nextElementSibling.style.height = '0';
+    //setParentHeight(node, node.nextElementSibling.offsetHeight * -1);
+    nodeS.style.height = nodeS.dataset.height;
+
+    setTimeout(() => {
+      nodeS.style.height = '0';
+    }, 0);
+
   } else {
     node.setAttribute('aria-expanded', 'true');
-    node.nextElementSibling.style.height = height + 'px';
-    setParentHeight(node, height);
+    nodeS.dataset.height = height + 'px';
+    nodeS.style.height = height + 'px';
+    //setParentHeight(node, height);
+    setTimeout(() => {
+      nodeS.style.height = 'auto';
+    }, 300);
   }
 }
 
 // Event bind
 // -------------------------------------------------------------------------------------------------------------------
 
-// Block Authorization
-const onAuthEvent = () => {
+const onBind = () => {
+  // Block Authorization
   let node = f.gI(f.ID.AUTH_BLOCK);
   node && node.querySelectorAll('[data-action]')
-              .forEach(n => n.addEventListener('click', authEvent));
-}
+              .forEach(n => n.addEventListener('click', cmsEvent));
 
-const onClickSubmenu = () => {
+  if (node) return;
+  // Menu Action
   f.qA('#sidebarMenu [role="button"]').forEach(n =>
-    n.addEventListener('click', (e) => sideMenuExpanded(e, n))
+    n.addEventListener('click', e => sideMenuExpanded(e, n))
   );
+
+  node = f.qS('[data-action="menuToggle"]');
+  node && node.addEventListener('click', cmsEvent);
 }
 
 // Entrance function
@@ -125,8 +140,7 @@ const onClickSubmenu = () => {
 
   if (f.gI('authForm')) return;
   cancelFormSubmit();
-  onAuthEvent();
-  onClickSubmenu();
+  onBind();
   f.dictionaryInit();
 
   setLinkMenu(page || '/');
@@ -135,7 +149,55 @@ const onClickSubmenu = () => {
 
   stopPreloader();
 
+  testT();
+
   setTimeout(() => { // todo разобраться с синхронизацией
     f.initShadow(); // todo убрать отсюда
   }, 100);
 })();
+
+function testT() {
+  const nodes = f.qA('[data-tooltip]');
+
+  // top end bottom start
+  const getArrow = side => {
+    switch (side) {
+
+    }
+  }
+
+  nodes.forEach(n => {
+    const position = n.computedStyleMap().get('position'),
+          coord = n.getBoundingClientRect(),
+          start = { top: coord.y + coord.height / 2, left: coord.x},
+          top = { top: coord.y, left: coord.x + coord.width / 2},
+          end = { top: coord.y + coord.height / 2, left: coord.x + coord.width},
+          bottom = { top: coord.y + coord.height, left: coord.x + coord.width / 2};
+
+    position === 'static' && (n.style.position = 'relative');
+
+    n.addEventListener('mouseenter', function () {
+      if (position !== 'static') {
+
+      }
+
+      const tool = document.createElement('div');
+      tool.style.value = 'position-fixed';
+      tool.style.top = coord;
+    });
+    n.addEventListener('mouseleave', function () {
+      if (position !== 'static') {
+
+      }
+    });
+  });
+
+
+
+  /*<div class="tooltip fade show bs-tooltip-end" role="tooltip"
+   style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(632px, 1922px);"
+   data-popper-placement="right">
+   <div class="tooltip-arrow" style="position: absolute; top: 0px; transform: translate(0px, 8px);"></div>
+   <div class="tooltip-inner">Tooltip on right</div>
+   </div>*/
+}

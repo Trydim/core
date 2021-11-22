@@ -1,5 +1,5 @@
 
-.content-body {
+.container-content {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
@@ -12,3 +12,12 @@
     margin-left: 14.375rem;
   }*/
 }
+
+.content-body {
+  width: calc(100% - var(--theme-sidebar-width));
+}
+
+/* компактное меню
+.menu-toggle {
+
+}*/
