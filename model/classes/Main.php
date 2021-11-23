@@ -16,6 +16,8 @@ use Xml\Xml;
  */
 trait Authorization {
 
+  static $AVAILABLE_ACTION = ['loadCVS', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
+
   private $id, $login, $name;
 
   /**
@@ -81,6 +83,11 @@ trait Authorization {
     }
 
     return $this;
+  }
+
+  /** Нужна ли регистрация для действия */
+  public function checkAction(string $action) {
+    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth('check');
   }
 
   /**

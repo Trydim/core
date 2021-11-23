@@ -164,7 +164,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
           <div class="mt-1 text-center">
             <input class="btn btn-success" type="button" value="Добавить" data-action="createProperty">
             <input class="btn btn-warning" type="button" value="Изменить" data-action="changeProperty">
-            <input class="btn btn-danger" type="button" value="Удалить" data-action="delProperty">
+            <input class="btn btn-danger" type="button" value="Удалить" data-action="delProperties">
           </div>
         </div>
       </details>

@@ -3,8 +3,6 @@
 /**
  * @var $main - global main object
  *
- * @var array $dbConfig - config from public
- *
  * @var $setAction - fromQuery
  * @var $orderMail - fromQuery
  * @var $orderMailCopy - fromQuery
@@ -63,10 +61,7 @@ function setManagerCustomField() {
   return $result;
 }
 
-if (!isset($db)) {
-  require_once 'classes/Db.php';
-  $db = new RedBeanPHP\Db($dbConfig);
-}
+$db = $main->getDB();
 
 if (isset($setAction)) {
   switch ($setAction) {
@@ -172,35 +167,35 @@ if (isset($setAction)) {
       break;
 
     case 'createProperty':
-      if (isset($dbTable)) {
+    case 'changeProperty':
+      if (isset($tableName) && isset($dataType) && !empty($tableName)) {
         $propertySetting = [];
         $setting = getSettingFile();
 
-        $propName = 'prop_' . (isset($tableCode) ? $tableCode : translit($dbTable));
-        $dataType = isset($dataType) ? str_replace('s_', '', $dataType) : false;
+        $tableCode = $tableCode ?? translit($tableName);
+        $propName = 'prop_' . str_replace('prop_', '', $tableCode);
+        $dataType = str_replace('s_', '', $dataType);
 
-        if (!isset($setting['propertySetting'][$propName])
-            && $propName && $dataType) {
+        if (!isset($setting['propertySetting'][$propName]) || $setAction === 'changeProperty') {
           $setting['propertySetting'][$propName] = [
-            'name' => $dbTable,
+            'name' => $tableName,
             'type' => $dataType,
           ];
           setSettingFile($setting);
         } else {
           $result['error'] = 'Property exist';
         }
-      } else {
-        $result['error'] = 'Property name not exist';
-      }
+      } else $result['error'] = 'Property name not exist';
       break;
     case 'loadProperties':
-      if (($setting = getSettingFile()) && isset($setting['propertySetting'])) {
+      $setting = $setting ?? getSettingFile();
+      if (isset($setting['propertySetting'])) {
          $result['propertiesTables'] = array_filter($setting['propertySetting'],
            function ($prop) { return isset($prop['type']);}
          );
       }
       break;
-    case 'delProperty':
+    case 'delProperties':
       if (isset($props) && ($setting = getSettingFile()) && isset($setting['propertySetting'])) {
         $setting['propertySetting'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
           return !in_array($item, $props);

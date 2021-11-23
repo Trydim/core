@@ -67,7 +67,7 @@ export class Properties {
 
     setTimeout(() => this.loader.start(), 1);
     f.Post({data: form}).then(data => {
-      if(this.needReload) {
+      if (this.needReload) {
         this.reloadQuery();
         return;
       }
@@ -98,7 +98,7 @@ export class Properties {
       'loadProperties': () => !e.target.parentNode.open && this.reloadQuery(),
       'createProperty': () => this.createProperty(),
       'changeProperty': () => this.changeProperty(),
-      'delProperty': () => this.delProperty(),
+      'delProperties': () => this.delProperties(),
 
       'addCol': () => this.addCol(),
       'remCol': () => this.remCol(),
@@ -108,6 +108,7 @@ export class Properties {
       this.delayFunc();
       this.delayFunc = () => {};
       this.needReload = true;
+      this.selected.clear();
       this.query();
     } else {
       !['addCol', 'remCol'].includes(action) && (this.queryParam.dbAction = action);
@@ -117,35 +118,44 @@ export class Properties {
 
   createProperty() {
     this.delayFunc = () => {
-      let fd = new FormData(this.tmp.create);
-
-      for (const [k, v] of fd.entries()) this.queryParam[k] = v;
-    }
+      for (const [k, v] of new FormData(this.tmp.create).entries()) this.queryParam[k] = v;
+    };
 
     // default Form;
     //this.field.propertyType.value = 's_text';
     //f.eraseNode(this.field.colsField);
+
+    this.tmp.create.querySelector('[name="tableCode"]').removeAttribute('disabled', 'disabled');
 
     this.M.show('Добавить новое свойство', this.tmp.create);
     f.relatedOption(this.tmp.create);
   }
   changeProperty() {
     let props = this.selected.getSelected();
-    if (props.length !== 1) {
-      f.showMsg('Выберите 1 параметр', 'error');
-      return;
-    }
+    if (props.length !== 1) { f.showMsg('Выберите 1 параметр', 'error'); return; }
+    const form = this.tmp.create;
+    this.delayFunc = () => {
+      for (const [k, v] of new FormData(form).entries()) this.queryParam[k] = v;
+    };
+
+    let prop = this.propertiesList.get(props[0]),
+        node = form.querySelector('[name="tableName"]');
+    node.value = prop.name;
+
+    node = form.querySelector('[name="tableCode"]');
+    this.queryParam['tableCode'] = node.value = props[0];
+    node.setAttribute('disabled', 'disabled');
+
+    node = form.querySelector('[name="dataType"]');
+    node.value = (prop.type === 'select' ? 'h_' : 's_') + prop.type;
 
     this.queryParam.props = props;
-    this.query();
-    this.M.show('Удалить параметр?', this.tmp.edit);
+    this.M.show('Изменить параметр?', form);
+    f.relatedOption(form);
   }
-  delProperty() {
+  delProperties() {
     let props = this.selected.getSelected();
-    if (!props.length) {
-      f.showMsg('Выберите параметр', 'error');
-      return;
-    }
+    if (!props.length) { f.showMsg('Выберите параметр', 'error'); return; }
 
     this.queryParam.props = props;
     this.M.show('Удалить параметр?', props.join(', '));

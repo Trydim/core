@@ -8,7 +8,7 @@ $publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a href="/' . PUBLIC_PAGE . '">От�
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global
 <main class="container-fluid mx-auto">
-  <section class="h-100 d-flex justify-content-center align-items-center">
+  <section class="d-flex justify-content-center align-items-center" style="height: 100vh">
     <div class="col-xl-4 col-lg-6 col-md-10 mx-auto mt-5">
       <form id="authForm" action="$actionLink" method="POST" class="m-1">
         <div class="card wow fadeIn animated" data-wow-delay="0.3s"

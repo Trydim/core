@@ -3,6 +3,7 @@
 /**
  * @var array $publicConfig - config from public
  */
+
 $absPath = strtolower(str_replace('\\', '/', ABS_SITE_PATH));
 $siteDir = str_replace(strtolower($_SERVER['DOCUMENT_ROOT']), '/', $absPath);
 define('SITE_PATH', str_replace('//', '/', $siteDir));
@@ -12,13 +13,13 @@ require ABS_SITE_PATH . 'config.php'; // Public config
 !isset($dbConfig) && $dbConfig = [];
 
 define('CORE', basename( __DIR__ ) . '/');
-define('VIEW', CORE . 'views/');
+const VIEW = CORE . 'views/';
 
-define('CORE_CSS', SITE_PATH . CORE . 'assets/css/');
-define('CORE_SCRIPT', SITE_PATH . CORE . 'assets/js/');
+const CORE_CSS = SITE_PATH . CORE . 'assets/css/';
+const CORE_SCRIPT = SITE_PATH . CORE . 'assets/js/';
 
-define('SETTINGS_PATH', ABS_SITE_PATH . 'shared/settingSave.json');
-define('SYSTEM_PATH', ABS_SITE_PATH . 'shared/system.php');
+const SETTINGS_PATH = ABS_SITE_PATH . 'shared/settingSave.json';
+const SYSTEM_PATH = ABS_SITE_PATH . 'shared/system.php';
 
 !$publicConfig['PUBLIC_PAGE'] && define('ONLY_LOGIN', true);
 
@@ -35,7 +36,7 @@ foreach ($publicConfig as $k => $v) {
 !defined('USERS_ORDERS') && define('USERS_ORDERS', false);
 !defined('PATH_LEGEND') && define('PATH_LEGEND', false);
 !defined('USE_DATABASE') && define('USE_DATABASE', true);
-!defined('HOME_PAGE') && define('HOME_PAGE', PUBLIC_PAGE ? PUBLIC_PAGE : ACCESS_MENU[0]);
+!defined('HOME_PAGE') && define('HOME_PAGE', PUBLIC_PAGE ?? ACCESS_MENU[0]);
 !defined('ACCESS_MENU') && define('ACCESS_MENU', []);
 !defined('PRINT_BTN') && define('PRINT_BTN', 1);
 !defined('SHARE_DIR') && define('SHARE_DIR', '/');

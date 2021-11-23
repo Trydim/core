@@ -29,5 +29,5 @@ $field['pageFooter']  = '';
              "<input type='hidden' id='dataConfig' value='$config'>";*/
 /*
 // Курс
-$main->getCourse();
+$dbContent .= $main->getCourse();
 */

@@ -413,13 +413,14 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadProperties':
       $setAction = 'loadProperties';
       $result['propertiesTables'] = [];
+      $setting = getSettingFile();
       require 'setting.php';
 
       $dbPropertiesTables = $db->getTables('prop');
 
       foreach ($dbPropertiesTables as $table) {
-        $result['propertiesTables'][$table['name']] = [
-          'name' => str_replace('prop_', '', $table['name']),
+        $result['propertiesTables'][$table['dbTable']] = [
+          'name' => $setting['propertySetting'][$table['dbTable']]['name'] ?? $table['name'],
           'type' => 'справочник',
         ];
       };
@@ -430,13 +431,15 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'createProperty':
+    case 'changeProperty':
       if (isset($tableName) && isset($dataType) && !empty($tableName)) {
         // Простой или сложный параметр по префиксу
         if (stripos($dataType, 's_') === 0) {
-          $setAction = 'createProperty';
+          $setAction = $dbAction;
           require 'setting.php';
         } else {
-          $tableCode = 'prop_' . ($tableCode ?? translit($dbTable));
+          $tableCode = $tableCode ?? translit($tableName);
+          $propName = 'prop_' . str_replace('prop_', '', $tableCode);
 
           $param = [];
           foreach ($_REQUEST as $key => $value) {
@@ -450,19 +453,23 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           }
 
           $setting = getSettingFile();
-          if (!isset($setting['propertySetting'][$tableCode])) {
-            $setting['propertySetting'][$tableCode]['name'] = $dbTable;
+          if (!isset($setting['propertySetting'][$propName])) {
+            $setting['propertySetting'][$propName]['name'] = $tableName;
             setSettingFile($setting);
-
-            $result['error'] = $db->createPropertyTable($tableCode, $param);
+            $result['error'] = $db->createPropertyTable($propName, $param);
+          } else if ($dbAction === 'changeProperty') {
+            $db->delPropertyTable([$propName]);
+            $setting['propertySetting'][$propName]['name'] = $tableName;
+            setSettingFile($setting);
+            $result['error'] = $db->createPropertyTable($propName, $param);
           } else $result['error'] = 'Property exist';
         }
       } else $result['error'] = 'Property name error!';
       break;
-    case 'delProperty':
+    case 'delProperties':
       if (isset($props)) {
-        $props = array_map(function ($prop) {return 'prop_' . $prop;}, explode(',', $props));
-        $setAction = 'delProperty';
+        $props = explode(',', $props);
+        $setAction = 'delProperties';
         require 'setting.php';
         $db->delPropertyTable($props);
       }
