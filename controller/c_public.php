@@ -1,10 +1,8 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $db
+ * @var object $main
  */
-
-if (!isset($main)) $main = new cms\Main();
 
 $dbContent = "";
 $field = [];
@@ -18,18 +16,17 @@ if ($authStatus && isset($_GET['orderId'])) {
   $orderId = $_GET['orderId'];
 
   if (is_finite($orderId)) {
-    $order = $db->loadOrderById($orderId);
+    $order = $main->db->loadOrderById($orderId);
 
     if ($order) {
-      $customers = $db->loadCustomerByOrderId($order['ID']);
+      $customer = $main->db->loadCustomerByOrderId($order['ID']);
 
-      $dbContent .= "<input type='hidden' id='orderSaveValue' value='$order[saveValue]'>" .
-                    "<input type='hidden' id='orderReport' value='$order[reportValue]'>" .
-                    "<input type='hidden' id='orderImportantValue' value='$order[importantValue]'>";
+      $order = json_encode($order);
+      $dbContent .= "<input type='hidden' id='dataOrder' value='$order'>";
 
-      if ($customers) {
-        $customers = json_encode($customers);
-        $dbContent .= "<input type='hidden' id='customerLoadOrders' value='$customers'>";
+      if ($customer) {
+        $customer = json_encode($customer);
+        $dbContent .= "<input type='hidden' id='dataCustomer' value='$customer'>";
       }
     }
   }
@@ -40,17 +37,11 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
   $orderId = $_GET['orderVisitorId'];
 
   if (is_finite($orderId)) {
-    $order = $db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
+    $order = $main->db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
 
     if (count($order) === 1) {
-      $order = $order[0];
-
-      $oldData = json_encode([
-        'date'  => $order['createDate'],
-        'total' => $order['total'],
-      ]);
-      $dbContent .= "<input type='hidden' id='orderSaveValue' value='$order[inputValue]'>" .
-                    "<input type='hidden' id='orderOldTotal' value='$oldData'>";
+      $order = json_encode($order[0]);
+      $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='$order'>";
     }
   }
 }
@@ -59,5 +50,5 @@ if (!$authStatus) $field['sideLeft'] = '';
 
 
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
-if (OUTSIDE) $html = template('outside', $field);
-else $html = template('base', $field);
+$html = template(OUTSIDE ? 'outside' : 'base', $field);
+

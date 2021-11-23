@@ -29,8 +29,5 @@ $field['pageFooter']  = '';
              "<input type='hidden' id='dataConfig' value='$config'>";*/
 /*
 // Курс
-$rate = new Course();
-if ($rate) {
-  $rate = json_encode($rate);
-  $dbContent .= "<input type='hidden' id='dataRate' value='$rate'>";
-}*/
+$main->getCourse();
+*/

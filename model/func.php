@@ -107,7 +107,7 @@ function getTargetPage($get) {
  *
  * @return string
  */
-function template($path = 'base', $vars = []) {
+function template(string $path = 'base', array $vars = []): string {
   extract($vars);
   ob_start();
   if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {
@@ -390,7 +390,7 @@ function getPageAsString($data, $wrapId = 'wrapCalcNode') {
  *
  * @param bool $decode
  * @param bool $assoc
- * @return string
+ * @return mixed - array or object
  */
 function getSettingFile(bool $decode = true, bool $assoc = true) {
   if (file_exists(SETTINGS_PATH)) {

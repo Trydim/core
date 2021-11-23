@@ -7,36 +7,64 @@ if (!defined('MAIN_ACCESS')) die('access denied!');
 
 // General setting
 
-// To
-!defined('MAIL_TARGET_DEBUG') && define('MAIL_TARGET_DEBUG', 'trydim@mail.ru');
-define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта ' . $_SERVER['SERVER_NAME']);
-// From
-define('MAIL_SMTP', true);
+const MAIL_TARGET_DEBUG = MAIL_TARGET ?? 'trydim@mail.ru';
+!defined('MAIL_SUBJECT_DEFAULT') && define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта ' . $_SERVER['SERVER_NAME']);
+!defined('ABS_SITE_PATH') && define('ABS_SITE_PATH', $_SERVER['DOCUMENT_ROOT']);
+!defined('CORE') && define('CORE', '/');
+!defined('SETTINGS_PATH') && define('SETTINGS_PATH', '');
 
-define('MAIL_PORT', 465);
-define('MAIL_HOST', 'smtp.yandex.ru');
-define('MAIL_FROM', 'noreplycalcby@yandex.ru');
-define('MAIL_PASSWORD', '638ch1');
-/*define('MAIL_HOST', 'smtp.mail.ru');
-define('MAIL_FROM', 'mail.common@list.ru');
-define('MAIL_PASSWORD', 'RAE^ysPypo22');*/
-//define('MAIL_FROM', 'commonserver@yandex.ru');
-//define('MAIL_PASSWORD', 'xmbxqxulvhwcqyta');
+// MailSetting
+const MAIL_SMTP = true;
 
-require_once CORE . 'libs/vendor/autoload.php';
+const MAIL_PORT = 465;
+
+const MAIL_HOST = 'smtp.yandex.ru';
+const MAIL_FROM = 'noreplycalcby@yandex.ru';
+const MAIL_PASSWORD = '638ch1';
+/*
+const MAIL_HOST = 'smtp.mail.ru';
+const MAIL_FROM = 'mail.common@list.ru';
+const MAIL_PASSWORD = 'RAE^ysPypo22';
+/*
+const MAIL_FROM = 'commonserver@yandex.ru';
+const MAIL_PASSWORD = 'xmbxqxulvhwcqyta';
+*/
+
+require_once './libs/vendor/autoload.php';
 
 class Mail {
-  private $mailTpl    = '', $body = '', $docPath = '', $pdfFileName = '';
+  private $mailTpl, $body = '', $docPath = '', $pdfFileName = '';
   private $mailTarget;
   private $subject, $fromName;
   private $otherMail       = [];
   private $attachmentFiles = [];
 
-  public function __construct($mailTpl) {
+
+  /**
+   *
+   * @return array
+   */
+  private function LoadSettingFile(): array {
+    $content = file_get_contents(SETTINGS_PATH);
+    return !empty($content) && is_string($content) ? json_decode($content): [];
+  }
+
+  /**
+   * @param string $fileName
+   * @return string
+   */
+  private function findFile(string $fileName): string {
+    return __DIR__ . '/template/mailTpl.php';
+  }
+
+  /**
+   * @param string $mailTpl
+   */
+  public function __construct(string $mailTpl) {
     $this->mailTpl = $mailTpl;
 
     if (!DEBUG && file_exists(SETTINGS_PATH)) {
-      $setting = getSettingFile();
+      $setting = function_exists('getSettingFile') ? getSettingFile() : $this->LoadSettingFile();
       $this->mailTarget = $setting['orderMail'];
       isset($setting['orderMailCopy']) && strlen($setting['orderMailCopy']) && $this->otherMail[] = $setting['orderMailCopy'];
       isset($setting['mailFromName']) && strlen($setting['mailFromName']) && $this->otherMail[] = $setting['orderMailCopy'];
@@ -46,32 +74,47 @@ class Mail {
     }
   }
 
-  public function prepareMail($array) {
-    if (!count($array)) return;
-
+  /**
+   * @param array $array
+   */
+  public function prepareMail(array $array = []): void {
     extract($array);
     ob_start();
 
+    // Шаблон в public
     if (file_exists(ABS_SITE_PATH . 'public/views/docs/' . $this->mailTpl . '.php'))
       include ABS_SITE_PATH . "public/views/docs/$this->mailTpl.php";
-    else if (file_exists(CORE . "views/docs/$this->mailTpl.php"))
-      include CORE . "views/docs/$this->mailTpl.php";
-
+    else if (file_exists($this->mailTpl)) include $this->mailTpl;
+    else {
+      ob_clean();
+      $this->body = $this->getDefaultTemplate();
+      return;
+    }
     $this->body = ob_get_clean();
   }
 
-  public function setSubject($str) {
+  /**
+   * @param string $str
+   */
+  public function setSubject(string $str): void {
     $this->subject = $str;
   }
 
-  public function addMail($email) {
+  /**
+   * @param string $email
+   */
+  public function addMail(string $email): void {
     $this->otherMail[] = $email;
   }
 
-  public function addFile($docPath, $fileName = "") {
+  /**
+   * @param string $docPath
+   * @param string $fileName
+   */
+  public function addFile(string $docPath, string $fileName = '') {
+    $fileName = !empty($fileName) ? $fileName : basename($docPath);
     $this->docPath = $docPath;
-    $this->pdfFileName = $fileName !== '' ? $fileName : uniqid() . '.pdf';
-    //'КП_' . $this->cpNumber . '_' . date('dmY') . '.pdf';
+    $this->pdfFileName = empty($fileName) ? uniqid() . '.pdf' : $fileName;
   }
 
   public function addOtherFile($files) {
@@ -110,7 +153,7 @@ class Mail {
         $this->fromName = 'vistegra.by';
       }
 
-      $mail->addBCC($this->mailTarget || MAIL_TARGET_DEBUG);
+      $mail->addBCC($this->mailTarget ?? MAIL_TARGET_DEBUG);
       $mail->From = MAIL_FROM;
       $mail->FromName = $this->fromName;
 
@@ -127,7 +170,7 @@ class Mail {
         for ($i = 1; $i <= count($resource); $i++)
           $mail->AddEmbeddedImage($resource[$i - 1], "pict$i.jpg", "pict$i.jpg", 'base64', 'image/jpeg');
 
-      $mail->Subject = $this->subject;
+      $mail->Subject = $this->subject ?? MAIL_SUBJECT_DEFAULT;
       $mail->MsgHTML($this->body);
       $mail->AltBody = 'Тестовое сообщение.';
 
@@ -172,6 +215,17 @@ private function createImg($img) {
   }
   return $arrResource;
 }*/
+
+  /**
+   * @return string
+   */
+  private function getDefaultTemplate(): string {
+    $htmlTemplate = 'Default Template<br>';
+    foreach ($_REQUEST as $k => $v) {
+      $htmlTemplate .= "<div>$k: $v</div>";
+    }
+    return $htmlTemplate;
+  }
 
 }
 

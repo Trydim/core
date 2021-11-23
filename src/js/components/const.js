@@ -4,7 +4,8 @@
  * Global variables and simple functions
  */
 export const c = {
-  DEBUG        : !!(window['DEBUG'] || false),
+  DEBUG        : window['DEBUG'] || false,
+  CSV_DEVELOP  : !!window['CSV_DEVELOP'] || false,
   OUTSIDE      : window['CL_OUTSIDE'],
   SITE_PATH    : window['SITE_PATH'] || '/',
   MAIN_PHP_PATH: (window['SITE_PATH'] || '/') + 'index.php',
@@ -25,6 +26,8 @@ export const c = {
   },
 
   CLASS_NAME: {
+    // css класс который добавляется активным элементам
+    ACTIVE: 'active',
     // css класс который добавляется кнопкам сортировки
     SORT_BTN_CLASS: 'btn-light',
     // css класс который добавляется скрытым элементам

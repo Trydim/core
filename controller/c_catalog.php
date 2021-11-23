@@ -1,10 +1,11 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $db - global
+ * @var object $main
  * @var string $pathTarget
- * @var object $main - global
  */
+
+$db = $main->getDB();
 
 function prepareData($data) {
   return json_encode(array_reduce($data, function ($r, $item) {

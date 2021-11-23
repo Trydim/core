@@ -32,9 +32,9 @@ class Db extends \R {
    * db constructor
    *
    * @param array $dbConfig
-   * @param bool $freeze
+   * @param bool  $freeze
    */
-  public function __construct($dbConfig = [], $freeze = true) {
+  public function __construct(array $dbConfig = [], bool $freeze = true) {
     if (USE_DATABASE) {
       if (!count($dbConfig)) {
         require ABS_SITE_PATH . 'config.php';
@@ -257,11 +257,11 @@ class Db extends \R {
 
   /**
    * @param $dbTable
-   * @param $filters
+   * @param string $filters
    *
    * @return integer
    */
-  public function getCountRows($dbTable, $filters = '') {
+  public function getCountRows($dbTable, string $filters = ''): int {
     $sql = "SELECT COUNT(*) as 'count' from $dbTable";
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
@@ -283,7 +283,7 @@ class Db extends \R {
    *
    * @return array|int
    */
-  public function insert($curTable, $dbTable, $param, $change = false) {
+  public function insert($curTable, $dbTable, $param, bool $change = false) {
     $result = $this->checkTableBefore($curTable, $dbTable, $param);
 
     $beans = self::xdispense($dbTable, count($param));
@@ -745,16 +745,16 @@ class Db extends \R {
   }
 
   /**
-   * @param int $pageNumber
-   * @param int $countPerPage
+   * @param int    $pageNumber
+   * @param int    $countPerPage
    * @param string $sortColumn
-   * @param bool $sortDirect
-   * @param array $dateRange
-   * @param array $ids
+   * @param bool   $sortDirect
+   * @param array  $dateRange
+   * @param array  $ids
    *
    * @return array|null
    */
-  public function loadVisitorOrder($pageNumber = 0, $countPerPage = 20, $sortColumn = 'create_date', $sortDirect = false, $dateRange = [], $ids = []) {
+  public function loadVisitorOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'createDate', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT cp_number, create_date, important_value, total FROM client_orders\n";
@@ -766,6 +766,7 @@ class Db extends \R {
       else $sql .= implode(' OR ID = ', $ids) . " ";
     }
 
+    $sortColumn = AQueryWriter::camelsSnake($sortColumn);
     $sql .= "ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
@@ -838,9 +839,11 @@ class Db extends \R {
 
   public function setMoney($rate) {
     $beans = self::xdispense('money', 1);
+    $date = date('Y-m-d h:i:s');
     foreach ($rate as $currency) {
       $beans->id = $currency['ID'];
       $beans->rate = $currency['rate'];
+      $beans->lastEditDate = $date;
       self::store($beans);
     }
   }
@@ -884,7 +887,7 @@ class Db extends \R {
    * @return array|null
    */
   public function getUser($login, $column = 'ID') {
-    $result = self::getRow("SELECT $column FROM users WHERE login = :login", [':login' => $login]);
+    $result = self::getRow("SELECT $column FROM users WHERE name = :name", [':name' => $login]);
 
     if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
     return $result;
@@ -952,7 +955,7 @@ class Db extends \R {
    *
    * @return array
    */
-  public function loadUsers(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'register_date', bool $sortDirect = false) {
+  public function loadUsers(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'register_date', bool $sortDirect = false): array {
     $pageNumber *= $countPerPage;
     $sortColumn = AQueryWriter::camelsSnake($sortColumn);
 
@@ -1062,7 +1065,7 @@ trait MainCsv {
    * @param $link {string}
    * @return mixed|null
    */
-  static function scanDirCsv($path, $link = '') {
+  static function scanDirCsv(string $path, string $link = '') {
 
     return array_reduce(scandir($path), function ($r, $item) use ($link) {
       if (!($item === '.' || $item === '..')) {
@@ -1074,8 +1077,7 @@ trait MainCsv {
         } else {
           $link && $link .= '/';
           if (filetype(PATH_CSV . $link . $item) === 'dir') {
-            global $db;
-            $r[$item] = $db::scanDirCsv(PATH_CSV . $link . $item, $link . $item);
+            $r[$item] = self::scanDirCsv(PATH_CSV . $link . $item, $link . $item);
           }
         }
       }

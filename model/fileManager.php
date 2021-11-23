@@ -251,4 +251,4 @@ if (isset($fmAction)) {
   }
 }
 
-$result['html'] = isset($html) ? $html : '';
+$result['html'] = $html ?? '';

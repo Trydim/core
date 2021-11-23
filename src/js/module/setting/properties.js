@@ -38,8 +38,6 @@ export class Properties {
 
     this.loader = new f.LoaderIcon(this.field.body, false, true, {small: false});
     this.selected = new f.SelectedRow({table: this.form});
-
-    f.relatedOption(this.tmp.create);
   }
 
   reloadQuery() {
@@ -129,6 +127,7 @@ export class Properties {
     //f.eraseNode(this.field.colsField);
 
     this.M.show('Добавить новое свойство', this.tmp.create);
+    f.relatedOption(this.tmp.create);
   }
   changeProperty() {
     let props = this.selected.getSelected();

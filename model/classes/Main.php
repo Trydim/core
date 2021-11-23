@@ -2,57 +2,105 @@
 
 namespace cms;
 
+use Course;
+use RedBeanPHP;
+use Xml\Xml;
+
+/**
+ * @var $dbConfig
+ */
+
 /**
  * Trait Authorization
  * @package cms
  */
 trait Authorization {
+
   private $id, $login, $name;
+
+  /**
+   * @var string
+   */
   private $status = 'no';
+
+  /**
+   * @var array
+   */
   private $sideMenu = [];
+
+  /**
+   * @var bool
+   */
   private $admin = true;
 
   /**
    * @param $field
    * @return mixed
    */
-  public function getLogin($field = 'login') {
+  public function getLogin(string $field = 'login') {
     return $this->$field;
   }
 
-  public function setLogin($session = null) {
-    !$session && session_start() && $session = $_SESSION;
+  public function setLogin($session): Main {
     $this->login = $session['login'];
     $this->name  = $session['name'];
     $this->id    = $session['priority'];
     $this->setLoginStatus('ok');
-    $this->setHash($session);
     return $this;
   }
 
-  public function setHash($session) {
-
-  }
-
   /**
-   * @param $status
+   * @param string $status
    *
    * @return bool
    */
-  public function checkStatus($status) {
+  public function checkStatus(string $status = 'ok'): bool {
     return $this->status === $status;
   }
 
-  public function getLoginStatus() {
-    return $this->status;
-  }
-
-  public function setLoginStatus($status) {
+  public function setLoginStatus($status): Main {
     $this->status = $status;
     return $this;
   }
 
-  public function setSideMenu() {
+  /**
+   * Проверка пароля
+   */
+  public function checkAuth($target = ''): Main {
+    $this->setLoginStatus('no');
+    session_start();
+
+    if (isset($_SESSION['hash'])
+        //&& !$this->checkStatus('error')
+        && $_SESSION['id'] === $_COOKIE['PHPSESSID']) {
+
+      if ($this->db->checkUserHash($_SESSION)) {
+        $this->setLogin($_SESSION);
+        $target === '' && reDirect(true, HOME_PAGE);
+      }
+    }
+
+    return $this;
+  }
+
+  /**
+   * Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт или
+   * нет регистрации и целевая страница не открыта
+   */
+  public function applyAuth($target = ''): Main {
+
+    if ($this->checkStatus('no') && $target !== 'login'
+        && (ONLY_LOGIN || (PUBLIC_PAGE && $target !== 'public'))) {
+      //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
+      $_SESSION['target'] = $target;
+      reDirect(false);
+    } else if ($target === 'login') $pageTarget = $_SESSION['target'] ?? '';
+
+    session_abort();
+    return $this;
+  }
+
+  private function setSideMenu() {
     if (USE_DATABASE) {
       $menuAccess = isset($this->getSettings('permission')['menuAccess'])
         ? $this->getSettings('permission')['menuAccess']
@@ -68,10 +116,6 @@ trait Authorization {
     }
     PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
     $this->sideMenu[] = 'setting';
-  }
-
-  public function isAdmin() {
-    return $this->admin;
   }
 
   public function getSideMenu($first = false) {
@@ -173,10 +217,46 @@ final class Main {
   use Dictionary;
   use Hooks;
 
+  /**
+   * @var array
+   */
   private $setting = [];
 
+  /**
+   * @var array
+   */
+  private $dbConfig;
+
+  /**
+   * @var array
+   */
+  private $dbTables;
+
+  public function __construct($dbConfig) {
+    $this->dbConfig = $dbConfig;
+    $this->loadSetting();
+  }
+
+  public function __get($value) {
+    if ($value === 'db') {
+      require_once CORE . 'model/classes/Db.php';
+      $this->db = new RedBeanPHP\Db($this->dbConfig);
+      return $this->db;
+    }
+
+    return $this->$value;
+  }
+
+  /**
+   *
+   */
   private function loadSetting() {
     $this->setting = getSettingFile();
+  }
+
+  private function checkXml() {
+    require_once CORE . 'model/classes/Xml.php';
+    Xml::checkXml($this->dbTables);
   }
 
   public function setSettings($key, $value) {
@@ -194,9 +274,61 @@ final class Main {
     return false;
   }
 
-  public function __construct() {
-    $this->loadSetting();
+  /**
+   * Установка всех параметров для аккаунта
+   * @return $this
+   */
+  public function setAccount(): Main {
+    if ($this->checkStatus('ok')) {
+      // Меню
+      $this->setSideMenu();
+
+      if (DB_TABLE_IN_SIDEMENU) {
+        $dbTables = [];
+        if (USE_DATABASE) {
+          if (CHANGE_DATABASE) {
+            $dbTables = array_merge($dbTables, $this->db->getTables());
+          } else if (in_array('catalog', ACCESS_MENU)) {
+            $props = array_merge([[
+              'dbTable' => 'codes',
+              'name' => gTxtDB('codes', 'codes')
+            ]], $this->db->getTables('prop'));
+
+            $props = array_map(function ($prop) {
+              $setting = $this->getSettings('propertySetting')[$prop['dbTable']] ?? false;
+              $setting && $setting['name'] && $prop['name'] = $setting['name'];
+              return $prop;
+            }, $props);
+            $dbTables = array_merge($dbTables, ['z_prop' => $props]);
+          }
+        }
+        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv(PATH_CSV));
+        //$this->checkXml();
+      }
+    }
+    return $this;
+  }
+
+  public function getBaseTable(): array {
+    return $this->dbTables;
+  }
+
+  public function getDB(): RedBeanPHP\Db {
+    return $this->db;
+  }
+
+  /**
+   * @param bool   $inline
+   * @param string $dataId
+   * @return string
+   * @default $dataId = 'dataRate'
+   */
+  public function getCourse(bool $inline = true, string $dataId = 'dataRate'): string {
+    require_once CORE . 'model/classes/Course.php';
+    $rate = new Course($this->db);
+    $rate = json_encode($rate);
+    return "<input type='hidden' id='$dataId' value='$rate'>";
   }
 }
 
-$main = new Main();
+$main = new Main(USE_DATABASE ? $dbConfig : []);

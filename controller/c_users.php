@@ -1,16 +1,13 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 /**
  * @var object $main global
- * @var array $dbConfig
  * @var string $pathTarget
  */
 
 $field = [ 'pageTitle' => 'Пользователи' ];
 
-if (!isset($db)) die('db not defined');
-
 if(!isset($setting)) {
-  $columns = $db->loadUsers(0, 1);
+  $columns = $main->db->loadUsers(0, 1);
 
 	if(count($columns) === 1) {
     unset($columns[0]['permission_id']);
@@ -28,7 +25,7 @@ if(!isset($setting)) {
 	}
 }
 
-$permission = $db->selectQuery('permission', ['ID', 'name']);
+$permission = $main->db->selectQuery('permission', ['ID', 'name']);
 
 $param['permission'] = $permission = implode('', array_map(function ($item) {
   return "<option value=" . $item['ID'] . ">" . gTxt($item['name']) . "</option>";
@@ -37,6 +34,6 @@ $param['permission'] = $permission = implode('', array_map(function ($item) {
 $managerField = $main->getSettings('managerSetting');
 if (!$managerField) $managerField = [];
 
-$param['columns'] = isset($columns) ? $columns : '';
+$param['columns'] = $columns ?? '';
 require $pathTarget;
 $html = template('base', $field);

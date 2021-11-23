@@ -3,6 +3,7 @@
 import '../../../css/module/admindb/handsontable.full.min.css';
 import {Handsontable} from './handsontable.full.min.js';
 import {handson} from "./handsontable.option";
+import mustache from 'mustache';
 
 import {XMLTable} from './XMLTable.js';
 import {FormViews} from './FormViews.js';
@@ -19,7 +20,7 @@ import {FormViews} from './FormViews.js';
  * @param tmpString
  * @return {string}
  */
-const eraseTemplate = (tmpString) => tmpString.replace(/\$\{.+?\}/g, '');
+const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
 
 /* Проверка файла перед добавлением (не знаю что хотел проверить)
 const checkAddedFile = function (e) {
@@ -92,9 +93,12 @@ export const admindb = {
   setTableName() {
     let node = f.qS('#tableNameField'),
         name = this.tableName.substring(this.tableName.lastIndexOf("/") + 1).replace('.csv', '');
-    node && (node.innerHTML = _(name));
+
+    name = _(name);
+    node && (node.innerHTML = name);
+    document.title = name;
   },
-  showTablesName: (data) => {
+  showTablesName: data => {
     if (!data.hasOwnProperty('tables') && !data.hasOwnProperty('csvFiles')) {
       throw Error('Error load DB');
     }
@@ -137,6 +141,7 @@ export const admindb = {
 
     this.handsontable = new Handsontable(div, Object.assign(handson.option, {
       data: handson.removeSlashesData(this.queryResult['csvValues']),
+      colHeaders: this.queryResult['csvValues'][0].map(h => _(h)),
     }));
 
     this.handsontable.updateSettings(handson.context);
@@ -162,6 +167,12 @@ export const admindb = {
     }
   },
 
+  checkTemplate(val) {
+    try {mustache.parse(val);}
+    catch (e) {
+      f.showMsg(`Ошибка в шаблоне (${e.message})` , 'warning');
+    }
+  },
   checkSavedTableChange(e) {
     if (this.btnSaveEnable && !confirm('Изменения будут потеряны, продолжить?')) {
       e.preventDefault();
@@ -460,7 +471,7 @@ const TableValues = {
     node.classList.add('btn-danger');
   },
 
-  // TODO events function
+  // Events function
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
@@ -558,10 +569,11 @@ const TableValues = {
       f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
       f.removeLoading(e.target);
       TableValues.init('csv');
+      data['status'] && admindb.disableBtnSave();
     });
   },
 
-  // TODO bind events
+  // Bind events
   //--------------------------------------------------------------------------------------------------------------------
   // Проверка ввода
   onCheckEdit(node) {

@@ -1,30 +1,31 @@
 "use strict";
 
-const addSlashes = (value) => value.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
-const removeSlashes = (value) => value.replaceAll('\\n', '\n').replaceAll('\\r', '\r');
+const addSlashes = value => value.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
+const removeSlashes = value => value.replaceAll('\\n', '\n').replaceAll('\\r', '\r');
 
-const changeRowCol = (that) => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
+const changeRowCol = that => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
 
 export const handson = {
-  option: {
+  option: Object.assign({
     rowHeaders        : true,
     colHeaders        : true, //filters   : true,
+    columnSorting     : false,
     dropdownMenu      : true,
     contextMenu       : true,
     manualColumnResize: true,
     manualRowResize   : true,
     stretchH          : 'all',
     width             : '100%',
-    height            : 800,
+    height            : window.innerHeight * 0.8,
     licenseKey        : 'non-commercial-and-evaluation',
 
     afterChange(changes) {
-      if (!this.tableChanged && changes) {
-        for (const [row, prop, oldValue, newValue] of changes) {
+      if (changes) {
+        for (const [row, column, oldValue, newValue] of changes) {
           if (oldValue !== newValue) {
+            if (this.getColHeader(column).includes('template')) this.admindb.checkTemplate(newValue);
             this.admindb.enableBtnSave();
-            this.tableChanged = true;
-            break;
+            !this.tableChanged && (this.tableChanged = true);
           }
         }
       }
@@ -35,6 +36,54 @@ export const handson = {
     afterRemoveCol() { changeRowCol(this) },
     afterRemoveRow() { changeRowCol(this) },
   },
+  f.CSV_DEVELOP ?
+  /**
+   * Настройки для разработки
+   * */
+  {} :
+  /**
+   * Продакшн настройки
+   * */
+  {
+    hiddenRows: {rows: [0]}, // Не показывать заголовок
+
+    beforeRemoveCol(ind, count, columns) {
+      for (const cIndex of columns) {
+        const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
+        if (important) {
+          f.showMsg('Ключевые значения нельзя удалить');
+          throw new Error('try to delete important values!');
+        }
+      }
+    },
+    beforeRemoveRow(ind, count, rows) {
+      for (const rIndex of rows) {
+        const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
+        if (important) {
+          f.showMsg('Ключевые значения нельзя удалить');
+          throw new Error('try to delete important values!');
+        }
+      }
+    },
+
+    // Перебор всех ячеек
+    cells(row, col) {
+      if (row === 0 || this.hasOwnProperty('readOnly')) return; // Первую строку пропускаем
+      const cell = this.instance.getDataAtCell(row, col), res = {readOnly: false};
+
+      if (!cell) return res;
+
+      res.readOnly = /^(c_|d_)/i.test(cell);
+      if (cell === '+' || cell === '-') {
+        res.type = 'checkbox';
+        res.checkedTemplate = '+';
+        res.uncheckedTemplate = '-';
+      }
+      else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
+
+      return res;
+    },
+  }),
 
   context: {
     contextMenu: {
@@ -60,7 +109,7 @@ export const handson = {
   },
 
   addSlashesData(data) {
-    data.length && (data = data.map(row => row.map(cell => cell && addSlashes(cell))));
+    data.length && (data = data.map(row => row.map(cell => typeof cell === 'string' ? addSlashes(cell) : cell)));
     return data;
   },
 };

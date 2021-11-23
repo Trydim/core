@@ -27,7 +27,9 @@ foreach ($publicConfig as $k => $v) {
 }
 
 // Не использую цикл т.к. куча предупреждений
+!defined('PROJECT_TITLE') && define('PROJECT_TITLE', false);
 !defined('DEBUG') && define('DEBUG', false);
+!defined('CSV_DEVELOP') && define('CSV_DEVELOP', false);
 !defined('PUBLIC_PAGE') && define('PUBLIC_PAGE', false);
 !defined('ONLY_LOGIN') && define('ONLY_LOGIN', false);
 !defined('USERS_ORDERS') && define('USERS_ORDERS', false);
@@ -41,8 +43,6 @@ foreach ($publicConfig as $k => $v) {
 
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/classes/Main.php';
-require_once CORE . 'model/classes/Course.php';
-require_once CORE . 'model/classes/Xml.php';
 require_once CORE . 'model/hooks.php';
 
 // Public php.

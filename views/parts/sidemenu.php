@@ -1,7 +1,8 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
-global $main, $dbTables;
+global $main;
 
 $adminMenu = '';
+$dbTables = $main->getBaseTable();
 
 if(is_array($dbTables)) {
 

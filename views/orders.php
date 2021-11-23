@@ -11,7 +11,7 @@
 $field['content'] = template('parts/ordersContent', $param);
 
 $field['pageFooter'] = <<<pageFooter
-<div id="paginator"></div>
+<div id="paginator" class="w-100"></div>
 pageFooter;
 
 $field['footerContent'] = '<a id="publicPageLink" href="public" hidden></a>';

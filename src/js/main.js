@@ -1,6 +1,6 @@
 "use strict";
 
-const importModuleFunc = async (moduleName) => {
+const importModuleFunc = async moduleName => {
   let link;
   if (moduleName === 'public') {
     link = `${f.SITE_PATH}public/js/${f.PUBLIC_PAGE}.js`;
@@ -29,7 +29,7 @@ const init = (moduleName = 'default') => {
   return module;
 }
 
-const setLinkMenu = (page) => {
+const setLinkMenu = page => {
   let menu = f.qS('#sideMenu');
   if (!menu) return;
 
@@ -56,7 +56,20 @@ const cancelFormSubmit = () => {
   });
 }
 
-// TODO event function
+const stopPreloader = () => {
+  f.gI('preloader').remove();
+  f.gI('mainWrapper').classList.add('show');
+}
+
+const setParentHeight = (target, height) => {
+  const n = target.closest("ul[aria-expanded=\"false\"]");
+  if (n) {
+    n.style.height = (n.offsetHeight + height) + 'px';
+    setParentHeight(n.parentNode, height);
+  }
+}
+
+// Event function
 // ---------------------------------------------------------------------------------------------------------------------
 
 const authEvent = function(e) {
@@ -64,7 +77,7 @@ const authEvent = function(e) {
       action = this.getAttribute('data-action');
 
   let select = {
-    'exit' : () => {
+    'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
     }
   }
@@ -83,13 +96,14 @@ const sideMenuExpanded = (e, node) => {
   }
 }
 
-// TODO event bind
+// Event bind
 // -------------------------------------------------------------------------------------------------------------------
 
 // Block Authorization
 const onAuthEvent = () => {
   let node = f.gI(f.ID.AUTH_BLOCK);
-  node && node.querySelectorAll('[data-action]').forEach(n => n.onclick = authEvent );
+  node && node.querySelectorAll('[data-action]')
+              .forEach(n => n.addEventListener('click', authEvent));
 }
 
 const onClickSubmenu = () => {

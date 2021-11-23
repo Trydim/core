@@ -7,9 +7,7 @@
 
 if (!defined('MAIN_ACCESS')) die('access denied!');
 
-require_once 'classes/Db.php';
-
-$db = new Db($dbConfig);
+$db = $main->getDB();
 
 !isset($dbAction) && $dbAction = '';
 isset($tableName) && $dbTable = $tableName;
@@ -37,9 +35,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     }
   }
 
-  $pageNumber = isset($currPage) ? $currPage : 0;
+  $pageNumber = $currPage ?? 0;
   !isset($countPerPage) && $countPerPage = 20;
-  $sortDirect = isset($sortDirect) ? $sortDirect === 'true' : false;
+  $sortDirect = isset($sortDirect) && $sortDirect === 'true';
 
   switch ($dbAction) {
     // Tables
@@ -127,25 +125,26 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $changeUser === 'add' && $customerId = $db->getLastID('customers');
         }
 
-        $idOrder = isset($idOrder) ? $idOrder : false;
-        $newOrder = !$idOrder || !is_numeric($idOrder);
-        $idOrder = $newOrder ? ((int)$db->getLastID('orders')) + 1 : $idOrder;
+        $orderId = isset($orderId) ? $orderId : false;
+        $newOrder = !$orderId || !is_numeric($orderId);
+        $orderId = $newOrder ? ((int)$db->getLastID('orders')) + 1 : $orderId;
 
-        $param = [$idOrder => []];
-        $param[$idOrder]['customer_id'] = $customerId;
-        $param[$idOrder]['user_id'] = $_SESSION['priority']; // TODO нет не пойдет
-        isset($saveVal) && $param[$idOrder]['save_value'] = $saveVal;
-        isset($importantVal) && $param[$idOrder]['important_value'] = $importantVal;
-        isset($orderTotal) && is_finite($orderTotal) && $param[$idOrder]['total'] = floatval($orderTotal);
-        $param[$idOrder]['report_value'] = addCpNumber($idOrder, $reportVal);
+        $param = [$orderId => []];
+        $param[$orderId]['customer_id'] = $customerId;
+        $param[$orderId]['user_id'] = $_SESSION['priority']; // TODO нет не пойдет
+        isset($saveVal) && $param[$orderId]['save_value'] = $saveVal;
+        isset($importantVal) && $param[$orderId]['important_value'] = $importantVal;
+        isset($orderTotal) && is_finite($orderTotal) && $param[$orderId]['total'] = floatval($orderTotal);
+        $param[$orderId]['report_value'] = addCpNumber($orderId, $reportVal);
 
         $columns = $db->getColumnsTable('orders');
         $result['error'] = $db->insert($columns, 'orders', $param, !$newOrder);
 
         // status_id = ; по умолчанию сохранять из настроек
-        //$db->saveOrder($param, $idOrder);
+        //$db->saveOrder($param, $orderId);
         $result['customerId'] = $customerId;
-        $result['orderID'] = $idOrder;
+        $result['orderId'] = $orderId;
+        $result['saveDate'] = date('Y-m-d H:i:s');
       }
       break;
     case 'loadOrders':
@@ -196,7 +195,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'loadVisitorOrders':
-      !isset($sortColumn) && $sortColumn = 'create_date';
+      !isset($sortColumn) && $sortColumn = 'createDate';
 
       $search = isset($search);
       // Значит нужны все заказы (поиск)
@@ -431,13 +430,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'createProperty':
-      if (isset($dbTable) && isset($dataType) && !empty($dbTable)) {
+      if (isset($tableName) && isset($dataType) && !empty($tableName)) {
         // Простой или сложный параметр по префиксу
         if (stripos($dataType, 's_') === 0) {
           $setAction = 'createProperty';
           require 'setting.php';
         } else {
-          $tableCode = 'prop_' . (isset($tableCode) ? $tableCode : translit($dbTable));
+          $tableCode = 'prop_' . ($tableCode ?? translit($dbTable));
 
           $param = [];
           foreach ($_REQUEST as $key => $value) {
@@ -456,11 +455,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             setSettingFile($setting);
 
             $result['error'] = $db->createPropertyTable($tableCode, $param);
-          } else {
-            $result['error'] = 'Property exist';
-          }
+          } else $result['error'] = 'Property exist';
         }
-      }
+      } else $result['error'] = 'Property name error!';
       break;
     case 'delProperty':
       if (isset($props)) {
@@ -492,40 +489,24 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['customers'] = $db->loadCustomers($pageNumber, $countPerPage, $sortColumn, $sortDirect, $customerIds);
       break;
     case 'addCustomer':
-      $param = ['0' => []];
-      if (isset($name) && !empty($name)) {
-        $param['0']['name'] = $name;
-        $param['0']['ITN'] = isset($ITN) ? $ITN : '';
-
-        $contacts = [];
-        isset($phone) && $contacts['phone'] = $phone;
-        isset($email) && $contacts['email'] = $email;
-        isset($address) && $contacts['address'] = $address;
-        count($contacts) && $param['0']['contacts'] = json_encode($contacts);
-
-        // TODO обработка ошибки не верна
-        //$result['error'] = $db->insert($columns, 'customers', $param);
-        $db->insert($columns, 'customers', $param);
-      }
-      break;
     case 'changeCustomer':
-      if (isset($usersId) && is_finite($usersId)) {
-        $param = [];
+      $newCustomer = isset($customerId) && is_finite($customerId);
+      $customerId = $customerId ?? 0;
+      $param = [$customerId => []];
+      $customer = isset($authForm) ? json_decode($authForm, true) : [];
 
-        $contacts = [];
-        isset($phone) && $contacts['phone'] = $phone;
-        isset($email) && $contacts['email'] = $email;
-        isset($address) && $contacts['address'] = $address;
-
-        isset($name) && $param[$usersId]['name'] = $name;
-        isset($ITN) && $param[$usersId]['ITN'] = $ITN;
-        count($contacts) && $param[$usersId]['contacts'] = json_encode($contacts);
-
-        $db->insert($columns, 'customers', $param, true);
+      $contacts = [];
+      foreach ($customer as $k => $v) {
+        if ($k === 'cType') continue;
+        if (in_array($k, ['name', 'ITN'])) $param[$customerId][$k] = $v;
+        else $contacts[$k] = $v;
       }
+      count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);
+
+      $db->insert($columns, 'customers', $param, $newCustomer);
       break;
     case 'delCustomer':
-      $usersId = isset($usersId) ? json_decode($usersId) : [];
+      $usersId = isset($customerId) ? json_decode($customerId) : [];
 
       if (count($usersId)) {
         $result['customers'] = $db->deleteItem('customers', $usersId);
@@ -550,18 +531,16 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     //case 'loadUser': break; // Вероятно для загрузки пароля
     case 'addUser':
-      $param = ['0' => []];
-
+      $param = [0 => []];
       $user = isset($authForm) ? json_decode($authForm, true) : [];
 
       $contacts = [];
       foreach ($user as $k => $v) {
-        if (in_array($k, ['login', 'name', 'permissionId'])) $param['0'][$k] = $v;
-        else if ($k === 'password') $param['0'][$k] = password_hash($v, PASSWORD_BCRYPT);
+        if (in_array($k, ['login', 'name', 'permissionId'])) $param[0][$k] = $v;
+        else if ($k === 'password') $param[0][$k] = password_hash($v, PASSWORD_BCRYPT);
         else $contacts[$k] = $v;
       }
-
-      count($contacts) && $param['0']['contacts'] = json_encode($contacts);
+      $param[0]['contacts'] = json_encode($contacts);
 
       $result['error'] = $db->insert($columns, 'users', $param);
       break;
@@ -577,7 +556,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $contacts = [];
           foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permission_id'])) $param[$id][$k] = $v;
-            else if ($k !== 'permission_id') $contacts[$k] = $v;
+            else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
           $param[$id]['activity'] = isset($authForm['activity']) ? '1' : '0';

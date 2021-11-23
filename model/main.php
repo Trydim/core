@@ -1,7 +1,13 @@
-<?php
+<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
-$mode = isset($_REQUEST['mode']) ? $_REQUEST['mode'] : 'noMode';
+/**
+ * @var $main - global
+ */
+
 $result = [];
+$mode = $_REQUEST['mode'] ?? 'noMode';
+$main->checkAuth('check');
+if ($mode !== 'auth' && $main->checkStatus('no')) $result['error'] = ['Auth no passing!'];
 extract($_REQUEST);
 
 try {
@@ -24,7 +30,7 @@ try {
       break;
   }
 
-  $result['status'] = isset($result['error']) ? checkError($result['error']) : true;
+  $result['status'] = !isset($result['error']) || checkError($result['error']);
 
 } catch (\mysql_xdevapi\Exception $e) {
   echo $e->getMessage();

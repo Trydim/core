@@ -147,8 +147,9 @@ CREATE TABLE `money` (
 -- Дамп данных таблицы `money`
 --
 
-INSERT INTO `money` (`ID`, `name`, `short_name`, `rate`) VALUES
-(1, 'United State Dollar', '$', '1.0000');
+INSERT INTO `money` (`ID`, `code`, `name`, `short_name`, `rate`, `main`) VALUES
+(1, 'USD', 'United State Dollar', '$', '1.0000', null),
+(2, 'RUB', 'Российский рубль', 'руб.', '1.0000', 1);
 
 -- --------------------------------------------------------
 

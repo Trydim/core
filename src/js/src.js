@@ -11,6 +11,7 @@ import {Modal} from './components/Modal.js';
 import {CustomSelect} from './components/CustomSelect.js';
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
+import {Valid} from "./components/Valid";
 
 const m = {
   /**
@@ -82,7 +83,7 @@ const m = {
    * @param {string} type (success, warning, error)
    * @param {boolean} autoClose
    */
-  showMsg: (msg, type, autoClose) => new module.MessageToast().show(msg, type, autoClose),
+  showMsg: (msg, type = 'error', autoClose = true) => new module.MessageToast().show(msg, type, autoClose),
 
   /**
    * Validation component
@@ -111,7 +112,7 @@ const m = {
    *
    * @example mask: new f.Valid({phoneMask: '+1 (\_\_) \_\_\_'});
    */
-  Valid : module.Valid,
+  Valid,
   //initValid : (sendFunc, idForm, idSubmit) => module.valid.init(sendFunc, idForm, idSubmit),
 };
 

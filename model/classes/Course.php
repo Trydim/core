@@ -1,5 +1,7 @@
 <?php
 
+!defined('PATH_CSV') && define('PATH_CSV', $_SERVER['DOCUMENT_ROOT'] . '/csv');
+
 class Course {
   const REFRESH_INTERVAL = 36000;
   const LINK_PARAM = '';
@@ -16,7 +18,6 @@ class Course {
   private $db;
   private $xml;
   private $dataFile;
-  private $refreshTime;
 
 
   /**
@@ -31,9 +32,15 @@ class Course {
     $this->refresh();
   }
 
+  private function checkTableMoney() {
+    // проверить есть ли в Таблице базовая валюта
+  }
+
   private function getMainCurrency() {
     $res = array_filter($this->rate, function ($c) { return boolval($c['main']); });
-    return count($res) ? array_values($res)[0] : $this->rate[$this::DEFAULT_CURRENCY];
+    if (count($res)) return array_values($res)[0];
+
+    return $this->rate[self::DEFAULT_CURRENCY] ?? array_values($this->rate)[0];
   }
 
   private function searchRate($code) {
@@ -46,7 +53,7 @@ class Course {
     return false;
   }
 
-  private function notNeedRefresh() {
+  private function notNeedRefresh(): bool {
     $time = time() - $this::REFRESH_INTERVAL;
     foreach ($this->rate as $currency) {
       if ($time > strtotime($currency['lastEditDate'])) return false;
@@ -56,6 +63,7 @@ class Course {
 
   private function getRateFromDb($db) {
     $this->db = $db;
+    if (DEBUG) $this->checkTableMoney();
     $this->rate = $db->getMoney();
   }
 
@@ -77,13 +85,12 @@ class Course {
       serialize(["refresh_time" => time(), 'curs' => $this->rate]));
   }
 
-  private function readFromCbr() {
+  private function readFromCbr(): void {
     $mainCurrency = $this->getMainCurrency();
 
-    $linkSource = $this->source[$mainCurrency['code']];
+    $linkSource = $this->source[$mainCurrency['code']] ?? false;
 
-    if (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM)) return false;
-    //$curs['date'] = strtotime($xml->attributes()->Date);
+    if (!$linkSource || (!$this->xml = simplexml_load_file($linkSource . $this::LINK_PARAM))) return;
 
     foreach ($this->rate as $code => $currency) {
       if ($currency === $mainCurrency) continue;
@@ -92,7 +99,7 @@ class Course {
     }
   }
 
-  public function refresh() {
+  public function refresh(): Course {
     if ($this->notNeedRefresh()) return $this;
 
     $this->readFromCbr();
@@ -101,11 +108,11 @@ class Course {
     return $this;
   }
 
-  public function getRate($fields = []) {
+  public function getRate(): array {
     return array_map(function ($c) {
       return [
         'id' => $c['code'],
-        'value' => $c['rate']
+        'value' => $c['rate'] ?? 1,
       ];
     }, $this->rate);
   }
