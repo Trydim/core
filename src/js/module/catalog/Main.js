@@ -107,6 +107,18 @@ export class Catalog {
     delete e.target.dataset.action;
   }
 
+  selectedAll() {
+    this.id.checkedAll();
+  }
+  clearId() {
+    this.id.clear();
+  }
+  // Удалить из выбора
+  removeSelected(t) {
+    const id = t.dataset.id;
+    id && this.id.checkedById(id, false);
+  }
+
   // Bind events
   //--------------------------------------------------------------------------------------------------------------------
 

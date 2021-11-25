@@ -1,7 +1,5 @@
 'use strict';
 
-import {orders} from "../orders/orders";
-
 export class Search {
   constructor() {
     this.setParam();

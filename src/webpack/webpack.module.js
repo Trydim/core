@@ -5,7 +5,7 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //const CssMinimizerPlugin   = require('css-minimizer-webpack-plugin');
 //const TerserPlugin         = require("terser-webpack-plugin");
-// const webpack = require('webpack'); // вроде не обязательно
+//const webpack = require('webpack'); // вроде не обязательно
 
 const absPath = '../../',
       resFileName = 'webpackModule.json';
@@ -33,12 +33,12 @@ module.exports = env => {
   },
 
   output: {
-      path    : path.resolve(__dirname, '../../assets/'),
+    path    : path.resolve(__dirname, '../../assets/'),
     filename: 'js/module/[name]/[name].js',
     library: {
       type: 'module',
     },
-      scriptType   : 'module',
+    scriptType: 'module',
     module: true,
     libraryTarget: 'module',
   },
@@ -49,7 +49,7 @@ module.exports = env => {
     }
   },
 
-    devtool: dev ? 'source-map' : false, //source mapping
+  devtool: dev ? 'source-map' : false, //source mapping
   optimization: {
     minimize: !dev,
     minimizer: [
@@ -87,11 +87,11 @@ module.exports = env => {
     }),
     //new VueLoaderPlugin(),
 
-      /*new HtmlWebpackPlugin({
-        title: 'yrdy',
-        filename: 'view/content.php',
-        template: `content.php`,
-      }),*/
+    /*new HtmlWebpackPlugin({
+      title: 'yrdy',
+      filename: 'view/content.php',
+      template: `content.php`,
+    }),*/
 
     new webpack.DefinePlugin({
       // Drop Options API from bundle
@@ -101,6 +101,7 @@ module.exports = env => {
   ],
 
   module: {
+    //noParse: /canvasjs\.min/,
     rules: [
         getVueRules(),
         getScssRules(),

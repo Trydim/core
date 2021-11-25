@@ -280,8 +280,8 @@ $field['footerContent'] .= <<<footerContent
         <div class="col-12">
           <input type="file" class="d-none" name="files" id="uploadFile" multiple>
           <label class="btn btn-warning" for="uploadFile">Загрузить</label>
-          <input type="button" class="btn btn-warning" name="chooseFile" value="Выбрать">
-          <div id="fileField"></div>
+          <input type="button" class="btn btn-warning chooseFile" value="Выбрать">
+          <div id="fileField" class="overflow-auto" style="max-height: 300px"></div>
         </div>
         <div class="col" id="fileField"></div>
       </div>
