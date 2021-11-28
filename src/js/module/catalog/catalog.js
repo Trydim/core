@@ -29,7 +29,7 @@ export const catalog = {
 
     setTimeout(() => {
       document.querySelector("#sectionField [data-id='9']").click();
-      document.querySelector("#sectionField > div.controlWrap > input:nth-child(2)").click();
+      document.querySelector("#sectionField [data-action=\"openSection\"]").click();
 
       /*setTimeout(() => {
         this.elements.id.addSelectedId('241');

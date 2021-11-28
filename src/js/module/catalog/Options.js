@@ -219,7 +219,8 @@ export class Options extends Common {
       node.addEventListener('change', () => {
         f.show(nodeProp);
         option.property && initParam(JSON.parse(option.property));
-        node.remove();
+        node.parentElement.previousElementSibling.remove();
+        node.parentElement.remove();
       }, {once: true});
 
       form.querySelectorAll('.onlyOne').forEach(n => n.remove());

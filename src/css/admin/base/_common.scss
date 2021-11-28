@@ -22,9 +22,8 @@
   }
 }
 
-.opacity5 {
-  opacity: .5;
-  transition: opacity .15s;
+[data-action="clickSection"] {
+  border: 1px solid transparent;
 }
 
 .closeSection + .subSection {
@@ -36,7 +35,7 @@
 }
 
 .focused {
-  border: 1px solid blue;
+  border-color: blue;
 }
 
 .mouseSelected {

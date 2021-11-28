@@ -17,7 +17,7 @@ $field['global'] = <<<global
   <section class="content-center h-100">
     <div class="authincation-content auth-form col-md-5">
       <h4 class="text-center mb-4"><i class="pi pi-user"></i> Авторизация</h4>
-      <form action="$actionLink" method="POST">
+      <form action="$actionLink" method="POST" id="authForm">
         <div class="form-group">
           <label><strong>Логин</strong></label>
           <input name="login" type="text" class="form-control" value="$login">

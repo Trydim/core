@@ -55,17 +55,46 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'saveTable':
-      if ($dbTable !== '') {
+      if (isset($dbData) && !empty($dbData)) {
+        $column = array_filter($columns, function ($col) { return $col['key'] === 'PRI'; });
+        $priColumn = count($column) ? $column[0]['columnName'] : false;
 
-        $added = isset($added) ? $added = json_decode($added, true) : false;
-        $changed = isset($changed) ? $changed = json_decode($changed, true) : false;
-        $deleted = isset($deleted) ? $deleted = json_decode($deleted) : false;
+        $dbDataOld = $db->loadTable($dbTable);
+        $dbData = json_decode($dbData, true);
 
-        if ($deleted) $result['notAllowed'] = $db->deleteItem($dbTable, $deleted);
-        if ($added) $result['notAllowed'] = $db->insert($columns, $dbTable, $added);
-        if ($changed) $result['notAllowed'] = $db->insert($columns, $dbTable, $changed, true);
+        $find = function ($array, $testRow) use ($priColumn) {
+          return array_values(array_filter($array, function ($row) use ($priColumn, $testRow) {
+            return $row[$priColumn] === $testRow[$priColumn];
+          }));
+        };
+
+        // Delete
+        $deleted = [];
+        foreach ($dbDataOld as $index => $rowOld) {
+          $have = $find($dbData, $rowOld);
+          if (!count($have)) {
+            $deleted[] = $rowOld[$priColumn];
+            array_splice($dbDataOld, $index, 1);
+          }
+        }
+        count($deleted) && $result['deleteCount'] = $db->deleteItem($dbTable, $deleted, $priColumn);
+
+        // Insert & Update
+        $added = [];
+        $changed = [];
+        foreach ($dbData as $row) {
+          $have = $find($dbDataOld, $row);
+          if (count($have)) {
+            $dif = array_diff_assoc($row, $have[0]);
+            !empty($dif) && $changed[$row[$priColumn]] = $row;
+          } else {
+            $added[] = $row;
+          }
       }
-      if (isset($csvData)) {
+        count($added) && $result['insert'] = $db->insert($columns, $dbTable, $added);
+        count($changed) && $result['change'] = $db->insert($columns, $dbTable, $changed, true);
+      }
+      else if (isset($csvData) && !empty($csvData)) {
         $db->saveCsv(json_decode($csvData));
       }
       break;

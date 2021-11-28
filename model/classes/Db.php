@@ -198,35 +198,42 @@ class Db extends \R {
   }
 
   /**
-   * @param $dbTable
-   * @param $ids
+   * @param string $dbTable
+   * @param array $ids
+   * @param string $primaryKey
    *
-   * @return array
+   * @return int
    */
-  public function deleteItem($dbTable, $ids) {
+  public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'ID'): int {
+    $count = 0;
+    if ($primaryKey !== 'ID') {
+      foreach ($ids as $id) {
+        $count += self::exec("DELETE FROM `$dbTable` WHERE `$primaryKey` = '$id'");
+      }
+      return $count;
+    }
+
     if (count($ids) === 1) {
       $bean = self::xdispense($dbTable);
-      $bean->ID = $ids[0];
       $bean->id = $ids[0];
-      self::trash($bean);
+      $count = self::trash($bean);
     } else {
       $beans = self::xdispense($dbTable, count($ids));
 
       for ($i = 0; $i < count($ids); $i++) {
-        $beans[$i]->ID = $ids[$i];
         $beans[$i]->id = $ids[$i];
       }
 
-      self::trashAll($beans);
+      $count = self::trashAll($beans);
     }
-    return [];
+    return $count;
   }
 
   /**
    * @param string $like
    * @return mixed|null
    */
-  public function getTables($like = '') {
+  public function getTables(string $like = '') {
     $sql = "SHOW TABLES
             FROM `$this->dbName`
             WHERE `Tables_in_$this->dbName` LIKE '%$like%'";
@@ -244,9 +251,9 @@ class Db extends \R {
    * get columns table
    * @param $dbTable
    *
-   * @return mixed
+   * @return array|null
    */
-  public function getColumnsTable($dbTable) {
+  public function getColumnsTable($dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
        COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
 		FROM information_schema.COLUMNS where TABLE_SCHEMA = :dbName AND  TABLE_NAME = :dbTable',
@@ -276,34 +283,52 @@ class Db extends \R {
   /**
    * insert or change rows
    *
-   * @param $curTable
-   * @param $dbTable
-   * @param $param
+   * @param array $curTable
+   * @param string $dbTable
+   * @param array $param
    * @param bool $change
    *
-   * @return array|int
+   * @return array
    */
-  public function insert($curTable, $dbTable, $param, bool $change = false) {
+  public function insert(array $curTable, string $dbTable, array $param, bool $change = false): array {
     $result = $this->checkTableBefore($curTable, $dbTable, $param);
 
     $beans = self::xdispense($dbTable, count($param));
 
     if (count($param) > 0) {
 
-      if ($change) {
+      $idColName = 'id';
         foreach ($curTable as $col) {
           if ($col['key'] === 'PRI') {
             $idColName = $col['columnName'];
             break;
           }
         }
+
+      if (strtolower($idColName) !== 'id') {
+        if ($change) {
+          foreach ($param as $id => $item) {
+            $sql = "UPDATE `$dbTable` SET ";
+            foreach ($item as $k => $v) $sql .= "`$k` = '$v' ";
+            $sql .= "WHERE `$idColName` LIKE '$id'";
+            self::exec($sql);
+          }
+        } else {
+          foreach ($param as $id => $item) {
+            $sql = "INSERT INTO `$dbTable` ";
+            $sql .= '(' . implode(', ', array_keys($item)) . ') VALUES ';
+            $sql .= '(\'' . implode('\', \'', array_values($item)) . '\')';
+            self::exec($sql);
+          }
+        }
+        return $result;
       }
 
       try {
         if (count($param) === 1) {
           foreach ($param as $id => $item) {
 
-            if ($change) $beans->$idColName = $id;
+            $change && $beans->id = $id;
 
             foreach ($item as $k => $v) {
               if (isset($idColName) && $idColName === $k) continue;
@@ -316,7 +341,7 @@ class Db extends \R {
           $i = 0;
           foreach ($param as $id => $item) {
 
-            if ($change) $beans[$i]->$idColName = $id;
+            $change && $beans[$i]->id = $id;
 
             foreach ($item as $k => $v) {
               $beans[$i]->$k = $v;
@@ -328,7 +353,7 @@ class Db extends \R {
       } catch (\RedBeanPHP\RedException $e) {
         return [
           'result'   => $result,
-          'sqlError' => $e->getMessage(),
+          'error' => $e->getMessage(),
         ];
       }
     }
@@ -494,11 +519,9 @@ class Db extends \R {
    * @param array  $filter
    * @param int    $pageNumber
    * @param int    $countPerPage
-   * @param string $sortColumn
-   * @param false  $sortDirect
    * @return array
    */
-  public function loadOptions($filter = [], int $pageNumber = 0, $countPerPage = -1) {
+  public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
     $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
                    O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
@@ -542,8 +565,8 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']];
-        //$option['images'] = $this->setImages($option['images']);
+        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']]; TODO удалить
+        $option['images'] = $this->setImages($option['images']);
       }
 
       // set property

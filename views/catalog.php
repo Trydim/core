@@ -213,7 +213,7 @@ $field['footerContent'] .= <<<footerContent
 </template>
 <template id="section">
   <li>
-    <div class="closeSection border-dark" data-action="clickSection" data-id="\${ID}">\${ID} - \${name}</div>
+    <div class="closeSection" data-action="clickSection" data-id="\${ID}">\${ID} - \${name}</div>
     <div class="subSection"></div>
   </li>
 </template>

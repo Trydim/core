@@ -83,7 +83,7 @@ const m = {
    * @param {string} type (success, warning, error)
    * @param {boolean} autoClose
    */
-  showMsg: (msg, type = 'error', autoClose = true) => new module.MessageToast().show(msg, type, autoClose),
+  showMsg: (msg, type = 'success', autoClose = true) => new module.MessageToast().show(msg, type, autoClose),
 
   /**
    * Validation component

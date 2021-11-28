@@ -23,14 +23,14 @@
   <input type="button" class="btn btn-warning ms-1" value="Отмена" data-action="confirmNo">
 </div>
 <div class="pb-4 d-none" id="printTypeField">
-<? for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
+  <?php for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
   <input type="button" class="btn btn-primary"
          data-action="printReport" data-type="printType<?= $i ?>"
          value="<?= gTxt('printType' . $i) ?>">
-<? } ?>
+  <?php } ?>
   <input type="button" class="btn btn-warning" data-action="cancelPrint" value="Отмена">
 </div>
-<? if (USERS_ORDERS) { ?>
+<?php if (USERS_ORDERS) { ?>
   <div class="d-flex pb-4" style="justify-content: left">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="orderType" value="order" id="orderTypeO" checked data-action="orderType">
@@ -45,7 +45,7 @@
       </label>
     </div>
   </div>
-<? } ?>
+<?php } ?>
 <div class="res-table">
 
   <div class="input-group">
@@ -78,7 +78,7 @@
     </table>
   </template>
 
-  <? if (USERS_ORDERS) { ?>
+  <?php if (USERS_ORDERS) { ?>
   <template id="orderVisitorTableTmp">
     <table>
       <thead>
@@ -101,6 +101,6 @@
       </tbody>
     </table>
   </template>
-  <? } ?>
+  <?php } ?>
 </div>
 <div id="paginator" class="w-100"></div>

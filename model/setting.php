@@ -116,6 +116,8 @@ if (isset($setAction)) {
       $setting = getSettingFile();
       isset($orderMail) && $setting['orderMail'] = $orderMail;
       isset($orderMailCopy) && $setting['orderMailCopy'] = $orderMailCopy;
+      isset($orderMailSubject) && $setting['orderMailSubject'] = $orderMailSubject;
+      isset($orderMailFromName) && $setting['orderMailFromName'] = $orderMailFromName;
       !USE_DATABASE && $setting['onlyOne'] = isset($onlyOne);
 
       // Global manager setting

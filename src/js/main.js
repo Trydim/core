@@ -78,6 +78,7 @@ const cmsEvent = function() {
   let select = {
     'menuToggle': () => {
       f.gI('mainWrapper').classList.toggle('menu-toggle');
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
     },
     'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;

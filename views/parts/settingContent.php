@@ -20,7 +20,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       </div>
 
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="orderMailCopy" placeholder="Почта"
+        <input type="text" class="form-control" id="orderMailSubject" placeholder="Почта"
                name="orderMailSubject" value="<?= $main->getSettings('orderMailSubject') ?>">
         <label for="orderMailSubject">Тема письма</label>
       </div>
@@ -44,12 +44,12 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       </div>
 
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="password" placeholder="Почта" name="password">
+        <input type="password" class="form-control" id="password" placeholder="Почта" name="password">
         <label for="password">Новый Пароль</label>
       </div>
 
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="passwordRepeat" placeholder="Почта" name="passwordRepeat">
+        <input type="password" class="form-control" id="passwordRepeat" placeholder="Почта" name="passwordRepeat">
         <label for="passwordRepeat">Повторите пароль</label>
       </div>
 

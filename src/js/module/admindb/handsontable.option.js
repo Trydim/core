@@ -6,7 +6,7 @@ const removeSlashes = value => value.replaceAll('\\n', '\n').replaceAll('\\r', '
 const changeRowCol = that => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
 
 export const handson = {
-  option: Object.assign({
+  optionCommon: {
     rowHeaders        : true,
     colHeaders        : true, //filters   : true,
     columnSorting     : false,
@@ -36,56 +36,82 @@ export const handson = {
     afterRemoveCol() { changeRowCol(this) },
     afterRemoveRow() { changeRowCol(this) },
   },
-  f.CSV_DEVELOP ?
-  /**
-   * Настройки для разработки
-   * */
-  {} :
-  /**
-   * Продакшн настройки
-   * */
-  {
-    hiddenRows: {rows: [0]}, // Не показывать заголовок
 
-    beforeRemoveCol(ind, count, columns) {
-      for (const cIndex of columns) {
-        const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
-        if (important) {
-          f.showMsg('Ключевые значения нельзя удалить');
-          throw new Error('try to delete important values!');
+
+  optionDb: (() => f.CSV_DEVELOP
+    /**
+     * Настройки DataBase для разработки
+     */
+                   ? {}
+    /**
+     * Настройки DataBase продакшн
+     * */
+                   : {})(),
+
+
+  optionCsv: (() => f.CSV_DEVELOP
+    /**
+     * Настройки СSV для разработки
+     */
+                    ? {}
+    /**
+     * Настройки СSV продакшн
+     */
+                    : {
+      hiddenRows: {rows: [0]}, // Не показывать заголовок
+
+      beforeRemoveCol(ind, count, columns) {
+        for (const cIndex of columns) {
+          const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
+          if (important) {
+            f.showMsg('Ключевые значения нельзя удалить');
+            throw new Error('try to delete important values!');
+          }
         }
-      }
-    },
-    beforeRemoveRow(ind, count, rows) {
-      for (const rIndex of rows) {
-        const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
-        if (important) {
-          f.showMsg('Ключевые значения нельзя удалить');
-          throw new Error('try to delete important values!');
+      },
+      beforeRemoveRow(ind, count, rows) {
+        for (const rIndex of rows) {
+          const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
+          if (important) {
+            f.showMsg('Ключевые значения нельзя удалить');
+            throw new Error('try to delete important values!');
+          }
         }
-      }
+      },
+
+      // Перебор всех ячеек
+      cells(row, col) {
+        if (row === 0 || this.hasOwnProperty('readOnly')) return; // Первую строку пропускаем
+        const cell = this.instance.getDataAtCell(row, col), res = {readOnly: false};
+
+        if (!cell) return res;
+
+        res.readOnly = /^(c_|d_)/i.test(cell);
+        if (cell === '+' || cell === '-') {
+          res.type = 'checkbox';
+          res.checkedTemplate = '+';
+          res.uncheckedTemplate = '-';
+        }
+        else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
+
+        return res;
+      },
+    })(),
+
+  contextDb: {
+    contextMenu: {
+      items: {
+        "row_above" : {name: 'Добавить строку выше'},
+        "row_below" : {name: 'Добавить строку ниже'},
+        "hsep1"     : "---------",
+        "remove_row": {name: 'Удалить строку'},
+        "hsep3"     : "---------",
+        "undo"      : {name: 'Отменить'},
+        "redo"      : {name: 'Вернуть'},
+      },
     },
-
-    // Перебор всех ячеек
-    cells(row, col) {
-      if (row === 0 || this.hasOwnProperty('readOnly')) return; // Первую строку пропускаем
-      const cell = this.instance.getDataAtCell(row, col), res = {readOnly: false};
-
-      if (!cell) return res;
-
-      res.readOnly = /^(c_|d_)/i.test(cell);
-      if (cell === '+' || cell === '-') {
-        res.type = 'checkbox';
-        res.checkedTemplate = '+';
-        res.uncheckedTemplate = '-';
-      }
-      else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
-
-      return res;
-    },
-  }),
-
-  context: {
+  },
+  contextCsv: {
     contextMenu: {
       items: {
         "row_above" : {name: 'Добавить строку выше'},

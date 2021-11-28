@@ -16,6 +16,7 @@ import {FullCalendar} from './fullCalendar.js';
 
 const component = {
   default: {
+    height: window.innerHeight * 0.9,
     initialView  : 'dayGridMonth', // Вид по умолчанию dayGridMonth timeGridWeek timeGridDay
     firstDay     : 1, // Первый день в календаре 0 воскр 1 понедельник...
     slotMinTime: '0:00:00',

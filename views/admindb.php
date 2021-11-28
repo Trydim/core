@@ -28,9 +28,8 @@ $field['content'] = <<<main
     <h2 id="tableNameField"></h2>
   </div>
   <div id="btnField">
-    <input type="button" class="btn btn-primary d-none" value="Добавить" id="btnAddMore">
-    <input type="button" class="btn btn-primary" value="Сохранить" id="btnSave" disabled>
-    <input type="button" class="btn btn-primary d-none" value="Обновить Конфиг" id="btnRefresh">
+    <button type="button" class="btn btn-primary" id="btnSave" disabled>Сохранить</button>
+    <button type="button" class="btn btn-primary d-none" id="btnRefresh">Обновить Конфиг</button>
   </div>
   <div id="viewField" class="d-flex">
     <div class="form-check">
@@ -94,19 +93,8 @@ $legendHtml
 <template id="tablesListTmp">
   <li><label><input type="radio" name="tablesList" value="\${name}">\${name}</label></li>
 </template>
-<template id="columnsList">
-  <table id="tableTempName">
-    <thead>
-    <tr id="columnName">
-      <th class="text-center">\${columnName} - \${type} (\${key}\${null})</th>
-    </tr>
-    </thead>
-    <tbody id="columnValue">
-    <tr>
-      <td><input type="text" name="col_\${columnName}[]" data-column="\${columnName}" value="\${\${columnName}}"></td>
-    </tr>
-    </tbody>
-  </table>
+<template id="columnName">
+  <p>\${columnName} - \${type} (\${key} Null-\${null})</p>
 </template>
 <template id="emptyTable">
   <p>Таблица пустая</p>
