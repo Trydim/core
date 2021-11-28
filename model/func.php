@@ -23,28 +23,36 @@ function addCpNumber($number, $reportVal) {
 }
 
 /**
- * Check have error
- * @param $var
+ * Check if there is an error
+ * Deep search for all error messages and return as an array
+ * @param array $result
  *
- * @return bool - true if error no
+ * @return array - ['...', '...']
  */
-function checkError($var) {
-  if (is_array($var)) {
-    foreach ($var as $item) {
-      $error = checkError($item);
-      if (!$error) return false;
+function checkError(array $result): array {
+  $error = [];
+  $findError = function ($findError, $var) use (&$error) {
+    if (is_array($var)) {
+      if (isset($var['error'])) {
+        if (empty($var['error'])) unset($var['error']);
+        else $error[] = $var['error'];
+      }
+
+      foreach ($var as $item) {
+        $findError($findError, $item);
+      }
     }
-    return true;
-  }
-  return empty($var);
+  };
+
+  $findError($findError, $result);
+  return $error;
 }
 
 /**
- *
  * @param $target
  * @return string
  */
-function checkAccess($target) {
+function checkAccess($target): string {
   if (PUBLIC_PAGE && in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
   global $main;
   if (in_array($target, $main->getSideMenu())) return $target;
@@ -57,7 +65,7 @@ function checkAccess($target) {
  * @param $status - auth status
  * @param string $target
  */
-function reDirect($status, $target = '') {
+function reDirect($status, string $target = '') {
   if (!$target) {
     if ($status) $target = HOME_PAGE;
     else {
@@ -77,7 +85,7 @@ function reDirect($status, $target = '') {
  *
  * @return string path to file name
  */
-function checkTemplate($tmpFile) {
+function checkTemplate($tmpFile): string {
   if ($tmpFile === 'public' && PUBLIC_PAGE
       && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . ".php")) {
     return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
@@ -93,7 +101,7 @@ function checkTemplate($tmpFile) {
 /**
  * @param $get
  *
- * @return mixed|string
+ * @return array|string|string[]
  */
 function getTargetPage($get) {
   return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage'])

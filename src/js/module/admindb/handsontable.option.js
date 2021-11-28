@@ -6,7 +6,7 @@ const removeSlashes = value => value.replaceAll('\\n', '\n').replaceAll('\\r', '
 const changeRowCol = that => !that.tableChanged && (that.tableChanged = true) && that.admindb.enableBtnSave();
 
 export const handson = {
-  option: Object.assign({
+  optionCommon: {
     rowHeaders        : true,
     colHeaders        : true, //filters   : true,
     columnSorting     : false,
@@ -36,15 +36,28 @@ export const handson = {
     afterRemoveCol() { changeRowCol(this) },
     afterRemoveRow() { changeRowCol(this) },
   },
-  f.CSV_DEVELOP ?
+
+
+  optionDb: (() => f.CSV_DEVELOP
   /**
-   * Настройки для разработки
-   * */
-  {} :
+   * Настройки DataBase для разработки
+   */
+  ? {}
   /**
-   * Продакшн настройки
+   * Настройки DataBase продакшн
    * */
-  {
+  : {})(),
+
+
+  optionCsv: (() => f.CSV_DEVELOP
+  /**
+   * Настройки СSV для разработки
+   */
+  ? {}
+  /**
+   * Настройки СSV продакшн
+   */
+  : {
     hiddenRows: {rows: [0]}, // Не показывать заголовок
 
     beforeRemoveCol(ind, count, columns) {
@@ -83,9 +96,22 @@ export const handson = {
 
       return res;
     },
-  }),
+  })(),
 
-  context: {
+  contextDb: {
+    contextMenu: {
+      items: {
+        "row_above" : {name: 'Добавить строку выше'},
+        "row_below" : {name: 'Добавить строку ниже'},
+        "hsep1"     : "---------",
+        "remove_row": {name: 'Удалить строку'},
+        "hsep3"     : "---------",
+        "undo"      : {name: 'Отменить'},
+        "redo"      : {name: 'Вернуть'},
+      },
+    },
+  },
+  contextCsv: {
     contextMenu: {
       items: {
         "row_above" : {name: 'Добавить строку выше'},
