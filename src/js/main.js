@@ -17,11 +17,6 @@ const importModuleFunc = async moduleName => {
   } catch (e) { console.error(e); f.showMsg(e, 'error', false); return false; }
 }
 
-//Index.php page
-const initIndex = () => {
-  //f.init('');
-}
-
 const init = (moduleName = 'default') => {
   let module = importModuleFunc(moduleName);
   if (!module) initIndex();
@@ -56,6 +51,33 @@ const cancelFormSubmit = () => {
   });
 }
 
+const dictionaryInit = () => {
+  const d = Object.create(null),
+        node = f.qS('#dictionaryData');
+
+  if (!node) return;
+  d.data = JSON.parse(node.value);
+  node.remove();
+
+  d.getTitle = key => d.data[key] || key;
+
+  /**
+   * Template string can be param (%1, %2)
+   * @param key - array, first item must be string
+   * @returns {*}
+   */
+  d.translate = (...key) => {
+    if (key.length === 1) return d.getTitle(key[0]);
+
+    let str = d.getTitle(key[0]);
+    for (let i = 1; i< key.length; i++) {
+      key[i] && (str = str.replace(`%${i}`, key[i]));
+    }
+    return str;
+  };
+  window._ = d.translate;
+}
+
 const stopPreloader = () => {
   f.gI('preloader').remove();
   f.gI('mainWrapper').classList.add('show');
@@ -72,22 +94,21 @@ const setParentHeight = (target, height) => {
 // Event function
 // ---------------------------------------------------------------------------------------------------------------------
 
-const authEvent = function(e) {
-  let target = e.target,
-      action = this.getAttribute('data-action');
+const cmsEvent = e => {
+  let action = this.getAttribute('data-action');
 
   let select = {
     'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
     }
-  }
+  };
 
-  select[action]();
+  select[action] && select[action]();
 };
 
 const sideMenuExpanded = (e, node) => {
   e.preventDefault();
-  if( node.getAttribute('aria-expanded') === 'true'){
+  if (node.getAttribute('aria-expanded') === 'true') {
     node.setAttribute('aria-expanded', 'false');
     f.hide(node.nextElementSibling);
   } else {
@@ -99,17 +120,16 @@ const sideMenuExpanded = (e, node) => {
 // Event bind
 // -------------------------------------------------------------------------------------------------------------------
 
-// Block Authorization
-const onAuthEvent = () => {
+const onEvent = () => {
+  // Block Authorization
   let node = f.gI(f.ID.AUTH_BLOCK);
   node && node.querySelectorAll('[data-action]')
-              .forEach(n => n.addEventListener('click', authEvent));
-}
+              .forEach(n => n.addEventListener('click', cmsEvent));
 
-const onClickSubmenu = () => {
+  if (node) return;
+  // Menu Action
   f.qA('#sideMenu a[href^="#"]').forEach(n =>
-    n.addEventListener('click', (e) => sideMenuExpanded(e, n))
-  );
+    n.addEventListener('click', (e) => sideMenuExpanded(e, n)));
 }
 
 // Entrance function
@@ -119,13 +139,11 @@ const onClickSubmenu = () => {
 
   if (f.gI('authForm')) return;
   cancelFormSubmit();
-  onAuthEvent();
-  onClickSubmenu();
-  f.dictionaryInit();
+  dictionaryInit();
+  onEvent();
 
   setLinkMenu(page || '/');
-  if(page) init(page);
-  else initIndex();
+  page && init(page);
 
   setTimeout(() => { // todo разобраться с синхронизацией
     f.initShadow(); // todo убрать отсюда
