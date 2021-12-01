@@ -56,8 +56,8 @@ function checkAccess($target): string {
   if (PUBLIC_PAGE && in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
   global $main;
   if (in_array($target, $main->getSideMenu())) return $target;
-  if ($main->checkStatus('no')) return 'login';
-  else reDirect(false, $main->getSideMenu(true));
+  if ($main->checkStatus('no') || $main->checkStatus('error')) return 'login';
+  reDirect(false, $main->getSideMenu(true));
   die;
 }
 

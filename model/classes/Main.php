@@ -43,7 +43,11 @@ trait Authorization {
     return $this->$field;
   }
 
-  public function setLogin($session): Main {
+  /**
+   * @param array $session
+   * @return $this|Main
+   */
+  public function setLogin(array $session): Main {
     $this->login = $session['login'];
     $this->name  = $session['name'];
     $this->id    = $session['priority'];
@@ -60,15 +64,21 @@ trait Authorization {
     return $this->status === $status;
   }
 
-  public function setLoginStatus($status): Main {
+  /**
+   * @param string $status
+   * @return $this|Main
+   */
+  public function setLoginStatus(string $status): Main {
     $this->status = $status;
     return $this;
   }
 
   /**
    * Проверка пароля
+   * @param string $target
+   * @return $this|Main
    */
-  public function checkAuth($target = ''): Main {
+  public function checkAuth(string $target = ''): Main {
     $this->setLoginStatus('no');
     session_start();
 
@@ -91,8 +101,10 @@ trait Authorization {
   }
 
   /**
-   * Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт или
-   * нет регистрации и целевая страница не открыта
+   *   Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт
+   * или нет регистрации и целевая страница не открыта
+   * @param string $target
+   * @return $this|Main
    */
   public function applyAuth($target = ''): Main {
 
@@ -101,7 +113,7 @@ trait Authorization {
       //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
       $_SESSION['target'] = $target;
       reDirect(false);
-    } else if ($target === 'login') $pageTarget = $_SESSION['target'] ?? '';
+    } else if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
 
     session_abort();
     return $this;
