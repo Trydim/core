@@ -19,6 +19,7 @@ const CORE_CSS = SITE_PATH . CORE . 'assets/css/';
 const CORE_SCRIPT = SITE_PATH . CORE . 'assets/js/';
 
 const SETTINGS_PATH = ABS_SITE_PATH . 'shared/settingSave.json';
+const CSV_CACHE_FILE = ABS_SITE_PATH . 'shared/csvCache.bin';
 const SYSTEM_PATH = ABS_SITE_PATH . 'shared/system.php';
 
 !$publicConfig['PUBLIC_PAGE'] && define('ONLY_LOGIN', true);

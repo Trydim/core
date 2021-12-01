@@ -198,6 +198,63 @@ trait Dictionary {
   }
 }
 
+/** Trait Cache */
+trait Cache {
+
+  private $updateTime = 1209600; // 2 Недели.
+  /**
+   * @var array
+   */
+  private $cvsVars = ['all'];
+  /**
+   * @var bool
+   */
+  private $needCsvCached = false;
+
+  private function checkEditTime() {
+    $this->needCsvCached = time() - filemtime(CSV_CACHE_FILE) > $this->updateTime;
+  }
+
+  public function setCsvVariable(array $vars) {
+    $this->cvsVars = $vars;
+    return $this;
+  }
+
+  /**
+   * @param mixed ...$vars
+   * @return bool if loaded, then return true
+   */
+  public function loadCsvCache(&...$vars) {
+    if (file_exists(CSV_CACHE_FILE)) {
+      $this->checkEditTime();
+
+      if (!$this->needCsvCached) {
+        $data = json_decode(gzuncompress(file_get_contents(CSV_CACHE_FILE)), true);
+        $this->setCsvVariable(array_keys($data));
+        foreach (array_values($data) as $index => $var) {
+          $vars[$index] = $var;
+        }
+        return true;
+      }
+    } else {
+      $this->needCsvCached = true;
+    }
+    return false;
+  }
+
+  public function saveCsvCache(...$vars) {
+    if (file_exists(CSV_CACHE_FILE)) {
+      $this->checkEditTime();
+
+    } else {
+      $data = [];
+      foreach ($this->cvsVars as $index => $key) $data[$key] = $vars[$index];
+      file_put_contents(CSV_CACHE_FILE, gzcompress(json_encode($data), 1));
+    }
+  }
+
+}
+
 /**
  * Trait hooks
  * @package cms
@@ -234,6 +291,7 @@ trait Hooks {
 final class Main {
   use Authorization;
   use Dictionary;
+  use Cache;
   use Hooks;
 
   /**

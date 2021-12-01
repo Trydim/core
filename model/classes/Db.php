@@ -1166,6 +1166,7 @@ trait MainCsv {
       }
 
       file_put_contents(PATH_CSV . $this->csvTable, $fileStrings);
+      unlink(CSV_CACHE_FILE);
     }
     return $this;
   }

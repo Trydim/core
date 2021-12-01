@@ -230,7 +230,10 @@ function loadCVS($dict, $filename, $one_rang = false) {
             if (is_array($item)) {
               $arr[$key] = trim(iconv($inCharset, 'UTF-8', $data[$item[0]]));
               $arr[$key] = convert($item[1], $arr[$key]);
-            } else $arr[$key] = trim(iconv($inCharset, 'UTF-8', $data[$item]));
+            } else {
+              $value = trim(iconv($inCharset, 'UTF-8', $data[$item]));
+              $arr[$key] = preg_replace('/^d_/', '', $value);
+            }
           }
           return $arr;
         };
