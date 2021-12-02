@@ -395,14 +395,16 @@ final class Main {
   }
 
   /**
-   * @param bool   $inline
    * @param string $dataId
+   * @param bool   $justRate
    * @return string
    * @default $dataId = 'dataRate'
+   * @default $justRate = false
    */
-  public function getCourse(bool $inline = true, string $dataId = 'dataRate'): string {
+  public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
     require_once CORE . 'model/classes/Course.php';
     $rate = new Course($this->db);
+    $rate = $justRate ? array_map(function ($rate) { return $rate['rate'];}, $rate->rate) : $rate->rate;
     $rate = json_encode($rate);
     return "<input type='hidden' id='$dataId' value='$rate'>";
   }
