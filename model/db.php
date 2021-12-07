@@ -135,8 +135,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (isset($reportVal)) {
         $db->setCurrentUserId();
 
-        $customerId = isset($customerId) ? $customerId : '0';
-        $changeUser = isset($customerChange) ? $customerChange : false; // false/add/change
+        $customerId = $customerId ?? '0';
+        $changeUser = $customerChange ?? 'add'; // false/add/change
 
         if ($changeUser && isset($name)) {
           $contacts = [];
@@ -154,9 +154,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $changeUser === 'add' && $customerId = $db->getLastID('customers');
         }
 
-        $orderId = isset($orderId) ? $orderId : false;
+        $orderId = $orderId ?? false;
         $newOrder = !$orderId || !is_numeric($orderId);
-        $orderId = $newOrder ? ((int)$db->getLastID('orders')) + 1 : $orderId;
+        $orderId = $newOrder ? intval($db->getLastID('orders')) + 1 : $orderId;
 
         $param = [$orderId => []];
         $param[$orderId]['customer_id'] = $customerId;
@@ -172,8 +172,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         // status_id = ; по умолчанию сохранять из настроек
         //$db->saveOrder($param, $orderId);
         $result['customerId'] = $customerId;
-        $result['orderId'] = $orderId;
-        $result['saveDate'] = date('Y-m-d H:i:s');
+        $result['orderId']    = $orderId;
+        $result['saveDate']   = date('Y-m-d H:i:s');
       }
       break;
     case 'loadOrders':
