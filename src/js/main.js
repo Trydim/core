@@ -126,7 +126,6 @@ const onEvent = () => {
   node && node.querySelectorAll('[data-action]')
               .forEach(n => n.addEventListener('click', cmsEvent));
 
-  if (node) return;
   // Menu Action
   f.qA('#sideMenu a[href^="#"]').forEach(n =>
     n.addEventListener('click', (e) => sideMenuExpanded(e, n)));
