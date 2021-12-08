@@ -10,8 +10,8 @@ module.exports = env => {
   //process.env.NODE_ENV = dev ? 'development' : 'production'; // зачем это
 
   return {
-    mode        : dev ? 'development' : 'production',
-    watch       : dev, // слежка за изменениями файлов
+    mode : dev ? 'development' : 'production',
+    watch: dev, // слежка за изменениями файлов
     watchOptions: {aggregateTimeout: 300}, // задержка оценки изменений в мс
     entry       : {
       main: './js/main.js',
@@ -153,8 +153,8 @@ const getCssRules = () => ({
  * @returns Object
  */
 const getImageRules = () => ({
-  test   : /\.(png|jpe?g|gif|webp)$/i,
-  type   : 'asset',
+  test: /\.(png|jpe?g|gif|webp)$/i,
+  type: 'asset',
   generator: {
     filename: 'image/[name][ext]',
     publicPath: generator.publicPath,
@@ -190,8 +190,8 @@ const getSVGRules = () => ({
  * @returns Object
  */
 const getFontsRules = () => ({
-  test   : /\.(ttf|woff|woff2|eot)$/,
-  type   : "asset/resource",
+  test: /\.(ttf|woff|woff2|eot)$/,
+  type: "asset/resource",
   generator: {
     filename: 'fonts/[name][ext]',
     publicPath: '../',

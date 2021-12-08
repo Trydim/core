@@ -23,48 +23,48 @@ module.exports = env => {
   //process.env.NODE_ENV = dev ? 'development' : 'production'; // зачем это
 
   return {
-  mode: dev ? 'development' : 'production',
-    watch       : dev, // слежка за изменениями файлов
-  watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
+    mode: dev ? 'development' : 'production',
+    watch: dev, // слежка за изменениями файлов
+    watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
     entry,
 
-  experiments: {
-    outputModule: true,
-  },
-
-  output: {
-    path    : path.resolve(__dirname, '../../assets/'),
-    filename: 'js/module/[name]/[name].js',
-    library: {
-      type: 'module',
+    experiments: {
+      outputModule: true,
     },
-    scriptType: 'module',
-    module: true,
-    libraryTarget: 'module',
-  },
 
-  resolve: {
-    alias: {
-        vue: dev ? 'vue/dist/vue.esm-bundler.js' : 'vue/dist/vue.esm-browser.prod.js',
-    }
-  },
+    output: {
+      path    : path.resolve(__dirname, '../../assets/'),
+      filename: 'js/module/[name]/[name].js',
+      library: {
+        type: 'module',
+      },
+      scriptType: 'module',
+      module: true,
+      libraryTarget: 'module',
+    },
 
-  devtool: dev ? 'source-map' : false, //source mapping
-  optimization: {
-    minimize: !dev,
-    minimizer: [
+    resolve: {
+      alias: {
+          vue: dev ? 'vue/dist/vue.esm-bundler.js' : 'vue/dist/vue.esm-browser.prod.js',
+      }
+    },
+
+    devtool: dev ? 'source-map' : false, //source mapping
+    optimization: {
+      minimize: !dev,
+      minimizer: [
         /*new TerserPlugin({
           extractComments: false // Убрать комментарии
         }),*/
         `...`,
         /*new CssMinimizerPlugin({
           minimizerOptions: {
-          preset: [
-            "default",
-            {discardComments: { removeAll: true }},
-    ],
-  },
-          }),*/
+            preset: [
+              "default",
+              {discardComments: { removeAll: true }},
+            ],
+          },
+        }),*/
       ],
       /*
       splitChunks: {
@@ -81,35 +81,35 @@ module.exports = env => {
       },
       },*/
     },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: "css/module/[name]/[name].css",
-    }),
-    //new VueLoaderPlugin(),
+    plugins: [
+      new MiniCssExtractPlugin({
+        filename: "css/module/[name]/[name].css",
+      }),
+      //new VueLoaderPlugin(),
 
-    /*new HtmlWebpackPlugin({
-      title: 'yrdy',
-      filename: 'view/content.php',
-      template: `content.php`,
-    }),*/
+      /*new HtmlWebpackPlugin({
+        title: 'yrdy',
+        filename: 'view/content.php',
+        template: `content.php`,
+      }),*/
 
-    new webpack.DefinePlugin({
-      // Drop Options API from bundle
-        __VUE_OPTIONS_API__  : 'true',
-        __VUE_PROD_DEVTOOLS__: 'false',
-    }),
-  ],
+      new webpack.DefinePlugin({
+        // Drop Options API from bundle
+          __VUE_OPTIONS_API__  : 'true',
+          __VUE_PROD_DEVTOOLS__: 'false',
+      }),
+    ],
 
-  module: {
-    //noParse: /canvasjs\.min/,
-    rules: [
+    module: {
+      //noParse: /canvasjs\.min/,
+      rules: [
         getVueRules(),
         getScssRules(),
         getCssRules(),
         getImageRules(),
         getSVGRules(),
         getFontsRules(),
-      ]
+      ],
     },
   };
 };
@@ -132,8 +132,8 @@ const generator = {
  * @returns Object
  */
 const getVueRules = () => ({
-        test: /\.vue$/,
-        loader: "vue-loader"
+  test: /\.vue$/,
+  loader: "vue-loader"
 });
 
 /**
@@ -141,12 +141,12 @@ const getVueRules = () => ({
  * @returns Object
  */
 const getScssRules = () => ({
-        test: /\.s[ac]ss$/i,
-        use: [
+  test: /\.s[ac]ss$/i,
+  use: [
     MiniCssExtractPlugin.loader,
-          'css-loader',
-          'sass-loader',
-        ],
+    'css-loader',
+    'sass-loader',
+  ],
 });
 
 /**
@@ -154,11 +154,11 @@ const getScssRules = () => ({
  * @returns Object
  */
 const getCssRules = () => ({
-        test: /\.css$/i,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-        ],
+  test: /\.css$/i,
+  use: [
+    MiniCssExtractPlugin.loader,
+    'css-loader',
+  ],
 });
 
 /**
@@ -167,8 +167,8 @@ const getCssRules = () => ({
  * @returns Object
  */
 const getImageRules = () => ({
-        test: /\.(png|jpe?g|gif|webp)$/i,
-  type   : 'asset',
+  test: /\.(png|jpe?g|gif|webp)$/i,
+  type: 'asset',
   generator: {
     filename: 'image/[name][ext]',
     publicPath: generator.publicPath,
@@ -177,7 +177,7 @@ const getImageRules = () => ({
     dataUrlCondition: {
       maxSize: 8196, // 8kb
     }
-        },
+  },
 });
 
 /**
@@ -191,7 +191,7 @@ const getSVGRules = () => ({
   generator: {
     filename: 'svg/[name][ext]',
     publicPath: generator.publicPath,
-      },
+  },
   parser: {
     dataUrlCondition: {
       maxSize: 8196, // 8kb
@@ -204,8 +204,8 @@ const getSVGRules = () => ({
  * @returns Object
  */
 const getFontsRules = () => ({
-  test   : /\.(ttf|woff|woff2|eot)$/,
-  type   : "asset/resource",
+  test: /\.(ttf|woff|woff2|eot)$/,
+  type: "asset/resource",
   generator: {
     filename: 'fonts/[name][ext]',
     publicPath: '../',
