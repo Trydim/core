@@ -1,6 +1,7 @@
 "use strict";
 
 import '../../../css/module/admindb/handsontable.full.min.css';
+import mustache from 'mustache';
 
 import {Handsontable} from "./handsontable.full.min";
 import {handson} from "./handsontable.option";

@@ -51,7 +51,7 @@ menu;
 ?>
 <aside id="sideLeft" class="sidebar"> <!-- data-background-color="white"-->
   <div class="position-sticky top-0">
-    <ul class="sidebar-menu show" id="sidebarMenu">
+    <ul class="sidebar-menu show" id="sideMenu">
       <li class="nav-label">Main Menu</li>
       <?php if (PUBLIC_PAGE) { ?>
         <li>

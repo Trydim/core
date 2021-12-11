@@ -66,7 +66,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 </div>
 
 <?php if(!isset($global)) { ?>
-  <main class="main-wrapper mx-auto menu-toggle" id="mainWrapper">
+  <main class="main-wrapper mx-auto" id="mainWrapper">
     <div class="nav-header">
       <a href="<?= SITE_PATH ?>" class="brand-logo">
         <img class="logo-abbr" src="./images/logo.png" alt="">

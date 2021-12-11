@@ -64,7 +64,7 @@ export const handson = {
         for (const cIndex of columns) {
           const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
           if (important) {
-            f.showMsg('Ключевые значения нельзя удалить');
+            f.showMsg('Ключевые значения нельзя удалить', 'error');
             throw new Error('try to delete important values!');
           }
         }
@@ -73,7 +73,7 @@ export const handson = {
         for (const rIndex of rows) {
           const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
           if (important) {
-            f.showMsg('Ключевые значения нельзя удалить');
+            f.showMsg('Ключевые значения нельзя удалить', 'error');
             throw new Error('try to delete important values!');
           }
         }

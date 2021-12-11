@@ -100,6 +100,7 @@ module.exports = env => {
       }),
     ],
     module: {
+      //noParse: /canvasjs\.min/,
       rules: [
         getVueRules(),
         getScssRules(),
@@ -107,7 +108,7 @@ module.exports = env => {
         getImageRules(),
         getSVGRules(),
         getFontsRules(),
-      ]
+      ],
     },
   };
 };

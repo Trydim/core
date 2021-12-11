@@ -30,7 +30,7 @@ export const Modal = (param = {}) => {
     node && param && Object.entries(param).forEach(([k, v]) => {node[k] = v});
   }
   modal.onEvent = function () {
-    let func = function (e) {
+    const func = e => {
       if (e.key === 'Escape') {
         modal.hide();
         document.removeEventListener('keyup', func);
@@ -75,13 +75,10 @@ export const Modal = (param = {}) => {
 
     setTimeout( () => {
       this.wrap.style.display = 'none';
-      document.body.style.overflow = data.bodyOver || 'initial';
-      document.body.style.cssText = 'scroll-behavior: initial';
+      document.body.style.overflow = this.bodyOver || 'initial';
       window.scrollTo(0, data.scrollY);
-      document.body.style.cssText = '';
-      //document.body.style.scrollBehavior = 'smooth';
-      if (document.body.scrollHeight > window.innerHeight)
-        document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
+      if (document.body.style.paddingRight === '16px')
+        this.bodyPaddingRight && (document.body.style.paddingRight = 'initial');
     }, 300);
     //c.eraseNode(modal.content);
   }
@@ -111,7 +108,6 @@ export const Modal = (param = {}) => {
     btnY && (this.btnConfirm = btnY);
     btnN && (this.btnCancel = btnN);
 
-    //document.head.insertAdjacentHTML('beforeend', `<link rel="stylesheet" href="${c.SITE_PATH}core/assets/css/libs/modal.css">`);
     document.body.append(node.children[0]);
   }
 

@@ -17,11 +17,6 @@ const importModuleFunc = async moduleName => {
   } catch (e) { console.error(e); f.showMsg(e, 'error', false); return false; }
 }
 
-//Index.php page
-const initIndex = () => {
-  //f.init('');
-}
-
 const init = (moduleName = 'default') => {
   let module = importModuleFunc(moduleName);
   if (!module) initIndex();
@@ -30,7 +25,7 @@ const init = (moduleName = 'default') => {
 }
 
 const setLinkMenu = page => {
-  let menu = f.qS('#sidebarMenu');
+  let menu = f.qS('#sideMenu');
   if (!menu) return;
 
   let target = menu.querySelector('.active');
@@ -54,6 +49,33 @@ const cancelFormSubmit = () => {
       return false;
     }
   });
+}
+
+const dictionaryInit = () => {
+  const d = Object.create(null),
+        node = f.qS('#dictionaryData');
+
+  if (!node) return;
+  d.data = JSON.parse(node.value);
+  node.remove();
+
+  d.getTitle = key => d.data[key] || key;
+
+  /**
+   * Template string can be param (%1, %2)
+   * @param key - array, first item must be string
+   * @returns {*}
+   */
+  d.translate = (...key) => {
+    if (key.length === 1) return d.getTitle(key[0]);
+
+    let str = d.getTitle(key[0]);
+    for (let i = 1; i< key.length; i++) {
+      key[i] && (str = str.replace(`%${i}`, key[i]));
+    }
+    return str;
+  };
+  window._ = d.translate;
 }
 
 const stopPreloader = () => {
@@ -82,7 +104,7 @@ const cmsEvent = function() {
     },
     'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
-    }
+    },
   };
 
   select[action] && select[action]();
@@ -118,17 +140,15 @@ const sideMenuExpanded = (e, node) => {
 // Event bind
 // -------------------------------------------------------------------------------------------------------------------
 
-const onBind = () => {
+const onEvent = () => {
   // Block Authorization
   let node = f.gI(f.ID.AUTH_BLOCK);
   node && node.querySelectorAll('[data-action]')
               .forEach(n => n.addEventListener('click', cmsEvent));
 
-  if (node) return;
   // Menu Action
-  f.qA('#sidebarMenu [role="button"]').forEach(n =>
-    n.addEventListener('click', e => sideMenuExpanded(e, n))
-  );
+  f.qA('#sideMenu [role="button"]').forEach(n =>
+    n.addEventListener('click', e => sideMenuExpanded(e, n)));
 
   node = f.qS('[data-action="menuToggle"]');
   node && node.addEventListener('click', cmsEvent);
@@ -141,12 +161,11 @@ const onBind = () => {
 
   if (f.gI('authForm')) return;
   cancelFormSubmit();
-  onBind();
-  f.dictionaryInit();
+  dictionaryInit();
+  onEvent();
 
   setLinkMenu(page || '/');
-  if(page) init(page);
-  else initIndex();
+  page && init(page);
 
   stopPreloader();
 

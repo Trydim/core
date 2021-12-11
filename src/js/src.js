@@ -12,6 +12,7 @@ import {CustomSelect} from './components/CustomSelect.js';
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
 import {Valid} from "./components/Valid";
+import {searching} from "./components/SearchCustomers";
 
 const m = {
   /**
@@ -26,7 +27,10 @@ const m = {
 
   observer: new module.Observer(),
 
-  searchInit: module.Searching,
+  /**
+   *
+   */
+  searchInit: searching,
 
   /**
    *

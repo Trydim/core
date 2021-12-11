@@ -1,8 +1,9 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $wrongPass
- * @var $login
+ * @var boolean $wrongPass - from controller
+ * @var string $login - from Request
+ * @var string $pass - from Request
  */
 
 !isset($pageTarget) && $pageTarget = '';

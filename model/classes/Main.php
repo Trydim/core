@@ -43,7 +43,11 @@ trait Authorization {
     return $this->$field;
   }
 
-  public function setLogin($session): Main {
+  /**
+   * @param array $session
+   * @return $this|Main
+   */
+  public function setLogin(array $session): Main {
     $this->login = $session['login'];
     $this->name  = $session['name'];
     $this->id    = $session['priority'];
@@ -60,15 +64,21 @@ trait Authorization {
     return $this->status === $status;
   }
 
-  public function setLoginStatus($status): Main {
+  /**
+   * @param string $status
+   * @return $this|Main
+   */
+  public function setLoginStatus(string $status): Main {
     $this->status = $status;
     return $this;
   }
 
   /**
    * Проверка пароля
+   * @param string $target
+   * @return $this|Main
    */
-  public function checkAuth($target = ''): Main {
+  public function checkAuth(string $target = ''): Main {
     $this->setLoginStatus('no');
     session_start();
 
@@ -91,17 +101,19 @@ trait Authorization {
   }
 
   /**
-   * Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт или
-   * нет регистрации и целевая страница не открыта
+   *   Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт
+   * или нет регистрации и целевая страница не открыта
+   * @param string $target
+   * @return $this|Main
    */
-  public function applyAuth($target = ''): Main {
+  public function applyAuth(string $target = ''): Main {
 
     if ($this->checkStatus('no') && $target !== 'login'
         && (ONLY_LOGIN || (PUBLIC_PAGE && $target !== 'public'))) {
       //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
       $_SESSION['target'] = $target;
       reDirect(false);
-    } else if ($target === 'login') $pageTarget = $_SESSION['target'] ?? '';
+    } else if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
 
     session_abort();
     return $this;
@@ -186,6 +198,63 @@ trait Dictionary {
   }
 }
 
+/** Trait Cache */
+trait Cache {
+
+  private $updateTime = 1209600; // 2 Недели.
+  /**
+   * @var array
+   */
+  private $cvsVars = ['all'];
+  /**
+   * @var bool
+   */
+  private $needCsvCached = false;
+
+  private function checkEditTime() {
+    $this->needCsvCached = time() - filemtime(CSV_CACHE_FILE) > $this->updateTime;
+  }
+
+  public function setCsvVariable(array $vars) {
+    $this->cvsVars = $vars;
+    return $this;
+  }
+
+  /**
+   * @param mixed ...$vars
+   * @return bool if loaded, then return true
+   */
+  public function loadCsvCache(&...$vars) {
+    if (file_exists(CSV_CACHE_FILE)) {
+      $this->checkEditTime();
+
+      if (!$this->needCsvCached) {
+        $data = json_decode(gzuncompress(file_get_contents(CSV_CACHE_FILE)), true);
+        $this->setCsvVariable(array_keys($data));
+        foreach (array_values($data) as $index => $var) {
+          $vars[$index] = $var;
+        }
+        return true;
+      }
+    } else {
+      $this->needCsvCached = true;
+    }
+    return false;
+  }
+
+  public function saveCsvCache(...$vars) {
+    if (file_exists(CSV_CACHE_FILE)) {
+      $this->checkEditTime();
+
+    } else {
+      $data = [];
+      foreach ($this->cvsVars as $index => $key) $data[$key] = $vars[$index];
+      file_put_contents(CSV_CACHE_FILE, gzcompress(json_encode($data), 1));
+    }
+  }
+
+}
+
 /**
  * Trait hooks
  * @package cms
@@ -222,6 +291,7 @@ trait Hooks {
 final class Main {
   use Authorization;
   use Dictionary;
+  use Cache;
   use Hooks;
 
   /**
@@ -325,14 +395,16 @@ final class Main {
   }
 
   /**
-   * @param bool   $inline
    * @param string $dataId
+   * @param bool   $justRate
    * @return string
    * @default $dataId = 'dataRate'
+   * @default $justRate = false
    */
-  public function getCourse(bool $inline = true, string $dataId = 'dataRate'): string {
+  public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
     require_once CORE . 'model/classes/Course.php';
     $rate = new Course($this->db);
+    $rate = $justRate ? array_map(function ($rate) { return $rate['rate'];}, $rate->rate) : $rate->rate;
     $rate = json_encode($rate);
     return "<input type='hidden' id='$dataId' value='$rate'>";
   }

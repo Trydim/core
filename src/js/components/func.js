@@ -9,6 +9,14 @@ const func = {
   log: msg => c.DEBUG && console.log('Error:' + msg),
 
   /**
+   * @param {string|HTMLElement} htmlOrTemplate
+   * @return {Node}
+   */
+  createElement: htmlOrTemplate => typeof htmlOrTemplate === 'string'
+      ? document.createRange().createContextualFragment(htmlOrTemplate).firstElementChild
+      : htmlOrTemplate['content'].firstElementChild.cloneNode(true),
+
+  /**
    * Get Element by id from document or shadow DOM
    * @param id
    * @return {HTMLElement | {}}
@@ -50,7 +58,7 @@ const func = {
    * @param selector {string}
    * @return {string}
    */
-  gT: selector => { let node = func.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + id},
+  gT: selector => { let node = func.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + selector},
 
   /**
    * Получить Node шаблона
@@ -94,14 +102,6 @@ const func = {
   getDataAsMap: selector => new Map(Object.entries(func.getDataAsAssoc(selector) || {})),
   getDataAsSet: selector => new Set(Object.values(func.getData(selector) || [])),
   getDataAsArray : selector => Object.values(func.getData(selector) || []),
-
-  // перевод в число
-  toNumber: input => +(input.replace(/(\s|\D)/g, '')),
-
-  /**
-   * Формат цифр (разделение пробелом)
-   */
-  setFormat: num => (num.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g, " "),
 
   /** Показать элементы, аргументы коллекции NodeList */
   show: (...collection) => { collection.map(nodes => {
@@ -428,74 +428,66 @@ const func = {
   },
 
   /**
-   * Словарь
+   * Курсы валют (РФ/РБ)
+   * @param dataSelector
+   *
+   * @return {void}
    */
-  dictionaryInit() {
-    const d = Object.create(null),
-          node = f.qS('#dictionaryData');
-
-    if (!node) return;
-    d.data = JSON.parse(node.value);
-    node.remove();
-
-    d.getTitle = function (key) { return this.data[key] || key; }
-
-    /**
-     * Template string can be param (%1, %2)
-     * @param key - array, first item must be string
-     * @returns {*}
-     * @private
-     */
-    d.translate = function (...key) {
-      if(key.length === 1) return d.getTitle(key[0]);
-      else {
-        let str = d.getTitle(key[0]);
-        for(let i = 1; i< key.length; i++) {
-          if(key[i]) str = str.replace(`%${i}`, key[i]);
-        }
-        return str;
-      }
-    };
-    window._ = d.translate;
-  },
-
-  // Курсы валют (РФ)
-  setRate(dataSelector = '#dataRate') {
+  setRate: (dataSelector = '#dataRate') => {
     let node = f.qS(dataSelector), json;
     node && (json = JSON.parse(node.value)) && node.remove();
     json && (this.rate = json['curs']);
   },
 
-  // Border warning
-  flashNode(item) {
-    let def                 = item.style.boxShadow,
+  /**
+   * Flash border element
+   * @param {HTMLElement} node
+   * @param {number} delay
+   *
+   * @default delay = 1000
+   * @return {void}
+   */
+  flashNode: (node, delay = 1000) => {
+    let def                 = node.style.boxShadow,
         boxShadow           = 'red 0px 0px 4px 1px';
     def === boxShadow && (def = '');
-    item.style.boxShadow    = boxShadow;
-    item.style.borderRadius = '4px';
-    item.style.transition   = 'all 0.2s ease';
+    node.style.boxShadow    = boxShadow;
+    node.style.borderRadius = '4px';
+    node.style.transition   = 'all 0.2s ease';
     setTimeout(() => {
-      item.style.boxShadow = def || 'none';
+      node.style.boxShadow = def || 'none';
     }, 1000);
   },
 
   /**
-   * Try parse to float number from any string
-   * @val v string
+   * Try parse to float number from any value
+   * @val {any} v
+   * @return {number}
    */
-  parseNumber(v) {
+  toNumber: v => f.parseNumber(v),
+  parseNumber: v => {
     typeof v === 'string' && (v = v.replace(',', '.'))
     && !isFinite(v) && /\d/.test(v) && (v = parseFloat(v.match(/\d+|\.|\d+/g).join('')));
     !isFinite(v) && (v = 0);
     return +v;
   },
+  /**
+   * Формат цифр (разделение пробелом)
+   * @param {number|string} value
+   * @param {number} fractionDigits
+   *
+   * @default fractionDigits = 0
+   */
+  setFormat: (value, fractionDigits = 0) =>
+    ((+value).toFixed(fractionDigits)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '),
+
 
   /**
    * Get value
-   * @param selector {string|HTMLSelectElement}
+   * @param {string|HTMLSelectElement} selector
    * @return {boolean|array}
    */
-  getMultiSelect(selector) {
+  getMultiSelect: selector => {
     const node = typeof selector === 'string' ? f.qS(selector) : selector;
     if (node) {
       return [...node.selectedOptions].reduce((r, option) => { r.push(option.value); return r}, []);
