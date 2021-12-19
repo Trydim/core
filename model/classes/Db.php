@@ -352,8 +352,8 @@ class Db extends \R {
         }
       } catch (\RedBeanPHP\RedException $e) {
         return [
-          'result'   => $result,
-          'error' => $e->getMessage(),
+          'result' => $result,
+          'error'  => $e->getMessage(),
         ];
       }
     }

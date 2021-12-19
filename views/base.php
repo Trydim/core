@@ -73,7 +73,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
         <span class="brand-title">title</span>
       </a>
 
-      <div class="nav-control" role="button" data-action="menuToggle" data-bs-toggle="tooltip">
+      <div class="nav-control" role="button" data-action-cms="menuToggle">
         <div>
           <i class="pi pi-caret-left"></i>
         </div>

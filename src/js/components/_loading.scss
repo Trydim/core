@@ -1,0 +1,32 @@
+$white: #fff;
+$loading-color: $white !default;
+
+  .loading-st1 {
+  position: relative !important;
+
+  &:after {
+    position:      absolute;
+    content:       " ";
+    display:       inline-block;
+    background:    #ffffff2b;
+    left:          calc(50% - 10px);
+    top:           calc(50% - 10px);
+    width:         16px;
+    height:        16px;
+    border-radius: 50%;
+    border-style:  solid;
+    border-width:  3px;
+    border-color:  $loading-color transparent $loading-color transparent;
+    box-shadow:    0 0 20px 0 #ffffff78;
+    animation:     lds-dual-ring 1.2s linear infinite;
+  }
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

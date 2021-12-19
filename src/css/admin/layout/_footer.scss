@@ -6,6 +6,7 @@
   position: absolute;
   left: 0;
   bottom: 0;
+  padding: 0 0 0 var(--theme-sidebar-width);
   width: 100%;
   background-color: $body-bg;
   height: $theme-footer-height;

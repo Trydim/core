@@ -44,5 +44,12 @@ if ($main->getSettings('admin')) {
     </tbody>
   </table>
 </template>
+
+<template id="orderStatus">
+  <div class="input-group mb-3" data-field="orderStatusItem">
+    <input class="input-group-text col-2" data-field="key" disabled>
+    <input type="text" class="form-control" data-field="name">
+  </div>
+</template>
 footerContent;
 }

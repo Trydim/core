@@ -95,7 +95,7 @@ const setParentHeight = (target, height) => {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const cmsEvent = function() {
-  let action = this.getAttribute('data-action');
+  let action = this.dataset.actionCms;
 
   let select = {
     'menuToggle': () => {
@@ -110,15 +110,15 @@ const cmsEvent = function() {
   select[action] && select[action]();
 };
 
-const sideMenuExpanded = (e, node) => {
+const sideMenuExpanded = function(e) {
   e.preventDefault();
 
-  const nodeS  = node.nextElementSibling,
+  const nodeS  = this.nextElementSibling,
         count  = nodeS.childElementCount,
         height = count * 50;//e.target.parentNode.offsetHeight;
 
-  if (node.getAttribute('aria-expanded') === 'true') {
-    node.setAttribute('aria-expanded', 'false');
+  if (this.getAttribute('aria-expanded') === 'true') {
+    this.setAttribute('aria-expanded', 'false');
     //setParentHeight(node, node.nextElementSibling.offsetHeight * -1);
     nodeS.style.height = nodeS.dataset.height;
 
@@ -127,7 +127,7 @@ const sideMenuExpanded = (e, node) => {
     }, 0);
 
   } else {
-    node.setAttribute('aria-expanded', 'true');
+    this.setAttribute('aria-expanded', 'true');
     nodeS.dataset.height = height + 'px';
     nodeS.style.height = height + 'px';
     //setParentHeight(node, height);
@@ -147,11 +147,9 @@ const onEvent = () => {
               .forEach(n => n.addEventListener('click', cmsEvent));
 
   // Menu Action
-  f.qA('#sideMenu [role="button"]').forEach(n =>
-    n.addEventListener('click', e => sideMenuExpanded(e, n)));
+  f.qA('#sideMenu [role="button"]', 'click', sideMenuExpanded);
 
-  node = f.qS('[data-action="menuToggle"]');
-  node && node.addEventListener('click', cmsEvent);
+  f.qA('[data-action-cms]', 'click', cmsEvent);
 }
 
 // Entrance function

@@ -6,6 +6,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
 <div class="row container m-auto" id="settingForm">
   <?php if ($admin) { ?>
   <div class="col-6 border">
+    <h3 class="w-100 mt-3 text-center">Настройка почты</h3>
     <form action="#" id="mailForm" class="col">
       <div class="form-floating my-3">
         <input type="text" class="form-control" id="orderMail" placeholder="Почта"
@@ -35,6 +36,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <?php } ?>
 
   <div class="col-6 border">
+    <h3 class="w-100 mt-3 text-center">Пользователь</h3>
     <form action="#" id="userForm" class="col">
       <input type="hidden" name="priority" value="<?= $main->getLogin('id') ?>">
       <div class="form-floating my-3">
@@ -63,6 +65,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <?php if ($admin && USE_DATABASE) {
     !isset($permStatus) && $permStatus = []; ?>
   <div class="col-6 border">
+    <h3 class="w-100 mt-3 text-center">Управление доступом</h3>
     <form action="#" class="col" id="permission">
       <?php if (isset($permIds)) { ?>
         <input type="hidden" name="permIds" value="<?= $permIds ?>">
@@ -100,6 +103,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   </div>
 
   <div class="col-6 border">
+    <h3 class="w-100 mt-3 text-center">Настройки менеджеров</h3>
     <form action="#" id="managerForm" class="col">
       <div class="input-group my-3">
         <span class="input-group-text flex-grow-1">Дополнительные поля менеджеров</span>
@@ -116,12 +120,13 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <?php } ?>
 
   <?php if ($admin && USE_DATABASE) { ?>
-    <div class="col-6 border">
+    <div class="col-6 border testClass" style="transition: height 0.3s linear">
+      <h3 class="w-100 mt-3 text-center">Курсы валют</h3>
       <form action="#" id="rateForm" class="col">
         <div class="input-group my-3">
           <span class="input-group-text flex-grow-1">Автоматически обновлять курсы</span>
           <div class="input-group-text">
-            <input class="form-check-input mt-0" type="checkbox" name="autoRefresh" checked data-target="manualRefresh">
+            <input class="form-check-input mt-0 " type="checkbox" name="autoRefresh" checked data-target="manualRefresh">
           </div>
         </div>
         <div class="col-12 text-center mb-3" data-relation="!manualRefresh">
@@ -131,19 +136,28 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     </div>
   <?php } ?>
 
-  <?php if ($admin && false) { ?>
+  <?php if ($admin && $main->availablePage('orders')) { ?>
     <div class="col-6 border">
-      <div class="col-12 text-center">Статусы</div>
-      <div class="col-12">
-        <select name="">
-
-        </select>
-      </div>
+      <h3 class="w-100 mt-3 text-center">Статусы</h3>
+      <form action="#" id="ordersStatusForm" class="col">
+        <div class="input-group my-3">
+          <span class="input-group-text flex-grow-1">Настройка статусов заказов</span>
+          <button type="button" class="btn btn-outline-secondary" data-action="addOrderStatusField">
+            <i class="pi pi-plus-circle align-text-bottom pi-green" data-action="addOrderStatusField"></i>
+          </button>
+          <button type="button" class="btn btn-outline-secondary" data-action="removeOrderStatusField">
+            <i class="pi pi-times-circle align-text-bottom pi-red" data-action="removeOrderStatusField"></i>
+          </button>
+        </div>
+        <div class="col" data-field="statusField"></div>
+      </form>
     </div>
   <? } ?>
 
   <div class="col-12 text-center">
-    <input type="button" class="btn btn-primary m-3" value="Сохранить" data-action="save">
+    <button type="button" class="btn btn-primary m-3" data-action="save">
+      Сохранить
+    </button>
   </div>
 
   <?php if ($catalogProperties) { ?>

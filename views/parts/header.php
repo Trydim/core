@@ -7,17 +7,20 @@ if ($main && $main->checkStatus('ok')) { ?>
       <div class="collapse navbar-collapse">
 
         <ul class="navbar-nav">
-          <li class="d-flex justify-content-end dropdown header-profile">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown">
+          <li class="d-flex justify-content-end dropdown">
+            <label role="button" class="nav-link dropdown-toggle">
+              <input hidden type="checkbox" data-target="dropdownAuth">
               <i class="pi pi-user"></i>
               <?= $main->getLogin('name') ?>
-            </a>
-            <div class="dropdown-menu mt-5">
-              <a href="#" class="dropdown-item" data-action="exit">
-                <i class="pi pi-sign-out"></i>
-                <span class="ml-2">Logout</span>
-              </a>
-            </div>
+            </label>
+            <ul class="dropdown-menu mt-5 show" data-relation="dropdownAuth">
+              <li>
+                <button type="button" class="dropdown-item" data-action-cms="exit">
+                  <i class="pi pi-sign-out"></i>
+                  <span class="ml-2">Logout</span>
+                </button>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>
