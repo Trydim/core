@@ -1,3 +1,7 @@
+"use strict";
+
+//import './_loading.scss';
+
 import {c} from "./const.js";
 import {q} from "./query.js";
 
@@ -40,10 +44,10 @@ const func = {
    */
   qA: (selector, nodeKey = null, value = null) => {
     let nodeList = (c.calcWrap || document).querySelectorAll(selector);
-    if (!nodeList) return {};
-    if (nodeKey && value) nodeList.forEach((item) => {
-      if(typeof value === 'function') {
-        item.addEventListener(nodeKey, (e) => value.call(item, e, nodeList, selector));
+    if (!nodeList) return [];
+    if (nodeKey && value) nodeList.forEach(item => {
+      if (typeof value === 'function') {
+        item.addEventListener(nodeKey, e => value.call(item, e, nodeList, selector));
         //item[nodeKey] = () => value.call(item, nodeList, selector);
       } else {
         item[nodeKey] = value;
@@ -228,7 +232,7 @@ const func = {
         if (member.nodesT[t].length) {
           let checked = !!member.nodesT[t].find(item => item.checked || item.selected); // Находим в группе хоть 1 включенный (или противоположный выключенный)
           relation = relation.replace(t, checked.toString());
-        } else console.warn('Event relatedOption: target not found ' + t);
+        } else console.warn('Event relatedOption: target not found' + t);
       });
 
       try {
@@ -493,7 +497,7 @@ const func = {
       return [...node.selectedOptions].reduce((r, option) => { r.push(option.value); return r}, []);
     }
     return false;
-  }
+  },
 }
 
 export const f = Object.assign(func, q);

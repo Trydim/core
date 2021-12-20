@@ -6,12 +6,13 @@ import {Properties} from "./properties";
 
 export const setting = {
   form: {
-    mail: f.qS('#mailForm'),
-    user: f.qS('#userForm'),
-    custom: f.qS('#customForm'),
-    manager: f.qS('#managerForm'),
+    mail      : f.qS('#mailForm'),
+    user      : f.qS('#userForm'),
+    custom    : f.qS('#customForm'),
+    manager   : f.qS('#managerForm'),
     permission: f.qS('#permission'),
-    rate: f.qS('#rateForm'),
+    rate      : f.qS('#rateForm'),
+    status    : f.qS('#ordersStatusForm'),
   },
 
   field   : Object.create(null),
@@ -42,6 +43,11 @@ export const setting = {
     if (this.form.rate) {
       this.template.rateModal = f.gTNode('#rateModalTmp');
     }
+
+    if (this.form.status) {
+      this.field.statusField = getFieldNode(this.form.status, 'statusField');
+      this.template.statusField = f.gTNode('#orderStatus');
+    }
   },
 
   query(data) {
@@ -63,8 +69,8 @@ export const setting = {
       node.remove();
 
       if (value['managerSetting']) {
-        Object.values(value['managerSetting']).forEach((v) => {
-          this.addManagerField(v['name'], v['type']);
+        Object.values(value['managerSetting']).forEach(v => {
+          this.addManagerField(v.name, v.type);
         });
       }
       //value.setting && (value.setting = JSON.parse(value.setting));
@@ -89,6 +95,33 @@ export const setting = {
         return r;
       }, {});
     }
+
+    node = f.qS('#dataOrdersStatus');
+    value = node ? JSON.parse(node.value) : false;
+    if (value) {
+      value.forEach(v => this.addOrderStatusField(v));
+      this.field.statusField.lastId = value[value.length - 1].ID;
+    }
+  },
+
+  // add to FormData status
+  prepareSaveOrderStatusField(form) {
+    const items = this.field.statusField.querySelectorAll('[data-field="orderStatusItem"]');
+    if (items.length) {
+      let status = [];
+      items.forEach(node => {
+        const id   = getFieldNode(node, 'key'),
+              name = getFieldNode(node, 'name');
+
+        status.push({
+          ID: id.value,
+          name: name.value
+        });
+      });
+      form.set('orderStatus', JSON.stringify(status));
+    } else {
+      f.showMsg('Заказы обязаны иметь 1 статус. Изменения не будут применены', 'error');
+    }
   },
 
   // bind events
@@ -110,7 +143,7 @@ export const setting = {
     this.queryParam.setAction = action;
 
     const select = {
-      'save': () => this.saveSetting(),
+      'save': () => this.saveSetting(target),
 
       // Доп. поля для пользователей
       'addCustomManagerField': () => this.addManagerField(),
@@ -122,12 +155,16 @@ export const setting = {
 
       // Курсы
       'loadRate': () => this.loadRate(),
+
+      // Статусы заказов
+      'addOrderStatusField': () => this.addOrderStatusField(),
+      'removeOrderStatusField': () => this.removeOrderStatusField(),
     }
 
     select[action] && select[action]();
   },
 
-  saveSetting() {
+  saveSetting(target) {
     const form = new FormData(),
           customization = Object.create(null),
           setData = (f) => {for (const [k, v] of (new FormData(f)).entries()) form.set(k, v)};
@@ -146,11 +183,14 @@ export const setting = {
       });
     }
 
+    this.form.status && this.prepareSaveOrderStatusField(form);
+
     // Special field
     form.get('onlyOne') && (customization['onlyOne'] = true);
     form.set('customization', JSON.stringify(customization));
 
-    this.query(form);
+    f.setLoading(target);
+    this.query(form).then(() => f.removeLoading(target));
   },
 
   addManagerField(keyValue = false, typeValue = false) {
@@ -164,13 +204,12 @@ export const setting = {
     type.value = typeValue || 'string';
     this.field.customField.append(node);
   },
-
   removeManagerField() {
     let last = this.field.customField.querySelector('[data-field="customFieldItem"]:last-child');
     last && last.remove();
   },
 
-  changePassword(e, nodes) {
+  changePassword() {
     let value = [],
         node = this.form.user.querySelector('[name="password"]');
 
@@ -230,5 +269,20 @@ export const setting = {
         this.M.show('Курсы валют', this.template.rateModal);
       } else f.showMsg('', 'error');
     })
+  },
+
+  addOrderStatusField(status = {}) {
+    let node     = this.template.statusField.cloneNode(true),
+        id       = getFieldNode(node, 'key'),
+        name     = getFieldNode(node, 'name'),
+        randName = new Date().getTime();
+
+    id.value = status.ID || ++this.field.statusField.lastId;
+    name.value = status.name || 'Статус-' + randName;
+    this.field.statusField.append(node);
+  },
+  removeOrderStatusField() {
+    let last = this.field.statusField.querySelector('[data-field="orderStatusItem"]:last-child');
+    last && last.remove();
   },
 }

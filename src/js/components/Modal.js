@@ -75,11 +75,10 @@ export const Modal = (param = {}) => {
 
     setTimeout( () => {
       this.wrap.style.display = 'none';
-      this.bodyOver && (document.body.style.overflow = 'initial');
-      document.body.style.scrollBehavior = 'initial';
+      document.body.style.overflow = data.bodyOver || 'initial';
       window.scrollTo(0, data.scrollY);
       if (document.body.style.paddingRight === '16px')
-        this.bodyPaddingRight && (document.body.style.paddingRight = 'initial');
+        document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
     }, 300);
     //c.eraseNode(modal.content);
   }
@@ -115,7 +114,7 @@ export const Modal = (param = {}) => {
   const templatePopup = () => {
     return `
     <div class="modal-overlay" id="${modalId}">
-      <div class="modal p-15" data-role="window">
+      <div class="modal p-3" data-role="window">
         <button type="button" class="close-modal">
           <div class="close-icon"></div>
         </button>
