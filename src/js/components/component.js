@@ -7,8 +7,15 @@ import {q} from "./query.js";
 
 // Загрузчик / preLoader
 export class LoaderIcon {
+  /**
+   *
+   * @param {string|HTMLElement} field
+   * @param {boolean} showNow
+   * @param {boolean} targetBlock
+   * @param {object} param
+   */
   constructor(field, showNow = true, targetBlock = true, param = {}) {
-    this.node = typeof field === 'string' ? f.qS(field) : field;
+    this.node = typeof fields === 'string' ? f.qS(field) : field;
     if (!(this.node instanceof HTMLElement)) return;
     //this.block         = targetBlock;
     this.customWrap    = param.wrap || false;
@@ -20,21 +27,21 @@ export class LoaderIcon {
 
   setParam() {
     let coords = this.node.getBoundingClientRect();
+    if (!coords.height || !coords.width) return;
 
     this.big = coords.height > 50;
     this.loaderNode = this.getTemplateNode();
 
-    this.loaderNode.style.top    = coords.y + pageYOffset + 'px';
-    this.loaderNode.style.left   = coords.x + pageXOffset + 'px';
+    this.loaderNode.style.top    = coords.y + window.pageYOffset + 'px';
+    this.loaderNode.style.left   = coords.x + window.pageXOffset + 'px';
     this.loaderNode.style.height = coords.height + 'px';
     this.loaderNode.style.width  = coords.width + 'px';
+    return true;
   }
 
   start() {
     if (this.status) return;
-    this.status = true;
-
-    this.setParam();
+    if (!(this.status = this.setParam())) return;
     this.big && (this.node.style.filter = 'blur(5px)');
     document.body.style.position = 'relative';
     document.body.append(this.loaderNode);
@@ -591,6 +598,7 @@ export class SaveVisitorsOrder {
   }
 }
 
+// Функции наблюдатели
 export class Observer {
   constructor() {
     this.publisher = Object.create(null);
@@ -614,12 +622,26 @@ export class Observer {
       listeners: Object.keys(this.listeners),
     };
   }
+
+  /**
+   *
+   * @param {string} name
+   * @param {function} func
+   * @returns {boolean}
+   */
   subscribe(name, func) {
     if (!func) console.warn('Function must have!');
     !this.listeners[name] && (this.listeners[name] = []);
     this.listeners[name].push(func);
     return this.publisher[name] || false;
   }
+
+  /**
+   *
+   * @param {string} name
+   * @param {any} arg
+   * @returns {boolean}
+   */
   fire(name, ...arg) {
     if (Array.isArray(this.listeners[name])) {
       this.listeners[name].forEach(listener => listener(...arg, this.publisher[name]));
@@ -631,16 +653,31 @@ export class Observer {
 
 // Одноразовые функции
 export class OneTimeFunction {
+  /**
+   *
+   * @param {string} funcName
+   * @param {function} func
+   */
   constructor(funcName, func) {
     this.func = Object.create(null);
 
     funcName && this.add(funcName, func);
   }
 
+  /**
+   *
+   * @param {string} name
+   * @param {function} func
+   */
   add(name, func) {
     this.func[name] = func;
   }
 
+  /**
+   *
+   * @param {string} name
+   * @param {any} arg
+   */
   exec(name, ...arg) {
     if (this.func[name]) {
       this.func[name](...arg);
@@ -648,6 +685,10 @@ export class OneTimeFunction {
     }
   }
 
+  /**
+   *
+   * @param {string} name
+   */
   del(name) {
     this.func[name] && (delete this.func[name]);
   }

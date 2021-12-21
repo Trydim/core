@@ -1,3 +1,5 @@
+'use strict';
+
 const getTemplate = (data = [], placeholder, selectedId) => {
   let text = placeholder ?? 'Placeholder по умолчанию';
 

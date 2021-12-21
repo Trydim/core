@@ -23,7 +23,7 @@ const m = {
 
   initModal : Modal,
   initPrint : module.Print,
-  initShadow: (param) => new shadowNode(param),
+  initShadow: param => new shadowNode(param),
 
   observer: new module.Observer(),
 
@@ -48,8 +48,8 @@ const m = {
   LoaderIcon: module.LoaderIcon,
 
   /**
-   * @param name {string}
-   * @param func {function}
+   * @param {string} name
+   * @param {function} func
    */
   OneTimeFunction: module.OneTimeFunction,
 
@@ -93,7 +93,7 @@ const m = {
    * Validation component
    * autodetect input field with attribute "require" and show error/valid.
    *
-   * @param param {{sendFunc: function,
+   * @param {{sendFunc: function,
    * formNode: HTMLFormElement,
    * formSelector: string,
    * submitNode: HTMLElement,
@@ -101,20 +101,20 @@ const m = {
    * fileFieldSelector: string,
    * initMask: boolean,
    * phoneMask: string,
-   * cssMask: object}}
-   * @param param.sendFunc - exec func for event click (default = () => {}),
-   * @param param.formSelector - form selector (default: #authForm),
-   * @param param.submitSelector - btn selector (default: #btnConfirm),
-   * @param param.fileFieldSelector - field selector for show attachment files information,
-   * @param param.cssClass = {
+   * cssMask: object}} param
+   * @param {function} param.sendFunc - exec func for event click (default = () => {}),
+   * @param {string/HTMLElement} param.formSelector - form selector (default: #authForm),
+   * @param {string/HTMLElement} param.submitSelector - btn selector (default: #btnConfirm),
+   * @param {string} param.fileFieldSelector - field selector for show attachment files information,
+   * @param {object} param.cssClass = {
    *     error: will be added class for node (default: 'cl-input-error'),
    *     valid: will be added class for node (default: 'cl-input-valid'),
    *   },
-   * @param param.debug: submit btn be activated (def: false),
-   * @param param.initMask: use mask for field whit type "tel" (def: true),
-   * @param param.phoneMask: mask matrix (def: from global constant),
+   * @param {boolean} param.debug: submit btn be activated (def: false),
+   * @param {boolean} param.initMask: use mask for field whit type "tel" (def: true),
+   * @param {string} param.phoneMask: mask matrix (def: from global constant),
    *
-   * @example mask: new f.Valid({phoneMask: '+1 (\_\_) \_\_\_'});
+   * @example Mask: new f.Valid({phoneMask: '+1 (\_\_) \_\_\_'});
    */
   Valid,
   //initValid : (sendFunc, idForm, idSubmit) => module.valid.init(sendFunc, idForm, idSubmit),

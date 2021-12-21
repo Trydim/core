@@ -7,8 +7,11 @@ import {f} from "./func.js";
 
 /**
  * Модальное окно
- * @param param {{modalId: string, template: string, showDefaultButton: boolean, btnConfig: boolean}}
-  */
+ * @param param {{modalId: string,
+ * template: string,
+ * showDefaultButton: boolean,
+ * btnConfig: boolean }}
+ */
 export const Modal = (param = {}) => {
   let modal = Object.create(null),
       data = Object.create(null),
@@ -43,8 +46,8 @@ export const Modal = (param = {}) => {
 
   /**
    * Show modal window
-   * @param title Nodes | string[]
-   * @param content Nodes | string[]
+   * @param {string|HTMLElement} title
+   * @param {string|HTMLElement} content
    */
   modal.show = function (title, content = '') {
     this.title && title !== undefined && f.eraseNode(this.title).append(title);
