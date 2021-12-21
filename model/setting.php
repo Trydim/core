@@ -66,7 +66,7 @@ $db = $main->getDB();
 if (isset($setAction)) {
   switch ($setAction) {
     case 'save':
-      $usersId = isset($priority) ? $priority : false;
+      $usersId = $priority ?? false;
 
       // Change Setting
       if (USE_DATABASE && $usersId) {
@@ -97,6 +97,17 @@ if (isset($setAction)) {
 
           $result['error'] = $db->insert($columns, 'permission', $param, true);
         }
+
+        // Статусы
+        if (isset($orderStatus)) {
+          $columns = $db->getColumnsTable('order_status');
+          $currentTable = $db->loadTable('order_status');
+          $param = [];
+          foreach (json_decode($orderStatus, true) as $status) {
+            $param[$status['ID']]['name'] = $status['name'];
+          }
+          $result['error'] = $db->insert($columns, 'order_status', $param, false);
+        }
       } else {
         $hash = '';
 
@@ -116,6 +127,8 @@ if (isset($setAction)) {
       $setting = getSettingFile();
       isset($orderMail) && $setting['orderMail'] = $orderMail;
       isset($orderMailCopy) && $setting['orderMailCopy'] = $orderMailCopy;
+      isset($orderMailSubject) && $setting['orderMailSubject'] = $orderMailSubject;
+      isset($orderMailFromName) && $setting['orderMailFromName'] = $orderMailFromName;
       !USE_DATABASE && $setting['onlyOne'] = isset($onlyOne);
 
       // Global manager setting

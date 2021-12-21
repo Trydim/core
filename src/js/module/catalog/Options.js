@@ -182,6 +182,7 @@ export class Options extends Common {
     this.reloadAction = {
       dbAction: 'openElement',
       callback: data => {
+        f.showMsg('Создан');
         this.id.clear();
         this.load(data);
       },
@@ -231,6 +232,7 @@ export class Options extends Common {
     this.reloadAction = {
       dbAction: 'openElement',
       callback: data => {
+        f.showMsg('Изменения сохранены');
         this.id.clear();
         this.load(data);
       },

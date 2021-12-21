@@ -224,7 +224,8 @@ export class MessageToast {
       }, delay);
     }
 
-    if (typeof type !== 'string') this.checkMsq(msg, type); else {
+    if (typeof type !== 'string') this.checkMsq(msg, type);
+    else {
       this.setMessage(msg);
       this.setColor(type);
     }

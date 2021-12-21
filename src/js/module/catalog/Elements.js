@@ -90,6 +90,7 @@ export class Elements extends Common {
     this.reloadAction = {
       dbAction: 'openSection',
       callback: data => {
+        f.showMsg('Элемент создан');
         this.id.clear();
         this.load(data);
       },
@@ -138,6 +139,7 @@ export class Elements extends Common {
     this.reloadAction = {
       dbAction: 'openSection',
       callback: data => {
+        f.showMsg('Элемент изменен');
         this.id.clear();
         this.load(data);
       },
@@ -167,6 +169,7 @@ export class Elements extends Common {
     this.reloadAction = {
       dbAction: 'openSection',
       callback: data => {
+        f.showMsg('Элемент скопирован');
         this.id.clear();
         this.load(data);
       },
@@ -182,6 +185,7 @@ export class Elements extends Common {
       dbAction: 'openSection',
       callback: data => {
         f.observer.fire('delElements', this.id.getSelected());
+        f.showMsg('Элемент(ы) удалены!');
         this.id.clear();
         this.load(data);
       },

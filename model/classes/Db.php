@@ -352,8 +352,8 @@ class Db extends \R {
         }
       } catch (\RedBeanPHP\RedException $e) {
         return [
-          'result'   => $result,
-          'error' => $e->getMessage(),
+          'result' => $result,
+          'error'  => $e->getMessage(),
         ];
       }
     }
@@ -516,9 +516,9 @@ class Db extends \R {
 
   /**
    * Load for calculator
-   * @param array $filter
-   * @param int   $pageNumber
-   * @param int   $countPerPage
+   * @param array  $filter
+   * @param int    $pageNumber
+   * @param int    $countPerPage
    * @return array
    */
   public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
@@ -770,12 +770,12 @@ class Db extends \R {
   }
 
   /**
-   * @param int    $pageNumber
-   * @param int    $countPerPage
+   * @param int $pageNumber
+   * @param int $countPerPage
    * @param string $sortColumn
-   * @param bool   $sortDirect
-   * @param array  $dateRange
-   * @param array  $ids
+   * @param bool  $sortDirect
+   * @param array $dateRange
+   * @param array $ids
    *
    * @return array|null
    */

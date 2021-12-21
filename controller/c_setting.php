@@ -31,6 +31,14 @@ if ($main->getSettings('admin')) {
     $param['permStatus'] = $permissions;
     $permissions = json_encode($permissions);
     $field['footerContent'] .= "<input type='hidden' id='permissionSetting' value='$permissions'>";
+
+    // if available orders
+    if ($main->availablePage('orders') && false) {
+      $status = json_encode($main->db->loadTable('order_status'));
+      $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
+    }
+
+    unset($permIds, $permissions, $status);
   }
 }
 

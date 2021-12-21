@@ -106,7 +106,7 @@ trait Authorization {
    * @param string $target
    * @return $this|Main
    */
-  public function applyAuth($target = ''): Main {
+  public function applyAuth(string $target = ''): Main {
 
     if ($this->checkStatus('no') && $target !== 'login'
         && (ONLY_LOGIN || (PUBLIC_PAGE && $target !== 'public'))) {
@@ -137,9 +137,23 @@ trait Authorization {
     $this->sideMenu[] = 'setting';
   }
 
-  public function getSideMenu($first = false) {
+  /**
+   * get array of pages
+   * @param bool $first
+   * @return array|mixed
+   */
+  public function getSideMenu(bool $first = false) {
     if ($first) return array_values($this->sideMenu)[0];
     return $this->sideMenu;
+  }
+
+  /**
+   * Check available page
+   * @param string $page
+   * @return bool
+   */
+  public function availablePage(string $page): bool {
+    return in_array($page, $this->getSideMenu());
   }
 
 }

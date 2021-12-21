@@ -38,7 +38,7 @@ const setLinkMenu = page => {
 
   for (let n of [...menu.querySelectorAll('a')]) {
     let href = n.getAttribute('href') || '';
-    if(href.includes(page)) { n.parentNode.classList.add('active'); break; }
+    if (href.includes(page)) { n.parentNode.classList.add('active'); break; }
   }
 }
 
@@ -94,13 +94,17 @@ const setParentHeight = (target, height) => {
 // Event function
 // ---------------------------------------------------------------------------------------------------------------------
 
-const cmsEvent = e => {
-  let action = this.getAttribute('data-action');
+const cmsEvent = function() {
+  let action = this.dataset.actionCms;
 
   let select = {
+    'menuToggle': () => {
+      f.gI('mainWrapper').classList.toggle('menu-toggle');
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
+    },
     'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
-    }
+    },
   };
 
   select[action] && select[action]();
