@@ -8,7 +8,7 @@
 
 !isset($pageTarget) && $pageTarget = '';
 $actionLink = 'index.php';
-$wrongString = $wrongPass ? '<div class="notification-container error" role="alert">Неправильный логин или пароль</div><br>' : '';
+$wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
 $publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="/' . PUBLIC_PAGE . '">Открытая страница</a>' : '';
 
@@ -18,6 +18,7 @@ $field['global'] = <<<global
   <section class="content-center h-100">
     <div class="authincation-content auth-form col-md-5">
       <h4 class="text-center mb-4"><i class="pi pi-user"></i> Авторизация</h4>
+      $wrongString
       <form action="$actionLink" method="POST" id="authForm">
         <div class="form-group">
           <label><strong>Логин</strong></label>
@@ -38,12 +39,11 @@ $field['global'] = <<<global
             <a href="forgot">Забыли пароль?</a>
           </div>
         </div>
-        $wrongString
-        
+
         <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-block">Подтвердить</button>
+          <button type="submit" class="btn btn-primary btn-block" onclick="this.classList.add(f.CLASS_NAME.LOADING)">Подтвердить</button>
         </div>
-        
+
         <input name="mode" type="hidden" value="auth">
         <input name="authAction" type="hidden" value="login">
         <input name="clientPageTarget" type="hidden" value="$pageTarget">
@@ -51,9 +51,8 @@ $field['global'] = <<<global
       <div class="new-account mt-3">
         <p>$publicLink</p>
       </div>
-      
+
     </div>
   </section>
 </main>
 global;
-
