@@ -298,12 +298,12 @@ class Db extends \R {
     if (count($param) > 0) {
 
       $idColName = 'id';
-        foreach ($curTable as $col) {
-          if ($col['key'] === 'PRI') {
-            $idColName = $col['columnName'];
-            break;
-          }
+      foreach ($curTable as $col) {
+        if ($col['key'] === 'PRI') {
+          $idColName = $col['columnName'];
+          break;
         }
+      }
 
       if (strtolower($idColName) !== 'id') {
         if ($change) {
@@ -464,15 +464,15 @@ class Db extends \R {
   // Options
   //------------------------------------------------------------------------------------------------------------------
 
-  private function setImages($imagesIds) {
+  private function setImages(string $imagesIds): array {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
       $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
-      $item['path'] = $path ? $path : $item['path'];
+      $item['path'] = $path ? $path : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
       return $item;
     }, $images);
   }
-  private function getAlias($table) {
+  private function getAlias(string $table): string {
     $tables = ['codes.', 'money.', 'elements.', 'options_elements.', 'units.'];
     $alias = ['C.', 'M.', 'E.', 'O.', 'U.'];
     $table = str_replace($tables, $alias, $table);
@@ -773,7 +773,7 @@ class Db extends \R {
    * @param int $pageNumber
    * @param int $countPerPage
    * @param string $sortColumn
-   * @param bool $sortDirect
+   * @param bool  $sortDirect
    * @param array $dateRange
    * @param array $ids
    *

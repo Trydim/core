@@ -11,13 +11,13 @@ const checkJSON = data => {
   catch (e) { f.showMsg(e['xdebug_message'] || e.message || data, 'error', false); return {status: false}; }
 };
 
-const downloadBody = async (data) => {
+const downloadBody = async data => {
   const fileName = JSON.parse(data.headers.get('fileName')),
-        reader = data.body.getReader();
-  let chunks = [],
+        reader   = data.body.getReader();
+  let chunks    = [],
       countSize = 0;
 
-  while(true) {
+  while (true) {
     // done становится true в последнем фрагменте
     // value - Uint8Array из байтов каждого фрагмента
     const {done, value} = await reader.read();
@@ -50,9 +50,9 @@ const query = (url, data, type = 'json') => {
 export const q = {
 
   /**
-   * @param url
-   * @param data
-   * @param type
+   * @param {string} url
+   * @param {object} data
+   * @param {string: 'json'} type
    * @return {*}
    * @constructor
    */
@@ -60,9 +60,9 @@ export const q = {
 
   /**
    * Fetch Post function
-   * @param url
-   * @param data
-   * @param type
+   * @param {string} url
+   * @param {object} data
+   * @param {string: 'json'} type
    * @returns {Promise<Response>}
    */
   Post: ({url = c.MAIN_PHP_PATH, data, type = 'json'}) => query(url, data, type),

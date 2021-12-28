@@ -5,7 +5,7 @@
  * @var string $pathTarget
  */
 
-$field['pageTitle'] = 'login';
+$field['pageTitle'] = PROJECT_TITLE;
 
 $field['pageFooter']    = '';
 $field['sideLeft']      = '';

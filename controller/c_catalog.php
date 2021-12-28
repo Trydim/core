@@ -15,7 +15,7 @@ function prepareData($data) {
 }
 
 $field = [
-	'pageTitle' => 'Пользователи',
+	'pageTitle' => 'Каталог',
   'footerContent' => '',
   'sideRight' => '',
 ];

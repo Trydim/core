@@ -93,8 +93,7 @@ export class SelectedRow {
     return this.observerKey;
   }
   /**
-   * @param {function(string[], int, , SelectedRow)} func - fired function(selectedIds, count, any, SelectedRow)
-   *
+   * @param {function} func {{(string[], int, , SelectedRow)}}- fired function(selectedIds, count, any, SelectedRow)
    * @param {any} arg - add argument
    */
   subscribe(func, ...arg) {
@@ -108,7 +107,10 @@ export class SelectedRow {
     return this.selectedId.size;
   }
 
-  // Выделить выбранные строки
+  /**
+   * Выделить выбранные строки
+   * @param {boolean} check
+   */
   checkedRows(check = true) {
     this.selectedId.forEach(id => {
       let input = this.table.querySelector(`input[data-id="${id}"]`);

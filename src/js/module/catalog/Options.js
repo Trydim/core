@@ -182,6 +182,7 @@ export class Options extends Common {
     this.reloadAction = {
       dbAction: 'openElement',
       callback: data => {
+        f.showMsg('Создан');
         this.id.clear();
         this.load(data);
       },
@@ -221,6 +222,7 @@ export class Options extends Common {
         option.property && initParam(JSON.parse(option.property));
         node.parentElement.previousElementSibling.remove();
         node.parentElement.remove();
+        //node.remove();
       }, {once: true});
 
       form.querySelectorAll('.onlyOne').forEach(n => n.remove());
@@ -232,6 +234,7 @@ export class Options extends Common {
     this.reloadAction = {
       dbAction: 'openElement',
       callback: data => {
+        f.showMsg('Изменения сохранены');
         this.id.clear();
         this.load(data);
       },

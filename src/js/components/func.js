@@ -28,8 +28,8 @@ const func = {
   gI: id => (c.calcWrap || document).getElementById(id) || func.log('not found note by id -' + id),
 
   /**
-   * @param selector
-   * @param node
+   * @param {string} selector
+   * @param {HTMLElement} node
    * @return {HTMLElement | {}}
    */
   qS: (selector = '', node = c.calcWrap) =>
@@ -37,9 +37,9 @@ const func = {
 
   /**
    *
-   * @param selector {string} - css selector string
-   * @param nodeKey {string/null} - param/key
-   * @param value - value/function, function (this, Node list, current selector)
+   * @param {string} selector - css selector string
+   * @param {string/null} nodeKey - param/key
+   * @param {string/function} value - value or function (this, Node list, current selector)
    * @return NodeListOf<HTMLElementTagNameMap[*]>|object
    */
   qA: (selector, nodeKey = null, value = null) => {
@@ -59,14 +59,14 @@ const func = {
   /**
    * получить html шаблона
    *
-   * @param selector {string}
+   * @param {string} selector
    * @return {string}
    */
   gT: selector => { let node = func.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + selector},
 
   /**
    * Получить Node шаблона
-   * @param selector {string}
+   * @param {string} selector
    * @returns {Node}
    */
   gTNode: selector => func.qS(selector).content.children[0].cloneNode(true),
@@ -81,13 +81,13 @@ const func = {
 
   /**
    * get Object like associative arrays
-   * @param selector
-   * @return object
+   * @param {string} selector
+   * @return {object}
    */
   getDataAsAssoc: selector => {
-    const arr      = Object.values(func.getData(selector) || []),
-          fItem    = arr[0],
-          fKeys    = Object.keys(fItem);
+    const arr   = Object.values(func.getData(selector) || []),
+          fItem = arr[0],
+          fKeys = Object.keys(fItem);
 
     let oneValue = false;
 
@@ -126,7 +126,7 @@ const func = {
 
   /**
    * Очистить узел от дочерних элементов (почему-то быстрее чем через innerHTMl)
-   * @param node
+   * @param {HTMLElement} node
    * @returns {*}
    */
   eraseNode: node => {
@@ -137,7 +137,7 @@ const func = {
 
   /**
    * Replace latin to cyrillic symbol
-   * @param value
+   * @param {string} value
    * @return {void | string}
    */
   replaceLetter: value => {
@@ -150,8 +150,8 @@ const func = {
 
   /**
    * replace ${key from obj} from template to value from obj
-   * @param tmpString html string template
-   * @param arrayObjects array of object
+   * @param {string} tmpString html string template
+   * @param {array} arrayObjects - array of object
    * @return {string}
    */
   replaceTemplate: (tmpString, arrayObjects) => {
@@ -184,7 +184,7 @@ const func = {
    *
    * Селекторы должны иметь класс useToggleOption
    * Опциям селектора добавить data-target="targetClass"
-   *
+   * @param {HTMLElement|Document} node
    */
   relatedOption: (node = document) => {
     const reg = new RegExp(/([\w\d_-]+)/, 'g'),
@@ -293,7 +293,7 @@ const func = {
 
   /**
    * Получить и скачать файл
-   * @param fileName
+   * @param {string} fileName
    * @return {HTMLAnchorElement}
    */
   createLink: fileName => {
@@ -321,7 +321,11 @@ const func = {
     link.click();
   },
 
-  // Маска для телефона
+  /**
+   * Маска для телефона
+   * @param {HTMLElement} node
+   * @param {string} phoneMask
+   */
   maskInit: (node, phoneMask) => {
     if (!node) return;
     const minValue = 2;
@@ -342,24 +346,24 @@ const func = {
     ['input', 'focus', 'blur'].map(e => node.addEventListener(e, mask));
   },
 
-  // Активировать элементы
+  /**
+   * Активировать элементы
+   * @param {NodeList} collection
+   */
   enable: (...collection) => {
     collection.map(nodes => {
-      if(!nodes.forEach) nodes = [nodes];
+      if (!nodes.forEach) nodes = [nodes];
       nodes.forEach(n => {
-
         n.classList.remove(c.CLASS_NAME.DISABLED_NODE);
         n.removeAttribute('disabled');
-
-        /*switch (n.tagName) { TODO что это
-         case 'BUTTON': case 'INPUT': { }
-         case 'A': { }
-         }*/
       });
     });
   },
 
-  // Деактивировать элементы
+  /**
+   * Деактивировать элементы
+   * @param {NodeList} collection
+   */
   disable: (...collection) => {
     collection.map(nodes => {
       if(!nodes.forEach) nodes = [nodes];
@@ -370,19 +374,21 @@ const func = {
     });
   },
 
-  /** Добавить иконку загрузки */
-  setLoading: node => {
-    node && node.classList.add(c.CLASS_NAME.LOADING);
-  },
-  /** Удалить иконку загрузки */
-  removeLoading: node => {
-    node && node.classList.remove(c.CLASS_NAME.LOADING);
-  },
+  /**
+   * Добавить иконку загрузки
+   * @param {HTMLElement} node
+   */
+  setLoading: node => node && node.classList.add(c.CLASS_NAME.LOADING),
+  /**
+   * Удалить иконку загрузки
+   * @param {HTMLElement} node
+   */
+  removeLoading: node => node && node.classList.remove(c.CLASS_NAME.LOADING),
 
   /**
    * Функция печати по умолчанию
-   * @param report
-   * @param number
+   * @param {object} report
+   * @param {number} number
    * @returns {string}
    */
   printReport: (report, number = 1) => {
@@ -401,11 +407,11 @@ const func = {
 
   /**
    *
-   * @param target HTML node (loading field)
-   * @param report {object}: send to pdf
-   * @param data {FormData}: object of formData to send in query Body
-   * @param finishOk function
-   * @param err function
+   * @param {HTMLElement} target - loading field
+   * @param {object} report - send to pdf
+   * @param {FormData} data - object of formData to send in query Body
+   * @param {function} finishOk
+   * @param {function} err
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
     func.setLoading(target);
@@ -433,8 +439,7 @@ const func = {
 
   /**
    * Курсы валют (РФ/РБ)
-   * @param dataSelector
-   *
+   * @param {string} dataSelector
    * @return {void}
    */
   setRate: (dataSelector = '#dataRate') => {
@@ -460,7 +465,7 @@ const func = {
     node.style.transition   = 'all 0.2s ease';
     setTimeout(() => {
       node.style.boxShadow = def || 'none';
-    }, 1000);
+    }, delay);
   },
 
   /**

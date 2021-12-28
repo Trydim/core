@@ -38,7 +38,7 @@ const setLinkMenu = page => {
 
   for (let n of [...menu.querySelectorAll('a')]) {
     let href = n.getAttribute('href') || '';
-    if(href.includes(page)) { n.classList.add('active'); break; }
+    if (href.includes(page)) { n.classList.add('active'); break; }
   }
 }
 

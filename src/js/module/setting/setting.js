@@ -273,7 +273,7 @@ export const setting = {
 
   addOrderStatusField(status = {}) {
     let node = this.template.statusField.cloneNode(true),
-        id = getFieldNode(node, 'key'),
+        id   = getFieldNode(node, 'key'),
         name = getFieldNode(node, 'name'),
         randName = new Date().getTime();
 
