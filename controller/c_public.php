@@ -5,7 +5,7 @@
  */
 
 $dbContent = "";
-$field = [];
+$field = ['pageTitle' => PROJECT_TITLE ?? 'Project title'];
 
 require ABS_SITE_PATH . 'public/public.php';
 

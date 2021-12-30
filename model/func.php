@@ -441,6 +441,7 @@ function translit($value) {
  */
 function findingFile($dir, $fileName) {
   $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $dir;
+  if (!file_exists($absolutePath)) return false;
   if (file_exists($absolutePath . '/' . $fileName)) return $dir . '/' . $fileName;
 
   $arrDir = array_values(array_filter(scandir($absolutePath), function ($dir) use ($absolutePath) {

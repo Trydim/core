@@ -15,7 +15,7 @@ export class LoaderIcon {
    * @param {object} param
    */
   constructor(field, showNow = true, targetBlock = true, param = {}) {
-    this.node = typeof fields === 'string' ? f.qS(field) : field;
+    this.node = typeof field === 'string' ? f.qS(field) : field;
     if (!(this.node instanceof HTMLElement)) return;
     //this.block         = targetBlock;
     this.customWrap    = param.wrap || false;

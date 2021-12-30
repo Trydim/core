@@ -23,7 +23,7 @@ switch ($authAction) {
       /*$main->getSettings('onlyOne') && */$main->db->setUserHash($user['ID'], $_SESSION['hash']);
 
       reDirect(true, (isset($clientPageTarget) && $clientPageTarget !== 'login') ? $clientPageTarget : '');
-    } else reDirect(false, "login?status=error&login=$login&password=$password");
+    } else reDirect(false, "login?status=error&login=$login");
     break;
   case 'exit':
     if (isset($_SESSION['priority'])) {

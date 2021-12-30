@@ -5,7 +5,7 @@
  */
 
 $field = [
-  'pageTitle' => 'Administration DB',
+  'pageTitle' => 'Администрирование',
 ];
 
 $field['cssLinks'] = [CORE_CSS . 'module/admindb/admindb.css'];
