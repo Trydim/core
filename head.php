@@ -11,22 +11,17 @@ else {
   $html = '';
 
   $target = getTargetPage($_GET);
+  $pathTarget = checkTemplate($target);
 
-  !PUBLIC_PAGE && !$target && $target = ACCESS_MENU[0];
-  ($target === PUBLIC_PAGE) && reDirect(null, 'public');
-  $target && $pathTarget = checkTemplate($target);
-  if ($target && strstr($pathTarget, '404')) require CORE . 'controller/c_404.php';
+  if (OUTSIDE) $main->setLoginStatus('no');
   else {
-    if (!OUTSIDE) {
-      $main->checkAuth($target)
-           ->applyAuth($target)
-           ->setAccount();
-    }
-
-    $target = checkAccess($target);
-    $target !== 'public' && $pathTarget = checkTemplate($target);
-    require CORE . "controller/c_$target.php";
+    $main->checkAuth()
+         ->setAccount()
+         ->applyAuth($target);
   }
+
+  $target === '' && $target = 'public';
+  require CORE . "controller/c_$target.php";
   echo $html;
 }
 

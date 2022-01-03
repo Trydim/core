@@ -46,7 +46,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (is_string($dbTable) && stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
       else {
         if (CHANGE_DATABASE) {
-          //if (stripos($dbTable, 'csv') !== false) reDirect(false, '404');
           USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
         } else {
           $dbTable = $db->getTables($dbTable);

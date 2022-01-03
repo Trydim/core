@@ -55,7 +55,7 @@ menu;
       <li class="nav-label">Main Menu</li>
       <?php if (PUBLIC_PAGE) { ?>
         <li>
-          <a class="nav-item" href="<?= SITE_PATH ?>public" aria-expanded="false">
+          <a class="nav-item" href="<?= SITE_PATH ?>" aria-expanded="false">
             <i class="pi pi-globe"></i>
             <span class="nav-text">Калькулятор</span>
           </a>

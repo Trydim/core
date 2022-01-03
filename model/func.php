@@ -12,6 +12,19 @@ function de($var, $die = 1) {
 }
 
 /**
+ * @param $get
+ * @return array|string|string[]
+ */
+function getTargetPage($get) {
+  $target = isset($get['targetPage']) ? str_replace('/', '', $get['targetPage']) : '';
+  if (PUBLIC_PAGE) {
+    if ($target === 'public') return '';
+    if ($target === PUBLIC_PAGE) reDirect();
+  }
+  return $target;
+}
+
+/**
  *
  * @param $number
  * @param $reportVal
@@ -49,63 +62,36 @@ function checkError(array $result): array {
 }
 
 /**
- * @param $target
- * @return string
- */
-function checkAccess($target): string {
-  if (PUBLIC_PAGE && in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
-  global $main;
-  if (in_array($target, $main->getSideMenu())) return $target;
-  if ($main->checkStatus('no') || $main->checkStatus('error')) return 'login';
-  reDirect(false, $main->getSideMenu(true));
-  die;
-}
-
-/**
- * @param $status - auth status
  * @param string $target
  */
-function reDirect($status, string $target = '') {
-  if (!$target) {
-    if ($status) $target = HOME_PAGE;
-    else {
-      if (isset($_SESSION['target']) && $_SESSION['target']) $target = 'login';
-      else $target = ONLY_LOGIN ? 'login' : 'public';
+function reDirect(string $target = '') {
+  if ($target === '') {
+    $target = $_SESSION['target'] ?? '';
+    isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
     }
-  }
-  //unset($_GET['targetPage']);
-  if ($target === 'public' && isset($_GET['orderId'])) $target .= '?orderId=' . $_GET['orderId']; // TODO уточнить откуда такая загрузка
   header('location: ' . SITE_PATH . $target);
   die;
 }
 
 /**
- *
- * @param $tmpFile
+ * Check exist template file in views directory
+ * @param string $tmpFile
  *
  * @return string path to file name
  */
-function checkTemplate($tmpFile): string {
-  if ($tmpFile === 'public' && PUBLIC_PAGE
-      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . ".php")) {
+function checkTemplate(string $tmpFile): string {
+  if ($tmpFile === '' && PUBLIC_PAGE
+      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php')) {
+    return ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
+  } else if (file_exists(ABS_SITE_PATH . 'public/views/' . "$tmpFile.php")) {
     return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
   } else if (file_exists(VIEW . "$tmpFile.php")) {
     return VIEW . "$tmpFile.php";
   } else if (file_exists(VIEW . $tmpFile . "/$tmpFile.php")) {
     return VIEW . $tmpFile . "/$tmpFile.php";
   } else {
-    return VIEW . '404.php';
+    require VIEW . '404.php'; die();
   }
-}
-
-/**
- * @param $get
- *
- * @return array|string|string[]
- */
-function getTargetPage($get) {
-  return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage'])
-    : (OUTSIDE ? 'public' : '');
 }
 
 /**
@@ -271,7 +257,7 @@ function loadFullCVS($path) {
         }
         if ($emptyRow > 0) $emptyRow = 0;
 
-        $result[] = $data;
+        $result[] = array_map(function ($cell) { return preg_replace('/^d_/', '', $cell);}, $data);
       } else $emptyRow++;
     }
     fclose($handle);

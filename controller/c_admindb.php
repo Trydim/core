@@ -14,7 +14,7 @@ if (DB_TABLE_IN_SIDEMENU) {
   if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];
   else {
     global $dbTables;
-    count($dbTables) && reDirect(false, 'admindb?tableName=' . $dbTables[0]['fileName']);
+    count($dbTables) && reDirect('admindb?tableName=' . $dbTables[0]['fileName']);
   }
 }
 

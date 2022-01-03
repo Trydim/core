@@ -16,6 +16,9 @@ use Xml\Xml;
  */
 trait Authorization {
 
+  /**
+   * @var string[]
+   */
   static $AVAILABLE_ACTION = ['loadCVS', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
 
   private $id, $login, $name;
@@ -75,45 +78,47 @@ trait Authorization {
 
   /**
    * Проверка пароля
-   * @param string $target
    * @return $this|Main
    */
-  public function checkAuth(string $target = ''): Main {
+  public function checkAuth(): Main {
     $this->setLoginStatus('no');
     session_start();
 
     if (isset($_SESSION['hash'])
-        //&& !$this->checkStatus('error')
-        && $_SESSION['id'] === $_COOKIE['PHPSESSID']) {
-
-      if ($this->db->checkUserHash($_SESSION)) {
+        && $_SESSION['id'] === $_COOKIE['PHPSESSID']
+        && $this->db->checkUserHash($_SESSION)) {
         $this->setLogin($_SESSION);
-        $target === '' && reDirect(true, HOME_PAGE);
-      }
     }
 
     return $this;
   }
 
-  /** Нужна ли регистрация для действия */
+  /** Нужна ли регистрация для действия
+   * @param string $action
+   * @return bool|Main
+   */
   public function checkAction(string $action) {
-    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth('check');
+    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth();
   }
 
   /**
+   * Если отк. страница доступна без регистрации, то перейти
+   * Если отк. стр-ца не доустпна без регистрации, то перейти на login
+   *
    *   Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт
    * или нет регистрации и целевая страница не открыта
    * @param string $target
    * @return $this|Main
    */
   public function applyAuth(string $target = ''): Main {
-
-    if ($this->checkStatus('no') && $target !== 'login'
-        && (ONLY_LOGIN || (PUBLIC_PAGE && $target !== 'public'))) {
-      //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
+    if ($this->checkStatus('no')) {
       $_SESSION['target'] = $target;
-      reDirect(false);
-    } else if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
+      if ($target === '' && ONLY_LOGIN) reDirect('login');
+      if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
+    } else {
+      if ($target === '' && !PUBLIC_PAGE) reDirect($this->getSideMenu(true));
+      if ($target !== '' && !in_array($target, $this->getSideMenu())) reDirect('404');
+    }
 
     session_abort();
     return $this;
@@ -143,8 +148,8 @@ trait Authorization {
    * @return array|mixed
    */
   public function getSideMenu(bool $first = false) {
-    if ($first) return array_values($this->sideMenu)[0];
-    return $this->sideMenu;
+    return $first ? array_values($this->sideMenu)[0]
+                  : $this->sideMenu;
   }
 
   /**

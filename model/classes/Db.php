@@ -50,7 +50,7 @@ class Db extends \R {
       );
 
       if (!self::testConnection()) {
-        is_callable('reDirect') && reDirect(false, '404&dbError=true');
+        is_callable('reDirect') && reDirect('404&dbError=true');
         exit('Data Base connect error!');
       }
 

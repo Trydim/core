@@ -2,9 +2,16 @@
   "version": "1.0.0",
   "description": "Public project",
   "name": "my-webpack-project",
+  "private": true,
   "scripts": {
+    "updateVersion": "node ./webpack/updateVersion.js",
+
     "publicBuildProd": "webpack --env production --config ./webpack/webpack.config.js && node ./webpack/updateVersion.js",
 
-    "publicBuildDev": "webpack --config ./webpack/webpack.config.js"
+    "publicBuildDev": "webpack --config ./webpack/webpack.config.js",
+
+    "localCypressTest": "cypress open --project ../../ --config-file ./public/src/tests/cypress.json --env external=false",
+
+    "cypressDeployProd": "cypress open --project ../../ --config-file ./public/src/tests/cypress.json --env external=true"
   }
 }
