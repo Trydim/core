@@ -468,7 +468,7 @@ class Db extends \R {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
       $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
-      $item['path'] = $path ? $path : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
+      $item['src'] = $path ? $path : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
       return $item;
     }, $images);
   }

@@ -16,7 +16,8 @@ const dataMain = './src/templates/main/main.html';
 
 const path    = require('path'),
       webpack = require('webpack'), // Используется для сборки VUE
-      MiniCssExtractPlugin = require('mini-css-extract-plugin');
+      MiniCssExtractPlugin = require('mini-css-extract-plugin'),
+      { VueLoaderPlugin }  = require('vue-loader');
 
 // Конфиг Дениса
 const fs         = require('fs'),
@@ -177,7 +178,7 @@ module.exports = env => {
         //filename: name => name.chunk.name !== 'main' ? `${outputsPoints[name.chunk.name]}/css/${name.chunk.name.split('_')[0]}.css` : `/css/${name.chunk.name}.css`,
       }),
       //getCopyPlugin(dev),
-
+      new VueLoaderPlugin(),
 
       new webpack.DefinePlugin({
         // Drop Options API from bundle

@@ -1,11 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const webpack = require('webpack');
-//const HtmlWebpackPlugin = require('html-webpack-plugin');
+const fs = require('fs'),
+      path = require('path'),
+      webpack = require('webpack'),
+      { VueLoaderPlugin }  = require('vue-loader');
+
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-//const CssMinimizerPlugin   = require('css-minimizer-webpack-plugin');
-//const TerserPlugin         = require("terser-webpack-plugin");
-//const webpack = require('webpack'); // вроде не обязательно
 
 const absPath = '../../',
       resFileName = 'webpackModule.json';
@@ -20,12 +18,11 @@ if (fs.existsSync(absPath + 'public/' + resFileName)) {
 
 module.exports = env => {
   const dev = !env.production;
-  //process.env.NODE_ENV = dev ? 'development' : 'production'; // зачем это
 
   return {
-    mode: dev ? 'development' : 'production',
-    watch: dev, // слежка за изменениями файлов
-    watchOptions: { aggregateTimeout: 300 }, // задержка оценки изменений в мс
+    mode        : dev ? 'development' : 'production',
+    watch       : dev, // слежка за изменениями файлов
+    watchOptions: {aggregateTimeout: 300}, // задержка оценки изменений в мс
     entry,
 
     experiments: {
@@ -33,39 +30,26 @@ module.exports = env => {
     },
 
     output: {
-      path    : path.resolve(__dirname, '../../assets/'),
-      filename: 'js/module/[name]/[name].js',
-      library: {
+      path         : path.resolve(__dirname, '../../assets/'),
+      filename     : 'js/module/[name]/[name].js',
+      library      : {
         type: 'module',
       },
-      scriptType: 'module',
-      module: true,
+      scriptType   : 'module',
+      module       : true,
       libraryTarget: 'module',
     },
 
     resolve: {
       alias: {
-          vue: dev ? 'vue/dist/vue.esm-bundler.js' : 'vue/dist/vue.esm-browser.prod.js',
+        vue: dev ? 'vue/dist/vue.esm-bundler.js' : 'vue/dist/vue.esm-browser.prod.js',
       }
     },
 
     devtool: dev ? 'source-map' : false, //source mapping
     optimization: {
       minimize: !dev,
-      minimizer: [
-        /*new TerserPlugin({
-          extractComments: false // Убрать комментарии
-        }),*/
-        `...`,
-        /*new CssMinimizerPlugin({
-          minimizerOptions: {
-            preset: [
-              "default",
-              {discardComments: { removeAll: true }},
-            ],
-          },
-        }),*/
-      ],
+      minimizer: [`...`],
       /*
       splitChunks: {
         chunks: 'all', //maxSize: 1024,
@@ -85,18 +69,18 @@ module.exports = env => {
       new MiniCssExtractPlugin({
         filename: "css/module/[name]/[name].css",
       }),
-      //new VueLoaderPlugin(),
+      new VueLoaderPlugin(),
 
       /*new HtmlWebpackPlugin({
-        title: 'yrdy',
+        title: 'title',
         filename: 'view/content.php',
         template: `content.php`,
       }),*/
 
       new webpack.DefinePlugin({
         // Drop Options API from bundle
-          __VUE_OPTIONS_API__  : 'true',
-          __VUE_PROD_DEVTOOLS__: 'false',
+        __VUE_OPTIONS_API__  : 'true',
+        __VUE_PROD_DEVTOOLS__: 'false',
       }),
     ],
 

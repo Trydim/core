@@ -19,18 +19,14 @@ if ($authStatus && isset($_GET['orderId'])) {
     $order = $main->db->loadOrderById($orderId);
 
     if ($order) {
+      $dbContent .= "<input type='hidden' id='dataOrder' value='" . json_encode($order) . "'>";
+
       $customer = $main->db->loadCustomerByOrderId($order['ID']);
-
-      $order = json_encode($order);
-      $dbContent .= "<input type='hidden' id='dataOrder' value='$order'>";
-
       if ($customer) {
-        $customer = json_encode($customer);
-        $dbContent .= "<input type='hidden' id='dataCustomer' value='$customer'>";
+        $dbContent .= "<input type='hidden' id='dataCustomer' value='" . json_encode($customer) . "'>";
       }
     }
   }
-
 }
 
 if ($authStatus && isset($_GET['orderVisitorId'])) {
@@ -40,8 +36,7 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
     $order = $main->db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
 
     if (count($order) === 1) {
-      $order = json_encode($order[0]);
-      $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='$order'>";
+      $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='" . json_encode($order[0]) . "'>";
     }
   }
 }

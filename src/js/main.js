@@ -95,7 +95,7 @@ const setParentHeight = (target, height) => {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const cmsEvent = function() {
-  let action = this.dataset.actionCms;
+  let action = this.dataset.action;
 
   let select = {
     'menuToggle': () => {

@@ -420,7 +420,7 @@ const func = {
     let fileName = report.fileName || false;
     //data.set('dbAction', 'DB');
     data.set('mode', 'docs');
-    data.set('docType', 'pdf');
+    data.set('docsAction', 'pdf');
     data.set('reportVal', JSON.stringify(report));
 
     q.Post({data}).then(data => {
@@ -435,6 +435,39 @@ const func = {
         finishOk();
       }
     });
+  },
+
+  /**
+   *
+   * @param {object} param {{
+   * customer }}
+   */
+  saveOrder(param) {
+    const data = new FormData();
+
+    data.set('mode', 'DB');
+    data.set('dbAction', 'saveOrder');
+    param.docType && data.set('docType', 'param.docType');
+
+    if (param.customer) {
+      Object.entries(param.customer).forEach(([k, v]) => data.set(k, v));
+    }
+
+    return q.Post({data});
+  },
+
+  /**
+   *
+   * @param param
+   */
+  sendOrder(param) {
+    const data = new FormData();
+
+    data.set('mode', 'docs');
+    data.set('docsAction', param.email || 'mail');
+    param.docType && data.set('docType', 'param.docType');
+
+    return q.Post({data});
   },
 
   /**

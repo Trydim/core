@@ -1,9 +1,8 @@
-const path    = require('path');
-const webpack = require('webpack');
+const path    = require('path'),
+      webpack = require('webpack'),
+      { VueLoaderPlugin }  = require('vue-loader');
 //const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-//const CssMinimizerPlugin   = require('css-minimizer-webpack-plugin');
-//const TerserPlugin         = require("terser-webpack-plugin");
 
 module.exports = env => {
   const dev = !env.production;
@@ -40,40 +39,13 @@ module.exports = env => {
     optimization: {
       minimize : !dev,
 
-      minimizer: [
-        /*new TerserPlugin({
-         extractComments: false // Убрать комментарии
-         }),*/
-        `...`,
-        /*new CssMinimizerPlugin({
-         minimizerOptions: {
-         preset: [
-         "default",
-         {discardComments: { removeAll: true }},
-         ],
-         },
-         }),*/
-      ],
-      /*
-       splitChunks: {
-       chunks: 'all', //maxSize: 1024,
-       cacheGroups: {
-       commons: {
-       test: /[\\/]node_modules[\\/]/, // cacheGroupKey here is `commons` as the key of the cacheGroup
-       name(module, chunks, cacheGroupKey) {
-       const moduleFileName = module.identifier().split('/').reduceRight(item => item);
-       const allChunksNames = chunks.map((item) => item.name).join('~');
-       return `js/${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
-       },
-       }
-       },
-       },*/
+      minimizer: [`...`],
     },
     plugins: [
       new MiniCssExtractPlugin({
         filename: "css/admin.css",
       }),
-      //new VueLoaderPlugin(),
+      new VueLoaderPlugin(),
 
       /*new HtmlWebpackPlugin({
        title: 'html',
