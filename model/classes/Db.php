@@ -945,10 +945,10 @@ class Db extends \R {
    * @return mixed
    */
   public function getUserByOrderId($id) {
-    return self::getRow("SELECT u.name as 'name', u.contacts as 'contacts'
-            FROM users u 
-            JOIN orders o ON u.ID = o.user_id
-            WHERE o.ID = :id", [':id' => $id]);
+    return self::getRow("SELECT U.name as 'name', U.contacts as 'contacts'
+            FROM users U 
+            JOIN orders O ON U.ID = O.user_id
+            WHERE O.ID = :id", [':id' => $id]);
   }
 
   public function checkPassword($login, $password) {

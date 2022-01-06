@@ -2,9 +2,8 @@
 
 /**
  * @var array $main - global
- * @var array $dbConfig - config from public
- * @var string $docsAction
- * @var string $docType
+ * @var string $docsAction - from query
+ * @var string $docType - from query
  */
 
 $data = [];
@@ -17,7 +16,37 @@ $orderIds = !$reportVal && isset($orderIds) ? json_decode($orderIds) : false;
 !$orderIds && $orderIds = isset($reportVal['orderId']) ? json_decode($reportVal['orderId']) : false;
 $orderIds = is_array($orderIds) && count($orderIds) === 1 ? $orderIds[0] : false;
 
-$addManager = isset($addManager) || isset($useUser) || isset($addUser);
+// Данные о менеджере
+if (isset($addManager)) {
+  if (isset($reportVal['name'])) {
+    $userData = $main->db->getUser($reportVal['name'], 'name, contacts');
+  } else {
+    $userData = $main->db->getUserById($reportVal['userId'] ?? $main->getLogin('id'));
+  }
+
+  if (count($userData)) {
+    $userData['contacts'] = json_decode($userData['contacts'], true);
+    $data['userData'] = $userData;
+  }
+  unset($userData);
+}
+
+// Данные о клиенте
+if (isset($addCustomer)) {
+  if (isset($customerId)) {
+    $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
+  } else if (isset($customer)) {
+    $customerData = $customer;
+  } else {
+    $customerData = '';
+  }
+
+  if (count($customerData)) {
+    $userData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);
+    $data['customerData'] = $userData;
+  }
+  unset($customerData);
+}
 
 // Отчет загрузить из БД по ИД
 if ($orderIds) {
@@ -37,22 +66,6 @@ if ($orderIds) {
   ];
 } else if ($reportVal) {
   $data['reportValue'] = $reportVal;
-}
-
-// Данные о менеджере
-if ($addManager) {
-  if (isset($reportVal['name'])) {
-    $userData = $main->db->getUser($reportVal['name'], 'name, contacts');
-  } else if (isset($reportVal['userId'])) {
-    $userData = $main->db->getUserById($reportVal['userId']);
-  } else {
-    $userData = $main->db->getUserByOrderId($main->getLogin('id'));
-  }
-
-  if (count($userData)) {
-    $userData['contacts'] = json_decode($userData['contacts'], true);
-    $data['userData'] = $userData;
-  }
 }
 
 $docsAction = $docsAction ?? 'mail';
@@ -76,7 +89,7 @@ if (isset($docsAction)) {
       $mail = new Mail($mailTpl ?? 'mailTpl');
       $param = [
         'name'  => $name ?? '',
-        'phone' => $tel ?? ($phone ?? ''),
+        'phone' => $tel ?? $phone ?? '',
         'email' => $email ?? '',
         'info'  => $info ?? '',
         'data'  => $data,

@@ -439,33 +439,110 @@ const func = {
 
   /**
    *
-   * @param {object} param {{
-   * customer }}
+   * @param {object} param
+   *
+   * @param {object} param.customer - customer param
+   * @param {?string|number} param.customer.id - id of have customer
+   * @param {?string} param.customer.name - name for new customer
+   * @param {?string} param.customer.phone - phone for new customer
+   * @param {?string} param.customer.email - email for new customer
+   * @param {?string} param.customer.address - address for new customer
+   * @param {?string} param.customer.ITN - number itn for new customer
+   * @param {?string|boolean} param.customerChange - add|change
+   *
+   * @param {?string|number} param.orderId - input or other values (save as JSON)
+   * @param {?string|number} param.orderTotal - important param for show in order table (save as JSON)
+   * @param {object} param.importantVal - important param for show in order table (save as JSON)
+   * @param {object} param.saveVal - input or other values (save as JSON)
+   * @param {object} param.reportVal - require param report (save as JSON)
+   *
+   * @default param.orderTotal = 0
+   *
+   * @return {Promise} - return object {status, customerId, orderId}
    */
   saveOrder(param) {
     const data = new FormData();
 
     data.set('mode', 'DB');
     data.set('dbAction', 'saveOrder');
-    param.docType && data.set('docType', 'param.docType');
 
-    if (param.customer) {
-      Object.entries(param.customer).forEach(([k, v]) => data.set(k, v));
+    // Customer
+    param.customerChange = param.customerChange || 'add';
+    param.customerChange !== 'add' && data.set('customerId', (param.customer.id || 0).toString());
+
+    if (param.customerChange && param.customer) {
+      Object.entries(param.customer).forEach(([k, v]) => data.set(k, v.toString()));
     }
+
+    // Order
+    data.set('orderId', (param.orderId || 0).toString());
+    data.set('orderTotal', (param.orderTotal || 0).toString());
+    data.set('importantVal', JSON.stringify(param.importantVal || {}));
+    data.set('saveVal', JSON.stringify(param.saveVal || {}));
+    data.set('reportVal', JSON.stringify(param.reportVal || {}));
 
     return q.Post({data});
   },
 
   /**
+   * send report to mail
+   * @param {object} param
    *
-   * @param param
+   * @param {?string} param.docType - docType param (email)
+   * @param {?string} param.email - target email
+   *
+   * @param {?boolean} param.addManagerInfo - add or not and information about Manager to send Documents
+   *
+   * @param {?boolean} param.addCustomerInfo - add or not and information about Customer to send Documents
+   * @param {object} param.customer - customer param
+   * @param {?string|number} param.customer.id - id of have customer
+   * @param {?string} param.customer.name - name for new customer
+   * @param {?string} param.customer.phone - phone for new customer
+   * @param {?string} param.customer.email - email for new customer
+   * @param {?string} param.customer.address - address for new customer
+   * @param {?string} param.customer.info - info for new customer
+   * @param {?string} param.customer.ITN - number itn for new customer
+   * @param {?string|boolean} param.customerChange - add|change
+   *
+   * @param {?boolean} param.orderChanged -
+   * @param {?string} param.orderId - id of savedOrders
+   * @param {object} param.saveVal - input or other values
+   * @param {object} param.reportVal - require param report
+   *
+   * @return {object} - result {status}
    */
   sendOrder(param) {
-    const data = new FormData();
+    const data = new FormData(),
+          p    = param;
 
     data.set('mode', 'docs');
-    data.set('docsAction', param.email || 'mail');
-    param.docType && data.set('docType', 'param.docType');
+    data.set('docsAction', 'mail');
+    data.set('email', p.email || p.customer.email);
+    p.docType && data.set('docType', p.docType);
+
+    // Показать информацию о Менеджере
+    p.addManagerInfo && data.set('addManager', 'true');
+
+    // Пользователь взять из сохранненного заказа или из найденного, если не изменен
+    p.addCustomerInfo && data.set('addCustomer', 'true');
+
+    if (c.AUTH_STATUS && p.customer.id && !p.customerChange) {
+      data.set('customerId', p.customer.id.toString());
+    } else if (p.customer) {
+      data.set('name', p.customer.name || '');
+      data.set('phone', p.customer.phone || '');
+
+      data.set('info', p.customer.info || '');
+      data.set('customer', JSON.stringify(p.customer));
+    }
+
+    // Расчет загружен или сохранен и не изменен
+    if (c.AUTH_STATUS && p.orderId && !p.orderChanged) {
+      data.set('orderId', p.orderId.toString()); // Отчет из сохранненого заказа
+    } else {
+      data.set('saveVal', JSON.stringify(p.saveVal || {}));
+      data.set('reportVal', JSON.stringify(p.reportVal || {}));
+    }
 
     return q.Post({data});
   },
@@ -522,7 +599,6 @@ const func = {
    */
   setFormat: (value, fractionDigits = 0) =>
     ((+value).toFixed(fractionDigits)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '),
-
 
   /**
    * Get value

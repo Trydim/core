@@ -10,8 +10,8 @@
  * @return false|string
  */
 function addCpNumber_DefaultFunc($number, $reportVal) {
-  $reportVal = json_decode($reportVal, true);
-  $reportVal['cpNumber'] = $number;
-  return json_encode($reportVal);
+  $report = json_decode($reportVal, true);
+  $report['cpNumber'] = $report['cpNumber'] ?? $number;
+  return json_encode($report);
 }
 addHook('addCpNumber', 'addCpNumber_DefaultFunc');
