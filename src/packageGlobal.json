@@ -10,7 +10,6 @@
     "css-loader": "latest",
     "css-minimizer-webpack-plugin": "latest",
     "cypress-watch-and-reload": "latest",
-    "file-loader": "latest",
     "glob": "latest",
     "html-loader": "latest",
     "html-minimizer-webpack-plugin": "latest",

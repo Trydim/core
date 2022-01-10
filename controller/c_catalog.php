@@ -8,55 +8,55 @@
 $db = $main->getDB();
 
 function prepareData($data) {
-  return json_encode(array_reduce($data, function ($r, $item) {
-    $r[$item['ID']] = $item;
-    return $r;
-  }, []));
+  return json_encode(array_map(function ($item) {
+    $item['id'] = $item['ID'];
+    unset($item['ID']);
+    return $item;
+  }, array_values($data)));
 }
 
 $field = [
   'pageTitle' => 'Каталог',
   'footerContent' => '',
   'sideRight' => '',
+  'cssLinks'      => [CORE_CSS . 'module/catalog.css'],
 ];
 
 // Загрузка настройки столбцов
 $setting = getSettingFile();
-$elementsColumn = $setting['optionsColumn'] ?? 'ID,C.name,E.name,activity,sort,lastEditDate';
-$field['footerContent'] .= "<input type='hidden' id='elementsColumn' value='$elementsColumn'>";
-$optionsColumn = $setting['elementsColumn'] ?? 'ID,images,name,unitId,activity,sort,lastEditDate,moneyInputId,inputPrice,moneyOutputId,outputPercent,outputPrice';
-$field['footerContent'] .= "<input type='hidden' id='optionsColumn' value='$optionsColumn'>";
+$value = $setting['optionsColumn'] ?? 'ID,C.name,E.name,activity,sort,lastEditDate';
+$field['footerContent'] .= "<input type='hidden' id='elementsColumn' value='$value'>";
+$value = $setting['elementsColumn'] ?? 'ID,images,name,unitId,activity,sort,lastEditDate,moneyInputId,inputPrice,moneyOutputId,outputPercent,outputPrice';
+$field['footerContent'] .= "<input type='hidden' id='optionsColumn' value='$value'>";
 
 // Типы товаров
-$types = $db->selectQuery('codes', ['symbolCode', 'name']);
-// Разделы
-$section = $db->selectQuery('section', ['ID', 'name']);
-
-
-// Валют и единиц измерения
-$units = $db->selectQuery('units', ['ID', 'shortName']);
-$field['footerContent'] .= "<input type='hidden' id='dataUnits' value='" . prepareData($units) . "'>";
-$money = $db->getMoney();
-$field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($money) . "'>";
+$value = $db->selectQuery('codes', ['symbolCode', 'name']);
+$field['footerContent'] .= "<input type='hidden' id='dataCodes' value='" . json_encode($value) . "'>";
+// Единиц измерения
+$value = $db->selectQuery('units', ['ID', 'name', 'shortName']);
+$field['footerContent'] .= "<input type='hidden' id='dataUnits' value='" . prepareData($value) . "'>";
+// Валюта
+$value = $db->getMoney();
+$field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($value) . "'>";
 
 // Все свойства
-$properties = $main->getSettings('propertySetting');
+$value = $main->getSettings('propertySetting');
 foreach ($db->getTables('prop') as $table) {
-  $name = isset($properties[$table['dbTable']])
-    ? $properties[$table['dbTable']]['name']
-    : $table['name'];
+  $name = isset($value[$table['dbTable']]) ? $value[$table['dbTable']]['name'] : $table['name'];
 
-  $properties[$table['dbTable']] = [
+  $value[$table['dbTable']] = [
     'name' => $name,
-    'values' => $db->loadTable($table['dbTable']),
+    'values' => array_map(function ($row) {
+      $row['id'] = $row['ID'];
+      return $row;
+    }, $db->loadTable($table['dbTable'])),
   ];
 }
-//$properties = array_merge([], $properties); //бредовая строка
+$field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . json_encode($value) . "'>";
 
-$mess = [];
-include ABS_SITE_PATH . 'lang/dbDictionary.php';
-$field['footerContent'] .= "<input type='hidden' id='dataDbLang' value='" . json_encode($mess) . "'>";
+unset($value, $propSetting, $mess);
 
-unset($optionsColumn, $elementsColumn, $propSetting, $mess);
-require $pathTarget;
+ob_start();
+include $pathTarget;
+$field['content'] = ob_get_clean();
 $html = template('base', $field);

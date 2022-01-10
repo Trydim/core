@@ -1,62 +1,105 @@
 'use strict';
 
-import {Common} from "./Main";
+export const data = {
+  elementsModal: {
+    display        : false,
+    confirmDisabled: true,
+    title          : '',
+    single         : true,
+  },
 
-export class Elements extends Common {
-  constructor(props) {
-    super('elements', props);
+  elements: [],
+  elementsLoading: false,
 
-    const field = f.qS(`#${this.type}Field`);
+  element: {
+    id      : 0,
+    type    : 0,
+    parentId: 0,
+    name    : '',
+    activity: true,
+    sort    : 100,
+  },
 
-    this.queryParam.tableName = this.type;
-    this.setNodes(field, props.tmp);
+  fieldChange: {
+    type    : true,
+    parentId: true,
+    activity: true,
+    sort    : true,
+  },
 
-    this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
-      dbAction : 'openSection',
-      sortParam: this.sortParam,
-      query    : action => this.query(action).then(d => this.load(d, false)),
-    });
-    this.id = new f.SelectedRow({table: this.node.fieldT});
-    this.id.subscribe(this.selectedRow.bind(this));
+  sectionLoaded: 0,
+  elementsSelected: [],
+  elementsSelectedShow: false,
+  elementParentModalDisabled: false,
+  elementParentModalSelected: undefined,
+}
 
-    f.observer.subscribe(`sortEvent`, d => this.load(d, false));
-    f.observer.subscribe(`openSection`, d => this.open(d));
-    f.observer.subscribe(`searchInput`, (d, c) => this.searchEvent(d, c));
-    this.onEvent();
+export const watch = {
+  'element.parentId'() {
+    this.elementParentModalSelected = {[this.element.parentId]: true};
+  },
+
+  'element.name'() {
+    this.elementsModal.confirmDisabled = !this.element.name;
+  },
+}
+
+export const computed = {
+  sectionTreeModal() {
+    return this.sectionTree ? this.sectionTree[0].children : [{key: 0}];
+  },
+
+  getSectionId() {
+    return this.sectionLoaded || this.sectionTreeModal[0].key;
+  },
+
+  getElementsSelectedId() {
+    return this.elementsSelected.map(i => i.id);
   }
+}
 
-  open(id) {
-    this.queryParam.sectionId = id || false;
+const prepareData = data => data.map(el => {
+  el['activity'] = f.toNumber(el['activity']);
+  return el;
+});
+
+const reload = that => ({
+  dbAction : 'openSection',
+  callback: (fData, aData) => {
+    that.elements         = prepareData(aData['elements']);
+    that.elementsLoading  = false;
+    that.elementsSelected = [];
+  }
+});
+
+export const methods = {
+  loadElements() {
     this.queryParam.dbAction = 'openSection';
-    this.query().then(d => this.load(d));
-  }
-  load(data, idClear = true) {
-    idClear && this.id.clear();
-    data['elements'] && this.prepareItems(data['elements']);
-    data['countRowsElements'] && this.paginator.setCountPageBtn(data['countRowsElements']);
-  }
-  searchEvent(p, clearSearch) {
-    this.sortParam.pageNumber = 0;
+    this.sectionLoaded = this.queryParam.sectionId;
+    this.elementsLoading = true;
+    this.query().then(data => {
+      this.elements        = prepareData(data['elements']);
+      this.elementsLoading = false;
+    });
+  },
 
-    if (clearSearch) {
-      this.paginator.setQueryAction('openSection');
-      this.load({elements: [], countRowsElements: 0});
-    } else {
-      this.queryParam.searchValue = p.value;
-      this.paginator.setQueryAction('searchElements');
-      this.load(p.data);
-    }
-  }
+  checkLoadedElement() {
+    //if (this.elementsSelected.includes(this.elementLoaded)) this.options = [];
+  },
 
-  checkSection() {
-    if (!this.queryParam.sectionId) { f.showMsg('Ошибка раздела', 'error'); return true; }
-    return false;
-  }
+  enableField() {
+    this.fieldChange = {
+      type    : true,
+      parentId: true,
+      activity: true,
+      sort    : true,
+    };
+  },
 
   getPopularType() {
     let obj = {}, count = -1, key;
 
-    for (let item of this.itemList.values()) {
+    for (let item of this.elementsSelected) {
       let code = item['symbolCode'];
       !obj[code] && (obj[code] = 0);
       obj[code]++;
@@ -68,134 +111,118 @@ export class Elements extends Common {
     }
 
     return key;
-  }
+  },
+  getAvgSort(selected) {
+    return selected.reduce((r, i) => (r += f.toNumber(i.sort)), 0) / selected.length;
+  },
+
+  setElementModal(title, confirmDisabled, single) {
+    single && this.enableField();
+    this.elementsModal = {display: true, confirmDisabled, title, single};
+  },
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
-  // Создать элемент
+  selectedAll() {
+    this.elementsSelected = Object.values(this.elements);
+  },
+  clearAll() {
+    this.elementsSelected = [];
+  },
+  unselectedElement(id) {
+    this.elementsSelected = this.elementsSelected.filter(i => i.id !== id);
+    this.elementsSelectedShow = !!this.elementsSelected.length;
+  },
+
+  elementParentModalSelectedChange(v) {
+    this.element.parentId = Object.keys(v)[0];
+  },
+
+  elementNameInput() {
+    this.elementsModal.confirmDisabled = !this.element.name;
+  },
+
+  // Создать
   createElement() {
-    let form = this.tmp.form.cloneNode(true);
-    let node = form.querySelector('[name="type"]');
-    node.value = this.getPopularType();
+    this.queryParam.dbAction = 'createElement';
 
-    node = form.querySelector('[name="parentId"]');
-    if (this.queryParam.sectionId) {
-      node.value    = this.queryParam.sectionId;
-      node.disabled = true;
-    }
+    this.element.type = this.codes[0]['symbolCode'];
+    this.element.name = '';
+    this.element.parentId = this.getSectionId;
+    this.element.sort = 100;
 
-    this.queryParam.form = form;
-    this.M.show('Создание элемента', form);
-    form.querySelector('[name="name"]').focus();
-    this.reloadAction = {
-      dbAction: 'openSection',
-      callback: data => {
-        f.showMsg('Элемент создан');
-        this.id.clear();
-        this.load(data);
-      },
-    };
-  }
-  // Открыть элемент
-  openElement() {
-    if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
-
-    this.queryParam.elementsId = this.id.getSelected()[0];
-    this.id.clear();
-    f.observer.fire('openElement', this.queryParam.elementsId);
-  }
-  // Изменить элемент
+    this.setElementModal('Создать элемент', true, true);
+    this.reloadAction = reload(this);
+  },
   changeElements() {
-    if (!this.id.getSelectedSize() || this.checkSection()) { f.showMsg('Выберите минимум 1 элемент', 'error'); return; }
+    if (!this.elementsSelected.length) { return; }
+    const el     = this.elementsSelected[0],
+          single = this.elementsSelected.length === 1;
 
-    let form        = this.tmp.form.cloneNode(true),
-        oneElements = this.id.getSelectedSize() === 1,
-        id          = this.id.getSelected(),
-        element     = this.itemList.get(id[0]);
+    this.queryParam.elementsId = JSON.stringify(this.getElementsSelectedId);
+    this.queryParam.dbAction = 'changeElements';
 
-    this.queryParam.elementsId = JSON.stringify(id);
-    this.delayFunc = () => this.id.clear();
+    this.element.name     = single ? el.name : '';
+    this.element.type     = single ? el['symbolCode'] : this.getPopularType();
+    this.element.parentId = this.getSectionId;
+    this.element.activity = single ? !!el.activity : true;
+    this.element.sort     = single ? f.toNumber(el.sort) : this.getAvgSort(this.elementsSelected);
 
-    let node = form.querySelector('[name="type"]');
-    if (oneElements) node.value = element['symbolCode'];
-    else node.closest('.formRow').remove();
-
-    node = form.querySelector('[name="name"]');
-    if (oneElements) node.value = element['E.name'];
-    else node.closest('.formRow').remove();
-
-    node = form.querySelector('[name="parentId"]');
-    node.value = this.queryParam.sectionId;
-
-    node = form.querySelector('[name="activity"]');
-    node.checked = oneElements ? !!(+element['activity']) : true;
-
-    node = form.querySelector('[name="sort"]');
-    if (oneElements) node.value = element['sort'];
-    else node.closest('.formRow').remove();
-
-    this.queryParam.form = form;
-    this.M.show('Изменение элемента', form);
-    this.reloadAction = {
-      dbAction: 'openSection',
-      callback: data => {
-        f.showMsg('Элемент изменен');
-        this.id.clear();
-        this.load(data);
-      },
-    };
-  }
-  // Копировать Элемент
+    this.setElementModal('Редактировать элемент', false, single);
+    this.reloadAction = reload(this);
+  },
   copyElement() {
-    if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только 1 элемент', 'error'); return; }
+    if (this.elementsSelected.length !== 1) { return; }
+    const el = this.elementsSelected[0];
 
-    let form = this.tmp.form.cloneNode(true),
-        id          = this.id.getSelected(),
-        element     = this.itemList.get(id[0]);
+    this.queryParam.dbAction = 'copyElement';
 
-    let node = form.querySelector('[name="type"]');
-    node.value = this.getPopularType();
+    this.element.name     = el.name;
+    this.element.type     = el['symbolCode'];
+    this.element.parentId = this.getSectionId;
+    this.element.activity = !!el.activity;
+    this.element.sort     = f.toNumber(el.sort);
 
-    node = form.querySelector('[name="name"]');
-    node.value = element['E.name'];
-    node.focus();
+    this.setElementModal('Копировать элемент', false, true);
+    this.reloadAction = reload(this);
+  },
+  deleteElements() {
+    if (!this.elementsSelected.length) return;
 
-    node = form.querySelector('[name="parentId"]');
-    node.value = this.queryParam.sectionId;
-    node.disabled = true;
+    this.queryParam.elementsId = JSON.stringify(this.getElementsSelectedId);
+    this.queryParam.dbAction   = 'deleteElements';
 
-    this.queryParam.form = form;
-    this.M.show('Копирование элемента', form);
+    this.setElementModal('Удалить элемент(ы)', false, false);
     this.reloadAction = {
-      dbAction: 'openSection',
-      callback: data => {
-        f.showMsg('Элемент скопирован');
-        this.id.clear();
-        this.load(data);
-      },
-    };
-  }
-  // Удалить элемент
-  delElements() {
-    if (!this.id.getSelectedSize()) return;
-    this.queryParam.elementsId = JSON.stringify(this.id.getSelected());
+      dbAction : 'openSection',
+      callback: (fData, aData) => {
+        this.checkLoadedElement();
 
-    this.M.show('Удалить элемент', 'Удалить элемент и варианты?');
-    this.reloadAction = {
-      dbAction: 'openSection',
-      callback: data => {
-        f.observer.fire('delElements', this.id.getSelected());
-        f.showMsg('Элемент(ы) удалены!');
-        this.id.clear();
-        this.load(data);
-      },
+        this.elements         = prepareData(aData['elements']);
+        this.elementsLoading  = false;
+        this.elementsSelected = [];
+      }
     };
-  }
+  },
 
-  // Bind events
-  //--------------------------------------------------------------------------------------------------------------------
-  onEvent() {
-    this.node.field.addEventListener('click', e => this.commonEvent(e));
-    this.node.field.addEventListener('dblclick', e => this.dblClick(e));
+  elementConfirm() {
+    //this.elementsLoading = true;
+    this.queryParam = Object.assign(this.queryParam, this.element, {fieldChange: JSON.stringify(this.fieldChange)});
+    this.query();
+    this.elementsModal.display = false;
+  },
+  elementCancel() {
+    this.elementsModal.display = false;
+  },
+
+  loadElement(e) {
+    let tr = e.target.closest('tr'),
+        n  = tr && tr.querySelector('[data-id]'),
+        id = n && +n.dataset.id;
+    id && this.loadOptions(id);
+  },
+
+  onToggle(value) {
+    this.optionsColumnsSelected = this.optionsColumns.filter(col => value.includes(col));
   }
 }

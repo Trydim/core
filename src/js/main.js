@@ -5,7 +5,7 @@ const importModuleFunc = async moduleName => {
   if (moduleName === 'public') {
     link = `${f.SITE_PATH}public/js/${f.PUBLIC_PAGE}.js`;
     moduleName = f.PUBLIC_PAGE;
-  } else link = `./module/${moduleName}/${moduleName}.js`;
+  } else link = `./module/${moduleName}.js`;
 
   try {
     let importModule = await new Promise((resolve, reject) => {

@@ -2,6 +2,7 @@
   "version": "1.0.0",
   "description": "My webpack project",
   "name": "my-webpack-project",
+  "private": true,
   "scripts": {
     "update": "git pull && npm run coreProd && npm run createResourceFile && npm run coreModuleProd",
 
@@ -12,6 +13,9 @@
     "coreModuleProd": "webpack --env production --config ./webpack/webpack.module.js",
 
     "coreDev": "webpack --config ./webpack/webpack.config.js",
-    "coreModuleDev": "webpack --config ./webpack/webpack.module.js"
+    "coreModuleDev": "webpack --config ./webpack/webpack.module.js",
+
+    "localCypressTest": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=false",
+    "cypressDeployProd": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=true"
   }
 }

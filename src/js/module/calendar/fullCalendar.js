@@ -1,8 +1,3 @@
-/*!
-FullCalendar v5.1.0
-Docs & License: https://fullcalendar.io/
-(c) 2020 Adam Shaw
-*/
 export const FullCalendar = (function (exports) {
     'use strict';
 

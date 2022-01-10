@@ -16,6 +16,9 @@ use Xml\Xml;
  */
 trait Authorization {
 
+  /**
+   * @var string[]
+   */
   static $AVAILABLE_ACTION = ['loadCVS', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
 
   private $id, $login, $name;
@@ -107,7 +110,6 @@ trait Authorization {
    * @return $this|Main
    */
   public function applyAuth(string $target = ''): Main {
-
     if ($this->checkStatus('no') && $target !== 'login'
         && (ONLY_LOGIN || (PUBLIC_PAGE && $target !== 'public'))) {
       //$_SESSION['target'] = !in_array($target , [HOME_PAGE, PUBLIC_PAGE]) ? $target : '';
@@ -143,8 +145,8 @@ trait Authorization {
    * @return array|mixed
    */
   public function getSideMenu(bool $first = false) {
-    if ($first) return array_values($this->sideMenu)[0];
-    return $this->sideMenu;
+    return $first ? array_values($this->sideMenu)[0]
+                  : $this->sideMenu;
   }
 
   /**

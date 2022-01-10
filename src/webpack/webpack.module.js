@@ -1,9 +1,10 @@
 const fs = require('fs'),
       path = require('path'),
       webpack = require('webpack'),
-      { VueLoaderPlugin }  = require('vue-loader');
+      { VueLoaderPlugin } = require('vue-loader');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizer = require('css-minimizer-webpack-plugin');
 
 const absPath = '../../',
       resFileName = 'webpackModule.json';
@@ -31,7 +32,7 @@ module.exports = env => {
 
     output: {
       path         : path.resolve(__dirname, '../../assets/'),
-      filename     : 'js/module/[name]/[name].js',
+      filename     : 'js/module/[name].js',
       library      : {
         type: 'module',
       },
@@ -49,25 +50,14 @@ module.exports = env => {
     devtool: dev ? 'source-map' : false, //source mapping
     optimization: {
       minimize: !dev,
-      minimizer: [`...`],
-      /*
-      splitChunks: {
-        chunks: 'all', //maxSize: 1024,
-        cacheGroups: {
-        commons: {
-          test: /[\\/]node_modules[\\/]/, // cacheGroupKey here is `commons` as the key of the cacheGroup
-          name(module, chunks, cacheGroupKey) {
-            const moduleFileName = module.identifier().split('/').reduceRight(item => item);
-            const allChunksNames = chunks.map((item) => item.name).join('~');
-            return `js/${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
-          },
-        }
-      },
-      },*/
+      minimizer: [
+        new CssMinimizer(),
+        `...`,
+      ],
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "css/module/[name]/[name].css",
+        filename: "css/module/[name].css",
       }),
       new VueLoaderPlugin(),
 
@@ -88,8 +78,8 @@ module.exports = env => {
       //noParse: /canvasjs\.min/,
       rules: [
         getVueRules(),
-        getScssRules(),
-        getCssRules(),
+        getScssRules(dev),
+        getCssRules(dev),
         getImageRules(),
         getSVGRules(),
         getFontsRules(),
@@ -102,18 +92,14 @@ module.exports = env => {
 // Правила / Rules
 // ---------------------------------------------------------------------------------------------------------------------
 
-// asset/resource - file-loader - в отдельный файл
-// asset/inline - url-loader - инлайном базе64
-// asset/source - raw-loader - ?
-// asset - автоматический выбор от размера по умолчанию 8к
-
-const generator = {
-  publicPath: '../', // папка относительно собранных файлов.
-}
+/** asset/resource - file-loader - в отдельный файл
+ * asset/inline - url-loader - inline базе64
+ * asset/source - raw-loader - ?
+ * asset - автоматический выбор от размера по умолчанию 8к */
 
 /**
  * Vue
- * @returns Object
+ * @return {object}
  */
 const getVueRules = () => ({
   test: /\.vue$/,
@@ -122,12 +108,12 @@ const getVueRules = () => ({
 
 /**
  * Scss
- * @returns Object
+ * @return {object}
  */
-const getScssRules = () => ({
+const getScssRules = dev => ({
   test: /\.s[ac]ss$/i,
   use: [
-    MiniCssExtractPlugin.loader,
+    dev ? 'style-loader' : MiniCssExtractPlugin.loader,
     'css-loader',
     'sass-loader',
   ],
@@ -135,27 +121,25 @@ const getScssRules = () => ({
 
 /**
  * Css
- * @returns Object
+ * @return {object}
  */
-const getCssRules = () => ({
+const getCssRules = dev => ({
   test: /\.css$/i,
   use: [
-    MiniCssExtractPlugin.loader,
+    dev ? 'style-loader' : MiniCssExtractPlugin.loader,
     'css-loader',
   ],
 });
 
 /**
- * Image
- * loader: 'svgo-loader', - какой-то инлайн лоадер
- * @returns Object
+ * Image loader
+ * @return {object}
  */
 const getImageRules = () => ({
   test: /\.(png|jpe?g|gif|webp)$/i,
   type: 'asset',
   generator: {
     filename: 'image/[name][ext]',
-    publicPath: generator.publicPath,
   },
   parser: {
     dataUrlCondition: {
@@ -167,14 +151,13 @@ const getImageRules = () => ({
 /**
  * SVG
  * inline
- * @returns Object
+ * @return {object}
  */
 const getSVGRules = () => ({
   test: /\.(svg)$/,
   type: 'asset',
   generator: {
     filename: 'svg/[name][ext]',
-    publicPath: generator.publicPath,
   },
   parser: {
     dataUrlCondition: {
@@ -185,13 +168,12 @@ const getSVGRules = () => ({
 
 /**
  * Шрифты
- * @returns Object
+ * @return {object}
  */
 const getFontsRules = () => ({
   test: /\.(ttf|woff|woff2|eot)$/,
   type: "asset/resource",
   generator: {
     filename: 'fonts/[name][ext]',
-    publicPath: '../',
   },
 });

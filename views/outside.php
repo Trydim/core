@@ -5,55 +5,49 @@
  */
 $inline = strtolower(OUTSIDE);
 
-if(isset($global)) $content = $global;
-else if (!isset($content)) $content = '';
+$content = $global ?? $content ?? '';
+$footerContent = $footerContent ?? '';
 
-$coreScript = CORE_SCRIPT;
+$cssLinksArr = $cssLinks ?? [];
+$cssLinksRes = $inline ? '' : [];
 
-$globalWindowJsValue = 'window.CL_OUTSIDE = "1"; window.SITE_PATH = "' . SITE_PATH . '";' .
+$jsLinksArr = $jsLinks ?? [];
+$jsLinksRes = $inline ? '' : [];
+
+$globalWindowJsValue = '<script>window.CL_OUTSIDE = "1"; window.SITE_PATH = "' . SITE_PATH . '";' .
                        ' window.MAIN_PHP_PATH = "' . SITE_PATH . 'index.php' . '";' .
                        ' window.PUBLIC_PAGE = "' . PUBLIC_PAGE . '";' .
-                       ' window.PATH_IMG = "' . PATH_IMG . '";';
+                       ' window.PATH_IMG = "' . PATH_IMG . '";</script>';
 
-$inline && $globalWindowJsValue = "<script>$globalWindowJsValue</script>";
-
-$cssLinksArr = $inline ? '' : [];
-if(!isset($cssLinks)) $cssLinks = [];
-array_map(function($item) use (&$cssLinksArr, $inline) {
-  if ($inline) {
-    $global = '';
-    if (stripos($item, 'global') !== false) $global = 'data-global="true"';
+array_map(function($item) use (&$cssLinksRes, $inline) {
+  if (gettype(OUTSIDE) !== 'boolean') {
+    $global = stripos($item, 'global') !== false ? 'data-global="true"' : '';
     $href = $inline === 'i' ? 'href' : 'data-href';
-    $cssLinksArr .= "<link rel=\"stylesheet\" $global $href=\"$item\">";
+    $cssLinksRes .= "<link rel=\"stylesheet\" $global $href=\"$item\">";
   }
-  else $cssLinksArr[] = $item;
-}, $cssLinks);
+  else $cssLinksRes[] = $item;
+}, $cssLinksArr);
 
-$jsLinksArr = [ $coreScript . 'src.js', $coreScript . 'main.js'];
-if(!isset($jsLinks)) $jsLinks = [];
-array_map(function($item) use (&$jsLinksArr) {
-  $jsLinksArr[] = $item;
-}, $jsLinks);
-
-$inline && $jsLinksArr = array_reduce($jsLinksArr, function($r, $item) {
-  $r .= '<script defer type="module" src="' . $item . '"></script>';
-  return $r;
-}, '');
-
-if(!isset($footerContent)) $footerContent = '';
+$jsLinksArr = [ CORE_SCRIPT . 'src.js', CORE_SCRIPT . 'main.js'];
+array_map(function($item) use (&$jsLinksRes) {
+  if (gettype(OUTSIDE) !== 'boolean') {
+    $jsLinksRes .= '<script defer type="module" src="' . $item . '"></script>';
+  }
+  else $jsLinksRes[] = $item;
+}, $jsLinksArr);
 
 $result = [
   'content'             => $content,
   'globalWindowJsValue' => $globalWindowJsValue,
   'footerContent'       => $footerContent,
-  'cssLinksArr'         => $cssLinksArr,
-  'jsLinksArr'          => $jsLinksArr,
+  'cssLinksArr'         => $cssLinksRes,
+  'jsLinksArr'          => $jsLinksRes,
 ];
 
 if ($inline === 's') {
   echo getPageAsString($result);
 } else if ($inline === 'i') {
-  echo $cssLinksArr . $globalWindowJsValue . $content . $footerContent . $jsLinksArr;
+  echo $cssLinksRes . $globalWindowJsValue . $content . $footerContent . $jsLinksRes;
 } else {
   echo json_encode($result);
   die();
