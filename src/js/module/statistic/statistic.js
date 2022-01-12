@@ -28,7 +28,7 @@ const initCharts = (dataPoints) => {
   chart.render();
 }
 
-export const statistic = {
+const statistic = {
   default: {},
 
   init() {
@@ -96,3 +96,5 @@ const orders = {
     return value.reduce ? value.reduce((a, i) => { a += `${i.key}:${i.value}`; return a; }, '') : '';
   },
 }
+
+statistic.init();

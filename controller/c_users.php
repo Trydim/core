@@ -4,7 +4,10 @@
  * @var string $pathTarget
  */
 
-$field = [ 'pageTitle' => 'Пользователи' ];
+$field = [
+  'pageTitle' => 'Пользователи',
+  'jsLinks'   => [CORE_JS . 'module/users.js'],
+];
 
 if(!isset($setting)) {
   $columns = $main->db->loadUsers(0, 1);

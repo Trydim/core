@@ -242,7 +242,7 @@ const orders = {
   },
 }
 
-export const calendar = {
+const calendar = {
   M: f.initModal({showDefaultButton: false}),
 
   init() {
@@ -253,3 +253,5 @@ export const calendar = {
     return this;
   }
 }
+
+calendar.init();

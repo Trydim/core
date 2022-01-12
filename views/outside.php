@@ -28,7 +28,7 @@ array_map(function($item) use (&$cssLinksRes, $inline) {
   else $cssLinksRes[] = $item;
 }, $cssLinksArr);
 
-$jsLinksArr = [ CORE_SCRIPT . 'src.js', CORE_SCRIPT . 'main.js'];
+$jsLinksArr = [ CORE_JS . 'src.js', CORE_JS . 'main.js'];
 array_map(function($item) use (&$jsLinksRes) {
   if (gettype(OUTSIDE) !== 'boolean') {
     $jsLinksRes .= '<script defer type="module" src="' . $item . '"></script>';

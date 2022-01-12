@@ -75,7 +75,7 @@ class allOrdersList {
   }
 }
 
-export const orders = {
+const orders = {
   M: f.initModal(),
   form: new FormData(),
 
@@ -451,3 +451,5 @@ export const orders = {
     });
   },*/
 }
+
+orders.init();

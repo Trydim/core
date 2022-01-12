@@ -69,8 +69,8 @@ if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase'
   <main class="main-wrapper mx-auto" id="mainWrapper">
     <div class="nav-header">
       <a href="<?= SITE_PATH ?>" class="brand-logo">
-        <img class="logo-abbr" src="./images/logo.png" alt="">
-        <span class="brand-title">title</span>
+        <img class="logo-abbr" src="<?= SITE_PATH ?>favicon.ico" alt="">
+        <span class="brand-title"><?= PROJECT_TITLE ?></span>
       </a>
 
       <div class="nav-control" role="button" data-action-cms="menuToggle">
@@ -97,11 +97,11 @@ if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase'
   </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src="<?= CORE_SCRIPT?>src.js"></script>
-<script defer type="module" src="<?= CORE_SCRIPT?>main.js"></script>
+<script defer type="module" src="<?= CORE_JS?>src.js"></script>
+<script defer type="module" src="<?= CORE_JS?>main.js"></script>
 
 <?php array_map(function($item) { ?>
-  <script type="module" src="<?= str_replace('//', '/', $item); ?>"></script>
+  <script defer type="module" src="<?= str_replace('//', '/', $item); ?>"></script>
 <?php }, $jsLinks) ?>
 
 <?= $footerContent; ?>
