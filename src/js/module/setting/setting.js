@@ -4,7 +4,7 @@ const getFieldNode = (p, field) => p.querySelector(`[data-field=${field}]`);
 
 import {Properties} from "./properties";
 
-export const setting = {
+const setting = {
   form: {
     mail      : f.qS('#mailForm'),
     user      : f.qS('#userForm'),
@@ -286,3 +286,5 @@ export const setting = {
     last && last.remove();
   },
 }
+
+setting.init();

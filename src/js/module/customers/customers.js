@@ -100,7 +100,7 @@ const orders = {
   },
 }
 
-export const customers = {
+const customers = {
   form: new FormData(),
 
   needReload: false,
@@ -369,3 +369,5 @@ export const customers = {
     this.onEventNode(f.gI('search'), this.focusSearch, {once: true}, 'focus');
   },
 }
+
+customers.init();

@@ -5,7 +5,10 @@
  * @var string $pathTarget
  */
 
-$field = ['pageTitle' => 'Заказы'];
+$field = [
+  'pageTitle' => 'Заказы',
+  'jsLinks'   => [CORE_JS . 'module/orders.js'],
+];
 
 // получить конфиг текущего пользователя
 $setting = $main->db->getUserSetting();

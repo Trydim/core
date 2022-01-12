@@ -12,6 +12,7 @@ $orders = $main->db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
 $field = [];
 $field['cssLinks'] = [CORE_CSS . 'module/calendar.css'];
+$field['jsLinks'] = [CORE_JS . 'module/calendar.js'];
 $field['pageTitle'] = 'Календарь';
 $field['footerContent'] = '';
 

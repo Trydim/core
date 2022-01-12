@@ -19,7 +19,7 @@ const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
  }
  }*/
 
-export const admindb = {
+const admindb = {
   init() {
     this.onEvent();
     this.setDefault();
@@ -66,3 +66,5 @@ export const admindb = {
     f.qA('input[data-action]').forEach(n => n.addEventListener('click', e => this.commonClick(e)));
   },
 }
+
+admindb.init();
