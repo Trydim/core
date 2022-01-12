@@ -11,7 +11,7 @@ $ordersStatus = $main->db->loadTable('order_status');
 $orders = $main->db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
 $field = [];
-$field['cssLinks'] = [CORE_CSS . 'module/calendar/calendar.css'];
+$field['cssLinks'] = [CORE_CSS . 'module/calendar.css'];
 $field['pageTitle'] = 'Календарь';
 $field['footerContent'] = '';
 

@@ -8,7 +8,7 @@ $field = [
   'pageTitle' => 'Администрирование',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/admindb/admindb.css'];
+$field['cssLinks'] = [CORE_CSS . 'module/admindb.css'];
 
 if (DB_TABLE_IN_SIDEMENU) {
   if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];

@@ -89,7 +89,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           } else {
             $added[] = $row;
           }
-      }
+        }
         count($added) && $result['insert'] = $db->insert($columns, $dbTable, $added);
         count($changed) && $result['change'] = $db->insert($columns, $dbTable, $changed, true);
       }
@@ -132,47 +132,44 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Orders
     case 'saveOrder':
       if (isset($reportVal)) {
-        $db->setCurrentUserId();
+        $customerId = intval($customerId ?? 0);
+        $customerChange = $customerId === 0 ? 'add' : ($customerChange ?? 'add'); // add/change
 
-        $customerId = $customerId ?? '0';
-        $changeUser = $customerChange ?? 'add'; // false/add/change
-
-        if ($changeUser && isset($name)) {
-          $contacts = [];
-          isset($phone) && $contacts['phone'] = $phone;
-          isset($email) && $contacts['email'] = $email;
-          isset($address) && $contacts['address'] = $address;
-
-          $param = [$customerId => []];
-          $param[$customerId]['name'] = $name;
-          isset($ITN) && $param[$customerId]['ITN'] = $ITN;
-          count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);
+        if ($customerChange) {
+          $param = [$customerId => [
+            'name' => $name ?? 'No name',
+            'ITN'  => $ITN ?? '',
+            'contacts' => json_encode([
+              'phone'   => $phone ?? '',
+              'email'   => $email ?? '',
+              'address' => $address ?? '',
+            ]),
+          ]];
 
           $columns = $db->getColumnsTable('customers');
-          $result['error'] = $db->insert($columns, 'customers', $param, $changeUser === 'change');
-          $changeUser === 'add' && $customerId = $db->getLastID('customers');
+          $result['error'] = $db->insert($columns, 'customers', $param, $customerChange === 'change');
+          $customerChange === 'add' && $customerId = $db->getLastID('customers');
         }
 
-        $orderId = $orderId ?? false;
-        $newOrder = !$orderId || !is_numeric($orderId);
-        $orderId = $newOrder ? intval($db->getLastID('orders')) + 1 : $orderId;
+        $orderId = intval($orderId ?? 0);
+        $orderTotal = $orderTotal ?? 0;
 
-        $param = [$orderId => []];
-        $param[$orderId]['customer_id'] = $customerId;
-        $param[$orderId]['user_id'] = $_SESSION['priority']; // TODO нет не пойдет
-        isset($saveVal) && $param[$orderId]['save_value'] = $saveVal;
-        isset($importantVal) && $param[$orderId]['important_value'] = $importantVal;
-        isset($orderTotal) && is_finite($orderTotal) && $param[$orderId]['total'] = floatval($orderTotal);
-        $param[$orderId]['report_value'] = addCpNumber($orderId, $reportVal);
+        $param = [$orderId => [
+          'user_id'     => $main->getLogin('id'),
+          'customer_id' => $customerId,
+          'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
+          'important_value' => $importantVal ?? '{}',
+          'status_id'       => $statusId ?? 1, // по умолчанию сохранять из настроек
+          'save_value'      => $saveVal ?? '{}',
+          'report_value'    => addCpNumber($orderId, $reportVal),
+        ]];
 
         $columns = $db->getColumnsTable('orders');
-        $result['error'] = $db->insert($columns, 'orders', $param, !$newOrder);
+        $result['error'] = $db->insert($columns, 'orders', $param, $orderId !== '0');
 
-        // status_id = ; по умолчанию сохранять из настроек
-        //$db->saveOrder($param, $orderId);
         $result['customerId'] = $customerId;
-        $result['orderId'] = $orderId;
-        $result['saveDate'] = date('Y-m-d H:i:s');
+        $result['orderId']    = $db->getLastID('orders');
+        $result['saveDate']   = date('Y-m-d H:i:s');
       }
       break;
     case 'loadOrders':
@@ -249,37 +246,44 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         } else {
           $param['0']['name'] = $name;
           $param['0']['code'] = $code;
+          $param['0']['active'] = intval(isset($activity) && $activity === "true");
           $result['error'] = $db->insert([], 'section', $param);
         }
       }
       break;
     case 'openSection':
-      !isset($sortColumn) && $sortColumn = 'C.name';
       if (isset($sectionId) && is_finite($sectionId)) {
         $result['countRowsElements'] = $db->getCountRows('elements', " section_parent_id = $sectionId");
-        $result['elements'] = $db->loadElements($sectionId, $pageNumber, $countPerPage, $sortColumn, $sortDirect);
+        $result['elements'] = $db->loadElements($sectionId, $pageNumber, 10000);
       }
       break;
     case 'loadSection':
-      if (isset($sectionId) && is_finite($sectionId)) {
-        $result['section'] = $db->selectQuery('section', ['ID', 'name'], " parent_ID = $sectionId");
-      }
+      $result['section'] = array_map(function ($row) {
+        $row['key']      = intval($row['ID']);
+        $row['parentId'] = intval($row['parent_ID']);
+        $row['label']    = $row['name'];
+        $row['activity'] = boolval($row['active']);
+        unset($row['ID'], $row['parent_id'], $row['name'], $row['active']);
+        return $row;
+      }, $db->selectQuery('section'));
       break;
     case 'changeSection':
-      $param = [];
-      if (isset($sectionId)) {
-        $id = $sectionId;
-        $param[$id] = [];
+      $parentId = $parentId ?? 0;
+      $name = $name ?? false;
+      $code = $code ?? false;
+      $param[$sectionId ?? 'error'] = [
+        'parent_ID' => $parentId,
+        'name'      => $name,
+        'code'      => $code ?: $name,
+        'active'    => intval(isset($activity) && $activity === "true"),
+      ];
+      if (!$param['error']) {
+        if (empty($name)) { $result['error'] = 'name_error'; break; }
 
-        if (isset($name) && !empty($name)) $param[$id]['name'] = $name;
-        else { $result['error'] = 'name_error'; break; }
-        if (isset($code) && $code !== '') $param[$id]['code'] = $code;
-        if (isset($parentId) && is_finite($parentId)) $param[$id]['parent_ID'] = $parentId;
-
-        $result['error'] = $db->insert($columns, $dbTable, $param, true);
+        $result['error'] = $db->insert($db->getColumnsTable('section'), 'section', $param, true);
       }
       break;
-    case 'delSection':
+    case 'deleteSection':
       if (isset($sectionId)) {
         $ids = [$sectionId];
         $ids = array_merge($ids, $db->selectQuery('section', 'ID', " parent_ID = $sectionId "));
@@ -300,7 +304,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
         $param['0']['name'] = $name;
         $param['0']['element_type_code'] = $type;
-        $param['0']['activity'] = (integer) isset($activity);
+        $param['0']['activity'] = intval(isset($activity) && $activity === "true");
         $param['0']['sort'] = $sort ?? 100;
         $result['error'] = $db->insert($columns, 'elements', $param);
 
@@ -318,19 +322,19 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'openElement':
-      !isset($sortColumn) && $sortColumn = 'name';
-
       if (isset($elementsId) && is_finite($elementsId)) {
         $result['countRowsOptions'] = $db->getCountRows('options_elements', " element_id = $elementsId ");
-        $result['options'] = $db->openOptions($elementsId, $pageNumber, $countPerPage, $sortColumn, $sortDirect);
+        $result['options'] = $db->openOptions($elementsId);
       }
       break;
     case 'changeElements':
-      $elementsId = isset($elementsId) ? json_decode($elementsId) : [];
+      $elementsId = json_decode($elementsId ?? '[]');
       if (count($elementsId)) {
+        $single = count($elementsId) === 1;
+        $name = $name ?? '';
         $param = [];
 
-        if (count($elementsId) === 1 && isset($name)) {
+        if ($single) {
           $elements = $db->selectQuery('elements', ['ID', 'name'], " name = '$name' ");
           if (count($elements) > 1 || empty($name)
               || (count($elements) === 1 && $elements[0]['ID'] !== $elementsId[0])) {
@@ -339,20 +343,18 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         }
 
         foreach ($elementsId as $id) {
-          isset($parentId) && ($param[$id]['section_parent_id'] = $parentId);
-          isset($name) && ($param[$id]['name'] = $name);
-          $param[$id]['activity'] = (integer) isset($activity);
+          $param[$id]['section_parent_id'] = $parentId ?? false;
+          $single && $param[$id]['name'] = $name;
+          $param[$id]['activity'] = intval(isset($activity) && $activity === "true");
           $param[$id]['sort'] = $sort ?? 100;
         }
 
-        $result['error'] = $db->insert($columns, $dbTable, $param, true);
+        $result['error'] = $db->insert($db->getColumnsTable('elements'), 'elements', $param, true);
       }
       break;
-    case 'delElements':
-      $elementsId = isset($elementsId) ? json_decode($elementsId) : [];
-      if (count($elementsId)) {
-        $db->deleteItem('elements', $elementsId);
-      }
+    case 'deleteElements':
+      $elementsId = json_decode($elementsId ?? '[]');
+      count($elementsId) && $db->deleteItem('elements', $elementsId);
       break;
     case 'searchElements':
       if (isset($searchValue)) {
@@ -362,7 +364,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Options
     case 'loadOptions':
-      $countPerPage = $countPerPage === 20 ? -1 : $countPerPage;
       $result['options'] = $db->loadOptions(
         isset($filter) ? json_decode($filter, true) : [],
         $pageNumber ?? 0, $countPerPage
@@ -383,24 +384,21 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['output_percent'] = $outputPercent ?? 0;
         $param['0']['output_price'] = $outputPrice ?? 0;
         $param['0']['unit_id'] = $unitId ?? 1;
-        $param['0']['activity'] = isset($activity);
+        $param['0']['activity'] = intval(isset($activity) && $activity === "true");
         $param['0']['sort'] = $sort ?? 100;
+        $param['0']['property'] = $propertyJson ?? '{}';
 
-        $property = [];
         $imageIds = [];
-        $param['0']['property'] = json_encode($property);
         foreach ($_REQUEST as $k => $v) {
-          stripos($k, 'prop_') === 0 && !empty($v) && $property[$k] = $v;
           stripos($k, 'files') === 0 && $param['0']['images_id'][] = $v;
         }
-        $param['0']['property'] = json_encode($property);
         $param['0']['images_ids'] = $db->setFiles($result, $imageIds);
 
-        $result['error'] = $db->insert($columns, 'options_elements', $param);
+        $result['error'] = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param);
       }
       break;
     case 'changeOptions':
-      $optionsId = isset($optionsId) ? json_decode($optionsId) : [];
+      $optionsId = json_decode($optionsId ?? '[]');
       if (count($optionsId)) {
         $param = [];
 
@@ -414,27 +412,23 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           isset($unitId) && $param[$id]['unit_id'] = $unitId;
           isset($sort) && $param[$id]['sort'] = $sort;
 
-          $param[$id]['activity'] = isset($activity);
+          $param[$id]['activity'] = intval(isset($activity) && $activity === "true");
 
-          $property = [];
           $imageIds = [];
           foreach ($_REQUEST as $k => $v) {
-            stripos($k, 'prop_') === 0 && !empty($v) && $property[$k] = $v;
             stripos($k, 'files') === 0 && $imageIds[] = $v;
           }
-          $param[$id]['property'] = json_encode($property);
+          $param[$id]['property'] = $property ?? '{}';
 
           count($optionsId) === 1 && $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
         }
 
-        $result['error'] = $db->insert($columns, $dbTable, $param, true);
+        $result['error'] = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param, true);
       }
       break;
-    case 'delOptions':
-      $optionsId = isset($optionsId) ? json_decode($optionsId) : [];
-      if (count($optionsId)) {
-        $db->deleteItem('options_elements', $optionsId);
-      }
+    case 'deleteOptions':
+      $optionsId = json_decode($optionsId ?? '[]');
+      if (count($optionsId)) $db->deleteItem('options_elements', $optionsId);
       break;
 
     // Options property
@@ -619,12 +613,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Files
     case 'loadFiles':
-      $result['files'] = $db->selectQuery('files');
-      $result['files'] = array_map(function ($files) {
-        $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($files['path']));
-        $files['path'] = $path ? $path : $files['path'];
-        return $files;
-      }, $result['files']);
+      $result['files'] = $db->loadFiles();
       break;
 
     case 'openOrders': /* TODO когда это отправляется */

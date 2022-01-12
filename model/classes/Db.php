@@ -370,7 +370,7 @@ class Db extends \R {
    * @return array
    */
   public function getFiles($ids = false) {
-    if (is_string($ids)) $ids = explode(',', $ids);
+    if (is_string($ids) && !empty($ids)) $ids = explode(',', $ids);
     $filters = $ids ? ' ID = ' . implode(' or ID = ', $ids) : '';
     return $this->selectQuery('files', '*', $filters);
   }
@@ -429,23 +429,22 @@ class Db extends \R {
   public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT ID, E.name AS 'E.name', activity, sort, last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'C.name'
+    $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
+                   C.symbol_code AS 'symbolCode', C.name AS 'codeName'
     FROM elements E
     JOIN codes C on C.symbol_code = E.element_type_code
     WHERE E.section_parent_id = $sectionID
     ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
-    //return self::getAll($sql, [':sectionID', $sectionID]);
   }
 
   public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
     $pageNumber *= $countPerPage;
     $searchValue = str_replace(' ', '%', $searchValue);
 
-    $sql = "SELECT ID, E.name AS 'E.name', activity, sort, last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'C.name'
+    $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
+                   C.symbol_code AS 'symbolCode', C.name AS 'codeName'
     FROM elements E
     JOIN codes C on C.symbol_code = E.element_type_code
     WHERE E.name LIKE '%$searchValue%'
@@ -464,11 +463,13 @@ class Db extends \R {
   // Options
   //------------------------------------------------------------------------------------------------------------------
 
-  private function setImages(string $imagesIds): array {
+  private function setImages(string $imagesIds = ''): array {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
       $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
-      $item['path'] = $path ? $path : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
+      $item['id'] = $item['ID'];
+      $item['src'] = $path ? $path : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
+      unset($item['ID']);
       return $item;
     }, $images);
   }
@@ -481,37 +482,37 @@ class Db extends \R {
     return str_replace($cols, $alias, $table);
   }
 
+  public function loadFiles(): array {
+    return $this->setImages();
+  }
+
   /**
    * Для страницы Catalog
    * @param false $elementID
-   * @param int $pageNumber
-   * @param int $countPerPage
-   * @param string $sortColumn
-   * @param false $sortDirect
    * @return array|null
    */
-  public function openOptions($elementID = false, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'name', $sortDirect = false) {
-    $pageNumber *= $countPerPage;
-
-    $sql = "SELECT ID, money_input_id AS 'moneyInputId', money_output_id as 'moneyOutputId',
+  public function openOptions($elementID = false): ?array {
+    $sql = "SELECT O.ID AS 'id',
+                   MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId', 
+                   MO.short_name as 'moneyOutputName', MO.ID AS 'moneyOutputId',
                    images_ids AS 'images', property,
-                   name, unit_id AS 'unitId', last_edit_date AS 'lastEditDate', activity, sort,
+                   O.name AS 'name', U.ID AS 'unitId', U.name AS 'unitName', O.last_edit_date AS 'lastEditDate', O.activity AS 'activity', sort,
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
-            FROM options_elements";
-
-    if ($elementID) {
-      $sql .= " WHERE element_id = $elementID
-      		ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
-    }
-
-    $options = self::getAll($sql);
+            FROM options_elements O
+            JOIN money MI on MI.ID = O.money_input_id
+            JOIN money MO on MO.ID = O.money_output_id
+            JOIN units U on U.ID = O.unit_id
+            WHERE element_id = $elementID";
 
     return array_map(function ($option) {
       // set images
-      strlen($option['images']) && $option['images'] = $this->setImages($option['images']);
+      $option['images'] = strlen($option['images']) ? $this->setImages($option['images']) : [];
+
+      // set property
+      $option['property'] = json_decode($option['property'] ?: '[]');
 
       return $option;
-    }, $options);
+    }, self::getAll($sql));
   }
 
   /**
@@ -570,7 +571,7 @@ class Db extends \R {
       }
 
       // set property
-      $properties = $option['property'] ? json_decode($option['property'], true) : [];
+      $properties = json_decode($option['property'] ?: '[]', true);
       $option['property'] = [];
       foreach ($properties as $property => $id) {
         $propName = str_replace('prop_', '', $property);
@@ -945,10 +946,10 @@ class Db extends \R {
    * @return mixed
    */
   public function getUserByOrderId($id) {
-    return self::getRow("SELECT u.name as 'name', u.contacts as 'contacts'
-            FROM users u 
-            JOIN orders o ON u.ID = o.user_id
-            WHERE o.ID = :id", [':id' => $id]);
+    return self::getRow("SELECT U.name as 'name', U.contacts as 'contacts'
+            FROM users U 
+            JOIN orders O ON U.ID = O.user_id
+            WHERE O.ID = :id", [':id' => $id]);
   }
 
   public function checkPassword($login, $password) {

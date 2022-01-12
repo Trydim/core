@@ -353,12 +353,21 @@ export class Pagination {
 
     this.prevBtn = {node: this.node.querySelector('[data-action="prev"]')};
     this.nextBtn = {node: this.node.querySelector('[data-action="next"]')};
+    this.pageCounter = {node: this.node.querySelector('[data-action="count"]')};
     this.onePageBtnWrap = this.node.querySelector('[data-btnwrap]');
 
     this.query       = query;
     this.dbAction    = dbAction;
     this.sortParam   = sortParam;
     this.activeClass = c.CLASS_NAME.ACTIVE;
+    this.setParam();
+  }
+
+  setParam() {
+    const pageCounts = Array.from(this.pageCounter.node.options).map(o => f.toNumber(o.value));
+
+    this.pageCounter.min = Math.min(...pageCounts);
+    this.pageCounter.max = Math.max(...pageCounts);
   }
 
   setQueryAction(action) {
@@ -377,6 +386,8 @@ export class Pagination {
       f.eraseNode(this.onePageBtnWrap);
       return;
     }
+
+    f[count <= this.pageCounter.min ? 'hide' : 'show'](this.node);
 
     this.fillPagination(pageCount);
   }

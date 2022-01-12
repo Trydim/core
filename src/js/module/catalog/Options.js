@@ -1,270 +1,272 @@
 'use strict';
 
-import {Common} from "./Main";
+export const data = {
+  optionsModal: {
+    display: false,
+    chooseFileDisplay: false,
+    confirmDisabled: true,
+    title: '',
+    single: true,
+  },
 
-export class Options extends Common {
-  constructor(props) {
-    super('options', props);
+  options: [],
+  optionsLoading: false,
+  filesLoading: false,
 
-    const field = f.qS(`#${this.type}Field`);
+  option: {
+    id           : 0,
+    type         : 0,
+    elementId    : 0,
+    images       : [],
+    name         : '',
+    unitId       : 0,
+    activity     : true,
+    sort         : 100,
+    percent      : 0,
+    moneyInputId : 0,
+    inputPrice   : 0,
+    moneyOutputId: 0,
+    outputPrice  : 0,
+    propertyJson : '',
+    property     : {},
+  },
 
-    this.queryParam.tableName = 'options_elements';
+  fieldChange: {
+    unitId       : true,
+    moneyInputId : true,
+    percent      : true,
+    moneyOutputId: true,
+    activity     : true,
+    sort         : true,
+    property     : false,
+  },
 
-    props.tmp.chooseFile       = f.gT('#chooseFileTmp');
-    props.tmp.chooseLoadedFile = f.gT('#chooseLoadedFileTmp');
-    this.setNodes(field, props.tmp);
+  elementLoaded  : 0,
+  optionsSelected: [],
+  filesUpSelected: [],
+  filesUploaded: [],
 
-    this.setFileModal();
-    this.setParam();
-    this.paginator = new f.Pagination(`#${this.type}Field .pageWrap`,{
-      dbAction : 'openElement',
-      sortParam: this.sortParam,
-      query    : action => this.query(action).then(d => this.load(d, false)),
-    });
-    this.id = new f.SelectedRow({table: this.node.fieldT});
-    this.id.subscribe(this.selectedRow.bind(this));
+  optionsSelectedShow: false,
+  elementParentModalDisabled: false,
+  elementParentModalSelected: undefined,
 
-    f.observer.subscribe(`openElement`, d => this.open(d));
-    f.observer.subscribe(`sortEvent`, d => this.load(d, false));
-    f.observer.subscribe(`delElements`, d => this.checkElements(d));
-    f.observer.subscribe('searchInput', (d, c) => this.searchEvent(d, c));
-    this.onEvent();
+  optionsColumns: [
+    {name: 'Номер', value: 'id'},
+    {name: 'Файлы', value: 'images'},
+    {name: 'Ед.Измерения', value: 'unitName'},
+    {name: 'activity', value: 'activity'},
+    {name: 'sort', value: 'Сортировка'},
+    {name: 'moneyInputName', value: 'moneyInputName'},
+    {name: 'inputPrice', value: 'inputPrice'},
+    {name: 'outputPercent', value: 'outputPercent'},
+    {name: 'moneyOutputName', value: 'moneyOutputName'},
+    {name: 'outputPrice', value: 'outputPrice'},
+  ],
+
+  optionsColumnsSelected: undefined,
+  files: {},
+
+}
+
+export const watch = {
+  'option.name'() {
+    this.optionsModal.confirmDisabled = !this.option.name;
+  },
+}
+
+export const computed = {
+  optionsColumnsValues() {
+    return this.optionsColumnsSelected.map(v => v.value);
+  },
+
+  getOptionSelectedId() {
+    return this.optionsSelected.map(i => i.id);
+  },
+}
+
+const reload = that => ({
+  dbAction : 'openElement',
+  callback: (fData, aData) => {
+    that.options         = aData['options']
+    that.optionsLoading  = false;
+    that.optionsSelected = [];
+    that.files           = Object.create(null);
   }
+});
 
-  setFileModal() {
-    this.fModal = f.initModal();
-  }
-  setParam() {
-    this.mainMoney = Object.values(this.db.money).find(m => +m.main === 1); // не используется.
-  }
-  open(id) {
-    this.queryParam.elementsId = id;
+export const methods = {
+  loadOptions(id) {
     this.queryParam.dbAction = 'openElement';
-    this.query().then(d => this.load(d));
-  }
-  load(data, idClear = true) {
-    f.hide(this.node.tableWrap);
-    idClear && this.id.clear();
-    data['options'] && this.prepareItems(data['options']);
-    data['countRowsOptions'] && this.paginator.setCountPageBtn(data['countRowsOptions']);
-  }
-  checkElements(id) {
-    id.includes(this.queryParam.elementsId) && f.hide(this.node.field);
-  }
-  searchEvent(data, clearSearch) {
-    f.hide(this.node.tableWrap, this.node.btnWrap);
-  }
-  // Money function
-  getRate(nInputM, nOutputM) {
-    const inRate = this.db.money[nInputM.value].rate,
-          outRate = this.db.money[nOutputM.value].rate;
+    this.queryParam.elementsId = id;
+    this.elementLoaded = id;
+    this.optionsLoading = true;
+    this.query().then(data => {
+      this.options        = data['options'];
+      this.optionsLoading = false;
+    })
+  },
 
-    return inRate/outRate;
-  }
-  changeMoneyInput(t, nPercent, nOutput, rate) {
-    const v = +t.value * (1 + +nPercent.value / 100) * rate;
-    nOutput.value = v.toFixed(2);
-  }
-  changeMoneyInputId(t) { t.dispatchEvent(new Event('change')) }
-  changeOutputPercent(t, nInputM, nOutput, rate) {
-    const v = +nInputM.value * (1 + +t.value / 100) * rate;
-    nOutput.value = v.toFixed(2);
-  }
-  changeMoneyOutput(t, nInputM, nPercent, rate) {
-    const v = (+t.value / rate / +nInputM.value - 1) * 100;
-    nPercent.value = v.toFixed(2);
-  }
-  changeMoneyOutputId(t) { t.dispatchEvent(new Event('change')) }
-  initMoneyControl(form) {
-    let nInput   = form.querySelector('[name="inputPrice"]'),
-        nInputM = form.querySelector('[name="moneyInputId"]'),
-        nPercent = form.querySelector('[name="outputPercent"]'),
-        nOutput  = form.querySelector('[name="outputPrice"]'),
-        nOutputM = form.querySelector('[name="moneyOutputId"]');
+  enableOptionField() {
+    this.fieldChange = {
+      unitId       : true,
+      moneyInputId : true,
+      percent      : true,
+      moneyOutputId: true,
+      activity     : true,
+      sort         : true,
+      property     : false,
+    };
+  },
 
-    nInput.addEventListener('change', e => this.changeMoneyInput(e.target, nPercent, nOutput, this.getRate(nInputM, nOutputM)));
-    nInputM.addEventListener('change', () => this.changeMoneyInputId(nInput));
-    nPercent.addEventListener('change', e => this.changeOutputPercent(e.target, nInput, nOutput, this.getRate(nInputM, nOutputM)));
-    nOutput.addEventListener('change', e => this.changeMoneyOutput(e.target, nInput, nPercent, this.getRate(nInputM, nOutputM)));
-    nOutputM.addEventListener('change', () => this.changeMoneyOutputId(nInput));
-  }
-
-
+  setOptionModal(title, confirmDisabled, single) {
+    single && this.enableOptionField();
+    this.optionsModal = {display: true, confirmDisabled, title, single};
+  },
   clearFiles(node) {
-    let input = document.createElement('input');
+    const input = document.createElement('input');
     input.type = 'file';
     node.files = input.files;
-  }
-  showLoadedFiles(data) {
-    let html = '<div class="row overflow-auto" style="max-height: 80vh">';
-
-    data.forEach(file => {
-      html += f.replaceTemplate(this.tmp.chooseLoadedFile, {
-        id: file.ID,
-        name : file.name,
-        image: file.path,
-      });
+  },
+  setImages(option) {
+    this.option.images = option.images.map(f => f.id).join(',');
+    option.images.forEach(f => {
+      this.files['F_' + f.id] = f;
+      this.queryFiles['F_' + f.id] = f.id;
     });
-
-    this.fModal.show('Выбор файлов', html);
-  }
-  showFiles(fileField) {
-    let html = '';
-
-    Object.entries(this.queryFiles).forEach(([index, file]) => {
-      html += f.replaceTemplate(this.tmp.chooseFile, {
-        index,
-        name : file.name,
-        error: file.fileError ? this.cssClass.error : '',
-      });
-    });
-
-    fileField.innerHTML = html;
-  }
-  initChooseFile(form, option) {
-    const inputN = form.querySelector('input[type="file"]'),
-          fileField = form.querySelector('#fileField'),
-          btnN = form.querySelector('.chooseFile');
-
-    this.queryFiles = Object.create(null);
-
-    btnN.addEventListener('click', () => {
-      f.Get({data: 'mode=DB&dbAction=loadFiles'})
-       .then(data => data['files'] && this.showLoadedFiles(data['files']));
-    });
-
-    inputN.addEventListener('change', () => {
-      Object.values(inputN.files).forEach(file => {
-        let id = Math.random() * 10000 | 0;
-
-        file.fileError = file.size > 1024*1024;
-        //if (file.fileError && !error) error = true;
-
-        this.queryFiles[id] && (id += '1');
-        this.queryFiles[id] = file;
-      });
-      this.clearFiles(inputN);
-      this.showFiles(fileField);
-    });
-
-    fileField.addEventListener('click', e => {
-      e.preventDefault();
-      const action = e.target.dataset.action;
-
-      if (action === 'removeFile') {
-        delete this.queryFiles[e.target.dataset.id];
-        this.showFiles(fileField);
-      }
-    });
-
-    if (option && option.images.length) {
-      option.images.forEach(img => {
-        this.queryFiles[img.ID] = {name: img.name, path: img.path};
-      });
-      this.showFiles(fileField);
-    }
-  }
+  },
+  setDefaultProperty() {
+    Object.keys(this.properties).map(key => this.option.property[key] = undefined);
+  },
+  setOptionProperty(el) {
+    this.setDefaultProperty();
+    Object.entries(el.property).map(([key, value]) => this.option.property[key] = value);
+  },
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
-  // Добавить вариант
+  checkColumn(v) {
+    return this.optionsColumnsValues.includes(v);
+  },
+
+  selectedAllOptions() {
+    this.optionsSelected = Object.values(this.options);
+  },
+  clearAllOptions() {
+    this.optionsSelected = [];
+  },
+  unselectedOption(id) {
+    this.optionsSelected = this.optionsSelected.filter(i => i.id !== id);
+    this.optionsSelectedShow = !!this.optionsSelected.length;
+  },
+
   createOption() {
-    let form = this.tmp.form.cloneNode(true);
-    form.querySelectorAll('.onlyMany').forEach(n => n.remove());
-    f.show(form.querySelector('[data-field="property"]'));
+    this.queryParam.dbAction = 'createOption';
 
-    this.initMoneyControl(form);
-    this.initChooseFile(form);
+    this.option.name = '';
+    this.option.unitId = this.units[0].id;
+    this.option.moneyInputId  = this.money[0].id;
+    this.option.moneyOutputId = this.money[0].id;
+    this.option.sort = 100;
+    this.setDefaultProperty();
 
-    this.queryParam.form = form;
-    this.M.show('Добавить вариант', form);
-    form.querySelector('[name="name"]').focus();
-    this.reloadAction = {
-      dbAction: 'openElement',
-      callback: data => {
-        f.showMsg('Создан');
-        this.id.clear();
-        this.load(data);
-      },
-    };
-  }
-  // Изменить вариант
+    this.setOptionModal('Создать', true, true);
+    this.reloadAction = reload(this);
+  },
   changeOptions() {
-    if (!this.id.getSelectedSize()) { f.showMsg('Выберите варианты', 'error'); return; }
+    if (!this.optionsSelected.length) { return; }
+    const el = this.optionsSelected[0],
+          single = this.optionsSelected.length === 1;
 
-    const form       = this.tmp.form.cloneNode(true),
-          oneElement = this.id.getSelectedSize() === 1,
-          id         = this.id.getSelected(),
-          option     = this.itemList.get(id[0]),
-          initParam  = (option, skip = []) => {
-            Object.entries(option).forEach(([k, v]) => {
-              if (skip.includes(k)) return;
-              let node = form.querySelector(`[name="${k}"]`);
-              node && (node.type === 'checkbox' ? node.checked = !!+v : node.value = v);
-            });
-          };
+    this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
+    this.queryParam.dbAction = 'changeOptions';
 
-    let nodeProp = form.querySelector('[data-field="property"]');
+    this.option.name      = single ? el.name : '';
+    this.option.elementId = this.elementLoaded;
+    this.option.unitId    = single ? el.unitId : this.units[0].id;
+    this.option.moneyInputId  = single ? el.moneyInputId : this.money[0].id;
+    this.option.moneyOutputId = single ? el.moneyOutputId : this.money[0].id;
+    this.option.activity = single ? !!el.activity : true;
+    this.option.sort     = this.getAvgSort(this.optionsSelected);
+    single && this.setImages(el);
+    single ? this.setOptionProperty(el) : this.setDefaultProperty();
 
-    if (oneElement) {
-      form.querySelectorAll('.onlyMany').forEach(n => n.remove());
-      f.show(nodeProp);
-
-      initParam(option, ['property']);
-      option.property && initParam(JSON.parse(option.property));
-      this.initMoneyControl(form, option);
-      //this.initImages(form, option.images);
-      this.initChooseFile(form, option);
-    } else {
-      const node = form.querySelector('#property');
-      node.addEventListener('change', () => {
-        f.show(nodeProp);
-        option.property && initParam(JSON.parse(option.property));
-        node.parentElement.previousElementSibling.remove();
-        node.parentElement.remove();
-        //node.remove();
-      }, {once: true});
-
-      form.querySelectorAll('.onlyOne').forEach(n => n.remove());
-    }
-
-    this.queryParam.form = form;
-    this.queryParam.optionsId = JSON.stringify(id);
-    this.M.show('Изменение вариантов', form);
-    this.reloadAction = {
-      dbAction: 'openElement',
-      callback: data => {
-        f.showMsg('Изменения сохранены');
-        this.id.clear();
-        this.load(data);
-      },
-    };
-  }
-  // Копировать вариант
+    this.setOptionModal('Редактировать', false, single);
+    this.reloadAction = reload(this);
+  },
   copyOption() {
-    if (!this.id.getSelectedSize()) { f.showMsg('Выберите варианты', 'error'); return; }
+    if (this.optionsSelected.length !== 1) { return; }
+    const el = this.optionsSelected[0];
 
-    let form = this.tmp.form.cloneNode(true);
+    this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
+    this.queryParam.dbAction = 'copyOption';
 
-    this.queryParam.form = form;
-    this.M.show('Копировать вариантов', form);
-  }
-  // Удалить вариант
-  delOptions() {
-    if (!this.id.getSelectedSize()) return;
+    this.option.name      = el.name;
+    this.option.elementId = this.elementLoaded;
+    this.option.unitId    = el.unitId;
+    this.option.moneyInputId  = el.moneyInputId;
+    this.option.moneyOutputId = el.moneyOutputId;
+    this.option.activity = !!el.activity;
+    this.option.sort     = el.sort;
+    this.setImages(el);
+    this.setOptionProperty(el);
 
-    this.queryParam.id = JSON.stringify(this.id.getSelected());
-    this.delayFunc = () => this.id.clear();
+    this.setOptionModal('Редактировать', false, true);
+    this.reloadAction = reload(this);
+  },
+  deleteOptions() {
+    if (!this.optionsSelected.length) { return; }
 
-    this.M.show('Удалить вариант', 'Удалить выбранные варианты?');
-    this.reloadAction = {dbAction: 'openElement'};
-  }
+    this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
+    this.queryParam.dbAction   = 'deleteOptions';
 
-  // Bind events
-  //--------------------------------------------------------------------------------------------------------------------
+    this.setOptionModal('Удалить', false, false);
+    this.reloadAction = reload(this);
+  },
 
-  onEvent() {
-    this.node.field.addEventListener('click', e => this.commonEvent(e));
-    this.node.field.addEventListener('dblclick', e => this.dblClick(e));
-  }
+  addFile(e) {
+    Object.values(e.target.files).forEach(file => {
+      let id    = Math.random() * 10000 | 0,
+          error = false;
+
+      file.fileError = file.size > 1024*1024;
+      if (file.fileError && !error) error = true;
+
+      this.queryFiles.id && (id += '1');
+      this.queryFiles[id] = file;
+      this.files[id] = {
+        name: file.name,
+        src: URL.createObjectURL(file),
+        error,
+      };
+    });
+    this.clearFiles(e.target);
+  },
+  removeFile(e) {
+    const id = e.target.closest('[data-id]').dataset.id;
+    delete this.queryFiles[id];
+    delete this.files[id];
+  },
+  chooseUploadedFiles() {
+    this.queryParam.dbAction = 'loadFiles';
+    this.optionsModal.chooseFileDisplay = true;
+    this.filesLoading = true;
+
+    this.reloadAction = false;
+    this.query().then(data => {
+      this.loadedFiles = data['files'];
+      this.filesLoading = false;
+    });
+  },
+
+  optionsConfirm() {
+    //this.optionsLoading = true;
+    this.option.propertyJson = JSON.stringify(this.option.property);
+    this.queryParam = Object.assign(this.queryParam, this.option, {fieldChange: JSON.stringify(this.fieldChange)});
+    this.query();
+    this.optionsModal.display = false;
+  },
+  optionsCancel() {
+    this.files = Object.create(null);
+    this.optionsModal.display = false;
+  },
 }

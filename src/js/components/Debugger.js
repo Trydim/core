@@ -3,19 +3,20 @@
 export class Debugger {
   /**
    *
+   * @param {string|HTMLElement} field
    * @param param
    */
-  constructor(param = Object.create(null)) {
-    const {
+  constructor(field, param = Object.create(null)) {
+    /*const {
       fieldSelector,
       fieldNode,
-    } = param;
+    } = param;*/
 
-    this.field       = fieldSelector ? document.querySelector(fieldSelector) : fieldNode;
+    this.field       = typeof field === 'string' ? document.querySelector(field) : field;
     this.showEach    = param.showEach || false;   // Show each added value
     this.showConsole = param.showConsole || true; // Show result to console
     this.showDom     = param.showDom || false;    // Output result to Dom
-    this.showTrace   = param.showConsole || false;// add Trace
+    this.showTrace   = param.trace || false;      // add Trace
 
     this.clear();
   }
@@ -29,6 +30,13 @@ export class Debugger {
     this.showEach = flag ? flag : true;
   }
 
+  /**
+   * Максимум три параметра
+   * @param {array|string|object} param - или строка как значение первого столбца или массив или объект с ключами.
+   * @param {array|} param - строка как значенеи второй колонки, если первый аргумент массив или объект, игнорируется
+   * @param {array|} param - строка как значение третьей колонки, если первый аргумент массив или объект, игнорируется
+   * @return {Debugger}
+   */
   add(...param) {
     const [key, value, comment = ''] = param;
 
