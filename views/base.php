@@ -6,20 +6,20 @@
 
 global $main, $target;
 
-if(!isset($pageTitle)) $pageTitle = '';
-if(!isset($headContent)) $headContent = '';
+if (!isset($pageTitle)) $pageTitle = '';
+if (!isset($headContent)) $headContent = '';
 
-if(!isset($global)) {
+if (!isset($global)) {
   if (!isset($pageHeader)) $pageHeader = template('parts/header');
   if (!isset($pageFooter)) $pageFooter = template('parts/footer');
   if (!isset($sideLeft)) $sideLeft = template('parts/sidemenu');
   if (!isset($content)) $content = '';
   if (!isset($sideRight)) $sideRight = '';
 }
-if(!isset($cssLinks)) $cssLinks = [];
-if(!isset($jsLinks)) $jsLinks = [];
-if(!isset($footerContent)) $footerContent = '';
-if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase');
+if (!isset($cssLinks)) $cssLinks = [];
+if (!isset($jsLinks)) $jsLinks = [];
+if (!isset($footerContent)) $footerContent = '';
+if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase');
 
 ?>
 <!doctype html>
@@ -32,7 +32,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
   <title><?= $pageTitle; ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
   <?php if($main->checkStatus('ok') || $target === 'login') { ?>
-    <link rel="stylesheet" href="<?= CORE_CSS?>admin.css">
+    <link rel="stylesheet" href="<?= CORE_CSS ?>admin.css">
   <?php } ?>
 
   <?php array_map(function($item) { ?>

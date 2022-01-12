@@ -1,29 +1,5 @@
 "use strict";
 
-const importModuleFunc = async moduleName => {
-  let link;
-  if (moduleName === 'public') {
-    link = `${f.SITE_PATH}public/js/${f.PUBLIC_PAGE}.js`;
-    moduleName = f.PUBLIC_PAGE;
-  } else link = `./module/${moduleName}.js`;
-
-  try {
-    let importModule = await new Promise((resolve, reject) => {
-      import(/* webpackIgnore: true */ link)
-        .then(module => resolve(module[moduleName]))
-        .catch(err => reject(err));
-    });
-    return importModule.init() || false;
-  } catch (e) { console.error(e); f.showMsg(e, 'error', false); return false; }
-}
-
-const init = (moduleName = 'default') => {
-  let module = importModuleFunc(moduleName);
-  if (!module) initIndex();
-  f.relatedOption();
-  return module;
-}
-
 const setLinkMenu = page => {
   let menu = f.qS('#sideMenu');
   if (!menu) return;
@@ -158,16 +134,14 @@ const onEvent = () => {
   page = (page && !f.OUTSIDE) ? page[1] : 'public';
 
   if (f.gI('authForm')) return;
+
   cancelFormSubmit();
   dictionaryInit();
+  setLinkMenu(page || '/');
+  f.relatedOption();
   onEvent();
 
-  setLinkMenu(page || '/');
-  page && init(page);
-
   stopPreloader();
-
-  testT();
 
   setTimeout(() => { // todo разобраться с синхронизацией
     f.initShadow(); // todo убрать отсюда
