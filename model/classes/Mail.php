@@ -6,18 +6,17 @@ use PHPMailer\PHPMailer\Exception;
 if (!defined('MAIN_ACCESS')) die('access denied!');
 
 // General setting
-
-const MAIL_TARGET_DEBUG = MAIL_TARGET ?? 'trydim@mail.ru';
+!defined('MAIL_TARGET') && define('MAIL_TARGET', 'trydim@mail.ru');
 !defined('MAIL_SUBJECT_DEFAULT') && define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта ' . $_SERVER['SERVER_NAME']);
 !defined('ABS_SITE_PATH') && define('ABS_SITE_PATH', $_SERVER['DOCUMENT_ROOT']);
 !defined('CORE') && define('CORE', '/');
 !defined('SETTINGS_PATH') && define('SETTINGS_PATH', '');
 
 // MailSetting
+const MAIL_TARGET_DEBUG = 'trydim@mail.ru';
 const MAIL_SMTP = true;
 
 const MAIL_PORT = 465;
-
 const MAIL_HOST = 'smtp.yandex.ru';
 const MAIL_FROM = 'noreplycalcby@yandex.ru';
 const MAIL_PASSWORD = '638ch1';
@@ -30,7 +29,7 @@ const MAIL_FROM = 'commonserver@yandex.ru';
 const MAIL_PASSWORD = 'xmbxqxulvhwcqyta';
 */
 
-require_once './libs/vendor/autoload.php';
+require_once CORE . 'libs/vendor/autoload.php';
 
 class Mail {
   private $mailTpl, $body = '', $docPath = '', $pdfFileName = '';
@@ -149,8 +148,8 @@ class Mail {
       // Получатель письма
       if (DEBUG) {
         $this->mailTarget = MAIL_TARGET_DEBUG;
-        $this->subject = 'Тестовое письмо ' . $_SERVER['SERVER_NAME'];
-        $this->fromName = 'vistegra.by';
+        $this->subject    = 'Тестовое письмо ' . $_SERVER['SERVER_NAME'];
+        $this->fromName   = 'vistegra.by';
       }
 
       $mail->addBCC($this->mailTarget ?? MAIL_TARGET_DEBUG);

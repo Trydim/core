@@ -241,7 +241,7 @@ export class Common extends Catalog {
     this.setItemsList(data);
     if (data.length) {
       this.showTablesItems(data);
-      f.show(this.node.tableWrap, this.node.btnWrap);
+      f.show(this.node.field, this.node.tableWrap, this.node.btnWrap);
     } else {
       f.showMsg('Раздел пустой');
       f.hide(this.node.tableWrap, this.node.btnWrap);

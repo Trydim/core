@@ -1,21 +1,3 @@
-/*!
-
- =========================================================
- * Material Dashboard Pro - v2.1.2
- =========================================================
-
- * Product Page: https://www.creative-tim.com/product/material-dashboard-pro
- * Copyright 2020 Creative Tim (http://www.creative-tim.com)
-
- =========================================================
-
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- */
-.card {
-  font-size: .875rem
-}
-
 @media print {
   *, :after, :before {
     text-shadow: none !important;
@@ -120,7 +102,7 @@ body {
 [tabindex="-1"]:focus {
   outline: 0 !important
 }
-pt-1
+
 hr {
   box-sizing: content-box;
   height: 0;
@@ -4806,20 +4788,6 @@ button.close {
   min-height: calc(100% - 1rem)
 }
 
-.modal-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  pointer-events: auto;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, .2);
-  border-radius: .3rem;
-  box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .5);
-  outline: 0
-}
-
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -4896,10 +4864,6 @@ button.close {
 
   .modal-dialog-centered {
     min-height: calc(100% - 3.5rem)
-  }
-
-  .modal-content {
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .5)
   }
 
   .modal-sm {
@@ -11637,12 +11601,6 @@ h2.title {
   padding: 10px 15px 15px;
   line-height: 1.4;
   color: #555
-}
-
-.modal-dialog .modal-content {
-  box-shadow: 0 27px 24px 0 rgba(0, 0, 0, .2), 0 40px 77px 0 rgba(0, 0, 0, .22);
-  border-radius: 6px;
-  border: none
 }
 
 .modal-dialog .modal-content .card-signup {

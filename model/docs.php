@@ -2,28 +2,55 @@
 
 /**
  * @var array $main - global
- * @var array $dbConfig - config from public
- * @var string $docsAction
- * @var string $docType
+ * @var string $docsAction - from query
+ * @var string $docType - from query
  */
 
 $data = [];
 
+// Если есть отчет
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
-$orderIds = isset($orderIds) ? json_decode($orderIds) : false;
-!$orderIds && $orderIds = isset($reportVal['orderIds']) ? json_decode($reportVal['orderIds']) : false;
+// Если есть номер заказа
+$orderIds = !$reportVal && isset($orderIds) ? json_decode($orderIds) : false;
+// Посмотреть номер заказа в отчете
+!$orderIds && $orderIds = isset($reportVal['orderId']) ? json_decode($reportVal['orderId']) : false;
 $orderIds = is_array($orderIds) && count($orderIds) === 1 ? $orderIds[0] : false;
 
-$addManager = isset($addManager) || isset($useUser) || isset($addUser);
+// Данные о менеджере
+if (isset($addManager)) {
+  if (isset($reportVal['name'])) {
+    $userData = $main->db->getUser($reportVal['name'], 'name, contacts');
+  } else {
+    $userData = $main->db->getUserById($reportVal['userId'] ?? $main->getLogin('id'));
+  }
 
-if ($orderIds || $addManager) {
-  require_once 'classes/Db.php';
-  $db = new RedBeanPHP\Db($dbConfig);
+  if (count($userData)) {
+    $userData['contacts'] = json_decode($userData['contacts'], true);
+    $data['userData'] = $userData;
+  }
+  unset($userData);
+}
+
+// Данные о клиенте
+if (isset($addCustomer)) {
+  if (isset($customerId)) {
+    $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
+  } else if (isset($customer)) {
+    $customerData = $customer;
+  } else {
+    $customerData = '';
+  }
+
+  if (count($customerData)) {
+    $userData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);
+    $data['customerData'] = $userData;
+  }
+  unset($customerData);
 }
 
 // Отчет загрузить из БД по ИД
 if ($orderIds) {
-  $reportVal = $db->loadOrderById($orderIds);
+  $reportVal = $main->db->loadOrderById($orderIds);
 
   $reportVal['id']           = $reportVal['ID'];
   $reportVal['customerName'] = $reportVal['C.name'];
@@ -41,38 +68,12 @@ if ($orderIds) {
   $data['reportValue'] = $reportVal;
 }
 
-// Данные о менеджере
-if ($addManager) {
-  if (isset($reportVal['name'])) {
-    $userData = $db->getUser($reportVal['name'], 'name, contacts');
-  } else if (isset($reportVal['userId'])) {
-    $userData = $db->getUserById($reportVal['userId']);
-  } else {
-    $userData = $db->getUserByOrderId($main->getLogin('id'));
-  }
+$docsAction = $docsAction ?? 'mail';
+$docType = $docType ?? $docsAction;
 
-  if (count($userData)) {
-    $userData['contacts']  = json_decode($userData['contacts'], true);
-    $data['userData'] = $userData;
-  }
-}
-
-!isset($docsAction) && $docsAction = $docType;
-$docType = isset($docType) ? $docType : false;
-isset($usePdf) && $docType = 'pdf';
-isset($useExcel) && $docType = 'excel';
-$docType === 'mail' && $docType = false;
-
-$mailTpl = isset($mailTpl) ? $mailTpl : 'mailTpl';
-
-if (count($_FILES)) {
-  //$filesArray = array_map(function ($files) { return $files; }, $_FILES);
-  $filesArray = $_FILES;
-}
-
-if ($docType && $docType !== 'mail') {
+if ($docType !== 'mail') {
   require_once 'classes/Docs.php';
-  $docs = new Docs($docType, $data, isset($fileTpl) ? $fileTpl : 'default');
+  $docs = new Docs($docType, $data, $fileTpl ?? 'default');
 }
 
 if (isset($docsAction)) {
@@ -80,20 +81,20 @@ if (isset($docsAction)) {
     case 'excel':
     case 'pdf':
     case 'print':
-      $docType && $result = $docs->getDocs($mailTpl);
+      $docType && $result = $docs->getDocs($mailTpl ?? 'mailTpl');
       break;
     case 'mail':
       $docType && $docsPath = $docs->getDocs('save');
       require_once 'classes/Mail.php';
-      $mail = new Mail($mailTpl);
+      $mail = new Mail($mailTpl ?? 'mailTpl');
       $param = [
         'name'  => $name ?? '',
-        'phone' => $tel ?? ($phone ?? ''),
+        'phone' => $tel ?? $phone ?? '',
         'email' => $email ?? '',
         'info'  => $info ?? '',
         'data'  => $data,
       ];
-      isset($filesArray) && $mail->addOtherFile($filesArray);
+      count($_FILES) && $mail->addOtherFile($_FILES);
       $mail->prepareMail($param);
       $docType && $mail->addFile($docsPath);
       isset($email) && $mail->addMail($email);

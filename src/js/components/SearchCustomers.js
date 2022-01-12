@@ -111,3 +111,7 @@ export const searching = () => {
   return obj;
 }
 
+/*<template id="searchResult">
+ <!--Перенести в компонент поиска-->
+ <div class="border position-absolute bg-white w-100" style="top: 100%; z-index: +1; cursor: pointer"></div>
+ </template>*/

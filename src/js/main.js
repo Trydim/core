@@ -5,7 +5,7 @@ const importModuleFunc = async moduleName => {
   if (moduleName === 'public') {
     link = `${f.SITE_PATH}public/js/${f.PUBLIC_PAGE}.js`;
     moduleName = f.PUBLIC_PAGE;
-  } else link = `./module/${moduleName}/${moduleName}.js`;
+  } else link = `./module/${moduleName}.js`;
 
   try {
     let importModule = await new Promise((resolve, reject) => {
@@ -95,7 +95,7 @@ const setParentHeight = (target, height) => {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const cmsEvent = function() {
-  let action = this.dataset.actionCms;
+  let action = this.dataset.action;
 
   let select = {
     'menuToggle': () => {
