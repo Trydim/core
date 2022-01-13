@@ -6,21 +6,12 @@
 
 global $main, $target;
 
-if (!isset($pageTitle)) $pageTitle = '';
-if (!isset($headContent)) $headContent = '';
-
 if (!isset($global)) {
-  if (!isset($pageHeader)) $pageHeader = template('parts/header');
+  $pageHeader = $pageHeader ?? template('parts/header');
   $pageFooter = $pageFooter ?? template('parts/footer');
   $sideLeft = $sideLeft ?? template('parts/sidemenu');
-  $content = $content ?? '';
-  $sideRight = $sideRight ?? '';
 }
-if (!isset($cssLinks)) $cssLinks = [];
-if (!isset($jsLinks)) $jsLinks = [];
-if (!isset($footerContent)) $footerContent = '';
-if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase');
-
+$footerContentBase = $footerContentBase ?? template('parts/footerBase');
 ?>
 <!doctype html>
 <html lang="en">
@@ -28,8 +19,8 @@ if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase'
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <?= $headContent ?>
-  <title><?= $pageTitle ?></title>
+  <?= $headContent ?? '' ?>
+  <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= PATH_IMG ?>favicon.ico">
   <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="<?= CORE_CSS ?>admin.css">
@@ -37,7 +28,7 @@ if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase'
 
   <?php array_map(function ($item) { ?>
     <link rel="stylesheet" href="<?= str_replace('//', '/', $item); ?>">
-  <?php }, $cssLinks); ?>
+  <?php }, $cssLinks ?? []); ?>
 
   <script>
     window.DEBUG         = '<?= DEBUG ?>';
@@ -69,7 +60,7 @@ if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase'
   <main class="main-wrapper mx-auto" id="mainWrapper">
     <div class="nav-header">
       <a href="<?= SITE_PATH ?>" class="brand-logo">
-        <img class="logo-abbr" src="<?= SITE_PATH ?>favicon.ico" alt="">
+        <img class="logo-abbr" src="<?= PATH_IMG ?>logo.webp" alt="">
         <span class="brand-title"><?= PROJECT_TITLE ?></span>
       </a>
 
@@ -86,11 +77,11 @@ if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase'
         <?= $sideLeft; ?>
       <?php } ?>
       <section class="content-body">
-        <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content; ?></div>
+        <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content ?? '' ?></div>
         <?= $pageFooter; ?>
       </section>
-      <?php if ($sideRight) { ?>
-        <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight; ?></section>
+      <?php if (isset($sideRight)) { ?>
+        <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight ?></section>
       <?php } ?>
     </div>
 
@@ -101,10 +92,10 @@ if (!isset($footerContentBase)) $footerContentBase = template('parts/footerBase'
 <script defer type="module" src="<?= CORE_JS ?>main.js"></script>
 
 <?php array_map(function ($item) { ?>
-  <script defer type="module" src="<?= str_replace('//', '/', $item); ?>"></script>
-<?php }, $jsLinks) ?>
+  <script defer type="module" src="<?= str_replace('//', '/', $item) ?>"></script>
+<?php }, $jsLinks ?? []) ?>
 
-<?= $footerContent ?>
+<?= $footerContent ?? '' ?>
 <?= $footerContentBase ?>
 </body>
 </html>

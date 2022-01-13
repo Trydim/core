@@ -1,22 +1,8 @@
 "use strict";
 
-const setLinkMenu = page => {
-  let menu = f.qS('#sideMenu');
-  if (!menu) return;
+const menuClass = 'menu-toggle';
 
-  let target = menu.querySelector('.active');
-  while (target) {
-    let wrap = target.closest('[data-role="link"]');
-    if (!wrap) return;
-    target = wrap.previousElementSibling;
-    target.click();
-  }
-
-  for (let n of [...menu.querySelectorAll('a')]) {
-    let href = n.getAttribute('href') || '';
-    if (href.includes(page)) { n.classList.add('active'); break; }
-  }
-}
+const storage = new f.LocalStorage();
 
 const cancelFormSubmit = () => {
   f.qA('form', 'keypress', (e) => {
@@ -54,9 +40,11 @@ const dictionaryInit = () => {
   window._ = d.translate;
 }
 
-const stopPreloader = () => {
-  f.gI('preloader').remove();
-  f.gI('mainWrapper').classList.add('show');
+const storageLoad = () => {
+  if (!storage.length) return;
+
+  // Set Menu Toggle
+  if (storage.get('menuToggle') === 'true') f.gI('mainWrapper').classList.add(menuClass);
 }
 
 const setParentHeight = (target, height) => {
@@ -67,17 +55,39 @@ const setParentHeight = (target, height) => {
   }
 }
 
+const setLinkMenu = page => {
+  let menu = f.qS('#sideMenu');
+  if (!menu) return;
+
+  let target = menu.querySelector('.active');
+  while (target) {
+    let wrap = target.closest('[data-role="link"]');
+    if (!wrap) return;
+    target = wrap.previousElementSibling;
+    target.click();
+  }
+}
+
+const stopPreloader = () => {
+  f.gI('preloader').remove();
+  f.gI('mainWrapper').classList.add('show');
+}
+
 // Event function
 // ---------------------------------------------------------------------------------------------------------------------
+
+const menuToggle = () => {
+  let node = f.gI('mainWrapper');
+  node.classList.toggle(menuClass);
+  storage.set('menuToggle', node.classList.contains(menuClass));
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
+}
 
 const cmsEvent = function() {
   let action = this.dataset.actionCms;
 
   let select = {
-    'menuToggle': () => {
-      f.gI('mainWrapper').classList.toggle('menu-toggle');
-      setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
-    },
+    'menuToggle': menuToggle,
     'exit': () => {
       location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
     },
@@ -137,15 +147,15 @@ const onEvent = () => {
 
   cancelFormSubmit();
   dictionaryInit();
-  setLinkMenu(page || '/');
   f.relatedOption();
+  storageLoad();
   onEvent();
-
-  stopPreloader();
+  setLinkMenu(page || '/'); // after bind events
 
   setTimeout(() => { // todo разобраться с синхронизацией
     f.initShadow(); // todo убрать отсюда
   }, 100);
+  stopPreloader();
 })();
 
 function testT() {

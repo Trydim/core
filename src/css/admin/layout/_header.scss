@@ -25,6 +25,11 @@
     width: 100%;
   }*/
 
+  .logo-abbr {
+    min-width: 32px;
+    min-height: 32px;
+  }
+
   .brand-logo {
     display: flex;
     height: 100%;
@@ -218,6 +223,11 @@
 
 /* Компактное меню */
 .menu-toggle {
+  .brand-logo {
+    justify-content: space-around;
+    padding: 0;
+  }
+
   .brand-title {
     display: none;
   }
