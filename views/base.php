@@ -21,7 +21,7 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
-  <link rel="icon" href="<?= PATH_IMG ?>favicon.ico">
+  <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
   <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="<?= CORE_CSS ?>admin.css">
   <?php } ?>
