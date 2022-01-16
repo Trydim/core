@@ -52,6 +52,7 @@ $field = [
 ];
 
 $field['cssLinks'] = [CORE_CSS . 'module/fileManager.css'];
+$field['jsLinks'] = [CORE_JS . 'module/fileManager.js'];
 
 require $pathTarget;
 $html = template('base', $field);

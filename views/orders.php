@@ -1,6 +1,7 @@
 <?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var $main - global object
  * @var $param - from controller c_orders.php
  */
 
@@ -10,11 +11,9 @@
 // pageHeader;
 $field['content'] = template('parts/ordersContent', $param);
 
-$field['pageFooter'] = <<<pageFooter
-<div id="paginator" class="w-100"></div>
-pageFooter;
+$field['pageFooter'] = '<div id="paginator" class="w-100"></div>';
 
-$field['footerContent'] = '<a id="publicPageLink" href="public" hidden></a>';
+$field['footerContent'] = '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>

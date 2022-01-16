@@ -6,21 +6,12 @@
 
 global $main, $target;
 
-if(!isset($pageTitle)) $pageTitle = '';
-if(!isset($headContent)) $headContent = '';
-
 if(!isset($global)) {
-  if (!isset($pageHeader)) $pageHeader = template('parts/header');
-  if (!isset($pageFooter)) $pageFooter = template('parts/footer');
-  if (!isset($sideLeft)) $sideLeft = template('parts/sidemenu');
-  if (!isset($content)) $content = '';
-  if (!isset($sideRight)) $sideRight = '';
+  $pageHeader = $pageHeader ?? template('parts/header');
+  $pageFooter = $pageFooter ?? template('parts/footer');
+  $sideLeft = $sideLeft ?? template('parts/sidemenu');
 }
-if(!isset($cssLinks)) $cssLinks = [];
-if(!isset($jsLinks)) $jsLinks = [];
-if(!isset($footerContent)) $footerContent = '';
-if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase');
-
+$footerContentBase = $footerContentBase ?? template('parts/footerBase');
 ?>
 <!doctype html>
 <html lang="en">
@@ -28,8 +19,8 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <?= $headContent ?>
-  <title><?= $pageTitle; ?></title>
+  <?= $headContent ?? '' ?>
+  <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
   <?php if($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
@@ -39,7 +30,7 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 
   <?php array_map(function($item) { ?>
     <link rel="stylesheet" href="<?= str_replace('//', '/', $item); ?>">
-  <?php }, $cssLinks); ?>
+  <?php }, $cssLinks ?? []); ?>
 
   <script>
     window.DEBUG         = '<?= DEBUG ?>';
@@ -54,24 +45,23 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 
 <body>
 
-<?php if(!isset($global)) { ?>
+<?php if (!isset($global)) { ?>
 <main class="container-fluid mx-auto">
   <section class="wrapper">
 
-    <?php if($sideLeft) { ?>
-      <aside id="sideLeft"><?= $sideLeft; ?></aside>
+    <?php if ($sideLeft) { ?>
+      <aside id="sideLeft"><?= $sideLeft ?></aside>
     <?php } ?>
 
-    <section class="main-panel mx-auto" style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
-      <?= $pageHeader; ?>
+    <section class="main-panel mx-auto" style="<?= $sideLeft ? '' : 'width: 100%' ?>">
+      <?= $pageHeader ?>
 
       <div class="content mt-0 p-1">
-        <div class="row justify-center"> <!-- возможно убрать justify-center -->
-                                         <!-- стили временно-->
-          <div class="col-12 <?= $sideRight ? 'col-xl-10' : '' ?>"><?= $content; ?></div>
+        <div class="row justify-center">
+          <div class="col-12 <?= $sideRight ? 'col-xl-10' : '' ?>"><?= $content ?? '' ?></div>
 
-          <?php if($sideRight) { ?>
-            <aside id="right" class="col-12 col-md-2"><?= $sideRight; ?></aside>
+          <?php if (isset($sideRight)) { ?>
+            <aside id="right" class="col-12 col-md-2"><?= $sideRight ?></aside>
           <?php } ?>
 
         </div>
@@ -83,14 +73,14 @@ if(!isset($footerContentBase)) $footerContentBase = template('parts/footerBase')
 </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src="<?= CORE_SCRIPT?>src.js"></script>
-<script defer type="module" src="<?= CORE_SCRIPT?>main.js"></script>
+<script defer type="module" src="<?= CORE_JS ?>src.js"></script>
+<script defer type="module" src="<?= CORE_JS ?>main.js"></script>
 
 <?php array_map(function($item) { ?>
-  <script type="module" src="<?= str_replace('//', '/', $item); ?>"></script>
-<?php }, $jsLinks) ?>
+  <script defer type="module" src="<?= str_replace('//', '/', $item) ?>"></script>
+<?php }, $jsLinks ?? []) ?>
 
-<?= $footerContent; ?>
-<?= $footerContentBase; ?>
+<?= $footerContent ?? '' ?>
+<?= $footerContentBase ?>
 </body>
 </html>

@@ -8,7 +8,7 @@ $field['content'] = <<<CONTENT
 <div class="calendar" id="calendar"></div>
 CONTENT;
 
-$field['footerContent'] .= '<a id="publicPageLink" href="public" hidden></a>';
+$field['footerContent'] .= '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="orderTemplate">
   <div>

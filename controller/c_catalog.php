@@ -20,6 +20,7 @@ $field = [
   'footerContent' => '',
   'sideRight' => '',
   'cssLinks'      => [CORE_CSS . 'module/catalog.css'],
+  'jsLinks'   => [CORE_JS . 'module/catalog.js'],
 ];
 
 // Загрузка настройки столбцов

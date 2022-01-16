@@ -9,6 +9,7 @@ $field = [
 ];
 
 $field['cssLinks'] = [CORE_CSS . 'module/admindb.css'];
+$field['jsLinks'] = [CORE_JS . 'module/admindb.js'];
 
 if (DB_TABLE_IN_SIDEMENU) {
   if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];

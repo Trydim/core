@@ -19,7 +19,7 @@ const checkAddedFile = function (e) {
   }
 }*/
 
-export const admindb = {
+const admindb = {
   init() {
     this.onEvent();
     this.setDefault();
@@ -67,3 +67,5 @@ export const admindb = {
       n.addEventListener('click', e => this.commonClick(e)));
   },
 }
+
+admindb.init();

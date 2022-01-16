@@ -8,6 +8,7 @@
 $field = [
   'pageTitle' => 'Настройки',
   'footerContent' => '',
+  'jsLinks'   => [CORE_JS . 'module/setting.js'],
 ];
 $param = [];
 

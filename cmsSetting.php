@@ -16,7 +16,7 @@ define('CORE', basename( __DIR__ ) . '/');
 const VIEW = CORE . 'views/';
 
 const CORE_CSS = SITE_PATH . CORE . 'assets/css/';
-const CORE_SCRIPT = SITE_PATH . CORE . 'assets/js/';
+const CORE_JS = SITE_PATH . CORE . 'assets/js/';
 
 const SETTINGS_PATH = ABS_SITE_PATH . 'shared/settingSave.json';
 const CSV_CACHE_FILE = ABS_SITE_PATH . 'shared/csvCache.bin';

@@ -11,7 +11,7 @@ const t = (dir) => {
   });
 }
 
-export const fileManager = {
+const fileManager = {
   form: new FormData(),
 
   queryParam: {
@@ -245,3 +245,5 @@ export const fileManager = {
     });
   },
 }
+
+fileManager.init();

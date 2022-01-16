@@ -1,6 +1,6 @@
 'use strict';
 
-export const users = {
+const users = {
   form: new FormData(),
 
   needReload: false,
@@ -276,11 +276,13 @@ export const users = {
    * @param eventType
    */
   onEventNode(node, func, options = {}, eventType = 'click') {
-    node.addEventListener(eventType, (e) => func.call(this, e), options);
+    node.addEventListener(eventType, e => func.call(this, e), options);
   },
 
   onEvent() {
     // Action buttons
-    f.qA('input[data-action]', 'click', (() => (e) => this.actionBtn.call(this, e))());
+    f.qA('input[data-action]', 'click', e => this.actionBtn.call(this, e));
   },
 }
+
+users.init();

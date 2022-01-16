@@ -9,6 +9,7 @@ import * as module from './components/component.js';
 import {Debugger} from "./components/Debugger";
 import {Modal} from './components/Modal.js';
 import {CustomSelect} from './components/CustomSelect.js';
+import LocalStorage from "./components/LocalStorage.js";
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
 import {Valid} from "./components/Valid";
@@ -46,6 +47,11 @@ const m = {
    *
    */
   LoaderIcon: module.LoaderIcon,
+
+  /**
+   *
+   */
+  LocalStorage,
 
   /**
    * @param {string} name
