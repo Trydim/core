@@ -6,10 +6,11 @@
 
 global $main, $target;
 
-if(!isset($global)) {
+if (!isset($global)) {
   $pageHeader = $pageHeader ?? template('parts/header');
   $pageFooter = $pageFooter ?? template('parts/footer');
   $sideLeft = $sideLeft ?? template('parts/sidemenu');
+  $sideRight = $sideRight ?? '';
 }
 $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 ?>
@@ -22,14 +23,14 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
   <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
-  <?php if($main->checkStatus('ok') || $target === 'login') { ?>
+  <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
-    <link rel="stylesheet" href="<?= CORE_CSS?>admin.css">
+    <link rel="stylesheet" href="<?= CORE_CSS ?>admin.css">
   <?php } ?>
 
-  <?php array_map(function($item) { ?>
-    <link rel="stylesheet" href="<?= str_replace('//', '/', $item); ?>">
+  <?php array_map(function ($item) { ?>
+    <link rel="stylesheet" href="<?= str_replace('//', '/', $item) ?>">
   <?php }, $cssLinks ?? []); ?>
 
   <script>
@@ -60,13 +61,13 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
         <div class="row justify-center">
           <div class="col-12 <?= $sideRight ? 'col-xl-10' : '' ?>"><?= $content ?? '' ?></div>
 
-          <?php if (isset($sideRight)) { ?>
+          <?php if ($sideRight) { ?>
             <aside id="right" class="col-12 col-md-2"><?= $sideRight ?></aside>
           <?php } ?>
 
         </div>
       </div>
-      <footer class="footer"><?= $pageFooter; ?></footer>
+      <footer class="footer"><?= $pageFooter ?></footer>
     </section>
 
   </section>
@@ -76,9 +77,9 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 <script defer type="module" src="<?= CORE_JS ?>src.js"></script>
 <script defer type="module" src="<?= CORE_JS ?>main.js"></script>
 
-<?php array_map(function($item) { ?>
+<?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= str_replace('//', '/', $item) ?>"></script>
-<?php }, $jsLinks ?? []) ?>
+<?php }, $jsLinks ?? []); ?>
 
 <?= $footerContent ?? '' ?>
 <?= $footerContentBase ?>

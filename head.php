@@ -15,7 +15,7 @@ else {
   !PUBLIC_PAGE && !$target && $target = ACCESS_MENU[0];
   ($target === PUBLIC_PAGE) && reDirect(null, 'public');
   $target && $pathTarget = checkTemplate($target);
-  if ($target && strstr($pathTarget, '404')) require CORE . 'views/c_404.php';
+  if ($target && strstr($pathTarget, '404')) require CORE . 'views/404.php';
   else {
     if (!OUTSIDE) {
       $main->checkAuth($target)
