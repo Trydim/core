@@ -29,9 +29,7 @@ if ($main->checkAction($dbAction) || $mode === 'auth') {
         break;
     }
 
-    $result['error'] = checkError($result);
-    $result['status'] = empty($result['error']);
-    if ($result['status']) unset($result['error']);
+    $result = checkError($result);
 
   } catch (\mysql_xdevapi\Exception $e) {
     echo $e->getMessage();

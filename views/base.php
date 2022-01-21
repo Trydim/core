@@ -10,6 +10,7 @@ if (!isset($global)) {
   $pageHeader = $pageHeader ?? template('parts/header');
   $pageFooter = $pageFooter ?? template('parts/footer');
   $sideLeft = $sideLeft ?? template('parts/sidemenu');
+  $sideRight = $sideRight ?? '';
 }
 $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 ?>
@@ -27,7 +28,7 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
-    <link rel="stylesheet" href="<?= str_replace('//', '/', $item); ?>">
+    <link rel="stylesheet" href="<?= str_replace('//', '/', $item) ?>">
   <?php }, $cssLinks ?? []); ?>
 
   <script>
@@ -73,14 +74,13 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
     <?= $pageHeader; ?>
 
     <div class="container-content">
-      <?php if ($sideLeft) { ?>
-        <?= $sideLeft; ?>
-      <?php } ?>
+      <?= $sideLeft ?>
+
       <section class="content-body">
         <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content ?? '' ?></div>
-        <?= $pageFooter; ?>
+        <?= $pageFooter ?>
       </section>
-      <?php if (isset($sideRight)) { ?>
+      <?php if ($sideRight) { ?>
         <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight ?></section>
       <?php } ?>
     </div>
@@ -93,7 +93,7 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 
 <?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= str_replace('//', '/', $item) ?>"></script>
-<?php }, $jsLinks ?? []) ?>
+<?php }, $jsLinks ?? []); ?>
 
 <?= $footerContent ?? '' ?>
 <?= $footerContentBase ?>

@@ -254,8 +254,8 @@ const customers = {
 
         ['name', 'phone', 'email', 'address', 'ITN'].map(i => {
           let node = form.querySelector(`[name="${i}"]`);
-          i === 'phone' && f.maskInit(node, '+375 (__) ___ __ __');
-          i === 'ITN' && f.maskInit(node, '_________');
+          i === 'phone' && f.initMask(node, '+375 (__) ___ __ __');
+          i === 'ITN' && f.initMask(node, '_________');
         });
 
         this.confirmMsg = 'Клиент добавлен';
@@ -280,7 +280,7 @@ const customers = {
         let {phone = '', email = '', address = ''} = customer['contactsParse'];
 
         node = form.querySelector(`[name="phone"]`);
-        f.maskInit(node, '+375 (__) ___ __ __');
+        f.initMask(node, '+375 (__) ___ __ __');
         node.value = phone;
 
         node = form.querySelector(`[name="email"]`);
@@ -290,7 +290,7 @@ const customers = {
         node.value = address;
 
         node = form.querySelector(`[name="ITN"]`);
-        f.maskInit(node, '_________');
+        f.initMask(node, '_________');
         node.value = customer['ITN'];
 
         this.confirmMsg = 'Изменения сохранены';

@@ -34,7 +34,7 @@ export class Valid {
       else {
         n.addEventListener('keyup', e => this.keyEnter(e));
 
-        initMask && n.type === 'tel' && f.maskInit && f.maskInit(n, phoneMask);
+        initMask && n.type === 'tel' && f.initMask && f.initMask(n, phoneMask);
       }
       n.addEventListener('blur', e => this.validate(e)); // может и не нужна
       this.validate(n);

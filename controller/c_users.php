@@ -9,10 +9,10 @@ $field = [
   'jsLinks'   => [CORE_JS . 'module/users.js'],
 ];
 
-if(!isset($setting)) {
+if (!isset($setting)) {
   $columns = $main->db->loadUsers(0, 1);
 
-	if(count($columns) === 1) {
+	if (count($columns) === 1) {
     unset($columns[0]['permission_id']);
     $columns = array_keys($columns[0]) ?: [];
     $columns = array_map(function ($item) {
@@ -34,7 +34,7 @@ $param['permission'] = $permission = implode('', array_map(function ($item) {
   return "<option value=" . $item['ID'] . ">" . gTxt($item['name']) . "</option>";
 }, $permission));
 
-$managerField = $main->getSettings('managerSetting');
+$managerField = $main->getSettings('managerFields');
 if (!$managerField) $managerField = [];
 
 $param['columns'] = $columns ?? '';

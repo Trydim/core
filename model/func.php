@@ -39,26 +39,12 @@ function addCpNumber($number, $reportVal) {
  * Check if there is an error
  * Deep search for all error messages and return as an array
  * @param array $result
- *
- * @return array - ['...', '...']
+ * @return array
  */
 function checkError(array $result): array {
   $error = [];
-  $findError = function ($findError, $var) use (&$error) {
-    if (is_array($var)) {
-      if (isset($var['error'])) {
-        if (empty($var['error'])) unset($var['error']);
-        else $error[] = $var['error'];
-      }
-
-      foreach ($var as $item) {
-        $findError($findError, $item);
-      }
-    }
-  };
-
-  $findError($findError, $result);
-  return $error;
+  array_walk_recursive($result, function($k, $v) use (&$error) { $error[] = [$k => $v]; });
+  return empty($error) ? ['status' => true] : array_merge($result, ['status' => false]);
 }
 
 /**

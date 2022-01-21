@@ -1,142 +1,162 @@
 <?php
 global $main;
-$admin = $main->getSettings('admin');
+$isAdmin = $main->getSettings('admin');
 $catalogProperties = in_array('catalog', $main->getSideMenu());
 ?>
 <div class="row container m-auto" id="settingForm">
-  <?php if ($admin) { ?>
-  <div class="col-6 border">
-    <h3 class="w-100 mt-3 text-center">Настройка почты</h3>
-    <form action="#" id="mailForm" class="col">
+  <?php if ($isAdmin) { ?>
+    <div class="col-6 border" id="mailForm">
+      <h3 class="col text-center">Настройка почты</h3>
       <div class="form-floating my-3">
-        <input type="text" class="form-control" id="orderMail" placeholder="Почта"
-               name="orderMail" value="<?= $main->getSettings('orderMail') ?>">
-        <label for="orderMail">Почта для получения заказов</label>
+        <p-input-text v-model="mail.mailTarget" ref="mailTarget" :class="'form-control'" placeholder="_"
+        ></p-input-text>
+        <label>Почта для получения заказов</label>
       </div>
-
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="orderMailCopy" placeholder="Почта"
-               name="orderMailCopy" value="<?= $main->getSettings('orderMailCopy') ?>">
-        <label for="orderMailCopy">Копия письма</label>
+        <p-input-text v-model="mail.mailTargetCopy" ref="mailTargetCopy" :class="'form-control'" placeholder="_"
+        ></p-input-text>
+        <label>Копия письма</label>
       </div>
-
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="orderMailSubject" placeholder="Почта"
-               name="orderMailSubject" value="<?= $main->getSettings('orderMailSubject') ?>">
-        <label for="orderMailSubject">Тема письма</label>
+        <p-input-text v-model="mail.mailSubject" :class="'form-control'" placeholder="_"
+        ></p-input-text>
+        <label>Тема письма</label>
       </div>
-
       <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="orderMailFromName" placeholder="Почта"
-               name="orderMailFromName" value="<?= $main->getSettings('orderMailFromName') ?>">
-        <label for="orderMailFromName">Имя отправителя</label>
+        <p-input-text v-model="mail.mailFromName" :class="'form-control'" placeholder="_"
+        ></p-input-text>
+        <label>Имя отправителя</label>
       </div>
-    </form>
-  </div>
+    </div>
   <?php } ?>
 
   <div class="col-6 border">
-    <h3 class="w-100 mt-3 text-center">Пользователь</h3>
-    <form action="#" id="userForm" class="col">
-      <input type="hidden" name="priority" value="<?= $main->getLogin('id') ?>">
-      <div class="form-floating my-3">
-        <input type="text" class="form-control" id="login" placeholder="Почта"
-               name="login" value="<?= $main->getLogin() ?>">
-        <label for="login">Логин</label>
-      </div>
-
-      <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="password" placeholder="Почта" name="password">
-        <label for="password">Новый Пароль</label>
-      </div>
-
-      <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="passwordRepeat" placeholder="Почта" name="passwordRepeat">
-        <label for="passwordRepeat">Повторите пароль</label>
-      </div>
-
-      <div class="form-floating mb-3 d-none">
-        <input type="checkbox" class="form-control" id="onlyOne" placeholder="Почта" name="onlyOne" <?= $main->getSettings('onlyOne') ? 'checked' : '' ?>>
-        <label for="onlyOne">Запретить одновременный вход</label>
-      </div>
-    </form>
+    <h3 class="col text-center">Пользователь</h3>
+    <div class="form-floating my-3">
+      <p-input-text v-model="user.name" :class="'form-control'" placeholder="_"
+      ></p-input-text>
+      <label>ФИО</label>
+    </div>
+    <div class="form-floating my-3">
+      <p-input-text v-model="user.login" :class="'form-control'" placeholder="_"
+      ></p-input-text>
+      <label>Логин</label>
+    </div>
+    <div class="form-floating mb-3">
+      <p-input-text type="password" v-model="user.password" :class="'form-control'" placeholder="_"
+      ></p-input-text>
+      <label>Новый Пароль</label>
+    </div>
+    <div class="form-floating mb-3">
+      <p-input-text type="password" v-model="user.passwordRepeat" :class="'form-control'" placeholder="_"
+      ></p-input-text>
+      <label>Повторите Пароль</label>
+    </div>
+    <div class="form-floating mb-3 d-none">
+      <p-checkbox v-model="user.onlyOne" :class="'form-control'" placeholder="_"
+      ></p-checkbox>
+      <label>Запретить одновременный вход</label>
+    </div>
   </div>
 
-  <?php if ($admin && USE_DATABASE) {
-    !isset($permStatus) && $permStatus = []; ?>
-  <div class="col-6 border">
-    <h3 class="w-100 mt-3 text-center">Управление доступом</h3>
-    <form action="#" class="col" id="permission">
-      <?php if (isset($permIds)) { ?>
-        <input type="hidden" name="permIds" value="<?= $permIds ?>">
-      <?php } ?>
+  <?php if ($isAdmin && USE_DATABASE) { ?>
+    <div class="col-6 border">
+      <h3 class="col text-center">Управление доступом</h3>
+
       <div class="input-group my-3">
         <span class="input-group-text">Добавить тип доступа</span>
-        <input type="text" class="form-control" placeholder="Менеджер" name="permType">
-        <button type="button" class="btn btn-outline-secondary" data-action="addPermType">
-          <i class="pi pi-plus-circle pi-green align-text-bottom" data-action="addPermType"></i>
-        </button>
+        <p-input-text v-model="permission.name" :class="'form-control'"
+        ></p-input-text>
+        <p-button v-tooltip.bottom="'Добавить тип доступа'" icon="pi pi-plus-circle" class="p-button-success"
+                  @click="addPermission"></p-button>
       </div>
 
       <div class="input-group mb-3">
         <span class="input-group-text">Тип доступа</span>
-        <select class="form-select" data-field="permTypes">
-          <?php foreach ($permStatus as $item) { ?>
-            <option value="<?= $item['ID'] ?>" data-target="perm<?= $item['ID'] ?>"><?= $item['name'] ?></option>
-          <?php } ?>
-        </select>
-        <button type="button" class="btn btn-outline-secondary" data-action="removePermType">
-          <i class="pi pi-trash pi-red align-text-bottom" data-action="removePermType"></i>
-        </button>
+        <p-select option-label="name" option-value="id"
+                  :editable="true"
+                  :options="permissionsData"
+                  v-model="permission.id"
+                  :class="'col'"
+                  @input="changePermission"
+        ></p-select>
+        <p-button v-tooltip.bottom="'Удалить тип доступа'" icon="pi pi-trash" class="p-button-danger"
+                  @click="removePermission"></p-button>
       </div>
-      <?php foreach ($permStatus as $item) { ?>
-      <div class="input-group mb-3" data-relation="perm<?= $item['ID'] ?>">
-        <span class="input-group-text">Доступные меню</span>
-        <select class="form-select" name="permMenuAccess_<?= $item['ID'] ?>" multiple size="5">
-          <?php foreach ($main->getSideMenu() as $menu) { ?>
-            <option value="<?= $menu ?>"><?= gTxt($menu) ?></option>
-          <?php } ?>
-        </select>
-      </div>
-      <?php } ?>
-    </form>
-  </div>
 
-  <div class="col-6 border">
-    <h3 class="w-100 mt-3 text-center">Настройки менеджеров</h3>
-    <form action="#" id="managerForm" class="col">
+      <div class="col mb-3">
+        <p class="col-12 mt-2 text-center">
+          Доступные меню
+          <i class="pi pi-tag" v-tooltip.bottom="'Если в `Доступные` пусто, значит доступны все'"></i>
+        </p>
+        <p-picklist v-model="permission.menu" data-key="id"
+                    list-style="height:220px"
+                    :class="'w-100'"
+                    @selection-change="pickedChange"
+        >
+          <template #source>
+            Возможные
+          </template>
+          <template #target>
+            Доступные
+          </template>
+          <template #item="slotProps">
+            <div class="product-item">
+              {{ slotProps.item.name }}
+            </div>
+          </template>
+        </p-picklist>
+      </div>
+    </div>
+
+    <div class="col-6 border">
+      <h3 class="col-12 text-center">Настройки менеджеров</h3>
+
       <div class="input-group my-3">
         <span class="input-group-text flex-grow-1">Дополнительные поля менеджеров</span>
-        <button type="button" class="btn btn-outline-secondary" data-action="addCustomManagerField">
-          <i class="pi pi-plus-circle align-text-bottom pi-green" data-action="addCustomManagerField"></i>
-        </button>
-        <button type="button" class="btn btn-outline-secondary" data-action="removeCustomManagerField">
-          <i class="pi pi-times-circle align-text-bottom pi-red" data-action="removeCustomManagerField"></i>
-        </button>
+        <p-button v-tooltip.bottom="'Добавить новое поле'" icon="pi pi-plus-circle" class="p-button-success"
+                  @click="addCustomField"></p-button>
       </div>
-      <div class="col" data-field="customField"></div>
-    </form>
-  </div>
-  <?php } ?>
 
-  <?php if ($admin && USE_DATABASE) { ?>
-    <div class="col-6 border testClass" style="transition: height 0.3s linear">
-      <h3 class="w-100 mt-3 text-center">Курсы валют</h3>
-      <form action="#" id="rateForm" class="col">
-        <div class="input-group my-3">
-          <span class="input-group-text flex-grow-1">Автоматически обновлять курсы</span>
-          <div class="input-group-text">
-            <input class="form-check-input mt-0 " type="checkbox" name="autoRefresh" checked data-target="manualRefresh">
-          </div>
+      <template v-for="(item, key) of managerFields" :key="key">
+        <div class="input-group mb-1">
+          <p-input-text v-model="item.name" class="form-control"
+          ></p-input-text>
+          <p-select option-label="name" option-value="id"
+                    :options="managerFieldTypes"
+                    v-model="item.type"
+                    class="'col'"
+          ></p-select>
+          <p-button v-tooltip.bottom="'Удалить поле'" icon="pi pi-times" class="p-button-danger"
+                    @click="removeCustomField(key)"></p-button>
         </div>
-        <div class="col-12 text-center mb-3" data-relation="!manualRefresh">
-          <input type="button" class="btn btn-primary" value="Редактировать курсы" data-action="loadRate">
-        </div>
-      </form>
+      </template>
     </div>
   <?php } ?>
 
-  <?php if ($admin && $main->availablePage('orders')) { ?>
+  <?php if ($isAdmin && USE_DATABASE) { ?>
+    <div class="col-6 border" id="rateForm">
+      <h3 class="col-12 text-center">Курсы валют</h3>
+
+      <div class="col-12 row">
+        <p class="col-8">Автоматически обновлять курсы</p>
+        <div class="col-4 d-inline-flex">
+          <p class="col text-center">Нет</p>
+          <p-switch v-model="rate.autoRefresh"></p-switch>
+          <p class="col text-center">Да</p>
+        </div>
+      </div>
+
+      <div v-if="!rate.autoRefresh" class="col-12 text-center mb-3">
+        <p-button v-tooltip.bottom="'Редактировать курсы'" icon="pi pi-sliders-h" class="p-button-success"
+                  label="Редактировать курсы"
+                  @click="editRate"
+        ></p-button>
+      </div>
+    </div>
+  <?php } ?>
+
+  <?php if ($isAdmin && $main->availablePage('orders')) { ?>
     <div class="col-6 border">
       <h3 class="w-100 mt-3 text-center">Статусы</h3>
       <form action="#" id="ordersStatusForm" class="col">
@@ -155,102 +175,117 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <? } ?>
 
   <div class="col-12 text-center">
-    <button type="button" class="btn btn-primary m-3" data-action="save">
-      Сохранить
-    </button>
+    <p-button v-tooltip.bottom="'Сохранить'" icon="pi pi-save" class="p-button-primary m-3"
+              label="Сохранить" @click="saveSetting"
+    ></p-button>
   </div>
 
   <?php if ($catalogProperties) { ?>
-    <div class="col-12" id="propertiesWrap">
-      <hr>
-      <details>
-        <summary data-action="loadProperties">
-          Редактировать параметры каталога
-        </summary>
-        <div>
-          <table id="propertiesTable" class="table table-striped table-hover text-center">
-            <thead>
-            <tr>
-              <th></th>
-              <th>Свойство</th>
-              <th>Код</th>
-              <th>Тип</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td><input type="checkbox" class="" data-id="${property}"></td>
-              <td>${name}</td>
-              <td>${property}</td>
-              <td>${type}</td>
-            </tr>
-            </tbody>
-          </table>
+    <hr>
+    <div class="col-12" id="propertiesWrap($event)">
+      <p-accordion @tab-open="openAccordion($event)">
+        <p-accordion-tab header="Редактировать параметры каталога">
+          <p-table v-if="propertiesData"
+                   :value="propertiesData"
+                   :loading="propertiesLoading"
+                   :resizable-columns="true" column-resize-mode="fit" show-gridlines
+                   selection-mode="single" :meta-key-selection="false"
+                   :scrollable="true"
+                   responsive-layout="scroll"
+                   v-model:selection="propertiesSelected"
+                   @dblclick="changeProperty($event)"
+                   :bodyClass="'text-center'"
+          >
+            <p-t-column field="name" header="Название"></p-t-column>
+            <p-t-column field="code" :sortable="true" header="Код"></p-t-column>
+            <p-t-column field="type" header="Тип"></p-t-column>
+          </p-table>
+
           <div class="my-3 text-center">
-            <input class="btn btn-success" type="button" value="Добавить" data-action="createProperty">
-            <input class="btn btn-warning" type="button" value="Изменить" data-action="changeProperty">
-            <input class="btn btn-danger" type="button" value="Удалить" data-action="delProperties">
+            <p-button v-tooltip.bottom="'Добавить'" icon="pi pi-plus-circle" class="p-button-warning mx-1"
+                      :loading="propertiesLoading" @click="createProperty"></p-button>
+            <p-button v-tooltip.bottom="'Изменить'" icon="pi pi-cog" class="p-button-warning mx-1"
+                      :loading="propertiesLoading" @click="changeProperty"></p-button>
+            <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-trash" class="p-button-danger mx-1"
+                      :loading="propertiesLoading" @click="deleteProperty"></p-button>
           </div>
+        </p-accordion-tab>
+      </p-accordion>
+
+      <p-dialog v-model:visible="propertiesModal.display" :modal="true">
+        <template #header>
+          <h4>{{ propertiesModal.title }}</h4>
+        </template>
+
+        <div v-if="queryParam.dbAction !== 'deleteProperty'" style="width: 600px">
+          <!-- Имя -->
+          <div class="col-12 row my-1">
+            <div class="col">Название свойства:</div>
+            <div class="col">
+              <p-input-text class="w-100" v-model="property.name" autofocus></p-input-text>
+            </div>
+          </div>
+          <!-- Код свойства -->
+          <div class="col-12 row my-1">
+            <div class="col">Код свойства:</div>
+            <div class="col">
+              <p-input-text class="w-100" v-model="property.code"></p-input-text>
+            </div>
+          </div>
+
+          <!-- Тип данных -->
+          <div class="col-12 row my-1">
+            <div class="col">Тип данных:</div>
+            <div class="col">
+              <p-select class="w-100" option-label="name"
+                        :options="propertiesTypes"
+                        option-group-label="label" option-group-children="items"
+                        option-value="id" option-label="name"
+                        v-model="property.type">
+              </p-select>
+            </div>
+          </div>
+
+          <!-- Составной тип-->
+          <template v-if="property.type === 'select'">
+            <div class="col-12 row mb-1">
+              <div class="col">Дополнительные поля свойства (имя есть):</div>
+              <div class="col">
+                <p-button v-tooltip.bottom="'Добавить поле'" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+                          label="Добавить поле"
+                          @click="addPropertyField"></p-button>
+              </div>
+            </div>
+
+            <div v-for="(field, key) of property.fields" class="row mb-1 border" :key="key">
+              <div class="col-5 text-center">
+                <p-input-text class="w-100"
+                              v-model="field.name"
+                ></p-input-text>
+              </div>
+              <div class="col-6">
+                <p-select class="w-100" option-label="name"
+                          :options="propertiesDataBaseTypes"
+                          option-value="id" option-label="name"
+                          v-model="field.type">
+                </p-select>
+              </div>
+              <div class="col-1 text-center">
+                <p-button v-tooltip.bottom="'Удалить поле'" icon="pi pi-times" class="p-button-danger"
+                          @click="removePropertyField(key)"></p-button>
+              </div>
+            </div>
+          </template>
         </div>
-      </details>
+        <div v-else>
+          Удалить свойство
+        </div>
+
+        <template #footer>
+          <p-button label="Yes" icon="pi pi-check" :disabled="propertiesModal.confirmDisabled" @click="propertiesConfirm"></p-button>
+          <p-button label="No" icon="pi pi-times" class="p-button-text" @click="propertiesCancel"></p-button>
+        </template>
+      </p-dialog>
     </div>
   <?php } ?>
 </div>
-
-<?php if ($catalogProperties) { ?>
-<template id="propertiesCreateTmp">
-  <form action="#" id="temp">
-    <div class="input-group my-3">
-      <span class="input-group-text">Название свойства</span>
-      <input type="text" class="form-control" placeholder="Название свойства" name="tableName">
-    </div>
-
-    <div class="input-group mb-3">
-      <span class="input-group-text">Код свойства</span>
-      <input type="text" class="form-control" placeholder="Название свойства" name="tableCode">
-    </div>
-
-    <div class="input-group mb-3">
-      <span class="input-group-text">Код свойства</span>
-      <select class="form-select useToggleOption" name="dataType" data-field="propertyType">
-        <optgroup label="Простые">
-          <option value="s_text" data-target="">Текст (~200 символов)</option>
-          <option value="s_textarea">Текст (много)</option>
-          <option value="s_number">Число</option>
-          <option value="s_date">Дата</option>
-          <option value="s_bool">Флаг (Да/Нет)</option>
-        </optgroup>
-        <optgroup label="Составные">
-          <option value="h_select" data-target="selectField">Справочник</option>
-        </optgroup>
-      </select>
-    </div>
-
-    <div class="form-group" data-relation="selectField">
-      <div class="input-group mb-3">
-        <span class="input-group-text flex-grow-1">Дополнительные поля параметра (имя есть)</span>
-        <button type="button" class="btn btn-outline-secondary" data-action="addCol">
-          <i class="pi pi-plus-circle align-text-bottom pi-green" data-action="addCol"></i>
-        </button>
-        <button type="button" class="btn btn-outline-secondary" data-action="remCol">
-          <i class="pi pi-times-circle align-text-bottom pi-red" data-action="remCol"></i>
-        </button>
-      </div>
-      <div class="col-12" data-field="propertiesCols">
-        <div class="input-group mb-3" data-field="propertiesColItem">
-          <input type="text" class="form-control" data-field="key">
-          <select class="form-select" data-field="type">
-            <option value="string">Текст (~200 символов)</option>
-            <option value="textarea">Текст (много)</option>
-            <option value="double">Число</option>
-            <option value="money">Число</option>
-            <option value="date">Дата</option>
-            <option value="file">Файл</option>
-            <option value="bool">Флаг</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </form>
-</template>
-<?php } ?>

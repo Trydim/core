@@ -8,30 +8,37 @@
 $field = [
   'pageTitle' => 'Настройки',
   'footerContent' => '',
-  'jsLinks'   => [CORE_JS . 'module/setting.js'],
+  'cssLinks'   => [CORE_CSS . 'module/setting.css'],
+  'jsLinks'    => [CORE_JS . 'module/setting.js'],
 ];
-$param = [];
 
-if ($main->getSettings('admin')) {
-  $fileSetting = getSettingFile(false);
-  $field['footerContent'] .= "<input type='hidden' id='userSetting' value='$fileSetting'>";
+$user = [
+  'name'         => $main->getLogin('name'),
+  'login'        => $main->getLogin(),
+  'permissionId' => $main->getSettings('permissionId'),
+  'isAdmin'      => $main->getSettings('admin'),
+];
+$field['footerContent'] .= "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>";
+
+if ($user['isAdmin']) {
+  $field['footerContent'] .= "<input type='hidden' id='dataSettings' value='" . $main->getSettings('json') . "'>";
 
   if (USE_DATABASE) {
-    $permissions = $main->db->loadTable('permission');
-    $permIds = [];
+    $permissions['permissions'] = $main->db->loadTable('permission');
 
-    $permissions = array_map(function ($row) use (&$permIds) {
-      $permIds[] = $row['ID'];
+    $permissions['permissions'] = array_map(function ($row) {
+      $row['id'] = intval($row['ID']);
       $row['name'] = gTxt($row['name']);
       $row['accessVal'] = json_decode($row['access_val'], true);
-      unset($row['access_val']);
+      unset($row['ID'], $row['access_val']);
       return $row;
-    }, $permissions);
+    }, $permissions['permissions']);
 
-    $param['permIds'] = implode(',', $permIds);
-    $param['permStatus'] = $permissions;
-    $permissions = json_encode($permissions);
-    $field['footerContent'] .= "<input type='hidden' id='permissionSetting' value='$permissions'>";
+    $permissions['menu'] =  array_map(function ($menu) {
+      return ['id' => $menu, 'name' => gTxt($menu)];
+    }, $main->getSideMenu());
+
+    $field['footerContent'] .= "<input type='hidden' id='dataPermissions' value='" . json_encode($permissions) . "'>";
 
     // if available orders
     if ($main->availablePage('orders') && false) {
@@ -39,7 +46,7 @@ if ($main->getSettings('admin')) {
       $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
     }
 
-    unset($permIds, $permissions, $status);
+    unset($permissions, $status);
   }
 }
 

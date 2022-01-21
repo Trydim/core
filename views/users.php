@@ -22,7 +22,7 @@ foreach ($managerField as $k => $item) {
       break;
   }
 
-  $managerFieldHtml .= '<div class="form-floating managerField">' . $input .
+  $managerFieldHtml .= '<div class="form-floating managerField mb-3">' . $input .
                        '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
 }
 

@@ -57,7 +57,7 @@ menu;
         <li>
           <a class="nav-item" href="<?= SITE_PATH ?>" aria-expanded="false">
             <i class="pi pi-globe"></i>
-            <span class="nav-text">Калькулятор</span>
+            <span class="nav-text"><?= gTxt('calculator') ?></span>
           </a>
         </li>
       <?php } ?>
@@ -67,7 +67,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>orders" aria-expanded="false">
                 <i class="pi pi-inbox"></i>
-                <span class="nav-text">Заказы</span>
+                <span class="nav-text"><?= gTxt('orders') ?></span>
               </a>
             </li>
             <?php break;
@@ -75,7 +75,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>calendar" aria-expanded="false">
                 <i class="pi pi-table"></i>
-                <span class="nav-text">Календарь</span>
+                <span class="nav-text"><?= gTxt('calendar') ?></span>
               </a>
             </li>
             <?php break;
@@ -83,7 +83,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>customers" aria-expanded="false">
                 <i class="pi pi-dollar"></i>
-                <span class="nav-text">Клиенты</span>
+                <span class="nav-text"><?= gTxt('customers') ?></span>
               </a>
             </li>
             <?php break;
@@ -91,7 +91,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>users" aria-expanded="false">
                 <i class="pi pi-users"></i>
-                <span class="nav-text">Менеджеры</span>
+                <span class="nav-text"><?= gTxt('users') ?></span>
               </a>
             </li>
             <?php break;
@@ -99,7 +99,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>statistic" aria-expanded="false">
                 <i class="pi pi-chart-line"></i>
-                <span class="nav-text">Статистика</span>
+                <span class="nav-text"><?= gTxt('Calculator') ?></span>
               </a>
             </li>
             <?php break;
@@ -110,7 +110,7 @@ menu;
               <? } else { ?>
                 <a class="nav-item" href="<?= SITE_PATH ?>admindb" aria-expanded="false">
                   <i class="pi pi-user"></i>
-                  <span class="nav-text">Администрирование</span>
+                  <span class="nav-text"><?= gTxt('admindb') ?></span>
                 </a>
               <?php } ?>
             </li>
@@ -119,7 +119,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>catalog" aria-expanded="false">
                 <i class="pi pi-user"></i>
-                <span class="nav-text">Каталог</span>
+                <span class="nav-text"><?= gTxt('catalog') ?></span>
               </a>
             </li>
             <?php break;
@@ -127,7 +127,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>fileManager" aria-expanded="false">
                 <i class="pi pi-folder-open"></i>
-                <span class="nav-text">Файловый менеджер</span>
+                <span class="nav-text"><?= gTxt('fileManager') ?></span>
               </a>
             </li>
             <?php break;
@@ -137,7 +137,7 @@ menu;
         <li>
           <a class="nav-item" href="<?= SITE_PATH ?>setting" aria-expanded="false">
             <i class="pi pi-sliders-h"></i>
-            <span class="nav-text">Настройки</span>
+            <span class="nav-text"><?= gTxt('setting') ?></span>
           </a>
         </li>
       <?php } ?>

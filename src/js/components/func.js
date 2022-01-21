@@ -151,7 +151,7 @@ const func = {
   /**
    * replace ${key from obj} from template to value from obj
    * @param {string} tmpString html string template
-   * @param {array} arrayObjects - array of object
+   * @param {array|object} arrayObjects - array of object
    * @return {string}
    */
   replaceTemplate: (tmpString, arrayObjects) => {
@@ -326,7 +326,7 @@ const func = {
    * @param {HTMLElement} node
    * @param {string} phoneMask
    */
-  maskInit: (node, phoneMask) => {
+  initMask: (node, phoneMask) => {
     if (!node) return;
     const minValue = 2;
 

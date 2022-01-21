@@ -126,12 +126,9 @@ trait Authorization {
 
   private function setSideMenu() {
     if (USE_DATABASE) {
-      $menuAccess = isset($this->getSettings('permission')['menuAccess'])
-        ? $this->getSettings('permission')['menuAccess']
-        : false;
-
-      $menuAccess = $menuAccess ? explode(',', $menuAccess) : [];
-      $this->sideMenu = count($menuAccess) ? $menuAccess : ACCESS_MENU;
+      $menuAccess = $this->getSettings('permission')['menu'] ?? '';
+      $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
+      $this->sideMenu = $menuAccess ? $menuAccess : ACCESS_MENU;
     } else {
       $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
       $this->sideMenu = array_filter(ACCESS_MENU, function ($m) use ($filterMenu) {
@@ -197,21 +194,9 @@ trait Dictionary {
    */
   private $dictionaryPath = ABS_SITE_PATH . 'lang/dictionary.php';
 
-  private function includeFromSetting() {
-    if (isset($this->setting['managerSetting'])) {
-      $list = $this->setting['managerSetting'];
-      return array_reduce(array_keys($list), function ($r, $k) use ($list) {
-        $r[$k] = $list[$k]['name'];
-        return $r;
-      }, []);
-    }
-    return [];
-  }
-
   public function initDictionary() {
     $mess = [];
     include $this->dictionaryPath;
-    $mess = array_merge($mess, $this->includeFromSetting());
     $mess = json_encode($mess);
     return $mess ? "<input type='hidden' id='dictionaryData' value='$mess'>" : '';
   }
@@ -230,8 +215,11 @@ trait Cache {
    */
   private $needCsvCached = false;
 
-  private function checkEditTime() {
-    $this->needCsvCached = time() - filemtime(CSV_CACHE_FILE) > $this->updateTime;
+  /**
+   * @param string $file
+   */
+  private function checkEditTime(string $file) {
+    $this->needCsvCached = time() - filemtime($file) > $this->updateTime;
   }
 
   public function setCsvVariable(array $vars) {
@@ -245,7 +233,7 @@ trait Cache {
    */
   public function loadCsvCache(&...$vars) {
     if (file_exists(CSV_CACHE_FILE)) {
-      $this->checkEditTime();
+      $this->checkEditTime(CSV_CACHE_FILE);
 
       if (!$this->needCsvCached) {
         $data = json_decode(gzuncompress(file_get_contents(CSV_CACHE_FILE)), true);
@@ -262,14 +250,30 @@ trait Cache {
   }
 
   public function saveCsvCache(...$vars) {
-    if (file_exists(CSV_CACHE_FILE)) {
-      $this->checkEditTime();
+    $data = [];
+    foreach ($this->cvsVars as $index => $key) $data[$key] = $vars[$index];
+    file_put_contents(CSV_CACHE_FILE, gzcompress(json_encode($data), 1));
+  }
 
+  public function loadPageCache() {
+    if (file_exists(PAGE_CACHE_FILE)) {
+      $this->checkEditTime(PAGE_CACHE_FILE);
+
+      if (!$this->needCsvCached) {
+        return json_decode(gzuncompress(file_get_contents(PAGE_CACHE_FILE)), true);
+      }
     } else {
-      $data = [];
-      foreach ($this->cvsVars as $index => $key) $data[$key] = $vars[$index];
-      file_put_contents(CSV_CACHE_FILE, gzcompress(json_encode($data), 1));
+      $this->needCsvCached = true;
     }
+    return false;
+  }
+
+  /**
+   * @param {any} $data
+   */
+  public function savePageCache($data) {
+    //if (gettype($data) === 'string')
+    file_put_contents(CSV_CACHE_FILE, gzcompress(json_encode($data), 1));
   }
 
 }
@@ -357,6 +361,15 @@ final class Main {
 
   public function setSettings($key, $value) {
     $this->setting[$key] = $value;
+  }
+
+  /**
+   * Save cms setting to file
+   */
+  public function saveSettings() {
+    $content = $this->setting;
+    unset($content['permission']);
+    file_put_contents(SETTINGS_PATH, json_encode($content));
   }
 
   /**
