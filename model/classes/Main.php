@@ -359,8 +359,9 @@ final class Main {
     Xml::checkXml($this->dbTables);
   }
 
-  public function setSettings($key, $value) {
+  public function setSettings($key, $value): Main {
     $this->setting[$key] = $value;
+    return $this;
   }
 
   /**

@@ -85,6 +85,9 @@ export class Main {
       colHeaders.push(f.replaceTemplate(columnValueTmp, col));
     });
 
+    // Table empty
+    if (!data.length) data.push(new Array(columns.length).fill(''));
+
     this.handsontable = new Handsontable(div, Object.assign(handson.optionCommon, handson.optionDb, {
       data: handson.removeSlashesData(data), colHeaders,
       cells(row, col) {

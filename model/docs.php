@@ -35,11 +35,7 @@ if (isset($addManager)) {
 if (isset($addCustomer)) {
   if (isset($customerId)) {
     $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
-  } else if (isset($customer)) {
-    $customerData = $customer;
-  } else {
-    $customerData = '';
-  }
+  } else $customerData = $customer ?? '';
 
   if (count($customerData)) {
     $userData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);
@@ -100,14 +96,11 @@ if (isset($docsAction)) {
       isset($email) && $mail->addMail($email);
       $result['mail'] = $mail->send();
       break;
-
     case 'getPrintStyle':
-      $fileTpl = isset($fileTpl) ? $fileTpl : 'printTpl.css';
+      $fileTpl = $fileTpl ?? 'printTpl.css';
 
       if (file_exists(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl)) {
-        ob_start();
-        include(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl);
-        $result['style'] = ob_get_clean();
+        $result['style'] = file_get_contents(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl);
       }
       break;
   }

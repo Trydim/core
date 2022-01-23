@@ -115,36 +115,79 @@ switch ($cmsAction) {
     $result['setting'] = getSettingFile();
     break;
 
+  // Options property
   case 'createProperty':
   case 'changeProperty':
-    if (isset($tableName) && isset($dataType) && !empty($tableName)) {
-      $propertySetting = [];
-      $setting = getSettingFile();
+    $property = json_decode($property ?? '[]', true);
 
-      $tableCode = $tableCode ?? translit($tableName);
-      $propName = 'prop_' . str_replace('prop_', '', $tableCode);
-      $dataType = str_replace('s_', '', $dataType);
+    $tableName = $property['name'];
+    $tableCode = $property['code'] ?? translit($tableName);
+    $propName = 'prop_' . str_replace('prop_', '', $tableCode);
+    $setting = $main->getSettings('optionProperties');
 
-      if (!isset($setting['propertySetting'][$propName])) {
-        $setting['propertySetting'][$propName] = [
+    if ($property['type'] === 'select') { // Справочник
+      $param = [];
+      foreach ($property['fields'] as $id => $value) {
+        $param[translit($value['name'])] = $value['type'];
+      }
+
+      if (!isset($setting[$propName])) {
+        $setting[$propName]['name'] = $tableName;
+        $main->setSettings('optionProperties', $setting)->saveSettings();
+        $result['error'] = $db->createPropertyTable($propName, $param);
+      } else if ($cmsAction === 'changeProperty') {
+        $db->delPropertyTable([$propName]);
+        $setting[$propName]['name'] = $tableName;
+        $main->setSettings('optionProperties', $setting)->saveSettings();
+        $result['error'] = $db->createPropertyTable($propName, $param);
+      } else $result['error'] = 'Property exist';
+
+    } else { // остальные
+      $dataType = $property['type'];
+
+      if (!isset($setting[$propName]) || $cmsAction === 'changeProperty') {
+        $setting[$propName] = [
           'name' => $tableName,
           'type' => $dataType,
         ];
-        setSettingFile($setting);
-      } else {
-        $result['error'] = 'Property exist';
-      }
-    } else $result['error'] = 'Property name not exist';
+        $main->setSettings('optionProperties', $setting)->saveSettings();
+      } else $result['error'] = 'Property exist';
+    }
     break;
   case 'loadProperties':
-    $setting = $setting ?? getSettingFile();
-    if (isset($setting['propertySetting'])) {
-       $result['propertiesTables'] = array_filter($setting['propertySetting'],
-         function ($prop) { return isset($prop['type']);}
-       );
+    $result['optionProperties'] = [];
+    $setting = $main->getSettings('optionProperties');
+    $dbProperties = array_keys($db->getTables('prop'));
+
+    if ($setting) {
+      foreach ($setting as $code => $table) {
+        if (isset($table['type']) || in_array($code, $dbProperties)) {
+          $type = $table['type'] ?? 'select';
+
+          $result['optionProperties'][] = [
+            'name' => $table['name'],
+            'code' => $code,
+            'type' => $type,
+            'typeLang' => gTxtDB('types', $type),
+          ];
+        }
+      }
+    }
+    break;
+  case 'loadProperty':
+    if (isset($props)) {
+      $result['propertyValue'] = $db->getColumnsTable($props);// todo загрузить просто
     }
     break;
   case 'delProperties':
+    $property = json_decode($property ?? '[]', true);
+    $setting = $main->getSettings('optionProperties');
+
+    if (isset($props)) {
+      $props = explode(',', $props);
+
+      $db->delPropertyTable($props);
+    }
     if (isset($props) && ($setting = getSettingFile()) && isset($setting['propertySetting'])) {
       $setting['propertySetting'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
         return !in_array($item, $props);
@@ -152,6 +195,7 @@ switch ($cmsAction) {
 
       setSettingFile($setting);
     }
+    $main->saveSettings();
     break;
 
 }

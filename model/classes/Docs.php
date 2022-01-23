@@ -43,6 +43,12 @@ class Docs {
   private $docs;
 
   /**
+   * If true, then use default template
+   * @var boolean
+   */
+  private $useDefault = false;
+
+  /**
    * temp files path, unlink after make pdf
    * @var array
    */
@@ -56,7 +62,7 @@ class Docs {
     $this->setDefaultParam();
     $this->getFileName();
     in_array($docsType, ['pdf', 'print']) && $this->prepareTemplate();
-    $docsType === 'excel' && $this->setExcelDate();
+    $docsType === 'excel' && $this->setExcelData();
 
     $func = 'init' . $this->getFunc();
     $this->$func();
@@ -78,15 +84,12 @@ class Docs {
   }
 
   private function setFileTpl($fileTpl) {
-    $this->fileTpl = $fileTpl !== 'default' ? $fileTpl
-      : (in_array($this->docsType, ['pdf', 'print']) ? 'pdfTpl' : 'excelTpl');
+    $this->fileTpl = $fileTpl !== 'default' ?
+      $fileTpl : (in_array($this->docsType, ['pdf', 'print']) ? 'pdfTpl' : 'excelTpl');
 
-    foreach ([ABS_SITE_PATH . "public/views/docs/$this->fileTpl.php",
-              CORE . "views/docs/$this->fileTpl.php"] as $path) {
-      if (file_exists($path)) {
-        $this->filePath = $path; break;
-      }
-    }
+    $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.php";
+    if (file_exists($path)) $this->filePath = $path;
+    else $this->useDefault = true;
   }
 
   private function setDefaultParam() {
@@ -105,16 +108,16 @@ class Docs {
   }
 
   private function prepareTemplate() {
+    if ($this->useDefault) { $this->setPdfDefaultData(); return; }
     ob_start();
     include($this->filePath);
     isset($footerPage) && $this->footerPage = $footerPage;
     $this->content = ob_get_clean();
   }
 
-  private function setExcelDate() {
-    $rows = [['header', 'type', 'comment'], ['c1-text', 'string', 'text'], ['c2-text', '@', 'text'],
-             ['c3-integer', 'integer', ''], ['c4-integer', '0', ''], ['c5-price', 'price', ''],
-             ['c6-price', '#,##0.00', 'custom'], ['c7-date', 'date', ''], ['c8-date', 'YYYY-MM-DD', '']];
+  private function setExcelData() {
+    if ($this->useDefault) { $this->setExcelDefaultData(); return; }
+    $rows = [];
     include($this->filePath);
     $this->data = $rows;
     isset($header) && $this->excelHeader = $header;
@@ -170,7 +173,7 @@ class Docs {
   private function initPrint() { }
 
   private function initExcel() {
-    require_once 'Xlsxwriter.php';
+    require_once './Xlsxwriter.php';
     $this->docs = new XLSXWriter();
     count($this->excelHeader) && $this->docs->writeSheetHeader(gTxt('Sheet1'), $this->excelHeader);
 
@@ -178,16 +181,13 @@ class Docs {
       $this->docs->writeSheetRow(gTxt('Sheet1'), $row);
   }
 
+  /**
+   * Add separate css to pdf
+   */
   private function setCss() {
-    foreach ([ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css",
-              CORE . "/views/docs/$this->fileTpl.css"] as $path) {
-      if (file_exists($path)) {
-        $cssPath = $path; break;
-      }
-    }
-
-    if (isset($cssPath)) {
-      $stylesheet = file_get_contents($cssPath);
+    $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css";
+    if (file_exists($path)) {
+      $stylesheet = file_get_contents($path);
       switch (PDF_LIBRARY) {
         case 'mpdf':
           $this->docs->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
@@ -209,13 +209,11 @@ class Docs {
   }
 
   /**
-   * What do with pdf file:
+   * Return file as:
    * save - save on server in RESULT_PATH, any other value send to browser
    * I - inline, D - DOWNLOAD, F - save local file, S - string
    * @param {string} $path
    * @param {string} $dest
-   *
-   * @return mixed
    */
   private function getPdf($path, $dest) {
 
@@ -290,6 +288,32 @@ class Docs {
           'excelBody' => base64_encode($this->docs->writeToString()),
         ];
     }
+  }
+
+  private function setPdfDefaultData() {
+    $this->content = '
+<style>
+.class {
+  padding: 0;
+  margin: 0;
+}
+</style>
+<div>
+  <p>Use "$this->data" for all data</p>
+  <p>Use "$this->data" for all data</p>
+  <p>Use "$this->imgPath" for link to image</p>
+  <p>Use $this->numFormat(\'1000\') for result "1 000"</p>
+  
+</div>';
+  }
+
+  /**
+   * Example for Excel
+   */
+  private function setExcelDefaultData() {
+    $this->data = [['header', 'type', 'comment'], ['c1-text', 'string', 'text'], ['c2-text', '@', 'text'],
+                   ['c3-integer', 'integer', ''], ['c4-integer', '0', ''], ['c5-price', 'price', ''],
+                   ['c6-price', '#,##0.00', 'custom'], ['c7-date', 'date', ''], ['c8-date', 'YYYY-MM-DD', '']];
   }
 
   /**

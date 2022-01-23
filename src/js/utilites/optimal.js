@@ -48,11 +48,11 @@ function UserException(message, name) {
 export function optimal(options) {
   const init = () => {
     ({
-      name: this.name  = '',
-      values: this.values = false,
+      name     : this.name      = '',
+      values   : this.values    = false,
       leftovers: this.leftovers = false,
-      cutW: this.cutW = 0,
-      added: this.added = 0,
+      cutW     : this.cutW      = 0,
+      added    : this.added     = 0,
       minRemain: this.minRemain = 0,
     } = options);
 

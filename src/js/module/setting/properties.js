@@ -58,10 +58,9 @@ export const computed = {
 
 export const methods = {
   loadProperties() {
-    this.queryParam.dbAction = 'loadProperties';
+    this.queryParam.cmsAction = 'loadProperties';
     this.query().then(data => {
-      //  Object.values(data['propertiesTables']) тут нужен массив
-      this.propertiesData = data['propertiesTables'];
+      this.propertiesData = data['optionProperties'];
       this.propertiesLoading = false;
     });
   },
@@ -76,7 +75,7 @@ export const methods = {
     exp && this.loadProperties();
   },
   createProperty() {
-    this.queryParam.dbAction = 'createProperty';
+    this.queryParam.cmsAction = 'createProperty';
 
     this.property.name = '';
     this.property.code = '';
@@ -104,12 +103,8 @@ export const methods = {
   propertiesConfirm() {
     //this.propertiesLoading = true;
 
-    this.property.type === 'select' && (this.property.code = 'prop_' + this.property.code);
     this.queryParam.property = JSON.stringify(this.property);
-    this.query().then(data => {
-      this.propertiesData = data['propertiesTables'];
-      this.propertiesLoading = false;
-    });
+    this.query().then(() => this.loadProperties());
     this.propertiesModal.display = false;
   },
   propertiesCancel() {
@@ -136,7 +131,7 @@ class Properties {
     this.needReload = false;
     this.delayFunc = () => {};
     this.queryParam = {
-      dbAction: 'loadProperties',
+      cmsAction: 'loadProperties',
     };
 
     this.field = {
@@ -160,7 +155,7 @@ class Properties {
   }
 
   reloadQuery() {
-    this.queryParam = {dbAction: 'loadProperties'};
+    this.queryParam = {cmsAction: 'loadProperties'};
     this.needReload = false;
   }
   // Events function
@@ -186,7 +181,7 @@ class Properties {
       this.delayFunc = () => {};
       this.needReload = true;
     } else {
-      !['addCol', 'remCol'].includes(action) && (this.queryParam.dbAction = action);
+      !['addCol', 'remCol'].includes(action) && (this.queryParam.cmsAction = action);
       select[action] && select[action]();
     }
   }

@@ -4,7 +4,7 @@
  * @param $var
  * @param int $die
  */
-function de($var, $die = 1) {
+function de($var, int $die = 1) {
   echo '<pre>';
   var_dump($var);
   echo '</pre>';
@@ -39,12 +39,19 @@ function addCpNumber($number, $reportVal) {
  * Check if there is an error
  * Deep search for all error messages and return as an array
  * @param array $result
- * @return array
  */
-function checkError(array $result): array {
+function checkError(array &$result): void {
   $error = [];
-  array_walk_recursive($result, function($k, $v) use (&$error) { $error[] = [$k => $v]; });
-  return empty($error) ? ['status' => true] : array_merge($result, ['status' => false]);
+  if (is_array($result['error'] ?? false)) {
+    if (empty($result['error'])) unset($result['error']);
+    else array_walk_recursive($result['error'], function($v, $k) use (&$error) {
+      if (empty($v)) return;
+      $error[] = [$k => $v];
+    });
+  }
+
+  $result['status'] = empty($error);
+  !empty($error) && $result['error'] = $error;
 }
 
 /**

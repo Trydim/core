@@ -53,7 +53,7 @@ const common = {
 
     Object.entries(this.queryParam).map(param => data.set(param[0], param[1]));
 
-    return f.Post({data}).then(d => d);
+    return f.Post({data});
   },
 
   // Event function

@@ -172,7 +172,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
         <div class="col" data-field="statusField"></div>
       </form>
     </div>
-  <? } ?>
+  <?php } ?>
 
   <div class="col-12 text-center">
     <p-button v-tooltip.bottom="'Сохранить'" icon="pi pi-save" class="p-button-primary m-3"
@@ -198,7 +198,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
           >
             <p-t-column field="name" header="Название"></p-t-column>
             <p-t-column field="code" :sortable="true" header="Код"></p-t-column>
-            <p-t-column field="type" header="Тип"></p-t-column>
+            <p-t-column field="typeLang" header="Тип"></p-t-column>
           </p-table>
 
           <div class="my-3 text-center">
@@ -232,7 +232,6 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
               <p-input-text class="w-100" v-model="property.code"></p-input-text>
             </div>
           </div>
-
           <!-- Тип данных -->
           <div class="col-12 row my-1">
             <div class="col">Тип данных:</div>
@@ -245,7 +244,6 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
               </p-select>
             </div>
           </div>
-
           <!-- Составной тип-->
           <template v-if="property.type === 'select'">
             <div class="col-12 row mb-1">
