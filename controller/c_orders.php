@@ -42,6 +42,6 @@ if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
   }
 }
 
-$main->exist('orderTemplate') && $field = doHook('orderTemplate', $field);
+$main->fireHook('orderTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

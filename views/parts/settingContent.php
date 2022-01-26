@@ -30,7 +30,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     </div>
   <?php } ?>
 
-  <div class="col-6 border">
+  <div class="col-6 border" id="userForm">
     <h3 class="col text-center">Пользователь</h3>
     <div class="form-floating my-3">
       <p-input-text v-model="user.name" :class="'form-control'" placeholder="_"
@@ -60,7 +60,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   </div>
 
   <?php if ($isAdmin && USE_DATABASE) { ?>
-    <div class="col-6 border">
+    <div class="col-6 border" id="controlForm">
       <h3 class="col text-center">Управление доступом</h3>
 
       <div class="input-group my-3">
@@ -109,7 +109,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       </div>
     </div>
 
-    <div class="col-6 border">
+    <div class="col-6 border" id="managerForm">
       <h3 class="col-12 text-center">Настройки менеджеров</h3>
 
       <div class="input-group my-3">
@@ -157,7 +157,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <?php } ?>
 
   <?php if ($isAdmin && $main->availablePage('orders')) { ?>
-    <div class="col-6 border">
+    <div class="col-6 border" id="statsForm">
       <h3 class="w-100 mt-3 text-center">Статусы</h3>
       <form action="#" id="ordersStatusForm" class="col">
         <div class="input-group my-3">

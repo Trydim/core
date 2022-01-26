@@ -550,12 +550,12 @@ const func = {
   /**
    * Курсы валют (РФ/РБ)
    * @param {string} dataSelector
-   * @return {void}
+   * @return {object}
    */
   setRate: (dataSelector = '#dataRate') => {
     let node = f.qS(dataSelector), json;
     node && (json = JSON.parse(node.value)) && node.remove();
-    json && (this.rate = json['curs']);
+    return json || Object.create(null);
   },
 
   /**

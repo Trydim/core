@@ -17,6 +17,8 @@ const VIEW = CORE . 'views/';
 const CORE_CSS = SITE_PATH . CORE . 'assets/css/';
 const CORE_JS = SITE_PATH . CORE . 'assets/js/';
 
+const HOOKS_PATH = ABS_SITE_PATH . 'public/hooks.php';
+
 const SETTINGS_PATH = ABS_SITE_PATH . 'shared/settingSave.json';
 const CSV_CACHE_FILE = ABS_SITE_PATH . 'shared/csvCache.bin';
 const PAGE_CACHE_FILE = ABS_SITE_PATH . 'shared/pageCache.bin';
@@ -46,8 +48,5 @@ foreach ($publicConfig as $k => $v) {
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/classes/Main.php';
 require_once CORE . 'model/hooks.php';
-
-// Public php.
-if(file_exists(ABS_SITE_PATH . 'public/hooks.php')) require_once ABS_SITE_PATH . 'public/hooks.php';
 
 unset($absPath, $siteDir, $publicConfig, $k, $v);

@@ -31,7 +31,8 @@ function getTargetPage($get) {
  * @return false|string
  */
 function addCpNumber($number, $reportVal) {
-  $reportVal = doHook('addCpNumber', $number, $reportVal);
+  global $main;
+  $reportVal = $main->fireHook('addCpNumber', $number, $reportVal);
   return gzcompress($reportVal, 9);
 }
 
@@ -350,18 +351,6 @@ function gTxtDB($db, $str) {
 function addHook($hookName, $callable) {
   global $main;
   if ($main instanceof cms\Main) $main->addAction($hookName, $callable);
-}
-
-/**
- * Alias for $main->execAction();
- * @param $hookName - string
- * @param $args - array
- * @return mixed
- */
-function doHook($hookName, ...$args) {
-  global $main;
-  if ($main instanceof cms\Main) return $main->execAction($hookName, ...$args);
-  return false;
 }
 
 function getPageAsString($data, $wrapId = 'wrapCalcNode') {

@@ -50,5 +50,6 @@ if ($user['isAdmin']) {
   }
 }
 
+$main->fireHook('settingTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

@@ -1,4 +1,4 @@
-<?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 /**
  * @var object $main global
  * @var string $pathTarget
@@ -12,7 +12,7 @@ $field = [
 if (!isset($setting)) {
   $columns = $main->db->loadUsers(0, 1);
 
-	if (count($columns) === 1) {
+  if (count($columns) === 1) {
     unset($columns[0]['permission_id']);
     $columns = array_keys($columns[0]) ?: [];
     $columns = array_map(function ($item) {
@@ -25,7 +25,7 @@ if (!isset($setting)) {
 
       return $item;
     }, $columns);
-	}
+  }
 }
 
 $permission = $main->db->selectQuery('permission', ['ID', 'name']);

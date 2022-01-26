@@ -7,10 +7,6 @@ use RedBeanPHP;
 use Xml\Xml;
 
 /**
- * @var $dbConfig
- */
-
-/**
  * Trait Authorization
  * @package cms
  */
@@ -365,6 +361,24 @@ final class Main {
   }
 
   /**
+   * add public hooks
+   */
+  public function setHooks() {
+    if (file_exists(HOOKS_PATH)) require_once HOOKS_PATH;
+  }
+
+  /**
+   * Alias for $main->execAction();
+   * @param $hookName - string
+   * @param $args - array
+   * @return mixed
+   */
+  public function fireHook($hookName, ...$args) {
+    return $this->execAction($hookName, ...$args);
+  }
+
+
+  /**
    * Save cms setting to file
    */
   public function saveSettings() {
@@ -443,4 +457,3 @@ final class Main {
   }
 }
 
-$main = new Main(USE_DATABASE ? $dbConfig : []);
