@@ -1,21 +1,19 @@
-
-
-
 .footer {
-    padding-left: 17.1875rem;
-    background-color: $body-bg;
-    
-    .copyright {
-        padding: 0.9375rem;
-        p {
-            text-align: center;
-            margin: 0;
-        }
+  padding-left: 17.1875rem;
+  background-color: $body-bg;
 
-        a{
-            color: $primary;
-        }
+  .copyright {
+    padding: 0.9375rem;
+
+    p {
+      text-align: center;
+      margin: 0;
     }
+
+    a {
+      color: $primary;
+    }
+  }
 }
 
 
