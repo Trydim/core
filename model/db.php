@@ -492,7 +492,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['users'] = $db->loadUsers($pageNumber, $countPerPage, $sortColumn, $sortDirect);
       $result['permissionUsers'] = $db->loadTable('permission');
       break;
-    //case 'loadUser': break; // Вероятно для загрузки пароля
     case 'addUser':
       $param = [0 => []];
       $user = isset($authForm) ? json_decode($authForm, true) : [];

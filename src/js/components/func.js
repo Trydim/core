@@ -627,6 +627,15 @@ const func = {
 
     return value.replaceAll(/\s/g, '_').replace(letters, replacer);
   },
+
+
+  settingInit() {
+    if (!c.INIT_SETTING) return;
+
+    let node = f.gI('dataSettings');
+    node && (this.cmsSetting = JSON.parse(node.value));
+    node && node.remove();
+  },
 }
 
 export const f = Object.assign(func, q);

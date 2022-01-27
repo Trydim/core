@@ -14,6 +14,7 @@ import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
 import {Valid} from "./components/Valid";
 import {searching} from "./components/SearchCustomers";
+import User from "./components/User";
 
 const m = {
   /**
@@ -124,6 +125,11 @@ const m = {
    */
   Valid,
   //initValid : (sendFunc, idForm, idSubmit) => module.valid.init(sendFunc, idForm, idSubmit),
+
+  /**
+   * User class
+   */
+  User,
 };
 
 window.f = Object.assign(c, m, f);

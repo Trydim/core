@@ -17,10 +17,11 @@ export const computed = {}
 
 export const methods = {
   addCustomField() {
-    const rand = Math.random() * 100000 | 0;
-    this.managerFields[rand] = {name: 'Поле' + rand, type: 'text'};
+    const rand = 'cf' + ((Math.random() * 1e8) | 0);
+    this.managerFields[rand] = {name: 'Поле-' + rand, type: 'text'};
   },
   removeCustomField(id) {
     delete this.managerFields[id];
+    delete this.user[id];
   },
 }

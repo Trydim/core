@@ -12,44 +12,45 @@ $field = [
   'jsLinks'    => [CORE_JS . 'module/setting.js'],
 ];
 
+$user = $main->db->getUserById($main->getLogin('id'));
 $user = [
-  'name'         => $main->getLogin('name'),
-  'login'        => $main->getLogin(),
-  'permissionId' => $main->getSettings('permissionId'),
+  'name'         => $user['name'],
+  'login'        => $user['login'],
+  'permissionId' => $user['permission_id'],
   'isAdmin'      => $main->getSettings('admin'),
+  'contacts'     => $user['contacts'],
+  'customization'=> $user['customization'],
 ];
-$field['footerContent'] .= "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>";
+$field['footerContent'] .= "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>"
+                         . "<input type='hidden' id='dataSettings' value='" . $main->getSettings('json') . "'>";
 
-if ($user['isAdmin']) {
-  $field['footerContent'] .= "<input type='hidden' id='dataSettings' value='" . $main->getSettings('json') . "'>";
+if (USE_DATABASE && $user['isAdmin']) {
+  $permissions['permissions'] = $main->db->loadTable('permission');
 
-  if (USE_DATABASE) {
-    $permissions['permissions'] = $main->db->loadTable('permission');
+  $permissions['permissions'] = array_map(function ($row) {
+    $row['id'] = intval($row['ID']);
+    $row['name'] = gTxt($row['name']);
+    $row['accessVal'] = json_decode($row['access_val'], true);
+    unset($row['ID'], $row['access_val']);
+    return $row;
+  }, $permissions['permissions']);
 
-    $permissions['permissions'] = array_map(function ($row) {
-      $row['id'] = intval($row['ID']);
-      $row['name'] = gTxt($row['name']);
-      $row['accessVal'] = json_decode($row['access_val'], true);
-      unset($row['ID'], $row['access_val']);
-      return $row;
-    }, $permissions['permissions']);
+  $permissions['menu'] =  array_map(function ($menu) {
+    return ['id' => $menu, 'name' => gTxt($menu)];
+  }, $main->getSideMenu());
 
-    $permissions['menu'] =  array_map(function ($menu) {
-      return ['id' => $menu, 'name' => gTxt($menu)];
-    }, $main->getSideMenu());
+  $field['footerContent'] .= "<input type='hidden' id='dataPermissions' value='" . json_encode($permissions) . "'>";
 
-    $field['footerContent'] .= "<input type='hidden' id='dataPermissions' value='" . json_encode($permissions) . "'>";
-
-    // if available orders
-    if ($main->availablePage('orders') && false) {
-      $status = json_encode($main->db->loadTable('order_status'));
-      $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
-    }
-
-    unset($permissions, $status);
+  // if available orders
+  if ($main->availablePage('orders') && false) {
+    $status = json_encode($main->db->loadTable('order_status'));
+    $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
   }
+
+  unset($permissions, $status);
 }
 
-$main->fireHook('settingTemplate', $field);
+$main->setControllerField($field)
+  ->fireHook('settingTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

@@ -31,7 +31,7 @@ export const watch = {
 
     const menu = this.permission.menu,
           sPer = this.permissionsData.find(i => i.id === this.permission.id),
-          accessVal = sPer['accessVal']['menu'] || '';
+          accessVal = (sPer && sPer['accessVal']['menu']) || '';
 
     menu[0] = this.permissionsMenu.filter(m => !accessVal.includes(m.id));
     menu[1] = this.permissionsMenu.filter(m => accessVal.includes(m.id));

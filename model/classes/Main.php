@@ -161,7 +161,15 @@ trait Authorization {
  * @package cms
  */
 trait Page {
+  /**
+   * @var string - controller path
+   */
   private $target;
+
+  /**
+   * @var array - controller
+   */
+  private $controllerField;
 
   /**
    * @return mixed
@@ -281,28 +289,35 @@ trait Cache {
 trait Hooks {
   private $hooks = [];
 
-  public function addAction($hookName, $callable) {
+  public function addHook($hookName, $callable) {
     if (!is_string($hookName) || !is_callable($callable)) return;
 
     $this->hooks[$hookName] = $callable;
   }
 
-  public function execAction($hookName, ...$args) {
-    if ($this->exist($hookName)) {
+  /**
+   * add public hooks
+   */
+  public function setHooks() {
+    if (file_exists(HOOKS_PATH)) require_once HOOKS_PATH;
+  }
+
+  /**
+   * @param $hookName - string
+   * @param $args - array
+   * @return mixed
+   */
+  public function fireHook($hookName, ...$args) {
+    if ($this->hookExists($hookName)) {
       $func = $this->hooks[$hookName];
 
-      if (!isset($args) || !is_array($args)) {
-        $args = [];
-      }
-
-      if (isset($func)) {
-        return $func(...$args);
-      }
+      if (!isset($args) || !is_array($args)) $args = [];
+      if (isset($func)) return $func(...$args);
     }
     return false;
   }
 
-  public function exist($hookName) {
+  public function hookExists($hookName) {
     return isset($this->hooks[$hookName]);
   }
 }
@@ -319,7 +334,7 @@ final class Main {
   private $setting = [];
 
   /**
-   * @var array
+   * @var array - data base config array
    */
   private $dbConfig;
 
@@ -327,6 +342,21 @@ final class Main {
    * @var array
    */
   private $dbTables;
+
+  /**
+   * @var array
+   */
+  private $controllerParam;
+
+  /**
+   * @var array
+   */
+  private $controllerField;
+
+  /**
+   * @var boolean
+   */
+  public $frontSettingInit = false;
 
   public function __construct($dbConfig) {
     $this->dbConfig = $dbConfig;
@@ -361,24 +391,6 @@ final class Main {
   }
 
   /**
-   * add public hooks
-   */
-  public function setHooks() {
-    if (file_exists(HOOKS_PATH)) require_once HOOKS_PATH;
-  }
-
-  /**
-   * Alias for $main->execAction();
-   * @param $hookName - string
-   * @param $args - array
-   * @return mixed
-   */
-  public function fireHook($hookName, ...$args) {
-    return $this->execAction($hookName, ...$args);
-  }
-
-
-  /**
    * Save cms setting to file
    */
   public function saveSettings() {
@@ -389,11 +401,27 @@ final class Main {
 
   /**
    * Get one setting or array if have
-   * @param $key
+   * @param string $key [
+   * 'json' - return json, <p>
+   * 'managerFields' - return managers custom fields, <p>
+   * 'mailTarget' - <p>
+   * 'mailTargetCopy' - <p>
+   * 'mailSubject' - <p>
+   * 'mailFromName' - <p>
+   * 'optionProperties' - <p>
+   * @param boolean $front if true - ready html input ]
    * @return false|mixed|string
    */
-  public function getSettings($key) {
-    if ($key === 'json') return json_encode($this->setting);
+  public function getSettings(string $key, bool $front = false) {
+    $data = isset($this->setting[$key]) ? $this->setting[$key] : null;
+    $jsonData = $key === 'json' || $front ? json_encode($data ?: $this->setting) : '';
+
+    if ($front) {
+      $this->frontSettingInit = true;
+      return "<input type='hidden' id='dataSettings' value='$jsonData'>";
+    }
+    else if ($key === 'json') return $jsonData;
+
     if (isset($this->setting[$key])) return $this->setting[$key];
     return false;
   }
@@ -431,6 +459,73 @@ final class Main {
       }
     }
     return $this;
+  }
+
+  /**
+   * @param mixed $field
+   * @return Main
+   */
+  public function setControllerField(&$field): Main {
+    $this->controllerField =& $field;
+    return $this;
+  }
+
+  /**
+   * @param mixed ...$args
+   * @return Main
+   */
+  public function setControllerParam(...$args): Main {
+    array_map(function ($arg) {
+      $this->controllerParam = $arg;
+    }, $args);
+
+    return $this;
+  }
+
+  /**
+   * @param string $key
+   * @param mixed $value
+   * @return $this
+   */
+  public function addControllerField(string $key, $value): Main {
+    if (isset($this->controllerField[$key])) {
+      $field =& $this->controllerField[$key];
+
+      if (is_array($field)) $field[] = $value;
+      else if (is_object($field)) $field->$key = $value;
+
+    } else {
+      $this->controllerField[$key] = $value;
+    }
+    return $this;
+  }
+
+  /*
+   * @param string $key
+   * @param mixed $value
+   * @return $this
+   */
+  /*public function addControllerField(string $key, $value): Main {
+    if (!isset($this->controllerParam['field'])) $this->controllerParam['field'] = [];
+
+    if (isset($this->controllerParam['field'][$key])) {
+      $field =& $this->controllerParam['field'][$key];
+
+      if (is_array($field)) $field[] = $value;
+      else if (is_object($field)) $field->$key = $value;
+
+    } else {
+      $this->controllerParam['field'][$key] = $value;
+    }
+    return $this;
+  }*/
+
+  public function getControllerField() {
+    return $this->controllerField;
+  }
+
+  public function getControllerParam(string $key) {
+    return $this->controllerParam[$key] ?: false;
   }
 
   public function getBaseTable(): array {

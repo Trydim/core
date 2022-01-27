@@ -6,8 +6,6 @@
  * @var $cmsAction - fromQuery
  *
  * @var $user - from Query
- *
- * @var $customization - fromQuery
  */
 
 $db = $main->getDB();
@@ -30,6 +28,7 @@ switch ($cmsAction) {
       $param[$usersId] = [
         'name'          => $userName,
         'login'         => $user['login'],
+        'contacts'      => json_encode($user['fields'] ?? []), // todo
         'customization' => $customization ?? '{}',
       ];
 
@@ -44,7 +43,7 @@ switch ($cmsAction) {
         $result['error'] = $db->insert($columns, 'users', $param, true);
 
         // Set new userName
-        if (!count(checkError($result['error']))) $_SESSION['name'] = $userName;
+        if (empty($result['error'])) $_SESSION['name'] = $userName;
       }
 
       // Permission
@@ -188,12 +187,13 @@ switch ($cmsAction) {
 
       $db->delPropertyTable($props);
     }
+
     if (isset($props) && ($setting = getSettingFile()) && isset($setting['propertySetting'])) {
       $setting['propertySetting'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
         return !in_array($item, $props);
       }, ARRAY_FILTER_USE_KEY);
 
-      setSettingFile($setting);
+      //setSettingFile($setting);
     }
     $main->saveSettings();
     break;

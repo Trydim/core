@@ -30,7 +30,9 @@ export default {
       login         : '',
       password      : '',
       passwordRepeat: '',
+      fields        : {},
       onlyOne       : false,
+      showAllField  : false,
     },
 
     rate: {
@@ -45,7 +47,15 @@ export default {
     //loadingPage: true,
   }, permissionData, managerFieldData, propertiesData),
   computed: Object.assign({}, permissionComputed, managerFieldComputed, propertiesComputed),
-  watch   : Object.assign({}, permissionWatch, managerFieldWatch, propertiesWatch),
+  watch   : Object.assign({
+    user: {
+      deep: true,
+      handler() {
+        this.user.change = true;
+        //if (this.user.change) this.$emit('change', this.user);
+      },
+    },
+  }, permissionWatch, managerFieldWatch, propertiesWatch),
   methods : methods,
   mounted() {
     this.loadData();
@@ -54,6 +64,7 @@ export default {
 
     this.$nextTick(() => {
       this.permissionsChanged = false;
+      this.user.change = false;
     });
     //this.loadingPage = false;
   },

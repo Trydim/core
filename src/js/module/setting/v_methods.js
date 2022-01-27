@@ -15,14 +15,21 @@ const conArrToObject = (arr, key) => arr.reduce((r, i) => {r[i[key]] = i; return
 const common = {
   loadData() {
     this.setUser();
-    this.isAdmin && this.setSetting();
+    this.setSetting();
     this.isAdmin && this.setPermissions();
   },
   setUser() {
-    const data = setData('#dataUser');
+    const data = setData('#dataUser'),
+          contacts = JSON.parse(data.contacts),
+          customization = JSON.parse(data['customization']);
+
     this.user.name  = data.name;
     this.user.login = data.login;
-    this.permission.id = data['permissionId'];
+    this.permission.id = +data['permissionId'];
+
+    Object.entries(contacts).forEach(([k, v]) => this.user.fields[k] = v);
+    Object.entries(customization).forEach(([k, v]) => this.user[k] = v);
+
     this.queryParam.isAdmin = this.isAdmin = data.isAdmin || false;
   },
   setSetting() {

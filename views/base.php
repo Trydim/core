@@ -13,6 +13,18 @@ if (!isset($global)) {
   $sideRight = $sideRight ?? '';
 }
 $footerContentBase = $footerContentBase ?? template('parts/footerBase');
+
+$jsGlobalConst = json_encode([
+  'DEBUG'         => DEBUG,
+  'CSV_DEVELOP'   => CSV_DEVELOP,
+  'SITE_PATH'     => SITE_PATH,
+  'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
+  'PUBLIC_PAGE'   => PUBLIC_PAGE,
+  'PATH_IMG'      => PATH_IMG,
+  'AUTH_STATUS'   => $main->checkStatus('ok'),
+  'INIT_SETTING'  => $main->frontSettingInit,
+]);
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -32,13 +44,7 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
   <?php }, $cssLinks ?? []); ?>
 
   <script>
-    window.DEBUG         = '<?= DEBUG ?>';
-    window.CSV_DEVELOP   = '<?= CSV_DEVELOP ?>';
-    window.SITE_PATH     = '<?= SITE_PATH ?>';
-    window.MAIN_PHP_PATH = '<?= SITE_PATH ?>index.php';
-    window.PUBLIC_PAGE   = '<?= PUBLIC_PAGE ?>';
-    window.PATH_IMG      = '<?= PATH_IMG ?>';
-    window.AUTH_STATUS   = '<?= $main->checkStatus('ok') ?>';
+    window.CMS_CONST = '<?= $jsGlobalConst ?>'
   </script>
 </head>
 
