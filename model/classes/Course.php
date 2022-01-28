@@ -13,6 +13,8 @@ class Course {
   private $source = [
     'RUS' => "https://www.cbr.ru/scripts/XML_daily.asp",
     'BYN' => "https://www.nbrb.by/services/xmlexrates.aspx",
+    'USD' => "https://www.nbrb.by/services/xmlexrates.aspx",
+    'EUR' => "https://www.nbrb.by/services/xmlexrates.aspx",
   ];
 
   private $db;

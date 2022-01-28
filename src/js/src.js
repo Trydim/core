@@ -128,6 +128,7 @@ const m = {
 
   /**
    * User class
+   *
    */
   User,
 };

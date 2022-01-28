@@ -1170,5 +1170,4 @@ trait MainCsv {
     }
     return $this;
   }
-
 }

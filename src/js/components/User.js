@@ -11,7 +11,8 @@ export default class {
     }
 
     this.data = JSON.parse(node.value);
-    this.data.contacts = JSON.parse(this.data.contacts);
+    this.data.fields = JSON.parse(this.data.contacts);
+    delete this.data.contacts // после переименования не потребуется.
 
     this.setSettings();
 
@@ -20,16 +21,20 @@ export default class {
 
   setSettings() {
     if (f.INIT_SETTING) {
-      const interval = setInterval(() => {
+      let interval,
+          applySetting = () => {
         if (f.cmsSetting) {
           Object.entries(f.cmsSetting).forEach(([id, setting]) => {
-            this.data.contacts[id] && (this.data.contacts[id] = {
-              value: this.data.contacts[id], ...setting,
-            });
+            if (this.data.fields[id] !== undefined) {
+              this.data.fields[id] = {value: this.data.fields[id], ...setting};
+            }
           });
           clearInterval(interval);
         }
-      }, 80);
+      }
+
+      if (f.cmsSetting) applySetting();
+      else interval = setInterval(applySetting, 90);
       setTimeout(() => clearInterval(interval), 300);
     }
   }
