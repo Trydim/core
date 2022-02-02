@@ -11,11 +11,13 @@ export const data = {
   permission: {
     id: 0,
     name: '',
+    tags: '',
     current: {
       id: 0,
       name: '',
-      accessVal: {
+      properties: {
         menu: '',
+        tags: '',
       },
     },
     menu: [[], []],
@@ -31,10 +33,11 @@ export const watch = {
 
     const menu = this.permission.menu,
           sPer = this.permissionsData.find(i => i.id === this.permission.id),
-          accessVal = (sPer && sPer['accessVal']['menu']) || '';
+          accessMenu = (sPer && sPer.properties['menu']) || '';
 
-    menu[0] = this.permissionsMenu.filter(m => !accessVal.includes(m.id));
-    menu[1] = this.permissionsMenu.filter(m => accessVal.includes(m.id));
+    menu[0] = this.permissionsMenu.filter(m => !accessMenu.includes(m.id));
+    menu[1] = this.permissionsMenu.filter(m => accessMenu.includes(m.id));
+    this.permission.tags = (sPer && sPer.properties['tags']) || '';
 
     this.permission.current = sPer;
   },
@@ -50,13 +53,26 @@ export const watch = {
 export const computed = {
   permissionNames() {
     return new Set(this.permissionsData.map(p => p.name.toLowerCase()));
-  }
+  },
+
+  isPermissionDelete() {
+    const sPer = this.permissionsData.find(i => i.id === this.permission.id);
+    return !!(sPer && sPer.delete);
+  },
 }
 
 export const methods = {
   checkPermName(name) {
     return [...this.permissionNames].includes(name.toLowerCase());
   },
+
+  setPermissionTags(id) {
+    if (typeof id === 'string') id = this.permissionsChangeId;
+    const sPer = this.permissionsData.find(i => i.id === id);
+    sPer.properties.tags = this.permission.tags;
+  },
+
+  // Events
 
   addPermission() {
     const id = Math.random(),
@@ -69,7 +85,7 @@ export const methods = {
 
     this.permissionsData.push({
       id, name,
-      accessVal: {},
+      properties: {},
     });
 
     this.permission.name = '';
@@ -89,13 +105,29 @@ export const methods = {
       }, 3000);
     }
   },
+  changePermissionTags() {
+    this.permission.tags = this.permission.tags.toLowerCase();
+    this.setPermissionTags(this.permission.id);
+  },
   removePermission() {
-    const sPer = this.permissionsData.find(i => i.id === this.permissionsChangeId);
-    sPer.name += ' (удаление)';
-    sPer.delete = true;
+    const id = typeof this.permission.id !== 'string' ? this.permission.id : this.permissionsChangeId,
+          sPer = this.permissionsData.find(i => i.id === id);
+
+    if (/защ|guard/i.test(sPer.properties.tags)) {
+      f.showMsg('Для удаления требуется снять защиту! Удаление защищенных прав может нарушить работу приложения!', 'warning');
+      return;
+    }
+
+    if (sPer.delete) {
+      sPer.name = sPer.name.replace(' (удаление)', '');
+      delete sPer.delete;
+    } else {
+      sPer.name += ' (удаление)';
+      sPer.delete = true;
+    }
   },
 
   pickedChange() {
-    this.permission.current.accessVal.menu = this.permission.menu[1].map(m => m.id).join(',');
+    this.permission.current.properties.menu = this.permission.menu[1].map(m => m.id).join(',');
   }
 }

@@ -932,7 +932,7 @@ class Db extends \R {
    */
   public function getUserByLogin($login) {
     return self::getRow("SELECT hash, password, customization, 
-            p.ID as 'permId', p.name as 'permName', access_val as 'permVal'
+            p.ID as 'permId', p.name as 'permName', properties as 'permValue'
             FROM users
             LEFT JOIN permission p on users.permission_id = p.ID
             WHERE login = :login", [':login' => $login]);
@@ -1015,7 +1015,7 @@ class Db extends \R {
         'onlyOne' => isset(json_decode($user['customization'])->onlyOne),
         'admin' => $user['permId'] === 'admin' || $user['permId'] === '1',
         'customization' => json_decode($user['customization'], true),
-        'permission' => json_decode($user['permVal'], true),
+        'permission' => json_decode($user['permValue'], true),
       ];
     } else {
       try {

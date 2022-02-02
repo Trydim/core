@@ -63,7 +63,7 @@ switch ($cmsAction) {
           // Js random 0 - 1
           $param[$id < 1 ? 'new' : 'change'][$id] = [
             'name'       => $permission['name'],
-            'access_val' => json_encode($permission['accessVal']),
+            'properties' => json_encode($permission['properties']),
           ];
         }
 

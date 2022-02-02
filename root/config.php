@@ -65,7 +65,7 @@ $dbConfig = [
   'dbHost'     => 'localhost',
   'dbName'     => 'dbName',
   /*'dbUsername' => 'dbUser',
-  'dbPass'     => 'WHZM4JpunONGycmf'*/
+  'dbPass'     => 'WHZM4JpunONGycm'*/
   'dbUsername' => 'root',
   'dbPass'     => ''
 ];

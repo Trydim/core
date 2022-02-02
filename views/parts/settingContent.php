@@ -131,8 +131,22 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
                   class="col"
                   @input="changePermission"
         ></p-select>
-        <p-button v-tooltip.bottom="'Удалить тип доступа'" icon="pi pi-trash" class="p-button-danger"
+        <p-button v-tooltip.bottom="isPermissionDelete ? 'Отменить удаление' : 'Удалить тип доступа'"
+                  icon="pi pi-trash" class="p-button-danger"
                   @click="removePermission"></p-button>
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">
+          Теги
+          <i class="ms-1 pi pi-tag"
+             v-tooltip.bottom="'Теги особых свойств (через пробел):\n\'защита/guard\' - защита от удаления\n'"
+          ></i>
+        </span>
+        <p-input-text v-model="permission.tags" :class="'form-control'"
+                      :disabled="isPermissionDelete"
+                      @change="changePermissionTags"
+        ></p-input-text>
       </div>
 
       <div class="col mb-3">

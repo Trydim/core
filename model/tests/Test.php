@@ -19,6 +19,17 @@ class Test extends TestCase {
     $this->assertSame($arr['json'], '{}');
     $this->assertSame($arr['msg'], 'test');
 
+    // Any empty, any deep values in 'error' should be removed
+    $arr['error'] = [
+      'level1-1' => ['level2' => [
+        'level2-1' => '',
+        'level2-2' => '',
+      ]],
+      'level1-2' => ['level2' => ''],
+    ];
+    checkError($arr);
+    $this->assertSame(isset($arr['error']), false);
+
     // Any values in 'error' flatter to one level array
     // Empty values should be removed
     $arr['error'] = [
@@ -45,9 +56,5 @@ class Test extends TestCase {
 
     $this->assertSame('foo', array_pop($stack));
     $this->assertSame(0, count($stack));
-  }
-
-  public function testPushAndPop2() {
-    echo 2;
   }
 }

@@ -60,7 +60,8 @@ function checkError(array &$result): void {
   }
 
   $result['status'] = empty($error);
-  !empty($error) && $result['error'] = $error;
+  if (empty($error)) unset($result['error']);
+  else $result['error'] = $error;
 }
 
 /**

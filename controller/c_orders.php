@@ -12,7 +12,7 @@ $field = [
 
 // получить конфиг текущего пользователя
 $setting = $main->db->getUserSetting();
-if (!$setting) $setting = json_decode('{}');
+if (!$setting) $setting = new stdClass();
 
 if (!isset($setting->ordersColumnsSort)) {
   $columns = $main->db->loadOrder(0, 1);

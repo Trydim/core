@@ -30,8 +30,8 @@ if (USE_DATABASE && $user['isAdmin']) {
   $permissions['permissions'] = array_map(function ($row) {
     $row['id'] = intval($row['ID']);
     $row['name'] = gTxt($row['name']);
-    $row['accessVal'] = json_decode($row['access_val'], true);
-    unset($row['ID'], $row['access_val']);
+    $row['properties'] = json_decode($row['properties'], true);
+    unset($row['ID']);
     return $row;
   }, $permissions['permissions']);
 
@@ -50,7 +50,6 @@ if (USE_DATABASE && $user['isAdmin']) {
   unset($permissions, $status);
 }
 
-$main->setControllerField($field)
-  ->fireHook('settingTemplate', $field);
+$main->setControllerField($field)->fireHook('settingTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

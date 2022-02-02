@@ -108,8 +108,8 @@ trait Authorization {
    */
   public function applyAuth(string $target = ''): Main {
     if ($this->checkStatus('no')) {
-      $_SESSION['target'] = $target;
-      if ($target === '' && ONLY_LOGIN) reDirect('login');
+      $target !== 'login' && $_SESSION['target'] = $target;
+      if (($target === '' && ONLY_LOGIN) || $target !== 'login') reDirect('login');
       if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
     } else {
       if ($target === '' && !PUBLIC_PAGE) reDirect($this->getSideMenu(true));
@@ -124,7 +124,7 @@ trait Authorization {
     if (USE_DATABASE) {
       $menuAccess = $this->getSettings('permission')['menu'] ?? '';
       $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
-      $this->sideMenu = $menuAccess ? $menuAccess : ACCESS_MENU;
+      $this->sideMenu = $menuAccess ?: ACCESS_MENU;
     } else {
       $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
       $this->sideMenu = array_filter(ACCESS_MENU, function ($m) use ($filterMenu) {
