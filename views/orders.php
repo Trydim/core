@@ -10,7 +10,7 @@
 // pageHeader;
 $field['content'] = template('parts/ordersContent', $param);
 
-$field['footerContent'] = '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
+$field['footerContent'] .= '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>

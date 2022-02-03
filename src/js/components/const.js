@@ -5,7 +5,7 @@
  */
 window.CMS_CONST = JSON.parse(window.CMS_CONST) || {};
 
-export const c = {
+export default {
   DEBUG        : window.CMS_CONST['DEBUG'] || false,
   CSV_DEVELOP  : !!window.CMS_CONST['CSV_DEVELOP'] || false,
   OUTSIDE      : window.CMS_CONST['CL_OUTSIDE'],
@@ -39,4 +39,6 @@ export const c = {
     // css класс который добавляется при загрузке
     LOADING: 'loading-st1',
   },
+
+  HOOKS: {},
 };

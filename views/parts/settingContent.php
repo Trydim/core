@@ -33,11 +33,6 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <div class="col-6 border" id="userForm">
     <h3 class="col text-center">Пользователь</h3>
     <div class="form-floating my-3">
-      <p-input-text v-model="user.name" :class="'form-control'" placeholder="_"
-      ></p-input-text>
-      <label>ФИО</label>
-    </div>
-    <div class="form-floating my-3">
       <p-input-text v-model="user.login" :class="'form-control'" placeholder="_"
       ></p-input-text>
       <label>Логин</label>
@@ -61,6 +56,11 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     </div>
 
     <template v-if="user.showAllField">
+      <div class="form-floating my-3">
+        <p-input-text v-model="user.name" :class="'form-control'" placeholder="_"
+        ></p-input-text>
+        <label>ФИО</label>
+      </div>
       <div class="form-floating mb-3">
         <p-input-text v-model="user.fields.phone" :class="'form-control'" placeholder="_"
         ></p-input-text>

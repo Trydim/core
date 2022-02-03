@@ -26,11 +26,15 @@ function addCssLink(string $cssLink) {
 /**
  * alias for $main->addControllerField('jsLinks')
  * @param string $jsLink
+ * @param mixed $position [optional] <p>
+ * head - in head <p>
+ * before - before all script, after cms libs<p>
+ * last - before end body <p>
  * @return mixed - false or Main object
  */
-function addJsLink(string $jsLink) {
+function addJsLink(string $jsLink, string $position = 'last') {
   global $main;
-  if ($main instanceof cms\Main) return $main->addControllerField('jsLinks', $jsLink);
+  if ($main instanceof cms\Main) return $main->addControllerField('jsLinks', $jsLink, $position);
   return false;
 }
 

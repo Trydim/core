@@ -299,6 +299,7 @@ trait Hooks {
    * add public hooks
    */
   public function setHooks() {
+    require_once CORE . 'model/hooks.php';
     if (file_exists(HOOKS_PATH)) require_once HOOKS_PATH;
   }
 
@@ -485,13 +486,21 @@ final class Main {
   /**
    * @param string $key
    * @param mixed $value
+   * @param mixed $position [optional] <p>
+   * head - in head <p>
+   * before - before all script, after cms libs<p>
+   * last - before end body <p>
    * @return $this
    */
-  public function addControllerField(string $key, $value): Main {
+  public function addControllerField(string $key, $value, string $position = 'last'): Main {
     if (isset($this->controllerField[$key])) {
       $field =& $this->controllerField[$key];
 
-      if (is_array($field)) $field[] = $value;
+      if (is_array($field)) {
+        if ($position === 'head') array_unshift($field, $value);
+        else if ($position === 'before') array_unshift($field, $value);
+        if ($position === 'last') $field[] = $value;
+      }
       else if (is_object($field)) $field->$key = $value;
 
     } else {

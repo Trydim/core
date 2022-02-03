@@ -47,6 +47,5 @@ foreach ($publicConfig as $k => $v) {
 
 require_once CORE . 'model/func.php';
 require_once CORE . 'model/classes/Main.php';
-require_once CORE . 'model/hooks.php';
 
 unset($absPath, $siteDir, $publicConfig, $k, $v);

@@ -2,8 +2,9 @@
 
 import '../css/style.scss';
 
-import {c} from "./components/const.js";
-import {f} from "./components/func.js";
+import c from "./components/const.js";
+import f from "./components/func.js";
+import q from "./components/query.js";
 
 import * as module from './components/component.js';
 import {Debugger} from "./components/Debugger";
@@ -133,4 +134,4 @@ const m = {
   User,
 };
 
-window.f = Object.assign(c, m, f);
+window.f = Object.assign(c, f, q, m);

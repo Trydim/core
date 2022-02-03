@@ -1,119 +1,118 @@
 'use strict';
 
-export const data = {
-  propertiesData: [],
-  propertiesSelected: [],
+export default {
+  data: {
+    propertiesData: [],
+    propertiesSelected: [],
 
-  property: {
-    name: '',
-    code: '',
-    type: '',
-    fields: {},
-  },
-
-  propertiesLoading: true,
-  propertiesModal: {
-    display: false,
-    title: '',
-    confirmDisabled: false,
-  },
-  propertiesTypes: [
-    {
-      label: 'Простые',
-      items: [
-        {id: 'text', name: 'Текст (~200 символов)'},
-        {id: 'textarea', name: 'Текст (много)'},
-        {id: 'number', name: 'Число'},
-        {id: 'date', name: 'Дата'},
-        {id: 'bool', name: 'Флаг (да/нет)'},
-      ]
+    property: {
+      name: '',
+      code: '',
+      type: '',
+      fields: {},
     },
-    {
-      label: 'Составные',
-      items: [
-        {id: 'select', name: 'Справочник'},
-      ]
-    }
-  ],
-  propertiesDataBaseTypes: [
-    {id: 'text', name: 'Текст (~200 символов)'},
-    {id: 'textarea', name: 'Текст (много)'},
-    {id: 'number', name: 'Целое число'},
-    {id: 'float', name: 'Дробное число'},
-    {id: 'date', name: 'Дата'},
-    {id: 'file', name: 'Файл'},
-    {id: 'bool', name: 'Флаг (да/нет)'},
-  ],
-}
 
-export const watch = {
-  'property.name'() {
-    this.property.code = f.transLit(this.property.name);
+    propertiesLoading: true,
+    propertiesModal: {
+      display: false,
+      title: '',
+      confirmDisabled: false,
+    },
+    propertiesTypes: [
+      {
+        label: 'Простые',
+        items: [
+          {id: 'text', name: 'Текст (~200 символов)'},
+          {id: 'textarea', name: 'Текст (много)'},
+          {id: 'number', name: 'Число'},
+          {id: 'date', name: 'Дата'},
+          {id: 'bool', name: 'Флаг (да/нет)'},
+        ]
+      },
+      {
+        label: 'Составные',
+        items: [
+          {id: 'select', name: 'Справочник'},
+        ]
+      }
+    ],
+    propertiesDataBaseTypes: [
+      {id: 'text', name: 'Текст (~200 символов)'},
+      {id: 'textarea', name: 'Текст (много)'},
+      {id: 'number', name: 'Целое число'},
+      {id: 'float', name: 'Дробное число'},
+      {id: 'date', name: 'Дата'},
+      {id: 'file', name: 'Файл'},
+      {id: 'bool', name: 'Флаг (да/нет)'},
+    ],
+  },
+  watch: {
+    'property.name'() {
+      this.property.code = f.transLit(this.property.name);
+    },
+  },
+  computed: {
+
+  },
+  methods: {
+    loadProperties() {
+      this.queryParam.cmsAction = 'loadProperties';
+      this.query().then(data => {
+        this.propertiesData = data['optionProperties'];
+        this.propertiesLoading = false;
+      });
+    },
+
+    // -------------------------------------------------------------------------------------------------------------------
+    // Action
+    // -------------------------------------------------------------------------------------------------------------------
+
+    openAccordion(e) {
+      let n   = e.originalEvent.target.closest(`[tabindex="${e.index}"]`),
+          exp = n && n.getAttribute('aria-expanded') === 'false';
+      exp && this.loadProperties();
+    },
+    createProperty() {
+      this.queryParam.cmsAction = 'createProperty';
+
+      this.property.name = '';
+      this.property.code = '';
+      this.property.type = 'text';
+      this.property.fields = {};
+
+      this.propertiesModal.title = 'Создать свойство';
+      this.propertiesModal.display = true;
+    },
+    changeProperty() {},
+    deleteProperty() {},
+
+    addPropertyField() {
+      let random = Math.random() * 10000 | 0;
+
+      this.property.fields[random] = {
+        name: 'Поле' + random,
+        type: 'text',
+      }
+    },
+    removePropertyField(id) {
+      delete this.property.fields[id];
+    },
+
+    propertiesConfirm() {
+      //this.propertiesLoading = true;
+
+      this.queryParam.property = JSON.stringify(this.property);
+      this.query().then(() => this.loadProperties());
+      this.propertiesModal.display = false;
+    },
+    propertiesCancel() {
+      this.propertiesModal.display = false;
+    },
   },
 }
 
-export const computed = {
-
-}
-
-export const methods = {
-  loadProperties() {
-    this.queryParam.cmsAction = 'loadProperties';
-    this.query().then(data => {
-      this.propertiesData = data['optionProperties'];
-      this.propertiesLoading = false;
-    });
-  },
-
-  // -------------------------------------------------------------------------------------------------------------------
-  // Action
-  // -------------------------------------------------------------------------------------------------------------------
-
-  openAccordion(e) {
-    let n   = e.originalEvent.target.closest(`[tabindex="${e.index}"]`),
-        exp = n && n.getAttribute('aria-expanded') === 'false';
-    exp && this.loadProperties();
-  },
-  createProperty() {
-    this.queryParam.cmsAction = 'createProperty';
-
-    this.property.name = '';
-    this.property.code = '';
-    this.property.type = 'text';
-    this.property.fields = {};
-
-    this.propertiesModal.title = 'Создать свойство';
-    this.propertiesModal.display = true;
-  },
-  changeProperty() {},
-  deleteProperty() {},
-
-  addPropertyField() {
-    let random = Math.random() * 10000 | 0;
-
-    this.property.fields[random] = {
-      name: 'Поле' + random,
-      type: 'text',
-    }
-  },
-  removePropertyField(id) {
-    delete this.property.fields[id];
-  },
-
-  propertiesConfirm() {
-    //this.propertiesLoading = true;
-
-    this.queryParam.property = JSON.stringify(this.property);
-    this.query().then(() => this.loadProperties());
-    this.propertiesModal.display = false;
-  },
-  propertiesCancel() {
-    this.propertiesModal.display = false;
-  },
-}
 
 const getFieldNode = (p, field) => p.querySelector(`[data-field=${field}]`);
-
 
 class Properties {
   constructor(modal) {

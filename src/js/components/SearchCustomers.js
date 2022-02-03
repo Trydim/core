@@ -1,7 +1,8 @@
 "use strict";
-// Поиск
-import {f} from "./func";
 
+/**
+ * Поиск
+ */
 export const searching = () => {
   const obj = Object.create(null);
 

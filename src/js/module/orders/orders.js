@@ -293,16 +293,16 @@ const orders = {
             data = new FormData();
 
         data.set('mode', 'docs');
-        data.set('docType', 'print');
-        data.set('fileTpl', 'pdfTpl'); // ToDO сделать по умолчанию?
+        data.set('docsAction', 'print');
         data.set('orderIds', this.queryParam.orderIds);
-        data.set('useUser', 'true');
+        data.set('addManager', 'true');
+        data.set('addCustomer', 'true');
 
-        f.Post({data}).then((data) => {
-            try { data && P.print(data['printBody']); }
-            //try { data && P.print(f.printReport, data, type); }
-            catch (e) { console.log(e.message); }
-          });
+        f.Post({data}).then(data => {
+          try { data && P.print(data['printBody']); }
+          //try { data && P.print(f.printReport, data, type); }
+          catch (e) { console.log(e.message); }
+        });
 
         f.hide(f.qS('#printTypeField'));
         f.show(f.qS('#actionBtnWrap'));
@@ -313,7 +313,7 @@ const orders = {
         if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
         let data = new FormData();
-        data.set('useUser', 'true');
+        data.set('addCustomer', 'true');
         data.set('orderIds', this.queryParam.orderIds);
 
         f.downloadPdf(target, {}, data, () => target.blur());

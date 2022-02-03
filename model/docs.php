@@ -17,11 +17,14 @@ $orderIds = !$reportVal && isset($orderIds) ? json_decode($orderIds) : false;
 $orderIds = is_array($orderIds) && count($orderIds) === 1 ? $orderIds[0] : false;
 
 // Данные о менеджере
+// ---------------------------------------------------------------------------------------------------------------------
 if (isset($addManager)) {
-  if (isset($reportVal['name'])) {
-    $userData = $main->db->getUser($reportVal['name'], 'name, contacts');
-  } else {
-    $userData = $main->db->getUserById($reportVal['userId'] ?? $main->getLogin('id'));
+  if (isset($reportVal['name'])) { // Имя пользователя - неправильно
+    $userData = $main->db->getUser($reportVal['userId'] ?? $reportVal['name'], 'name, contacts');
+  } else if (isset($orderIds)) { // Менеджер из сохраненного заказа
+    $userData = $main->db->getUserByOrderId($orderIds);
+  } else { // Текущий пользователь
+    $userData = $main->db->getUserById($main->getLogin('id'));
   }
 
   if (count($userData)) {
@@ -32,9 +35,12 @@ if (isset($addManager)) {
 }
 
 // Данные о клиенте
+// ---------------------------------------------------------------------------------------------------------------------
 if (isset($addCustomer)) {
   if (isset($customerId)) {
     $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
+  } else if (isset($orderIds)) { // Заказчик из сохраненного заказа
+    $customerData = $main->db->loadCustomerByOrderId($orderIds);
   } else $customerData = $customer ?? '';
 
   if (count($customerData)) {
@@ -45,6 +51,7 @@ if (isset($addCustomer)) {
 }
 
 // Отчет загрузить из БД по ИД
+// ---------------------------------------------------------------------------------------------------------------------
 if ($orderIds) {
   $reportVal = $main->db->loadOrderById($orderIds);
 
@@ -56,10 +63,8 @@ if ($orderIds) {
   $reportVal['saveValue']      = json_decode($reportVal['saveValue'], true);
   $reportVal['reportValue']    = json_decode($reportVal['reportValue'], true);
 
-  $data = [
-    'order'       => $reportVal,
-    'reportValue' => &$reportVal['reportValue'],
-  ];
+  $data['order'] = $reportVal;
+  $data['reportValue'] = &$reportVal['reportValue'];
 } else if ($reportVal) {
   $data['reportValue'] = $reportVal;
 }
@@ -67,6 +72,8 @@ if ($orderIds) {
 $docsAction = $docsAction ?? 'mail';
 $docType = $docType ?? $docsAction;
 
+// Создание документа
+// ---------------------------------------------------------------------------------------------------------------------
 if ($docType !== 'mail') {
   require_once 'classes/Docs.php';
   $docs = new Docs($docType, $data, $fileTpl ?? 'default');

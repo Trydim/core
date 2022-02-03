@@ -2,15 +2,15 @@
 
 import './_loading.scss';
 
-import {c} from "./const.js";
-import {q} from "./query.js";
-
-const func = {
+export default {
 
   // Simple and often used function
   // ------------------------------------------------------------------------------------------------
 
-  log: msg => c.DEBUG && console.log('Error:' + msg),
+  /**
+   * @param {string} msg
+   */
+  log: msg => f.DEBUG && console.log('Error:' + msg),
 
   /**
    * @param {string|HTMLElement} htmlOrTemplate
@@ -25,15 +25,15 @@ const func = {
    * @param id
    * @return {HTMLElement | {}}
    */
-  gI: id => (c.calcWrap || document).getElementById(id) || func.log('not found note by id -' + id),
+  gI: id => (f['calcWrap'] || document).getElementById(id) || f.log('not found note by id -' + id),
 
   /**
    * @param {string} selector
    * @param {HTMLElement} node
    * @return {HTMLElement | {}}
    */
-  qS: (selector = '', node = c.calcWrap) =>
-    (node || document).querySelector(selector) || func.log(selector),
+  qS: (selector = '', node = f['calcWrap']) =>
+    (node || document).querySelector(selector) || f.log(selector),
 
   /**
    *
@@ -43,7 +43,7 @@ const func = {
    * @return NodeListOf<HTMLElementTagNameMap[*]>|object
    */
   qA: (selector, nodeKey = null, value = null) => {
-    let nodeList = (c.calcWrap || document).querySelectorAll(selector);
+    let nodeList = (f['calcWrap'] || document).querySelectorAll(selector);
     if (!nodeList) return [];
     if (nodeKey && value) nodeList.forEach(item => {
       if (typeof value === 'function') {
@@ -62,17 +62,17 @@ const func = {
    * @param {string} selector
    * @return {string}
    */
-  gT: selector => { let node = func.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + selector},
+  gT: selector => { let node = f.qS(selector); return node ? node.content.children[0].outerHTML : 'Not found template' + selector},
 
   /**
    * Получить Node шаблона
    * @param {string} selector
    * @returns {Node}
    */
-  gTNode: selector => func.qS(selector).content.children[0].cloneNode(true),
+  gTNode: selector => f.qS(selector).content.children[0].cloneNode(true),
 
   getData: selector => {
-    const node = func.qS(selector),
+    const node = f.qS(selector),
           json = node && (JSON.parse(node.value));
     if (!node) return false;
     else node.remove();
@@ -85,7 +85,7 @@ const func = {
    * @return {object}
    */
   getDataAsAssoc: selector => {
-    const arr   = Object.values(func.getData(selector) || []),
+    const arr   = Object.values(f.getData(selector) || []),
           fItem = arr[0],
           fKeys = Object.keys(fItem);
 
@@ -103,15 +103,15 @@ const func = {
       return r;
     }, Object.create(null));
   },
-  getDataAsMap: selector => new Map(Object.entries(func.getDataAsAssoc(selector) || {})),
-  getDataAsSet: selector => new Set(Object.values(func.getData(selector) || [])),
-  getDataAsArray : selector => Object.values(func.getData(selector) || []),
+  getDataAsMap: selector => new Map(Object.entries(f.getDataAsAssoc(selector) || {})),
+  getDataAsSet: selector => new Set(Object.values(f.getData(selector) || [])),
+  getDataAsArray : selector => Object.values(f.getData(selector) || []),
 
   /** Показать элементы, аргументы коллекции NodeList */
   show: (...collection) => { collection.map(nodes => {
     if(!nodes) return;
     if(!nodes.forEach) nodes = [nodes];
-    nodes.forEach(n => n.classList.remove(c.CLASS_NAME.HIDDEN_NODE));
+    nodes.forEach(n => n.classList.remove(f.CLASS_NAME.HIDDEN_NODE));
   }) },
 
   /**
@@ -121,7 +121,7 @@ const func = {
   hide: (...collection) => { collection.map(nodes => {
     if(!nodes) return;
     if(!nodes.forEach) nodes = [nodes];
-    nodes.forEach(n => n.classList.add(c.CLASS_NAME.HIDDEN_NODE));
+    nodes.forEach(n => n.classList.add(f.CLASS_NAME.HIDDEN_NODE));
   }) },
 
   /**
@@ -315,7 +315,7 @@ const func = {
    */
   saveFile: data => {
     const {name = 'download.file', blob} = data;
-    let link = func.createLink(name);
+    let link = f.createLink(name);
     if (data.type === 'base64') link.href = blob;
     else link.href = URL.createObjectURL(blob);
     link.click();
@@ -332,7 +332,7 @@ const func = {
 
     const mask = e => {
       let target = e.target, i = 0,
-          matrix = phoneMask || c.PHONE_MASK,
+          matrix = phoneMask || f.PHONE_MASK,
           def = matrix.replace(/\D/g, ""),
           val = target.value.replace(/\D/g, "");
 
@@ -354,7 +354,7 @@ const func = {
     collection.map(nodes => {
       if (!nodes.forEach) nodes = [nodes];
       nodes.forEach(n => {
-        n.classList.remove(c.CLASS_NAME.DISABLED_NODE);
+        n.classList.remove(f.CLASS_NAME.DISABLED_NODE);
         n.removeAttribute('disabled');
       });
     });
@@ -368,7 +368,7 @@ const func = {
     collection.map(nodes => {
       if(!nodes.forEach) nodes = [nodes];
       nodes.forEach(n => {
-        n.classList.add(c.CLASS_NAME.DISABLED_NODE);
+        n.classList.add(f.CLASS_NAME.DISABLED_NODE);
         n.setAttribute('disabled', 'disabled');
       });
     });
@@ -378,12 +378,12 @@ const func = {
    * Добавить иконку загрузки
    * @param {HTMLElement} node
    */
-  setLoading: node => node && node.classList.add(c.CLASS_NAME.LOADING),
+  setLoading: node => node && node.classList.add(f.CLASS_NAME.LOADING),
   /**
    * Удалить иконку загрузки
    * @param {HTMLElement} node
    */
-  removeLoading: node => node && node.classList.remove(c.CLASS_NAME.LOADING),
+  removeLoading: node => node && node.classList.remove(f.CLASS_NAME.LOADING),
 
   /**
    * Функция печати по умолчанию
@@ -414,7 +414,7 @@ const func = {
    * @param {function} err
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
-    func.setLoading(target);
+    f.setLoading(target);
     target.setAttribute('disabled', 'disabled');
 
     let fileName = report.fileName || false;
@@ -423,8 +423,8 @@ const func = {
     data.set('docsAction', 'pdf');
     data.set('reportVal', JSON.stringify(report));
 
-    q.Post({data}).then(data => {
-      func.removeLoading(target);
+    f.Post({data}).then(data => {
+      f.removeLoading(target);
       target.removeAttribute('disabled');
       if (data['pdfBody']) {
         f.saveFile({
@@ -526,7 +526,7 @@ const func = {
     // Пользователь взять из сохранненного заказа или из найденного, если не изменен
     p.addCustomerInfo && data.set('addCustomer', 'true');
 
-    if (c.AUTH_STATUS && p.customer.id && !p.customerChange) {
+    if (f.AUTH_STATUS && p.customer.id && !p.customerChange) {
       data.set('customerId', p.customer.id.toString());
     } else if (p.customer) {
       data.set('name', p.customer.name || '');
@@ -537,7 +537,7 @@ const func = {
     }
 
     // Расчет загружен или сохранен и не изменен
-    if (c.AUTH_STATUS && p.orderId && !p.orderChanged) {
+    if (f.AUTH_STATUS && p.orderId && !p.orderChanged) {
       data.set('orderId', p.orderId.toString()); // Отчет из сохранненого заказа
     } else {
       data.set('saveVal', JSON.stringify(p.saveVal || {}));
@@ -567,8 +567,8 @@ const func = {
    * @return {void}
    */
   flashNode: (node, delay = 1000) => {
-    let def                 = node.style.boxShadow,
-        boxShadow           = 'red 0px 0px 4px 1px';
+    let def       = node.style.boxShadow,
+        boxShadow = 'red 0px 0px 4px 1px';
     def === boxShadow && (def = '');
     node.style.boxShadow    = boxShadow;
     node.style.borderRadius = '4px';
@@ -600,7 +600,6 @@ const func = {
   setFormat: (value, fractionDigits = 0) =>
     ((+value).toFixed(fractionDigits)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '),
 
-
   /**
    * Get value
    * @param {string|HTMLSelectElement} selector
@@ -628,14 +627,14 @@ const func = {
     return value.replaceAll(/\s/g, '_').replace(letters, replacer);
   },
 
-
+  /**
+   *
+   */
   settingInit() {
-    if (!c.INIT_SETTING) return;
+    if (!f.INIT_SETTING) return;
 
     let node = f.gI('dataSettings');
-    node && (this.cmsSetting = JSON.parse(node.value));
+    node && (f.cmsSetting = JSON.parse(node.value));
     node && node.remove();
   },
 }
-
-export const f = Object.assign(func, q);

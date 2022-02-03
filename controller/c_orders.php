@@ -10,8 +10,14 @@ $field = [
   'jsLinks'   => [CORE_JS . 'module/orders.js'],
 ];
 
+$user = [
+  'permission' => $main->getSettings('permission'),
+  'isAdmin'    => $main->getSettings('admin'),
+];
+$field['footerContent'] = "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>";
+
 // получить конфиг текущего пользователя
-$setting = $main->db->getUserSetting();
+$setting = $main->getSettings('customization');
 if (!$setting) $setting = new stdClass();
 
 if (!isset($setting->ordersColumnsSort)) {
@@ -42,6 +48,6 @@ if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
   }
 }
 
-$main->fireHook('orderTemplate', $field);
+$main->setControllerField($field)->fireHook('orderTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

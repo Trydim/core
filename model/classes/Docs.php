@@ -171,7 +171,9 @@ class Docs {
     }
   }
 
-  private function initPrint() { }
+  private function initPrint() {
+    $this->initPdf();
+  }
 
   private function initExcel() {
     require_once './Xlsxwriter.php';

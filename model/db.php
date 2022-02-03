@@ -187,7 +187,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       !$search && $result['statusOrders'] = $db->loadTable('order_status');
       break;
     case 'loadOrder': // Показать подробности
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
+      $orderIds = isset($orderId) ? [$orderId] : json_decode($orderIds ?? '[]');
       if (count($orderIds) === 1) $result['order'] = $db->loadOrderById($orderIds[0]);
       break;
     case 'changeStatusOrder':
