@@ -17,5 +17,26 @@
 
     "localCypressTest": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=false",
     "cypressDeployProd": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=true"
+  },
+  "dependencies": {
+    "mustache": "latest",
+    "normalize-scss": "latest",
+    "primevue": "^3.10.0",
+    "vue": "next"
+  },
+  "devDependencies": {
+    "@vue/compiler-sfc": "latest",
+    "css-loader": "latest",
+    "css-minimizer-webpack-plugin": "latest",
+    "cypress-watch-and-reload": "latest",
+    "file-loader": "latest",
+    "mini-css-extract-plugin": "2.4.6",
+    "sass": "latest",
+    "sass-loader": "latest",
+    "style-loader": "latest",
+    "svgo-loader": "latest",
+    "vue-loader": "next",
+    "webpack": "latest",
+    "webpack-cli": "latest"
   }
 }

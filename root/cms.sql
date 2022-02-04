@@ -220,14 +220,14 @@ INSERT INTO `order_status` (`ID`, `name`) VALUES
 CREATE TABLE `permission` (
   `ID` int(10) UNSIGNED NOT NULL,
   `name` varchar(50) CHARACTER SET utf8 NOT NULL,
-  `permission` varchar(255) CHARACTER SET utf8 NOT NULL
+  `properties` varchar(255) CHARACTER SET utf8 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `permission`
 --
 
-INSERT INTO `permission` (`ID`, `name`, `permission`) VALUES
+INSERT INTO `permission` (`ID`, `name`, `properties`) VALUES
 (1, 'Администратор', '{\"menu\":\"\"}'),
 (2, 'Менеджер', '{\"menu\":\"calculator,orders\"}');
 

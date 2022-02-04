@@ -110,10 +110,14 @@ class Docs {
 
   private function prepareTemplate() {
     if ($this->useDefault) { $this->setPdfDefaultData(); return; }
+
+    $footerPage = '';
+
     ob_start();
     include($this->filePath);
-    isset($footerPage) && $this->footerPage = $footerPage;
     $this->content = ob_get_clean();
+
+    $this->footerPage = $footerPage;
   }
 
   private function setExcelData() {

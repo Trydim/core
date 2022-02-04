@@ -23,7 +23,7 @@
     "mustache": "latest",
     "normalize-scss": "latest",
     "postcss-loader": "latest",
-    "primevue": "latest",
+    "primevue": "^3.10.0",
     "sass": "latest",
     "sass-loader": "latest",
     "style-loader": "latest",
