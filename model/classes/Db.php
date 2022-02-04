@@ -97,7 +97,7 @@ class Db extends \R {
 
     $columns[0] !== '*' && $columns = array_map(function ($item) { return $this->setQueryAs($item); }, $columns);
     $sql = 'SELECT ' . implode(', ',  $columns) . ' FROM ' . $dbTable;
-    if (strlen($filters)) $sql .= ' WHERE ' . AQueryWriter::camelsSnake($filters);
+    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
 
     return $simple ? self::getCol($sql) : self::getAll($sql);
   }
