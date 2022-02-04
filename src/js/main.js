@@ -145,6 +145,7 @@ const onEvent = () => {
   if (f.gI('authForm')) return;
   cancelFormSubmit();
   dictionaryInit();
+  f.settingInit();
   f.relatedOption();
   storageLoad();
   onEvent();

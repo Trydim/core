@@ -12,12 +12,12 @@ import {XMLTable} from "./XMLTable";
 const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
 
 /* Проверка файла перед добавлением (не знаю что хотел проверить)
-const checkAddedFile = function (e) {
-  let input = e.target;
-  if (!input.value.includes('csv')) {
-    //return;
-  }
-}*/
+ const checkAddedFile = function (e) {
+ let input = e.target;
+ if (!input.value.includes('csv')) {
+ //return;
+ }
+ }*/
 
 const admindb = {
   init() {
@@ -48,10 +48,10 @@ const admindb = {
       case 'table':
         //f.hide(this.btnRefresh);
         /*if (this.tableName === '') {
-          f.Get({data: 'mode=load&dbAction=tables'})
-           .then(data => this.showTablesName(data));
-        } else {*/
-          new TableValues();
+         f.Get({data: 'mode=load&dbAction=tables'})
+         .then(data => this.showTablesName(data));
+         } else {*/
+        new TableValues();
         //}
         break;
       case 'config':
@@ -63,8 +63,7 @@ const admindb = {
   },
 
   onEvent() {
-    f.qA('input[data-action]').forEach(n =>
-      n.addEventListener('click', e => this.commonClick(e)));
+    f.qA('input[data-action]').forEach(n => n.addEventListener('click', e => this.commonClick(e)));
   },
 }
 

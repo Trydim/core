@@ -187,7 +187,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       !$search && $result['statusOrders'] = $db->loadTable('order_status');
       break;
     case 'loadOrder': // Показать подробности
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
+      $orderIds = isset($orderId) ? [$orderId] : json_decode($orderIds ?? '[]');
       if (count($orderIds) === 1) $result['order'] = $db->loadOrderById($orderIds[0]);
       break;
     case 'changeStatusOrder':
@@ -306,9 +306,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['element_type_code'] = $type;
         $param['0']['activity'] = intval(isset($activity) && $activity === "true");
         $param['0']['sort'] = $sort ?? 100;
-        $result['error'] = $db->insert($columns, 'elements', $param);
+        $result['error'] = $db->insert($db->getColumnsTable('elements'), 'elements', $param);
 
-        // Проверка на срабатываение триггера
+        // Проверка на срабатывание триггера
         $haveOptions = $db->selectQuery('options_elements', 'ID', " name = '$name' ");
         if (!count($haveOptions)) {
           $columns = $db->getColumnsTable('options_elements');
@@ -431,72 +431,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (count($optionsId)) $db->deleteItem('options_elements', $optionsId);
       break;
 
-    // Options property
-    case 'loadProperties':
-      $setAction = 'loadProperties';
-      $result['propertiesTables'] = [];
-      $setting = getSettingFile();
-      require 'setting.php';
-
-      $dbPropertiesTables = $db->getTables('prop');
-
-      foreach ($dbPropertiesTables as $table) {
-        $result['propertiesTables'][$table['dbTable']] = [
-          'name' => $setting['propertySetting'][$table['dbTable']]['name'] ?? $table['name'],
-          'type' => 'справочник',
-        ];
-      };
-      break;
-    case 'loadProperty':
-      if (isset($props)) {
-        $result['propertyValue'] = $db->getColumnsTable($props);// todo загрузить просто
-      }
-      break;
-    case 'createProperty':
-    case 'changeProperty':
-      if (isset($tableName) && isset($dataType) && !empty($tableName)) {
-        // Простой или сложный параметр по префиксу
-        if (stripos($dataType, 's_') === 0) {
-          $setAction = $dbAction;
-          require 'setting.php';
-        } else {
-          $tableCode = $tableCode ?? translit($tableName);
-          $propName = 'prop_' . str_replace('prop_', '', $tableCode);
-
-          $param = [];
-          foreach ($_REQUEST as $key => $value) {
-            if (stripos($key, 'colName') !== false) {
-              $id = str_replace('colName', '', $key);
-
-              if (isset($_REQUEST['colType' . $id])) {
-                $param[translit($value)] = $_REQUEST['colType' . $id];
-              }
-            }
-          }
-
-          $setting = getSettingFile();
-          if (!isset($setting['propertySetting'][$propName])) {
-            $setting['propertySetting'][$propName]['name'] = $tableName;
-            setSettingFile($setting);
-            $result['error'] = $db->createPropertyTable($propName, $param);
-          } else if ($dbAction === 'changeProperty') {
-            $db->delPropertyTable([$propName]);
-            $setting['propertySetting'][$propName]['name'] = $tableName;
-            setSettingFile($setting);
-            $result['error'] = $db->createPropertyTable($propName, $param);
-          } else $result['error'] = 'Property exist';
-        }
-      } else $result['error'] = 'Property name error!';
-      break;
-    case 'delProperties':
-      if (isset($props)) {
-        $props = explode(',', $props);
-        $setAction = 'delProperties';
-        require 'setting.php';
-        $db->delPropertyTable($props);
-      }
-      break;
-
     // Customers
     case 'loadCustomerByOrder':
       $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
@@ -558,7 +492,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['users'] = $db->loadUsers($pageNumber, $countPerPage, $sortColumn, $sortDirect);
       $result['permissionUsers'] = $db->loadTable('permission');
       break;
-    //case 'loadUser': break; // Вероятно для загрузки пароля
     case 'addUser':
       $param = [0 => []];
       $user = isset($authForm) ? json_decode($authForm, true) : [];

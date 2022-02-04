@@ -50,7 +50,7 @@ class Db extends \R {
       );
 
       if (!self::testConnection()) {
-        is_callable('reDirect') && reDirect(false, '404&dbError=true');
+        is_callable('reDirect') && reDirect('404&dbError=true');
         exit('Data Base connect error!');
       }
 
@@ -88,9 +88,8 @@ class Db extends \R {
    *
    * @return array
    */
-  public function selectQuery($dbTable, $columns = '*', $filters = '') {
+  public function selectQuery(string $dbTable, $columns = '*', string $filters = '') {
     $simple = false;
-    if (!$dbTable) return [];
     if (!is_array($columns)) {
       $simple = $columns !== '*';
       $columns = [$columns];
@@ -98,7 +97,7 @@ class Db extends \R {
 
     $columns[0] !== '*' && $columns = array_map(function ($item) { return $this->setQueryAs($item); }, $columns);
     $sql = 'SELECT ' . implode(', ',  $columns) . ' FROM ' . $dbTable;
-    if (strlen($filters)) $sql .= ' WHERE ' . AQueryWriter::camelsSnake($filters);
+    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
 
     return $simple ? self::getCol($sql) : self::getAll($sql);
   }
@@ -107,14 +106,15 @@ class Db extends \R {
    * Проверка таблицы перед добавлениями/изменениями
    *
    * @param $curTable
-   * @param $dbTable
+   * @param string $dbTable
    * @param $param - link
+   * @param boolean $change - link
    * @return array $result
    */
-  public function checkTableBefore($curTable, $dbTable, &$param) {
+  public function checkTableBefore($curTable, string $dbTable, &$param, bool $change) {
     $result = [];
 
-    array_map(function ($col) use (&$result, $dbTable, &$param) {
+    array_map(function ($col) use (&$result, $dbTable, &$param, $change) {
       // Если автоинкремент -> удалить все поля из $param
       if ($col['key'] === 'PRI' && strpos($col['extra'], 'auto') !== false) {
 
@@ -128,15 +128,15 @@ class Db extends \R {
       else if ($col['key'] === 'PRI' || $col['key'] === 'UNI') {
 
         foreach ($param as $k => $item) {
-          if (isset($item[$col['columnName']])) $queryResult = $this->checkHaveRows($dbTable, $col['columnName'], $item[$col['columnName']]);
-          else $queryResult = [];
+          $count = isset($item[$col['columnName']])
+            ? $this->checkHaveRows($dbTable, $col['columnName'], $item[$col['columnName']]) : 0;
 
-          if (count($queryResult)) {
+          if ($change && $count > 2 || !$change && $count > 0) {
             $result[] = [
-              'id'         => $queryResult[0],
+              'id'         => $count[0],
               'columnName' => $col['columnName'],
               'value'      => $item[$col['columnName']],
-              'cause'      => 'UNI'
+              'cause'      => 'Must be unique value',
             ];
 
             unset($param[$k][$col['columnName']]);
@@ -149,7 +149,7 @@ class Db extends \R {
             $result[] = [
               'id'         => $k,
               'columnName' => $col['columnName'],
-              'cause'      => 'Not Null'
+              'cause'      => 'Must be Not Null value',
             ];
 
             unset($param[$k][$col['columnName']]);
@@ -190,11 +190,11 @@ class Db extends \R {
    * @param $columnName
    * @param $value
    *
-   * @return array|null
+   * @return integer
    */
   public function checkHaveRows($dbTable, $columnName, $value) {
-    return self::getCol('Select * FROM ' . $dbTable . ' WHERE ' . $columnName . ' = :value', [':value' => $value]);
-    //return R::find($dbTable , $columnName . ' = ' . $value);
+    return intval(self::getCell('SELECT count(*) FROM ' . $dbTable .
+                                ' WHERE ' . $columnName . ' = :value', [':value' => $value]));
   }
 
   /**
@@ -291,71 +291,69 @@ class Db extends \R {
    * @return array
    */
   public function insert(array $curTable, string $dbTable, array $param, bool $change = false): array {
-    $result = $this->checkTableBefore($curTable, $dbTable, $param);
+    if (count($param) === 0) return [];
+    $result = $this->checkTableBefore($curTable, $dbTable, $param, $change);
 
     $beans = self::xdispense($dbTable, count($param));
 
-    if (count($param) > 0) {
+    $idColName = 'id';
+    foreach ($curTable as $col) {
+      if ($col['key'] === 'PRI') {
+        $idColName = $col['columnName'];
+        break;
+      }
+    }
 
-      $idColName = 'id';
-      foreach ($curTable as $col) {
-        if ($col['key'] === 'PRI') {
-          $idColName = $col['columnName'];
-          break;
+    if (strtolower($idColName) !== 'id') {
+      if ($change) {
+        foreach ($param as $id => $item) {
+          $sql = "UPDATE `$dbTable` SET ";
+          foreach ($item as $k => $v) $sql .= "`$k` = '$v' ";
+          $sql .= "WHERE `$idColName` LIKE '$id'";
+          self::exec($sql);
+        }
+      } else {
+        foreach ($param as $id => $item) {
+          $sql = "INSERT INTO `$dbTable` ";
+          $sql .= '(' . implode(', ', array_keys($item)) . ') VALUES ';
+          $sql .= '(\'' . implode('\', \'', array_values($item)) . '\')';
+          self::exec($sql);
         }
       }
+      return $result;
+    }
 
-      if (strtolower($idColName) !== 'id') {
-        if ($change) {
-          foreach ($param as $id => $item) {
-            $sql = "UPDATE `$dbTable` SET ";
-            foreach ($item as $k => $v) $sql .= "`$k` = '$v' ";
-            $sql .= "WHERE `$idColName` LIKE '$id'";
-            self::exec($sql);
-          }
-        } else {
-          foreach ($param as $id => $item) {
-            $sql = "INSERT INTO `$dbTable` ";
-            $sql .= '(' . implode(', ', array_keys($item)) . ') VALUES ';
-            $sql .= '(\'' . implode('\', \'', array_values($item)) . '\')';
-            self::exec($sql);
+    try {
+      if (count($param) === 1) {
+        foreach ($param as $id => $item) {
+
+          $change && $beans->id = $id;
+
+          foreach ($item as $k => $v) {
+            if (isset($idColName) && $idColName === $k) continue;
+            $beans->$k = $v;
           }
         }
-        return $result;
-      }
+        self::store($beans);
+      } else {
 
-      try {
-        if (count($param) === 1) {
-          foreach ($param as $id => $item) {
+        $i = 0;
+        foreach ($param as $id => $item) {
 
-            $change && $beans->id = $id;
+          $change && $beans[$i]->id = $id;
 
-            foreach ($item as $k => $v) {
-              if (isset($idColName) && $idColName === $k) continue;
-              $beans->$k = $v;
-            }
+          foreach ($item as $k => $v) {
+            $beans[$i]->$k = $v;
           }
-          self::store($beans);
-        } else {
-
-          $i = 0;
-          foreach ($param as $id => $item) {
-
-            $change && $beans[$i]->id = $id;
-
-            foreach ($item as $k => $v) {
-              $beans[$i]->$k = $v;
-            }
-            $i++;
-          }
-          self::storeAll($beans);
+          $i++;
         }
-      } catch (\RedBeanPHP\RedException $e) {
-        return [
-          'result' => $result,
-          'error'  => $e->getMessage(),
-        ];
+        self::storeAll($beans);
       }
+    } catch (\RedBeanPHP\RedException $e) {
+      return [
+        'result' => $result,
+        'error'  => $e->getMessage(),
+      ];
     }
 
     return $result;
@@ -913,7 +911,7 @@ class Db extends \R {
    * @return array|null
    */
   public function getUser($login, $column = 'ID') {
-    $result = self::getRow("SELECT $column FROM users WHERE name = :name", [':name' => $login]);
+    $result = self::getRow("SELECT $column FROM users WHERE login = :login", [':login' => $login]);
 
     if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
     return $result;
@@ -934,7 +932,7 @@ class Db extends \R {
    */
   public function getUserByLogin($login) {
     return self::getRow("SELECT hash, password, customization, 
-            p.ID as 'permId', p.name as 'permName', access_val as 'permVal'
+            p.ID as 'permId', p.name as 'permName', properties as 'permValue'
             FROM users
             LEFT JOIN permission p on users.permission_id = p.ID
             WHERE login = :login", [':login' => $login]);
@@ -954,7 +952,7 @@ class Db extends \R {
 
   public function checkPassword($login, $password) {
     if (USE_DATABASE) {
-      $user = $this->getUser($login, 'ID, name, password');
+      $user = $this->getUser($login, 'ID, name, login, password');
     } else {
       return $this->getUserFromFile($login, $password);
     }
@@ -1013,10 +1011,11 @@ class Db extends \R {
     if (USE_DATABASE) {
       $user = $this->getUserByLogin($session['login']);
       count($user) && $userParam = [
+        'permissionId' => intval($user['permId']),
         'onlyOne' => isset(json_decode($user['customization'])->onlyOne),
         'admin' => $user['permId'] === 'admin' || $user['permId'] === '1',
         'customization' => json_decode($user['customization'], true),
-        'permission' => json_decode($user['permVal'], true),
+        'permission' => json_decode($user['permValue'], true),
       ];
     } else {
       try {
@@ -1171,5 +1170,4 @@ trait MainCsv {
     }
     return $this;
   }
-
 }

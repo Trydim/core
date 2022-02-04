@@ -1,10 +1,124 @@
 <?php
 
 /**
+ *
+ * @param $number
+ * @param $reportVal
+ * @return false|string
+ */
+function addCpNumber($number, $reportVal) {
+  global $main;
+  $reportVal = $main->fireHook('addCpNumber', $number, $reportVal);
+  return gzcompress($reportVal, 9);
+}
+
+/**
+ * alias for $main->addControllerField('cssLinks')
+ * @param string $cssLink
+ * @return mixed - false or Main object
+ */
+function addCssLink(string $cssLink) {
+  global $main;
+  if ($main instanceof cms\Main) return $main->addControllerField('cssLinks', $cssLink);
+  return false;
+}
+
+/**
+ * alias for $main->addControllerField('jsLinks')
+ * @param string $jsLink
+ * @param mixed $position [optional] <p>
+ * head - in head <p>
+ * before - before all script, after cms libs<p>
+ * last - before end body <p>
+ * @return mixed - false or Main object
+ */
+function addJsLink(string $jsLink, string $position = 'last') {
+  global $main;
+  if ($main instanceof cms\Main) return $main->addControllerField('jsLinks', $jsLink, $position);
+  return false;
+}
+
+/**
+ * Alias for $main->addHook();
+ * @param $hookName - string
+ * @param $callable - func
+ */
+function addHook($hookName, $callable) {
+  global $main;
+  if ($main instanceof cms\Main) $main->addHook($hookName, $callable);
+}
+
+/**
+ * Check if there is an error
+ * Deep search for all error messages and return as an array
+ * @param array $result
+ */
+function checkError(array &$result): void {
+  $error = [];
+  if (is_array($result['error'] ?? false)) {
+    if (empty($result['error'])) unset($result['error']);
+    else array_walk_recursive($result['error'], function($v, $k) use (&$error) {
+      if (empty($v)) return;
+      $error[] = [$k => $v];
+    });
+  }
+
+  $result['status'] = empty($error);
+  if (empty($error)) unset($result['error']);
+  else $result['error'] = $error;
+}
+
+/**
+ * Check exist template file in views directory
+ * @param string $tmpFile
+ *
+ * @return string path to file name
+ */
+function checkTemplate(string $tmpFile): string {
+  if ($tmpFile === '' && PUBLIC_PAGE
+      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php')) {
+    return ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
+  } else if (file_exists(ABS_SITE_PATH . 'public/views/' . "$tmpFile.php")) {
+    return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
+  } else if (file_exists(VIEW . "$tmpFile.php")) {
+    return VIEW . "$tmpFile.php";
+  } else if (file_exists(VIEW . $tmpFile . "/$tmpFile.php")) {
+    return VIEW . $tmpFile . "/$tmpFile.php";
+  } else {
+    require VIEW . '404.php'; die();
+  }
+}
+
+/**
+ * for param by load csv
+ * @param $type
+ * @param $value
+ * @return false|float
+ */
+function convert($type, $value) {
+  switch ($type) {
+    case 'int':
+    case 'integer':
+      return floor((integer)$value);
+    case 'float':
+    case 'double':
+      return floatval(str_replace(',', '.', $value));
+  }
+  return $value;
+}
+
+function convertToArray($value) {
+  if (is_array($value)) return $value;
+  if (is_string($value)) {
+    return array_map(function ($item) { return trim($item); }, explode(',', $value));
+  }
+}
+
+/**
  * @param $var
  * @param int $die
  */
-function de($var, $die = 1) {
+function de($var, int $die = 1) {
   echo '<pre>';
   var_dump($var);
   echo '</pre>';
@@ -12,121 +126,75 @@ function de($var, $die = 1) {
 }
 
 /**
+ * @param $word
  *
- * @param $number
- * @param $reportVal
- * @return false|string
+ * @return false|float|int
  */
-function addCpNumber($number, $reportVal) {
-  $reportVal = doHook('addCpNumber', $number, $reportVal);
-  return gzcompress($reportVal, 9);
-}
-
-/**
- * Check if there is an error
- * Deep search for all error messages and return as an array
- * @param array $result
- *
- * @return array - ['...', '...']
- */
-function checkError(array $result): array {
-  $error = [];
-  $findError = function ($findError, $var) use (&$error) {
-    if (is_array($var)) {
-      if (isset($var['error'])) {
-        if (empty($var['error'])) unset($var['error']);
-        else $error[] = $var['error'];
-      }
-
-      foreach ($var as $item) {
-        $findError($findError, $item);
-      }
-    }
-  };
-
-  $findError($findError, $result);
-  return $error;
-}
-
-/**
- * @param $target
- * @return string
- */
-function checkAccess($target): string {
-  if (PUBLIC_PAGE && in_array($target, [PUBLIC_PAGE, 'public', ''])) return 'public';
-  global $main;
-  if (in_array($target, $main->getSideMenu())) return $target;
-  if ($main->checkStatus('no') || $main->checkStatus('error')) return 'login';
-  reDirect(false, $main->getSideMenu(true));
-  die;
-}
-
-/**
- * @param $status - auth status
- * @param string $target
- */
-function reDirect($status, string $target = '') {
-  if (!$target) {
-    if ($status) $target = HOME_PAGE;
-    else {
-      if (isset($_SESSION['target']) && $_SESSION['target']) $target = 'login';
-      else $target = ONLY_LOGIN ? 'login' : 'public';
-    }
+function getLimitLevenshtein($word) {
+  if (iconv_strlen($word) <= 3) {
+    return iconv_strlen($word);
   }
-  //unset($_GET['targetPage']);
-  if ($target === 'public' && isset($_GET['orderId'])) $target .= '?orderId=' . $_GET['orderId']; // TODO уточнить откуда такая загрузка
-  header('location: ' . SITE_PATH . $target);
-  die;
+
+  return ceil(iconv_strlen($word) / 2);
 }
 
-/**
- *
- * @param $tmpFile
- *
- * @return string path to file name
- */
-function checkTemplate($tmpFile): string {
-  if ($tmpFile === 'public' && PUBLIC_PAGE
-      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . ".php")) {
-    return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
-  } else if (file_exists(VIEW . "$tmpFile.php")) {
-    return VIEW . "$tmpFile.php";
-  } else if (file_exists(VIEW . $tmpFile . "/$tmpFile.php")) {
-    return VIEW . $tmpFile . "/$tmpFile.php";
-  } else {
-    return VIEW . '404.php';
-  }
+function getPageAsString($data, $wrapId = 'wrapCalcNode') {
+  $html = "<div class=\"shadow-calc\" id=\"shadow-calc\"><shadow-calc></shadow-calc></div>";
+  $html .= "<div id=\"$wrapId\" style='display:none;'>" . $data['cssLinksArr'];
+  $html .= $data['globalWindowJsValue'];
+  $html .= $data['content'];
+  $html .= $data['jsLinksArr'];
+  $html .= $data['footerContent'] . '</div>';
+
+  return $html;
 }
 
 /**
  * @param $get
- *
  * @return array|string|string[]
  */
 function getTargetPage($get) {
-  return isset($get['targetPage']) ? str_replace('/', '', $get['targetPage'])
-    : (OUTSIDE ? 'public' : '');
+  $target = isset($get['targetPage']) ? str_replace('/', '', $get['targetPage']) : '';
+  if (PUBLIC_PAGE) {
+    if ($target === 'public') return '';
+    if ($target === PUBLIC_PAGE) reDirect();
+  }
+  return $target;
 }
 
 /**
- * get template from directory view
- * @param string $path whit out
- * @param array $vars
+ * Get setting from file
  *
- * @return string
+ * @param bool $decode
+ * @param bool $assoc
+ * @return mixed - array or object
  */
-function template(string $path = 'base', array $vars = []): string {
-  extract($vars);
-  ob_start();
-  if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {
-    include(ABS_SITE_PATH . 'public/views/' . "$path.php");
-  } else if (file_exists(ABS_SITE_PATH . VIEW . "$path.php")) { // TODO два раза с нижним условием?
-    include(ABS_SITE_PATH . VIEW . "$path.php");
-  } else if (file_exists(VIEW . "$path.php")) {
-    include(VIEW . "$path.php");
+function getSettingFile(bool $decode = true, bool $assoc = true) {
+  if (file_exists(SETTINGS_PATH)) {
+    $setting = file_get_contents(SETTINGS_PATH);
+    return $decode ? json_decode($setting, $assoc) : $setting;
   }
+  return $decode ? json_decode('[]', $assoc) : '[]';
+}
 
-  return ob_get_clean();
+function gTxt($str) {
+  static $txt;
+  if (!$txt) {
+    $mess = [];
+    include ABS_SITE_PATH . 'lang/dictionary.php';
+    $txt = $mess;
+  }
+  return isset($txt[$str]) ? $txt[$str] : $str;
+}
+
+function gTxtDB($db, $str) {
+  static $txt;
+  if (!$txt) {
+    $mess = [];
+    include ABS_SITE_PATH . 'lang/dbDictionary.php';
+    $txt = $mess;
+  }
+  return isset($txt[$db][$str]) ? $txt[$db][$str] : $str;
 }
 
 /**
@@ -181,6 +249,29 @@ function findkey($cell, $input) {
     if (preg_match_all($input, $key) === $count) {
       return $key;
     }
+  }
+
+  return false;
+}
+
+/**
+ * @param $dir {string} - path without slash on the end
+ * @param $fileName {string} - only file name without slash
+ * @return false|string
+ */
+function findingFile($dir, $fileName) {
+  $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $dir;
+  if (!file_exists($absolutePath)) return false;
+  if (file_exists($absolutePath . '/' . $fileName)) return $dir . '/' . $fileName;
+
+  $arrDir = array_values(array_filter(scandir($absolutePath), function ($dir) use ($absolutePath) {
+    return !($dir === '.' || $dir === '..' || is_file($absolutePath . '/' . $dir));
+  }));
+
+  $length = count($arrDir);
+  for ($i = 0; $i < $length; $i++) {
+    $result = findingFile($dir . '/' . $arrDir[$i], $fileName);
+    if ($result) return $result;
   }
 
   return false;
@@ -271,45 +362,13 @@ function loadFullCVS($path) {
         }
         if ($emptyRow > 0) $emptyRow = 0;
 
-        $result[] = $data;
+        $result[] = array_map(function ($cell) { return preg_replace('/^d_/', '', $cell);}, $data);
       } else $emptyRow++;
     }
     fclose($handle);
   } else return false;
 
   return $result;
-}
-
-/**
- * @param $word
- *
- * @return false|float|int
- */
-function getLimitLevenshtein($word) {
-  if (iconv_strlen($word) <= 3) {
-    return iconv_strlen($word);
-  }
-
-  return ceil(iconv_strlen($word) / 2);
-}
-
-function convert($type, $value) {
-  switch ($type) {
-    case 'int':
-    case 'integer':
-      return floor((integer)$value);
-    case 'float':
-    case 'double':
-      return floatval(str_replace(',', '.', $value));
-  }
-  return $value;
-}
-
-function convertToArray($value) {
-  if (is_array($value)) return $value;
-  if (is_string($value)) {
-    return array_map(function ($item) { return trim($item); }, explode(',', $value));
-  }
 }
 
 /**
@@ -343,77 +402,37 @@ function setUserLocale($lang = 'ru_RU') {
   textdomain($lang);
 }
 
-function gTxt($str) {
-  static $txt;
-  if (!$txt) {
-    $mess = [];
-    include ABS_SITE_PATH . 'lang/dictionary.php';
-    $txt = $mess;
-  }
-  return isset($txt[$str]) ? $txt[$str] : $str;
-}
-
-function gTxtDB($db, $str) {
-  static $txt;
-  if (!$txt) {
-    $mess = [];
-    include ABS_SITE_PATH . 'lang/dbDictionary.php';
-    $txt = $mess;
-  }
-  return isset($txt[$db][$str]) ? $txt[$db][$str] : $str;
-}
-
 /**
- * Alias for $main->addAction();
- * @param $hookName - string
- * @param $callable - func
+ * @param string $target
  */
-function addHook($hookName, $callable) {
-  global $main;
-  if ($main instanceof cms\Main) $main->addAction($hookName, $callable);
+function reDirect(string $target = '') {
+  if ($target === '') {
+    $target = $_SESSION['target'] ?? '';
+    isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
+  }
+  header('location: ' . SITE_PATH . $target);
+  die;
 }
 
 /**
- * Alias for $main->execAction();
- * @param $hookName - string
- * @param $args - array
- * @return mixed
- */
-function doHook($hookName, ...$args) {
-  global $main;
-  if ($main instanceof cms\Main) return $main->execAction($hookName, ...$args);
-  return false;
-}
-
-function getPageAsString($data, $wrapId = 'wrapCalcNode') {
-  $html = "<div class=\"shadow-calc\" id=\"shadow-calc\"><shadow-calc></shadow-calc></div>";
-  $html .= "<div id=\"$wrapId\" style='display:none;'>" . $data['cssLinksArr'];
-  $html .= $data['globalWindowJsValue'];
-  $html .= $data['content'];
-  $html .= $data['jsLinksArr'];
-  $html .= $data['footerContent'] . '</div>';
-
-  return $html;
-}
-
-/**
- * Get setting from file
+ * get template from directory view
+ * @param string $path whit out
+ * @param array  $vars
  *
- * @param bool $decode
- * @param bool $assoc
- * @return mixed - array or object
+ * @return string
  */
-function getSettingFile(bool $decode = true, bool $assoc = true) {
-  if (file_exists(SETTINGS_PATH)) {
-    $setting = file_get_contents(SETTINGS_PATH);
-    return $decode ? json_decode($setting, $assoc) : $setting;
+function template(string $path = 'base', array $vars = []): string {
+  extract($vars);
+  ob_start();
+  if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {
+    include(ABS_SITE_PATH . 'public/views/' . "$path.php");
+  } else if (file_exists(ABS_SITE_PATH . VIEW . "$path.php")) { // TODO два раза с нижним условием?
+    include(ABS_SITE_PATH . VIEW . "$path.php");
+  } else if (file_exists(VIEW . "$path.php")) {
+    include(VIEW . "$path.php");
   }
-  return $decode ? json_decode('[]', $assoc) : '[]';
-}
 
-function setSettingFile($content) {
-  is_array($content) && $content = json_encode($content);
-  file_put_contents(SETTINGS_PATH, $content);
+  return ob_get_clean();
 }
 
 /**
@@ -432,27 +451,4 @@ function translit($value) {
   ];
 
   return strtr(mb_strtolower($value), $converter);
-}
-
-/**
- * @param $dir {string} - path without slash on the end
- * @param $fileName {string} - only file name without slash
- * @return false|string
- */
-function findingFile($dir, $fileName) {
-  $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $dir;
-  if (!file_exists($absolutePath)) return false;
-  if (file_exists($absolutePath . '/' . $fileName)) return $dir . '/' . $fileName;
-
-  $arrDir = array_values(array_filter(scandir($absolutePath), function ($dir) use ($absolutePath) {
-    return !($dir === '.' || $dir === '..' || is_file($absolutePath . '/' . $dir));
-  }));
-
-  $length = count($arrDir);
-  for ($i = 0; $i < $length; $i++) {
-    $result = findingFile($dir . '/' . $arrDir[$i], $fileName);
-    if ($result) return $result;
-  }
-
-  return false;
 }

@@ -1,10 +1,6 @@
 // МОДУЛИ
 //----------------------------------------------------------------------------------------------------------------------
 
-import {c} from "./const.js";
-import {f} from "./func.js";
-import {q} from "./query.js";
-
 // Загрузчик / preLoader
 export class LoaderIcon {
   /**
@@ -20,7 +16,7 @@ export class LoaderIcon {
     //this.block         = targetBlock;
     this.customWrap    = param.wrap || false;
     this.customLoader  = param.loader || false;
-    this.customLoaderS = param.loaderS || false;
+    this.customLoaderS = param['loaderS'] || false;
     this.big           = !param.small || true;
     showNow && this.start();
   }
@@ -299,7 +295,7 @@ export const Print = () => {
   }
 
   p.print = function (content, printStyleTpl = 'printTpl.css', classList = []) {
-    q.Get({
+    f.Get({
       data: 'mode=docs&docsAction=getPrintStyle&fileTpl=' + printStyleTpl
     }).then(async data => {
       const scrollY = window.pageYOffset;
@@ -352,7 +348,7 @@ export class Pagination {
     this.query       = query;
     this.dbAction    = dbAction;
     this.sortParam   = sortParam;
-    this.activeClass = c.CLASS_NAME.ACTIVE;
+    this.activeClass = f.CLASS_NAME.ACTIVE;
     this.setParam();
   }
 
@@ -482,7 +478,7 @@ export class SortColumns {
 
     if (!thead || !query || !sortParam) return;
 
-    let activeClass = c.CLASS_NAME.SORT_BTN_CLASS;
+    let activeClass = f.CLASS_NAME.SORT_BTN_CLASS;
     this.thead = thead;
     this.query = query;
     this.dbAction = dbAction || '';
@@ -502,7 +498,6 @@ export class SortColumns {
         n.classList.add(activeClass);
         n.value = n.value.replace(this.arrow.notActive, this.arrow.arrowDown);
       }
-
     });
   }
 
@@ -510,7 +505,7 @@ export class SortColumns {
   sortRows(e) { /*↑↓*/
     let input = e.target,
         colSort = input.dataset.column,
-        activeClass = c.CLASS_NAME.SORT_BTN_CLASS,
+        activeClass = f.CLASS_NAME.SORT_BTN_CLASS,
         {notActive, arrowDown, arrowUp} = this.arrow,
         arrowReg = new RegExp(`${notActive}|${arrowDown}|${arrowUp}`);
 
@@ -592,7 +587,7 @@ export class SaveVisitorsOrder {
     data.set('importantValue', JSON.stringify(report['importantValue'] || false));
     data.set('total', report.total);
 
-    q.Post({data});
+    f.Post({data});
   }
 
   async emitAddOrder(report) {

@@ -1,32 +1,32 @@
 <?php if ( !defined('MAIN_ACCESS')) die('access denied!');
 
+use cms\Main;
 /**
  * @var $main - global
+ * @var $dbConfig - from root config
  */
 
 require_once basename( __DIR__ ) . '/cmsSetting.php';
 
-if(isset($_REQUEST['mode'])) require 'model/main.php';
+$main = new Main(USE_DATABASE ? $dbConfig : []);
+$main->setHooks();
+
+if (isset($_REQUEST['mode'])) require 'model/main.php';
 else {
   $html = '';
 
   $target = getTargetPage($_GET);
+  $pathTarget = checkTemplate($target);
 
-  !PUBLIC_PAGE && !$target && $target = ACCESS_MENU[0];
-  ($target === PUBLIC_PAGE) && reDirect(null, 'public');
-  $target && $pathTarget = checkTemplate($target);
-  if ($target && strstr($pathTarget, '404')) require CORE . 'views/404.php';
+  if (OUTSIDE) $main->setLoginStatus('no');
   else {
-    if (!OUTSIDE) {
-      $main->checkAuth($target)
-           ->applyAuth($target)
-           ->setAccount();
-    }
-
-    $target = checkAccess($target);
-    $target !== 'public' && $pathTarget = checkTemplate($target);
-    require CORE . "controller/c_$target.php";
+    $main->checkAuth()
+         ->setAccount()
+         ->applyAuth($target);
   }
+
+  $target === '' && $target = 'public';
+  require CORE . "controller/c_$target.php";
   echo $html;
 }
 

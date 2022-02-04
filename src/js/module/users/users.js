@@ -158,7 +158,7 @@ const users = {
         form.querySelector('#changeField').remove();
         this.confirmMsg = 'Новый пользователь добавлен';
         this.M.show('Добавление пользователя', form);
-        f.maskInit(form.querySelector('[name="phone"]'));
+        f.initMask(form.querySelector('[name="phone"]'));
       },
       'changeUser': () => {
         if (!this.id.getSelectedSize()) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
@@ -190,7 +190,7 @@ const users = {
           if (node) {
             if (oneElements) {
               node.value = v;
-              node.type === 'tel' && f.maskInit(node);
+              node.type === 'tel' && f.initMask(node);
             } else node.parentNode.remove();
           }
         });

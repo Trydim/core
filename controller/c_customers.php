@@ -16,7 +16,7 @@ $field = [
 if(!isset($setting)) {
   $columns = $main->db->loadCustomers(0, 1);
 
-	if(count($columns)) {
+  if(count($columns)) {
     $columns = array_keys($columns[0]) ?: [];
     $columns = array_map(function ($item) {
       $dbName = $item;
@@ -28,7 +28,7 @@ if(!isset($setting)) {
 
       return $item;
     }, $columns);
-	}
+  }
 }
 
 $param['columns'] = $columns;

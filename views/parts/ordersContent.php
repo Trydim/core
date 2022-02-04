@@ -75,7 +75,7 @@
     </table>
   </template>
 
-  <? if (USERS_ORDERS) { ?>
+  <?php if (USERS_ORDERS) { ?>
   <template id="orderVisitorTableTmp">
     <table>
       <thead>
@@ -98,5 +98,5 @@
       </tbody>
     </table>
   </template>
-  <? } ?>
+  <?php } ?>
 </div>

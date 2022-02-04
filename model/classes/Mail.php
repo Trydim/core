@@ -17,6 +17,7 @@ const MAIL_TARGET_DEBUG = 'trydim@mail.ru';
 const MAIL_SMTP = true;
 
 const MAIL_PORT = 465;
+
 const MAIL_HOST = 'smtp.yandex.ru';
 const MAIL_FROM = 'noreplycalcby@yandex.ru';
 const MAIL_PASSWORD = '638ch1';
@@ -64,12 +65,11 @@ class Mail {
 
     if (!DEBUG && file_exists(SETTINGS_PATH)) {
       $setting = function_exists('getSettingFile') ? getSettingFile() : $this->LoadSettingFile();
-      $this->mailTarget = $setting['orderMail'];
-      isset($setting['orderMailCopy']) && strlen($setting['orderMailCopy']) && $this->otherMail[] = $setting['orderMailCopy'];
-      isset($setting['mailFromName']) && strlen($setting['mailFromName']) && $this->otherMail[] = $setting['orderMailCopy'];
+      $this->mailTarget = $setting['mailTarget'];
+      strlen($setting['mailTargetCopy'] ?? '') && $this->otherMail[] = $setting['mailTargetCopy'];
+      strlen($setting['mailFromName'] ?? '') && $this->otherMail[] = $setting['mailFromName'];
 
-      if (isset($setting['mailSubject'])) $this->subject = $setting['mailSubject'];
-      else $this->subject = MAIL_SUBJECT_DEFAULT;
+      $this->subject = $setting['mailSubject'] ?? MAIL_SUBJECT_DEFAULT;
     }
   }
 
@@ -148,8 +148,8 @@ class Mail {
       // Получатель письма
       if (DEBUG) {
         $this->mailTarget = MAIL_TARGET_DEBUG;
-        $this->subject    = 'Тестовое письмо ' . $_SERVER['SERVER_NAME'];
-        $this->fromName   = 'vistegra.by';
+        $this->subject  = 'Тестовое письмо ' . $_SERVER['SERVER_NAME'];
+        $this->fromName = 'vistegra.by';
       }
 
       $mail->addBCC($this->mailTarget ?? MAIL_TARGET_DEBUG);

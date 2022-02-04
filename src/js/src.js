@@ -2,8 +2,9 @@
 
 import '../css/admin/admin.scss';
 
-import {c} from "./components/const.js";
-import {f} from "./components/func.js";
+import c from "./components/const.js";
+import f from "./components/func.js";
+import q from "./components/query.js";
 
 import * as module from './components/component.js';
 import {Debugger} from "./components/Debugger";
@@ -14,6 +15,7 @@ import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
 import {Valid} from "./components/Valid";
 import {searching} from "./components/SearchCustomers";
+import User from "./components/User";
 
 const m = {
   /**
@@ -124,6 +126,12 @@ const m = {
    */
   Valid,
   //initValid : (sendFunc, idForm, idSubmit) => module.valid.init(sendFunc, idForm, idSubmit),
+
+  /**
+   * User class
+   *
+   */
+  User,
 };
 
-window.f = Object.assign(c, m, f);
+window.f = Object.assign(c, f, q, m);

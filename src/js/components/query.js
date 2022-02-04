@@ -1,5 +1,3 @@
-import {c} from "./const.js";
-
 // Query Object -----------------------------------------------------------------------------------------------------------------
 
 const checkJSON = data => {
@@ -49,7 +47,7 @@ const query = (url, data, type = 'json') => {
  * @type {{Post: function, Get: function}}
  * @function Post({url: String, data, type})
  */
-export const q = {
+export default {
 
   /**
    * Fetch Get
@@ -60,7 +58,7 @@ export const q = {
    * @return {Promise<Response>}
    * @constructor
    */
-  Get: ({url = c.MAIN_PHP_PATH, data, type = 'json'}) => query(url + '?' + data, '', type),
+  Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url + '?' + data, '', type),
 
   /**
    * Fetch Post
@@ -72,5 +70,5 @@ export const q = {
    * @param {string?: 'json'} obj.type - return type.
    * @return {Promise<Response>}
    */
-  Post: ({url = c.MAIN_PHP_PATH, data, type = 'json'}) => query(url, data, type),
+  Post: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url, data, type),
 };

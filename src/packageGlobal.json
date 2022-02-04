@@ -1,9 +1,7 @@
 {
   "dependencies": {
     "@cypress/watch-preprocessor": "latest",
-    "@vue/cli-service": "latest",
     "@vue/compiler-sfc": "latest",
-    "alpinejs": "latest",
     "autoprefixer": "latest",
     "clean-webpack-plugin": "latest",
     "copy-webpack-plugin": "latest",
@@ -25,7 +23,7 @@
     "mustache": "latest",
     "normalize-scss": "latest",
     "postcss-loader": "latest",
-    "primevue": "latest",
+    "primevue": "^3.10.0",
     "sass": "latest",
     "sass-loader": "latest",
     "style-loader": "latest",

@@ -1,10 +1,10 @@
 <?php
-!isset($data) && $data = [];
+$data = $data ?? [];
 $data = $data['report'];
-$name = htmlspecialchars($name);
-$phone = htmlspecialchars($phone);
-$email = htmlspecialchars($email);
-$info = htmlspecialchars($info);
+$name = htmlspecialchars($name ?? '');
+$phone = htmlspecialchars($phone ?? '');
+$email = htmlspecialchars($email ?? '');
+$info = htmlspecialchars($info ?? '');
 ?>
 <br><b>Имя:</b><?= $name ?>
 <br><b>Контактный телефон:</b><?= $phone ?>
@@ -19,4 +19,4 @@ $info = htmlspecialchars($info);
       </tr>
     <?php /*} */?>
   </tbody>
-</table>-->
+</table>

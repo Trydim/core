@@ -3,15 +3,17 @@
 /**
  * Global variables and simple functions
  */
-export const c = {
-  DEBUG        : window['DEBUG'] || false,
-  CSV_DEVELOP  : !!window['CSV_DEVELOP'] || false,
-  OUTSIDE      : window['CL_OUTSIDE'],
-  SITE_PATH    : window['SITE_PATH'] || '/',
-  MAIN_PHP_PATH: (window['SITE_PATH'] || '/') + 'index.php',
-  PUBLIC_PAGE  : (window['PUBLIC_PAGE'] || 'calculator'),
-  PATH_IMG     : (window['PATH_IMG'] || 'public/images/'),
-  AUTH_STATUS  : !!(window['AUTH_STATUS'] || false),
+window.CMS_CONST = JSON.parse(window.CMS_CONST) || {};
+
+export default {
+  DEBUG        : window.CMS_CONST['DEBUG'] || false,
+  CSV_DEVELOP  : !!window.CMS_CONST['CSV_DEVELOP'] || false,
+  OUTSIDE      : window.CMS_CONST['CL_OUTSIDE'],
+  SITE_PATH    : window.CMS_CONST['SITE_PATH'] || '/',
+  MAIN_PHP_PATH: (window.CMS_CONST['SITE_PATH'] || '/') + 'index.php',
+  PATH_IMG     : (window.CMS_CONST['PATH_IMG'] || 'public/images/'),
+  AUTH_STATUS  : window.CMS_CONST['AUTH_STATUS'] || false,
+  INIT_SETTING : window.CMS_CONST['INIT_SETTING'] || false,
 
   PHONE_MASK: '+7 (___) ___ __ __',
 
@@ -38,6 +40,5 @@ export const c = {
     LOADING: 'loading-st1',
   },
 
-  // Пробное
-  calcWrap: document.querySelector('#wrapCalcNode'),
+  HOOKS: {},
 };

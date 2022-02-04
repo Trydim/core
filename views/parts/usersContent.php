@@ -23,24 +23,24 @@
 </div>
 <div class="res-table">
 <table id="usersTable" class="text-center table table-striped">
-	<thead>
-	<tr>
+  <thead>
+  <tr>
     <th></th>
     <?php if(isset($columns)) foreach ($columns as $item) { ?>
       <th>
         <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
       </th>
     <?php } ?>
-	</tr>
-	</thead>
-	<tbody>
+  </tr>
+  </thead>
+  <tbody>
   <tr>
     <td><input type="checkbox" class="" data-id="${U.ID}"></td>
-		<?php if(isset($columns)) foreach ($columns as $item) { ?>
+    <?php if(isset($columns)) foreach ($columns as $item) { ?>
       <td>${<?= $item['dbName']; ?>}</td>
-		<?php } ?>
+    <?php } ?>
   </tr>
   </tbody>
-	<tfoot><tr></tr></tfoot>
+  <tfoot><tr></tr></tfoot>
 </table>
 </div>

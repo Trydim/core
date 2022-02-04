@@ -10,9 +10,15 @@ $field = [
   'jsLinks'   => [CORE_JS . 'module/orders.js'],
 ];
 
+$user = [
+  'permission' => $main->getSettings('permission'),
+  'isAdmin'    => $main->getSettings('admin'),
+];
+$field['footerContent'] = "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>";
+
 // получить конфиг текущего пользователя
-$setting = $main->db->getUserSetting();
-if (!$setting) $setting = json_decode('{}');
+$setting = $main->getSettings('customization');
+if (!$setting) $setting = new stdClass();
 
 if (!isset($setting->ordersColumnsSort)) {
   $columns = $main->db->loadOrder(0, 1);
@@ -22,7 +28,7 @@ if (!isset($setting->ordersColumnsSort)) {
         'dbName' => $item,
         'name'   => gTxtDB('orders', $item),
       ];
-      }, array_keys($columns[0]));
+    }, array_keys($columns[0]));
 
     $param['ordersColumns'] = $setting->ordersColumnsSort;
   }
@@ -42,6 +48,6 @@ if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
   }
 }
 
-$main->exist('orderTemplate') && $field = doHook('orderTemplate', $field);
+$main->setControllerField($field)->fireHook('orderTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

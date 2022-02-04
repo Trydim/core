@@ -19,7 +19,7 @@ $field = [
   'pageTitle' => 'Каталог',
   'footerContent' => '',
   'sideRight' => '',
-  'cssLinks'      => [CORE_CSS . 'module/catalog.css'],
+  'cssLinks'  => [CORE_CSS . 'module/catalog.css'],
   'jsLinks'   => [CORE_JS . 'module/catalog.js'],
 ];
 

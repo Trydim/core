@@ -6,12 +6,6 @@
  * @var $admin - from controller
  */
 
-/*$field['headContent']    = <<<headContent
-headContent;
-$field['pageHeader']    = <<<pageHeader
-pageHeader;
-$field['sideLeft']      = <<<sideLeft
-sideLeft;*/
 
 $field['content'] = template('parts/settingContent', $param);
 

@@ -26,6 +26,6 @@ if(count($ordersStatus)) {
   $field['footerContent'] .= "<div hidden id='ordersStatusValue'>$ordersStatus</div>";
 }
 
-$main->exist('calendarTemplate') && $field = doHook('calendarTemplate', $field);
+$main->setControllerField($field)->fireHook('calendarTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

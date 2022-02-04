@@ -2,9 +2,6 @@
 
 import './_modal.scss';
 
-import {c} from "./const.js";
-import {f} from "./func.js";
-
 /**
  * Модальное окно
  * @param param {{modalId: string,
@@ -83,7 +80,7 @@ export const Modal = (param = {}) => {
       if (document.body.style.paddingRight === '16px')
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
     }, 300);
-    //c.eraseNode(modal.content);
+    //f.eraseNode(modal.content);
   }
 
   modal.destroy = function () {

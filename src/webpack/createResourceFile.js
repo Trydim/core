@@ -27,7 +27,7 @@ function addImport(path, mName, js = false) {
       if (isDir(`${path + mName}/${file}`)) addImport(path + mName + '/', file);
       else {
         let str = `${mName}: '${path + mName}/${file}',\n`;
-        //if (js) str = str.replace('./js', ''); // непомню зачем
+        //if (js) str = str.replace('./js', ''); // не помню зачем
         content += str;
       }
     });
