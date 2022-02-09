@@ -102,7 +102,7 @@ class Docs {
       'margin_bottom' => 5,
       'margin_header' => 0,
       'margin_footer' => 5,
-      'orientation'   => 'L',
+      /*'orientation'   => 'L',*/
     ];
 
     $this->imgPath = ($this->docsType !== 'print' ? $_SERVER['DOCUMENT_ROOT'] : '') . PATH_IMG;

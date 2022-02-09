@@ -32,8 +32,13 @@ export default {
       d.mail.subject           = data.subject || '';
       d.mail.fromName          = data.fromName || '';
 
-      debugger
       d.managerFields = data.managerFields || {};
+
+      d.statusDefault = +data.statusDefault || 0;
+
+      d.phoneMaskUsers     = data.phoneMaskUsers || f.PHONE_MASK;
+      d.phoneMaskCustomers = data.phoneMaskCustomers || f.PHONE_MASK;
+      d.phoneMaskGlobal    = data.phoneMaskGlobal || f.PHONE_MASK;
     };
     const setPermissions = () => {
       const data = setData('#dataPermissions');

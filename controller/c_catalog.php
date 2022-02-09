@@ -1,4 +1,4 @@
-<?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var object $main
@@ -16,7 +16,7 @@ function prepareData($data) {
 }
 
 $field = [
-	'pageTitle' => 'Каталог',
+  'pageTitle' => 'Каталог',
   'footerContent' => '',
   'sideRight' => '',
   'cssLinks'  => [CORE_CSS . 'module/catalog.css'],

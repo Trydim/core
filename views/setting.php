@@ -1,4 +1,4 @@
-<?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php  if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var $main - global object
@@ -8,7 +8,7 @@
 
 $field['content'] = template('parts/settingContent');
 
-if ($main->getSettings('admin')) {
+if ($main->getLogin('admin')) {
   $field['footerContent'] .= <<<footerContent
 <template id="rateModalTmp">
   <table class="text-center table table-striped">

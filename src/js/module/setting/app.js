@@ -65,6 +65,11 @@ const app = {
        node && f.initMask(node.$el);*/
     },
 
+    updateOrderStatus(s) {
+      this.queryParam.orderStatus = JSON.stringify(s.orderStatus);
+      this.queryParam.statusDefault = s.statusDefault;
+    },
+
     query() {
       const data = new FormData();
 

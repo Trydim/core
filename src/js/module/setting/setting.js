@@ -23,6 +23,7 @@ import Image from 'primevue/image';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
+import RadioButton from 'primevue/radiobutton';
 import Textarea from 'primevue/textarea';
 //import ToggleButton from 'primevue/togglebutton';
 //import MultiSelect from 'primevue/multiselect';
@@ -33,6 +34,7 @@ import Textarea from 'primevue/textarea';
 // ---------------------------------------------------------------------------------------------------------------------
 import PickList from './components/picklist.esm';
 //import UserField from "./userField.vue";
+import OrderStatus from "./orderStatus.vue";
 
 // Import Directives
 // ---------------------------------------------------------------------------------------------------------------------
@@ -60,6 +62,7 @@ app.component('p-image', Image);
 app.component('p-input-text', InputText);
 app.component('p-input-number', InputNumber);
 app.component('p-picklist', PickList);
+app.component('p-radiobutton', RadioButton);
 app.component('p-select', Dropdown);
 app.component('p-switch', InputSwitch);
 app.component('p-t-column', Column);
@@ -72,6 +75,7 @@ app.component('p-textarea', Textarea);
 
 // Custom component
 //app.component('c-user-form', UserField);
+app.component('setting-order-status', OrderStatus);
 
 app.directive('tooltip', Tooltip);
 

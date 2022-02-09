@@ -1,7 +1,6 @@
 "use strict";
 
 const menuClass = 'menu-toggle';
-
 const storage = new f.LocalStorage();
 
 const cancelFormSubmit = () => {

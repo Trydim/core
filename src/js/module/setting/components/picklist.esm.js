@@ -288,11 +288,11 @@ var script = {
       }
     },
     createStyle() {
-			if (!this.styleElement) {
-			  this.$el.setAttribute(this.attributeSelector, '');
-				this.styleElement = document.createElement('style');
-				this.styleElement.type = 'text/css';
-				document.head.appendChild(this.styleElement);
+      if (!this.styleElement) {
+        this.$el.setAttribute(this.attributeSelector, '');
+        this.styleElement = document.createElement('style');
+        this.styleElement.type = 'text/css';
+        document.head.appendChild(this.styleElement);
 
         let innerHTML = `
 @media screen and (max-width: ${this.breakpoint}) {
@@ -333,8 +333,8 @@ var script = {
 `;
 
         this.styleElement.innerHTML = innerHTML;
-			}
-		},
+      }
+    },
     destroyStyle() {
       if (this.styleElement) {
         document.head.removeChild(this.styleElement);
@@ -381,10 +381,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (openBlock(), createBlock("div", _hoisted_1, [
     createVNode("div", _hoisted_3, [
       (_ctx.$slots.source)
-        ? (openBlock(), createBlock("div", _hoisted_4, [
-            renderSlot(_ctx.$slots, "source")
-          ]))
-        : createCommentVNode("", true),
+      ? (openBlock(), createBlock("div", _hoisted_4, [
+        renderSlot(_ctx.$slots, "source")
+      ]))
+      : createCommentVNode("", true),
       createVNode(TransitionGroup, {
         ref: "sourceList",
         name: "p-picklist-flip",
@@ -443,10 +443,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ]),
     createVNode("div", _hoisted_6, [
       (_ctx.$slots.target)
-        ? (openBlock(), createBlock("div", _hoisted_7, [
-            renderSlot(_ctx.$slots, "target")
-          ]))
-        : createCommentVNode("", true),
+      ? (openBlock(), createBlock("div", _hoisted_7, [
+        renderSlot(_ctx.$slots, "target")
+      ]))
+      : createCommentVNode("", true),
       createVNode(TransitionGroup, {
         ref: "targetList",
         name: "p-picklist-flip",

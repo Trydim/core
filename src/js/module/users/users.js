@@ -281,7 +281,7 @@ const users = {
 
   onEvent() {
     // Action buttons
-    f.qA('input[data-action]', 'click', (() => (e) => this.actionBtn.call(this, e))());
+    f.qA('input[data-action]', 'click', e => this.actionBtn.call(this, e));
   },
 }
 

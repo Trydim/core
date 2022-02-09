@@ -74,13 +74,28 @@ switch ($cmsAction) {
 
       // Статусы
       if (isset($orderStatus)) {
-        $columns = $db->getColumnsTable('order_status');
-        $currentTable = $db->loadTable('order_status');
-        $param = [];
+        //$currentTable = $db->loadTable('order_status');
+        $param = [
+          'new'    => [],
+          'change' => [],
+        ];
+
         foreach (json_decode($orderStatus, true) as $status) {
-          $param[$status['ID']]['name'] = $status['name'];
+          $id = $status['ID'];
+
+          if (isset($status['delete'])) $result['error']['statusDel'] = $db->deleteItem('order_status', [$id]);
+
+          // Js random 0 - 1
+          if ($id < 1) {
+            $param['new'][uniqid()]['name'] = $status['name'];
+          } else {
+            $param['change'][$id]['name'] = $status['name'];
+          }
         }
-        $result['error'] = $db->insert($columns, 'order_status', $param, false);
+
+        $columns = $db->getColumnsTable('order_status');
+        $result['error']['statusAdd'] = $db->insert($columns, 'order_status', $param['new']);
+        $result['error']['statusChange'] = $db->insert($columns, 'order_status', $param['change'], true);
       }
     } else {
       $hash = '';
@@ -96,14 +111,17 @@ switch ($cmsAction) {
 
     // Global mail setting
     $mail = json_decode($mail ?? '[]', true);
-    !empty($mail['mailTarget']) && $main->setSettings('mailTarget',  $mail['mailTarget']);
-    !empty($mail['mailTargetCopy']) && $main->setSettings('mailTargetCopy',  $mail['mailTargetCopy']);
-    !empty($mail['mailSubject']) && $main->setSettings('mailSubject',  $mail['mailSubject']);
-    !empty($mail['mailFromName']) && $main->setSettings('mailFromName',  $mail['mailFromName']);
+    !empty($mail['mailTarget']) && $main->setSettings('mailTarget', $mail['mailTarget']);
+    !empty($mail['mailTargetCopy']) && $main->setSettings('mailTargetCopy', $mail['mailTargetCopy']);
+    !empty($mail['mailSubject']) && $main->setSettings('mailSubject', $mail['mailSubject']);
+    !empty($mail['mailFromName']) && $main->setSettings('mailFromName', $mail['mailFromName']);
 
     // Global manager setting
     $managerFields = json_decode($managerFields ?? '[]', true);
     count($managerFields) && $main->setSettings('managerFields', $managerFields);
+
+    // Global other setting
+    $main->setSettings('statusDefault', $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
 
     $main->saveSettings();
     break;

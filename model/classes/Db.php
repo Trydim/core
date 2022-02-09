@@ -97,7 +97,7 @@ class Db extends \R {
 
     $columns[0] !== '*' && $columns = array_map(function ($item) { return $this->setQueryAs($item); }, $columns);
     $sql = 'SELECT ' . implode(', ',  $columns) . ' FROM ' . $dbTable;
-    if (strlen($filters)) $sql .= ' WHERE ' . AQueryWriter::camelsSnake($filters);
+    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
 
     return $simple ? self::getCol($sql) : self::getAll($sql);
   }
@@ -193,8 +193,8 @@ class Db extends \R {
    * @return integer
    */
   public function checkHaveRows($dbTable, $columnName, $value) {
-    return intval(self::getCell('Select count(*) FROM ' . $dbTable .
-                                    ' WHERE ' . $columnName . ' = :value', [':value' => $value]));
+    return intval(self::getCell('SELECT count(*) FROM ' . $dbTable .
+                                ' WHERE ' . $columnName . ' = :value', [':value' => $value]));
   }
 
   /**
@@ -881,10 +881,10 @@ class Db extends \R {
   /**
    * @param string $login
    * @param string $password
-   * @param false $status
+   * @param bool   $status
    * @return array|false
    */
-  public function getUserFromFile($login = '', $password = '', $status = false) {
+  public function getUserFromFile(string $login = '', string $password = '', bool $status = false) {
 
     if (file_exists(SYSTEM_PATH)) {
       $value = file(SYSTEM_PATH)[0];
@@ -931,11 +931,11 @@ class Db extends \R {
    * @return array|null
    */
   public function getUserByLogin($login) {
-    return self::getRow("SELECT hash, password, customization, 
-            p.ID as 'permId', p.name as 'permName', properties as 'permValue'
-            FROM users
-            LEFT JOIN permission p on users.permission_id = p.ID
-            WHERE login = :login", [':login' => $login]);
+    return self::getRow("SELECT login, users.name AS 'name', hash, password, customization, 
+                                    p.ID as 'permId', p.name as 'permName', properties as 'permValue'
+                             FROM users
+                             LEFT JOIN permission p on users.permission_id = p.ID
+                             WHERE login = :login", [':login' => $login]);
   }
 
   /**
@@ -957,9 +957,7 @@ class Db extends \R {
       return $this->getUserFromFile($login, $password);
     }
 
-    if (count($user) && password_verify($password, $user['password'])) {
-      return $user;
-    } else return false;
+    return count($user) && password_verify($password, $user['password']) ? $user : false;
   }
 
   public function changeUser($loginId, $param) {
@@ -1006,16 +1004,20 @@ class Db extends \R {
     }
   }
 
+  /**
+   * @param $session
+   * @return array|bool[]|false
+   */
   public function checkUserHash($session) {
-    global $main;
     if (USE_DATABASE) {
       $user = $this->getUserByLogin($session['login']);
-      count($user) && $userParam = [
-        'permissionId' => intval($user['permId']),
-        'onlyOne' => isset(json_decode($user['customization'])->onlyOne),
-        'admin' => $user['permId'] === 'admin' || $user['permId'] === '1',
+      if (!count($user)) return false;
+
+      $userParam = [
+        'permissionId'  => intval($user['permId']),
+        'onlyOne'       => isset(json_decode($user['customization'])->onlyOne),
         'customization' => json_decode($user['customization'], true),
-        'permission' => json_decode($user['permValue'], true),
+        'permission'    => json_decode($user['permValue'], true),
       ];
     } else {
       try {
@@ -1029,32 +1031,32 @@ class Db extends \R {
       }
       $user = [
         'password' => $value[1],
-        'hash' => trim($value[2]),
+        'hash'     => trim($value[2]),
       ];
       $userParam = [
         'onlyOne' => true,
-        'admin' => true,
+        'admin'   => true,
       ];
     }
 
-    if (isset($userParam)) foreach ($userParam as $k => $v) $main->setSettings($k, $v);
-
-    if (!$main->getSettings('onlyOne') && isset($user['password']) && isset($_SESSION['password'])) {
+    if ($userParam['onlyOne']) $ok = $session['hash'] === $user['hash'];
+    else {
       $ok = USE_DATABASE ? password_verify($_SESSION['password'], $user['password'])
                          : $_SESSION['password'] === $user['password'];
     }
-    return $session['hash'] === $user['hash'] || (isset($ok) && $ok);
+
+    return $ok ? $userParam : false;
   }
 
   /**
    * get Setting for current user
    *
-   * @param $currentUser {string}
-   * @param $columns {string}
+   * @param string $currentUser {string}
+   * @param string $columns {string}
    *
    * @return mixed
    */
-  public function getUserSetting($currentUser = false, $columns = 'customization') {
+  public function getUserSetting(string $currentUser = '', string $columns = 'customization') {
     if (!$currentUser) {
       global $main;
       $currentUser = $main->getLogin();
@@ -1091,8 +1093,7 @@ trait MainCsv {
    * @return mixed|null
    */
   static function scanDirCsv(string $path, string $link = '') {
-
-    return array_reduce(scandir($path), function ($r, $item) use ($link) {
+    return array_reduce(is_dir($path) ? scandir($path) : [], function ($r, $item) use ($link) {
       if (!($item === '.' || $item === '..')) {
         if (stripos($item, '.csv')) {
           $r[] = [

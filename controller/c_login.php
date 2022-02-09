@@ -1,4 +1,4 @@
-<?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var object $main
@@ -7,10 +7,10 @@
 
 $field['pageTitle'] = PROJECT_TITLE;
 
-$field['pageFooter']    = '';
-$field['sideLeft']      = '';
-$field['content']       = '';
-$field['sideRight']     = '';
+$field['pageFooter'] = '';
+$field['sideLeft']   = '';
+$field['content']    = '';
+$field['sideRight']  = '';
 
 $wrongPass = $main->checkStatus('error');
 $login     = $_REQUEST['login'] ?? '';

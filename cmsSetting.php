@@ -11,7 +11,7 @@ require ABS_SITE_PATH . 'config.php'; // Public config
 
 !isset($dbConfig) && $dbConfig = [];
 
-define('CORE', basename( __DIR__ ) . '/');
+!defined('CORE') && define('CORE', basename( __DIR__ ) . '/');
 const VIEW = CORE . 'views/';
 
 const CORE_CSS = SITE_PATH . CORE . 'assets/css/';
@@ -45,7 +45,7 @@ foreach ($publicConfig as $k => $v) {
 !defined('SHARE_DIR') && define('SHARE_DIR', '/');
 !defined('OUTSIDE') && define('OUTSIDE', isset($_GET['outside']));
 
-require_once CORE . 'model/func.php';
-require_once CORE . 'model/classes/Main.php';
+require_once __DIR__ . '/model/func.php';
+require_once __DIR__ . '/model/classes/Main.php';
 
 unset($absPath, $siteDir, $publicConfig, $k, $v);

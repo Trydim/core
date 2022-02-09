@@ -1,29 +1,28 @@
 <?php
 global $main;
-$isAdmin = $main->getSettings('admin');
-$catalogProperties = in_array('catalog', $main->getSideMenu());
+$isAdmin = $main->getLogin('admin');
 ?>
 <div class="row container m-auto" id="settingForm">
   <?php if ($isAdmin) { ?>
     <div class="col-6 border" id="mailForm">
       <h3 class="col text-center">Настройка почты</h3>
       <div class="form-floating my-3">
-        <p-input-text v-model="mail.mailTarget" ref="mailTarget" :class="'form-control'" placeholder="_"
+        <p-input-text v-model="mail.mailTarget" ref="mailTarget" class="form-control" placeholder="_"
         ></p-input-text>
         <label>Почта для получения заказов</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="mail.mailTargetCopy" ref="mailTargetCopy" :class="'form-control'" placeholder="_"
+        <p-input-text v-model="mail.mailTargetCopy" ref="mailTargetCopy" class="form-control" placeholder="_"
         ></p-input-text>
         <label>Копия письма</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="mail.mailSubject" :class="'form-control'" placeholder="_"
+        <p-input-text v-model="mail.mailSubject" class="form-control" placeholder="_"
         ></p-input-text>
         <label>Тема письма</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="mail.mailFromName" :class="'form-control'" placeholder="_"
+        <p-input-text v-model="mail.mailFromName" class="form-control" placeholder="_"
         ></p-input-text>
         <label>Имя отправителя</label>
       </div>
@@ -33,17 +32,17 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <div class="col-6 border" id="userForm">
     <h3 class="col text-center">Пользователь</h3>
     <div class="form-floating my-3">
-      <p-input-text v-model="user.login" :class="'form-control'" placeholder="_"
+      <p-input-text v-model="user.login" class="form-control" placeholder="_"
       ></p-input-text>
       <label>Логин</label>
     </div>
     <div class="form-floating mb-3">
-      <p-input-text type="password" v-model="user.password" :class="'form-control'" placeholder="_"
+      <p-input-text type="password" v-model="user.password" class="form-control" placeholder="_"
       ></p-input-text>
       <label>Новый Пароль</label>
     </div>
     <div class="form-floating mb-3">
-      <p-input-text type="password" v-model="user.passwordRepeat" :class="'form-control'" placeholder="_"
+      <p-input-text type="password" v-model="user.passwordRepeat" class="form-control" placeholder="_"
       ></p-input-text>
       <label>Повторите Пароль</label>
     </div>
@@ -57,17 +56,17 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
 
     <template v-if="user.showAllField">
       <div class="form-floating my-3">
-        <p-input-text v-model="user.name" :class="'form-control'" placeholder="_"
+        <p-input-text v-model="user.name" class="form-control" placeholder="_"
         ></p-input-text>
         <label>ФИО</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="user.fields.phone" :class="'form-control'" placeholder="_"
+        <p-input-text v-model="user.fields.phone" class="form-control" placeholder="_"
         ></p-input-text>
         <label>Телефон</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="user.fields.email" :class="'form-control'" placeholder="_"
+        <p-input-text v-model="user.fields.email" class="form-control" placeholder="_"
         ></p-input-text>
         <label>Почта</label>
       </div>
@@ -77,12 +76,12 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
                     'input-group': item.type !== 'text' && item.type !== 'textarea'}"
       >
         <p-input-text v-if="item.type === 'text'"
-                      :class="'form-control'" :id="item.type + key"
+                      class="form-control" :id="item.type + key"
                       v-model="user.fields[key]" placeholder="_"
         ></p-input-text>
 
         <p-textarea v-if="item.type === 'textarea'"
-                    :class="'form-control'" :id="item.type + key" placeholder="_"
+                    class="form-control" :id="item.type + key" placeholder="_"
                     v-model="user.fields[key]"
         ></p-textarea>
 
@@ -103,20 +102,19 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
       </div>
 
       <div class="field-checkbox mb-3 d-none">
-        <p-checkbox v-model="user.onlyOne" placeholder="_"
-        ></p-checkbox>
+        <p-checkbox v-model="user.onlyOne" placeholder="_"></p-checkbox>
         <label>Запретить одновременный вход</label>
       </div>
     </template>
   </div>
 
-  <?php if ($isAdmin && USE_DATABASE) { ?>
+  <?php if ($main->availablePage('users') && $isAdmin) { ?>
     <div class="col-6 border" id="controlForm">
       <h3 class="col text-center">Управление доступом</h3>
 
       <div class="input-group my-3">
         <span class="input-group-text">Добавить тип доступа</span>
-        <p-input-text v-model="permission.name" :class="'form-control'"
+        <p-input-text v-model="permission.name" class="form-control"
         ></p-input-text>
         <p-button v-tooltip.bottom="'Добавить тип доступа'" icon="pi pi-plus-circle" class="p-button-success"
                   @click="addPermission"></p-button>
@@ -143,7 +141,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
              v-tooltip.bottom="'Теги особых свойств (через пробел):\n\'защита/guard\' - защита от удаления\n'"
           ></i>
         </span>
-        <p-input-text v-model="permission.tags" :class="'form-control'"
+        <p-input-text v-model="permission.tags" class="form-control"
                       :disabled="isPermissionDelete"
                       @change="changePermissionTags"
         ></p-input-text>
@@ -155,8 +153,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
           <i class="pi pi-tag" v-tooltip.bottom="'Если в `Доступные` пусто, значит доступны все'"></i>
         </p>
         <p-picklist v-model="permission.menu" data-key="id"
-                    list-style="height:220px"
-                    :class="'w-100'"
+                    list-style="height:220px" class="w-100"
                     @selection-change="pickedChange"
         >
           <template #source>
@@ -222,21 +219,26 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
   <?php } ?>
 
   <?php if ($isAdmin && $main->availablePage('orders')) { ?>
-    <div class="col-6 border" id="statsForm">
-      <h3 class="w-100 mt-3 text-center">Статусы</h3>
-      <form action="#" id="ordersStatusForm" class="col">
-        <div class="input-group my-3">
-          <span class="input-group-text flex-grow-1">Настройка статусов заказов</span>
-          <button type="button" class="btn btn-outline-secondary" data-action="addOrderStatusField">
-            <i class="pi pi-plus-circle align-text-bottom pi-green" data-action="addOrderStatusField"></i>
-          </button>
-          <button type="button" class="btn btn-outline-secondary" data-action="removeOrderStatusField">
-            <i class="pi pi-times-circle align-text-bottom pi-red" data-action="removeOrderStatusField"></i>
-          </button>
-        </div>
-        <div class="col" data-field="statusField"></div>
-      </form>
+    <setting-order-status :prop-status-def="statusDefault" @update="updateOrderStatus"></setting-order-status>
+  <?php } ?>
+
+  <?php if ($isAdmin) { ?>
+  <div class="col-6 border" id="otherForm">
+    <h3 class="col text-center">Прочее</h3>
+    <div class="form-floating mb-3">
+      <p-input-text v-model="phoneMaskUsers" class="form-control" placeholder="_"></p-input-text>
+      <label>Шаблон телефона для менеджеров</label>
     </div>
+    <div class="form-floating mb-3">
+      <p-input-text v-model="phoneMaskCustomers" class="form-control" placeholder="_"
+      ></p-input-text>
+      <label>Шаблон телефона для клиентов</label>
+    </div>
+    <div class="form-floating mb-3">
+      <p-input-text v-model="phoneMaskGlobal" class="form-control" placeholder="_"></p-input-text>
+      <label>Шаблон телефона для остальных пользователей</label>
+    </div>
+  </div>
   <?php } ?>
 
   <div class="col-12 text-center">
@@ -245,7 +247,7 @@ $catalogProperties = in_array('catalog', $main->getSideMenu());
     ></p-button>
   </div>
 
-  <?php if ($catalogProperties) { ?>
+  <?php if ($main->availablePage('catalog')) { ?>
     <hr>
     <div class="col-12" id="propertiesWrap($event)">
       <p-accordion @tab-open="openAccordion($event)">

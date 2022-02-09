@@ -39,64 +39,64 @@ export const handson = {
 
 
   optionDb: (() => f.CSV_DEVELOP
-    /**
-     * Настройки DataBase для разработки
-     */
-                   ? {}
-    /**
-     * Настройки DataBase продакшн
-     * */
-                   : {})(),
+  /**
+   * Настройки DataBase для разработки
+   */
+  ? {}
+  /**
+   * Настройки DataBase продакшн
+   * */
+  : {})(),
 
 
   optionCsv: (() => f.CSV_DEVELOP
-    /**
-     * Настройки СSV для разработки
-     */
-                    ? {}
-    /**
-     * Настройки СSV продакшн
-     */
-                    : {
-      hiddenRows: {rows: [0]}, // Не показывать заголовок
+  /**
+   * Настройки СSV для разработки
+   */
+  ? {}
+  /**
+   * Настройки СSV продакшн
+   */
+  : {
+    hiddenRows: {rows: [0]}, // Не показывать заголовок
 
-      beforeRemoveCol(ind, count, columns) {
-        for (const cIndex of columns) {
-          const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
-          if (important) {
-            f.showMsg('Ключевые значения нельзя удалить', 'error');
-            throw new Error('try to delete important values!');
-          }
+    beforeRemoveCol(ind, count, columns) {
+      for (const cIndex of columns) {
+        const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
+        if (important) {
+          f.showMsg('Ключевые значения нельзя удалить', 'error');
+          throw new Error('try to delete important values!');
         }
-      },
-      beforeRemoveRow(ind, count, rows) {
-        for (const rIndex of rows) {
-          const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
-          if (important) {
-            f.showMsg('Ключевые значения нельзя удалить', 'error');
-            throw new Error('try to delete important values!');
-          }
+      }
+    },
+    beforeRemoveRow(ind, count, rows) {
+      for (const rIndex of rows) {
+        const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
+        if (important) {
+          f.showMsg('Ключевые значения нельзя удалить', 'error');
+          throw new Error('try to delete important values!');
         }
-      },
+      }
+    },
 
-      // Перебор всех ячеек
-      cells(row, col) {
-        if (row === 0 || this.hasOwnProperty('readOnly')) return; // Первую строку пропускаем
-        const cell = this.instance.getDataAtCell(row, col), res = {readOnly: false};
+    // Перебор всех ячеек
+    cells(row, col) {
+      if (row === 0 || this.hasOwnProperty('readOnly')) return; // Первую строку пропускаем
+      const cell = this.instance.getDataAtCell(row, col), res = {readOnly: false};
 
-        if (!cell) return res;
+      if (!cell) return res;
 
-        res.readOnly = /^(c_|d_)/i.test(cell);
-        if (cell === '+' || cell === '-') {
-          res.type = 'checkbox';
-          res.checkedTemplate = '+';
-          res.uncheckedTemplate = '-';
-        }
-        else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
+      res.readOnly = /^(c_|d_)/i.test(cell);
+      if (cell === '+' || cell === '-') {
+        res.type = 'checkbox';
+        res.checkedTemplate = '+';
+        res.uncheckedTemplate = '-';
+      }
+      else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
 
-        return res;
-      },
-    })(),
+      return res;
+    },
+  })(),
 
   contextDb: {
     contextMenu: {

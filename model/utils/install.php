@@ -10,16 +10,16 @@ $dir = str_replace(INSTALL_PATH, '', $dir);
 //echo var_dump($_GET);
 extract($_GET);
 
-if(isset($ready)) {
-	$upDir = '../';
+if (isset($ready)) {
+  $upDir = '../';
 
-	if ($pathSite === '') {
-		$pathSite = '/';
-	}
+  if ($pathSite === '') {
+    $pathSite = '/';
+  }
 
-	if ($server === 'Apache') {
-		$serverFile        = '.htaccess';
-		$serverFileContent = <<<conf
+  if ($server === 'Apache') {
+    $serverFile        = '.htaccess';
+    $serverFileContent = <<<conf
 # Закрыть доступ всем
 # deny from all
 
@@ -30,9 +30,9 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([^?]*) $pathSite\index.php?targetPage=$1 [L,QSA]
 conf;
-	} else {
-		$serverFile        = $nginxFile;
-		$serverFileContent = <<<conf
+  } else {
+    $serverFile        = $nginxFile;
+    $serverFileContent = <<<conf
 server {
     listen         %ip%:%httpport%;
     listen         %ip%:%httpsport% ssl;
@@ -105,11 +105,11 @@ server {
     }
 }
 conf;
-	}
+  }
 
-	file_put_contents($upDir . $serverFile, $serverFileContent);
+  file_put_contents($upDir . $serverFile, $serverFileContent);
 
-	$config = <<<config
+  $config = <<<config
 <?php //if ( !defined('MAIN_ACCESS')) die('access denied!');
 
 // Путь от корня сайта
@@ -125,14 +125,14 @@ if ( !defined('PATH_SCRIPT')) define('PATH_SCRIPT', 'assets/js/');
 //----------------------------------------------------------------------------------------------------------------------
 // DB connect/config
 \$dbConfig = [
-	'dbHost'     => '$dbHost',
-	'dbName'     => '$dbName',
-	'dbUsername' => '$dbUsername',
-	'dbPass'     => '$dbPass'
+  'dbHost'     => '$dbHost',
+  'dbName'     => '$dbName',
+  'dbUsername' => '$dbUsername',
+  'dbPass'     => '$dbPass'
 ];
 config;
 
-	file_put_contents($upDir . 'config.php', $config);
+  file_put_contents($upDir . 'config.php', $config);
 }
 
 ?>

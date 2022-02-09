@@ -17,7 +17,7 @@ trait Authorization {
    */
   static $AVAILABLE_ACTION = ['loadCVS', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
 
-  private $id, $login, $name;
+
 
   /**
    * @var string
@@ -30,26 +30,30 @@ trait Authorization {
   private $sideMenu = [];
 
   /**
-   * @var bool
+   * @var object [admin, login, id, name]
    */
-  private $admin = true;
+  private $user = [];
 
   /**
    * @param $field
    * @return mixed
    */
   public function getLogin(string $field = 'login') {
-    return $this->$field;
+    return $this->user[$field];
   }
 
   /**
-   * @param array $session
+   * @param array $user
    * @return $this|Main
    */
-  public function setLogin(array $session): Main {
-    $this->login = $session['login'];
-    $this->name  = $session['name'];
-    $this->id    = $session['priority'];
+  public function setLogin(array $user): Main {
+    $this->user['login'] = $_SESSION['login'];
+    $this->user['name']  = $_SESSION['name'];
+    $this->user['id']    = $_SESSION['id'];
+    $this->user['onlyOne'] = $user['onlyOne'] ?? false;
+    $this->user['permission'] = $user['permission'] ?? [];
+
+    $this->user['admin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
     $this->setLoginStatus('ok');
     return $this;
   }
@@ -80,10 +84,10 @@ trait Authorization {
     $this->setLoginStatus('no');
     session_start();
 
-    if (isset($_SESSION['hash'])
-        && $_SESSION['id'] === $_COOKIE['PHPSESSID']
-        && $this->db->checkUserHash($_SESSION)) {
-        $this->setLogin($_SESSION);
+    if (isset($_SESSION['hash']) && isset($_SESSION['PHPSESSID'])
+        && $_SESSION['PHPSESSID'] === $_COOKIE['PHPSESSID']) {
+      $user = $this->db->checkUserHash($_SESSION);
+      $user && $this->setLogin($user);
     }
 
     return $this;
@@ -153,7 +157,6 @@ trait Authorization {
   public function availablePage(string $page): bool {
     return in_array($page, $this->getSideMenu());
   }
-
 }
 
 /**
@@ -342,7 +345,7 @@ final class Main {
   /**
    * @var array
    */
-  private $dbTables;
+  private $dbTables = [];
 
   /**
    * @var array
@@ -436,7 +439,7 @@ final class Main {
       // Меню
       $this->setSideMenu();
 
-      if (DB_TABLE_IN_SIDEMENU) {
+      if ($this->availablePage('admindb') && DB_TABLE_IN_SIDEMENU) {
         $dbTables = [];
         if (USE_DATABASE) {
           if (CHANGE_DATABASE) {
@@ -560,4 +563,3 @@ final class Main {
     return "<input type='hidden' id='$dataId' value='$rate'>";
   }
 }
-
