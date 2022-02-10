@@ -159,7 +159,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'customer_id' => $customerId,
           'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
           'important_value' => $importantVal ?? '{}',
-          'status_id'       => $statusId ?? 2, // TODO по умолчанию сохранять из настроек
+          'status_id'       => $main->getSettings('statusDefault'),
           'save_value'      => $saveVal ?? '{}',
           'report_value'    => addCpNumber($orderId, $reportVal),
         ]];

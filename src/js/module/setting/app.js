@@ -1,37 +1,15 @@
 'use strict';
 
-import permission from "./permission";
-import manager from "./managerField";
-import properties from "./properties";
-
 import sf from './settingFunc';
 
-const app = {
+export default {
+  components: {},
   data: () => {
     const d = {
-      ...permission.data,
-      ...manager.data,
-      ...properties.data,
-
       isAdmin: false,
 
-      mail: {
-        managerTarget    : '', // Почта получения заказов
-        managerTargetCopy: '', // Дополнительная Почта получения заказов
-        subject          : '', // тема письма
-        fromName         : '', // Имя отправителя
-      },
-
-      user: {
-        change        : false,
-        name          : '',
-        login         : '',
-        password      : '',
-        passwordRepeat: '',
-        fields        : {},
-        onlyOne       : false,
-        showAllField  : false,
-      },
+      mail: {},
+      user: {},
 
       rate: {
         autoRefresh: true,
@@ -47,15 +25,8 @@ const app = {
 
     return sf.loadData(d);
   },
-  watch: {
-    user: {
-      deep: true,
-      handler() {
-        this.user.change = true;
-      },
-    },
-  },
   computed: {},
+  watch   : {},
   methods: {
     setFieldMask() {
       /*let node = this.$refs['mailTarget'];
@@ -65,9 +36,27 @@ const app = {
        node && f.initMask(node.$el);*/
     },
 
+    updateMail(m) {
+      this.queryParam.mail = JSON.stringify(m);
+    },
+    updateUser(u) {
+      this.queryParam.user = JSON.stringify(u);
+    },
+    updatePermission(p) {
+      this.queryParam.permissions = JSON.stringify(p)
+    },
+    updateManagerFields(mF) {
+      this.queryParam.managerFields = JSON.stringify(mF);
+    },
+    updateRate(r) {
+      this.queryParam.rate = JSON.stringify(r);
+    },
     updateOrderStatus(s) {
       this.queryParam.orderStatus = JSON.stringify(s.orderStatus);
       this.queryParam.statusDefault = s.statusDefault;
+    },
+    updateProperties(p) {
+      this.queryParam.properties = JSON.stringify(p);
     },
 
     query() {
@@ -81,37 +70,13 @@ const app = {
     // Event function
     // -------------------------------------------------------------------------------------------------------------------
 
-    editRate() {
-      f.showMsg('asdf');
-    },
-
     saveSetting() {
       this.queryParam.cmsAction = 'saveSetting';
-      this.queryParam.user = JSON.stringify(this.user);
-      if (this.isAdmin) {
-        this.queryParam.mail = JSON.stringify(this.mail);
-        this.queryParam.permissions = this.permissionsChanged ? JSON.stringify(this.permissionsData): '[]';
-        this.queryParam.managerFields = JSON.stringify(this.managerFields);
-
-        //this.permissionsChanged = false;
-      }
-
       this.query().then(s => s.status && f.showMsg('Сохранено'));
     },
   },
-};
-
-export default {
-  components: {},
-  data: app.data,
-  computed: Object.assign(app.computed, permission.computed, manager.computed, properties.computed),
-  watch   : Object.assign(app.watch, permission.watch, manager.watch, properties.watch),
-  methods : Object.assign(app.methods, permission.methods, manager.methods, properties.methods),
   mounted() {
     this.setFieldMask();
-
-    this.setPermission();
-
     //this.loadingPage = false;
   },
 }

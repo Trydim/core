@@ -47,6 +47,8 @@ if (USE_DATABASE && $user['isAdmin']) {
     $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
   }
 
+  $field['footerContent'] .= $main->getCourse();
+
   unset($permissions, $status);
 }
 

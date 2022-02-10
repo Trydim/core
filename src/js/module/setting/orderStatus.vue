@@ -26,7 +26,6 @@
   </div>
 </template>
 
-
 <script>
 
 export default {
@@ -41,13 +40,7 @@ export default {
     status: {},
     statusDef: undefined,
   }),
-  watch: {
-    status: {
-      deep: true,
-      handler() { this.emits() },
-    },
-    statusDef() { this.emits() },
-  },
+
   methods: {
     loadData() {
       const node = f.qS('#dataOrdersStatus');
@@ -75,9 +68,16 @@ export default {
       this.status[index].delete = true;
     }
   },
-  mounted() {
+  created() {
     this.statusDef = this.propStatusDef;
     this.loadData();
+
+    this.$watch('status', {
+      deep: true,
+      handler() { this.emits() },
+    });
+
+    this.$watch('statusDef', () => this.emits());
   },
 }
 

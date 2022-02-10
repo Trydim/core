@@ -1,10 +1,74 @@
-'use strict';
+<template>
+  <div class="col-6 border" id="controlForm">
+    <h3 class="col text-center">Управление доступом</h3>
+
+    <div class="input-group my-3">
+      <span class="input-group-text">Добавить тип доступа</span>
+      <p-input-text v-model="permission.name" class="form-control"
+      ></p-input-text>
+      <p-button v-tooltip.bottom="'Добавить тип доступа'" icon="pi pi-plus-circle" class="p-button-success"
+                @click="addPermission"></p-button>
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">Тип доступа</span>
+      <p-select option-label="name" option-value="id"
+                :editable="true"
+                :options="permissionsData"
+                v-model="permission.id"
+                class="col"
+                @input="changePermission"
+      ></p-select>
+      <p-button v-tooltip.bottom="isPermissionDelete ? 'Отменить удаление' : 'Удалить тип доступа'"
+                icon="pi pi-trash" class="p-button-danger"
+                @click="removePermission"></p-button>
+    </div>
+
+    <div class="input-group mb-3">
+        <span class="input-group-text">
+          Теги
+          <i class="ms-1 pi pi-tag"
+             v-tooltip.bottom="'Теги особых свойств (через пробел):\n\'защита/guard\' - защита от удаления\n'"
+          ></i>
+        </span>
+      <p-input-text v-model="permission.tags" class="form-control"
+                    :disabled="isPermissionDelete"
+                    @change="changePermissionTags"
+      ></p-input-text>
+    </div>
+
+    <div class="col mb-3">
+      <p class="col-12 mt-2 text-center">
+        Доступные меню
+        <i class="pi pi-tag" v-tooltip.bottom="'Если в `Доступные` пусто, значит доступны все'"></i>
+      </p>
+      <p-picklist v-model="permission.menu" data-key="id"
+                  list-style="height:220px" class="w-100"
+                  @selection-change="pickedChange"
+      >
+        <template #source>
+          Возможные
+        </template>
+        <template #target>
+          Доступные
+        </template>
+        <template #item="slotProps">
+          <div class="product-item">
+            {{ slotProps.item.name }}
+          </div>
+        </template>
+      </p-picklist>
+    </div>
+  </div>
+</template>
+
+<script>
 
 export default {
-  data: {
+  emits: ['update'],
+  data: () => ({
     errorTimeOut: false,
 
-    permissionsChanged: false,
     permissionsChangeId: 0,
     permissionsData: [],
     permissionsMenu: [],
@@ -23,7 +87,7 @@ export default {
       },
       menu: [[], []],
     },
-  },
+  }),
   watch: {
     'permission.id'(newValue, oldValue) {
       if (typeof newValue === 'string') {
@@ -32,13 +96,6 @@ export default {
       }
 
       this.setPermission();
-    },
-
-    permissionsData: {
-      deep: true,
-      handler() {
-        this.permissionsChanged = true;
-      },
     },
   },
   computed: {
@@ -52,6 +109,17 @@ export default {
     },
   },
   methods: {
+    loadData() {
+      const node = f.gI('dataPermissions'),
+            data = JSON.parse(node.value);
+
+      this.permissionsData = data.permissions;
+      this.permissionsMenu = data.menu;
+      this.permission.id = data.permissions[0].id;
+
+      node.remove();
+    },
+
     checkPermName(name) {
       return [...this.permissionNames].includes(name.toLowerCase());
     },
@@ -132,4 +200,14 @@ export default {
       this.permission.current.properties.menu = this.permission.menu[1].map(m => m.id).join(',');
     }
   },
+  created() {
+    this.loadData();
+
+    this.$watch('permissionsData', {
+      deep: true,
+      handler() { this.$emit('update', this.permissionsData) },
+    });
+  },
 }
+
+</script>

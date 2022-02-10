@@ -33,8 +33,13 @@ import Textarea from 'primevue/textarea';
 // Custom components
 // ---------------------------------------------------------------------------------------------------------------------
 import PickList from './components/picklist.esm';
-//import UserField from "./userField.vue";
+import Mail from "./mail.vue";
+import UserFields from "./userField.vue";
+import Permission from "./permission.vue";
+import managerFields from "./managerField.vue";
+import Rate from "./rate.vue";
 import OrderStatus from "./orderStatus.vue";
+import Properties from "./properties.vue";
 
 // Import Directives
 // ---------------------------------------------------------------------------------------------------------------------
@@ -74,8 +79,13 @@ app.component('p-textarea', Textarea);
 //app.component('p-file', FileUpload);
 
 // Custom component
-//app.component('c-user-form', UserField);
+app.component('setting-mail', Mail);
+app.component('setting-user', UserFields);
+app.component('setting-permission', Permission);
+app.component('setting-manager-field', managerFields);
+app.component('setting-rate', Rate);
 app.component('setting-order-status', OrderStatus);
+app.component('setting-properties', Properties);
 
 app.directive('tooltip', Tooltip);
 
