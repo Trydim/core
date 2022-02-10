@@ -180,7 +180,7 @@ class Docs {
   }
 
   private function initExcel() {
-    require_once './Xlsxwriter.php';
+    require_once 'Xlsxwriter.php';
     $this->docs = new XLSXWriter();
     count($this->excelHeader) && $this->docs->writeSheetHeader(gTxt('Sheet1'), $this->excelHeader);
 
