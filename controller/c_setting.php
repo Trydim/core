@@ -16,7 +16,6 @@ $user = $main->db->getUserById($main->getLogin('id'));
 $user = [
   'name'         => $user['name'],
   'login'        => $user['login'],
-  'permissionId' => $user['permission_id'],
   'isAdmin'      => $main->getLogin('admin'),
   'contacts'     => $user['contacts'],
   'customization'=> $user['customization'],

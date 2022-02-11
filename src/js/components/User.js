@@ -11,8 +11,7 @@ export default class {
     }
 
     this.data = JSON.parse(node.value);
-    this.data.fields = JSON.parse(this.data.contacts);
-    delete this.data.contacts // после переименования не потребуется.
+    this.data.fields = JSON.parse(this.data.fields || '{}');
 
     this.setSettings();
 

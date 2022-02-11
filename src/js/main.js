@@ -146,7 +146,7 @@ const onEvent = () => {
 
   cancelFormSubmit();
   dictionaryInit();
-  f.settingInit();
+  f.getSetting();
   f.relatedOption();
   storageLoad();
   onEvent();
