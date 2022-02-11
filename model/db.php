@@ -517,7 +517,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $param[$id] = [];
           $contacts = [];
           foreach ($authForm as $k => $v) {
-            if (in_array($k, ['login', 'name', 'permission_id'])) $param[$id][$k] = $v;
+            if (in_array($k, ['login', 'name', 'permissionId'])) $param[$id][$k] = $v;
             else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);

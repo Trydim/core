@@ -102,7 +102,7 @@ class Docs {
       'margin_bottom' => 5,
       'margin_header' => 0,
       'margin_footer' => 5,
-      /*'orientation'   => 'L',*/
+      'orientation'   => 'L',
     ];
 
     $this->imgPath = ($this->docsType !== 'print' ? $_SERVER['DOCUMENT_ROOT'] : '') . PATH_IMG;
@@ -129,7 +129,7 @@ class Docs {
   }
 
   private function initPdf() {
-    require_once CORE . 'libs/vendor/autoload.php';
+    require_once ABS_SITE_PATH . CORE . 'libs/vendor/autoload.php';
 
     switch (PDF_LIBRARY) {
       case 'mpdf':

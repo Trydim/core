@@ -11,6 +11,7 @@
   ],
   "require": {
     "phpunit/phpunit": "9.5.12",
+    "mpdf/mpdf": "v8.0.17",
     "ext-json": "*",
     "ext-zlib": "*"
   }

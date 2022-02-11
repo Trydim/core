@@ -411,18 +411,20 @@ export default {
    *
    * @param {HTMLElement} target - loading field
    * @param {object} report - send to pdf
-   * @param {FormData} data - object of formData to send in query Body
-   * @param {function} finishOk
-   * @param {function} err
+   * @param {string?} report.fileName - result file name without extension
+   * @param {string?} report.fileTpl - pdf template file without extension
+   * @param {FormData?} data - object of formData to send in query Body
+   * @param {function?} finishOk
+   * @param {function?} err
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
     f.setLoading(target);
     target.setAttribute('disabled', 'disabled');
 
     let fileName = report.fileName || false;
-    //data.set('dbAction', 'DB');
     data.set('mode', 'docs');
     data.set('docsAction', 'pdf');
+    data.set('fileTpl', report.fileTpl || 'default');
     data.set('reportVal', JSON.stringify(report));
 
     f.Post({data}).then(data => {
