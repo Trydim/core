@@ -1,4 +1,4 @@
-<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var string $permission from user.php
@@ -26,7 +26,7 @@
 	<thead>
 	<tr>
     <th></th>
-    <?php if(isset($columns)) foreach ($columns as $item) { ?>
+    <?php if (isset($columns)) foreach ($columns as $item) { ?>
       <th>
         <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
       </th>
@@ -36,7 +36,7 @@
 	<tbody>
   <tr>
     <td><input type="checkbox" class="" data-id="${U.ID}"></td>
-		<?php if(isset($columns)) foreach ($columns as $item) { ?>
+		<?php if (isset($columns)) foreach ($columns as $item) { ?>
       <td>${<?= $item['dbName']; ?>}</td>
 		<?php } ?>
   </tr>

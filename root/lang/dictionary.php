@@ -1,4 +1,4 @@
-<?php $mess = [
+<?php return [
   'paramConfig' => 'Конфигурация',
   'pipeConfig'  => 'Конфигурация Трубы',
   'price'       => 'Прайс',

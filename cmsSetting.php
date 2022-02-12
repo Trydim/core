@@ -9,7 +9,7 @@ define('SITE_PATH', str_replace('//', '/', $siteDir));
 
 require ABS_SITE_PATH . 'config.php'; // Public config
 
-!isset($dbConfig) && $dbConfig = [];
+$dbConfig = $dbConfig ?? [];
 
 !defined('CORE') && define('CORE', basename( __DIR__ ) . '/');
 const VIEW = CORE . 'views/';

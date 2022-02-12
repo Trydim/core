@@ -4,7 +4,7 @@ namespace RedBeanPHP;
 
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
-require 'rb.php';
+require __DIR__ . '/rb.php';
 
 class Db extends \R {
   private $currentUserID = 2;
@@ -12,7 +12,7 @@ class Db extends \R {
   private $login;
 
   /**
-   * Plugin readbaen for special name
+   * Plugin readBean for special name
    * @param $type
    * @param $count
    *
@@ -62,19 +62,11 @@ class Db extends \R {
   }
 
   /**
-   * @param $id
-   */
-  public function setCurrentUserId() {
-    if (!isset($_SESSION)) session_start();
-    if (isset($_SESSION['priority'])) $this->currentUserID = $_SESSION['priority'];
-  }
-
-  /**
    * What does this function do?
    * @param $varName
    * @return string
    */
-  public function setQueryAs($varName) {
+  public function setQueryAs($varName): string {
     return AQueryWriter::camelsSnake($varName) . " AS '$varName'";
   }
 
@@ -88,7 +80,7 @@ class Db extends \R {
    *
    * @return array
    */
-  public function selectQuery(string $dbTable, $columns = '*', string $filters = '') {
+  public function selectQuery(string $dbTable, $columns = '*', string $filters = ''): array {
     $simple = false;
     if (!is_array($columns)) {
       $simple = $columns !== '*';
@@ -109,9 +101,9 @@ class Db extends \R {
    * @param string $dbTable
    * @param $param - link
    * @param boolean $change - link
-   * @return array $result
+   * @return array
    */
-  public function checkTableBefore($curTable, string $dbTable, &$param, bool $change) {
+  public function checkTableBefore($curTable, string $dbTable, &$param, bool $change): array {
     $result = [];
 
     array_map(function ($col) use (&$result, $dbTable, &$param, $change) {
@@ -181,7 +173,7 @@ class Db extends \R {
    *
    * @return array|null
    */
-  public function loadTable($dbTable) {
+  public function loadTable($dbTable): ?array {
     return self::getAll('SELECT * FROM ' . $dbTable);
   }
 
@@ -192,9 +184,9 @@ class Db extends \R {
    *
    * @return integer
    */
-  public function checkHaveRows($dbTable, $columnName, $value) {
-    return intval(self::getCell('SELECT count(*) FROM ' . $dbTable .
-                                ' WHERE ' . $columnName . ' = :value', [':value' => $value]));
+  public function checkHaveRows($dbTable, $columnName, $value): int {
+    return intval(self::getCell("SELECT count(*) FROM $dbTable
+                                     WHERE $columnName = :value", [':value' => $value]));
   }
 
   /**
@@ -208,7 +200,7 @@ class Db extends \R {
     $count = 0;
     if ($primaryKey !== 'ID') {
       foreach ($ids as $id) {
-        $count += self::exec("DELETE FROM `$dbTable` WHERE `$primaryKey` = '$id'");
+        $count += self::exec("DELETE FROM $dbTable WHERE $primaryKey = '$id'");
       }
       return $count;
     }
@@ -255,8 +247,9 @@ class Db extends \R {
    */
   public function getColumnsTable($dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
-       COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
-		FROM information_schema.COLUMNS where TABLE_SCHEMA = :dbName AND  TABLE_NAME = :dbTable',
+                                    COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
+		                         FROM information_schema.COLUMNS 
+                             WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
       [':dbName'  => $this->dbName,
        ':dbTable' => $dbTable
       ]);

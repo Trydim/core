@@ -114,7 +114,7 @@ class Docs {
     $footerPage = '';
 
     ob_start();
-    include($this->filePath);
+    include $this->filePath;
     $this->content = ob_get_clean();
 
     $this->footerPage = $footerPage;
@@ -123,7 +123,7 @@ class Docs {
   private function setExcelData() {
     if ($this->useDefault) { $this->setExcelDefaultData(); return; }
     $rows = [];
-    include($this->filePath);
+    include $this->filePath;
     $this->data = $rows;
     isset($header) && $this->excelHeader = $header;
   }
@@ -180,7 +180,7 @@ class Docs {
   }
 
   private function initExcel() {
-    require_once 'Xlsxwriter.php';
+    require_once __DIR__ . '/Xlsxwriter.php';
     $this->docs = new XLSXWriter();
     count($this->excelHeader) && $this->docs->writeSheetHeader(gTxt('Sheet1'), $this->excelHeader);
 

@@ -58,6 +58,6 @@ $field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . 
 unset($value, $propSetting, $mess);
 
 ob_start();
-include $pathTarget;
+require $pathTarget;
 $field['content'] = ob_get_clean();
 $html = template('base', $field);

@@ -177,24 +177,31 @@ function getSettingFile(bool $decode = true, bool $assoc = true) {
   return $decode ? json_decode('[]', $assoc) : '[]';
 }
 
-function gTxt($str) {
+/**
+ * translate text
+ * @param string $str
+ * @return string
+ */
+function gTxt(string $str): string {
   static $txt;
   if (!$txt) {
-    $mess = [];
-    include ABS_SITE_PATH . 'lang/dictionary.php';
-    $txt = $mess;
+    $txt = include ABS_SITE_PATH . 'lang/dictionary.php';
   }
-  return isset($txt[$str]) ? $txt[$str] : $str;
+  return $txt[$str] ?? $str;
 }
 
-function gTxtDB($db, $str) {
+/**
+ * translate dataBase text
+ * @param string $db
+ * @param string $str
+ * @return string
+ */
+function gTxtDB(string $db, string $str): string {
   static $txt;
   if (!$txt) {
-    $mess = [];
-    include ABS_SITE_PATH . 'lang/dbDictionary.php';
-    $txt = $mess;
+    $txt = include ABS_SITE_PATH . 'lang/dbDictionary.php';
   }
-  return isset($txt[$db][$str]) ? $txt[$db][$str] : $str;
+  return $txt[$db][$str] ?? $str;
 }
 
 /**
@@ -428,15 +435,15 @@ function template(string $path = 'base', array $vars = []): string {
 
   // Абсолютный путь файла
   if (file_exists($path)) {
-    include($path);
+    include $path;
   }
   // В корне сайта в public
   else if (file_exists(ABS_SITE_PATH . "public/views/$path")) {
-    include(ABS_SITE_PATH . "public/views/$path");
+    include ABS_SITE_PATH . "public/views/$path";
   }
   // в сms
   else if (file_exists(CORE . "views/$path")) {
-    include(CORE . "views/$path");
+    include CORE . "views/$path";
   } else echo 'Template not found: ' . $path;
 
   return ob_get_clean();
@@ -446,7 +453,7 @@ function template(string $path = 'base', array $vars = []): string {
  * @param $value {string}
  * @return string
  */
-function translit($value) {
+function translit($value): string {
   $converter = [
     'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
     'е' => 'e', 'ё' => 'e', 'ж' => 'zh', 'з' => 'z', 'и' => 'i',
