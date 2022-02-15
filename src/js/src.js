@@ -10,7 +10,7 @@ import * as module from './components/component.js';
 import {Debugger} from "./components/Debugger";
 import {Modal} from './components/Modal.js';
 import {CustomSelect} from './components/CustomSelect.js';
-import LocalStorage from "./components/localStorage.js";
+import LocalStorage from "./components/LocalStorage.js";
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
 import {Valid} from "./components/Valid";
@@ -109,20 +109,20 @@ const m = {
    * fileFieldSelector: string,
    * initMask: boolean,
    * phoneMask: string,
-   * cssMask: object}} param
-   * @param {function} param.sendFunc - exec func for event click (default = () => {}),
-   * @param {string/HTMLElement} param.formSelector - form selector (default: #authForm),
-   * @param {string/HTMLElement} param.submitSelector - btn selector (default: #btnConfirm),
-   * @param {string} param.fileFieldSelector - field selector for show attachment files information,
-   * @param {object} param.cssClass = {
-   *     error: will be added class for node (default: 'cl-input-error'),
-   *     valid: will be added class for node (default: 'cl-input-valid'),
-   *   },
-   * @param {boolean} param.debug: submit btn be activated (def: false),
-   * @param {boolean} param.initMask: use mask for field whit type "tel" (def: true),
+   * cssMask: object}} param <p>
+   * @param {function} param.sendFunc - exec func for event click (default = () => {}), <p>
+   * @param {string/HTMLElement} param.formSelector - form selector (default: #authForm), <p>
+   * @param {string/HTMLElement} param.submitSelector - btn selector (default: #btnConfirm), <p>
+   * @param {string} param.fileFieldSelector - field selector for show attachment files information, <p>
+   * @param {object} param.cssClass = { <p>
+   *     error: will be added class for node (default: 'cl-input-error'), <p>
+   *     valid: will be added class for node (default: 'cl-input-valid'), <p>
+   *   }, <p>
+   * @param {boolean} param.debug: submit btn be activated (def: false), <p>
+   * @param {boolean} param.initMask: use mask for field whit type "tel" (def: true), <p>
    * @param {string} param.phoneMask: mask matrix (def: from global constant),
    *
-   * @example Mask: new f.Valid({phoneMask: '+1 (\_\_) \_\_\_'});
+   * @example Mask: new f.Valid({phoneMask: '+1 (\_\_) \_\_\_ \_\_ \_\_'});
    */
   Valid,
   //initValid : (sendFunc, idForm, idSubmit) => module.valid.init(sendFunc, idForm, idSubmit),

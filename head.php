@@ -1,4 +1,4 @@
-<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 use cms\Main;
 /**
@@ -6,12 +6,12 @@ use cms\Main;
  * @var $dbConfig - from root config
  */
 
-require_once basename( __DIR__ ) . '/cmsSetting.php';
+require_once __DIR__ . '/cmsSetting.php';
 
 $main = new Main(USE_DATABASE ? $dbConfig : []);
 $main->setHooks();
 
-if (isset($_REQUEST['mode'])) require 'model/main.php';
+if (isset($_REQUEST['mode'])) require __DIR__ . '/model/main.php';
 else {
   $html = '';
 

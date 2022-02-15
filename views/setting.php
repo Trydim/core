@@ -1,36 +1,49 @@
-<?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var $main - global object
  * @var $admin - from controller
  */
 
+$isAdmin = $main->getLogin('admin');
 
-$field['content'] = template('parts/settingContent');
+ob_start();
+?>
+<div class="row container m-auto" id="settingForm">
+  <?php if ($isAdmin) { ?>
+    <setting-mail :prop-mail="mail" @update="updateMail"></setting-mail>
+  <?php } ?>
 
-if ($main->getSettings('admin')) {
-  $field['footerContent'] .= <<<footerContent
-<template id="rateModalTmp">
-  <table class="text-center table table-striped">
-    <thead>
-      <tr>
-        <th>Код</th>
-        <th>Имя</th>
-        <th>Курс</th>
-        <th>Основная</th>
-        <th>Обозначение</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-</template>
+  <setting-user :user-fields="managerFields" @update="updateUser"></setting-user>
 
-<template id="orderStatus">
-  <div class="input-group mb-3" data-field="orderStatusItem">
-    <input class="input-group-text col-2" data-field="key" disabled>
-    <input type="text" class="form-control" data-field="name">
+  <?php if ($main->availablePage('users') && $isAdmin) { ?>
+    <setting-permission @update="updatePermission"></setting-permission>
+
+    <setting-manager-field :prop-fields="managerFields" @update="updateManagerFields"></setting-manager-field>
+  <?php } ?>
+
+  <?php if ($isAdmin && USE_DATABASE) { ?>
+    <setting-rate @update="updateRate"></setting-rate>
+  <?php } ?>
+
+  <?php if ($isAdmin && $main->availablePage('orders')) { ?>
+    <setting-order-status :prop-status-def="statusDefault" @update="updateOrderStatus"></setting-order-status>
+  <?php } ?>
+
+  <?php if ($isAdmin) { ?>
+    <!-- Остальные опции -->
+  <?php } ?>
+
+  <div class="col-12 text-center">
+    <p-button v-tooltip.bottom="'Сохранить'" icon="pi pi-save" class="p-button-primary m-3"
+              label="Сохранить" @click="saveSetting"
+    ></p-button>
   </div>
-</template>
-footerContent;
-}
+
+  <?php if ($main->availablePage('catalog')) { ?>
+    <hr>
+    <setting-properties @update="updateProperties"></setting-properties>
+  <?php } ?>
+</div>
+<?php
+$field['content'] = ob_get_clean();

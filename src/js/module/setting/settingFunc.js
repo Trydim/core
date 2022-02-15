@@ -10,41 +10,24 @@ const conArrToObject = (arr, key) => arr.reduce((r, i) => {r[i[key]] = i; return
 
 export default {
   loadData(d) {
-    const setUser = () => {
-      const data = setData('#dataUser'),
-            contacts = JSON.parse(data.contacts),
-            customization = JSON.parse(data['customization']);
-
-      d.user.name = data.name;
-      d.user.login = data.login;
-      d.permission.id = +data['permissionId'];
-
-      Object.entries(contacts).forEach(([k, v]) => d.user.fields[k] = v);
-      Object.entries(customization).forEach(([k, v]) => d.user[k] = v);
-
-      d.queryParam.isAdmin = d.isAdmin = data.isAdmin || false;
-    };
     const setSetting = () => {
       const data = setData('#dataSettings');
 
-      d.mail.managerTarget     = data.managerTarget || '';
-      d.mail.managerTargetCopy = data.managerTargetCopy || '';
-      d.mail.subject           = data.subject || '';
-      d.mail.fromName          = data.fromName || '';
+      d.mail.target     = data['mailTarget'] || '';
+      d.mail.targetCopy = data['mailTargetCopy'] || '';
+      d.mail.subject    = data['mailSubject'] || '';
+      d.mail.fromName   = data['mailFromName'] || '';
 
-      debugger
       d.managerFields = data.managerFields || {};
-    };
-    const setPermissions = () => {
-      const data = setData('#dataPermissions');
 
-      d.permissionsData = data.permissions;
-      d.permissionsMenu = data.menu;
+      d.statusDefault = +data.statusDefault || 0;
+
+      d.phoneMaskUsers     = data.phoneMaskUsers || f.PHONE_MASK;
+      d.phoneMaskCustomers = data.phoneMaskCustomers || f.PHONE_MASK;
+      d.phoneMaskGlobal    = data.phoneMaskGlobal || f.PHONE_MASK;
     };
 
-    setUser();
     setSetting();
-    d.isAdmin && setPermissions();
 
     return d;
   },

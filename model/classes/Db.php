@@ -4,7 +4,7 @@ namespace RedBeanPHP;
 
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
-require 'rb.php';
+require __DIR__ . '/rb.php';
 
 class Db extends \R {
   private $currentUserID = 2;
@@ -12,7 +12,7 @@ class Db extends \R {
   private $login;
 
   /**
-   * Plugin readbaen for special name
+   * Plugin readBean for special name
    * @param $type
    * @param $count
    *
@@ -62,19 +62,11 @@ class Db extends \R {
   }
 
   /**
-   * @param $id
-   */
-  public function setCurrentUserId() {
-    if (!isset($_SESSION)) session_start();
-    if (isset($_SESSION['priority'])) $this->currentUserID = $_SESSION['priority'];
-  }
-
-  /**
    * What does this function do?
    * @param $varName
    * @return string
    */
-  public function setQueryAs($varName) {
+  public function setQueryAs($varName): string {
     return AQueryWriter::camelsSnake($varName) . " AS '$varName'";
   }
 
@@ -88,7 +80,7 @@ class Db extends \R {
    *
    * @return array
    */
-  public function selectQuery(string $dbTable, $columns = '*', string $filters = '') {
+  public function selectQuery(string $dbTable, $columns = '*', string $filters = ''): array {
     $simple = false;
     if (!is_array($columns)) {
       $simple = $columns !== '*';
@@ -109,9 +101,9 @@ class Db extends \R {
    * @param string $dbTable
    * @param $param - link
    * @param boolean $change - link
-   * @return array $result
+   * @return array
    */
-  public function checkTableBefore($curTable, string $dbTable, &$param, bool $change) {
+  public function checkTableBefore($curTable, string $dbTable, &$param, bool $change): array {
     $result = [];
 
     array_map(function ($col) use (&$result, $dbTable, &$param, $change) {
@@ -181,7 +173,7 @@ class Db extends \R {
    *
    * @return array|null
    */
-  public function loadTable($dbTable) {
+  public function loadTable($dbTable): ?array {
     return self::getAll('SELECT * FROM ' . $dbTable);
   }
 
@@ -192,9 +184,9 @@ class Db extends \R {
    *
    * @return integer
    */
-  public function checkHaveRows($dbTable, $columnName, $value) {
-    return intval(self::getCell('Select count(*) FROM ' . $dbTable .
-                                    ' WHERE ' . $columnName . ' = :value', [':value' => $value]));
+  public function checkHaveRows($dbTable, $columnName, $value): int {
+    return intval(self::getCell("SELECT count(*) FROM $dbTable
+                                     WHERE $columnName = :value", [':value' => $value]));
   }
 
   /**
@@ -208,7 +200,7 @@ class Db extends \R {
     $count = 0;
     if ($primaryKey !== 'ID') {
       foreach ($ids as $id) {
-        $count += self::exec("DELETE FROM `$dbTable` WHERE `$primaryKey` = '$id'");
+        $count += self::exec("DELETE FROM $dbTable WHERE $primaryKey = '$id'");
       }
       return $count;
     }
@@ -255,8 +247,9 @@ class Db extends \R {
    */
   public function getColumnsTable($dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
-       COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
-		FROM information_schema.COLUMNS where TABLE_SCHEMA = :dbName AND  TABLE_NAME = :dbTable',
+                                    COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
+		                         FROM information_schema.COLUMNS 
+                             WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
       [':dbName'  => $this->dbName,
        ':dbTable' => $dbTable
       ]);
@@ -881,10 +874,10 @@ class Db extends \R {
   /**
    * @param string $login
    * @param string $password
-   * @param false $status
+   * @param bool   $status
    * @return array|false
    */
-  public function getUserFromFile($login = '', $password = '', $status = false) {
+  public function getUserFromFile(string $login = '', string $password = '', bool $status = false) {
 
     if (file_exists(SYSTEM_PATH)) {
       $value = file(SYSTEM_PATH)[0];
@@ -931,11 +924,11 @@ class Db extends \R {
    * @return array|null
    */
   public function getUserByLogin($login) {
-    return self::getRow("SELECT hash, password, customization, 
-            p.ID as 'permId', p.name as 'permName', properties as 'permValue'
-            FROM users
-            LEFT JOIN permission p on users.permission_id = p.ID
-            WHERE login = :login", [':login' => $login]);
+    return self::getRow("SELECT login, users.name AS 'name', hash, password, customization, 
+                                    p.ID as 'permId', p.name as 'permName', properties as 'permValue'
+                             FROM users
+                             LEFT JOIN permission p on users.permission_id = p.ID
+                             WHERE login = :login", [':login' => $login]);
   }
 
   /**
@@ -957,9 +950,7 @@ class Db extends \R {
       return $this->getUserFromFile($login, $password);
     }
 
-    if (count($user) && password_verify($password, $user['password'])) {
-      return $user;
-    } else return false;
+    return count($user) && password_verify($password, $user['password']) ? $user : false;
   }
 
   public function changeUser($loginId, $param) {
@@ -1006,16 +997,20 @@ class Db extends \R {
     }
   }
 
+  /**
+   * @param $session
+   * @return array|bool[]|false
+   */
   public function checkUserHash($session) {
-    global $main;
     if (USE_DATABASE) {
       $user = $this->getUserByLogin($session['login']);
-      count($user) && $userParam = [
-        'permissionId' => intval($user['permId']),
-        'onlyOne' => isset(json_decode($user['customization'])->onlyOne),
-        'admin' => $user['permId'] === 'admin' || $user['permId'] === '1',
+      if (!count($user)) return false;
+
+      $userParam = [
+        'permissionId'  => intval($user['permId']),
+        'onlyOne'       => isset(json_decode($user['customization'])->onlyOne),
         'customization' => json_decode($user['customization'], true),
-        'permission' => json_decode($user['permValue'], true),
+        'permission'    => json_decode($user['permValue'], true),
       ];
     } else {
       try {
@@ -1029,32 +1024,32 @@ class Db extends \R {
       }
       $user = [
         'password' => $value[1],
-        'hash' => trim($value[2]),
+        'hash'     => trim($value[2]),
       ];
       $userParam = [
         'onlyOne' => true,
-        'admin' => true,
+        'admin'   => true,
       ];
     }
 
-    if (isset($userParam)) foreach ($userParam as $k => $v) $main->setSettings($k, $v);
-
-    if (!$main->getSettings('onlyOne') && isset($user['password']) && isset($_SESSION['password'])) {
+    if ($userParam['onlyOne']) $ok = $session['hash'] === $user['hash'];
+    else {
       $ok = USE_DATABASE ? password_verify($_SESSION['password'], $user['password'])
                          : $_SESSION['password'] === $user['password'];
     }
-    return $session['hash'] === $user['hash'] || (isset($ok) && $ok);
+
+    return $ok ? $userParam : false;
   }
 
   /**
    * get Setting for current user
    *
-   * @param $currentUser {string}
-   * @param $columns {string}
+   * @param string $currentUser {string}
+   * @param string $columns {string}
    *
    * @return mixed
    */
-  public function getUserSetting($currentUser = false, $columns = 'customization') {
+  public function getUserSetting(string $currentUser = '', string $columns = 'customization') {
     if (!$currentUser) {
       global $main;
       $currentUser = $main->getLogin();
@@ -1091,8 +1086,7 @@ trait MainCsv {
    * @return mixed|null
    */
   static function scanDirCsv(string $path, string $link = '') {
-
-    return array_reduce(scandir($path), function ($r, $item) use ($link) {
+    return array_reduce(is_dir($path) ? scandir($path) : [], function ($r, $item) use ($link) {
       if (!($item === '.' || $item === '..')) {
         if (stripos($item, '.csv')) {
           $r[] = [

@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- База данных: `baza`
+-- База данных: `cms`
 --
 
 -- --------------------------------------------------------
@@ -80,7 +80,7 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`ID`, `name`, `ITN`, `contacts`) VALUES
-(6, 'Петя', '', '{\"phone\":\"+7 (123) 456 78 97\",\"email\":\"as@as.by\",\"address\":\"test\"}');
+(1, 'Петя', '', '{\"phone\":\"+7 (123) 456 78 97\",\"email\":\"as@as.by\",\"address\":\"test\"}');
 
 -- --------------------------------------------------------
 
@@ -228,7 +228,7 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`ID`, `name`, `properties`) VALUES
-(1, 'Администратор', '{\"menu\":\"\"}'),
+(1, 'Администратор', '{\"menu\":\"\",\"tags\":\"guard admin\"}'),
 (2, 'Менеджер', '{\"menu\":\"calculator,orders\"}');
 
 -- --------------------------------------------------------

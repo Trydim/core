@@ -1,4 +1,4 @@
-<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 $block = template('parts/authBlock');
 // $field['pageHeader']  = <<<pageHeader

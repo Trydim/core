@@ -1,6 +1,7 @@
-<?php  if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var $main - global
  * @var $param - from controller c_orders.php
  */
 
@@ -19,7 +20,7 @@ $field['footerContent'] .= <<<footerContent
   <div>\${key} - \${value}</div>
 </template>
 <template id="sendMailTmp">
-  <form class="content-center" action="#" id="authForm" class="w-100">
+  <form class="content-center" action="#" id="authForm">
     <div class="input-group">
       <span class="input-group-text">Почта:</span>
       <input type="text" id="email" class="form-control" value="" name="email">

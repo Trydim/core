@@ -13,6 +13,8 @@ export default {
   log: msg => f.DEBUG && console.log('Error:' + msg),
 
   /**
+   * Create element from string or
+   *
    * @param {string|HTMLElement} htmlOrTemplate
    * @return {Node}
    */
@@ -22,8 +24,8 @@ export default {
 
   /**
    * Get Element by id from document or shadow DOM
-   * @param id
-   * @return {HTMLElement | {}}
+   * @param {string} id String that specifies the ID value.
+   * @return {HTMLElement} HtmlElement
    */
   gI: id => (f['calcWrap'] || document).getElementById(id) || f.log('not found note by id -' + id),
 
@@ -109,8 +111,8 @@ export default {
 
   /** Показать элементы, аргументы коллекции NodeList */
   show: (...collection) => { collection.map(nodes => {
-    if(!nodes) return;
-    if(!nodes.forEach) nodes = [nodes];
+    if (!nodes) return;
+    if (!nodes.forEach) nodes = [nodes];
     nodes.forEach(n => n.classList.remove(f.CLASS_NAME.HIDDEN_NODE));
   }) },
 
@@ -119,8 +121,8 @@ export default {
    * @param collection
    */
   hide: (...collection) => { collection.map(nodes => {
-    if(!nodes) return;
-    if(!nodes.forEach) nodes = [nodes];
+    if (!nodes) return;
+    if (!nodes.forEach) nodes = [nodes];
     nodes.forEach(n => n.classList.add(f.CLASS_NAME.HIDDEN_NODE));
   }) },
 
@@ -409,18 +411,20 @@ export default {
    *
    * @param {HTMLElement} target - loading field
    * @param {object} report - send to pdf
-   * @param {FormData} data - object of formData to send in query Body
-   * @param {function} finishOk
-   * @param {function} err
+   * @param {string?} report.fileName - result file name without extension
+   * @param {string?} report.fileTpl - pdf template file without extension
+   * @param {FormData?} data - object of formData to send in query Body
+   * @param {function?} finishOk
+   * @param {function?} err
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
     f.setLoading(target);
     target.setAttribute('disabled', 'disabled');
 
     let fileName = report.fileName || false;
-    //data.set('dbAction', 'DB');
     data.set('mode', 'docs');
     data.set('docsAction', 'pdf');
+    data.set('fileTpl', report.fileTpl || 'default');
     data.set('reportVal', JSON.stringify(report));
 
     f.Post({data}).then(data => {
@@ -481,7 +485,7 @@ export default {
     data.set('saveVal', JSON.stringify(param.saveVal || {}));
     data.set('reportVal', JSON.stringify(param.reportVal || {}));
 
-    return q.Post({data});
+    return f.Post({data});
   },
 
   /**
@@ -552,7 +556,7 @@ export default {
    * @param {string} dataSelector
    * @return {object}
    */
-  setRate: (dataSelector = '#dataRate') => {
+  getRate: (dataSelector = '#dataRate') => {
     let node = f.qS(dataSelector), json;
     node && (json = JSON.parse(node.value)) && node.remove();
     return json || Object.create(null);
@@ -601,6 +605,7 @@ export default {
     ((+value).toFixed(fractionDigits)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '),
 
   /**
+   * УДАЛИТЬ
    * Get value
    * @param {string|HTMLSelectElement} selector
    * @return {boolean|array}
@@ -630,7 +635,7 @@ export default {
   /**
    *
    */
-  settingInit() {
+  getSetting() {
     if (!f.INIT_SETTING) return;
 
     let node = f.gI('dataSettings');

@@ -1,7 +1,6 @@
 "use strict";
 
 const menuClass = 'menu-toggle';
-
 const storage = new f.LocalStorage();
 
 const cancelFormSubmit = () => {
@@ -147,7 +146,7 @@ const onEvent = () => {
 
   cancelFormSubmit();
   dictionaryInit();
-  f.settingInit();
+  f.getSetting();
   f.relatedOption();
   storageLoad();
   onEvent();

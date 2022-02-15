@@ -42,27 +42,33 @@ const query = (url, data, type = 'json') => {
 };
 
 /**
- * @type {{Post: (function({url?: *, data?: *, type?: *}): Promise),
- * Get: (function({url: *, data: *, type?: *}): Promise)}}
+ * Query namespace
+ * @const
+ * @type {{Post: function, Get: function}}
+ * @function Post({url: String, data, type})
  */
 export default {
 
   /**
-   * @param {string} url
-   * @param {object} data
-   * @param {string: 'json'} type
-   * @return {*}
+   * Fetch Get
+   * @param {object} obj
+   * @param {string?|any?: c.MAIN_PHP_PATH} obj.url - link to index.php.
+   * @param {string} obj.data - get params as string.
+   * @param {string?: 'json'} obj.type - return type.
+   * @return {Promise<Response>}
    * @constructor
    */
   Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url + '?' + data, '', type),
 
   /**
-   * Fetch Post function
-   * @param {string} url
-   * @param {object} data
-   * @param {string: 'json'} type
-   * @returns {Promise<Response>}
+   * Fetch Post
+   * @param {object} obj
+   * @param {string?|any?: c.MAIN_PHP_PATH} obj.url - link to index.php.
+   * @param {Blob|BufferSource|FormData|URLSearchParams|ReadableStream} obj.data -
+   * Any body that you want to add to your request object.
+   * Note that a request using the GET or HEAD method cannot have a body.
+   * @param {string?: 'json'} obj.type - return type.
+   * @return {Promise<Response>}
    */
   Post: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url, data, type),
-
 };

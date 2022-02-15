@@ -45,6 +45,20 @@ class Test extends TestCase {
     $this->assertSame($arr['status'], false);
   }
 
+  public function testGTxt() {
+    define('ABS_SITE_PATH', __DIR__ . '/../../../');
+    require_once __DIR__ . '/../func.php';
+
+    gTxt('calculator');
+  }
+
+  public function gTxtDB() {
+    define('ABS_SITE_PATH', __DIR__ . '/../../../');
+    require_once __DIR__ . '/../func.php';
+
+    gTxtDB('codes', 'codes');
+  }
+
   public function testPushAndPop() {
     echo 1;
     $stack = [];

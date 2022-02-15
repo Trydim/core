@@ -177,24 +177,31 @@ function getSettingFile(bool $decode = true, bool $assoc = true) {
   return $decode ? json_decode('[]', $assoc) : '[]';
 }
 
-function gTxt($str) {
+/**
+ * translate text
+ * @param string $str
+ * @return string
+ */
+function gTxt(string $str): string {
   static $txt;
   if (!$txt) {
-    $mess = [];
-    include ABS_SITE_PATH . 'lang/dictionary.php';
-    $txt = $mess;
+    $txt = include ABS_SITE_PATH . 'lang/dictionary.php';
   }
-  return isset($txt[$str]) ? $txt[$str] : $str;
+  return $txt[$str] ?? $str;
 }
 
-function gTxtDB($db, $str) {
+/**
+ * translate dataBase text
+ * @param string $db
+ * @param string $str
+ * @return string
+ */
+function gTxtDB(string $db, string $str): string {
   static $txt;
   if (!$txt) {
-    $mess = [];
-    include ABS_SITE_PATH . 'lang/dbDictionary.php';
-    $txt = $mess;
+    $txt = include ABS_SITE_PATH . 'lang/dbDictionary.php';
   }
-  return isset($txt[$db][$str]) ? $txt[$db][$str] : $str;
+  return $txt[$db][$str] ?? $str;
 }
 
 /**
@@ -287,7 +294,7 @@ function findingFile($dir, $fileName) {
  * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
-  $filename = PATH_CSV . $filename;
+  $filename = file_exists($filename) ? $filename : PATH_CSV . $filename;
   $result = [];
 
   if (!count($dict)) return loadFullCVS($filename);
@@ -422,15 +429,22 @@ function reDirect(string $target = '') {
  * @return string
  */
 function template(string $path = 'base', array $vars = []): string {
+  $path .= '.php';
   extract($vars);
   ob_start();
-  if (file_exists(ABS_SITE_PATH . 'public/views/' . "$path.php")) {
-    include(ABS_SITE_PATH . 'public/views/' . "$path.php");
-  } else if (file_exists(ABS_SITE_PATH . VIEW . "$path.php")) { // TODO два раза с нижним условием?
-    include(ABS_SITE_PATH . VIEW . "$path.php");
-  } else if (file_exists(VIEW . "$path.php")) {
-    include(VIEW . "$path.php");
+
+  // Абсолютный путь файла
+  if (file_exists($path)) {
+    include $path;
   }
+  // В корне сайта в public
+  else if (file_exists(ABS_SITE_PATH . "public/views/$path")) {
+    include ABS_SITE_PATH . "public/views/$path";
+  }
+  // в сms
+  else if (file_exists(CORE . "views/$path")) {
+    include CORE . "views/$path";
+  } else echo 'Template not found: ' . $path;
 
   return ob_get_clean();
 }
@@ -439,7 +453,7 @@ function template(string $path = 'base', array $vars = []): string {
  * @param $value {string}
  * @return string
  */
-function translit($value) {
+function translit($value): string {
   $converter = [
     'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
     'е' => 'e', 'ё' => 'e', 'ж' => 'zh', 'з' => 'z', 'и' => 'i',

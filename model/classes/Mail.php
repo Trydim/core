@@ -148,7 +148,7 @@ class Mail {
       // Получатель письма
       if (DEBUG) {
         $this->mailTarget = MAIL_TARGET_DEBUG;
-        $this->subject = 'Тестовое письмо ' . $_SERVER['SERVER_NAME'];
+        $this->subject  = 'Тестовое письмо ' . $_SERVER['SERVER_NAME'];
         $this->fromName = 'vistegra.by';
       }
 

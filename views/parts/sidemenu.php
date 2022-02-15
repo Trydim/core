@@ -133,7 +133,7 @@ menu;
             <?php break;
         }
       } ?>
-      <?php if (in_array('setting', $main->getSideMenu()) || $main->getSettings('admin')) { ?>
+      <?php if (in_array('setting', $main->getSideMenu()) || $main->getLogin('admin')) { ?>
         <li>
           <a class="nav-item" href="<?= SITE_PATH ?>setting" aria-expanded="false">
             <i class="pi pi-sliders-h"></i>

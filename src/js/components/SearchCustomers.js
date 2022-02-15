@@ -10,7 +10,7 @@ export const searching = () => {
     let {popup = true, node, searchData,
           finishFunc = () => {},
           showResult = () => {}} = param,
-        func = (e) => this.searchFocus(e);
+        func = e => this.searchFocus(e);
 
     this.usePopup = popup; // Показывать результаты в сплывающем окне
     this.searchData = searchData;
@@ -69,7 +69,7 @@ export const searching = () => {
   // Events
   const inputNodeEvent = function (e) {
     let value = e.target.value;
-    if(value.length > 1) {
+    if (value.length > 1) {
       f.show(this.resultTmp);
       this.returnFunc(this.search(value));
     } else {
@@ -83,7 +83,7 @@ export const searching = () => {
     let target = e.target,
         wrap = target.parentNode;
 
-    if(this.usePopup && !this.resultTmp) {
+    if (this.usePopup && !this.resultTmp) {
       this.resultTmp = f.gTNode('#searchResult');
       this.resultTmp.addEventListener('click', (e) => this.clickResult(e, target));
     }
@@ -92,7 +92,7 @@ export const searching = () => {
     target.addEventListener('keyup', this.bindInputNodeEvent);
     target.addEventListener('blur', () => setTimeout(() => this.clear(target), 100), {once: true});
 
-    if(this.usePopup) {
+    if (this.usePopup) {
       wrap.style.position = 'relative';
       wrap.append(this.resultTmp);
     }
@@ -101,7 +101,7 @@ export const searching = () => {
   }
 
   obj.clickResult = function (e, inputNode) {
-    if(this.resultTmp === e.target) return;
+    if (this.resultTmp === e.target) return;
     let index = +e.target.dataset.id;
 
     this.clear(inputNode);
@@ -111,4 +111,3 @@ export const searching = () => {
 
   return obj;
 }
-

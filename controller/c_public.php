@@ -1,4 +1,4 @@
-<?php if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var object $main
@@ -27,7 +27,6 @@ if ($authStatus && isset($_GET['orderId'])) {
       }
     }
   }
-
 }
 
 if ($authStatus && isset($_GET['orderVisitorId'])) {
