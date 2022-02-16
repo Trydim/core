@@ -6,8 +6,8 @@ const path    = require('path'),
       fs      = require('fs'),
       crypto = require('crypto'),
 
-      publicFileName = 'public.php',
-      publicDirName = 'public';
+      publicFileName = 'base.php',
+      publicDirName = 'views';
 
 /**
  * Получить результирующую папку в зависимости от расположения папки src
@@ -43,7 +43,7 @@ const setVersion = str => {
                    .update(Math.random().toString())
                    .digest('hex')
                    .slice(0, 10);
-  return str.replace(/\.(css|js)(|.+)'/i, `.$1?ver=${rand}\'`);
+  return str.replace(/\.(css|js)(|.+)"/i, `.$1?ver=${rand}"`);
 }
 
 let publicFilePath = getPublicPath();
@@ -53,7 +53,7 @@ let publicFileContent = fs.readFileSync(publicFilePath, {encoding: 'utf8'}),
     publicFileRow = publicFileContent.split('\n');
 
 publicFileRow = publicFileRow.map((row, i) => {
-  if (row.includes('cssLinks') || row.includes('jsLinks')) {
+  if (row.includes('CORE_CSS') || row.includes('CORE_JS')) {
     return setVersion(row);
   }
   return row;

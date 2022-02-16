@@ -54,7 +54,7 @@ const setParentHeight = (target, height) => {
   }
 }
 
-const setLinkMenu = page => {
+const setLinkMenu = () => {
   let menu = f.qS('#sideMenu');
   if (!menu) return;
 
