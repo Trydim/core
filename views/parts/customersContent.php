@@ -1,6 +1,4 @@
-<?php if ( !defined('MAIN_ACCESS')) {
-  die('access denied!');
-} ?>
+<?php if (!defined('MAIN_ACCESS')) die('access denied!'); ?>
 
 <div class="d-flex justify-content-between p-bottom-25" id="actionBtnWrap">
   <div>

@@ -61,7 +61,7 @@ export class Valid {
             error: 'cl-input-error',
             valid: 'cl-input-valid',
           },
-          debug = c.DEBUG || false,
+          debug = f.DEBUG || false,
         } = param;
     this.cssClass = cssClass;
     this.debug = debug;

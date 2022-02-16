@@ -10,7 +10,7 @@ export const searching = () => {
     let {popup = true, node, searchData,
           finishFunc = () => {},
           showResult = () => {}} = param,
-        func = (e) => this.searchFocus(e);
+        func = e => this.searchFocus(e);
 
     this.usePopup = popup; // Показывать результаты в сплывающем окне
     this.searchData = searchData;

@@ -16,8 +16,7 @@ $user = $main->db->getUserById($main->getLogin('id'));
 $user = [
   'name'         => $user['name'],
   'login'        => $user['login'],
-  'permissionId' => $user['permission_id'],
-  'isAdmin'      => $main->getSettings('admin'),
+  'isAdmin'      => $main->getLogin('admin'),
   'contacts'     => $user['contacts'],
   'customization'=> $user['customization'],
 ];
@@ -42,10 +41,12 @@ if (USE_DATABASE && $user['isAdmin']) {
   $field['footerContent'] .= "<input type='hidden' id='dataPermissions' value='" . json_encode($permissions) . "'>";
 
   // if available orders
-  if ($main->availablePage('orders') && false) {
+  if ($main->availablePage('orders')) {
     $status = json_encode($main->db->loadTable('order_status'));
     $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
   }
+
+  $field['footerContent'] .= $main->getCourse();
 
   unset($permissions, $status);
 }
