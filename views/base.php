@@ -38,7 +38,7 @@ $jsGlobalConst = json_encode([
   <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
-    <link rel="stylesheet" href="<?= CORE_CSS?>admin.css">
+    <link rel="stylesheet" href="<?= CORE_CSS ?>admin.css?ver=a22d8c4f0d">
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
@@ -81,8 +81,8 @@ $jsGlobalConst = json_encode([
   </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src="<?= CORE_JS ?>src.js?v=1234"></script>
-<script defer type="module" src="<?= CORE_JS ?>main.js?v=1234"></script>
+<script defer type="module" src="<?= CORE_JS ?>src.js?ver=4fce2414f6"></script>
+<script defer type="module" src="<?= CORE_JS ?>main.js?ver=4c854b1fe1"></script>
 
 <?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= str_replace('//', '/', $item) ?>"></script>

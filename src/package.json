@@ -11,6 +11,7 @@
     "createResourceFile": "node ./webpack/createResourceFile.js",
     "coreProd": "webpack --env production --config ./webpack/webpack.config.js",
     "coreModuleProd": "webpack --env production --config ./webpack/webpack.module.js",
+    "updateVersion": "node ./webpack/updateVersion.js",
 
     "coreDev": "webpack --config ./webpack/webpack.config.js",
     "coreModuleDev": "webpack --config ./webpack/webpack.module.js",
