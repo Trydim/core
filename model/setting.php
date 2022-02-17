@@ -18,32 +18,39 @@ switch ($cmsAction) {
 
     // Change Setting
     if (USE_DATABASE && $usersId) {
-      // Test unique login
-      $users = $db->selectQuery('users', '*', ' login = "' . $user['login'] . '"');
-      if (count($users) > 1 || $users[0]['ID'] !== $usersId) {
-        $result['error'] = gTxt('Login exist');
-        break;
-      }
 
-      $param[$usersId] = [
-        'name'          => $userName,
-        'login'         => $user['login'],
-        'contacts'      => json_encode($user['fields'] ?? []), // todo
-        'customization' => $customization ?? '{}',
-      ];
+      // Update User
+      if (!empty($user)) {
 
-      // Check password
-      if (!empty($user['password']) && $user['password'] === $user['passwordRepeat']) {
-        $param[$usersId]['password'] = password_hash($user['password'], PASSWORD_BCRYPT);
-      }
+        // Test unique login
+        $users = $db->selectQuery('users', '*', ' login = "' . $user['login'] . '"');
+        if (count($users) > 1 || $users[0]['ID'] !== $usersId) {
+          $result['error'] = gTxt('Login exist');
+          break;
+        }
 
-      // Save user
-      if ($user['change']) {
+        $param[$usersId] = [
+          'name'          => $userName,
+          'login'         => $user['login'],
+          'contacts'      => json_encode($user['fields'] ?? []), // todo
+          'customization' => $user['customization'] ?? '{}',
+        ];
+
+        // Check password
+        if (!empty($user['password']) && $user['password'] === $user['passwordRepeat']) {
+          $param[$usersId]['password'] = password_hash($user['password'], PASSWORD_BCRYPT);
+        }
+
+        // Save user
         $columns = $db->getColumnsTable('users');
         $result['error'] = $db->insert($columns, 'users', $param, true);
 
-        // Set new userName
-        if (empty($result['error'])) $_SESSION['name'] = $userName;
+        // Set new User Params
+        if (empty($result['error'])) {
+          $_SESSION['login'] = $user['login'];
+          $_SESSION['name'] = $userName;
+          isset($param[$usersId]['password']) && $_SESSION['hash'] = $param[$usersId]['password'];
+        }
       }
 
       // Permission
@@ -58,13 +65,23 @@ switch ($cmsAction) {
         foreach ($permissions as $permission) {
           $id = $permission['id'];
 
-          if (isset($permission['delete'])) $result['error']['del'] = $db->deleteItem('permission', [$id]);
+          if (isset($permission['delete'])) {
+            $result['error']['del'] = $db->deleteItem('permission', [$id]);
+            continue;
+          }
 
           // Js random 0 - 1
-          $param[$id < 1 ? 'new' : 'change'][$id] = [
-            'name'       => $permission['name'],
-            'properties' => json_encode($permission['properties']),
-          ];
+          if ($id < 1) {
+            $param['new'][uniqid()] = [
+              'name'       => $permission['name'],
+              'properties' => json_encode($permission['properties']),
+            ];
+          } else {
+            $param['change'][$id] = [
+              'name'       => $permission['name'],
+              'properties' => json_encode($permission['properties']),
+            ];
+          }
         }
 
         $columns = $db->getColumnsTable('permission');
@@ -74,13 +91,31 @@ switch ($cmsAction) {
 
       // Статусы
       if (isset($orderStatus)) {
-        $columns = $db->getColumnsTable('order_status');
-        $currentTable = $db->loadTable('order_status');
-        $param = [];
+        //$currentTable = $db->loadTable('order_status');
+        $param = [
+          'new'    => [],
+          'change' => [],
+        ];
+
         foreach (json_decode($orderStatus, true) as $status) {
-          $param[$status['ID']]['name'] = $status['name'];
+          $id = $status['ID'];
+
+          if (isset($status['delete'])) {
+            $result['error']['statusDel'] = $db->deleteItem('order_status', [$id]);
+            continue;
+          }
+
+          // Js random 0 - 1
+          if ($id < 1) {
+            $param['new'][uniqid()]['name'] = $status['name'];
+          } else {
+            $param['change'][$id]['name'] = $status['name'];
+          }
         }
-        $result['error'] = $db->insert($columns, 'order_status', $param, false);
+
+        $columns = $db->getColumnsTable('order_status');
+        $result['error']['statusAdd'] = $db->insert($columns, 'order_status', $param['new']);
+        $result['error']['statusChange'] = $db->insert($columns, 'order_status', $param['change'], true);
       }
     } else {
       $hash = '';
@@ -96,14 +131,17 @@ switch ($cmsAction) {
 
     // Global mail setting
     $mail = json_decode($mail ?? '[]', true);
-    !empty($mail['mailTarget']) && $main->setSettings('mailTarget',  $mail['mailTarget']);
-    !empty($mail['mailTargetCopy']) && $main->setSettings('mailTargetCopy',  $mail['mailTargetCopy']);
-    !empty($mail['mailSubject']) && $main->setSettings('mailSubject',  $mail['mailSubject']);
-    !empty($mail['mailFromName']) && $main->setSettings('mailFromName',  $mail['mailFromName']);
+    !empty($mail['target']) && $main->setSettings('mailTarget', $mail['target']);
+    !empty($mail['targetCopy']) && $main->setSettings('mailTargetCopy', $mail['targetCopy']);
+    !empty($mail['subject']) && $main->setSettings('mailSubject', $mail['subject']);
+    !empty($mail['fromName']) && $main->setSettings('mailFromName', $mail['fromName']);
 
     // Global manager setting
     $managerFields = json_decode($managerFields ?? '[]', true);
     count($managerFields) && $main->setSettings('managerFields', $managerFields);
+
+    // Global other setting
+    $main->setSettings('statusDefault', $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
 
     $main->saveSettings();
     break;
@@ -175,7 +213,7 @@ switch ($cmsAction) {
     break;
   case 'loadProperty':
     if (isset($props)) {
-      $result['propertyValue'] = $db->getColumnsTable($props);// todo загрузить просто
+      $result['propertyValue'] = $db->getColumnsTable($props); // todo загрузить просто
     }
     break;
   case 'delProperties':

@@ -111,8 +111,8 @@ export default {
 
   /** Показать элементы, аргументы коллекции NodeList */
   show: (...collection) => { collection.map(nodes => {
-    if(!nodes) return;
-    if(!nodes.forEach) nodes = [nodes];
+    if (!nodes) return;
+    if (!nodes.forEach) nodes = [nodes];
     nodes.forEach(n => n.classList.remove(f.CLASS_NAME.HIDDEN_NODE));
   }) },
 
@@ -121,8 +121,8 @@ export default {
    * @param collection
    */
   hide: (...collection) => { collection.map(nodes => {
-    if(!nodes) return;
-    if(!nodes.forEach) nodes = [nodes];
+    if (!nodes) return;
+    if (!nodes.forEach) nodes = [nodes];
     nodes.forEach(n => n.classList.add(f.CLASS_NAME.HIDDEN_NODE));
   }) },
 

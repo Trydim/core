@@ -15,7 +15,7 @@ export default {
   AUTH_STATUS  : window.CMS_CONST['AUTH_STATUS'] || false,
   INIT_SETTING : window.CMS_CONST['INIT_SETTING'] || false,
 
-  PHONE_MASK: '+7 (___) ___ __ __',
+  PHONE_MASK: '+_ (___) ___ __ __',
 
   // Global IDs
   // ------------------------------------------------------------------------------------------------

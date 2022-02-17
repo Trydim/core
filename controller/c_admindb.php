@@ -1,6 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var object $main
  * @var string $pathTarget
  */
 
@@ -14,8 +15,9 @@ $field['jsLinks'] = [CORE_JS . 'module/admindb.js'];
 if (DB_TABLE_IN_SIDEMENU) {
   if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];
   else {
-    global $dbTables;
-    count($dbTables) && reDirect('admindb?tableName=' . $dbTables[0]['fileName']);
+    // Todo путь к первому файлу
+    $firstTable = '';
+    reDirect('admindb?tableName=' . $firstTable);
   }
 }
 

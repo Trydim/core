@@ -16,12 +16,12 @@ $field['jsLinks'] = [CORE_JS . 'module/calendar.js'];
 $field['pageTitle'] = 'Календарь';
 $field['footerContent'] = '';
 
-if(count($orders)) {
-	$orders = json_encode($orders);
-	$field['footerContent'] .= "<div hidden id='ordersValue'>$orders</div>";
+if (count($orders)) {
+  $orders = json_encode($orders);
+  $field['footerContent'] .= "<div hidden id='ordersValue'>$orders</div>";
 }
 
-if(count($ordersStatus)) {
+if (count($ordersStatus)) {
   $ordersStatus = json_encode($ordersStatus);
   $field['footerContent'] .= "<div hidden id='ordersStatusValue'>$ordersStatus</div>";
 }

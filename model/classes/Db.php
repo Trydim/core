@@ -1007,10 +1007,10 @@ class Db extends \R {
       if (!count($user)) return false;
 
       $userParam = [
-        'permissionId' => intval($user['permId']),
-        'onlyOne' => isset(json_decode($user['customization'])->onlyOne),
+        'permissionId'  => intval($user['permId']),
+        'onlyOne'       => isset(json_decode($user['customization'])->onlyOne),
         'customization' => json_decode($user['customization'], true),
-        'permission' => json_decode($user['permValue'], true),
+        'permission'    => json_decode($user['permValue'], true),
       ];
     } else {
       try {
@@ -1024,11 +1024,11 @@ class Db extends \R {
       }
       $user = [
         'password' => $value[1],
-        'hash' => trim($value[2]),
+        'hash'     => trim($value[2]),
       ];
       $userParam = [
         'onlyOne' => true,
-        'admin' => true,
+        'admin'   => true,
       ];
     }
 

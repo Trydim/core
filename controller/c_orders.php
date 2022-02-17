@@ -5,6 +5,7 @@
  * @var string $pathTarget
  */
 
+$param = [];
 $field = [
   'pageTitle' => 'Заказы',
   'jsLinks'   => [CORE_JS . 'module/orders.js'],
@@ -12,7 +13,7 @@ $field = [
 
 $user = [
   'permission' => $main->getSettings('permission'),
-  'isAdmin'    => $main->getSettings('admin'),
+  'isAdmin'    => $main->getLogin('admin'),
 ];
 $field['footerContent'] = "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>";
 
