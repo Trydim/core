@@ -2,8 +2,8 @@
  * @var process - global process
  */
 
-const path    = require('path'),
-      fs      = require('fs'),
+const path   = require('path'),
+      fs     = require('fs'),
       crypto = require('crypto'),
 
       publicFileName = 'base.php',

@@ -17,8 +17,8 @@ $field['pageTitle'] = 'Календарь';
 $field['footerContent'] = '';
 
 if (count($orders)) {
-	$orders = json_encode($orders);
-	$field['footerContent'] .= "<div hidden id='ordersValue'>$orders</div>";
+  $orders = json_encode($orders);
+  $field['footerContent'] .= "<div hidden id='ordersValue'>$orders</div>";
 }
 
 if (count($ordersStatus)) {
