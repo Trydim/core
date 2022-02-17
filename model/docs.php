@@ -75,7 +75,7 @@ $docType = $docType ?? $docsAction;
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
 if ($docType !== 'mail') {
-  require_once 'classes/Docs.php';
+  require_once __DIR__ . '/classes/Docs.php';
   $docs = new Docs($docType, $data, $fileTpl ?? 'default');
 }
 
@@ -88,7 +88,7 @@ if (isset($docsAction)) {
       break;
     case 'mail':
       $docType && $docsPath = $docs->getDocs('save');
-      require_once 'classes/Mail.php';
+      require_once __DIR__ . '/classes/Mail.php';
       $mail = new Mail($mailTpl ?? 'mailTpl');
       $param = [
         'name'  => $name ?? '',

@@ -548,7 +548,7 @@ export default {
       data.set('reportVal', JSON.stringify(p.reportVal || {}));
     }
 
-    return q.Post({data});
+    return f.Post({data});
   },
 
   /**
