@@ -202,8 +202,7 @@ trait Dictionary {
   private $dictionaryPath = ABS_SITE_PATH . 'lang/dictionary.php';
 
   public function initDictionary() {
-    $mess = [];
-    include $this->dictionaryPath;
+    $mess = require $this->dictionaryPath;
     $mess = json_encode($mess);
     return $mess ? "<input type='hidden' id='dictionaryData' value='$mess'>" : '';
   }

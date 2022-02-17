@@ -228,7 +228,7 @@ CREATE TABLE `permission` (
 --
 
 INSERT INTO `permission` (`ID`, `name`, `properties`) VALUES
-(1, 'Администратор', '{\"menu\":\"\"}'),
+(1, 'Администратор', '{\"menu\":\"\",\"tags\":\"admin\"}'),
 (2, 'Менеджер', '{\"menu\":\"calculator,orders\"}');
 
 -- --------------------------------------------------------
