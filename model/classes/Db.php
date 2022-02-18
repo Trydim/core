@@ -186,7 +186,7 @@ class Db extends \R {
    */
   public function checkHaveRows($dbTable, $columnName, $value): int {
     return intval(self::getCell("SELECT count(*) FROM $dbTable
-                                     WHERE $columnName = :value", [':value' => $value]));
+                                 WHERE $columnName = :value", [':value' => $value]));
   }
 
   /**
@@ -247,9 +247,9 @@ class Db extends \R {
    */
   public function getColumnsTable($dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
-                                    COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
-		                         FROM information_schema.COLUMNS 
-                             WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
+                           COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
+                         FROM information_schema.COLUMNS 
+                         WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
       [':dbName'  => $this->dbName,
        ':dbTable' => $dbTable
       ]);
@@ -925,10 +925,10 @@ class Db extends \R {
    */
   public function getUserByLogin($login) {
     return self::getRow("SELECT login, users.name AS 'name', hash, password, customization, 
-                                    p.ID as 'permId', p.name as 'permName', properties as 'permValue'
-                             FROM users
-                             LEFT JOIN permission p on users.permission_id = p.ID
-                             WHERE login = :login", [':login' => $login]);
+            p.ID as 'permId', p.name as 'permName', properties as 'permValue'
+            FROM users
+            LEFT JOIN permission p on users.permission_id = p.ID
+            WHERE login = :login", [':login' => $login]);
   }
 
   /**
