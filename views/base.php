@@ -16,7 +16,7 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
-  'CSV_DEVELOP'   => CSV_DEVELOP,
+  'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
   'SITE_PATH'     => SITE_PATH,
   'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
@@ -40,7 +40,7 @@ $jsGlobalConst = json_encode([
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
-    <link rel="stylesheet" href="<?= str_replace('//', '/', $item) ?>">
+    <link rel="stylesheet" href="<?= $item ?>">
   <?php }, $cssLinks ?? []); ?>
 
   <script>
@@ -68,7 +68,7 @@ $jsGlobalConst = json_encode([
     <div class="nav-header">
       <a href="<?= SITE_PATH ?>" class="brand-logo">
         <img class="logo-abbr" src="<?= PATH_IMG ?>logo.webp" alt="">
-        <span class="brand-title"><?= PROJECT_TITLE ?></span>
+        <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
       </a>
 
       <div class="nav-control" role="button" data-action-cms="menuToggle">
@@ -98,7 +98,7 @@ $jsGlobalConst = json_encode([
 <script defer type="module" src="<?= CORE_JS ?>main.js?v=1234"></script>
 
 <?php array_map(function ($item) { ?>
-  <script defer type="module" src="<?= str_replace('//', '/', $item) ?>"></script>
+  <script defer type="module" src="<?= $item ?>"></script>
 <?php }, $jsLinks ?? []); ?>
 
 <?= $footerContent ?? '' ?>

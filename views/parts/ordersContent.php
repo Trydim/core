@@ -23,14 +23,9 @@ $ordersVisitorColumns = $ordersVisitorColumns ?? [];
   <input type="button" class="btn btn-warning ms-1" value="Отмена" data-action="confirmNo">
 </div>
 <div class="pb-4 d-none" id="printTypeField">
-  <?php for ($i = 1; $i <= PRINT_BTN; $i++) { ?>
-  <input type="button" class="btn btn-primary"
-         data-action="printReport" data-type="printType<?= $i ?>"
-         value="<?= gTxt('printType' . $i) ?>">
-  <?php } ?>
   <input type="button" class="btn btn-warning" data-action="cancelPrint" value="Отмена">
 </div>
-<?php if (USERS_ORDERS) { ?>
+<?php if (isset($param['ordersVisitorColumns'])) { ?>
   <div class="d-flex pb-4" style="justify-content: left">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="orderType" value="order" id="orderTypeO" checked data-action="orderType">
@@ -78,7 +73,7 @@ $ordersVisitorColumns = $ordersVisitorColumns ?? [];
     </table>
   </template>
 
-  <?php if (USERS_ORDERS) { ?>
+  <?php if (isset($param['ordersVisitorColumns'])) { ?>
   <template id="orderVisitorTableTmp">
     <table>
       <thead>

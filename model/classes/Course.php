@@ -1,7 +1,5 @@
 <?php
 
-!defined('PATH_CSV') && define('PATH_CSV', $_SERVER['DOCUMENT_ROOT'] . '/csv');
-
 class Course {
   const REFRESH_INTERVAL = 36000;
   const LINK_PARAM = '';
@@ -27,7 +25,7 @@ class Course {
    */
   public $rate;
 
-  public function __construct(&$db, $dataFile = PATH_CSV . 'exchange_rate.bin') {
+  public function __construct(&$db, $dataFile = COURSE_CACHE) {
     if (is_object($db)) $this->getRateFromDb($db);
     else $this->getRateFromFile($dataFile);
 

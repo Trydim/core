@@ -27,8 +27,8 @@ export const data = {
     inputPrice   : 0,
     moneyOutputId: 0,
     outputPrice  : 0,
-    propertyJson : '',
-    property     : {},
+    propertiesJson : '',
+    properties     : {},
   },
 
   fieldChange: {
@@ -103,7 +103,7 @@ export const methods = {
     this.query().then(data => {
       this.options        = data['options'];
       this.optionsLoading = false;
-    })
+    });
   },
 
   enableOptionField() {
@@ -114,7 +114,7 @@ export const methods = {
       moneyOutputId: true,
       activity     : true,
       sort         : true,
-      property     : false,
+      properties     : false,
     };
   },
 
@@ -135,11 +135,11 @@ export const methods = {
     });
   },
   setDefaultProperty() {
-    Object.keys(this.properties).map(key => this.option.property[key] = undefined);
+    Object.keys(this.properties).map(key => this.option.properties[key] = undefined);
   },
   setOptionProperty(el) {
     this.setDefaultProperty();
-    Object.entries(el.property).map(([key, value]) => this.option.property[key] = value);
+    Object.entries(el.properties).map(([key, value]) => this.option.properties[key] = value);
   },
 
   // Events function
@@ -260,7 +260,7 @@ export const methods = {
 
   optionsConfirm() {
     //this.optionsLoading = true;
-    this.option.propertyJson = JSON.stringify(this.option.property);
+    this.option.propertiesJson = JSON.stringify(this.option.properties);
     this.queryParam = Object.assign(this.queryParam, this.option, {fieldChange: JSON.stringify(this.fieldChange)});
     this.query();
     this.optionsModal.display = false;

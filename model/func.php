@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * @param string $class
+ */
+function cmsAutoloader(string $class) {
+  $path = __DIR__ . '/classes/' . $class . '.php';
+  if (file_exists($path)) require_once $path;
+}
+
+/**
  *
  * @param $number
  * @param $reportVal
@@ -19,7 +27,7 @@ function addCpNumber($number, $reportVal) {
  */
 function addCssLink(string $cssLink) {
   global $main;
-  if ($main instanceof cms\Main) return $main->addControllerField('cssLinks', $cssLink);
+  if ($main instanceof Main) return $main->addControllerField('cssLinks', $cssLink);
   return false;
 }
 
@@ -34,7 +42,7 @@ function addCssLink(string $cssLink) {
  */
 function addJsLink(string $jsLink, string $position = 'last') {
   global $main;
-  if ($main instanceof cms\Main) return $main->addControllerField('jsLinks', $jsLink, $position);
+  if ($main instanceof Main) return $main->addControllerField('jsLinks', $jsLink, $position);
   return false;
 }
 
@@ -45,7 +53,7 @@ function addJsLink(string $jsLink, string $position = 'last') {
  */
 function addHook($hookName, $callable) {
   global $main;
-  if ($main instanceof cms\Main) $main->addHook($hookName, $callable);
+  if ($main instanceof Main) $main->addHook($hookName, $callable);
 }
 
 /**
@@ -214,7 +222,7 @@ function gTxtDB(string $db, string $str): string {
  *
  * @return integer or string - int: return index of position keyword in array
  */
-function findword($input, $cell, $inCharset = 'windows-1251', $index = false) {
+function findWord($input, $cell, $inCharset = 'windows-1251', $index = false) {
   $input = mb_strtolower($input, 'UTF-8');
   $shortest = -1;
   $gc = false;
@@ -249,7 +257,7 @@ function findword($input, $cell, $inCharset = 'windows-1251', $index = false) {
  *
  * @return string - keys or false
  */
-function findkey($cell, $input) {
+function findKey($cell, $input) {
   $count = count($input); // теперь всегда 1
   $input = '/(' . implode('|', $input) . ')/i';
   foreach ($cell as $key => $item) {
@@ -294,7 +302,8 @@ function findingFile($dir, $fileName) {
  * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
-  $filename = file_exists($filename) ? $filename : PATH_CSV . $filename;
+  global $main;
+  $filename = file_exists($filename) ? $filename : $main->getCmsParam('PATH_CSV') . $filename;
   $result = [];
 
   if (!count($dict)) return loadFullCVS($filename);
@@ -308,7 +317,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
       foreach ($dict as $key => $word) {
         $bool = is_array($word);
         $keyWord = $bool ? $word[0] : $word;
-        $i = findword($keyWord, $data, $inCharset);
+        $i = findWord($keyWord, $data, $inCharset);
         if ($i !== false) {
           if ($bool) $keyIndex[$key] = [$i, $word[1]];
           else $keyIndex[$key] = $i;

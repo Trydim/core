@@ -1,7 +1,5 @@
 <?php
 
-namespace RedBeanPHP;
-
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 require __DIR__ . '/rb.php';
@@ -368,7 +366,7 @@ class Db extends \R {
 
   public function setFiles(&$result, $imageIds) {
     $dbDir = 'upload/';
-    $uploadDir = SHARE_DIR . $dbDir;
+    $uploadDir = SHARE_PATH . $dbDir;
 
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
@@ -486,7 +484,7 @@ class Db extends \R {
     $sql = "SELECT O.ID AS 'id',
                    MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId', 
                    MO.short_name as 'moneyOutputName', MO.ID AS 'moneyOutputId',
-                   images_ids AS 'images', property,
+                   images_ids AS 'images', properties,
                    O.name AS 'name', U.ID AS 'unitId', U.name AS 'unitName', O.last_edit_date AS 'lastEditDate', O.activity AS 'activity', sort,
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
             FROM options_elements O
@@ -500,7 +498,7 @@ class Db extends \R {
       $option['images'] = strlen($option['images']) ? $this->setImages($option['images']) : [];
 
       // set property
-      $option['property'] = json_decode($option['property'] ?: '[]');
+      $option['properties'] = json_decode($option['properties'] ?: '[]');
 
       return $option;
     }, self::getAll($sql));
@@ -517,7 +515,7 @@ class Db extends \R {
     $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
                    O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
-                   O.sort AS 'sort', O.last_edit_date as 'lastDate', property, images_ids AS 'images',
+                   O.sort AS 'sort', O.last_edit_date as 'lastDate', properties, images_ids AS 'images',
                    MI.code AS 'moneyInput', MO.code AS 'moneyOutput',
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
             FROM options_elements O
@@ -562,11 +560,11 @@ class Db extends \R {
       }
 
       // set property
-      $properties = json_decode($option['property'] ?: '[]', true);
-      $option['property'] = [];
+      $properties = json_decode($option['properties'] ?: '[]', true);
+      $option['properties'] = [];
       foreach ($properties as $property => $id) {
         $propName = str_replace('prop_', '', $property);
-        $option['property'][$propName] = $this->getPropertyTable($id, $property);
+        $option['properties'][$propName] = $this->getPropertyTable($id, $property);
       }
 
       return $option;
@@ -1094,9 +1092,11 @@ trait MainCsv {
             'name'     => gTxt(str_replace('.csv', '', $item)),
           ];
         } else {
+          global $main;
+          $csvPath = $main->getCmsParam('PATH_CSV');
           $link && $link .= '/';
-          if (filetype(PATH_CSV . $link . $item) === 'dir') {
-            $r[$item] = self::scanDirCsv(PATH_CSV . $link . $item, $link . $item);
+          if (filetype($csvPath . $link . $item) === 'dir') {
+            $r[$item] = self::scanDirCsv($csvPath . $link . $item, $link . $item);
           }
         }
       }
@@ -1106,7 +1106,10 @@ trait MainCsv {
   }
 
   public function openCsv() {
-    if (($file = fopen(PATH_CSV . $this->csvTable, 'r'))) {
+    global $main;
+    $csvPath = $main->getCmsParam('PATH_CSV');
+
+    if (($file = fopen($csvPath . $this->csvTable, 'r'))) {
       $result = [];
       while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) {
         $cells = array_map(function ($cell) {
@@ -1121,7 +1124,8 @@ trait MainCsv {
   }
 
   public function fileForceDownload() {
-    $file = PATH_CSV . $this->csvTable;
+    global $main;
+    $file = $main->getCmsParam('PATH_CSV') . $this->csvTable;
 
     if (file_exists($file)) {
       // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
@@ -1150,7 +1154,10 @@ trait MainCsv {
    * @return $this
    */
   public function saveCsv($csvData) {
-    if (file_exists(PATH_CSV . $this->csvTable)) {
+    global $main;
+    $csvPath = $main->getCmsParam('PATH_CSV');
+
+    if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];
       $length = count($csvData[0]);
 
@@ -1159,8 +1166,8 @@ trait MainCsv {
         $fileStrings[] = implode(CSV_DELIMITER, $v);
       }
 
-      file_put_contents(PATH_CSV . $this->csvTable, $fileStrings);
-      file_exists(CSV_CACHE_FILE) && unlink(CSV_CACHE_FILE);
+      file_put_contents($csvPath . $this->csvTable, $fileStrings);
+      file_exists(CSV_CACHE) && unlink(CSV_CACHE);
     }
     return $this;
   }

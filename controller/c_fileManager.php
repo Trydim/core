@@ -9,8 +9,6 @@
   'extensions_for_editor' => array('ab', 'txt', 'php', 'js', 'tpl', 'html', 'htm', 'css', 'text', 'json', 'lng', 'xml', 'ini', 'sql')
 ];*/
 
-define('ROOT', SHARE_DIR);
-
 function tree($path) {
   if (stream_resolve_include_path($path)) {
 

@@ -35,7 +35,7 @@ if (!isset($setting->ordersColumnsSort)) {
   }
 }
 
-if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
+if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsSort)) {
   $columns = $main->db->loadVisitorOrder(0, 1);
   if (!empty($columns)) {
     $setting->ordersVisitorColumnsSort = array_map(function ($item) {

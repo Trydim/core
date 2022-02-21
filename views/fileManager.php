@@ -1,6 +1,6 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
-$shareDir = SHARE_DIR;
+$shareDir = SHARE_PATH;
 
 $field['content'] = <<<content
 <div class="container-fluid ab-filemanager" id="ab-main">
@@ -52,7 +52,7 @@ $field['content'] = <<<content
     <div id="home" data-fo="$shareDir" class="closed selected">$shareDir</div>
 content;
 
-tree(ABS_SITE_PATH . SHARE_DIR);
+tree(ABS_SITE_PATH . SHARE_PATH);
 
 $field['content'] .= <<<content
   </div>

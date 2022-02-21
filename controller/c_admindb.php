@@ -1,6 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var object $main - global
  * @var string $pathTarget
  */
 
@@ -11,7 +12,7 @@ $field = [
 $field['cssLinks'] = [CORE_CSS . 'module/admindb.css'];
 $field['jsLinks'] = [CORE_JS . 'module/admindb.js'];
 
-if (DB_TABLE_IN_SIDEMENU) {
+if ($main->getCmsParam('DB_TABLE_IN_SIDEMENU')) {
   if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];
   else {
     global $dbTables;
@@ -19,7 +20,9 @@ if (DB_TABLE_IN_SIDEMENU) {
   }
 }
 
-if (PATH_LEGEND && file_exists(PATH_LEGEND)) require PATH_LEGEND;
+$pathLegend = $main->getCmsParam('PATH_LEGEND');
+if ($pathLegend && file_exists($pathLegend)) require $pathLegend;
+unset($pathLegend);
 
 require $pathTarget;
 $html = template('base', $field);

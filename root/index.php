@@ -3,6 +3,6 @@
 if (defined('MAIN_ACCESS') || defined('ABS_SITE_PATH')) die('access denied!');
 
 const MAIN_ACCESS = true;
-const ABS_SITE_PATH = __DIR__ . '/';
+const ABS_SITE_PATH = __DIR__ . DIRECTORY_SEPARATOR;
 
-require __DIR__ . '/core/head.php';
+require ABS_SITE_PATH . 'core/head.php';

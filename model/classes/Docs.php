@@ -1,8 +1,12 @@
 <?php
 
+/**
+ * @var object $main;
+ */
+
 /* Папка для временных файлов */
 const RESULT_PATH = 'shared/';
-!defined('PDF_LIBRARY') && define('PDF_LIBRARY', 'mpdf');
+define('PDF_LIBRARY', $main->getCmsParam('PDF_LIBRARY') ?? 'mpdf');
 !defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
@@ -129,7 +133,7 @@ class Docs {
   }
 
   private function initPdf() {
-    require_once ABS_SITE_PATH . CORE . 'libs/vendor/autoload.php';
+    require_once CORE . 'libs/vendor/autoload.php';
 
     switch (PDF_LIBRARY) {
       case 'mpdf':

@@ -1,11 +1,9 @@
-<?php
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var array $dbConfig - config from public
  * @var object $main
  */
-
-if (!defined('MAIN_ACCESS')) die('access denied!');
 
 $db = $main->getDB();
 
@@ -17,7 +15,7 @@ stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
 
 if ($dbAction === 'tables') { // todo добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
-  $result['csvFiles'] = $db->scanDirCsv(PATH_CSV);
+  $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam('PATH_CSV'));
 } else {
 
   $columns = [];
@@ -100,7 +98,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadCVS': $db->fileForceDownload(); break;
     case 'loadFormConfig':
       if (isset($dbTable)) {
-        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath) && filesize($filePath) > 60) {
           $result['csvValues'] = $db->openCsv();
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -114,7 +112,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
-        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath)) {
           if (filesize($filePath) < 60) Xml::createXmlDefault($filePath, substr($dbTable, 1));
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -123,7 +121,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'refreshXMLConfig':
       if (isset($dbTable)) {
-        $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         Xml::createXmlDefault($filePath, substr($dbTable, 1));
         $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
       }
@@ -277,7 +275,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         'code'      => $code ?: $name,
         'active'    => intval(isset($activity) && $activity === "true"),
       ];
-      if (!$param['error']) {
+      if (!isset($param['error'])) {
         if (empty($name)) { $result['error'] = 'name_error'; break; }
 
         $result['error'] = $db->insert($db->getColumnsTable('section'), 'section', $param, true);
@@ -386,7 +384,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['unit_id'] = $unitId ?? 1;
         $param['0']['activity'] = intval(isset($activity) && $activity === "true");
         $param['0']['sort'] = $sort ?? 100;
-        $param['0']['property'] = $propertyJson ?? '{}';
+        $param['0']['properties'] = $propertiesJson ?? '{}';
 
         $imageIds = [];
         foreach ($_REQUEST as $k => $v) {

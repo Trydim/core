@@ -5,7 +5,7 @@
  */
 
 $dbContent = "";
-$field = ['pageTitle' => PROJECT_TITLE ?? 'Project title'];
+$field = ['pageTitle' => $main->getCmsParam('PROJECT_TITLE')];
 
 require ABS_SITE_PATH . 'public/public.php';
 

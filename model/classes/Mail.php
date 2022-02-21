@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @var object $main - global
+ */
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -9,18 +13,17 @@ if (!defined('MAIN_ACCESS')) die('access denied!');
 !defined('MAIL_TARGET') && define('MAIL_TARGET', 'trydim@mail.ru');
 !defined('MAIL_SUBJECT_DEFAULT') && define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта ' . $_SERVER['SERVER_NAME']);
 !defined('ABS_SITE_PATH') && define('ABS_SITE_PATH', $_SERVER['DOCUMENT_ROOT']);
-!defined('CORE') && define('CORE', '/');
 !defined('SETTINGS_PATH') && define('SETTINGS_PATH', '');
 
 // MailSetting
-const MAIL_TARGET_DEBUG = 'trydim@mail.ru';
-const MAIL_SMTP = true;
+define('MAIL_TARGET_DEBUG', $main->getCmsParam('MAIL_TARGET_DEBUG') ?? 'trydim@mail.ru');
+define('MAIL_SMTP', $main->getCmsParam('MAIL_TARGET_DEBUG') ?? true);
 
-const MAIL_PORT = 465;
+define('MAIL_PORT', $main->getCmsParam('MAIL_PORT') ?? 'smtp.yandex.ru');
 
-const MAIL_HOST = 'smtp.yandex.ru';
-const MAIL_FROM = 'noreplycalcby@yandex.ru';
-const MAIL_PASSWORD = '638ch1';
+define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 465);
+define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'noreplycalcby@yandex.ru');
+define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? '638ch1');
 /*
 const MAIL_HOST = 'smtp.mail.ru';
 const MAIL_FROM = 'mail.common@list.ru';
@@ -29,8 +32,6 @@ const MAIL_PASSWORD = 'RAE^ysPypo22';
 const MAIL_FROM = 'commonserver@yandex.ru';
 const MAIL_PASSWORD = 'xmbxqxulvhwcqyta';
 */
-
-require_once CORE . 'libs/vendor/autoload.php';
 
 class Mail {
   private $mailTpl, $body = '', $docPath = '', $pdfFileName = '';
@@ -130,6 +131,7 @@ class Mail {
   }
 
   public function send() {
+    require_once CORE . 'libs/vendor/autoload.php';
     $mail = new PHPMailer();
     $mail->SMTPDebug = DEBUG !== false;          // Enable verbose debug output
     $mail->CharSet = "UTF-8";

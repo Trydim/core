@@ -5,7 +5,7 @@
  * @var string $pathTarget
  */
 
-$field['pageTitle'] = PROJECT_TITLE;
+$field['pageTitle'] = $main->getCmsParam('PROJECT_TITLE');
 
 $field['pageFooter'] = '';
 $field['sideLeft']   = '';

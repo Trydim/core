@@ -3,6 +3,7 @@
 /**
  * @var array $vars extract param
  */
+
 $inline = strtolower(OUTSIDE);
 
 $content = $global ?? $content ?? '';

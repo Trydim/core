@@ -1,51 +1,59 @@
-<?php //if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var array $publicConfig - config from public
  */
-$absPath = strtolower(str_replace('\\', '/', ABS_SITE_PATH));
-$siteDir = str_replace(strtolower($_SERVER['DOCUMENT_ROOT']), '/', $absPath);
-define('SITE_PATH', str_replace('//', '/', $siteDir));
 
-require ABS_SITE_PATH . 'config.php'; // Public config
+require ABS_SITE_PATH . 'config.php';
+require __DIR__ . '/model/func.php';
 
-$dbConfig = $dbConfig ?? [];
+spl_autoload_register('cmsAutoloader');
 
-!defined('CORE') && define('CORE', basename( __DIR__ ) . '/');
+$url = new UrlGenerator(__DIR__);
+
+define('URI', $url->getUri());
+define('CORE', __DIR__ . '/');
+define('SITE_PATH', $url->getSitePath());
+define('SHARE_PATH', $publicConfig['SHARE_PATH'] ?? ABS_SITE_PATH . 'shared/');
+
 const VIEW = CORE . 'views/';
-
-const CORE_CSS = SITE_PATH . CORE . 'assets/css/';
-const CORE_JS = SITE_PATH . CORE . 'assets/js/';
 
 const HOOKS_PATH = ABS_SITE_PATH . 'public/hooks.php';
 
-const SETTINGS_PATH = ABS_SITE_PATH . 'shared/settingSave.json';
-const CSV_CACHE_FILE = ABS_SITE_PATH . 'shared/csvCache.bin';
-const PAGE_CACHE_FILE = ABS_SITE_PATH . 'shared/pageCache.bin';
-const SYSTEM_PATH = ABS_SITE_PATH . 'shared/system.php';
+const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';
+const PAGE_CACHE_FILE = SHARE_PATH . 'pageCache.bin'; // перенести в Main
+const CSV_CACHE = SHARE_PATH . 'csvCache.bin';
+const COURSE_CACHE = SHARE_PATH . 'courseCache.bin';
+const SYSTEM_PATH = SHARE_PATH . 'system.php';
 
-!$publicConfig['PUBLIC_PAGE'] && define('ONLY_LOGIN', true);
+define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
+define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 
-foreach ($publicConfig as $k => $v) {
-  if (!defined($k)) define($k, $v);
+$mainConfig = $publicConfig['PATH_MAIN_CONFIG'] ?? false;
+if ($mainConfig) {
+  $subConfig = $publicConfig;
+  $subDbConfig = $dbConfig ?? [];
+  require $mainConfig;
+  $publicConfig = array_merge($publicConfig, $subConfig);
+  $dbConfig = $subDbConfig;
 }
 
-// Не использую цикл т.к. куча предупреждений
-!defined('PROJECT_TITLE') && define('PROJECT_TITLE', false);
-!defined('DEBUG') && define('DEBUG', false);
-!defined('CSV_DEVELOP') && define('CSV_DEVELOP', false);
-!defined('PUBLIC_PAGE') && define('PUBLIC_PAGE', false);
-!defined('ONLY_LOGIN') && define('ONLY_LOGIN', false);
-!defined('USERS_ORDERS') && define('USERS_ORDERS', false);
-!defined('PATH_LEGEND') && define('PATH_LEGEND', false);
-!defined('USE_DATABASE') && define('USE_DATABASE', true);
-!defined('HOME_PAGE') && define('HOME_PAGE', PUBLIC_PAGE ?? ACCESS_MENU[0]);
-!defined('ACCESS_MENU') && define('ACCESS_MENU', []);
-!defined('PRINT_BTN') && define('PRINT_BTN', 1);
-!defined('SHARE_DIR') && define('SHARE_DIR', '/');
-!defined('OUTSIDE') && define('OUTSIDE', isset($_GET['outside']));
+define('DEBUG', array_key_exists('DEBUG', $publicConfig));
+define('PUBLIC_PAGE', $publicConfig['PUBLIC_PAGE'] ?? false);
+define('ONLY_LOGIN', $publicConfig['ONLY_LOGIN'] ?? !boolval(PUBLIC_PAGE)); // Можно перенести в main
 
-require_once __DIR__ . '/model/func.php';
-require_once __DIR__ . '/model/classes/Main.php';
+define('PATH_CSS', $url->getUri() . ($publicConfig['PATH_CSS'] ?? 'public/css/'));
+define('PATH_IMG', $url->getUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'));
+define('PATH_JS', $url->getUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
+define('USE_DATABASE', $publicConfig['USE_DATABASE'] ?? true);
+define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig['CHANGE_DATABASE'] ?? false) : false);
 
-unset($absPath, $siteDir, $publicConfig, $k, $v);
+define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);
+define('CSV_DELIMITER', $publicConfig['CSV_DELIMITER'] ?? ';');
+
+!defined('OUTSIDE') && define('OUTSIDE', array_key_exists('outside', $_GET));
+
+$main = new Main($publicConfig, $dbConfig ?? []);
+$main->setHooks();
+
+unset($mainConfig, $publicConfig, $subConfig, $dbConfig, $subDbConfig);
