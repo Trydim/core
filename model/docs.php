@@ -75,7 +75,11 @@ $docType = $docType ?? $docsAction;
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
 if ($docType !== 'mail') {
-  $docs = new Docs($docType, $data, $fileTpl ?? 'default');
+  $docs = new Docs([
+    'docType' => $docType,
+    'library' => $main->getCmsParam('PDF_LIBRARY'),
+    'orientation' => $main->getCmsParam('PDF_ORIENTATION'),
+  ], $data, $fileTpl ?? 'default');
 }
 
 if (isset($docsAction)) {

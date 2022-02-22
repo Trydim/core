@@ -394,12 +394,15 @@ final class Main {
     $this->cmsParam = array_merge($this->cmsParam, $cmsParam);
 
     $this->cmsParam['PROJECT_TITLE'] = $this->cmsParam['PROJECT_TITLE'] ?? 'Project title';
-    $this->cmsParam['PATH_CSV'] = $this->cmsParam['PATH_CSV'] ?? SHARE_PATH . 'csv/';
     $this->cmsParam['PATH_LEGEND'] = $this->cmsParam['PATH_LEGEND'] ?? ABS_SITE_PATH . 'public/views/legend.php';
     $this->cmsParam['DB_TABLE_IN_SIDEMENU'] = $this->cmsParam['DB_TABLE_IN_SIDEMENU'] ?? true;
 
     $this->cmsParam['ACCESS_MENU'] = $this->cmsParam['ACCESS_MENU']
                                      ?? ['calendar', 'catalog', 'statistic', 'orders', 'customers', 'admindb', 'users', 'fileManager'];
+
+    $this->setCmsParam('PATH_CSV',
+      isset($this->cmsParam['PATH_CSV']) ? ABS_SITE_PATH . $this->cmsParam['PATH_CSV'] : SHARE_PATH . 'csv/'
+    );
   }
 
   /**

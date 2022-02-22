@@ -1,13 +1,9 @@
-<?php
-
-/**
- * @var object $main - global
- */
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-if (!defined('MAIN_ACCESS')) die('access denied!');
+global $main;
 
 // General setting
 !defined('MAIL_TARGET') && define('MAIL_TARGET', 'trydim@mail.ru');

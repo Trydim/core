@@ -1,15 +1,24 @@
 <?php
 
-/**
- * @var object $main;
- */
-
 /* Папка для временных файлов */
 const RESULT_PATH = 'shared/';
-define('PDF_LIBRARY', $main->getCmsParam('PDF_LIBRARY') ?? 'mpdf');
 !defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
+
+  /**
+   * What library use
+   *
+   * @var string [mpdf/html2pdf]
+   */
+  private $pdfLibrary;
+
+  /**
+   * Page orientation
+   *
+   * @var string [P/L]
+   */
+  private $pdfOrientation;
 
   /**
    * Create name for new pdf file (Work only if DESTINATION=save)
@@ -58,15 +67,23 @@ class Docs {
    */
   private $tmpFiles = [];
 
-  public function __construct($docsType, $data, $fileTpl = 'default') {
-    $this->docsType = $docsType;
+  /**
+   * Docs constructor.
+   * @param array $param {library: string, orientation: string, docType: string}
+   * @param $data
+   * @param string $fileTpl
+   */
+  public function __construct(array $param, $data, string $fileTpl = 'default') {
+    $this->pdfLibrary = $param['library'] ?? 'mpdf';
+    $this->pdfOrientation = $param['orientation'] ?? 'P';
+    $this->docsType = $param['docType'] ?? 'pdf';
     $this->data = $data;
 
     $this->setFileTpl($fileTpl);
     $this->setDefaultParam();
     $this->getFileName();
-    in_array($docsType, ['pdf', 'print']) && $this->prepareTemplate();
-    $docsType === 'excel' && $this->setExcelData();
+    in_array($this->docsType, ['pdf', 'print']) && $this->prepareTemplate();
+    $this->docsType === 'excel' && $this->setExcelData();
 
     $func = 'init' . $this->getFunc();
     $this->$func();
@@ -106,10 +123,10 @@ class Docs {
       'margin_bottom' => 5,
       'margin_header' => 0,
       'margin_footer' => 5,
-      'orientation'   => 'L',
+      'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = ($this->docsType !== 'print' ? $_SERVER['DOCUMENT_ROOT'] : '') . PATH_IMG;
+    $this->imgPath = $this->docsType === 'print' ? PATH_IMG : ABS_SITE_PATH . basename(PATH_IMG) . DIRECTORY_SEPARATOR;
   }
 
   private function prepareTemplate() {
@@ -135,7 +152,7 @@ class Docs {
   private function initPdf() {
     require_once CORE . 'libs/vendor/autoload.php';
 
-    switch (PDF_LIBRARY) {
+    switch ($this->pdfLibrary) {
       case 'mpdf':
         try {
           $this->docs = new Mpdf\Mpdf($this->pdfParam);
@@ -162,7 +179,7 @@ class Docs {
             $this->pdfParam['margin_right'],
             $this->pdfParam['margin_bottom'],
           ];
-          $this->docs = new Spipu\Html2Pdf\Html2Pdf('P', $format, 'ru', true, 'UTF-8', $param);
+          $this->docs = new Spipu\Html2Pdf\Html2Pdf($this->pdfOrientation, $format, 'ru', true, 'UTF-8', $param);
 
           DEBUG && $this->docs->setModeDebug();
           $this->docs->setDefaultFont('freesans');
@@ -199,7 +216,7 @@ class Docs {
     $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css";
     if (file_exists($path)) {
       $stylesheet = file_get_contents($path);
-      switch (PDF_LIBRARY) {
+      switch ($this->pdfLibrary) {
         case 'mpdf':
           $this->docs->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
           break;
@@ -228,7 +245,7 @@ class Docs {
    */
   private function getPdf($path, $dest) {
 
-    switch (PDF_LIBRARY) {
+    switch ($this->pdfLibrary) {
       case 'mpdf':
       /** Default: \Mpdf\Output\Destination::INLINE
        *        Values:

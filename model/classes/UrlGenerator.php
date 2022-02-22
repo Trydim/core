@@ -68,13 +68,14 @@ class UrlGenerator {
   }
 
   private function setCoreUri() {
-    $sitePath = trim(str_replace('/', ' ', $this->sitePath));
+    // Определять автоматом.
+    /*$sitePath = trim(str_replace('/', ' ', $this->sitePath));
     $siteLevel = count(explode(' ', $sitePath));
     //$corePath = trim(str_replace($_SERVER['DOCUMENT_ROOT'] . '/', ' ', $this->corePath));
-    //$coreLevel = count(explode(' ', $corePath));
+    //$coreLevel = count(explode(' ', $corePath));*/
+    //$coreUri = str_repeat('../', $siteLevel) . 'core/';
 
-    $coreUri = str_repeat('../', $siteLevel) . 'core/';
-    $this->coreUri = $this->scheme . $this->host . $this->getSitePath() . $coreUri;
+    $this->coreUri = $this->scheme . $this->host . $this->getSitePath() . $this->corePath;
   }
 
   private function setFullUri() {

@@ -9,7 +9,7 @@ require __DIR__ . '/model/func.php';
 
 spl_autoload_register('cmsAutoloader');
 
-$url = new UrlGenerator(__DIR__);
+$url = new UrlGenerator($publicConfig['PATH_CORE'] ?? '/core/');
 
 define('URI', $url->getUri());
 define('CORE', __DIR__ . '/');
@@ -33,7 +33,7 @@ $mainConfig = $publicConfig['PATH_MAIN_CONFIG'] ?? false;
 if ($mainConfig) {
   $subConfig = $publicConfig;
   $subDbConfig = $dbConfig ?? [];
-  require $mainConfig;
+  require ABS_SITE_PATH . $mainConfig;
   $publicConfig = array_merge($publicConfig, $subConfig);
   $dbConfig = $subDbConfig;
 }
