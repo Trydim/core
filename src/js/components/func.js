@@ -413,6 +413,7 @@ export default {
    * @param {object} report - send to pdf
    * @param {string?} report.fileName - result file name without extension
    * @param {string?} report.fileTpl - pdf template file without extension
+   * @param {string?} report.pdfOrientation ['P', 'L'] - pdf orientation
    * @param {FormData?} data - object of formData to send in query Body
    * @param {function?} finishOk
    * @param {function?} err
@@ -424,7 +425,10 @@ export default {
     let fileName = report.fileName || false;
     data.set('mode', 'docs');
     data.set('docsAction', 'pdf');
-    data.set('fileTpl', report.fileTpl || 'default');
+
+    report.fileTpl && data.set('fileTpl', report.fileTpl);
+    report.pdfOrientation && data.set('pdfOrientation', report.pdfOrientation.toString().toUpperCase());
+
     data.set('reportVal', JSON.stringify(report));
 
     f.Post({data}).then(data => {

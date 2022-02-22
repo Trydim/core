@@ -20,7 +20,7 @@ $jsGlobalConst = json_encode([
   'SITE_PATH'     => SITE_PATH,
   'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
-  'PATH_IMG'      => PATH_IMG,
+  'URI_IMG'       => URI_IMG,
   'AUTH_STATUS'   => $main->checkStatus('ok'),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
@@ -67,7 +67,7 @@ $jsGlobalConst = json_encode([
   <main class="main-wrapper mx-auto" id="mainWrapper">
     <div class="nav-header">
       <a href="<?= SITE_PATH ?>" class="brand-logo">
-        <img class="logo-abbr" src="<?= PATH_IMG ?>logo.webp" alt="">
+        <img class="logo-abbr" src="<?= URI_IMG ?>logo.webp" alt="">
         <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
       </a>
 

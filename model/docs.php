@@ -78,7 +78,7 @@ if ($docType !== 'mail') {
   $docs = new Docs([
     'docType' => $docType,
     'library' => $main->getCmsParam('PDF_LIBRARY'),
-    'orientation' => $main->getCmsParam('PDF_ORIENTATION'),
+    'orientation' => $pdfOrientation ?? $main->getCmsParam('PDF_ORIENTATION'),
   ], $data, $fileTpl ?? 'default');
 }
 

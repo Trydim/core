@@ -126,7 +126,7 @@ class Docs {
       'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = $this->docsType === 'print' ? PATH_IMG : ABS_SITE_PATH . basename(PATH_IMG) . DIRECTORY_SEPARATOR;
+    $this->imgPath = $this->docsType === 'print' ? URI_IMG : PATH_IMG;
   }
 
   private function prepareTemplate() {

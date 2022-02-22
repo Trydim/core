@@ -11,7 +11,7 @@ export default {
   OUTSIDE      : window.CMS_CONST['CL_OUTSIDE'],
   SITE_PATH    : window.CMS_CONST['SITE_PATH'] || '/',
   MAIN_PHP_PATH: (window.CMS_CONST['SITE_PATH'] || '/') + 'index.php',
-  PATH_IMG     : (window.CMS_CONST['PATH_IMG'] || 'public/images/'),
+  PATH_IMG     : (window.CMS_CONST['URI_IMG'] || 'public/images/'),
   AUTH_STATUS  : window.CMS_CONST['AUTH_STATUS'] || false,
   INIT_SETTING : window.CMS_CONST['INIT_SETTING'] || false,
 

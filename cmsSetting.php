@@ -43,7 +43,8 @@ define('PUBLIC_PAGE', $publicConfig['PUBLIC_PAGE'] ?? false);
 define('ONLY_LOGIN', $publicConfig['ONLY_LOGIN'] ?? !boolval(PUBLIC_PAGE)); // Можно перенести в main
 
 define('PATH_CSS', $url->getUri() . ($publicConfig['PATH_CSS'] ?? 'public/css/'));
-define('PATH_IMG', $url->getUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'));
+define('PATH_IMG', ABS_SITE_PATH . ($publicConfig['PATH_IMG'] ?? 'public/images/'));
+define('URI_IMG', $url->getUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'));
 define('PATH_JS', $url->getUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 define('USE_DATABASE', $publicConfig['USE_DATABASE'] ?? true);
 define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig['CHANGE_DATABASE'] ?? false) : false);
