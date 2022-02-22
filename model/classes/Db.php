@@ -823,11 +823,11 @@ class Db extends \R {
     return self::getAll($sql);
   }
 
-  public function loadCustomerByOrderId($orderIds) {
+  public function loadCustomerByOrderId($orderId) {
 
     $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts FROM orders 
         LEFT JOIN customers C ON C.ID = orders.customer_id
-        WHERE orders.ID = $orderIds";
+        WHERE orders.ID = $orderId";
 
     return self::getRow($sql);
   }
@@ -1107,15 +1107,16 @@ trait MainCsv {
 
   public function openCsv() {
     global $main;
-    $csvPath = $main->getCmsParam('PATH_CSV');
+    $csvPath = $main->getCmsParam('PATH_CSV') . $this->csvTable;
 
-    if (($file = fopen($csvPath . $this->csvTable, 'r'))) {
+    if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
       $result = [];
       while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) {
+        /* Это не работает
         $cells = array_map(function ($cell) {
-          if (!mb_detect_encoding($cell, 'UTF-8', true)) $cell = iconv('cp1251', 'UTF-8', $cell);
-          return $cell;
-        }, $cells);
+          return mb_detect_encoding($cell, 'UTF-8', true) === 'UTF-8' ? $cell
+                 : iconv('cp1251', 'UTF-8', $cell);
+        }, $cells);*/
         $result[] = $cells;
       }
       return $result;

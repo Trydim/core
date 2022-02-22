@@ -9,7 +9,7 @@ require __DIR__ . '/model/func.php';
 
 spl_autoload_register('cmsAutoloader');
 
-$url = new UrlGenerator($publicConfig['PATH_CORE'] ?? '/core/');
+$url = new UrlGenerator($publicConfig['PATH_CORE'] ?? 'core/');
 
 define('URI', $url->getUri());
 define('CORE', __DIR__ . '/');
