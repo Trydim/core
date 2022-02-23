@@ -15,7 +15,7 @@ $authStatus = $main->checkStatus('ok');
 if ($authStatus && isset($_GET['orderId'])) {
   $orderId = $_GET['orderId'];
 
-  if (is_finite($orderId)) {
+  if (is_numeric($orderId)) {
     $order = $main->db->loadOrderById($orderId);
 
     if ($order) {

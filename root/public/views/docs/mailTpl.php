@@ -1,6 +1,5 @@
 <?php
 $data = $data ?? [];
-$data = $data['report'];
 $name = htmlspecialchars($name ?? '');
 $phone = htmlspecialchars($phone ?? '');
 $email = htmlspecialchars($email ?? '');
@@ -14,9 +13,9 @@ $info = htmlspecialchars($info ?? '');
 <table style="border-collapse: collapse;">
   <tbody>
   <?php /*foreach ($data['custom'] as $rows) { */?>
-      <tr>
-        <td><?/*= $rows[0] */?></td>
-      </tr>
-    <?php /*} */?>
+  <tr>
+    <td><?/*= $rows[0] */?></td>
+  </tr>
+  <?php /*} */?>
   </tbody>
 </table>

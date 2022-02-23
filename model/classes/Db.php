@@ -220,6 +220,17 @@ class Db extends \R {
   }
 
   /**
+   * @param $table
+   * @return mixed
+   */
+  public function getLastID($table) {
+    $bean = self::xdispense($table);
+    self::store($bean);
+
+    return $bean->getID();
+  }
+
+  /**
    * @param string $like
    * @return mixed|null
    */
@@ -789,10 +800,6 @@ class Db extends \R {
 
   // Customers
   //--------------------------------------------------------------------------------------------------------------------
-
-  public function getLastID($table) { // TODO плохо
-    return self::getRow("SELECT MAX(ID) AS 'ID' FROM $table")['ID'];
-  }
 
   /**
    * @param int $pageNumber

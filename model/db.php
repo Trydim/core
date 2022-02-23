@@ -131,9 +131,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'saveOrder':
       if (isset($reportVal)) {
         $customerId = intval($customerId ?? 0);
-        $customerChange = $customerId === 0 ? 'add' : ($customerChange ?? 'add'); // add/change
+        $customerId = $customerId !== 0 ? $customerId : $db->getLastID('customers');
+        $customerChange = boolValue($customerChange ?? true);
 
-        if ($customerChange) {
+        if (!empty($customerChange)) {
           $param = [$customerId => [
             'name' => $name ?? 'No name',
             'ITN'  => $ITN ?? '',
@@ -144,12 +145,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             ]),
           ]];
 
-          $columns = $db->getColumnsTable('customers');
-          $result['error'] = $db->insert($columns, 'customers', $param, $customerChange === 'change');
-          $customerChange === 'add' && $customerId = $db->getLastID('customers');
+          $result['error'] = $db->insert($db->getColumnsTable('customers'), 'customers', $param, true);
         }
 
         $orderId = intval($orderId ?? 0);
+        $orderId = $orderId !== 0 ? $orderId : $db->getLastID('orders');
         $orderTotal = $orderTotal ?? 0;
 
         $param = [$orderId => [
@@ -162,11 +162,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'report_value'    => addCpNumber($orderId, $reportVal),
         ]];
 
-        $columns = $db->getColumnsTable('orders');
-        $result['error'] = $db->insert($columns, 'orders', $param, $orderId !== '0');
+        $result['error'] = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
 
         $result['customerId'] = $customerId;
-        $result['orderId']    = $db->getLastID('orders');
+        $result['orderId']    = $orderId;
         $result['saveDate']   = date('Y-m-d H:i:s');
       }
       break;

@@ -1,7 +1,7 @@
-$white: #fff;
+$white: #fff !default;
 $loading-color: $white !default;
 
-  .loading-st1 {
+.loading-st1 {
   position: relative !important;
 
   &:after {

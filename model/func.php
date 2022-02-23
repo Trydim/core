@@ -57,6 +57,21 @@ function addHook($hookName, $callable) {
 }
 
 /**
+ * @param mixed $var
+ * @return bool
+ */
+function boolValue($var): bool {
+  if (is_bool($var)) return $var;
+  if (is_string($var)) {
+    return !(empty($var) || $var === '-' || $var === 'false');
+  }
+  if (is_numeric($var)) {
+    return boolval($var);
+  }
+  return !empty($var);
+}
+
+/**
  * Check if there is an error
  * Deep search for all error messages and return as an array
  * @param array $result

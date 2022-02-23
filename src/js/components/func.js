@@ -380,12 +380,46 @@ export default {
    * Добавить иконку загрузки
    * @param {HTMLElement} node
    */
-  setLoading: node => node && node.classList.add(f.CLASS_NAME.LOADING),
+  setLoading: node => {
+    if (!(node instanceof HTMLElement)) {
+      console.warn('Loading - node is not HTMLElement');
+      return;
+    }
+
+    if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
+      const c = node.getBoundingClientRect(),
+            loaderW = document.createElement('div'),
+            loader = loaderW.cloneNode();
+
+      loaderW.id = 'cmsLoaderWrapper';
+      loaderW.style.position = 'fixed';
+      loaderW.style.zIndex = '100';
+      loaderW.style.left = c.x + 'px';
+      loaderW.style.top = c.y + 'px';
+      loaderW.style.height = loader.style.height = c.height + 'px';
+      loaderW.style.width = loader.style.width = c.width + 'px';
+
+      loader.classList.add(f.CLASS_NAME.LOADING);
+
+      loaderW.append(loader);
+      document.body.append(loaderW);
+    } else {
+      node.classList.add(f.CLASS_NAME.LOADING);
+    }
+  },
   /**
    * Удалить иконку загрузки
    * @param {HTMLElement} node
    */
-  removeLoading: node => node && node.classList.remove(f.CLASS_NAME.LOADING),
+  removeLoading: node => {
+    if (!(node instanceof HTMLElement)) {
+      console.warn('Loading - node is not HTMLElement');
+      return;
+    }
+
+    if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) f.gI('cmsLoaderWrapper').remove();
+    else node.classList.remove(f.CLASS_NAME.LOADING);
+  },
 
   /**
    * Функция печати по умолчанию
