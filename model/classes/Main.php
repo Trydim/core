@@ -108,8 +108,8 @@ trait Authorization {
       if (($target === '' && ONLY_LOGIN) || $target !== 'login') reDirect('login');
       if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
     } else {
-      if ($target === '' && !PUBLIC_PAGE) reDirect($this->getSideMenu(true));
-      if ($target !== '' && !in_array($target, $this->getSideMenu())) reDirect('404');
+      if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) reDirect($this->getSideMenu(true));
+      if ($target !== '' && !$this->availablePage($target)) reDirect('404');
     }
 
     session_abort();

@@ -13,7 +13,7 @@ $field['footerContent'] = <<<footerContent
 </template>
 <template id="tableOrdersNumbers">
   <div class="form-check mb-1">
-    <input class="form-check-input" type="radio" name="orders" id="orders-\${value}">
+    <input class="form-check-input" type="radio" name="orders" id="orders-\${value}" value="\${value}">
     <label class="form-check-label" for="orders-\${value}">Заказ №\${value}</label>
   </div>
 </template>
