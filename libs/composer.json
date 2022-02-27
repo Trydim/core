@@ -17,6 +17,7 @@
     "ext-zlib": "*",
     "ext-mbstring": "*",
     "ext-iconv": "*",
-    "ext-gettext": "*"
+    "ext-gettext": "*",
+    "ext-simplexml": "*"
   }
 }

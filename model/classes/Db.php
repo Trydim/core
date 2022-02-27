@@ -14,7 +14,7 @@ class Db extends \R {
    * @param $type
    * @param $count
    *
-   * @return array|OODBBean|null
+   * @return array|\RedBeanPHP\OODBBean|null
    */
   private function dis($type, $count) {
     return self::getRedBean()->dispense($type, $count);
@@ -184,7 +184,7 @@ class Db extends \R {
    */
   public function checkHaveRows($dbTable, $columnName, $value): int {
     return intval(self::getCell("SELECT count(*) FROM $dbTable
-                                 WHERE $columnName = :value", [':value' => $value]));
+                                     WHERE $columnName = :value", [':value' => $value]));
   }
 
   /**
@@ -220,11 +220,13 @@ class Db extends \R {
   }
 
   /**
-   * @param $table
+   * @param string $table
+   * @param array  $requireParam
    * @return mixed
    */
-  public function getLastID($table) {
+  public function getLastID(string $table, array $requireParam = []) {
     $bean = self::xdispense($table);
+    foreach ($requireParam as $field => $value) $bean->$field = $value;
     self::store($bean);
 
     return $bean->getID();
@@ -256,12 +258,11 @@ class Db extends \R {
    */
   public function getColumnsTable($dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
-                           COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
-                         FROM information_schema.COLUMNS 
-                         WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
+                               COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
+                             FROM information_schema.COLUMNS 
+                             WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
       [':dbName'  => $this->dbName,
-       ':dbTable' => $dbTable
-      ]);
+       ':dbTable' => $dbTable]);
   }
 
   /**
