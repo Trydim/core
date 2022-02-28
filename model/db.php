@@ -149,7 +149,12 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         }
 
         $orderId = intval($orderId ?? 0);
-        $orderId = $orderId !== 0 ? $orderId : $db->getLastID('orders');
+        $orderId = $orderId !== 0 ? $orderId
+          : $db->getLastID('orders',
+            [
+              'status_id' => $main->getSettings('statusDefault'),
+              'customer_id' => $customerId
+            ]);
         $orderTotal = $orderTotal ?? 0;
 
         $param = [$orderId => [
@@ -206,9 +211,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'saveVisitorOrder':
       if (isset($inputValue)) {
         $param = [
-          'cp_number'   => isset($cpNumber) ? $cpNumber : time(),
+          'cp_number'   => $cpNumber ?? time(),
           'input_value' => $inputValue,
-          'total'       => isset($total) ? $total : 0,
+          'total'       => $total ?? 0,
         ];
 
         isset($importantValue) && $importantValue !== 'false' && $param['importantValue'] = $importantValue;
