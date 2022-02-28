@@ -142,6 +142,9 @@ switch ($cmsAction) {
 
     // Global other setting
     $main->setSettings('statusDefault', $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
+    $other = json_decode($otherFields ?? '[]', true);
+    $main->setSettings('phoneMaskGlobal', $other['phoneMask']['global'] ?? '+_ (___) ___ __ __');
+
 
     $main->saveSettings();
     break;

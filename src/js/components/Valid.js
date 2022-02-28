@@ -188,7 +188,7 @@ export class Valid {
             this.btnDisabled();
 
             //  добавить удаление события проверки файла
-          }
+          };
 
     this.fileInput && formData.delete(this.fileInput.name);
     this.files && Object.entries(this.files).forEach(([id, file]) => {

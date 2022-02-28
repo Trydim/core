@@ -36,10 +36,11 @@ import PickList from './components/picklist.esm';
 import Mail from "./mail.vue";
 import UserFields from "./userField.vue";
 import Permission from "./permission.vue";
-import managerFields from "./managerField.vue";
+import ManagerFields from "./managerField.vue";
 import Rate from "./rate.vue";
 import OrderStatus from "./orderStatus.vue";
 import Properties from "./properties.vue";
+import Other from "./other.vue";
 
 // Import Directives
 // ---------------------------------------------------------------------------------------------------------------------
@@ -82,10 +83,11 @@ app.component('p-textarea', Textarea);
 app.component('setting-mail', Mail);
 app.component('setting-user', UserFields);
 app.component('setting-permission', Permission);
-app.component('setting-manager-field', managerFields);
+app.component('setting-manager-field', ManagerFields);
 app.component('setting-rate', Rate);
 app.component('setting-order-status', OrderStatus);
 app.component('setting-properties', Properties);
+app.component('setting-other', Other);
 
 app.directive('tooltip', Tooltip);
 

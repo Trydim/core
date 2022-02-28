@@ -334,7 +334,7 @@ export default {
 
     const mask = e => {
       let target = e.target, i = 0,
-          matrix = phoneMask || f.PHONE_MASK,
+          matrix = phoneMask || f.cmsSetting && f.cmsSetting['phoneMaskGlobal'] || f.PHONE_MASK_DEFAULT,
           def = matrix.replace(/\D/g, ""),
           val = target.value.replace(/\D/g, "");
 

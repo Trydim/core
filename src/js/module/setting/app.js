@@ -1,6 +1,29 @@
 'use strict';
 
-import sf from './settingFunc';
+const conArrToObject = (arr, key) => arr.reduce((r, i) => {r[i[key]] = i; return r;}, Object.create(null));
+
+const loadData = d => {
+  const data = f['cmsSetting'];
+
+  d.mail.target     = data['mailTarget'] || '';
+  d.mail.targetCopy = data['mailTargetCopy'] || '';
+  d.mail.subject    = data['mailSubject'] || '';
+  d.mail.fromName   = data['mailFromName'] || '';
+
+  d.managerFields = data.managerFields || {};
+
+  d.statusDefault = +data.statusDefault || 0;
+
+  d.otherFields = {
+    phoneMask: {
+      users    : data['phoneMaskUsers'] || f.PHONE_MASK_DEFAULT,
+      customers: data['phoneMaskCustomers'] || f.PHONE_MASK_DEFAULT,
+      global   : data['phoneMaskGlobal'] || f.PHONE_MASK_DEFAULT,
+    },
+  };
+
+  return d;
+}
 
 export default {
   components: {},
@@ -23,7 +46,7 @@ export default {
       //loadingPage: true,
     };
 
-    return sf.loadData(d);
+    return loadData(d);
   },
   computed: {},
   watch   : {},
@@ -58,6 +81,9 @@ export default {
     updateProperties(p) {
       this.queryParam.properties = JSON.stringify(p);
     },
+    updateOtherFields(p) {
+      this.queryParam.otherFields = JSON.stringify(p);
+    },
 
     query() {
       const data = new FormData();
@@ -80,3 +106,7 @@ export default {
     //this.loadingPage = false;
   },
 }
+
+f.HOOKS.beforeCreateApp = f.HOOKS.beforeCreateApp || (() => {});
+f.HOOKS.beforeMoundedApp = f.HOOKS.beforeMoundedApp || (() => {});
+f.HOOKS.afterMoundedApp = f.HOOKS.afterMoundedApp || (() => {});

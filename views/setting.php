@@ -31,7 +31,7 @@ ob_start();
   <?php } ?>
 
   <?php if ($isAdmin) { ?>
-    <!-- Остальные опции -->
+    <setting-other :prop-other-fields="otherFields" @update="updateOtherFields"></setting-other>
   <?php } ?>
 
   <div class="col-12 text-center">

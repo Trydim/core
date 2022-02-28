@@ -436,7 +436,12 @@ final class Main {
     $this->setting = getSettingFile();
   }
 
-  public function setSettings($key, $value): Main {
+  /**
+   * @param string $key
+   * @param $value
+   * @return $this
+   */
+  public function setSettings(string $key, $value): Main {
     $this->setting[$key] = $value;
     return $this;
   }
@@ -464,7 +469,7 @@ final class Main {
    * @return false|mixed|string
    */
   public function getSettings(string $key, bool $front = false) {
-    $data = isset($this->setting[$key]) ? $this->setting[$key] : null;
+    $data = $this->setting[$key] ?? null;
     $jsonData = $key === 'json' || $front ? json_encode($data ?: $this->setting) : '';
 
     if ($front) {
