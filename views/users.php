@@ -26,7 +26,7 @@ foreach ($managerField as $k => $item) {
                        '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
 }
 
-$field['footerContent'] = <<<footerContent
+$field['footerContent'] .= <<<footerContent
 <template id="permission">
   <option value="\${ID}">\${name}</option>
 </template>

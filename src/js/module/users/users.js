@@ -175,7 +175,7 @@ const users = {
         else node.parentNode.remove();
 
         node = form.querySelector('[name="permissionId"]');
-        if (oneElements) node.value = users['permissionId'];
+        if (oneElements) node.value = users['permission_id'];
         else node.value = 1;
 
         node = form.querySelector('[name="login"]');

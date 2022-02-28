@@ -326,7 +326,7 @@ export default {
   /**
    * Маска для телефона
    * @param {HTMLElement} node
-   * @param {string} phoneMask
+   * @param {string?} phoneMask
    */
   initMask: (node, phoneMask) => {
     if (!node) return;

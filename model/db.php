@@ -483,15 +483,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Users
     case 'loadUsers':
-      !isset($sortColumn) && $sortColumn = 'create_date';
-
       $result['countRows'] = $db->getCountRows('users');
-      $result['users'] = $db->loadUsers($pageNumber, $countPerPage, $sortColumn, $sortDirect);
+      $result['users'] = $db->loadUsers($pageNumber, $countPerPage, $sortColumn ?? 'create_date', $sortDirect);
       $result['permissionUsers'] = $db->loadTable('permission');
       break;
     case 'addUser':
       $param = [0 => []];
-      $user = isset($authForm) ? json_decode($authForm, true) : [];
+      $user = json_decode($authForm ?? '[]', true);
 
       $contacts = [];
       foreach ($user as $k => $v) {
@@ -504,8 +502,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['error'] = $db->insert($columns, 'users', $param);
       break;
     case 'changeUser':
-      $usersId = isset($usersId) ? json_decode($usersId) : [];
-      $authForm = isset($authForm) ? json_decode($authForm, true) : [];
+      $usersId = json_decode($usersId ?? '[]');
+      $authForm = json_decode($authForm ?? '[]', true);
 
       if (count($usersId)) {
         $param = [];
@@ -525,7 +523,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'changeUserPassword':
-      $usersId = isset($usersId) ? json_decode($usersId) : [];
+      $usersId = json_decode($usersId ?? '[]');
 
       if (count($usersId) === 1 && isset($validPass)) {
         $param[$usersId[0]]['password'] = password_hash($validPass, PASSWORD_BCRYPT);
@@ -534,7 +532,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'delUser':
-      $usersId = isset($usersId) ? json_decode($usersId) : [];
+      $usersId = json_decode($usersId ?? '[]');
 
       if (count($usersId)) {
         $db->deleteItem('users', $usersId);
