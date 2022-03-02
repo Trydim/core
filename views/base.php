@@ -36,7 +36,7 @@ $jsGlobalConst = json_encode([
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
   <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
-    <link rel="stylesheet" href="<?= CORE_CSS ?>admin.css">
+    <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=7ef72720c4'>
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
@@ -94,8 +94,8 @@ $jsGlobalConst = json_encode([
   </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src="<?= CORE_JS ?>src.js?v=1234"></script>
-<script defer type="module" src="<?= CORE_JS ?>main.js?v=1234"></script>
+<script defer type="module" src='<?= CORE_JS ?>src.js?ver=4ec088c5e6'></script>
+<script defer type="module" src='<?= CORE_JS ?>main.js?ver=64fe1de61c'></script>
 
 <?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= $item ?>"></script>

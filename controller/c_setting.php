@@ -8,8 +8,8 @@
 $field = [
   'pageTitle' => 'Настройки',
   'footerContent' => '',
-  'cssLinks'   => [CORE_CSS . 'module/setting.css'],
-  'jsLinks'    => [CORE_JS . 'module/setting.js'],
+  'cssLinks'   => [CORE_CSS . 'module/setting.css?ver=6cac4c1cd2'],
+  'jsLinks'    => [CORE_JS . 'module/setting.js?ver=27f66c2a6f'],
 ];
 
 $user = $main->db->getUserById($main->getLogin('id'));
