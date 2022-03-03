@@ -2,7 +2,7 @@
 
 import '../../../css/module/fileManager/fileManager.css';
 
-const t = (dir) => {
+const t = dir => {
   //$("body").append('<div id="alerts" class="btn blue">загрузка..</div>');
   //$("#alerts").fadeIn(1e3);
   fileManager.query({fmAction: 'showTable', dir}, (data) => {
@@ -44,23 +44,30 @@ const fileManager = {
       $("#breadcrumb-links span").text(i);
       $(this).addClass("selected")
     });
-    $("body").on("click", "td.ab-tdfolder a", function (i) {
-      var r, f;
-      i.preventDefault();
-      r = $(this).attr("href");
-      f = "#" + r.match(/([^\/]*)\/*$/)[1];
-      t(r);
-      var u = $("div.selected").next().find(f), e = u.parents("ul"), o = e.prev("div");
-      u.parents("ul:hidden") && (e.css("display", "block"), o.removeClass("closed").addClass("open selected"));
-      scroll = 1;
-      u.click()
+    $("body").on("click", "td.ab-tdfolder a", function (e) {
+      e.preventDefault();
+
+      const href = this.href,
+            folder = href.match(/([^\/]*)\/*$/)[1],
+            u = $("div.selected").next().find("#" + folder),
+            ulNode = u.parents("ul"),
+            div = ulNode.prev("div");
+
+      $("#tree div.selected")[0].dataset.fo += folder + '/';
+
+      t(href);
+      u.parents("ul:hidden");
+      ulNode.css("display", "block");
+      div.removeClass("closed").addClass("open selected");
+      //scroll = 1;
+      u.click();
     });
     $("body").on("mouseenter", ".zoom", function (t) {
       t.preventDefault();
       $("body").append('<div id="imgpreview" style="background-color:#ddd;width:120px;position:fixed;z-index:9999;left:' + parseInt(t.clientX - 140) + "px;top:" + parseInt(t.clientY - 40) + 'px"><img src="' + $(this).attr("href") + '" width="120" height="120"></div>')
     });
     $("body").on("mouseleave", ".zoom", () => {$("#imgpreview").hide().remove()});
-    $("body").on("click", "#a-create-folder", (e) => {
+    $("body").on("click", "#a-create-folder", e => {
       e.preventDefault();
       let u = $("#tree div.selected").data("fo"),
           r = prompt("Name directory:", ""), f;
@@ -193,7 +200,7 @@ const fileManager = {
     function changeInput (e) {
       e.preventDefault();
 
-      let dir = $("#tree div.selected").data("fo"),
+      let dir = $("#tree div.selected")[0].dataset.fo,
           files = e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer.files : this.files;
 
       Object.values(files).forEach(file => {
@@ -225,6 +232,7 @@ const fileManager = {
     }
 
   },
+
 
   query(param, func) {
     let {type = ''} = param,
