@@ -194,16 +194,13 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'changeStatusOrder':
       if (isset($commonValues) && isset($statusId) && count($columns)) {
-
         if (!is_finite($statusId)) break;
 
-        $commonValues = json_decode($commonValues);
-
-        $db->changeOrders($columns, $dbTable, $commonValues, $statusId);
+        $db->changeOrders($columns, $dbTable, json_decode($commonValues), $statusId);
       }
       break;
     case 'delOrders':
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
+      $orderIds = explode(',', $orderIds ?? '');
       if (count($orderIds)) $db->deleteItem('orders', $orderIds);
       break;
 
