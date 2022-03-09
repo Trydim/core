@@ -34,10 +34,10 @@ export const searching = () => {
         latin       = 'YKEHXBAPOCMTykehxbapocmt',
         //cyrillicKey = 'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮйцукенгшщзхъфывапролджэячсмитьбю',
         //latinKey    = 'QWERTYUIOP{}ASDFGHJKL:\"ZXCVBNM<>qwertyuiop[]asdfghjkl;\'zxcvbnm,.',
-        replacerLC    = (match) => latin.charAt(cyrillic.indexOf(match)),
-        replacerCL    = (match) => cyrillic.charAt(latin.indexOf(match)),
-        //replacerKeyLC = (match) => latinKey.charAt(cyrillicKey.indexOf(match)),
-        //replacerKeyCL = (match) => cyrillicKey.charAt(latinKey.indexOf(match)),
+        replacerLC    = match => latin.charAt(cyrillic.indexOf(match)),
+        replacerCL    = match => cyrillic.charAt(latin.indexOf(match)),
+        //replacerKeyLC = match => latinKey.charAt(cyrillicKey.indexOf(match)),
+        //replacerKeyCL = match => cyrillicKey.charAt(latinKey.indexOf(match)),
         lettersL = new RegExp(`(${latin.split('').join('|')})`, 'gi'),
         lettersC = new RegExp(`(${cyrillic.split('').join('|')})`, 'gi');
     //funcKeyL = new RegExp(`(${latinKey.split('').join('|')})`, 'gi'),
@@ -61,9 +61,7 @@ export const searching = () => {
 
   obj.clear = function (inputNode) {
     inputNode.removeEventListener('keyup', this.bindInputNodeEvent);
-    setTimeout(() => {
-      this.usePopup && this.resultTmp.remove();
-    }, 0);
+    this.usePopup && setTimeout(() => this.resultTmp.remove(), 0);
   }
 
   // Events
@@ -85,7 +83,7 @@ export const searching = () => {
 
     if (this.usePopup && !this.resultTmp) {
       this.resultTmp = f.gTNode('#searchResult');
-      this.resultTmp.addEventListener('click', (e) => this.clickResult(e, target));
+      this.resultTmp.addEventListener('mousedown', e => this.clickResult(e, target));
     }
 
     this.bindInputNodeEvent = inputNodeEvent.bind(this);
@@ -102,11 +100,10 @@ export const searching = () => {
 
   obj.clickResult = function (e, inputNode) {
     if (this.resultTmp === e.target) return;
-    let index = +e.target.dataset.id;
 
     this.clear(inputNode);
     //inputNode.value = this.data[index].name;
-    this.resultFunc(index);
+    this.resultFunc(+e.target.dataset.id);
   }
 
   return obj;

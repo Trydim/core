@@ -131,10 +131,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'saveOrder':
       if (isset($reportVal)) {
         $customerId = intval($customerId ?? 0);
+        $customerChange = $customerId === 0 ? true : boolValue($customerChange ?? true);
         $customerId = $customerId !== 0 ? $customerId : $db->getLastID('customers');
-        $customerChange = boolValue($customerChange ?? true);
 
-        if (!empty($customerChange)) {
+        if ($customerChange) {
           $param = [$customerId => [
             'name' => $name ?? 'No name',
             'ITN'  => $ITN ?? '',

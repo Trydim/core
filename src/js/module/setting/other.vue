@@ -1,6 +1,9 @@
 <template>
   <div class="col-6 border" id="otherForm">
-    <h3 class="col text-center">Прочее</h3>
+    <h3 class="col text-center">
+      Прочее
+      <i class="ms-1 pi pi-tag" v-tooltip.bottom="'Для маски использовать \'_\''"></i>
+    </h3>
     <div class="form-floating mb-3">
       <p-input-text v-model="phoneMask.global" class="form-control" placeholder="_"></p-input-text>
       <label>Шаблон телефона общий</label>

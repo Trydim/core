@@ -43,11 +43,11 @@
           <p-input-text v-model="data[field]"></p-input-text>
         </template>
       </p-t-column>
-      <p-t-column field="lastEditDate" header="Дата обновления">
+      <!--<p-t-column field="lastEditDate" header="Дата обновления">
         <template #editor="{ data, field }">
           <p-calendar v-model="data[field]"></p-calendar>
         </template>
-      </p-t-column>
+      </p-t-column>-->
       <p-t-column field="rate" header="rate">
         <template #editor="{ data, field }">
           <p-input-number v-model.number="data[field]"></p-input-number>
@@ -68,7 +68,7 @@
     </p-table>
 
     <template #footer>
-      <p-button label="Yes" icon="pi pi-check" @click="modalHide"></p-button>
+      <p-button label="Закрыть" icon="pi pi-check" @click="modalHide"></p-button>
     </template>
   </p-dialog>
 </template>
@@ -106,8 +106,7 @@ export default {
     },
 
     onEditComplete(event) {
-      debugger
-      let { data, newValue, field } = event;
+      let {data, newValue, field} = event;
 
       switch (field) {
         case 'code':
@@ -133,9 +132,7 @@ export default {
 
     this.$watch('rate', {
       deep: true,
-      handler() {
-        debugger;
-      }
+      handler() { this.$emit('update', this.rate) },
     });
   },
 }

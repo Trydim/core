@@ -88,6 +88,7 @@ switch ($cmsAction) {
         $result['error']['add'] = $db->insert($columns, 'permission', $param['new']);
         $result['error']['change'] = $db->insert($columns, 'permission', $param['change'], true);
       }
+      unset($permissions);
 
       // Статусы
       if (isset($orderStatus)) {
@@ -116,6 +117,22 @@ switch ($cmsAction) {
         $columns = $db->getColumnsTable('order_status');
         $result['error']['statusAdd'] = $db->insert($columns, 'order_status', $param['new']);
         $result['error']['statusChange'] = $db->insert($columns, 'order_status', $param['change'], true);
+      }
+
+      // Rate
+      $rate = json_decode($rate ?? '[]', true);
+      if (count($rate)) {
+        foreach ($rate as $item) {
+          $param = [$item['ID'] => [
+            'code' => $item['code'],
+            'name' => $item['name'],
+            'short_name' => $item['shortName'],
+            'rate' => $item['rate'],
+            'main' => intval($item['main']),
+          ]];
+
+          $result['error']['rateChange'] = $db->insert($db->getColumnsTable('money'), 'money', $param, true);
+        }
       }
     } else {
       $hash = '';

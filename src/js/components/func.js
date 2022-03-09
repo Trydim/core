@@ -343,9 +343,9 @@ export default {
         a => /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a );
 
       if (e.type === "blur" && target.value.length <= minValue) target.value = "";
-    }
+    };
 
-    ['input', 'focus', 'blur'].map(e => node.addEventListener(e, mask));
+    ['input', 'blur'].map(e => node.addEventListener(e, mask));
   },
 
   /**
