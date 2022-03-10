@@ -34,7 +34,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   }
 
   $pageNumber = $currPage ?? 0;
-  !isset($countPerPage) && $countPerPage = 20;
+  $countPerPage = $countPerPage ?? 20;
   $sortDirect = isset($sortDirect) && $sortDirect === 'true';
 
   switch ($dbAction) {
@@ -364,7 +364,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Options
     case 'loadOptions':
       $result['options'] = $db->loadOptions(
-        isset($filter) ? json_decode($filter, true) : [],
+        json_decode($filter ?? '[]', true),
         $pageNumber ?? 0, $countPerPage
       );
       break;

@@ -285,22 +285,22 @@ function findKey($cell, $input) {
 }
 
 /**
- * @param $dir {string} - path without slash on the end
+ * @param $path {string} - path without slash on the end
  * @param $fileName {string} - only file name without slash
  * @return false|string
  */
-function findingFile($dir, $fileName) {
-  $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $dir;
-  if (!file_exists($absolutePath)) return false;
-  if (file_exists($absolutePath . '/' . $fileName)) return $dir . '/' . $fileName;
+function findingFile($path, $fileName) {
+  $path = $path ?? SHARE_PATH;
+  if (!file_exists($path)) return false;
+  if (file_exists($path . '/' . $fileName)) return $path . '/' . $fileName;
 
-  $arrDir = array_values(array_filter(scandir($absolutePath), function ($dir) use ($absolutePath) {
-    return !($dir === '.' || $dir === '..' || is_file($absolutePath . '/' . $dir));
+  $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path) {
+    return !($dir === '.' || $dir === '..' || is_file($path . '/' . $dir));
   }));
 
   $length = count($arrDir);
   for ($i = 0; $i < $length; $i++) {
-    $result = findingFile($dir . '/' . $arrDir[$i], $fileName);
+    $result = findingFile($path . '/' . $arrDir[$i], $fileName);
     if ($result) return $result;
   }
 

@@ -397,8 +397,8 @@ class Db extends \R {
           $result['fileExist'][] = $file['name'];
           if (filesize($uploadFile) === $file['size']) {
             $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
-            if (count($id) === 1) { $imageIds[] = $id[0]; continue;
-            } else unlink($uploadFile);
+            if (count($id) === 1) { $imageIds[] = $id[0]; continue; }
+            else unlink($uploadFile);
 
           } else {
             $name = pathinfo($file['name'], PATHINFO_BASENAME) . '_' . rand();
@@ -432,10 +432,10 @@ class Db extends \R {
 
     $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
                    C.symbol_code AS 'symbolCode', C.name AS 'codeName'
-    FROM elements E
-    JOIN codes C on C.symbol_code = E.element_type_code
-    WHERE E.section_parent_id = $sectionID
-    ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
+            FROM elements E
+            JOIN codes C on C.symbol_code = E.element_type_code
+            WHERE E.section_parent_id = $sectionID
+            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
   }
@@ -446,10 +446,10 @@ class Db extends \R {
 
     $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
                    C.symbol_code AS 'symbolCode', C.name AS 'codeName'
-    FROM elements E
-    JOIN codes C on C.symbol_code = E.element_type_code
-    WHERE E.name LIKE '%$searchValue%'
-    ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
+            FROM elements E
+            JOIN codes C on C.symbol_code = E.element_type_code
+            WHERE E.name LIKE '%$searchValue%'
+            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
 
     //$countPerPage OFFSET $pageNumber;
 
@@ -467,9 +467,12 @@ class Db extends \R {
   private function setImages(string $imagesIds = ''): array {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
-      $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+      $path = findingFile(substr(SHARE_PATH , 0, -1), mb_strtolower($item['path']));
       $item['id'] = $item['ID'];
-      $item['src'] = $path ? $path : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
+      $item['path'] = $item['src'] = $path
+        ? URI . str_replace(ABS_SITE_PATH, '', $path)
+        : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
+
       unset($item['ID']);
       return $item;
     }, $images);
@@ -567,8 +570,8 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']]; TODO удалить
-        $option['images'] = $this->setImages($option['images']);
+        $option['images'] = [['path' => URI . 'shared/upload/stone/a001_raffia.jpg']]; // TODO удалить
+        //$option['images'] = $this->setImages($option['images']);
       }
 
       // set property
@@ -617,9 +620,9 @@ class Db extends \R {
         // TODO временно
         if ($table['dbTable'] === 'prop_brand') {
           $tmp = array_map(function ($it) {
-            if($it['logo_ids']) {
+            if ($it['logo_ids']) {
               $it['logo_ids'] = $this->setImages($it['logo_ids']);
-              $it['logo'] = $it['logo_ids'][0]['path'];
+              $it['logo'] = $it['logo_ids'][0]['src'];
             }
             return $it;
           }, $props[$table['dbTable']]);
