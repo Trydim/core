@@ -70,23 +70,19 @@ switch ($cmsAction) {
             continue;
           }
 
+          $field = [
+            'name'       => $permission['name'],
+            'properties' => json_encode($permission['properties']),
+          ];
+
           // Js random 0 - 1
-          if ($id < 1) {
-            $param['new'][uniqid()] = [
-              'name'       => $permission['name'],
-              'properties' => json_encode($permission['properties']),
-            ];
-          } else {
-            $param['change'][$id] = [
-              'name'       => $permission['name'],
-              'properties' => json_encode($permission['properties']),
-            ];
-          }
+          if ($id < 1) $param['new'][uniqid()] = $field;
+          else $param['change'][$id] = $field;
         }
 
         $columns = $db->getColumnsTable('permission');
-        $result['error']['add'] = $db->insert($columns, 'permission', $param['new']);
-        $result['error']['change'] = $db->insert($columns, 'permission', $param['change'], true);
+        $result['error']['addPerm'] = $db->insert($columns, 'permission', $param['new']);
+        $result['error']['changePerm'] = $db->insert($columns, 'permission', $param['change'], true);
       }
       unset($permissions);
 
@@ -122,17 +118,34 @@ switch ($cmsAction) {
       // Rate
       $rate = json_decode($rate ?? '[]', true);
       if (count($rate)) {
+        $param = [
+          'new'    => [],
+          'change' => [],
+        ];
+
         foreach ($rate as $item) {
-          $param = [$item['ID'] => [
+          $id = $item['ID'];
+
+          if (isset($item['delete']) && boolValue($item['delete']) === true) {
+            $result['error']['del'] = $db->deleteItem('money', [$id]);
+            continue;
+          }
+
+          $field = [
             'code' => $item['code'],
             'name' => $item['name'],
             'short_name' => $item['shortName'],
             'rate' => $item['rate'],
             'main' => intval($item['main']),
-          ]];
+          ];
 
-          $result['error']['rateChange'] = $db->insert($db->getColumnsTable('money'), 'money', $param, true);
+          if ($id === 'new') $param['new'][uniqid()] = $field;
+          else $param['change'][$id] = $field;
         }
+
+        $columns = $db->getColumnsTable('money');
+        $result['error']['addRate'] = $db->insert($columns, 'money', $param['new']);
+        $result['error']['changeRate'] = $db->insert($columns, 'money', $param['change'], true);
       }
     } else {
       $hash = '';
@@ -160,8 +173,7 @@ switch ($cmsAction) {
     // Global other setting
     $main->setSettings('statusDefault', $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
     $other = json_decode($otherFields ?? '[]', true);
-    $main->setSettings('phoneMaskGlobal', $other['phoneMask']['global'] ?? '+_ (___) ___ __ __');
-
+    $main->setSettings('phoneMaskGlobal', $other['phoneMask']['global'] ?? $main->getSettings('phoneMaskGlobal') ?? '+_ (___) ___ __ __');
 
     $main->saveSettings();
     break;

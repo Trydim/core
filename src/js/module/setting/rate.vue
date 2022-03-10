@@ -26,21 +26,23 @@
 
     <p-table :value="rate"
              :bodyClass="'text-center'"
+             :rowClass="rowClass"
              :resizableColumns="true" columnResizeMode="fit" showGridlines
              :scrollable="true"
              editMode="cell"
              responsiveLayout="scroll"
              @cell-edit-complete="onEditComplete"
+             style="width: 60vw"
     >
       <p-t-column field="ID" header="ID"></p-t-column>
       <p-t-column field="code" :sortable="true" header="Код">
-        <template #editor="{ data, field }">
-          <p-input-text v-model="data[field]"></p-input-text>
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
         </template>
       </p-t-column>
       <p-t-column field="name" :sortable="true" header="name">
-        <template #editor="{ data, field }">
-          <p-input-text v-model="data[field]"></p-input-text>
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
         </template>
       </p-t-column>
       <!--<p-t-column field="lastEditDate" header="Дата обновления">
@@ -49,25 +51,31 @@
         </template>
       </p-t-column>-->
       <p-t-column field="rate" header="rate">
-        <template #editor="{ data, field }">
-          <p-input-number v-model.number="data[field]"></p-input-number>
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" v-model.number="data[field]"></p-input-text>
         </template>
       </p-t-column>
-      <p-t-column field="shortName" header="shortName">
-        <template #editor="{ data, field }">
-          <p-input-text v-model="data[field]"></p-input-text>
+      <p-t-column field="shortName" header="Обозначение">
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
         </template>
       </p-t-column>
       <p-t-column field="main" header="Основная">
         <template #body="slotProps">
-          <p-checkbox type="radio" name="main" :binary="true" v-model="slotProps.data.main"
+          <p-checkbox type="radio" class="mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
                       @click="setMain(slotProps.data.ID)"
           ></p-checkbox>
+        </template>
+      </p-t-column>
+      <p-t-column field="lastEditDate" header="Удалить">
+        <template #body="slotProps">
+          <p-button class="mx-auto p-button-rounded p-button-text p-button-sm" icon="pi pi-times" @click="deleteRate(slotProps.data.ID)"></p-button>
         </template>
       </p-t-column>
     </p-table>
 
     <template #footer>
+      <p-button class="float-start p-button-success" label="Добавить" icon="pi pi-plus" @click="addRate()"></p-button>
       <p-button label="Закрыть" icon="pi pi-check" @click="modalHide"></p-button>
     </template>
   </p-dialog>
@@ -91,14 +99,36 @@ export default {
       node.remove();
     },
 
+    rowClass(data) {
+      return data.delete ? 'bg-danger' : '';
+    },
+
     setMain(ID) {
-      this.rate.forEach(rate => {
-        if (rate.ID !== ID) rate.main = false;
+      this.$nextTick(() => {
+        let notMain = true;
+
+        this.rate.forEach(rate => {
+          if (rate.ID !== ID) rate.main = false;
+          if (notMain && rate.main) notMain = false;
+        });
+
+        if (notMain) this.rate[0].main = true;
       });
     },
 
     modalHide() {
       this.display = false;
+    },
+
+    addRate() {
+      const newRate = Object.entries(this.rate[0]).reduce((r, [k]) => {
+        if (k === 'ID') r[k] = 'new';
+        else if (k === 'lastEditDate') r[k] = new Date().toLocaleString().slice(0, 10);
+        else r[k] = '';
+        return r;
+      }, {});
+
+      this.rate.push(newRate);
     },
 
     editRate() {
@@ -111,12 +141,9 @@ export default {
       switch (field) {
         case 'code':
         case 'name':
-          if (newValue) {
-            data[field] = newValue;
-          }
+          if (newValue) data[field] = newValue;
           else event.preventDefault();
           break;
-
         case 'lastEditDate':
           data[field] = newValue.toLocaleDateString('en-US');
           break;
@@ -124,8 +151,16 @@ export default {
           if (newValue > 0) data[field] = newValue;
           else event.preventDefault();
           break;
+
+        default: data[field] = newValue; break;
       }
     },
+
+    deleteRate(id) {
+      this.rate.forEach(i => {
+        if (i.ID === id) i.delete = i.delete !== undefined ? !i.delete : true;
+      });
+    }
   },
   created() {
     this.loadData();
