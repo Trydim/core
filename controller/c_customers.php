@@ -7,7 +7,7 @@
 
 $field = [
   'pageTitle' => 'Клиенты',
-  'jsLinks'   => [CORE_JS . 'module/customers.js?ver=25fd52d695'],
+  'jsLinks'   => [CORE_JS . 'module/customers.js?ver=ab5d12c9ad'],
 ];
 
 // получить конфиг текущего пользователя

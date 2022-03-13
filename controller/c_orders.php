@@ -8,7 +8,7 @@
 $param = [];
 $field = [
   'pageTitle' => 'Заказы',
-  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=87ff0b7d1f'],
+  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=cfee101356'],
 ];
 
 $user = [

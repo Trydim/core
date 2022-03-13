@@ -12,8 +12,7 @@
       <div class="mb-3" style="max-height: 140px; overflow-y: auto">
         <template v-for="(item, index) of status" :key="item.ID">
           <div v-if="!item.delete" class="input-group mb-1">
-            <p-input-text v-model="item.name" class="form-control"
-            ></p-input-text>
+            <p-input-text v-model="item.name" class="form-control"></p-input-text>
             <div class="input-group-text">
               <p-radiobutton v-tooltip.bottom="'По умолчанию'" v-model="statusDef" :value="item.ID"></p-radiobutton>
             </div>
@@ -46,7 +45,7 @@ export default {
       const node = f.qS('#dataOrdersStatus');
 
       this.status = node && node.value ? JSON.parse(node.value) : false;
-      if (!this.statusDef) this.statusDef = +this.status[0].ID;
+      if (!this.statusDef) this.statusDef = this.status[0].ID;
 
       node.remove();
     },
@@ -69,7 +68,7 @@ export default {
     }
   },
   created() {
-    this.statusDef = this.propStatusDef;
+    this.statusDef = this.propStatusDef.toString();
     this.loadData();
 
     this.$watch('status', {

@@ -6,7 +6,7 @@
 
 $field = [
   'pageTitle' => 'Пользователи',
-  'jsLinks'   => [CORE_JS . 'module/users.js?ver=0cfa15ffcd'],
+  'jsLinks'   => [CORE_JS . 'module/users.js?ver=a7a492e214'],
   'footerContent' => $main->getSettings('json', true),
 ];
 

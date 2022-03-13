@@ -49,8 +49,8 @@ $field = [
 	'pageTitle' => 'File manager',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=8b5a67549a'];
-$field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=5f9efb14f5'];
+$field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=7a17436140'];
+$field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=92f8a8f43c'];
 
 require $pathTarget;
 $html = template('base', $field);

@@ -118,6 +118,10 @@ switch ($cmsAction) {
       // Rate
       $rate = json_decode($rate ?? '[]', true);
       if (count($rate)) {
+        // Auto update
+        $main->setSettings('autoRefresh', $rate['autoRefresh']);
+
+        $rate = $rate['data'];
         $param = [
           'new'    => [],
           'change' => [],

@@ -608,7 +608,7 @@ final class Main {
    * @default $justRate = false
    */
   public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
-    $rate = new Course($this->db);
+    $rate = new Course($this->db, $this->getSettings('autoRefresh'));
     $rate = $justRate ? array_map(function ($rate) { return $rate['rate'];}, $rate->rate) : $rate->rate;
     $rate = json_encode($rate);
     return "<input type='hidden' id='$dataId' value='$rate'>";

@@ -329,7 +329,7 @@ const orders = {
         fd.set('orderId', this.queryParam.orderIds);
         f.Post({data: fd})
           .then(data => {
-            if(data['customer'] && data['customer']['contacts']) {
+            if (data['customer'] && data['customer']['contacts']) {
               let contacts = JSON.parse(data['customer']['contacts']),
                   user = data['users'],
                   node = form.querySelector('[name="email"]');
@@ -337,6 +337,7 @@ const orders = {
               this.queryParam.mode = 'docs';
               this.queryParam.docsAction = 'mail';
               this.queryParam.docType = 'pdf';
+              this.queryParam.orderId = this.queryParam.orderIds;
               this.queryParam.name = user.name || user['login'];
               this.queryParam.phone = user.contacts.phone || '';
               this.queryParam.email = contacts['email'];
@@ -391,7 +392,7 @@ const orders = {
       f.hide(this.confirm, f.qS('#selectStatus'), f.qS('#printTypeField'));
       f.show(f.qS('#actionBtnWrap'));
 
-      if(action === 'confirmYes') {
+      if (action === 'confirmYes') {
         this.queryParam.commonValues = this.queryParam.orderIds;
         this.query();
       }

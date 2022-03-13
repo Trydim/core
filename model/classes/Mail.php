@@ -20,13 +20,17 @@ define('MAIL_PORT', $main->getCmsParam('MAIL_PORT') ?? 465);
 define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.yandex.ru');
 define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'noreplycalcby@yandex.ru');
 define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? '638ch1');
+
+
 /*
-const MAIL_HOST = 'smtp.mail.ru';
-const MAIL_FROM = 'mail.common@list.ru';
-const MAIL_PASSWORD = 'RAE^ysPypo22';
+define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.mail.ru');
+define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'mail.common@list.ru');
+define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'RAE^ysPypo22');
+*/
+
 /*
-const MAIL_FROM = 'commonserver@yandex.ru';
-const MAIL_PASSWORD = 'xmbxqxulvhwcqyta';
+define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'commonserver@yandex.ru');
+define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'xmbxqxulvhwcqyta');
 */
 
 class Mail {

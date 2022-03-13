@@ -175,28 +175,27 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'loadOrders':
-      !isset($sortColumn) && $sortColumn = 'create_date';
+      $sortColumn = $sortColumn ?? 'create_date';
 
-      $search = isset($search);
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : []; // TODO Зачем это
-      $dateRange = isset($dateRange) ? json_decode($dateRange) : [];
+      $orderIds = json_decode($orderIds ?? '[]'); // TODO Зачем это
+      $dateRange = json_decode($dateRange ?? '[]');
 
       // Значит нужны все заказы (поиск)
       if ($countPerPage > 999) $countPerPage = 1000000;
       else $result['countRows'] = $db->getCountRows('orders');
 
       $result['orders'] = $db->loadOrder($pageNumber, $countPerPage, $sortColumn, $sortDirect, $dateRange, $orderIds);
-      !$search && $result['statusOrders'] = $db->loadTable('order_status');
+      !isset($search) && $result['statusOrders'] = $db->loadTable('order_status');
       break;
     case 'loadOrder': // Показать подробности
       $orderIds = isset($orderId) ? [$orderId] : json_decode($orderIds ?? '[]');
       if (count($orderIds) === 1) $result['order'] = $db->loadOrderById($orderIds[0]);
       break;
     case 'changeStatusOrder':
-      if (isset($commonValues) && isset($statusId) && count($columns)) {
-        if (!is_finite($statusId)) break;
+      if (isset($orderIds) && isset($statusId) && count($columns)) {
+        if (!is_finite($statusId)) { $result['error'] = 'status_id_error'; break; }
 
-        $db->changeOrders($columns, $dbTable, json_decode($commonValues), $statusId);
+        $result['error'] = $db->changeOrders($columns, $dbTable, explode(',', $orderIds), $statusId);
       }
       break;
     case 'delOrders':
@@ -460,30 +459,27 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Customers
     case 'loadCustomerByOrder':
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
-      if (count($orderIds) === 1) {
-        $result['customer'] = $db->loadCustomerByOrderId($orderIds[0]);
-        $result['users'] = $db->getUserByOrderId($orderIds[0]);
+      if (isset($orderId)) {
+        $result['customer'] = $db->loadCustomerByOrderId($orderId);
+        $result['users'] = $db->getUserByOrderId($orderId);
       }
       break;
     case 'loadCustomers':
-      !isset($sortColumn) && $sortColumn = 'name';
-
-      //$search = isset($search);
-      $customerIds = isset($customerIds) ? json_decode($customerIds) : [];
-
-      // Значит нужны все заказчики(поиск при сохранении)
+      // Значит нужны все заказчики (поиск при сохранении)
       if ($countPerPage > 999) $countPerPage = 1000000;
       else $result['countRows'] = $db->getCountRows('customers');
 
-      $result['customers'] = $db->loadCustomers($pageNumber, $countPerPage, $sortColumn, $sortDirect, $customerIds);
+      $result['customers'] = $db->loadCustomers($pageNumber, $countPerPage,
+        $sortColumn ?? 'name', $sortDirect,
+        json_decode($customerIds ?? '[]')
+      );
       break;
     case 'addCustomer':
     case 'changeCustomer':
-      $newCustomer = isset($customerId) && is_finite($customerId);
+      $changeCustomer = isset($customerId) && is_finite($customerId);
       $customerId = $customerId ?? 0;
       $param = [$customerId => []];
-      $customer = isset($authForm) ? json_decode($authForm, true) : [];
+      $customer = json_decode($authForm ?? '[]', true);
 
       $contacts = [];
       foreach ($customer as $k => $v) {
@@ -493,14 +489,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);
 
-      $db->insert($columns, 'customers', $param, $newCustomer);
+      $db->insert($columns, 'customers', $param, $changeCustomer);
       break;
     case 'delCustomer':
-      $usersId = isset($customerId) ? json_decode($customerId) : [];
-
-      if (count($usersId)) {
-        $result['customers'] = $db->deleteItem('customers', $usersId);
-      }
+      $usersId = json_decode($customerId ?? '[]');
+      if (count($usersId)) $result['customers'] = $db->deleteItem('customers', $usersId);
       break;
 
     // Permission

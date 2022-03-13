@@ -25,11 +25,16 @@ class Course {
    */
   public $rate;
 
-  public function __construct(&$db, $dataFile = COURSE_CACHE) {
+  /**
+   * @param        $db
+   * @param bool   $autoRefresh
+   * @param string $dataFile
+   */
+  public function __construct(&$db, bool $autoRefresh, string $dataFile = COURSE_CACHE) {
     if (is_object($db)) $this->getRateFromDb($db);
     else $this->getRateFromFile($dataFile);
 
-    $this->refresh();
+    $autoRefresh && $this->refresh();
   }
 
   private function checkTableMoney() {

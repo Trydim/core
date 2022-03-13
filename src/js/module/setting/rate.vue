@@ -6,12 +6,12 @@
       <p class="col-8">Автоматически обновлять курсы</p>
       <div class="col-4 d-inline-flex">
         <p class="col text-center">Нет</p>
-        <p-switch v-model="rate.autoRefresh"></p-switch>
+        <p-switch v-model="autoRefresh"></p-switch>
         <p class="col text-center">Да</p>
       </div>
     </div>
 
-    <div v-if="!rate.autoRefresh" class="col-12 text-center mb-3">
+    <div v-if="!autoRefresh" class="col-12 text-center mb-3">
       <p-button v-tooltip.bottom="'Редактировать курсы'" icon="pi pi-sliders-h" class="p-button-success"
                 label="Редактировать курсы"
                 @click="editRate"
@@ -25,14 +25,14 @@
     </template>
 
     <p-table :value="rate"
-             :bodyClass="'text-center'"
+             :class="'text-center user-select-none'"
              :rowClass="rowClass"
              :resizableColumns="true" columnResizeMode="fit" showGridlines
              :scrollable="true"
              editMode="cell"
              responsiveLayout="scroll"
              @cell-edit-complete="onEditComplete"
-             style="width: 60vw"
+             style="width: 60vw; user-select: none;"
     >
       <p-t-column field="ID" header="ID"></p-t-column>
       <p-t-column field="code" :sortable="true" header="Код">
@@ -86,6 +86,7 @@ export default {
   name: "rate",
   emits: ['update'],
   data: () => ({
+    autoRefresh: false,
     display: false,
     rate: {},
   }),
@@ -167,7 +168,12 @@ export default {
 
     this.$watch('rate', {
       deep: true,
-      handler() { this.$emit('update', this.rate) },
+      handler() {
+        this.$emit('update', {
+          autoRefresh: this.autoRefresh,
+          data       : this.rate,
+        });
+      },
     });
   },
 }
