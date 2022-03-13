@@ -20,7 +20,7 @@ const common = {
 
     Object.entries(this.queryFiles).forEach(([id, file]) => {
       if (file instanceof File) data.append('files' + id, file, file.name);
-      else data.set('files' + id, id);
+      else data.set('files' + id, file.toString());
     });
     data.delete('files');
 

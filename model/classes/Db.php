@@ -376,7 +376,7 @@ class Db extends \R {
     return $this->selectQuery('files', '*', $filters);
   }
 
-  public function setFiles(&$result, $imageIds) {
+  public function setFiles(&$result, $imageIds): string {
     $dbDir = 'upload/';
     $uploadDir = SHARE_PATH . $dbDir;
 
@@ -392,9 +392,9 @@ class Db extends \R {
 
         // Если файл существует
         if (file_exists($uploadFile)) {
-          !isset($result['fileExist']) && $result['fileExist'] = [];
-
+          $result['fileExist'] = $result['fileExist'] ?? [];
           $result['fileExist'][] = $file['name'];
+
           if (filesize($uploadFile) === $file['size']) {
             $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
             if (count($id) === 1) { $imageIds[] = $id[0]; continue; }
@@ -411,12 +411,13 @@ class Db extends \R {
         }
 
         if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-          $this->insert([], 'files', ['0' => [
+          $lastId = $this->getLastID('files');
+          $imageIds[] = $lastId;
+          $this->insert([], 'files', [$lastId => [
             'name'   => $file['name'],
             'path'   => $dbFile,
             'format' => $file['type'],
-          ]]);
-          $imageIds[] = $this->getLastID('files');
+          ]], true);
         } else $result['error'] = 'Mover file error: ' . $file['name'];
       }
     }
@@ -427,7 +428,7 @@ class Db extends \R {
   // Elements
   //------------------------------------------------------------------------------------------------------------------
 
-  public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
+  public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): ?array {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
@@ -440,7 +441,7 @@ class Db extends \R {
     return self::getAll($sql);
   }
 
-  public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
+  public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): array {
     $pageNumber *= $countPerPage;
     $searchValue = str_replace(' ', '%', $searchValue);
 
@@ -492,10 +493,10 @@ class Db extends \R {
 
   /**
    * Для страницы Catalog
-   * @param false $elementID
+   * @param string $elementID
    * @return array|null
    */
-  public function openOptions($elementID = false): ?array {
+  public function openOptions(string $elementID): ?array {
     $sql = "SELECT O.ID AS 'id',
                    MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId', 
                    MO.short_name as 'moneyOutputName', MO.ID AS 'moneyOutputId',
@@ -527,18 +528,19 @@ class Db extends \R {
    * @return array
    */
   public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
-    $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
+    $sql = "SELECT O.ID AS 'id', element_id AS 'elementId', 
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
-                   O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
-                   O.sort AS 'sort', O.last_edit_date as 'lastDate', properties, images_ids AS 'images',
+                   O.name AS 'name', U.short_name AS 'unit', O.activity AS 'activity',
+                   O.sort AS 'sort', O.last_edit_date AS 'lastDate', properties, images_ids AS 'images',
                    MI.code AS 'moneyInput', MO.code AS 'moneyOutput',
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
             FROM options_elements O
-            JOIN elements E on E.ID = O.element_id
-            JOIN money MI on MI.ID = O.money_input_id
-            JOIN money MO on MO.ID = O.money_output_id
-            JOIN units U on U.ID = O.unit_id
-            WHERE (E.activity <> 0 OR O.activity <> 0)";
+            JOIN elements E ON E.ID = O.element_id
+            JOIN section S ON S.ID = E.section_parent_id
+            JOIN money MI ON MI.ID = O.money_input_id
+            JOIN money MO ON MO.ID = O.money_output_id
+            JOIN units U ON U.ID = O.unit_id
+            WHERE S.active <> 0 AND E.activity <> 0 AND O.activity <> 0";
 
     // Filter
     if (count($filter)) {

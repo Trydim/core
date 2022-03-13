@@ -20,7 +20,7 @@ export default {
   components: {
     Tree,
   },
-  data: () => Object.assign({
+  data: () => ({
     search: '',
     searchShow : true,
     sectionShow: true,
@@ -31,10 +31,10 @@ export default {
     temp: false,
 
     codes: [],
-
-  }, sectionData, elementsData, optionsData),
-  computed: Object.assign({}, elementsComputed, optionsComputed),
-  watch: Object.assign({}, sectionWatch, elementsWatch, optionsWatch),
+    ...sectionData, ...elementsData, ...optionsData
+  }),
+  computed: {...elementsComputed, ...optionsComputed},
+  watch: {...sectionWatch, ...elementsWatch, ...optionsWatch},
   methods: methods,
   mounted() {
     this.queryParam.mode = 'DB';

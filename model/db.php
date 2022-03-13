@@ -329,23 +329,26 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'changeElements':
       $elementsId = json_decode($elementsId ?? '[]');
       if (count($elementsId)) {
-        $single = count($elementsId) === 1;
-        $name = $name ?? '';
         $param = [];
+        $single = count($elementsId) === 1;
+        $element = json_decode($element ?? '[]', true);
+        $fieldChange = json_decode($fieldChange ?? '[]', true);
+        $name = $element['name'] ?? '';
 
         if ($single) {
           $elements = $db->selectQuery('elements', ['ID', 'name'], " name = '$name' ");
           if (count($elements) > 1 || empty($name)
               || (count($elements) === 1 && $elements[0]['ID'] !== $elementsId[0])) {
-            $result['error'] = 'element_name_exist'; break;
+            $result['error'] = 'element_name_error'; break;
           }
         }
 
         foreach ($elementsId as $id) {
-          $param[$id]['section_parent_id'] = $parentId ?? false;
-          $single && $param[$id]['name'] = $name;
-          $param[$id]['activity'] = intval(isset($activity) && $activity === "true");
-          $param[$id]['sort'] = $sort ?? 100;
+          if ($single || $fieldChange['type']) $param[$id]['element_type_code'] = $element['type'];
+          if ($single || $fieldChange['parentId']) $param[$id]['section_parent_id'] = $element['parentId'];
+          if ($single) $param[$id]['name'] = $name;
+          if ($single || $fieldChange['activity']) $param[$id]['activity'] = intval(boolValue($element['activity']));
+          if ($single || $fieldChange['sort']) $param[$id]['sort'] = $element['sort'];
         }
 
         $result['error'] = $db->insert($db->getColumnsTable('elements'), 'elements', $param, true);
@@ -400,26 +403,51 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $optionsId = json_decode($optionsId ?? '[]');
       if (count($optionsId)) {
         $param = [];
+        $single = count($optionsId) === 1;
+        $option = json_decode($option ?? '[]', true);
+        $fieldChange = json_decode($fieldChange ?? '[]', true);
+        $name = $option['name'] ?? '';
+
+        if ($single) {
+          $options = $db->selectQuery('options_elements', ['ID', 'name'], " name = '$name' ");
+          if (count($options) > 1 || empty($name)
+              || (count($options) === 1 && $options[0]['ID'] !== $optionsId[0])) {
+            $result['error'] = 'option_name_error'; break;
+          }
+        } elseif ($fieldChange['percent']) {
+          $currentOptions = $db->openOptions($option['elementId']);
+        }
 
         foreach ($optionsId as $id) {
-          isset($name) && $param[$id]['name'] = $name;
-          isset($moneyInputId) && $param[$id]['money_input_id'] = $moneyInputId;
-          isset($inputPrice) && $param[$id]['input_price'] = $inputPrice;
-          isset($moneyOutputId) && $param[$id]['money_output_id'] = $moneyOutputId;
-          isset($outputPercent) && $param[$id]['output_percent'] = $outputPercent;
-          isset($outputPrice) && $param[$id]['output_price'] = $outputPrice;
-          isset($unitId) && $param[$id]['unit_id'] = $unitId;
-          isset($sort) && $param[$id]['sort'] = $sort;
+          if ($single) $param[$id]['name'] = $name;
+          if ($single || $fieldChange['unitId']) $param[$id]['unit_id'] = $option['unitId'];
+          if ($single || $fieldChange['moneyInputId']) $param[$id]['money_input_id'] = $option['moneyInputId'];
+          if ($single) $param[$id]['input_price'] = $option['inputPrice'];
+          if ($single || $fieldChange['moneyOutputId']) $param[$id]['money_output_id'] = $option['moneyOutputId'];
+          if ($single) $param[$id]['output_price'] = $option['outputPrice'];
+          if ($single || $fieldChange['activity']) $param[$id]['activity'] = intval(boolValue($option['activity']));
+          if ($single || $fieldChange['sort']) $param[$id]['sort'] = $option['sort'];
+          if ($single || $fieldChange['properties']) $param[$id]['properties'] = json_encode($option['properties']);
 
-          $param[$id]['activity'] = intval(isset($activity) && $activity === "true");
+          // Change percent
+          if ($single) $param[$id]['output_percent'] = $option['percent'];
+          else if ($fieldChange['percent']) {
+            $currentOption = array_filter($currentOptions, function ($option) use ($id) {return $option['id'] === $id;});
+            $currentOption = array_values($currentOption)[0];
 
-          $imageIds = [];
-          foreach ($_REQUEST as $k => $v) {
-            stripos($k, 'files') === 0 && $imageIds[] = $v;
+            $param[$id]['output_percent'] = $option['percent'];
+            $basePrice = floatval($currentOption['outputPrice']) / (1 + floatval($currentOption['outputPercent']) / 100);
+            $param[$id]['output_price'] = $basePrice * (1 + $option['percent'] / 100);
           }
-          $param[$id]['property'] = $property ?? '{}';
 
-          count($optionsId) === 1 && $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
+          // Images
+          if ($single) {
+            $imageIds = [];
+            foreach ($_REQUEST as $k => $v) {
+              stripos($k, 'files') === 0 && $imageIds[] = $v;
+            }
+            $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
+          }
         }
 
         $result['error'] = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param, true);

@@ -15,7 +15,6 @@ export const data = {
 
   option: {
     id           : 0,
-    type         : 0,
     elementId    : 0,
     images       : [],
     name         : '',
@@ -38,11 +37,13 @@ export const data = {
     moneyOutputId: true,
     activity     : true,
     sort         : true,
-    property     : false,
+    properties   : false,
   },
 
-  elementLoaded  : 0,
+  elementLoaded: 0,
+  elementName  : '',
   optionsSelected: [],
+  loadedFiles    : undefined,
   filesUpSelected: [],
   filesUploaded: [],
 
@@ -65,12 +66,30 @@ export const data = {
 
   optionsColumnsSelected: undefined,
   files: {},
-
 }
 
 export const watch = {
-  'option.name'() {
-    this.optionsModal.confirmDisabled = !this.option.name;
+  option: {
+    deep: true,
+    handler() {
+      if (this.optionsSelected.length !== 1) return;
+      this.optionsModal.confirmDisabled = !this.option.name;
+    },
+  },
+
+  'option.moneyInputId'() {
+    // инпут кросс курс умножить на проценты изменить отп цену.
+  },
+  'option.inputPrice'() {
+    this.option.outputPrice = this.option.inputPrice * getPercent(this.option.percent);
+  },
+  'option.moneyOutputId'() {
+    // инпут кросс курс умножить на проценты изменить отп цену.
+  },
+
+  files: {
+    deep: true,
+    handler() { this.optionsModal.confirmDisabled = !this.option.name },
   },
 }
 
@@ -84,6 +103,7 @@ export const computed = {
   },
 }
 
+const getPercent = p => 1 + (p / 100);
 const reload = that => ({
   dbAction : 'openElement',
   callback: (fData, aData) => {
@@ -96,13 +116,15 @@ const reload = that => ({
 
 export const methods = {
   loadOptions(id) {
-    this.queryParam.dbAction = 'openElement';
+    this.queryParam.dbAction   = 'openElement';
     this.queryParam.elementsId = id;
-    this.elementLoaded = id;
-    this.optionsLoading = true;
+    this.elementLoaded         = id;
+    this.elementName           = this.elements.find(e => +e.id === id).name;
+    this.optionsLoading        = true;
     this.query().then(data => {
       this.options        = data['options'];
       this.optionsLoading = false;
+      this.clearAllOptions();
     });
   },
 
@@ -114,13 +136,15 @@ export const methods = {
       moneyOutputId: true,
       activity     : true,
       sort         : true,
-      properties     : false,
+      properties   : false,
     };
   },
 
   setOptionModal(title, confirmDisabled, single) {
-    single && this.enableOptionField();
-    this.optionsModal = {display: true, confirmDisabled, title, single};
+    this.$nextTick(() => {
+      single && this.enableOptionField();
+      this.optionsModal = {display: true, confirmDisabled, title, single};
+    });
   },
   clearFiles(node) {
     const input = document.createElement('input');
@@ -173,28 +197,34 @@ export const methods = {
     this.reloadAction = reload(this);
   },
   changeOptions() {
-    if (!this.optionsSelected.length) { return; }
+    if (!this.optionsSelected.length) return;
     const el = this.optionsSelected[0],
           single = this.optionsSelected.length === 1;
 
     this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
     this.queryParam.dbAction = 'changeOptions';
 
-    this.option.name      = single ? el.name : '';
+    if (single) {
+      this.option.name = el.name || '';
+      this.option.inputPrice  = +el.inputPrice || 0;
+      this.option.outputPrice  = +el.outputPrice || 0;
+      this.filesUpSelected = [];
+      this.setImages(el);
+    }
     this.option.elementId = this.elementLoaded;
     this.option.unitId    = single ? el.unitId : this.units[0].id;
     this.option.moneyInputId  = single ? el.moneyInputId : this.money[0].id;
     this.option.moneyOutputId = single ? el.moneyOutputId : this.money[0].id;
+    this.option.percent  = +el['outputPercent'];
     this.option.activity = single ? !!el.activity : true;
     this.option.sort     = this.getAvgSort(this.optionsSelected);
-    single && this.setImages(el);
     single ? this.setOptionProperty(el) : this.setDefaultProperty();
 
-    this.setOptionModal('Редактировать', false, single);
+    this.setOptionModal('Редактировать', single, single);
     this.reloadAction = reload(this);
   },
   copyOption() {
-    if (this.optionsSelected.length !== 1) { return; }
+    if (this.optionsSelected.length !== 1) return;
     const el = this.optionsSelected[0];
 
     this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
@@ -214,13 +244,33 @@ export const methods = {
     this.reloadAction = reload(this);
   },
   deleteOptions() {
-    if (!this.optionsSelected.length) { return; }
+    if (!this.optionsSelected.length) return;
 
     this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
     this.queryParam.dbAction   = 'deleteOptions';
 
     this.setOptionModal('Удалить', false, false);
     this.reloadAction = reload(this);
+  },
+
+  dblClickOptions(e) {
+    const node = e.target.closest('tr').querySelector('[data-id]'),
+          id = node && +node.dataset.id;
+
+    if (id) {
+      this.optionsSelected = [this.options.find(e => +e.id === id)];
+      this.changeOptions();
+    }
+  },
+  changePercent() {
+    this.$nextTick(() => {
+      this.option.outputPrice = this.option.inputPrice * getPercent(this.option.percent);
+    });
+  },
+  changeOutputPrice() {
+    this.$nextTick(() => {
+      this.option.percent = (this.option.outputPrice / this.option.inputPrice - 1) * 100;
+    });
   },
 
   addFile(e) {
@@ -247,21 +297,40 @@ export const methods = {
     delete this.files[id];
   },
   chooseUploadedFiles() {
-    this.queryParam.dbAction = 'loadFiles';
     this.optionsModal.chooseFileDisplay = true;
+
+    if (this.loadedFiles) return;
     this.filesLoading = true;
+    this.queryParam.dbAction = 'loadFiles';
 
     this.reloadAction = false;
     this.query().then(data => {
       this.loadedFiles = data['files'];
+      this.queryParam.dbAction = 'changeOptions';
       this.filesLoading = false;
     });
+  },
+  closeChooseImage() {
+    Object.keys(this.filesUpSelected).forEach(id => {
+      const f = this.loadedFiles.find(i => +i.id === +id);
+      this.files['F_' + f.id] = f;
+      this.queryFiles['F_' + f.id] = f.id;
+    });
+
+    this.optionsModal.chooseFileDisplay = false;
+  },
+  refreshUploadedFiles() {
+    this.loadedFiles = undefined;
+    this.chooseUploadedFiles();
   },
 
   optionsConfirm() {
     //this.optionsLoading = true;
-    this.option.propertiesJson = JSON.stringify(this.option.properties);
-    this.queryParam = Object.assign(this.queryParam, this.option, {fieldChange: JSON.stringify(this.fieldChange)});
+    this.queryParam = {
+      ...this.queryParam,
+      option: JSON.stringify(this.option),
+      fieldChange: JSON.stringify(this.fieldChange),
+    };
     this.query();
     this.optionsModal.display = false;
   },
