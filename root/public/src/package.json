@@ -10,8 +10,8 @@
 
     "publicBuildDev": "webpack --config ./webpack/webpack.config.js",
 
-    "localCypressTest": "cypress open --project ../../ --config-file ./public/src/tests/cypress.json --env external=false",
+    "localCypressTest": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=false",
 
-    "cypressDeployProd": "cypress open --project ../../ --config-file ./public/src/tests/cypress.json --env external=true"
+    "cypressDeployProd": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=true"
   }
 }

@@ -109,7 +109,7 @@ trait Authorization {
       if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
     } else {
       if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) reDirect($this->getSideMenu(true));
-      if ($target !== '' && !$this->availablePage($target)) reDirect('404');
+      if ($target !== '' && $target !== 'js' && !$this->availablePage($target)) reDirect('404');
     }
 
     session_abort();
