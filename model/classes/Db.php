@@ -468,7 +468,7 @@ class Db extends \R {
   private function setImages(string $imagesIds = ''): array {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
-      $path = findingFile(substr(SHARE_PATH , 0, -1), mb_strtolower($item['path']));
+      $path = findingFile(substr(SHARE_PATH, 0, -1), mb_strtolower($item['path']));
       $item['id'] = $item['ID'];
       $item['path'] = $item['src'] = $path
         ? URI . str_replace(ABS_SITE_PATH, '', $path)
@@ -557,7 +557,7 @@ class Db extends \R {
       }
 
       $sql .= ' AND ' . implode(' AND ', $filterArr);
-      unset($filterArr, $filter, $k, $values, $str, $index);
+      unset($filterArr, $filter, $k, $v, $values, $str, $index);
     }
     // Sorting
     $sql .= ' ORDER BY E.sort, O.sort';

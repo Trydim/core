@@ -68,6 +68,7 @@ const setLinkMenu = () => {
 }
 
 const stopPreloader = () => {
+  if (f.OUTSIDE) return;
   f.gI('preloader').remove();
   f.gI('mainWrapper').classList.add('show');
 }
@@ -152,9 +153,6 @@ const onEvent = () => {
   onEvent();
   setLinkMenu(page || '/'); // after bind events
 
-  setTimeout(() => { // todo разобраться с синхронизацией
-    f.initShadow(); // todo убрать отсюда
-  }, 100);
   stopPreloader();
 })();
 

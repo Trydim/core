@@ -4,6 +4,8 @@
  * @var array $vars extract param
  */
 
+global $main, $target;
+
 $inline = strtolower(OUTSIDE);
 
 $content = $global ?? $content ?? '';
@@ -12,44 +14,45 @@ $footerContent = $footerContent ?? '';
 $cssLinksArr = $cssLinks ?? [];
 $cssLinksRes = $inline ? '' : [];
 
-$jsLinksArr = $jsLinks ?? [];
-$jsLinksRes = $inline ? '' : [];
+$jsLinksArr = array_merge([CORE_JS . 'src.js', CORE_JS . 'main.js'], $jsLinks ?? []);
+//$jsLinksRes = $inline ? '' : [];
 
-$globalWindowJsValue = '<script>window.CL_OUTSIDE = "1"; window.SITE_PATH = "' . SITE_PATH . '";' .
-                       ' window.MAIN_PHP_PATH = "' . SITE_PATH . 'index.php' . '";' .
-                       ' window.PUBLIC_PAGE = "' . PUBLIC_PAGE . '";' .
-                       ' window.PATH_IMG = "' . PATH_IMG . '";</script>';
+$jsGlobalConst = json_encode([
+  'DEBUG'         => DEBUG,
+  'CL_OUTSIDE'    => true,
+  'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
+  'SITE_PATH'     => SITE_PATH,
+  'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
+  'PUBLIC_PAGE'   => PUBLIC_PAGE,
+  'URI_IMG'       => URI_IMG,
+  'AUTH_STATUS'   => $main->checkStatus('ok'),
+  'INIT_SETTING'  => $main->frontSettingInit,
+]);
+
+$globalWindowJsValue = '<script>window.CMS_CONST = ' . $jsGlobalConst . '</script>';
 
 array_map(function($item) use (&$cssLinksRes, $inline) {
-  if (gettype(OUTSIDE) !== 'boolean') {
-    $global = stripos($item, 'global') !== false ? 'data-global="true"' : '';
-    $href = $inline === 'i' ? 'href' : 'data-href';
-    $cssLinksRes .= "<link rel=\"stylesheet\" $global $href=\"$item\">";
-  }
-  else $cssLinksRes[] = $item;
+  $global = stripos($item, 'global') !== false ? 'data-global="true"' : '';
+  $href = $inline === 'i' ? 'href' : 'data-href';
+  $cssLinksRes .= "<link rel=\"stylesheet\" $global $href=\"$item\">";
 }, $cssLinksArr);
 
-$jsLinksArr = [ CORE_JS . 'src.js', CORE_JS . 'main.js'];
-array_map(function($item) use (&$jsLinksRes) {
-  if (gettype(OUTSIDE) !== 'boolean') {
-    $jsLinksRes .= '<script defer type="module" src="' . $item . '"></script>';
-  }
-  else $jsLinksRes[] = $item;
-}, $jsLinksArr);
-
 $result = [
-  'content'             => $content,
-  'globalWindowJsValue' => $globalWindowJsValue,
-  'footerContent'       => $footerContent,
-  'cssLinksArr'         => $cssLinksRes,
-  'jsLinksArr'          => $jsLinksRes,
+  'initJs'        => file_get_contents(CORE . 'views/parts/outside.js'),
+  'isShadow'      => $inline === 's',
+  'jsGlobalConst' => $jsGlobalConst,
+  'content'       => $content . $footerContent,
+  'css'           => $cssLinksRes,
+  'js'            => $jsLinksArr,
 ];
 
-if ($inline === 's') {
+echo json_encode($result);
+
+/*if ($inline === 's') {
   echo getPageAsString($result);
 } else if ($inline === 'i') {
-  echo $cssLinksRes . $globalWindowJsValue . $content . $footerContent . $jsLinksRes;
+  echo implode('', $result);
 } else {
   echo json_encode($result);
-  die();
-}
+}*/
+die();
