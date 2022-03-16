@@ -329,12 +329,14 @@ export default {
    * @param {string?} phoneMask
    */
   initMask: (node, phoneMask) => {
-    if (!node) return;
-    const minValue = 2;
+    const minValue = 2,
+          maskGl = f.cmsSetting && f.cmsSetting['phoneMaskGlobal'],
+          matrix = phoneMask || maskGl ||  f.PHONE_MASK_DEFAULT;
+
+    if (!node || maskGl === '') return;
 
     const mask = e => {
       let target = e.target, i = 0,
-          matrix = phoneMask || f.cmsSetting && f.cmsSetting['phoneMaskGlobal'] || f.PHONE_MASK_DEFAULT,
           def = matrix.replace(/\D/g, ""),
           val = target.value.replace(/\D/g, "");
 

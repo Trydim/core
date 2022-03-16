@@ -19,8 +19,8 @@ $field = [
   'pageTitle' => 'Каталог',
   'footerContent' => '',
   'sideRight' => '',
-  'cssLinks'  => [CORE_CSS . 'module/catalog.css?ver=527865aeb1'],
-  'jsLinks'   => [CORE_JS . 'module/catalog.js?ver=50685b9db2'],
+  'cssLinks'  => [CORE_CSS . 'module/catalog.css?ver=971a995b37'],
+  'jsLinks'   => [CORE_JS . 'module/catalog.js?ver=9995e5181a'],
 ];
 
 // Загрузка настройки столбцов

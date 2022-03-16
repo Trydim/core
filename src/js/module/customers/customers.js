@@ -252,7 +252,7 @@ const customers = {
 
         ['name', 'phone', 'email', 'address', 'ITN'].map(i => {
           let node = form.querySelector(`[name="${i}"]`);
-          i === 'phone' && f.initMask(node, '+375 (__) ___ __ __');
+          i === 'phone' && f.initMask(node);
           i === 'ITN' && f.initMask(node, '_________');
         });
 
@@ -280,7 +280,7 @@ const customers = {
         let {phone = '', email = '', address = ''} = customer['contactsParse'];
 
         node = form.querySelector(`[name="phone"]`);
-        f.initMask(node, '+375 (__) ___ __ __');
+        f.initMask(node);
         node.value = phone;
 
         node = form.querySelector(`[name="email"]`);
