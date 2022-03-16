@@ -6,7 +6,7 @@ const getCustomElements = () => new Promise((resolve) => {
       resolve(this.attachShadow({mode: 'open'}));
     }
   });
-})
+});
 
 const importJs = (node, jsArr) => {
   jsArr.forEach(src => {

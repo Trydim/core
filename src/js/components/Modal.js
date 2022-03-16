@@ -2,6 +2,33 @@
 
 import './_modal.scss';
 
+const findNode = (n, role) => n.querySelector(`[data-role="${role}"]`);
+
+const getCustomElements = () => new Promise(resolve => {
+  customElements.define('shadow-modal', class extends HTMLElement {
+    connectedCallback() {
+      resolve(this.attachShadow({mode: 'open'}));
+    }
+  });
+});
+
+const templatePopup = (pr, modalId) => {
+  return `
+    <div class="${pr}modal-overlay" id="${modalId}">
+      <div class="${pr}modal p-3" data-role="window">
+        <button type="button" class="${pr}close-modal">
+          <div class="${pr}close-icon"></div>
+        </button>
+        <div class="${pr}modal-title" data-role="title">Title</div>
+        <div class="${pr}modal-content" data-role="content"></div>
+        <div class="${pr}modal-button" data-role="bottomFieldBtn">
+          <input type="button" class="confirmYes btn btn-success" value="Подтвердить" data-action="confirmYes">
+          <input type="button" class="closeBtn btn btn-warning" value="Отмена" data-action="confirmNo">
+        </div>
+      </div>
+    </div>`;
+};
+
 /**
  * Модальное окно
  * @param param {{modalId: string,
@@ -13,16 +40,15 @@ export const Modal = (param = {}) => {
   let modal = Object.create(null),
       data = Object.create(null),
       {
+        prefix = 'vs_',
         modalId = 'adminPopup',
         template = '',
         showDefaultButton = true,
         btnConfig = false,
       } = param;
 
-  const findNode = (n, role) => n.querySelector(`[data-role="${role}"]`);
-
   modal.bindBtn = function () {
-    this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
+    this.wrap.querySelectorAll(`.${prefix}close-modal, .confirmYes, .closeBtn`)
         .forEach(n => n.addEventListener('click', () => this.hide()));
   }
   modal.btnConfig = function (key, param = Object.create(null)) {
@@ -64,14 +90,14 @@ export const Modal = (param = {}) => {
     }
 
     this.wrap.style.display = 'flex';
-    this.wrap.classList.add('active');
-    this.window.classList.add('active');
-    modal.onEvent();
+    this.wrap.classList.add(prefix + 'active');
+    this.window.classList.add(prefix + 'active');
+    this.onEvent();
   }
 
   modal.hide = function () {
-    this.wrap.classList.remove('active');
-    this.window.classList.remove('active');
+    this.wrap.classList.remove(prefix + 'active');
+    this.window.classList.remove(prefix + 'active');
 
     setTimeout( () => {
       this.wrap.style.display = 'none';
@@ -90,11 +116,12 @@ export const Modal = (param = {}) => {
     this.wrap.remove();
   }
 
-  modal.setTemplate = function () {
+  modal.setTemplate = async function () {
+    //const sNode = await getCustomElements();
     const node = document.createElement('div');
-    node.insertAdjacentHTML('afterbegin', template || templatePopup());
+    node.insertAdjacentHTML('afterbegin', template || templatePopup(prefix, modalId));
 
-    this.wrap     = node.children[0];
+    this.wrap     = node.firstElementChild;
     this.window   = findNode(node, 'window');
     this.title    = findNode(node, 'title');
     this.content  = findNode(node, 'content');
@@ -108,29 +135,14 @@ export const Modal = (param = {}) => {
     btnY && (this.btnConfirm = btnY);
     btnN && (this.btnCancel = btnN);
 
-    document.body.append(node.children[0]);
-  }
-
-  const templatePopup = () => {
-    return `
-    <div class="modal-overlay" id="${modalId}">
-      <div class="modal p-3" data-role="window">
-        <button type="button" class="close-modal">
-          <div class="close-icon"></div>
-        </button>
-        <div class="modal-title" data-role="title">Title</div>
-        <div class="w-100 pt-20" data-role="content"></div>
-        <div class="modal-button" data-role="bottomFieldBtn">
-          <input type="button" class="confirmYes btn btn-success" value="Подтвердить" data-action="confirmYes">
-          <input type="button" class="closeBtn btn btn-warning" value="Отмена" data-action="confirmNo">
-        </div>
-      </div>
-    </div>`;
+    //sNode.insertAdjacentHTML('afterbegin', '');
+    //sNode.append(this.wrap);
+    this.bindBtn();
   }
 
   modal.setTemplate();
-  //btnConfig && modal.btnConfig(btnConfig);
-  modal.bindBtn();
+  document.body.append(modal.wrap);
+  //document.body.insertAdjacentHTML('beforeend', '<shadow-modal></shadow-modal>');
 
   return modal;
 }
