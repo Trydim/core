@@ -1,10 +1,5 @@
-<?php if (!defined('MAIN_ACCESS')) die('access denied!');
-
-$shareDir = SHARE_PATH;
-
-$field['content'] = <<<content
+<?php if (!defined('MAIN_ACCESS')) die('access denied!'); ?>
 <div class="container-fluid ab-filemanager" id="ab-main">
-
   <div class="row" id="ab-content">
 
     <!-- breadcrumb -->
@@ -19,7 +14,7 @@ $field['content'] = <<<content
           <i class="fa fa-folder-o" aria-hidden="true"></i>Создать папку
         </a>-->
 
-       <!--<button id="createfile" class="ab-btn asphalt" title="Создать здесь файл">
+        <!--<button id="createfile" class="ab-btn asphalt" title="Создать здесь файл">
           <i class="fa fa-file-text-o" aria-hidden="true"></i>Создать файл
         </button>-->
 
@@ -32,11 +27,11 @@ $field['content'] = <<<content
     </div>
 
     <!--<a id="zipsite" class="ab-btn asphalt" title="Архивировать и скачать"
-      href="<?/*= config['rootdirectory'] */?>downloadfolder.php?file=<?php echo ROOT ?>">
+      href="</?= config['rootdirectory'] ?>downloadfolder.php?file=</?= ROOT ?>">
       <i class=" fa fa-download" aria-hidden="true"></i>Архивировать и скачать
     </a>-->
     <!--<a class="ab-btn asphalt" title="Основные настройки"
-       href="<?/*= config['rootdirectory'] */?>editor.php?editfile=config.php"
+       href="</?= config['rootdirectory'] ?>editor.php?editfile=config.php"
        target="_blank">
       <i class=" fa fa-cog" aria-hidden="true"></i>Основные настройки
     </a>-->
@@ -46,15 +41,11 @@ $field['content'] = <<<content
 
 <!-- left panel ........................................... -->
 
-<div  class="col-4" id="leftpanel">
+<div class="col-4" id="leftpanel">
   <div id="tree">
+    <div id="home" data-fo="<?= SHARE_PATH ?>" class="closed selected"><?= SHARE_PATH ?></div>
 
-    <div id="home" data-fo="$shareDir" class="closed selected">$shareDir</div>
-content;
-
-tree(ABS_SITE_PATH . SHARE_PATH);
-
-$field['content'] .= <<<content
+    <?php tree(ABS_SITE_PATH . SHARE_PATH); ?>
   </div>
 </div>
 
@@ -64,6 +55,5 @@ $field['content'] .= <<<content
   <!-- ajax data here.. -->
 </div>
 
-<input type="hidden" id="rootDirData" value="$shareDir">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
-content;
+<input type="hidden" id="rootDirData" value="<?= SHARE_PATH ?>">
+<script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>

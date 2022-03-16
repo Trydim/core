@@ -52,5 +52,7 @@ $field = [
 $field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=7a17436140'];
 $field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=92f8a8f43c'];
 
+ob_start();
 require $pathTarget;
+$field['content'] = ob_get_clean();
 $html = template('base', $field);
