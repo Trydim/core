@@ -27,14 +27,14 @@ export default {
    * @param {string} id String that specifies the ID value.
    * @return {HTMLElement} HtmlElement
    */
-  gI: id => (f['calcWrap'] || document).getElementById(id) || f.log('not found note by id -' + id),
+  gI: id => (window.shadowCalc || document).getElementById(id) || f.log('not found note by id -' + id),
 
   /**
    * @param {string} selector
    * @param {HTMLElement} node
    * @return {HTMLElement | {}}
    */
-  qS: (selector = '', node = f['calcWrap']) =>
+  qS: (selector = '', node = window.shadowCalc) =>
     (node || document).querySelector(selector) || f.log(selector),
 
   /**
@@ -45,7 +45,7 @@ export default {
    * @return NodeListOf<HTMLElementTagNameMap[*]>|object
    */
   qA: (selector, nodeKey = null, value = null) => {
-    let nodeList = (f['calcWrap'] || document).querySelectorAll(selector);
+    let nodeList = (window.shadowCalc || document).querySelectorAll(selector);
     if (!nodeList) return [];
     if (nodeKey && value) nodeList.forEach(item => {
       if (typeof value === 'function') {

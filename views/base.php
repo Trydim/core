@@ -65,18 +65,6 @@ $jsGlobalConst = json_encode([
 
 <?php if (!isset($global)) { ?>
   <main class="main-wrapper mx-auto" id="mainWrapper">
-    <div class="nav-header">
-      <a href="<?= SITE_PATH ?>" class="brand-logo">
-        <img class="logo-abbr" src="<?= URI_IMG ?>logo.webp" alt="">
-        <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
-      </a>
-
-      <div class="nav-control" role="button" data-action-cms="menuToggle">
-        <div>
-          <i class="pi pi-caret-left"></i>
-        </div>
-      </div>
-    </div>
     <?= $pageHeader; ?>
 
     <div class="container-content">

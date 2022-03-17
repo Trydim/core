@@ -1,21 +1,9 @@
 'use strict'
 
-const getCustomElements = () => {
-  let element;
-
-  customElements.define('shadow-calc', class extends HTMLElement {
-    connectedCallback() {
-      element = this.attachShadow({ mode: 'open' });
-    }
-  });
-
-  return element;
-}
-
 export class shadowNode {
 
   constructor() {
-    this.customElements = getCustomElements();
+    this.customElements = false;
     this.customElements && this.init();
   }
 

@@ -60,7 +60,8 @@ class UrlGenerator {
   }
 
   private function setScheme() {
-    $this->scheme = ($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://';
+    $https = $_SERVER['HTTPS'] ?? false;
+    $this->scheme = ($https ? 'https' : 'http') . '://';
   }
 
   private function setHost() {

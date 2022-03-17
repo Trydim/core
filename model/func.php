@@ -164,10 +164,9 @@ function getLimitLevenshtein($word) {
 function getPageAsString($data, $wrapId = 'wrapCalcNode') {
   $html = "<div class=\"shadow-calc\" id=\"shadow-calc\"><shadow-calc></shadow-calc></div>";
   $html .= "<div id=\"$wrapId\" style='display:none;'>" . $data['cssLinksArr'];
-  $html .= $data['globalWindowJsValue'];
   $html .= $data['content'];
-  $html .= $data['jsLinksArr'];
-  $html .= $data['footerContent'] . '</div>';
+  $html .= $data['footerContent'];
+  $html .= $data['jsLinksArr'] . '</div>';
 
   return $html;
 }
