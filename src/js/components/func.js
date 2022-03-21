@@ -597,15 +597,12 @@ export default {
    * @return {object}
    */
   getRate: (dataSelector = '#dataRate') => {
-    let node = f.qS(dataSelector),
-        rate = Object.create(null);
+    let node = f.qS(dataSelector), rate;
 
     try {
       let main, k;
-
       rate = JSON.parse(node.value);
 
-      debugger
       main = Object.values(rate).find(r => f.toNumber(r.main));
       k = main.rate / main.scale;
 
@@ -616,6 +613,7 @@ export default {
       node.remove();
     } catch (e) {
       f.showMsg('Load rate error: ' + e.message, 'error');
+      rate = Object.create(null);
     }
     return rate;
   },
