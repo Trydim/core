@@ -466,9 +466,9 @@ final class Main {
    * 'mailFromName' - <p>
    * 'optionProperties' - <p>
    * @param boolean $front if true - ready html input ]
-   * @return false|mixed|string
+   * @return mixed
    */
-  public function getSettings(string $key, bool $front = false) {
+  public function getSettings(string $key = '', bool $front = false) {
     $data = $this->setting[$key] ?? null;
     $jsonData = $key === 'json' || $front ? json_encode($data ?: $this->setting) : '';
 
@@ -478,8 +478,7 @@ final class Main {
     }
     else if ($key === 'json') return $jsonData;
 
-    if (isset($this->setting[$key])) return $this->setting[$key];
-    return false;
+    return $this->setting[$key] ?? $this->setting;
   }
 
   /**
@@ -608,8 +607,12 @@ final class Main {
    * @default $justRate = false
    */
   public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
-    $rate = new Course($this->db, $this->getSettings('autoRefresh'));
-    $rate = $justRate ? array_map(function ($rate) { return $rate['rate'];}, $rate->rate) : $rate->rate;
+    $rateParam = [
+      'autoRefresh' => $this->getSettings('autoRefresh'),
+      'serverRefresh' => $this->getSettings('autoRefresh'),
+    ];
+    $rate = new Course($rateParam, $this->db);
+    $rate = $justRate ? array_map(function ($rate) { return $rate['rate']; }, $rate->rate) : $rate->rate;
     $rate = json_encode($rate);
     return "<input type='hidden' id='$dataId' value='$rate'>";
   }

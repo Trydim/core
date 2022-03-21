@@ -120,6 +120,7 @@ switch ($cmsAction) {
       if (count($rate)) {
         // Auto update
         $main->setSettings('autoRefresh', $rate['autoRefresh']);
+        $main->setSettings('serverRefresh', $rate['serverRefresh']);
 
         $rate = $rate['data'];
         $param = [

@@ -33,10 +33,7 @@ export default {
 
       mail: {},
       user: {},
-
-      rate: {
-        autoRefresh: true,
-      },
+      rate: {},
 
       queryParam: {
         mode: 'setting',

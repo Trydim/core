@@ -837,7 +837,6 @@ class Db extends \R {
   }
 
   public function loadCustomerByOrderId($orderId) {
-
     $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts FROM orders 
         LEFT JOIN customers C ON C.ID = orders.customer_id
         WHERE orders.ID = $orderId";
@@ -857,6 +856,7 @@ class Db extends \R {
       unset($item['short_name']);
       $item['lastEditDate'] = $item['last_edit_date'];
       unset($item['last_edit_date']);
+      $item['scale'] = floatval($item['scale']);
       $item['rate'] = floatval($item['rate']);
 
       $res[$item['code']] = $item;
@@ -870,6 +870,7 @@ class Db extends \R {
     $date = date('Y-m-d h:i:s');
     foreach ($rate as $currency) {
       $beans->id = $currency['ID'];
+      $beans->scale = $currency['scale'];
       $beans->rate = $currency['rate'];
       $beans->lastEditDate = $date;
       self::store($beans);
