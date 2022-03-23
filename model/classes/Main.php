@@ -478,7 +478,7 @@ final class Main {
     }
     else if ($key === 'json') return $jsonData;
 
-    return $this->setting[$key] ?? $this->setting;
+    return empty($key) ? $this->setting : $this->setting[$key] ?? null;
   }
 
   /**
