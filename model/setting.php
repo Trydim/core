@@ -263,8 +263,8 @@ switch ($cmsAction) {
       $db->delPropertyTable($props);
     }
 
-    if (isset($props) && ($setting = getSettingFile()) && isset($setting['propertySetting'])) {
-      $setting['propertySetting'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
+    if (isset($props) && ($setting = getSettingFile()) && isset($setting['optionProperties'])) {
+      $setting['optionProperties'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
         return !in_array($item, $props);
       }, ARRAY_FILTER_USE_KEY);
 

@@ -71,6 +71,18 @@ class Db extends \R {
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
 
+  private function getConvertDbType(string $type) {
+    if (stripos($type, 'int') === 0) {
+      return function ($v) { return intval($v); };
+    }
+
+    if (stripos($type, 'decimal') === 0 || stripos($type, 'float') === 0 || stripos($type, 'double') === 0) {
+      return function ($v) { return floatval($v); };
+    }
+
+    return function ($v) {return $v;};
+  }
+
   /**
    * @param string $dbTable name of table
    * @param array|string $columns of columns, if size of array is 1 (except all column '*') return simple array,
@@ -167,12 +179,27 @@ class Db extends \R {
 
   /**
    * select all (*)
-   * @param $dbTable
+   * @param string $dbTable
+   * @param bool $typed
    *
    * @return array|null
    */
-  public function loadTable($dbTable): ?array {
-    return self::getAll('SELECT * FROM ' . $dbTable);
+  public function loadTable(string $dbTable, bool $typed = false): ?array {
+    $result = self::getAll('SELECT * FROM ' . $dbTable);
+
+    if ($typed) {
+      $columns = [];
+      foreach ($this->getColumnsTable($dbTable) as $col) {
+        $columns[$col['columnName']] = $this->getConvertDbType($col['type']);
+      }
+
+      $result = array_map(function ($row) use ($columns) {
+        foreach ($columns as $name => $func) $row[$name] = $func($row[$name]);
+        return $row;
+      }, $result);
+    }
+
+    return $result;
   }
 
   /**
@@ -608,8 +635,8 @@ class Db extends \R {
     if (!$propTables) {
       $props = [];
       // Простые параметры
-      if (($setting = getSettingFile()) && isset($setting['propertySetting'])) {
-        foreach ($setting['propertySetting'] as $prop => $value) {
+      if (($setting = getSettingFile()) && isset($setting['optionProperties'])) {
+        foreach ($setting['optionProperties'] as $prop => $value) {
           $props[$prop] = array_merge($value, ['simple' => true]);
         }
       }

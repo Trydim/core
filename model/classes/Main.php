@@ -502,7 +502,7 @@ final class Main {
             ]], $this->db->getTables('prop'));
 
             $props = array_map(function ($prop) {
-              $setting = $this->getSettings('propertySetting')[$prop['dbTable']] ?? false;
+              $setting = $this->getSettings('optionProperties')[$prop['dbTable']] ?? false;
               $setting && $setting['name'] && $prop['name'] = $setting['name'];
               return $prop;
             }, $props);

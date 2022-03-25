@@ -41,7 +41,7 @@ $value = $db->getMoney();
 $field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($value) . "'>";
 
 // Все свойства
-$value = $main->getSettings('propertySetting');
+$value = $main->getSettings('optionProperties');
 foreach ($db->getTables('prop') as $table) {
   $name = isset($value[$table['dbTable']]) ? $value[$table['dbTable']]['name'] : $table['name'];
 

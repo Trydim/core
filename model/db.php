@@ -7,9 +7,8 @@
 
 $db = $main->getDB();
 
-!isset($dbAction) && $dbAction = '';
-isset($tableName) && $dbTable = $tableName;
-!isset($dbTable) && $dbTable = '';
+$dbAction = $dbAction ?? '';
+$dbTable = $dbTable ?? $tableName ?? '';
 
 stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
 
@@ -17,7 +16,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
   $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam('PATH_CSV'));
 } else {
-
   $columns = [];
   if ($dbTable) {
     if (stripos($dbTable, '.csv')) $db->setCsvTable($dbTable);
