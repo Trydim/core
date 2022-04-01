@@ -16,7 +16,7 @@ const templatePopup = (pr, modalId) => {
   return `
     <div class="${pr}modal-overlay" id="${modalId}">
       <div class="${pr}modal p-3" data-role="window">
-        <button type="button" class="${pr}close-modal">
+        <button type="button" class="${pr}close-modal" data-action="confirmNo">
           <div class="${pr}close-icon"></div>
         </button>
         <div class="${pr}modal-title" data-role="title">Title</div>
@@ -36,12 +36,13 @@ const templatePopup = (pr, modalId) => {
  * showDefaultButton: boolean,
  * btnConfig: boolean }}
  */
-export const Modal = (param = {}) => {
+export const Modal = function (param = {}) {
   let modal = Object.create(null),
       data = Object.create(null),
+      destroy = this instanceof Modal,
       {
         prefix = 'vs_',
-        modalId = 'adminPopup',
+        modalId = 'adminPopup' + f.random(),
         template = '',
         showDefaultButton = true,
         btnConfig = false,
@@ -100,19 +101,21 @@ export const Modal = (param = {}) => {
     this.window.classList.remove(prefix + 'active');
 
     setTimeout( () => {
-      this.wrap.style.display = 'none';
       document.body.style.overflow = data.bodyOver || 'initial';
       window.scrollTo(0, data.scrollY);
       if (document.body.style.paddingRight === '16px')
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
+
+      if (destroy) this.destroy();
+      else this.wrap.style.display = 'none';
     }, 300);
     //f.eraseNode(modal.content);
   }
 
   modal.destroy = function () {
-    this.hide();
-    this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
-        .forEach(n => n.removeEventListener('click', () => this.hide()));
+    /*this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
+          .forEach(n => n.removeEventListener('click', () => this.hide()));
+    */
     this.wrap.remove();
   }
 

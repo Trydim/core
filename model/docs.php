@@ -69,11 +69,11 @@ if ($orderId) {
 }
 
 $docsAction = $docsAction ?? 'mail';
-$docType = $docType ?? $docsAction;
+$docType = $docType ?? false;
 
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
-if ($docType !== 'mail') {
+if ($docType) {
   $docs = new Docs([
     'docType' => $docType,
     'library' => $main->getCmsParam('PDF_LIBRARY'),

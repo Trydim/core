@@ -128,7 +128,7 @@ const customers = {
   usersList: new Map(),
 
   init() {
-    this.M = f.initModal();
+    this.M = new f.initModal();
     this.p = new f.Pagination( '#paginator',{
       dbAction : 'loadCustomers',
       query    : this.query.bind(this),

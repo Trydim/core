@@ -43,7 +43,7 @@ const users = {
       dbAction : 'loadUsers',
       sortParam: this.queryParam,
     });
-    this.M = f.initModal();
+    this.M = new f.initModal();
     this.query();
 
     this.onEvent();

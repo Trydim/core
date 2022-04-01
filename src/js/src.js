@@ -18,12 +18,9 @@ import {searching} from "./components/SearchCustomers";
 import User from "./components/User";
 
 const m = {
-  /**
-   * Debugger
-   */
   Debugger,
 
-
+  Modal,
   initModal : Modal,
   initPrint : module.Print,
   initShadow: param => new shadowNode(param),
@@ -102,22 +99,21 @@ const m = {
    * autodetect input field with attribute "require" and show error/valid.
    *
    * @param {{sendFunc: function,
-   * formNode: HTMLFormElement,
-   * formSelector: string,
-   * submitNode: HTMLElement,
-   * submitSelector: string,
+   * form: string|HTMLElement,
+   * submit: string|HTMLElement,
    * fileFieldSelector: string,
    * initMask: boolean,
    * phoneMask: string,
    * cssMask: object}} param <p>
    * @param {function} param.sendFunc - exec func for event click (default = () => {}), <p>
-   * @param {string/HTMLElement} param.formSelector - form selector (default: #authForm), <p>
-   * @param {string/HTMLElement} param.submitSelector - btn selector (default: #btnConfirm), <p>
+   * @param {string/HTMLElement} param.formSelector - form selector (default: '#authForm'), <p>
+   * @param {string/HTMLElement} param.submitSelector - btn selector (default: '.confirmYes'), <p>
    * @param {string} param.fileFieldSelector - field selector for show attachment files information, <p>
    * @param {object} param.cssClass = { <p>
    *     error: will be added class for node (default: 'cl-input-error'), <p>
    *     valid: will be added class for node (default: 'cl-input-valid'), <p>
    *   }, <p>
+   * @param {string} param.classPrefix: prefix for validation class (def: 'cl-'),
    * @param {boolean} param.debug: submit btn be activated (def: false), <p>
    * @param {boolean} param.initMask: use mask for field whit type "tel" (def: true), <p>
    * @param {string} param.phoneMask: mask matrix (def: from global constant),

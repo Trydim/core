@@ -99,7 +99,7 @@ export default {
     }
 
     return arr.reduce((r, i, index) => {
-      let idKey = i['id'] || i['key'] || Math.random() * 1000 | 0;
+      let idKey = i['id'] || i['key'] || Math.random() * 10000 | 0;
       r[idKey] && (idKey += index.toString());
       r[idKey] = oneValue ? i[oneValue] : i;
       return r;
@@ -331,7 +331,7 @@ export default {
   initMask: (node, phoneMask) => {
     const minValue = 2,
           maskGl = f.cmsSetting && f.cmsSetting['phoneMaskGlobal'],
-          matrix = phoneMask || maskGl ||  f.PHONE_MASK_DEFAULT;
+          matrix = phoneMask || maskGl || f.PHONE_MASK_DEFAULT;
 
     if (!node || maskGl === '') return;
 
@@ -532,6 +532,8 @@ export default {
    * send report to mail
    * @param {object} param
    *
+   * @param {?formData} param.data - docType param (email)
+   *
    * @param {?string} param.docType - docType param (email)
    * @param {?string} param.email - target email
    *
@@ -556,12 +558,12 @@ export default {
    * @return {object} - result {status}
    */
   sendOrder(param) {
-    const data = new FormData(),
+    const data = param.data || new FormData(),
           p    = param;
 
     data.set('mode', 'docs');
     data.set('docsAction', 'mail');
-    data.set('email', p.email || p.customer.email);
+    !data.has('email') && data.set('email', p.email || p.customer.email);
     p.docType && data.set('docType', p.docType);
 
     // Показать информацию о Менеджере
@@ -570,7 +572,7 @@ export default {
     // Пользователь взять из сохранненного заказа или из найденного, если не изменен
     p.addCustomerInfo && data.set('addCustomer', 'true');
 
-    if (f.AUTH_STATUS && p.customer.id && !p.customerChange) {
+    if (f.AUTH_STATUS && p.customer && p.customer.id && !p.customerChange) {
       data.set('customerId', p.customer.id.toString());
     } else if (p.customer) {
       data.set('name', p.customer.name || '');
@@ -582,10 +584,9 @@ export default {
 
     // Расчет загружен или сохранен и не изменен
     if (f.AUTH_STATUS && p.orderId && !p.orderChanged) {
-      data.set('orderId', p.orderId.toString()); // Отчет из сохранненого заказа
+      !data.has('orderId') && data.set('orderId', p.orderId.toString()); // Отчет из сохранненого заказа
     } else {
-      data.set('saveVal', JSON.stringify(p.saveVal || {}));
-      data.set('reportVal', JSON.stringify(p.reportVal || {}));
+      !data.has('reportVal') && data.set('reportVal', JSON.stringify(p.reportVal || {}));
     }
 
     return f.Post({data});
@@ -637,6 +638,25 @@ export default {
       node.style.boxShadow = def || 'none';
     }, delay);
   },
+
+  /**
+   * Random int number
+   * @param {number} min - from number or count digit
+   * @param {number} max - until number or undefined
+   * @return {number}
+   */
+  random: (min = 5, max= 0) => {
+    return max ? Math.floor(Math.random() * (max - min + 1) + min)
+               : Math.random() * Math.pow(10, min) | 0;
+  },
+  /**
+   * Generate unique string
+   * @param {number?} countChar - count of chars
+   */
+  unique: (countChar = 5) => new Array(countChar).fill('').map(n => {
+    const r = Math.random();
+    return String.fromCharCode(r < 0.334 ? f.random(48, 57) : r < 0.667 ? f.random(65, 90) : f.random(97, 122))
+  }).join(''),
 
   /**
    * Try parse to float number from any value

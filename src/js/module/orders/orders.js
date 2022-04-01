@@ -76,7 +76,7 @@ class AllOrdersList {
 }
 
 const orders = {
-  M: f.initModal(),
+  M: new f.initModal(),
   form: new FormData(),
 
   needReload: false,
