@@ -69,17 +69,17 @@ if ($orderId) {
 }
 
 $docsAction = $docsAction ?? 'mail';
-$docType = $docType ?? false;
+$docType = $docType ?? $docsAction;
 
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
-if ($docType) {
+if ($docType !== 'mail') {
   $docs = new Docs([
     'docType' => $docType,
     'library' => $main->getCmsParam('PDF_LIBRARY'),
     'orientation' => $pdfOrientation ?? $main->getCmsParam('PDF_ORIENTATION'),
   ], $data, $fileTpl ?? 'default');
-}
+} else $docType = false;
 
 if (isset($docsAction)) {
   switch ($docsAction) {

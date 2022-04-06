@@ -41,7 +41,7 @@ $field['global'] = <<<global
         </div>
 
         <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-block" onclick="this.classList.add(f.CLASS_NAME.LOADING)">Подтвердить</button>
+          <button type="submit" class="btn btn-primary btn-block" onclick="this.classList.add('loading-st1')">Подтвердить</button>
         </div>
 
         <input name="mode" type="hidden" value="auth">

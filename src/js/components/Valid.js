@@ -214,7 +214,7 @@ export class Valid {
       formData.append(id, file, file.name);
     });
 
-    sendFunc(formData, this.finished, e);
+    sendFunc(formData, this.finished.bind(this), e);
   }
 
   clickCommon(e) {

@@ -381,12 +381,45 @@ export default {
   /**
    * Добавить иконку загрузки
    * @param {HTMLElement} node
+   * @param {boolean?} isLight
    */
-  setLoading: node => {
+  setLoading: (node, isLight = false) => {
     if (!(node instanceof HTMLElement)) {
       console.warn('Loading - node is not HTMLElement');
       return;
     }
+
+    // Определить цвет?
+/*    const rgb2hsl = ([r, g, b]) => {
+      const max = Math.max(r, g, b),
+            min = Math.min(r, g, b),
+            d = max - min;
+
+      let h, l = (max + min) / 2;
+
+      if (max === min) {
+        h = 0;
+      } else {
+        //s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+
+      // H - цветовой тон, S - насыщенность, L - светлота
+      return (h < 0.55 && l >= 0.5) || (h > 0.55 && l >= 0.75);
+      //return [h, s, l];
+    }
+
+
+    debugger
+    const color = window.getComputedStyle(node).backgroundColor,
+          rgb = /(\d+),? (\d+),? (\d+)/.exec(color)[0].split(','),
+          bool = rgb2hsl(rgb);*/
 
     if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
       const c = node.getBoundingClientRect(),
@@ -401,12 +434,14 @@ export default {
       loaderW.style.height = loader.style.height = c.height + 'px';
       loaderW.style.width = loader.style.width = c.width + 'px';
 
-      loader.classList.add(f.CLASS_NAME.LOADING);
+      loader.classList.add('loading-st1');
+      isLight && loader.classList.add('loading-st1-light');
 
       loaderW.append(loader);
       document.body.append(loaderW);
     } else {
-      node.classList.add(f.CLASS_NAME.LOADING);
+      node.classList.add('loading-st1');
+      isLight && node.classList.add('loading-st1-light');
     }
   },
   /**
@@ -420,7 +455,10 @@ export default {
     }
 
     if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) f.gI('cmsLoaderWrapper').remove();
-    else node.classList.remove(f.CLASS_NAME.LOADING);
+    else {
+      node.classList.remove('loading-st1');
+      node.classList.remove('loading-st1-light');
+    }
   },
 
   /**

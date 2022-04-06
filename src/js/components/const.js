@@ -36,8 +36,6 @@ export default {
     HIDDEN_NODE: 'd-none',
     // css класс который добавляется неактивным элементам
     DISABLED_NODE: 'disabled',
-    // css класс который добавляется при загрузке
-    LOADING: 'loading-st1',
   },
 
   HOOKS: {},

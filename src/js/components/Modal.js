@@ -39,7 +39,7 @@ const templatePopup = (pr, modalId) => {
 export const Modal = function (param = {}) {
   let modal = Object.create(null),
       data = Object.create(null),
-      destroy = this instanceof Modal,
+      destroy = !(this instanceof Modal),
       {
         prefix = 'vs_',
         modalId = 'adminPopup' + f.random(),

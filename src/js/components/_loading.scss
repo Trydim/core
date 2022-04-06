@@ -1,5 +1,7 @@
 $white: #fff !default;
+$gray: #808080 !default;
 $loading-color: $white !default;
+$loading-color-light: $gray !default;
 
 .loading-st1 {
   position: relative !important;
@@ -19,6 +21,10 @@ $loading-color: $white !default;
     border-color:  $loading-color transparent $loading-color transparent;
     box-shadow:    0 0 20px 0 #ffffff78;
     animation:     lds-dual-ring 1.2s linear infinite;
+  }
+
+  &.loading-st1-light:after {
+    border-color:  $loading-color-light transparent $loading-color-light transparent;
   }
 }
 

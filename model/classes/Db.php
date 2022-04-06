@@ -599,7 +599,7 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => URI . 'shared/upload/stone/a001_raffia.jpg']]; // TODO удалить
+        $option['images'] = [['path' => URI . 'shared/upload/stone/1-corian-lime-ice.jpg']]; // TODO удалить
         //$option['images'] = $this->setImages($option['images']);
       }
 
