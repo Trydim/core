@@ -3,22 +3,22 @@
   <div class="row" id="ab-content">
 
     <!-- breadcrumb -->
-    <div class="col-12 d-flex align-items-center" id="ab-breadcrumb">
-
-      <div class="col-7" id="breadcrumb-links">
+    <div class="col-12 row align-items-center" id="ab-breadcrumb">
+      <div class="col-6" id="breadcrumb-links">
         <span class="open">public</span>
       </div>
 
-      <div class="col-5 text-right" id="ab-top-action-btn">
-        <!--<a id="a-create-folder" class="ab-btn asphalt" title="Создать здесь папку" href="#">
-          <i class="fa fa-folder-o" aria-hidden="true"></i>Создать папку
-        </a>-->
+      <div class="col-2 d-flex justify-content-end">
+        <button id="createFolder" class="btn btn-primary me-2" title="Создать здесь папку">
+          <i class="pi pi-folder"></i>
+        </button>
 
-        <!--<button id="createfile" class="ab-btn asphalt" title="Создать здесь файл">
-          <i class="fa fa-file-text-o" aria-hidden="true"></i>Создать файл
-        </button>-->
+        <button id="createFile" class="btn btn-primary" title="Создать здесь файл">
+          <i class="pi pi-file"></i>
+        </button>
+      </div>
 
-      <div class="dropzone">
+      <div class="col-4 dropzone">
         <div id="div-uploadfile" class="" title="загрузить файл здесь">
         <form id="frm-uploadfile" name="frm-uploadfile" enctype="multipart/form-data">
           <input type="file" id="file" name="file[]" multiple="multiple">
@@ -26,33 +26,29 @@
       </div>
     </div>
 
-    <!--<a id="zipsite" class="ab-btn asphalt" title="Архивировать и скачать"
+    <!--<a id="zipsite" class="btn asphalt" title="Архивировать и скачать"
       href="</?= config['rootdirectory'] ?>downloadfolder.php?file=</?= ROOT ?>">
       <i class=" fa fa-download" aria-hidden="true"></i>Архивировать и скачать
     </a>-->
-    <!--<a class="ab-btn asphalt" title="Основные настройки"
+    <!--<a class="btn asphalt" title="Основные настройки"
        href="</?= config['rootdirectory'] ?>editor.php?editfile=config.php"
        target="_blank">
       <i class=" fa fa-cog" aria-hidden="true"></i>Основные настройки
     </a>-->
 
   </div>
-</div>
+  <div class="row">
+    <!-- left panel -->
+    <div class="col-4">
+      <div id="tree">
+        <div id="home" data-fo="<?= SHARE_PATH ?>" class="closed selected"><?= SHARE_PATH ?></div>
 
-<!-- left panel ........................................... -->
-
-<div class="col-4" id="leftpanel">
-  <div id="tree">
-    <div id="home" data-fo="<?= SHARE_PATH ?>" class="closed selected"><?= SHARE_PATH ?></div>
-
-    <?php tree(ABS_SITE_PATH . SHARE_PATH); ?>
+        <?php tree(ABS_SITE_PATH . SHARE_PATH); ?>
+      </div>
+    </div>
+    <!-- table data -->
+    <div class="col-8" id="ab-container-table"></div>
   </div>
-</div>
-
-<!-- table data ........................................... -->
-
-<div class="col-8" id="ab-container-table">
-  <!-- ajax data here.. -->
 </div>
 
 <input type="hidden" id="rootDirData" value="<?= SHARE_PATH ?>">

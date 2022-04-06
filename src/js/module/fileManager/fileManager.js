@@ -11,6 +11,8 @@ const t = dir => {
   });
 }
 
+window.$ = window.$ || window['jQuery'];
+
 const fileManager = {
   form: new FormData(),
 
@@ -32,7 +34,7 @@ const fileManager = {
     $body.on("click", "#tree div.fo", function () {
       $(this).next().toggle(100);
       $(".selected").removeClass("selected");
-      var i = $(this).data("fo");
+      const i = $(this).data("fo");
       t(i);
       $("#breadcrumb-links span").text(i);
       $(this).hasClass("closed") ? $(this).removeClass("closed").addClass("open selected") : $(this).removeClass("open").addClass("closed selected")
@@ -40,7 +42,7 @@ const fileManager = {
     $body.on("click", "#tree #home", function () {
       $("div.fo.open").next().hide(100).removeClass("open").addClass("closed");
       $(".selected").removeClass("selected");
-      var i = $(this).data("fo");
+      const i = $(this).data("fo");
       t(i);
       $("#breadcrumb-links span").text(i);
       $(this).addClass("selected")
@@ -69,7 +71,7 @@ const fileManager = {
       $body.append('<div id="imgpreview" style="background-color:#ddd;width:120px;position:fixed;z-index:9999;left:' + parseInt(t.clientX - 140) + "px;top:" + parseInt(t.clientY - 40) + 'px"><img src="' + $(this).attr("href") + '" width="120" height="120"></div>')
     });
     $body.on("mouseleave", ".zoom", () => {$("#imgpreview").hide().remove()});
-    $body.on("click", "#a-create-folder", e => {
+    /*$body.on("click", "#a-create-folder", e => {
       e.preventDefault();
       let u = $("#tree div.selected").data("fo"),
           r = prompt("Name directory:", ""), f;
@@ -81,27 +83,25 @@ const fileManager = {
             $("#tree div.selected").next("ul").append('<li><div id="' + r + '" data-fo="' + f + '" class="fo closed">' + r + '<\/div><ul style="display: none;"><\/ul><\/li>');
             t(u)
           }), $("#alerts").hide().remove(), !1
-    });
-    // Создать файл
-    /*$body.on("click", "#createfile", function (i) {
-      var u, r, f;
-      if (i.preventDefault(), u = $("#tree div.selected").data("fo"), r = prompt("Name file:", ""), r != null && r != "") return $body.append('<div id="alerts" class="btn blue">working..<\/div>'), $("#alerts").fadeIn(1e3), f = u + r, $.ajax({
-        url    : "core/afm/createfile.php",
-        data   : {urlfile: f},
-        success: function () {
-          t(u);
-          var i = r.substr(r.lastIndexOf(".") + 1);
-          $("#tree div.selected").next("ul").append('<li class="ext-file ext-' + i + '" style="border-right:1px solid red">' + r + "<\/li>")
-        },
-        error  : function (t, i) {
-          $("#alerts").remove();
-          var r = "";
-          r     = t.status === 0 ? "Not connect.\n Verify Network." : t.status == 404 ? "Requested page not found. [404]" : t.status == 500 ? "Internal Server Error [500]." : i === "parsererror" ? "Requested JSON parse failed." : i === "timeout" ? "Time out error." : i === "abort" ? "Ajax request aborted." : "Uncaught Error.\n" + t.responseText;
-          $body.append('<div id="alerts" class="btn red">' + r + "<\/div>");
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()})
-        }
-      }), $("#alerts").hide().remove(), !1
     });*/
+    // Создать файл
+    $body.on("click", "#createFile", function (i) {
+      i.preventDefault();
+
+      const u = $("#tree div.selected").data("fo"),
+            r = prompt("Name file:", "");
+
+      if (r) {
+        fileManager.query({fmAction: 'createFile', fileName: u + r}, function (data) {
+          t(u);
+          let ext = r.substr(r.lastIndexOf(".") + 1);
+          $("#tree div.selected").next("ul")
+                                 .append('<li class="ext-file ext-' + ext + '" style="border-right:1px solid red">' + r + "<\/li>")
+        })
+      } else {
+        f.showMsg('File name error', 'error');
+      }
+    });
     $body.on("click", ".renamefolder", function (t) {
       t.preventDefault();
       var f = $(this).parents("tr").find("a.delete-directory").attr("href"),

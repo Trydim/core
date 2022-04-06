@@ -149,6 +149,21 @@ function de($var, int $die = 1) {
 }
 
 /**
+ * @param string $hayStack
+ * @param $search
+ * @return bool
+ */
+function includes(string $hayStack, $search) {
+  if (is_array($search)) {
+    foreach ($search as $w) {
+      if (includes($hayStack, $w)) return true;
+    }
+  } else {
+   return stripos($hayStack, $search) !== false;
+  }
+}
+
+/**
  * @param $word
  *
  * @return false|float|int
