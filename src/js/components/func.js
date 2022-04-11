@@ -2,6 +2,14 @@
 
 import './_loading.scss';
 
+const cacheStringFunction = fn => {
+  const cache = Object.create(null);
+  return (str => {
+    const hit = cache[str];
+    return hit || (cache[str] = fn(str));
+  });
+};
+
 export default {
 
   // Simple and often used function
@@ -11,6 +19,14 @@ export default {
    * @param {string} msg
    */
   log: msg => f.DEBUG && console.log('Error:' + msg),
+
+  capitalize: cacheStringFunction(str => str.charAt(0).toUpperCase() + str.slice(1)),
+
+  camelize: cacheStringFunction(str => {
+    return str.toLowerCase()
+              .replace(/\W(\w+)/g, (_, w) => w ? f.capitalize(w) : '')
+              .replace(/\s|-|_/g, '');
+  }),
 
   /**
    * Create element from string or
