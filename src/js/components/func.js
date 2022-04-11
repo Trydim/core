@@ -659,10 +659,10 @@ export default {
       rate = JSON.parse(node.value);
 
       main = Object.values(rate).find(r => f.toNumber(r.main));
-      k = main.rate / main.scale;
+      k = main.scale / main.rate;
 
       Object.values(rate).forEach(r => {
-        r.rate = k * (r.scale / r.rate);
+        r.rate = k * (r.rate / r.scale);
       });
 
       node.remove();
