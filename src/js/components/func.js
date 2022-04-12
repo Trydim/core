@@ -11,7 +11,6 @@ const cacheStringFunction = fn => {
 };
 
 export default {
-
   // Simple and often used function
   // ------------------------------------------------------------------------------------------------
 
@@ -480,21 +479,20 @@ export default {
   /**
    * Функция печати по умолчанию
    * @param {object} report
-   * @param {number} number
    * @returns {string}
    */
-  printReport: (report, number = 1) => {
-    let table = f.gTNode('#printTable'),
-        html = '';
+  printReport: (report) => {
+    let html = '';
 
+    if (report.number)  html += `<span>Orders №${report.number}</span>${html}`;
+
+    html += '<table>';
     Object.values(report).map(i => {
-      html += `<tr><td>${i[0]}</td><td>${i[1]}</td><td>${i[2]}</td></tr>`;
+      html += '<tr><td>' + Object.values(i).join('</td><td>') + '</td></tr>';
     });
+    html += '</table>';
 
-    if (number) table.querySelector('#number').innerHTML = number.toString();
-    else table.querySelector('#numberWrap').classList.add(f.CLASS_NAME.HIDDEN_NODE);
-    table.querySelector('tbody').innerHTML = html;
-    return table.outerHTML;
+    return f.createElement(html);
   },
 
   /**

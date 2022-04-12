@@ -5,9 +5,10 @@
  */
 
 // todo пропускать запросы к файлам. (почему не все файлы?)
-preg_match("/\..+$/i", $_SERVER['REQUEST_URI'], $match);
+$uri = str_replace('?' . $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
+preg_match("/\..+$/i", $uri, $match);
 if (!empty($match) && !in_array($match[0], ['.php', '.csv'])) die();
-unset($match);
+unset($uri, $match);
 
 require __DIR__ . '/cmsSetting.php';
 

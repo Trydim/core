@@ -81,7 +81,7 @@ export class ToastClass {
   }
 
   show(msg = 'message body', type = 'success', autoClose = true) {
-    const close = id => {
+    const close = (id, duration = this.duration) => {
       setTimeout(() => {
         this.toasts[id].classList.remove('show');
 
@@ -92,7 +92,7 @@ export class ToastClass {
 
           this.count === 0 && this.wrap.remove();
         }, 300);
-      }, this.duration);
+      }, duration);
     }
 
     const t = this.toast.cloneNode(true),
@@ -110,7 +110,7 @@ export class ToastClass {
     this.count++;
 
     if (autoClose) close(t.id);
-    else t.addEventListener('click', close.bind(this, t.id), {once: true});
+    else t.addEventListener('click', close.bind(this, t.id, 1), {once: true});
 
     this.wrap.append(t);
     return this;

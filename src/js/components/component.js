@@ -242,7 +242,7 @@ export const Print = () => {
     }).then(async data => {
       const scrollY = window.pageYOffset;
 
-      typeof data.style === 'string' && (content = `<style>${data.style}</style>` + content);
+      typeof data['style'] === 'string' && (content = `<style>${data['style']}</style>` + content);
       await this.setContent(content, classList);
 
       document.body.append(this.frame);

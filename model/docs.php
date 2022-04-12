@@ -73,7 +73,7 @@ $docType = $docType ?? $docsAction;
 
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
-if ($docType !== 'mail') {
+if (in_array($docType, ['excel', 'pdf', 'print'])) {
   $docs = new Docs([
     'docType' => $docType,
     'library' => $main->getCmsParam('PDF_LIBRARY'),
@@ -105,11 +105,9 @@ if (isset($docsAction)) {
       $result['mail'] = $mail->send();
       break;
     case 'getPrintStyle':
-      $fileTpl = $fileTpl ?? 'printTpl.css';
+      $fileTpl = ABS_SITE_PATH . 'public/views/docs/' . ($fileTpl ?? 'printTpl.css');
 
-      if (file_exists(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl)) {
-        $result['style'] = file_get_contents(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl);
-      }
+      if (file_exists($fileTpl)) $result['style'] = file_get_contents($fileTpl);
       break;
   }
 }

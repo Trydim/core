@@ -13,7 +13,7 @@ import {CustomSelect} from './components/CustomSelect.js';
 import LocalStorage from "./components/LocalStorage.js";
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
-import {ToastClass, toast} from "./components/Toast.js";
+import {ToastClass, toast} from "./components/toast/index.js";
 import {Valid} from "./components/Valid";
 import {searching} from "./components/SearchCustomers";
 import User from "./components/User";
@@ -88,19 +88,18 @@ const m = {
    */
   SelectedRow: SelectedRow,
 
-  //Toast: new ToastClass(),
   /**
-   * @type function
-   * @param {string} msg
-   * @param {string} type (success, warning, error)
-   * @param {boolean} autoClose
+   * @type class
+   * https://f3oall.github.io/awesome-notifications/docs/
+   * @param {object} options
    */
-  /*Toast: new ToastClass(),*/
+  Toast: ToastClass,
+
   /**
    * Alias for Toast
    * @param {string} msg
-   * @param {string} type (success, warning, error)
-   * @param {boolean} autoClose
+   * @param {string} type (tip, info, success|ok, warning, error|alert)
+   * @param {boolean|object} options https://f3oall.github.io/awesome-notifications/docs/
    */
   showMsg: toast,
 

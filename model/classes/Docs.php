@@ -82,8 +82,15 @@ class Docs {
     $this->setFileTpl($fileTpl);
     $this->setDefaultParam();
     $this->getFileName();
-    in_array($this->docsType, ['pdf', 'print']) && $this->prepareTemplate();
-    $this->docsType === 'excel' && $this->setExcelData();
+    switch ($this->docsType) {
+      case 'pdf': $this->prepareTemplate(); break;
+      case 'print':
+        $this->pdfLibrary = 'print';
+        $this->prepareTemplate();
+        $this->setCss();
+        break;
+      case 'excel': $this->setExcelData(); break;
+    }
 
     $func = 'init' . $this->getFunc();
     $this->$func();
@@ -223,6 +230,9 @@ class Docs {
         case 'html2pdf':
           $this->docs->WriteHTML('<style>' . $stylesheet . '</style>');
           break;
+        case 'print':
+          $this->content .= '<style>' . $stylesheet . '</style>';
+          break;
       }
     }
   }
@@ -240,11 +250,11 @@ class Docs {
    * Return file as:
    * save - save on server in RESULT_PATH, any other value send to browser
    * I - inline, D - DOWNLOAD, F - save local file, S - string
-   * @param {string} $path
-   * @param {string} $dest
+   * @param string $path
+   * @param string $dest
+   * @return array|false|string
    */
-  private function getPdf($path, $dest) {
-
+  private function getPdf(string $path, string $dest) {
     switch ($this->pdfLibrary) {
       case 'mpdf':
       /** Default: \Mpdf\Output\Destination::INLINE
@@ -290,7 +300,12 @@ class Docs {
     return false;
   }
 
-  private function getPrint($path, $dest) {
+  /**
+   * @param string $path
+   * @param string $dest
+   * @return array|string
+   */
+  private function getPrint(string $path, string $dest) {
     switch ($dest) {
       case 'save':
         file_put_contents($path . $this->fileName, $this->content);
@@ -304,7 +319,12 @@ class Docs {
     }
   }
 
-  private function getExcel($path, $dest) {
+  /**
+   * @param string $path
+   * @param string $dest
+   * @return array|string
+   */
+  private function getExcel(string $path, string $dest) {
     switch ($dest) {
       case 'save':
         $this->docs->writeToFile($path . $this->fileName);
