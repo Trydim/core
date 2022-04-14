@@ -139,9 +139,9 @@ function convertToArray($value) {
 
 /**
  * @param $var
- * @param int $die
+ * @param bool $die
  */
-function de($var, int $die = 1) {
+function de($var, bool $die = true) {
   echo '<pre>';
   var_dump($var);
   echo '</pre>';
@@ -176,12 +176,14 @@ function getLimitLevenshtein($word) {
   return ceil(iconv_strlen($word) / 2);
 }
 
-function getPageAsString($data, $wrapId = 'wrapCalcNode') {
-  $html = "<div class=\"shadow-calc\" id=\"shadow-calc\"><shadow-calc></shadow-calc></div>";
-  $html .= "<div id=\"$wrapId\" style='display:none;'>" . $data['cssLinksArr'];
-  $html .= $data['content'];
-  $html .= $data['footerContent'];
-  $html .= $data['jsLinksArr'] . '</div>';
+function getPageAsString($data) {
+  $id = 'wrapCalcNode' . uniqid();
+  $initJs = $data['initJs'];
+  unset($data['initJs']);
+
+  $html = "<div id='$id'><script>window.node = '#$id';";
+  $html .= 'window.data = ' . json_encode($data) . '</script>';
+  $html .= '<script>' . $initJs . '</script></div>';
 
   return $html;
 }

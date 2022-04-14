@@ -6,6 +6,7 @@
 
 global $main, $target;
 
+$isFetch = preg_match('/outside\.php/', $_SERVER['REQUEST_URI']);
 $inline = strtolower(OUTSIDE);
 
 $content = $global ?? $content ?? '';
@@ -29,8 +30,6 @@ $jsGlobalConst = json_encode([
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 
-$globalWindowJsValue = '<script>window.CMS_CONST = ' . $jsGlobalConst . '</script>';
-
 array_map(function($item) use (&$cssLinksRes, $inline) {
   $global = stripos($item, 'global') !== false ? 'data-global="true"' : '';
   $href = $inline === 'i' ? 'href' : 'data-href';
@@ -46,13 +45,5 @@ $result = [
   'js'            => $jsLinksArr,
 ];
 
-echo json_encode($result);
-
-/*if ($inline === 's') {
-  echo getPageAsString($result);
-} else if ($inline === 'i') {
-  echo implode('', $result);
-} else {
-  echo json_encode($result);
-}*/
-die();
+if ($isFetch) echo json_encode($result);
+else echo getPageAsString($result);

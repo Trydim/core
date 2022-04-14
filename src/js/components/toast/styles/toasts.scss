@@ -62,7 +62,8 @@
   }
 
   &-label {
-    display: block;
+    display: none;
+    /*display: block; Перевод */
     text-transform: uppercase;
     color: $awn-primary-color;
     font-size: $awn-toast-title-font-size;

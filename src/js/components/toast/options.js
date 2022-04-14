@@ -82,12 +82,11 @@ export default class Options {
   }
 
   icon(type) {
-    if (this.icons.enabled) return `${this.icons.prefix}${this.icons[type]}${this.icons.suffix}`
-    return ''
+    return this.icons.enabled ? `${this.icons.prefix}${this.icons[type]}${this.icons.suffix}` : '';
   }
 
   label(type) {
-    return this.labels[type]
+    return this.labels[type];
   }
 
   duration(type) {

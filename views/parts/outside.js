@@ -18,6 +18,7 @@ const importJs = (node, jsArr) => {
   });
 };
 
+node = typeof node === 'string' ? document.querySelector(node) : node;
 node.innerHTML = '';
 
 window.CMS_CONST = data['jsGlobalConst'];
