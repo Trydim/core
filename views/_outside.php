@@ -6,7 +6,7 @@
 
 global $main, $target;
 
-$isFetch = preg_match('/outside\.php/', $_SERVER['REQUEST_URI']);
+$isFetch = preg_match('/outside\.php/', $_SERVER['REQUEST_URI']) && isset($_GET['osd']);
 $inline = strtolower(OUTSIDE);
 
 $content = $global ?? $content ?? '';

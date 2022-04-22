@@ -474,7 +474,7 @@ function template(string $path = 'base', array $vars = []): string {
   ob_start();
 
   // Абсолютный путь файла
-  if (file_exists($path)) {
+  if (file_exists($path) && md5_file($path) !== md5_file('.' . $_SERVER['SCRIPT_NAME'])) {
     include $path;
   }
   // В корне сайта в public

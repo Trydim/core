@@ -14,6 +14,12 @@ const importJs = (node, jsArr) => {
     s.type = 'module';
     s.async = false;
     s.src = src;
+
+    fetch(src).then(d => d.text()).then(d => {
+      debugger
+      d;
+    });
+
     node.append(s);
   });
 };
