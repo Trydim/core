@@ -121,10 +121,15 @@ export const methods = {
     this.elementLoaded         = id;
     this.elementName           = this.elements.find(e => +e.id === id).name;
     this.optionsLoading        = true;
+
+    f.showMsg('Открыт: ' + this.elementName);
     this.query().then(data => {
       this.options        = data['options'];
       this.optionsLoading = false;
       this.clearAllOptions();
+      this.$nextTick(() => {
+        window.scrollTo(0, this.$refs['optionsWrap'].getBoundingClientRect().y);
+      });
     });
   },
 
@@ -325,7 +330,7 @@ export const methods = {
   },
 
   optionsConfirm() {
-    //this.optionsLoading = true;
+    this.optionsLoading = true;
     this.queryParam = {
       ...this.queryParam,
       option: JSON.stringify(this.option),

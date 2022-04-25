@@ -106,7 +106,7 @@
                      :loading="elementsLoading"
                      :resizable-columns="true" column-resize-mode="fit" show-gridlines
                      selection-mode="multiple" :meta-key-selection="false"
-                     :paginator="elements.length > 5" :rows="10" :rows-per-page-options="[5,10,20,50]"
+                     :paginator="elements.length > 10" :rows="10" :rows-per-page-options="[10,20,50]"
                      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                      current-page-report-template="Showing {first} to {last} of {totalRecords}"
                      responsive-layout="scroll"
@@ -250,7 +250,7 @@
   <hr>
 
   <!-- Options -->
-  <div class="container-fluid position-relative">
+  <div class="container-fluid position-relative" ref="optionsWrap">
     <p-table v-if="options.length"
              :value="options" datakey="id"
              :loading="optionsLoading"

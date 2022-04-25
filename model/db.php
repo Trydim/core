@@ -398,7 +398,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'changeOptions':
       $optionsId = json_decode($optionsId ?? '[]');
-      if (count($optionsId)) {
+      if (isset($elementsId) && count($optionsId)) {
         $param = [];
         $single = count($optionsId) === 1;
         $option = json_decode($option ?? '[]', true);
@@ -406,7 +406,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $name = $option['name'] ?? '';
 
         if ($single) {
-          $options = $db->selectQuery('options_elements', ['ID', 'name'], " name = '$name' ");
+          $options = $db->selectQuery('options_elements', ['ID', 'name'], " element_id = $elementsId AND name = '$name' ");
           if (count($options) > 1 || empty($name)
               || (count($options) === 1 && $options[0]['ID'] !== $optionsId[0])) {
             $result['error'] = 'option_name_error'; break;

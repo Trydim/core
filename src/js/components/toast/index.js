@@ -100,7 +100,7 @@ export class ToastClass {
 }
 
 export const toast = (msg = 'message body', type = 'success', options = {}) => {
-  if (typeof options === "boolean" && options === false) options.durations = {success: 0};
+  if (typeof options === "boolean" && options === false) options = {durations: {success: 0}};
 
   switch (type) {
     case "tip": return new ToastClass().tip(msg, options);
