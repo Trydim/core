@@ -35,7 +35,7 @@ class Course {
     if (is_object($db)) $this->getRateFromDb($db);
     else $this->getRateFromFile($dataFile);
 
-    ($refreshParam['autoRefresh'] ?? true) && $this->refresh();
+    if ($refreshParam['autoRefresh'] ?? true) $this->refresh();
   }
 
   private function checkTableMoney() {
@@ -111,8 +111,7 @@ class Course {
         $this->rate[$code]['scale'] = 1;
         $this->rate[$code]['rate'] = 1;
         continue;
-      }
-      */
+      }*/
 
       $value = $this->searchRate($code);
       if ($value) {
