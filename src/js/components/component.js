@@ -215,12 +215,12 @@ export const Print = () => {
         imagesPromise = [];
 
     nodes.forEach(n => {
-      !n.src.includes('base64') && imagesPromise.push(this.loadImage(n.src));
+      if (n.src.includes('base64')) imagesPromise.push(new Promise(r => r(n)));
+      else imagesPromise.push(this.loadImage(n.src));
     })
 
-    imagesPromise.length
-    && await Promise.all([...imagesPromise])
-                    .then(value => nodes.forEach((n, i) => n.src = value[i].src));
+    await Promise.all([...imagesPromise])
+                 .then(value => nodes.forEach((n, i) => n.src = value[i].src));
 
     return container;
   }
