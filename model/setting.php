@@ -242,7 +242,6 @@ switch ($cmsAction) {
             'name' => $table['name'],
             'code' => $code,
             'type' => $type,
-            'typeLang' => gTxtDB('types', $type),
           ];
         }
       }
@@ -253,22 +252,18 @@ switch ($cmsAction) {
       $result['propertyValue'] = $db->getColumnsTable($props); // todo загрузить просто
     }
     break;
-  case 'delProperties':
+  case 'deleteProperties':
     $property = json_decode($property ?? '[]', true);
     $setting = $main->getSettings('optionProperties');
 
-    if (isset($props)) {
-      $props = explode(',', $props);
-
-      $db->delPropertyTable($props);
+    if (!empty($property['fields'])) {
+      $db->delPropertyTable($property['code']);
     }
 
-    if (isset($props) && ($setting = getSettingFile()) && isset($setting['optionProperties'])) {
-      $setting['optionProperties'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
-        return !in_array($item, $props);
-      }, ARRAY_FILTER_USE_KEY);
+    if (isset($property['code'])) {
+      unset($setting['prop_' . $property['code']]);
 
-      //setSettingFile($setting);
+      $main->setSettings('optionProperties', $setting);
     }
     $main->saveSettings();
     break;

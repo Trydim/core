@@ -54,10 +54,10 @@ const m = {
   LocalStorage,
 
   /**
-   * @param {string} name
-   * @param {function} func
+   * @type object
+   * add, exec, del
    */
-  OneTimeFunction: module.OneTimeFunction,
+  oneTimeFunction: module.oneTimeFunction,
 
   Pagination: module.Pagination,
 

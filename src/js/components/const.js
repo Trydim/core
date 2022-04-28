@@ -3,7 +3,7 @@
 /**
  * Global variables and simple functions
  */
-const cms = JSON.parse(window.CMS_CONST) || {};
+const cms = JSON.parse(window.CMS_CONST || '{}');
 
 export default {
   DEBUG        : cms['DEBUG'] || false,

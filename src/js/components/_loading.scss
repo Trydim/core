@@ -3,18 +3,26 @@ $gray: #808080 !default;
 $loading-color: $white !default;
 $loading-color-light: $gray !default;
 
-.loading-st1 {
+$loaderSmall: 10px !default;
+$loaderMedium: 16px !default;
+$loaderBig: 30px !default;
+
+.loading-st1-sm,
+.loading-st1,
+.loading-st1-big {
   position: relative !important;
 
-  &:after {
-    position:      absolute;
+  &-sm:after,
+  &:after,
+  &-big:after {
     content:       " ";
     display:       inline-block;
+    position:      absolute;
+    left:          50%;
+    top:           50%;
+    width:         $loaderMedium;
+    height:        $loaderMedium;
     background:    #ffffff2b;
-    left:          calc(50% - 10px);
-    top:           calc(50% - 10px);
-    width:         16px;
-    height:        16px;
     border-radius: 50%;
     border-style:  solid;
     border-width:  3px;
@@ -23,6 +31,21 @@ $loading-color-light: $gray !default;
     animation:     lds-dual-ring 1.2s linear infinite;
   }
 
+  &-sm:after {
+    left:          50%;
+    top:           50%;
+    width:         10px;
+    height:        10px;
+  }
+
+  &-big:after {
+    left:          50%;
+    top:           50%;
+    width:         $loaderBig;
+    height:        $loaderBig;
+  }
+
+
   &.loading-st1-light:after {
     border-color:  $loading-color-light transparent $loading-color-light transparent;
   }
@@ -30,9 +53,9 @@ $loading-color-light: $gray !default;
 
 @keyframes lds-dual-ring {
   0% {
-    transform: rotate(0deg);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
   100% {
-    transform: rotate(360deg);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }

@@ -187,6 +187,7 @@ export const Print = () => {
   let p   = Object.create(null);
   p.frame = document.createElement("iframe");
   p.data  = 'no content'; // html
+  p.href  = location.pathname;
 
   p.frame.onload = function () {
     history.pushState({print: 'ok'}, '', '/');
@@ -226,11 +227,11 @@ export const Print = () => {
   }
 
   p.setContent = async function (content, classList = []) {
-    let container = document.createElement('div'), cloneN, delay = 0,
+    let container = document.createElement('div'),
         haveImg = content.includes('<img');
-    classList.map(i => container.classList.add(i));
+    container.classList.add(...classList);
     container.innerHTML = content;
-    if(haveImg) {
+    if (haveImg) {
       container = await this.prepareContent(container);
     }
     this.data = container;
@@ -248,6 +249,7 @@ export const Print = () => {
       document.body.append(this.frame);
       this.frame.remove();
       window.scrollTo(0, scrollY);
+      history.pushState({print: 'ok'}, '', this.href);
     });
   }
 
@@ -605,18 +607,11 @@ export class Observer {
   }
 }
 
-// Одноразовые функции
-export class OneTimeFunction {
-  /**
-   *
-   * @param {string} funcName
-   * @param {function} func
-   */
-  constructor(funcName, func) {
-    this.func = Object.create(null);
-
-    funcName && this.add(funcName, func);
-  }
+/**
+ * Одноразовые функции
+ */
+export const oneTimeFunction = {
+  func: Object.create(null),
 
   /**
    *
@@ -625,7 +620,7 @@ export class OneTimeFunction {
    */
   add(name, func) {
     this.func[name] = func;
-  }
+  },
 
   /**
    *
@@ -637,7 +632,7 @@ export class OneTimeFunction {
       this.func[name](...arg);
       this.del(name);
     }
-  }
+  },
 
   /**
    *
@@ -645,5 +640,5 @@ export class OneTimeFunction {
    */
   del(name) {
     this.func[name] && (delete this.func[name]);
-  }
+  },
 }

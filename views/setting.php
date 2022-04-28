@@ -42,7 +42,7 @@ ob_start();
 
   <?php if ($main->availablePage('catalog')) { ?>
     <hr>
-    <setting-properties @update="updateProperties"></setting-properties>
+    <setting-properties :query="query" :query-param="queryParam" @update="updateProperties"></setting-properties>
   <?php } ?>
 </div>
 <?php

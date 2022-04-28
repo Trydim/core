@@ -15,7 +15,11 @@
         >
           <p-t-column field="name" header="Название"></p-t-column>
           <p-t-column field="code" :sortable="true" header="Код"></p-t-column>
-          <p-t-column field="typeLang" header="Тип"></p-t-column>
+          <p-t-column field="type" header="Тип">
+            <template #body="slotProps">
+              {{ getTypeLang(slotProps.data.type) }}
+            </template>
+          </p-t-column>
         </p-table>
 
         <div class="my-3 text-center">
@@ -34,7 +38,7 @@
         <h4>{{ modal.title }}</h4>
       </template>
 
-      <div v-if="queryParam.dbAction !== 'deleteProperty'" style="width: 600px">
+      <div v-if="queryParam.cmsAction !== 'deleteProperties'" style="width: 600px">
         <!-- Имя -->
         <div class="col-12 row my-1">
           <div class="col">Название свойства:</div>
@@ -92,7 +96,7 @@
           </div>
         </template>
       </div>
-      <div v-else>
+      <div v-else style="min-width: 300px">
         Удалить свойство
       </div>
 
@@ -106,6 +110,14 @@
 
 <script>
 export default {
+  props: {
+    query: {
+      type: Function,
+    },
+    queryParam: {
+      type: Object,
+    }
+  },
   emits: ['update'],
   data: () => ({
     propertiesData: [],
@@ -157,13 +169,22 @@ export default {
       this.property.code = f.transLit(this.property.name);
     },
   },
+  computed: {
+    allTypes() {
+      return this.propertiesTypes[0].items.concat(this.propertiesTypes[1].items);
+    }
+  },
   methods: {
     loadProperties() {
-      this.$root.queryParam.cmsAction = 'loadProperties';
-      this.$root.query().then(data => {
+      this.queryParam.cmsAction = 'loadProperties';
+      this.query().then(data => {
         this.propertiesData = data['optionProperties'];
         this.loading = false;
       });
+    },
+
+    getTypeLang(type) {
+      return this.allTypes.find(i => i.id === type).name;
     },
 
     // -------------------------------------------------------------------------------------------------------------------
@@ -184,8 +205,20 @@ export default {
       this.modal.title = 'Создать свойство';
       this.modal.display = true;
     },
-    changeProperty() {},
-    deleteProperty() {},
+    changeProperty() {
+      this.queryParam.cmsAction = 'createProperty';
+
+      this.modal.title = 'В разработке';
+      this.modal.display = true;
+    },
+    deleteProperty() {
+      this.queryParam.cmsAction = 'deleteProperties';
+
+      this.property = {...this.propertiesSelected};
+
+      this.modal.title = 'Удалить свойство';
+      this.modal.display = true;
+    },
 
     addPropertyField() {
       let random = Math.random() * 10000 | 0;
@@ -200,10 +233,10 @@ export default {
     },
 
     propertiesConfirm() {
-      //this.loading = true;
+      this.loading = true;
 
-      this.$root.queryParam.property = JSON.stringify(this.property);
-      this.$root.query().then(() => this.loadProperties());
+      this.queryParam.property = JSON.stringify(this.property);
+      this.query().then(() => this.loadProperties());
       this.modal.display = false;
     },
     propertiesCancel() {
@@ -260,40 +293,7 @@ class Properties {
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
 
-  actionBtn(e) {
-    let target = e.target,
-        action = target.dataset.action;
 
-    if (!action) return;
-
-    let select = {
-      'loadProperties': () => !e.target.parentNode.open && this.reloadQuery(),
-      'createProperty': () => this.createProperty(),
-      'changeProperty': () => this.changeProperty(),
-      'delProperty': () => this.delProperty(),
-
-      'addCol': () => this.addCol(),
-    }
-
-    if (action === 'confirmYes') { // Закрыть подтверждением
-      this.delayFunc();
-      this.delayFunc = () => {};
-      this.needReload = true;
-    } else {
-      !['addCol', 'remCol'].includes(action) && (this.queryParam.cmsAction = action);
-      select[action] && select[action]();
-    }
-  }
-
-  createProperty() {
-    this.delayFunc = () => {
-      let fd = new FormData(this.tmp.create);
-
-      for (const [k, v] of fd.entries()) this.queryParam[k] = v;
-    }
-
-    this.M.show('Добавить новое свойство', this.tmp.create);
-  }
   changeProperty() {
     let props = this.selected.getSelected();
     if (props.length !== 1) {

@@ -492,7 +492,7 @@
             ></p-input-number>
             <p-textarea v-else-if="prop.type === 'textarea'" v-model="option.properties[key]" style="min-height: 42px"></p-textarea>
             <p-calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="option.properties[key]"></p-calendar>
-            <p-toggle-button v-else-if="prop.type === 'checkbox'"
+            <p-toggle-button v-else-if="prop.type === 'bool'"
                              on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
                              on-label="Да" off-label="Нет"
                              v-model="option.properties[key]"
