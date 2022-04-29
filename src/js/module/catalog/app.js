@@ -30,6 +30,7 @@ export default {
     reloadAction: Object.create(null),
     queryParam  : Object.create(null),
     queryFiles  : Object.create(null),
+    localStorage: new f.LocalStorage(),
     temp: false,
 
     codes: [],
@@ -58,6 +59,21 @@ export default {
     },
   },
   methods: {...sectionMethods, ...elementsElements, ...optionsMethods,
+    setOptionColumnsSelected() {
+      this.optionsColumnsSelected = this.localStorage.has('optionsColumnsSelected')
+                                    ? JSON.parse(this.localStorage.get('optionsColumnsSelected'))
+                                    : this.optionsColumns;
+
+      this.$watch('optionsColumnsSelected', {
+        deep: true,
+        handler: () => {
+          this.$nextTick(() => {
+            this.localStorage.set('optionsColumnsSelected', JSON.stringify(this.optionsColumnsSelected));
+          });
+        },
+      });
+    },
+
     setReloadQueryParam() {
       delete this.reloadAction.callback;
       this.queryParam = Object.assign(this.queryParam, this.reloadAction);
@@ -98,7 +114,7 @@ export default {
     this.units = setData('#dataUnits');
     this.money = setData('#dataMoney');
     this.properties = setData('#dataProperties');
-    this.optionsColumnsSelected = this.optionsColumns;
+    this.setOptionColumnsSelected();
     this.loadSections();
   },
 }

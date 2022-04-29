@@ -9,8 +9,8 @@ $field = [
   'pageTitle' => 'Администрирование',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/admindb.css?ver=f2fc4df8e1'];
-$field['jsLinks'] = [CORE_JS . 'module/admindb.js?ver=ff662d95c9'];
+$field['cssLinks'] = [CORE_CSS . 'module/admindb.css?ver=3f0d36561c'];
+$field['jsLinks'] = [CORE_JS . 'module/admindb.js?ver=f3bb2b6859'];
 
 if ($main->getCmsParam('DB_TABLE_IN_SIDEMENU')) {
   if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];

@@ -49,8 +49,8 @@ $field = [
 	'pageTitle' => 'File manager',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=e87baa0ebf'];
-$field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=9cecdcd6e1'];
+$field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=fda1c25660'];
+$field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=45223fc11b'];
 
 ob_start();
 require $pathTarget;

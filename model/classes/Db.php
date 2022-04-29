@@ -629,6 +629,22 @@ class Db extends \R {
     }
   }
 
+  private function parseDbProperty($prop, $type) {
+    $str = " `$prop` ";
+
+    switch ($type) {
+      case 'file': return " `$prop". "_ids` varchar(255)";
+      case 'string': return $str . "varchar(255)";
+      case 'textarea': return $str . "varchar(1000)";
+      case 'int': return $str . "int(20) NOT NULL DEFAULT 1";
+      case 'float': return $str . "float NOT NULL DEFAULT 1";
+      case 'double': return $str . "double NOT NULL DEFAULT 1";
+      case 'money': return $str . "decimal(10,4) NOT NULL DEFAULT 1.0000";
+      case 'date': return $str . "timestamp";
+      case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
+    }
+  }
+
   private function getPropertyTable($propValue, $propName) {
     static $propTables, $props;
 
@@ -670,28 +686,14 @@ class Db extends \R {
     return ['name' => "Prop item: $propValue in $propName - not found!"];
   }
 
-  public function createPropertyTable($dbTable, $param) {
+  public function createPropertyTable(string $dbTable, array $param) {
     $sql = "CREATE TABLE $dbTable (
             `ID` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
 
     if (count($param)) {
-      function getParam($prop, $type) {
-        $str = ", `$prop` ";
-
-        switch ($type) {
-          case 'file': return ", `$prop". "_ids` varchar(255)";
-          case 'string': return $str . "varchar(255)";
-          case 'textarea': return $str . "varchar(1000)";
-          case 'double': return $str . "double NOT NULL DEFAULT 1";
-          case 'money': return $str . "decimal(10,4) NOT NULL DEFAULT 1.0000";
-          case 'date': return $str . "timestamp";
-          case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
-        }
-      }
-
       foreach ($param as $prop => $type) {
-        $sql .= getParam($prop, $type);
+        $sql .= ', ' . $this->parseDbProperty($prop, $type);
       }
     }
 
@@ -700,6 +702,48 @@ class Db extends \R {
         ADD PRIMARY KEY (`ID`)");
     return self::exec("ALTER TABLE `$dbTable`
         MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
+  }
+
+  /**
+   * @param string $dbTable
+   * @param array $params
+   * @return array
+   */
+  public function changePropertyTable(string $dbTable, array $params) {
+    // `prop_kategoriya` ADD `scale` INT NOT NULL AFTER `work`;
+    //ALTER TABLE `prop_kategoriya` CHANGE `scale` `scale1` FLOAT(11) NOT NULL;
+    //ALTER TABLE `prop_kategoriya` DROP `scale`;
+
+    $error = [];
+    $query = [];
+    $sSql = "ALTER TABLE $dbTable";
+
+    if (count($params)) {
+      $haveColumns = array_map(function ($column) {return $column['columnName'];}, $this->getColumnsTable($dbTable));
+      array_shift($haveColumns);
+      array_shift($haveColumns);
+
+      // Add and change properties
+      foreach ($params as $columnName => $param) {
+        if (!in_array($columnName, $haveColumns)) {
+          $query[] = $sSql . ' ADD ' . $this->parseDbProperty($columnName, $param['type']);
+        } else {
+          $query[] = $sSql . " CHANGE `$columnName` " . $this->parseDbProperty($param['newName'], $param['type']);
+        }
+      }
+
+      // Drop properties
+      $param = array_keys($params);
+      foreach ($haveColumns as $column) {
+        if (!in_array($column, $param)) {
+          $query[] = $sSql . " DROP `$column`";
+        }
+      }
+
+      foreach ($query as $sql) $error[] = self::exec($sql);
+    }
+
+    return $error;
   }
 
   public function delPropertyTable($dbTables) {

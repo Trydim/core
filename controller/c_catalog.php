@@ -17,10 +17,11 @@ function prepareData($data) {
 
 $field = [
   'pageTitle' => 'Каталог',
+  'sideRight'     => '',
+  'pageFooter'    => '',
   'footerContent' => '',
-  'sideRight' => '',
-  'cssLinks'  => [CORE_CSS . 'module/catalog.css?ver=971a995b37'],
-  'jsLinks'   => [CORE_JS . 'module/catalog.js?ver=9995e5181a'],
+  'cssLinks'  => [CORE_CSS . 'module/catalog.css?ver=8cdf94ab40'],
+  'jsLinks'   => [CORE_JS . 'module/catalog.js?ver=73262afc8e'],
 ];
 
 // Загрузка настройки столбцов

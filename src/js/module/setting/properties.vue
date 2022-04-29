@@ -10,11 +10,16 @@
                  :scrollable="true"
                  responsive-layout="scroll"
                  v-model:selection="propertiesSelected"
-                 @dblclick="changeProperty($event)"
-                 :bodyClass="'text-center'"
+                 @rowReorder="onRowReorder"
+                 @dblclick="dblClickProperty($event)"
         >
+          <p-t-column :rowReorder="true" header-style="width: 3rem" header="Очередность"></p-t-column>
           <p-t-column field="name" header="Название"></p-t-column>
-          <p-t-column field="code" :sortable="true" header="Код"></p-t-column>
+          <p-t-column field="code" header="Код">
+            <template #body="slotProps">
+              <span :data-code="slotProps.data.code">{{ slotProps.data.code }}</span>
+            </template>
+          </p-t-column>
           <p-t-column field="type" header="Тип">
             <template #body="slotProps">
               {{ getTypeLang(slotProps.data.type) }}
@@ -78,9 +83,7 @@
 
           <div v-for="(field, key) of property.fields" class="row mb-1 border" :key="key">
             <div class="col-5 text-center">
-              <p-input-text class="w-100"
-                            v-model="field.name"
-              ></p-input-text>
+              <p-input-text class="w-100" v-model="field.newName"></p-input-text>
             </div>
             <div class="col-6">
               <p-select class="w-100"
@@ -157,7 +160,7 @@ export default {
     propertiesDataBaseTypes: [
       {id: 'text', name: 'Текст (~200 символов)'},
       {id: 'textarea', name: 'Текст (много)'},
-      {id: 'number', name: 'Целое число'},
+      {id: 'int', name: 'Целое число'},
       {id: 'float', name: 'Дробное число'},
       {id: 'date', name: 'Дата'},
       {id: 'file', name: 'Файл'},
@@ -191,6 +194,10 @@ export default {
     // Action
     // -------------------------------------------------------------------------------------------------------------------
 
+    onRowReorder(event) {
+      this.propertiesData = event.value;
+    },
+
     openAccordion() {
       this.loadProperties();
     },
@@ -205,10 +212,26 @@ export default {
       this.modal.title = 'Создать свойство';
       this.modal.display = true;
     },
-    changeProperty() {
-      this.queryParam.cmsAction = 'createProperty';
+    dblClickProperty(e) {
+      const node = e.target.closest('tr').querySelector('[data-code]'),
+            code = node && node.dataset.code;
 
-      this.modal.title = 'В разработке';
+      if (code) {
+        this.propertiesSelected = this.propertiesData.find(e => e.code === code);
+        this.changeProperty();
+      }
+    },
+    changeProperty() {
+      if (!this.propertiesSelected) return;
+      this.queryParam.cmsAction = 'changeProperty';
+
+      this.property = {...this.propertiesSelected};
+      if (this.property.type === 'select') {
+        Object.values(this.property.fields).forEach(f => f.newName = f.name);
+      }
+      this.$nextTick(() => this.property.code = this.propertiesSelected.code);
+
+      this.modal.title = 'Редактирование свойства';
       this.modal.display = true;
     },
     deleteProperty() {
@@ -224,12 +247,12 @@ export default {
       let random = Math.random() * 10000 | 0;
 
       this.property.fields[random] = {
-        name: 'Поле' + random,
+        newName: 'field_' + random,
         type: 'text',
       }
     },
     removePropertyField(id) {
-      delete this.property.fields[id];
+      delete this.property.fields.splice(id, 1);
     },
 
     propertiesConfirm() {
@@ -244,89 +267,4 @@ export default {
     },
   },
 }
-/*
-const getFieldNode = (p, field) => p.querySelector(`[data-field=${field}]`);
-
-class Properties {
-  constructor(modal) {
-    this.form = f.qS('#propertiesTable');
-    if (!this.form) return;
-
-    this.setParam(modal);
-
-    this.onEvent();
-  }
-
-  setParam(modal) {
-    this.M = modal;
-
-    this.needReload = false;
-    this.delayFunc = () => {};
-    this.queryParam = {
-      cmsAction: 'loadProperties',
-    };
-
-    this.field = {
-      body: this.form.querySelector('tbody'),
-    }
-
-    this.tmp = {
-      create: f.gTNode('#propertiesCreateTmp'),
-      property: this.field.body.innerHTML,
-    };
-
-    this.field.propertyType = getFieldNode(this.tmp.create, 'propertyType');
-    this.field.colsField    = getFieldNode(this.tmp.create, 'propertiesCols');
-    this.tmp.colItem        = getFieldNode(this.tmp.create, 'propertiesColItem');
-    this.tmp.colItem.remove();
-
-    this.loader = new f.LoaderIcon(this.field.body, false, true, {small: false});
-    this.selected = new f.SelectedRow({table: this.form});
-
-    f.relatedOption(this.tmp.create);
-  }
-
-  reloadQuery() {
-    this.queryParam = {cmsAction: 'loadProperties'};
-    this.needReload = false;
-  }
-  // Events function
-  //--------------------------------------------------------------------------------------------------------------------
-
-
-  changeProperty() {
-    let props = this.selected.getSelected();
-    if (props.length !== 1) {
-      f.showMsg('Выберите 1 параметр', 'error');
-      return;
-    }
-
-    this.queryParam.props = props;
-
-    this.M.show('Удалить параметр?', this.tmp.edit);
-  }
-  delProperty() {
-    let props = this.selected.getSelected();
-    if (!props.length) {
-      f.showMsg('Выберите параметр', 'error');
-      return;
-    }
-
-    this.queryParam.props = props;
-    this.M.show('Удалить параметр?', props.join(', '));
-  }
-
-  addCol(keyValue = false, typeValue = false) {
-    let node = this.tmp.colItem.cloneNode(true),
-        key = getFieldNode(node, 'key'),
-        type = getFieldNode(node, 'type'),
-        randName = new Date().getTime();
-
-    key.name = 'colName' + randName;
-    key.value = keyValue || 'Поле' + randName.toString().slice(-2);
-    type.name = 'colType' + randName;
-    type.value = typeValue || 'string';
-    this.field.colsField.append(node);
-  }
-}*/
 </script>
