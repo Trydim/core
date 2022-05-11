@@ -3,13 +3,33 @@
 // https://www.primefaces.org/diamond/icons.xhtml
 // ---------------------------------------------------------------------------------------------------------------------
 
+$grays: (
+        "100": #f8f9fa,
+        "500": #adb5bd,
+        "900": #212529
+) !default;
+
+$colors: (
+        "blue": blue,
+        "purple": purple,
+        "red": red,
+        "orange": orange,
+        "yellow": yellow,
+        "green": green,
+        "white": white,
+        "gray": gray,
+        "gray-dark": darkgray
+) !default;
+
+$theme-colors: () !default;
+
 @font-face {
   font-family: 'primeicons';
   font-display: block;
   //src: url('./fonts/primeicons.eot');
   src: //url('./fonts/primeicons.eot?#iefix') format('embedded-opentype'),
-    url('icons/fonts/primeicons.ttf') format('truetype'),
-    url('icons/fonts/primeicons.woff') format('woff');
+          url('icons/fonts/primeicons.ttf') format('truetype'),
+          url('icons/fonts/primeicons.woff') format('woff');
   //url('./fonts/primeicons.svg?#primeicons') format('svg');
   font-weight: normal;
   font-style: normal;

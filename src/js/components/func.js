@@ -545,6 +545,13 @@ export default {
         finishOk();
       }
     });
+
+    if (f.DEBUG || true) {
+      window.pdfResources = () => {
+        data.set('resource', 'true');
+        f.Post({data}).then(data => {console.log(data['css']); console.log(data['html'])});
+      }
+    }
   },
 
   /**
