@@ -7,7 +7,7 @@
 
 $field = [
   'pageTitle' => 'Клиенты',
-  'jsLinks'   => [CORE_JS . 'module/customers.js?ver=0f898f53ed'],
+  'jsLinks'   => [CORE_JS . 'module/customers.js?ver=6347eef0e2'],
   'footerContent' => $main->getSettings('json', true),
 ];
 

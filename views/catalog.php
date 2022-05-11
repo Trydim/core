@@ -90,7 +90,7 @@
       </div>
 
       <!-- Elements -->
-      <div class="col">
+      <div class="col-9">
         <div class="position-relative" :style="{'max-height': elementShow ? '100%' : '30px'}">
           <div style="height: 20px">
             <p-button v-tooltip.left="'Скрыть'" :label="elementShow ? '-' : '+'" :class="'position-absolute p-0 p-button-white'"
@@ -106,7 +106,7 @@
                      :loading="elementsLoading"
                      :resizable-columns="true" column-resize-mode="fit" show-gridlines
                      selection-mode="multiple" :meta-key-selection="false"
-                     :paginator="elements.length > 5" :rows="10" :rows-per-page-options="[5,10,20,50]"
+                     :paginator="elements.length > 10" :rows="10" :rows-per-page-options="[10,20,50]"
                      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                      current-page-report-template="Showing {first} to {last} of {totalRecords}"
                      responsive-layout="scroll"
@@ -250,7 +250,7 @@
   <hr>
 
   <!-- Options -->
-  <div class="container-fluid position-relative">
+  <div class="container-fluid position-relative" ref="optionsWrap">
     <p-table v-if="options.length"
              :value="options" datakey="id"
              :loading="optionsLoading"
@@ -264,11 +264,11 @@
     >
       <template #header>
         <p-multi-select :model-value="optionsColumnsSelected"
-                          :options="optionsColumns"
-                          option-label="name"
-                          @update:model-value="onToggle"
-                          placeholder="Настроить колонки" style="width: 20em"
-          ></p-multi-select>
+                        :options="optionsColumns"
+                        option-label="name"
+                        @update:model-value="onToggle"
+                        placeholder="Настроить колонки" style="width: 20em"
+        ></p-multi-select>
         <h3 class="d-inline ms-3">Открыт: {{ elementLoaded }} - {{ elementName }}</h3>
       </template>
       <p-t-column v-if="checkColumn('id')" field="id" :sortable="true" header="<?= gTxtDB('options', 'id') ?>" :class="'text-center'">
@@ -304,7 +304,9 @@
       <p-t-column v-if="checkColumn('outputPrice')" field="outputPrice" :sortable="true" header="<?= gTxtDB('options', 'outputPrice') ?>"></p-t-column>
     </p-table>
 
-    <div v-if="options.length" class="mt-1 d-flex justify-content-between">
+    <div v-if="options.length" class="d-flex justify-content-between position-sticky bottom-0 end-0 mt-1"
+         style="background-color: rgba(253, 253, 253, 0.81); z-index: +1"
+    >
       <div></div>
       <div>
         <p-button v-tooltip.left="'Добавить вариант'"
@@ -321,13 +323,13 @@
       </div>
 
       <div class="d-flex justify-content-end" style="min-width: 130px">
-        <p-button v-tooltip.bottom="'Выделить все'" icon="pi pi-check" class="p-button-warning"
+        <p-button v-tooltip.top="'Выделить все'" icon="pi pi-check" class="p-button-warning"
                   :loading="elementsLoading" @click="selectedAllOptions"></p-button>
         <p-button v-if="optionsSelected.length"
-                  v-tooltip.left="'Снять выделение'" icon="pi pi-times" class="p-button-danger ms-2"
+                  v-tooltip.top="'Снять выделение'" icon="pi pi-times" class="p-button-danger ms-2"
                   :loading="elementsLoading" @click="clearAllOptions"></p-button>
         <p-button v-if="optionsSelected.length"
-                  v-tooltip.left="'Показать выбранные'" icon="pi pi-bars" class="p-button-warning ms-2"
+                  v-tooltip.top="'Показать выбранные'" icon="pi pi-bars" class="p-button-warning ms-2"
                   @click="optionsSelectedShow = !optionsSelectedShow"></p-button>
       </div>
     </div>
@@ -372,11 +374,12 @@
                       v-model="option.unitId">
             </p-select>
           </div>
+
           <!-- Входная цена -->
           <div class="col text-center">Входная цена</div>
           <div class="p-inputgroup my-2">
             <!-- Валюта -->
-            <span class="p-inputgroup-addon" :class="{'col-5': !optionsModal.single}">Валюта</span>
+            <span class="p-inputgroup-addon">Валюта</span>
             <span v-if="!optionsModal.single" class="p-inputgroup-addon">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true"
                           v-model="fieldChange.moneyInputId"
@@ -387,11 +390,13 @@
                       :options="money" v-model="option.moneyInputId"
             ></p-select>
             <!-- Сумма -->
-            <template v-if="optionsModal.single">
-              <span class="p-inputgroup-addon">Сумма</span>
-              <p-input-number mode="decimal" :min-fraction-digits="2" v-model="option.inputPrice"></p-input-number>
-            </template>
+            <span class="p-inputgroup-addon">Сумма</span>
+            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+              <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyInput"></p-checkbox>
+            </span>
+            <p-input-number mode="decimal" :min-fraction-digits="2" v-model="option.inputPrice"></p-input-number>
           </div>
+
           <!-- Выходная цена -->
           <div class="col-12 text-center">Розничная цена</div>
           <div class="p-inputgroup my-2">
@@ -410,7 +415,7 @@
           </div>
           <div class="p-inputgroup my-2">
             <!-- Валюта -->
-            <span class="p-inputgroup-addon" :class="{'col-5': !optionsModal.single}">Валюта</span>
+            <span class="p-inputgroup-addon">Валюта</span>
             <span v-if="!optionsModal.single" class="p-inputgroup-addon">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyOutputId"></p-checkbox>
             </span>
@@ -420,14 +425,15 @@
                       v-model="option.moneyOutputId"
             ></p-select>
             <!-- Сумма -->
-            <template v-if="optionsModal.single">
-              <span class="p-inputgroup-addon">Сумма</span>
-              <p-input-number mode="decimal" :min-fraction-digits="2"
-                              v-model="option.outputPrice"
-                              @input="changeOutputPrice()"
-                              @blur="changeOutputPrice()"
-              ></p-input-number>
-            </template>
+            <span class="p-inputgroup-addon">Сумма</span>
+            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+              <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyOutput"></p-checkbox>
+            </span>
+            <p-input-number mode="decimal" :min-fraction-digits="2"
+                            v-model="option.outputPrice"
+                            @input="changeOutputPrice()"
+                            @blur="changeOutputPrice()"
+            ></p-input-number>
           </div>
           <!-- Доступен -->
           <div class="p-inputgroup my-2">
@@ -452,9 +458,16 @@
             ></p-input-number>
           </div>
           <!-- Показать параметры -->
-          <div v-if="!optionsModal.single" class="p-inputgroup my-5">
+          <div v-if="!optionsModal.single" class="p-inputgroup mt-5">
             <span class="p-inputgroup-addon col">Показать параметры</span>
             <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" v-model="fieldChange.properties"></p-toggle-button>
+          </div>
+          <!-- Показать параметры -->
+          <div v-if="!optionsModal.single" class="p-inputgroup my-2">
+            <p-button label="Изменить все" icon="pi pi-check" class="p-button-success p-button-outlined w-50"
+                      @click="setFieldChange(true)"></p-button>
+            <p-button label="Снять изменения" icon="pi pi-times" class="p-button-danger p-button-outlined w-50"
+                      @click="setFieldChange(false)"></p-button>
           </div>
           <!-- Файлы -->
           <div v-if="optionsModal.single" class="col">
@@ -482,7 +495,7 @@
         </div>
 
         <!-- Пользовательские параметры -->
-        <div v-if="optionsModal.single || fieldChange.properties" class="col-6 overflow-auto" style="max-height: 90vh">
+        <div v-if="optionsModal.single || fieldChange.properties" class="col-6">
           <div class="form-label text-center mb-3">Параметры</div>
           <div v-for="(prop, key, index) of properties" class="p-inputgroup mb-2" :key="'t' + key">
             <span class="p-inputgroup-addon col-6 text-nowrap">{{ prop.name }}</span>
@@ -492,7 +505,7 @@
             ></p-input-number>
             <p-textarea v-else-if="prop.type === 'textarea'" v-model="option.properties[key]" style="min-height: 42px"></p-textarea>
             <p-calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="option.properties[key]"></p-calendar>
-            <p-toggle-button v-else-if="prop.type === 'checkbox'"
+            <p-toggle-button v-else-if="prop.type === 'bool'"
                              on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
                              on-label="Да" off-label="Нет"
                              v-model="option.properties[key]"

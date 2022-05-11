@@ -78,16 +78,16 @@ function boolValue($var): bool {
  */
 function checkError(array &$result): void {
   $error = [];
-  if (is_array($result['error'] ?? false)) {
-    if (empty($result['error'])) unset($result['error']);
-    else array_walk_recursive($result['error'], function($v, $k) use (&$error) {
-      if (empty($v)) return;
-      $error[] = [$k => $v];
-    });
+  if (!empty($result['error'])) {
+    if (is_array($result['error'])) {
+      array_walk_recursive($result['error'], function ($v, $k) use (&$error) {
+        if (empty($v)) return;
+        $error[] = [$k => $v];
+      });
+    } else $error = true;
   }
 
-  $result['status'] = empty($error);
-  if (empty($error)) unset($result['error']);
+  if ($result['status'] = empty($error)) unset($result['error']);
   else $result['error'] = $error;
 }
 

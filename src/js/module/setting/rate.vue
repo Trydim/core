@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div class="col-12 text-center mb-3">
+    <div v-if="!autoRefresh" class="col-12 text-center mb-3">
       <p-button v-tooltip.bottom="'Редактировать курсы'" icon="pi pi-sliders-h" class="p-button-success"
                 label="Редактировать курсы"
                 @click="editRate"

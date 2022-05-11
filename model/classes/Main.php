@@ -609,7 +609,7 @@ final class Main {
   public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
     $rateParam = [
       'autoRefresh' => $this->getSettings('autoRefresh'),
-      'serverRefresh' => $this->getSettings('autoRefresh'),
+      'serverRefresh' => $this->getSettings('serverRefresh'),
     ];
     $rate = new Course($rateParam, $this->db);
     $rate = $justRate ? array_map(function ($rate) { return $rate['rate']; }, $rate->rate) : $rate->rate;

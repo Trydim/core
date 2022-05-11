@@ -33,8 +33,10 @@ export const data = {
   fieldChange: {
     unitId       : true,
     moneyInputId : true,
+    moneyInput   : true,
     percent      : true,
     moneyOutputId: true,
+    moneyOutput  : true,
     activity     : true,
     sort         : true,
     properties   : false,
@@ -55,13 +57,13 @@ export const data = {
     {name: 'Номер', value: 'id'},
     {name: 'Файлы', value: 'images'},
     {name: 'Ед.Измерения', value: 'unitName'},
-    {name: 'activity', value: 'activity'},
-    {name: 'sort', value: 'Сортировка'},
-    {name: 'moneyInputName', value: 'moneyInputName'},
-    {name: 'inputPrice', value: 'inputPrice'},
-    {name: 'outputPercent', value: 'outputPercent'},
-    {name: 'moneyOutputName', value: 'moneyOutputName'},
-    {name: 'outputPrice', value: 'outputPrice'},
+    {name: 'Активен', value: 'activity'},
+    {name: 'Сортировка', value: 'sort'},
+    {name: 'Валюта вход', value: 'moneyInputName'},
+    {name: 'Сумма вход', value: 'inputPrice'},
+    {name: 'Процент', value: 'outputPercent'},
+    {name: 'Валюта выход', value: 'moneyOutputName'},
+    {name: 'Сумма выход', value: 'outputPrice'},
   ],
 
   optionsColumnsSelected: undefined,
@@ -121,11 +123,30 @@ export const methods = {
     this.elementLoaded         = id;
     this.elementName           = this.elements.find(e => +e.id === id).name;
     this.optionsLoading        = true;
+
+    f.showMsg('Открыт: ' + this.elementName);
     this.query().then(data => {
       this.options        = data['options'];
       this.optionsLoading = false;
       this.clearAllOptions();
+      this.$nextTick(() => {
+        window.scrollTo(0, this.$refs['optionsWrap'].getBoundingClientRect().y);
+      });
     });
+  },
+
+  checkColumn(v) {
+    return this.optionsColumnsValues.includes(v);
+  },
+
+  getAvgPrice(type) {
+    let res = 0;
+
+    this.optionsSelected.forEach(option => {
+      res += +option[type + 'Price'];
+    });
+
+    return res / this.optionsSelected.length;
   },
 
   enableOptionField() {
@@ -168,10 +189,6 @@ export const methods = {
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
-  checkColumn(v) {
-    return this.optionsColumnsValues.includes(v);
-  },
-
   selectedAllOptions() {
     this.optionsSelected = Object.values(this.options);
   },
@@ -181,6 +198,10 @@ export const methods = {
   unselectedOption(id) {
     this.optionsSelected = this.optionsSelected.filter(i => i.id !== id);
     this.optionsSelectedShow = !!this.optionsSelected.length;
+  },
+
+  setFieldChange(check) {
+    Object.keys(this.fieldChange).forEach(k => this.fieldChange[k] = check);
   },
 
   createOption() {
@@ -206,16 +227,19 @@ export const methods = {
 
     if (single) {
       this.option.name = el.name || '';
-      this.option.inputPrice  = +el.inputPrice || 0;
-      this.option.outputPrice  = +el.outputPrice || 0;
       this.filesUpSelected = [];
       this.setImages(el);
     }
     this.option.elementId = this.elementLoaded;
     this.option.unitId    = single ? el.unitId : this.units[0].id;
+
     this.option.moneyInputId  = single ? el.moneyInputId : this.money[0].id;
+    this.option.inputPrice    = single ? +el.inputPrice || 0 : this.getAvgPrice('input');
+
     this.option.moneyOutputId = single ? el.moneyOutputId : this.money[0].id;
-    this.option.percent  = +el['outputPercent'];
+    this.option.outputPrice  = single ? +el.outputPrice || 0 : this.getAvgPrice('output');
+
+    this.option.percent  = +el['outputPercent'] || 0;
     this.option.activity = single ? !!el.activity : true;
     this.option.sort     = this.getAvgSort(this.optionsSelected);
     single ? this.setOptionProperty(el) : this.setDefaultProperty();
@@ -325,7 +349,7 @@ export const methods = {
   },
 
   optionsConfirm() {
-    //this.optionsLoading = true;
+    this.optionsLoading = true;
     this.queryParam = {
       ...this.queryParam,
       option: JSON.stringify(this.option),

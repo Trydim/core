@@ -404,60 +404,70 @@ export default {
       return;
     }
 
-    // Определить цвет?
-/*    const rgb2hsl = ([r, g, b]) => {
-      const max = Math.max(r, g, b),
-            min = Math.min(r, g, b),
-            d = max - min;
+    const isSingleTag = ['INPUT', 'HR', 'IMG'].includes(node.tagName),
+          cStyle = window.getComputedStyle(node),
+          c = node.getBoundingClientRect(),
+          side = Math.min(c.width, c.height),
+          size = side > 150 ? '-big' : side < 40 ? '-sm' : '';
 
-      let h, l = (max + min) / 2;
-
-      if (max === min) {
-        h = 0;
-      } else {
-        //s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-        switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-      }
-
-      // H - цветовой тон, S - насыщенность, L - светлота
-      return (h < 0.55 && l >= 0.5) || (h > 0.55 && l >= 0.75);
-      //return [h, s, l];
-    }
-
-
-    debugger
-    const color = window.getComputedStyle(node).backgroundColor,
-          rgb = /(\d+),? (\d+),? (\d+)/.exec(color)[0].split(','),
-          bool = rgb2hsl(rgb);*/
-
-    if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
-      const c = node.getBoundingClientRect(),
-            loaderW = document.createElement('div'),
-            loader = loaderW.cloneNode();
+    if (cStyle.position === 'fixed') {
+      const loaderW = document.createElement('div'),
+            loader  = document.createElement('div');
 
       loaderW.id = 'cmsLoaderWrapper';
-      loaderW.style.position = 'fixed';
-      loaderW.style.zIndex = '100';
-      loaderW.style.left = c.x + 'px';
-      loaderW.style.top = c.y + 'px';
-      loaderW.style.height = loader.style.height = c.height + 'px';
-      loaderW.style.width = loader.style.width = c.width + 'px';
-
-      loader.classList.add('loading-st1');
-      isLight && loader.classList.add('loading-st1-light');
+      loaderW.style.cssText = `position: fixed; 
+        left: ${node.offsetLeft}px; top: ${node.offsetTop}px;
+        z-index: ${typeof cStyle.zIndex === "number" ? cStyle.zIndex + 1 : +1}`;
+      loader.style.cssText = `width: ${c.width}px; height: ${c.height}px;`;
 
       loaderW.append(loader);
       document.body.append(loaderW);
-    } else {
-      node.classList.add('loading-st1');
-      isLight && node.classList.add('loading-st1-light');
+      node = loader;
+    } else if (isSingleTag) {
+      const loader = document.createElement('div');
+
+      loader.id = 'cmsLoaderWrapper';
+      loader.style.cssText = `display: ${cStyle.display}; width: ${c.width}px; height: ${c.height}px;`;
+
+      node.parentNode.append(loader);
+      loader.append(node);
+      node = loader;
     }
+
+    node.classList.add('loading-st1' + size);
+    isLight && node.classList.add('loading-st1-light');
+
+    // Определить цвет?
+    /*    const rgb2hsl = ([r, g, b]) => {
+     const max = Math.max(r, g, b),
+     min = Math.min(r, g, b),
+     d = max - min;
+
+     let h, l = (max + min) / 2;
+
+     if (max === min) {
+     h = 0;
+     } else {
+     //s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+     switch (max) {
+     case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+     case g: h = (b - r) / d + 2; break;
+     case b: h = (r - g) / d + 4; break;
+     }
+     h /= 6;
+     }
+
+     // H - цветовой тон, S - насыщенность, L - светлота
+     return (h < 0.55 && l >= 0.5) || (h > 0.55 && l >= 0.75);
+     //return [h, s, l];
+     }
+
+
+     debugger
+     const color = window.getComputedStyle(node).backgroundColor,
+     rgb = /(\d+),? (\d+),? (\d+)/.exec(color)[0].split(','),
+     bool = rgb2hsl(rgb);*/
   },
   /**
    * Удалить иконку загрузки
@@ -469,10 +479,14 @@ export default {
       return;
     }
 
-    if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) f.gI('cmsLoaderWrapper').remove();
-    else {
-      node.classList.remove('loading-st1');
-      node.classList.remove('loading-st1-light');
+    if (window.getComputedStyle(node).position === 'fixed') {
+      f.gI('cmsLoaderWrapper').remove();
+    }
+    if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
+      node.parentNode.parentNode.append(node);
+      f.gI('cmsLoaderWrapper').remove();
+    } else {
+      node.classList.remove('loading-st1', 'loading-st1-sm', 'loading-st1-big', 'loading-st1-light');
     }
   },
 

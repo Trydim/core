@@ -398,7 +398,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'changeOptions':
       $optionsId = json_decode($optionsId ?? '[]');
-      if (count($optionsId)) {
+      if (isset($elementsId) && count($optionsId)) {
         $param = [];
         $single = count($optionsId) === 1;
         $option = json_decode($option ?? '[]', true);
@@ -406,7 +406,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $name = $option['name'] ?? '';
 
         if ($single) {
-          $options = $db->selectQuery('options_elements', ['ID', 'name'], " name = '$name' ");
+          $options = $db->selectQuery('options_elements', ['ID', 'name'], " element_id = $elementsId AND name = '$name' ");
           if (count($options) > 1 || empty($name)
               || (count($options) === 1 && $options[0]['ID'] !== $optionsId[0])) {
             $result['error'] = 'option_name_error'; break;
@@ -419,9 +419,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           if ($single) $param[$id]['name'] = $name;
           if ($single || $fieldChange['unitId']) $param[$id]['unit_id'] = $option['unitId'];
           if ($single || $fieldChange['moneyInputId']) $param[$id]['money_input_id'] = $option['moneyInputId'];
-          if ($single) $param[$id]['input_price'] = $option['inputPrice'];
+          if ($single || $fieldChange['moneyInput']) $param[$id]['input_price'] = $option['inputPrice'];
           if ($single || $fieldChange['moneyOutputId']) $param[$id]['money_output_id'] = $option['moneyOutputId'];
-          if ($single) $param[$id]['output_price'] = $option['outputPrice'];
+          if ($single || $fieldChange['moneyOutput']) $param[$id]['output_price'] = $option['outputPrice'];
           if ($single || $fieldChange['activity']) $param[$id]['activity'] = intval(boolValue($option['activity']));
           if ($single || $fieldChange['sort']) $param[$id]['sort'] = $option['sort'];
           if ($single || $fieldChange['properties']) $param[$id]['properties'] = json_encode($option['properties']);

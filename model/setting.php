@@ -201,21 +201,24 @@ switch ($cmsAction) {
 
     if ($property['type'] === 'select') { // Справочник
       $param = [];
-      foreach ($property['fields'] as $id => $value) {
-        $param[translit($value['name'])] = $value['type'];
+      foreach ($property['fields'] as $field) {
+        if ($cmsAction !== 'changeProperty') $param[translit($field['name'])] = $field['type'];
+        else {
+          $param[$field['name']] = [
+            'newName' => $field['newName'],
+            'type'    => $field['type'],
+          ];
+        }
       }
 
       if (!isset($setting[$propName])) {
-        $setting[$propName]['name'] = $tableName;
-        $main->setSettings('optionProperties', $setting)->saveSettings();
         $result['error'] = $db->createPropertyTable($propName, $param);
       } else if ($cmsAction === 'changeProperty') {
-        $db->delPropertyTable([$propName]);
-        $setting[$propName]['name'] = $tableName;
-        $main->setSettings('optionProperties', $setting)->saveSettings();
-        $result['error'] = $db->createPropertyTable($propName, $param);
+        $result['error'] = $db->changePropertyTable($propName, $param);
       } else $result['error'] = 'Property exist';
 
+      $setting[$propName]['name'] = $tableName;
+      $main->setSettings('optionProperties', $setting)->saveSettings();
     } else { // остальные
       $dataType = $property['type'];
 
@@ -234,16 +237,54 @@ switch ($cmsAction) {
     $dbProperties = array_keys($db->getTables('prop'));
 
     if ($setting) {
+      function getField($name, $type) {
+
+        if (includes($name, '_ids')) $type = 'file';
+
+        switch ($type) {
+          case 'varchar(255)': $type = 'string'; break;
+          case 'varchar(1000)': $type = 'textarea'; break;
+          case 'float': case 'double': $type = 'float'; break;
+          case 'decimal(10,4)': $type = 'money'; break;
+          case 'timestamp': $type = 'date'; break;
+          case 'int(1)': $type = 'bool'; break;
+          case 'int(20)': $type = 'int'; break;
+        }
+
+        return [
+          'name' => $name,
+          'type' => $type,
+        ];
+      }
+
+
       foreach ($setting as $code => $table) {
         if (isset($table['type']) || in_array($code, $dbProperties)) {
           $type = $table['type'] ?? 'select';
-
-          $result['optionProperties'][] = [
+          $param = [
             'name' => $table['name'],
             'code' => $code,
             'type' => $type,
-            'typeLang' => gTxtDB('types', $type),
           ];
+
+
+          if ($type === 'select') {
+            $columns = $db->getColumnsTable($code);
+
+            if (count($columns) > 2) {
+              $fields = [];
+
+              foreach ($columns as $column) {
+                if (in_array($column['columnName'], ['ID', 'name'])) continue;
+
+                $fields[] = getField($column['columnName'], $column['type']);
+              }
+
+              $param['fields'] = $fields;
+            }
+          }
+
+          $result['optionProperties'][] = $param;
         }
       }
     }
@@ -253,24 +294,19 @@ switch ($cmsAction) {
       $result['propertyValue'] = $db->getColumnsTable($props); // todo загрузить просто
     }
     break;
-  case 'delProperties':
+  case 'deleteProperties':
     $property = json_decode($property ?? '[]', true);
     $setting = $main->getSettings('optionProperties');
 
-    if (isset($props)) {
-      $props = explode(',', $props);
-
-      $db->delPropertyTable($props);
+    if (!empty($property['fields'])) {
+      $db->delPropertyTable([$property['code']]);
     }
 
-    if (isset($props) && ($setting = getSettingFile()) && isset($setting['optionProperties'])) {
-      $setting['optionProperties'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
-        return !in_array($item, $props);
-      }, ARRAY_FILTER_USE_KEY);
+    if (isset($property['code'])) {
+      unset($setting['prop_' . str_replace('prop_', '', $property['code'])]);
 
-      //setSettingFile($setting);
+      $main->setSettings('optionProperties', $setting)->saveSettings();
     }
-    $main->saveSettings();
     break;
 
 }

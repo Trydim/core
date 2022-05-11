@@ -5,7 +5,7 @@
 
 $field = [
   'pageTitle' => 'Статистика',
-  'jsLinks'   => [CORE_JS . 'module/statistic.js?ver=bc57667d7e'],
+  'jsLinks'   => [CORE_JS . 'module/statistic.js?ver=d9712ad6ef'],
 ];
 
 require $pathTarget;
