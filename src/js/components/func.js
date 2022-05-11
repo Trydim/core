@@ -362,6 +362,7 @@ export default {
       if (e.type === "blur" && target.value.length <= minValue) target.value = "";
     };
 
+    node.dataset.mask = matrix;
     ['input', 'blur'].map(e => node.addEventListener(e, mask));
   },
 

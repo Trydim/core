@@ -36,7 +36,7 @@ $field['footerContent'] .= <<<footerContent
 <template id="userForm">
   <form action="#">
     <div class="form-floating my-3">
-      <input type="text" class="form-control" id="pName" placeholder="Имя" name="name">
+      <input type="text" class="form-control" id="pName" placeholder="Имя" name="name" required>
       <label for="pName">Имя</label>
     </div>
 
@@ -46,22 +46,22 @@ $field['footerContent'] .= <<<footerContent
     </div>
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" id="pLogin" placeholder="Логин" name="login">
+      <input type="text" class="form-control" id="pLogin" placeholder="Логин" name="login" required>
       <label for="pLogin">Логин</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" id="pPassword" placeholder="Пароль" name="password">
+      <input type="password" class="form-control" id="pPassword" placeholder="Пароль" name="password" required>
       <label for="pPassword">Пароль</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="tel" class="form-control" id="pPhone" placeholder="Телефон" name="phone">
+      <input type="tel" class="form-control" id="pPhone" placeholder="Телефон" name="phone" required>
       <label for="pPhone">Телефон</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="email" class="form-control" id="pEmail" placeholder="Почта" name="email">
+      <input type="email" class="form-control" id="pEmail" placeholder="Почта" name="email" required>
       <label for="pEmail">Почта</label>
     </div>
 
@@ -83,13 +83,13 @@ $field['footerContent'] .= <<<footerContent
   <form action="#">
     <!--label>Старый пароль: <input type="password" name="oldPass"></label-->
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" id="changePassword" placeholder="Новый пароль" name="newPass">
+      <input type="password" class="form-control" id="changePassword" placeholder="Новый пароль" name="newPass" required>
       <label for="changePassword">Новый пароль</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" id="changePassword" placeholder="Повторить пароль" name="repeatPass">
-      <label for="changePassword">Повторить пароль</label>
+      <input type="password" class="form-control" id="repeatPassword" placeholder="Повторить пароль" name="repeatPass" required>
+      <label for="repeatPassword">Повторить пароль</label>
     </div>
   </form>
 </template>

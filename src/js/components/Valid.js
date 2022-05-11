@@ -19,8 +19,8 @@ export class Valid {
   constructor(param) {
     let {
           sendFunc = defaultSendFunc,
-          form = '#authForm',
-          submit = '.confirmYes',
+          form     = '#authForm',
+          submit   = '.confirmYes',
           fileFieldSelector = false, // Если поля не будет тогда просто after
           initMask = true,
           phoneMask = '',
@@ -137,23 +137,29 @@ export class Valid {
       }
     } else if (node.value.length > 0 || ignoreValue) {
       switch (node.name) {
-        case 'name':
+        default: case 'name':
           if (node.value.length < 2) this.setErrorValidate(node);
           else this.setValidated(node);
           break;
 
         case 'phone': case 'tel':
-          reg = /[^\d|\(|\)|\s|\-|_|\+]/;
-          if (node.value.length < 18 || reg.test(String(node.value).toLowerCase())) {
-            this.setErrorValidate(node);
-          } else this.setValidated(node);
+          const count = node.dataset.mask ? node.dataset.mask.match(/_/g).length / 2 : 7;
+
+          reg = /^[^+\d]|[^\d\s()-]{2,}/; // первый символ +/цифра, остальные цифры/пробел/скобки/тире
+          if (node.value.length < count || reg.test(node.value)) this.setErrorValidate(node);
+          else this.setValidated(node);
           break;
 
         case 'email': case 'mail':
           reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          if (!reg.test(String(node.value).toLowerCase())) {
+          if (!reg.test(node.value.toLowerCase())) {
             this.setErrorValidate(node);
           } else this.setValidated(node);
+          break;
+
+        case 'pass': case 'password':
+          if (node.value.length < 3) this.setErrorValidate(node);
+          else this.setValidated(node);
           break;
       }
     } else this.removeValidateClasses(node);

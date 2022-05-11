@@ -509,18 +509,19 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $result['permissionUsers'] = $db->loadTable('permission');
       break;
     case 'addUser':
-      $param = [0 => []];
+      $param = [];
       $user = json_decode($authForm ?? '[]', true);
 
       $contacts = [];
       foreach ($user as $k => $v) {
-        if (in_array($k, ['login', 'name', 'permissionId'])) $param[0][$k] = $v;
-        else if ($k === 'password') $param[0][$k] = password_hash($v, PASSWORD_BCRYPT);
+        if (in_array($k, ['login', 'name', 'permissionId'])) $param[$k] = $v;
+        else if ($k === 'password') $param[$k] = password_hash($v, PASSWORD_BCRYPT);
+        else if ($k === 'activity') $param[$k] = isset($authForm['activity']) ? '1' : '0';
         else $contacts[$k] = $v;
       }
-      $param[0]['contacts'] = json_encode($contacts);
+      $param['contacts'] = json_encode($contacts);
 
-      $result['error'] = $db->insert($columns, 'users', $param);
+      $result['error'] = $db->insert($columns, 'users', [0 => $param]);
       break;
     case 'changeUser':
       $usersId = json_decode($usersId ?? '[]');
@@ -534,10 +535,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $contacts = [];
           foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permissionId'])) $param[$id][$k] = $v;
+            else if ($k === 'activity') $param[$id][$k] = isset($authForm['activity']) ? '1' : '0';
             else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
-          $param[$id]['activity'] = isset($authForm['activity']) ? '1' : '0';
         }
 
         $result['error'] = $db->insert($columns, 'users', $param, true);

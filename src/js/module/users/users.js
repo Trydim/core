@@ -156,9 +156,11 @@ const users = {
       'addUser': () => {
         form = this.tmp.form.cloneNode(true);
         form.querySelector('#changeField').remove();
+
+        new f.Valid({form});
+
         this.confirmMsg = 'Новый пользователь добавлен';
         this.M.show('Добавление пользователя', form);
-        f.initMask(form.querySelector('[name="phone"]'));
       },
       'changeUser': () => {
         if (!this.id.getSelectedSize()) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
@@ -208,6 +210,8 @@ const users = {
         node = form.querySelector('[name="activity"]');
         node.checked = oneElements ? users.activityValue : true;
 
+        new f.Valid({form});
+
         this.confirmMsg = 'Изменения сохранены';
         this.M.show('Изменение пользователей', form);
       },
@@ -226,6 +230,8 @@ const users = {
         this.onEventNode(newPass, e => this.changeTextInput(e, repeatPass), {}, 'change');
         this.onEventNode(repeatPass, e => this.changePassword(e, newPass), {}, 'change');
 
+        new f.Valid({form});
+
         this.confirmMsg = 'Новый пароль сохранен';
         this.M.show('Изменить пароль пользователя ' + user['U.name'], form);
       },
@@ -237,6 +243,8 @@ const users = {
 
         this.confirmMsg = 'Удаление успешно';
         this.M.show('Удалить', 'Удалить выбранных пользователя?');
+        this.M.btnConfirm.classList.remove('cl-confirm-disabled');
+        this.M.btnConfirm.removeAttribute('disabled');
       },
     }
 

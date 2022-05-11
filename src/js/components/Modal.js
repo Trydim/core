@@ -15,13 +15,15 @@ const getCustomElements = () => new Promise(resolve => {
 const templatePopup = (pr, modalId) => {
   return `
     <div class="${pr}modal-overlay" id="${modalId}">
-      <div class="${pr}modal p-3" data-role="window">
-        <button type="button" class="${pr}close-modal" data-action="confirmNo">
-          <div class="${pr}close-icon"></div>
-        </button>
-        <div class="${pr}modal-title" data-role="title">Title</div>
+      <div class="${pr}modal" data-role="window">
+        <div class="${pr}modal-header">
+          <div class="${pr}modal-title" data-role="title">Title</div>
+          <button type="button" class="${pr}modal-close" data-action="confirmNo">
+            <div class="${pr}close-icon"></div>
+          </button>
+        </div>
         <div class="${pr}modal-content" data-role="content"></div>
-        <div class="${pr}modal-button" data-role="bottomFieldBtn">
+        <div class="${pr}modal-footer" data-role="bottomFieldBtn">
           <input type="button" class="confirmYes btn btn-success" value="Подтвердить" data-action="confirmYes">
           <input type="button" class="closeBtn btn btn-warning" value="Отмена" data-action="confirmNo">
         </div>
@@ -49,7 +51,7 @@ export const Modal = function (param = {}) {
       } = param;
 
   modal.bindBtn = function () {
-    this.wrap.querySelectorAll(`.${prefix}close-modal, .confirmYes, .closeBtn`)
+    this.wrap.querySelectorAll(`.${prefix}modal-close, .confirmYes, .closeBtn`)
         .forEach(n => n.addEventListener('click', () => this.hide()));
   }
   modal.btnConfig = function (key, param = Object.create(null)) {
@@ -91,8 +93,11 @@ export const Modal = function (param = {}) {
     }
 
     this.wrap.style.display = 'flex';
-    this.wrap.classList.add(prefix + 'active');
-    this.window.classList.add(prefix + 'active');
+    setTimeout(() => {
+      this.wrap.classList.add(prefix + 'active');
+      this.window.classList.add(prefix + 'active');
+    }, 10);
+
     this.onEvent();
   }
 
@@ -100,7 +105,7 @@ export const Modal = function (param = {}) {
     this.wrap.classList.remove(prefix + 'active');
     this.window.classList.remove(prefix + 'active');
 
-    setTimeout( () => {
+    setTimeout(() => {
       document.body.style.overflow = data.bodyOver || 'initial';
       window.scrollTo(0, data.scrollY);
       if (document.body.style.paddingRight === '16px')
@@ -113,7 +118,7 @@ export const Modal = function (param = {}) {
   }
 
   modal.destroy = function () {
-    /*this.wrap.querySelectorAll('.close-modal, .confirmYes, .closeBtn')
+    /*this.wrap.querySelectorAll('.modal-close, .confirmYes, .closeBtn')
           .forEach(n => n.removeEventListener('click', () => this.hide()));
     */
     this.wrap.remove();
