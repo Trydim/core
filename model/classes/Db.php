@@ -322,7 +322,7 @@ class Db extends \R {
    */
   public function insert(array $curTable, string $dbTable, array $param, bool $change = false): array {
     if (count($param) === 0) return [];
-    $result = $this->checkTableBefore($curTable, $dbTable, $param, $change);
+    $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
 
     $beans = self::xdispense($dbTable, count($param));
 
@@ -365,6 +365,7 @@ class Db extends \R {
           }
         }
         self::store($beans);
+
       } else {
 
         $i = 0;
@@ -384,6 +385,10 @@ class Db extends \R {
         'result' => $result,
         'error'  => $e->getMessage(),
       ];
+    }
+
+    if ($change === false && count($param) === 1) {
+      $result [$dbTable . 'Id'] = $beans->getID();
     }
 
     return $result;

@@ -54,7 +54,7 @@ export const computed = {
   },
 
   getSectionId() {
-    return this.sectionLoaded || this.sectionTreeModal[0].key;
+    return this.getSectionSelectedId() || this.sectionTreeModal[0].key;
   },
 
   getElementsSelectedId() {

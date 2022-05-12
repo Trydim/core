@@ -143,7 +143,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             ]),
           ]];
 
-          $result['error'] = $db->insert($db->getColumnsTable('customers'), 'customers', $param, true);
+          $result = $db->insert($db->getColumnsTable('customers'), 'customers', $param, true);
         }
 
         $orderId = intval($orderId ?? 0);
@@ -165,7 +165,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'report_value'    => addCpNumber($orderId, $reportVal),
         ]];
 
-        $result['error'] = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
+        $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
 
         $result['customerId'] = $customerId;
         $result['orderId']    = $orderId;
@@ -233,18 +233,33 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Section
     case 'createSection':
-      $param = ['0' => []];
-      $param['0']['parent_ID'] = $parentId ?? 0;
-      if (isset($name) && isset($code) && !empty($name)) {
+    case 'changeSection':
+      $section = json_decode($section ?? '[]', true);
+      $sectionId = $sectionId ?? '0';
+      $parentId = $section['parentId'] ?? 0;
+      $name = $section['name'] ?? '';
+
+      if (!empty($name)) {
+        // Проверка есть ли раздел с таким же именем
         $haveSection = $db->selectQuery('section', 'name', " parent_ID = $parentId");
         if (in_array($name, $haveSection)) {
-          $result['error'] = 'section_exist';
-        } else {
-          $param['0']['name'] = $name;
-          $param['0']['code'] = $code;
-          $param['0']['active'] = intval(isset($activity) && $activity === "true");
-          $result['error'] = $db->insert([], 'section', $param);
+          if ($dbAction === 'changeSection') {
+            $haveSection = $db->selectQuery('section', 'ID', " name = '$name'");
+            if (count($haveSection) > 2 || $haveSection[0] !== $sectionId) {
+              $result['error'] = 'section_exist'; break;
+            }
+          } else {
+            $result['error'] = 'section_exist'; break;
+          }
         }
+
+        $param = [
+          'parent_ID' => $parentId,
+          'name'      => $name,
+          'code'      => $section['code'] ?? translit($name),
+          'active'    => intval($section['activity'] === true),
+        ];
+        $result = $db->insert([], 'section', [$sectionId => $param], $dbAction === 'changeSection');
       }
       break;
     case 'openSection':
@@ -263,22 +278,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         return $row;
       }, $db->selectQuery('section'));
       break;
-    case 'changeSection':
-      $parentId = $parentId ?? 0;
-      $name = $name ?? false;
-      $code = $code ?? false;
-      $param[$sectionId ?? 'error'] = [
-        'parent_ID' => $parentId,
-        'name'      => $name,
-        'code'      => $code ?: $name,
-        'active'    => intval(isset($activity) && $activity === "true"),
-      ];
-      if (!isset($param['error'])) {
-        if (empty($name)) { $result['error'] = 'name_error'; break; }
-
-        $result['error'] = $db->insert($db->getColumnsTable('section'), 'section', $param, true);
-      }
-      break;
     case 'deleteSection':
       if (isset($sectionId)) {
         $ids = [$sectionId];
@@ -290,30 +289,35 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     // Elements
     case 'createElement':
     case 'copyElement':
-      $param = ['0' => []];
       if (!isset($sectionId)) { $result['error'] = 'section_id_error'; break; }
 
-      $param['0']['section_parent_id'] = $sectionId;
-      if (isset($name) && isset($type) && !empty($name)) {
+      $element = json_decode($element ?? '[]', true);
+      $fieldChange = json_decode($fieldChange ?? '[]', true);
+      $name = $element['name'] ?? '';
+
+      if (!empty($name)) {
         $haveElements = $db->selectQuery('elements', 'name', " name = '$name' ");
         if (count($haveElements)) { $result['error'] = 'element_name_exist'; break; }
 
-        $param['0']['name'] = $name;
-        $param['0']['element_type_code'] = $type;
-        $param['0']['activity'] = intval(isset($activity) && $activity === "true");
-        $param['0']['sort'] = $sort ?? 100;
-        $result['error'] = $db->insert($db->getColumnsTable('elements'), 'elements', $param);
+        $param = [
+          'section_parent_id' => $sectionId,
+          'name'              => $name,
+          'element_type_code' => $element['type'],
+          'activity'          => intval($element['activity'] === true),
+          'sort'              => $element['sort'] ?? 100
+        ];
+
+        $result = $db->insert($db->getColumnsTable('elements'), 'elements', ['0' => $param]);
 
         // Проверка на срабатывание триггера
         $haveOptions = $db->selectQuery('options_elements', 'ID', " name = '$name' ");
         if (!count($haveOptions)) {
           $columns = $db->getColumnsTable('options_elements');
-          $elementsId = $db->getLastID('elements');
           $param = ['0' => [
-            'element_id' => $elementsId,
+            'element_id' => $result['elementsId'],
             'name'       => $name,
           ]];
-          $result['error'] = $db->insert($columns, 'options_elements', $param);
+          $result = $db->insert($columns, 'options_elements', $param);
         }
       }
       break;
@@ -348,7 +352,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           if ($single || $fieldChange['sort']) $param[$id]['sort'] = $element['sort'];
         }
 
-        $result['error'] = $db->insert($db->getColumnsTable('elements'), 'elements', $param, true);
+        $result = $db->insert($db->getColumnsTable('elements'), 'elements', $param, true);
       }
       break;
     case 'deleteElements':
@@ -393,7 +397,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         }
         $param['0']['images_ids'] = $db->setFiles($result, $imageIds);
 
-        $result['error'] = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param);
+        $result = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param);
       }
       break;
     case 'changeOptions':
@@ -447,7 +451,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           }
         }
 
-        $result['error'] = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param, true);
+        $result = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param, true);
       }
       break;
     case 'deleteOptions':
@@ -520,7 +524,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       $param[0]['contacts'] = json_encode($contacts);
 
-      $result['error'] = $db->insert($columns, 'users', $param);
+      $result = $db->insert($columns, 'users', $param);
       break;
     case 'changeUser':
       $usersId = json_decode($usersId ?? '[]');
@@ -540,7 +544,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $param[$id]['activity'] = isset($authForm['activity']) ? '1' : '0';
         }
 
-        $result['error'] = $db->insert($columns, 'users', $param, true);
+        $result = $db->insert($columns, 'users', $param, true);
       }
       break;
     case 'changeUserPassword':
@@ -549,7 +553,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       if (count($usersId) === 1 && isset($validPass)) {
         $param[$usersId[0]]['password'] = password_hash($validPass, PASSWORD_BCRYPT);
 
-        $result['error'] = $db->insert($columns, 'users', $param, true);
+        $result = $db->insert($columns, 'users', $param, true);
       }
       break;
     case 'delUser':
