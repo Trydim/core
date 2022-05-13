@@ -101,7 +101,10 @@ if (isset($docsAction)) {
       count($_FILES) && $mail->addOtherFile($_FILES);
       $mail->prepareMail($param);
       $docType && $mail->addFile($docsPath);
-      isset($email) && $mail->addMail($email);
+
+      $otherMail = $otherMail ?? [];
+      isset($email) && !empty($email) && $otherMail[] = $email;
+      $mail->addMail($otherMail);
       $result['mail'] = $mail->send();
       break;
     case 'getPrintStyle':

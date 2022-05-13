@@ -48,7 +48,7 @@ class Docs {
   /**
    * @var string
    */
-  private $docsType, $fileTpl, $filePath, $content, $footerPage = '', $imgPath, $fileName;
+  private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $fileName;
 
   /**
    * @var object
@@ -87,7 +87,6 @@ class Docs {
       case 'print':
         $this->pdfLibrary = 'print';
         $this->prepareTemplate();
-        $this->setCss();
         break;
       case 'excel': $this->setExcelData(); break;
     }
@@ -139,6 +138,7 @@ class Docs {
   private function prepareTemplate() {
     if ($this->useDefault) { $this->setPdfDefaultData(); return; }
 
+    $this->setCss();
     $footerPage = '';
 
     ob_start();
@@ -167,7 +167,7 @@ class Docs {
           //$this->pdf->useOnlyCoreFonts = true;
           //$this->pdf->SetDisplayMode('fullpage');
 
-          $this->setCss();
+          $this->docs->WriteHTML($this->styleContent, \Mpdf\HTMLParserMode::HEADER_CSS);
 
           //$this->pdf->SetHTMLHeader('');
           $this->docs->SetHTMLFooter($this->footerPage);
@@ -191,7 +191,7 @@ class Docs {
           DEBUG && $this->docs->setModeDebug();
           $this->docs->setDefaultFont('freesans');
 
-          $this->setCss();
+          $this->docs->writeHTML('<style>' . $this->styleContent . '</style>');
           $this->docs->writeHTML($this->content);
 
         } catch (Spipu\Html2Pdf\Exception\Html2PdfException $e) {
@@ -204,7 +204,7 @@ class Docs {
   }
 
   private function initPrint() {
-    $this->initPdf();
+    $this->content .= '<style>' . $this->styleContent . '</style>';
   }
 
   private function initExcel() {
@@ -222,18 +222,7 @@ class Docs {
   private function setCss() {
     $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css";
     if (file_exists($path)) {
-      $stylesheet = file_get_contents($path);
-      switch ($this->pdfLibrary) {
-        case 'mpdf':
-          $this->docs->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
-          break;
-        case 'html2pdf':
-          $this->docs->WriteHTML('<style>' . $stylesheet . '</style>');
-          break;
-        case 'print':
-          $this->content .= '<style>' . $stylesheet . '</style>';
-          break;
-      }
+      $this->styleContent = file_get_contents($path);
     }
   }
 
@@ -255,6 +244,14 @@ class Docs {
    * @return array|false|string
    */
   private function getPdf(string $path, string $dest) {
+    if (isset($_REQUEST['resource'])) {
+      return [
+        'css'  => $this->styleContent,
+        'html' => $this->content,
+      ];
+    }
+
+
     switch ($this->pdfLibrary) {
       case 'mpdf':
       /** Default: \Mpdf\Output\Destination::INLINE

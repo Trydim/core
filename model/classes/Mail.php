@@ -68,7 +68,7 @@ class Mail {
       $setting = function_exists('getSettingFile') ? getSettingFile() : $this->LoadSettingFile();
       $this->mailTarget = $setting['mailTarget'];
       strlen($setting['mailTargetCopy'] ?? '') && $this->otherMail[] = $setting['mailTargetCopy'];
-      strlen($setting['mailFromName'] ?? '') && $this->otherMail[] = $setting['mailFromName'];
+      strlen($setting['mailFromName'] ?? '') && $this->fromName = $setting['mailFromName'];
 
       $this->subject = $setting['mailSubject'] ?? MAIL_SUBJECT_DEFAULT;
     }
@@ -101,10 +101,10 @@ class Mail {
   }
 
   /**
-   * @param string $email
+   * @param array $emails
    */
-  public function addMail(string $email): void {
-    $this->otherMail[] = $email;
+  public function addMail(array $emails): void {
+    if (!empty($emails)) $this->otherMail = array_merge($this->otherMail, $emails);
   }
 
   /**
@@ -159,7 +159,6 @@ class Mail {
       $mail->FromName = $this->fromName;
 
       foreach ($this->otherMail as $moreMail) {
-        if ($moreMail === $this->otherMail) continue;
         $mail->addBCC($moreMail);
       }
 
