@@ -1122,8 +1122,8 @@ class Db extends \R {
 
     if ($userParam['onlyOne']) $ok = $session['hash'] === $user['hash'];
     else {
-      $ok = USE_DATABASE ? password_verify($_SESSION['password'], $user['password'])
-                         : $_SESSION['password'] === $user['password'];
+      $ok = USE_DATABASE ? password_verify($session['password'], $user['password'])
+                         : $session['password'] === $user['password'];
     }
 
     return $ok ? $userParam : false;

@@ -1,5 +1,4 @@
 
-
 // Всплывающее сообщение
 export class ToastClass {
   toastIndex = 0;
@@ -118,10 +117,3 @@ export class ToastClass {
 }
 
 export const toast = (...arg) => new ToastClass().show(...arg);
-
-//f.showMsd();
-//f.Toast.success();
-//f.Toast.ok();
-//f.Toast.error();
-//f.Toast.fail();
-//f.Toast.warning();

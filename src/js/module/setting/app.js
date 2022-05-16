@@ -95,7 +95,11 @@ export default {
 
     saveSetting() {
       this.queryParam.cmsAction = 'saveSetting';
-      this.query().then(s => s.status && f.showMsg('Сохранено'));
+      this.query().then(s => {
+        s.status && f.showMsg('Сохранено')
+
+        this.managerFields.password = '';
+      });
     },
   },
   mounted() {

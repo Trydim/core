@@ -57,6 +57,7 @@ function addHook($hookName, $callable) {
 }
 
 /**
+ *
  * @param mixed $var
  * @return bool
  */

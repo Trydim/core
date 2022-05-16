@@ -1,3 +1,5 @@
+'use strict';
+
 import './styles/style.scss';
 
 import Options from "./options";
@@ -100,13 +102,15 @@ export class ToastClass {
 }
 
 export const toast = (msg = 'message body', type = 'success', options = {}) => {
-  if (typeof options === "boolean" && options === false) options = {durations: {success: 0}};
+  const t = new ToastClass();
+
+  if (typeof options === "boolean" && options === false) options = {durations: {global: 0}};
 
   switch (type) {
-    case "tip": return new ToastClass().tip(msg, options);
-    case "info": return new ToastClass().info(msg, options);
-    default: case "ok": case "success": return new ToastClass().success(msg, options);
-    case "warning": return new ToastClass().warning(msg, options);
-    case "error": case "alert": return new ToastClass().alert(msg, options);
+    case "tip": return t.tip(msg, options);
+    case "info": return t.info(msg, options);
+    default: case "ok": case "success": return t.success(msg, options);
+    case "warning": return t.warning(msg, options);
+    case "error": case "alert": return t.alert(msg, options);
   }
 };

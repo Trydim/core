@@ -24,7 +24,7 @@ switch ($cmsAction) {
 
         // Test unique login
         $users = $db->selectQuery('users', '*', ' login = "' . $user['login'] . '"');
-        if (count($users) > 1 || $users[0]['ID'] !== $usersId) {
+        if (count($users) > 1 || (count($users) > 0 && $users[0]['ID'] !== $usersId)) {
           $result['error'] = gTxt('Login exist');
           break;
         }
@@ -39,17 +39,18 @@ switch ($cmsAction) {
         // Check password
         if (!empty($user['password']) && $user['password'] === $user['passwordRepeat']) {
           $param[$usersId]['password'] = password_hash($user['password'], PASSWORD_BCRYPT);
+          $param[$usersId]['hash'] = password_hash($user['password'], PASSWORD_BCRYPT);
         }
 
         // Save user
         $columns = $db->getColumnsTable('users');
-        $result['error'] = $db->insert($columns, 'users', $param, true);
+        $result = $db->insert($columns, 'users', $param, true);
 
         // Set new User Params
         if (empty($result['error'])) {
           $_SESSION['login'] = $user['login'];
           $_SESSION['name'] = $userName;
-          isset($param[$usersId]['password']) && $_SESSION['hash'] = $param[$usersId]['password'];
+          isset($param[$usersId]['hash']) && $_SESSION['hash'] = $param[$usersId]['hash'];
         }
       }
 

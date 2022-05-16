@@ -138,6 +138,8 @@ const users = {
 
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
+    e.stopImmediatePropagation();
+
     let target = e.target,
         action = target.getAttribute('data-action'),
         form;

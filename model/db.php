@@ -520,12 +520,12 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       foreach ($user as $k => $v) {
         if (in_array($k, ['login', 'name', 'permissionId'])) $param[$k] = $v;
         else if ($k === 'password') $param[$k] = password_hash($v, PASSWORD_BCRYPT);
-        else if ($k === 'activity') $param[$k] = isset($authForm['activity']) ? '1' : '0';
+        else if ($k === 'activity') $param[$k] = '1';
         else $contacts[$k] = $v;
       }
       $param['contacts'] = json_encode($contacts);
 
-      $result = $db->insert($columns, 'users', $param);
+      $result = $db->insert($columns, 'users', ['0' => $param]);
       break;
     case 'changeUser':
       $usersId = json_decode($usersId ?? '[]');

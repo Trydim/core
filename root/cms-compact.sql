@@ -144,7 +144,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`ID`, `permission_id`, `login`, `password`, `name`, `contacts`, `register_date`, `activity`, `customization`, `hash`) VALUES
-(1, 2, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'Админ', '{\"64660\":5,\"71610\":5,\"permissionId\":\"3\",\"phone\":\"\",\"email\":\"\",\"activity\":\"on\"}', '2020-07-28 21:00:00', 1, '{}', '$2y$10$Qk8mMRsCrBmVBbyROARRLO4nSr3q8YdLr6vHA35CZfRREhz/h.zz.');
+(1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'Админ', '{\"64660\":5,\"71610\":5,\"permissionId\":\"3\",\"phone\":\"\",\"email\":\"\",\"activity\":\"on\"}', '2020-07-28 21:00:00', 1, '{}', '$2y$10$Qk8mMRsCrBmVBbyROARRLO4nSr3q8YdLr6vHA35CZfRREhz/h.zz.');
 
 --
 -- Индексы сохранённых таблиц
