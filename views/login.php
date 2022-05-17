@@ -10,7 +10,7 @@
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
-$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="/' . PUBLIC_PAGE . '">Открытая страница</a>' : '';
+$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . SITE_PATH . PUBLIC_PAGE . '">Открытая страница</a>' : '';
 
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global
@@ -24,11 +24,11 @@ $field['global'] = <<<global
           <label><strong>Логин</strong></label>
           <input name="login" type="text" class="form-control" value="$login">
         </div>
-        <div class="form-group mt-1">
+        <div class="form-group mt-1 mb-2">
           <label><strong>Пароль</strong></label>
           <input name="password" type="password" class="form-control" value="">
         </div>
-        <div class="form-row d-flex justify-content-between mt-4 mb-2">
+        <div class="form-row d-flex justify-content-between mt-4 mb-2 d-none">
           <div class="form-group">
             <div class="form-check ml-2">
               <input class="form-check-input" type="checkbox" name="remember" id="basic_checkbox_1">

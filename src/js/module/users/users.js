@@ -58,7 +58,7 @@ const users = {
     data = data.map(item => {
       item['P.name'] && (item['P.name'] = _(item['P.name']));
       if (item.activity) {
-        item.activityValue = !!item.activity;
+        item.activityValue = !!+item.activity;
         item.activity = item.activityValue ? '+' : '-';
       }
 

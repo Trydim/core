@@ -28,7 +28,7 @@ if ($main && $main->checkStatus('ok')) { ?>
               <li>
                 <button type="button" class="dropdown-item" data-action-cms="exit">
                   <i class="pi pi-sign-out"></i>
-                  <span class="ml-2">Logout</span>
+                  <span class="ml-2"><?= gTxt('Logout') ?></span>
                 </button>
               </li>
             </ul>
@@ -40,6 +40,6 @@ if ($main && $main->checkStatus('ok')) { ?>
 </div>
 <?php } else { ?>
 <div>
-  <a href="<?= SITE_PATH?>login">Войти</a>
+  <a href="<?= SITE_PATH?>login"><?= gTxt('Login') ?></a>
 </div>
 <?php } ?>

@@ -535,11 +535,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param = [];
 
         foreach ($usersId as $id) {
-          $param[$id] = [];
+          $param[$id] = ['activity' => '0'];
           $contacts = [];
           foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permissionId'])) $param[$id][$k] = $v;
-            else if ($k === 'activity') $param[$id][$k] = isset($authForm['activity']) ? '1' : '0';
+            else if ($k === 'activity') $param[$id][$k] = '1';
             else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);

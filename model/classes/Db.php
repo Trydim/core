@@ -1013,7 +1013,7 @@ class Db extends \R {
    */
   public function getUserByLogin($login) {
     return self::getRow("SELECT login, users.name AS 'name', hash, password, customization, 
-            p.ID as 'permId', p.name as 'permName', properties as 'permValue'
+            p.ID as 'permId', p.name as 'permName', properties as 'permValue', activity
             FROM users
             LEFT JOIN permission p on users.permission_id = p.ID
             WHERE login = :login", [':login' => $login]);
@@ -1033,12 +1033,13 @@ class Db extends \R {
 
   public function checkPassword($login, $password) {
     if (USE_DATABASE) {
-      $user = $this->getUser($login, 'ID, name, login, password');
+      $user = $this->getUser($login, 'ID, name, login, password, activity');
     } else {
       return $this->getUserFromFile($login, $password);
     }
 
-    return count($user) && password_verify($password, $user['password']) ? $user : false;
+    return count($user) && boolValue($user['activity'])
+           && password_verify($password, $user['password']) ? $user : false;
   }
 
   public function changeUser($loginId, $param) {
@@ -1092,7 +1093,7 @@ class Db extends \R {
   public function checkUserHash($session) {
     if (USE_DATABASE) {
       $user = $this->getUserByLogin($session['login']);
-      if (!count($user)) return false;
+      if (!count($user) || !boolValue($user['activity'])) return false;
 
       $customization = json_decode($user['customization'], true);
 
