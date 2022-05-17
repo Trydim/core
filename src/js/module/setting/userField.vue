@@ -26,18 +26,15 @@
 
     <template v-if="showAllField">
       <div class="form-floating my-3">
-        <p-input-text v-model="user.name" class="form-control" placeholder="_"
-        ></p-input-text>
+        <p-input-text v-model="user.name" class="form-control" placeholder="_"></p-input-text>
         <label>ФИО</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="user.fields.phone" class="form-control" placeholder="_"
-        ></p-input-text>
+        <p-input-text v-model="user.fields.phone" class="form-control" placeholder="_"></p-input-text>
         <label>Телефон</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="user.fields.email" class="form-control" placeholder="_"
-        ></p-input-text>
+        <p-input-text v-model="user.fields.email" class="form-control" placeholder="_"></p-input-text>
         <label>Почта</label>
       </div>
 
@@ -71,10 +68,13 @@
         ></p-calendar>
       </div>
 
-      <div class="field-checkbox mb-3 d-none">
-        <p-checkbox v-model="user.onlyOne" placeholder="_"></p-checkbox>
-        <label>Запретить одновременный вход</label>
+      <div class="input-group mb-3">
+        <div class="input-group-text col-1">
+          <p-checkbox id="onlyOne" v-model="user.onlyOne" :binary="true"></p-checkbox>
+        </div>
+        <label class="input-group-text col" for="onlyOne">Запретить одновременный вход</label>
       </div>
+
     </template>
   </div>
 </template>
@@ -83,6 +83,10 @@
 
 export default {
   props: {
+    userData: {
+      required: true,
+      type: Object,
+    },
     userFields: {
       required: true,
       type: Object,
@@ -93,7 +97,6 @@ export default {
     showAllField: false,
 
     user: {
-      change        : false,
       name          : '',
       login         : '',
       password      : '',
@@ -102,19 +105,29 @@ export default {
       onlyOne       : false,
     },
   }),
+  watch: {
+    userData() {
+      this.user.password = this.user.passwordRepeat = '';
+    },
+  },
   methods: {
     loadData() {
       const node = f.gI('dataUser'),
-            data = node && node.value ? JSON.parse(node.value) : false,
-            contacts = JSON.parse(data.contacts),
-            customization = JSON.parse(data['customization']);
+            data = node && node.value ? JSON.parse(node.value) : false;
 
+      data.contacts = JSON.parse(data.contacts);
+      data.customization = JSON.parse(data.customization);
+
+      this.setData(data);
+    },
+
+    setData(data) {
       this.user.name = data.name;
       this.user.login = data.login;
 
-      Object.entries(contacts).forEach(([k, v]) => this.user.fields[k] = v);
-      Object.entries(customization).forEach(([k, v]) => this.user[k] = v);
-    },
+      Object.entries(data.contacts).forEach(([k, v]) => this.user.fields[k] = v);
+      Object.entries(data.customization).forEach(([k, v]) => this.user[k] = v);
+    }
   },
   created() {
     this.loadData();
@@ -123,9 +136,6 @@ export default {
       deep: true,
       handler() { this.$emit('update', this.user) },
     });
-  },
-  updated() {
-    // Реагировать на изменения полей
   },
 }
 

@@ -14,7 +14,7 @@ ob_start();
     <setting-mail :prop-mail="mail" @update="updateMail"></setting-mail>
   <?php } ?>
 
-  <setting-user :user-fields="managerFields" @update="updateUser"></setting-user>
+  <setting-user :user-data="user" :user-fields="managerFields" @update="updateUser"></setting-user>
 
   <?php if ($main->availablePage('users') && $isAdmin) { ?>
     <setting-permission @update="updatePermission"></setting-permission>

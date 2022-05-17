@@ -30,6 +30,7 @@ export default {
   data: () => {
     const d = {
       isAdmin: false,
+      userChange: false,
 
       mail: {},
       user: {},
@@ -38,7 +39,6 @@ export default {
       queryParam: {
         mode: 'setting',
       },
-      temp: false,
 
       //loadingPage: true,
     };
@@ -60,6 +60,7 @@ export default {
       this.queryParam.mail = JSON.stringify(m);
     },
     updateUser(u) {
+      this.userChange = true;
       this.queryParam.user = JSON.stringify(u);
     },
     updatePermission(p) {
@@ -96,9 +97,14 @@ export default {
     saveSetting() {
       this.queryParam.cmsAction = 'saveSetting';
       this.query().then(s => {
-        s.status && f.showMsg('Сохранено')
+        if (s.status) {
+          if (this.userChange) {
+            this.userChange = false;
+            this.user = JSON.parse(this.queryParam.user);
+          }
 
-        this.managerFields.password = '';
+          f.showMsg('Сохранено');
+        }
       });
     },
   },

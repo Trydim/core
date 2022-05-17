@@ -29,11 +29,18 @@ switch ($cmsAction) {
           break;
         }
 
+        $user['customization'] = $user['customization'] ?? [];
+
+        // Only one login
+        if ($user['onlyOne']) {
+          $user['customization']['onlyOne'] = true;
+        }
+
         $param[$usersId] = [
           'name'          => $userName,
           'login'         => $user['login'],
-          'contacts'      => json_encode($user['fields'] ?? []), // todo
-          'customization' => $user['customization'] ?? '{}',
+          'contacts'      => json_encode($user['fields'] ?? []),
+          'customization' => json_encode($user['customization']),
         ];
 
         // Check password

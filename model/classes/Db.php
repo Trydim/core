@@ -1094,10 +1094,12 @@ class Db extends \R {
       $user = $this->getUserByLogin($session['login']);
       if (!count($user)) return false;
 
+      $customization = json_decode($user['customization'], true);
+
       $userParam = [
         'permissionId'  => intval($user['permId']),
-        'onlyOne'       => isset(json_decode($user['customization'])->onlyOne),
-        'customization' => json_decode($user['customization'], true),
+        'onlyOne'       => isset($customization['onlyOne']),
+        'customization' => $customization,
         'permission'    => json_decode($user['permValue'], true),
       ];
     } else {
