@@ -14,7 +14,7 @@ ob_start();
     <setting-mail :prop-mail="mail" @update="updateMail"></setting-mail>
   <?php } ?>
 
-  <setting-user :user-fields="managerFields" @update="updateUser"></setting-user>
+  <setting-user :user-data="user" :user-fields="managerFields" @update="updateUser"></setting-user>
 
   <?php if ($main->availablePage('users') && $isAdmin) { ?>
     <setting-permission @update="updatePermission"></setting-permission>
@@ -31,7 +31,7 @@ ob_start();
   <?php } ?>
 
   <?php if ($isAdmin) { ?>
-    <!-- Остальные опции -->
+    <setting-other :prop-other-fields="otherFields" @update="updateOtherFields"></setting-other>
   <?php } ?>
 
   <div class="col-12 text-center">
@@ -42,7 +42,7 @@ ob_start();
 
   <?php if ($main->availablePage('catalog')) { ?>
     <hr>
-    <setting-properties @update="updateProperties"></setting-properties>
+    <setting-properties :query="query" :query-param="queryParam" @update="updateProperties"></setting-properties>
   <?php } ?>
 </div>
 <?php

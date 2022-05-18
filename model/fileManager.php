@@ -62,10 +62,9 @@ if (isset($fmAction)) {
               $html .= '<tr class="lightgray">
                           <td class="ab-tdfolder"><a href="' . $folderpath . '" class="closed">' . $file . '</a></td>
                           <td>' . $foldersize . '</td>
-                          <td><a class="ab-btn btn-danger delete-directory" title="Удалить папку" href="' . $folderpath . '"><i class="fa fa-trash" aria-hidden="true"></i></a>
-                          <!--<button class="ab-btn blue renamefolder" title="Переименовать папку"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
-                          <a class="ab-btn asphalt downloadfolder" title="Скачать архивом" data-action="downloadFolder" data-path="' . $folderpath . '"><i class="fa fa-download" aria-hidden="true"></i></a></td></tr>';
-
+                          <td><a class="btn btn-danger delete-directory" title="Удалить папку" href="' . $folderpath . '"><i class="pi pi-trash" aria-hidden="true"></i></a>
+                          <!--<button class="btn blue renamefolder" title="Переименовать папку"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
+                          <a class="btn btn-warning asphalt downloadfolder" title="Скачать архивом" data-action="downloadFolder" data-path="' . $folderpath . '"><i class="pi pi-table" aria-hidden="true"></i></a></td></tr>';
             }
           }
 
@@ -74,13 +73,7 @@ if (isset($fmAction)) {
             if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) !== 'dir') {
               $filepath = slashes($dir . $file);
 
-              $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ||
-                           $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-
-              $current_url = $protocol . $_SERVER['SERVER_NAME'] . '/';
-
-              //$filepath = mb_strtolower($filepath);
-              $url = str_replace(mb_strtolower($_SERVER['DOCUMENT_ROOT']), $current_url, $filepath); // исрпавить
+              $url = str_replace(slashes(ABS_SITE_PATH), URI, $filepath); // исрпавить
 
               $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 
@@ -91,17 +84,17 @@ if (isset($fmAction)) {
               $html .= '<tr class="white">
                           <td class="ab-tdfile"><span class="ext-file ext-' . $ext . '">' . $file . $newFileIcon .'</i></span></td>
                           <td>' . $size . '</td>
-                          <td><a href="' . $filepath . '" class="ab-btn btn-danger delete-file" title="Удалить файл"><i class="fa fa-trash" aria-hidden="true"></i></a>
-                          <!--<button class="ab-btn blue renamefile" title="Переименовать файл"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
-                          <a class="ab-btn asphalt downloadfile" title="Скачать файл" data-action="downloadFile" data-path="' . $filepath . '"><i class="fa fa-download" aria-hidden="true"></i></a>';
+                          <td><a href="' . $filepath . '" class="btn btn-danger delete-file" title="Удалить файл"><i class="pi pi-trash" aria-hidden="true"></i></a>
+                          <!--<button class="btn blue renamefile" title="Переименовать файл"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
+                          <a class="btn btn-success asphalt downloadfile" title="Скачать файл" data-action="downloadFile" data-path="' . $filepath . '"><i class="pi pi-download" aria-hidden="true"></i></a>';
 
               //if image file
               if (in_array($ext, array("jpg", "jpeg", "png", "gif", "ico", "bmp", 'svg'))) {
-                $html .= '<a class="ab-btn green zoom" href="' . $url . '" target="_blank"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $html .= '<a class="btn btn-info zoom" href="' . $url . '" target="_blank"><i class="pi pi-eye" aria-hidden="true"></i></a>';
 
                 //if edited file
               } elseif (in_array($ext, $config['extensions_for_editor'])) {
-                //$html .= '<a class="ab-btn violet ab-edit-file" href="editor.php?editfile=' . $filepath . '" target="_blank" title="Редактировать"><i class="fa fa-pencil" aria-hidden="true"></i></a></td></tr>';
+                //$html .= '<a class="btn violet ab-edit-file" href="editor.php?editfile=' . $filepath . '" target="_blank" title="Редактировать"><i class="fa fa-pencil" aria-hidden="true"></i></a></td></tr>';
               }
 
               $html .= '</td></tr>';
@@ -145,6 +138,19 @@ if (isset($fmAction)) {
 
       if (isset($dir) && $dir && file_exists($dir)) {
         deletefolder($dir);
+      }
+      break;
+    case 'createFile':
+      if (isset($fileName)) {
+        $name = pathinfo($fileName, PATHINFO_FILENAME);
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+        if (file_exists($fileName)) { $result['error'] = 'File exist!'; break; }
+        if (empty($name) || empty($ext)) { $result['error'] = 'File name error!'; break; }
+
+        $data = $ext === 'csv' ? ";;;\n;;;\n;;;\n" : '';
+
+        $result['error'] = file_put_contents($fileName, $data);
+        if (!$result['error']) $result['error'] = 'Error create file!';
       }
       break;
     case 'deleteFile':

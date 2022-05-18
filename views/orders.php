@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global object
+ * @var $main - global
  * @var $param - from controller c_orders.php
  */
 
@@ -11,9 +11,7 @@
 // pageHeader;
 $field['content'] = template('parts/ordersContent', $param);
 
-$field['pageFooter'] = '<div id="paginator" class="w-100"></div>';
-
-$field['footerContent'] = '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
+$field['footerContent'] .= '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>
@@ -21,21 +19,13 @@ $field['footerContent'] .= <<<footerContent
 <template id="tableImportantValue">
   <div>\${key} - \${value}</div>
 </template>
-<template id="onePageInput">
-  <input type="button" value="\${pageValue}" class="ml-1 mr-1 input-paginator" data-action="page" data-page="\${page}">
-</template>
 <template id="sendMailTmp">
-  <div class="d-flex">
-    <form action="#" id="authForm" class="w-100">
-      <div class="modal-content__form">
-        <div class="form-group w-100">
-          <label class="w-100 bold">Почта:
-            <input type="text" id="email" name="email" class="form-control">
-          </label>
-        </div>
-      </div>
-    </form>
-  </div>
+  <form class="content-center" action="#" id="authForm">
+    <div class="input-group">
+      <span class="input-group-text">Почта:</span>
+      <input type="text" id="email" class="form-control" value="" name="email">
+    </div>
+  </form>
 </template>
 <template id="noFoundSearchMsg">
   <tr><td colspan="15">не найдено</td></tr>

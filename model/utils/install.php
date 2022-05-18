@@ -110,17 +110,9 @@ conf;
   file_put_contents($upDir . $serverFile, $serverFileContent);
 
   $config = <<<config
-<?php //if ( !defined('MAIN_ACCESS')) die('access denied!');
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
-// Путь от корня сайта
-if ( !defined('SITE_PATH')) define('SITE_PATH', '$pathSite');
-
-if ( !defined('CONTROLLER')) define('CONTROLLER', 'controller/c_');
-if ( !defined('VIEW')) define('VIEW', 'views/');
-
-if ( !defined('PATH_CSS')) define('PATH_CSS', 'assets/css/');
-if ( !defined('PATH_IMG')) define('PATH_IMG', 'assets/images/');
-if ( !defined('PATH_SCRIPT')) define('PATH_SCRIPT', 'assets/js/');
+\$publicConfig = [];
 
 //----------------------------------------------------------------------------------------------------------------------
 // DB connect/config

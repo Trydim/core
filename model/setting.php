@@ -24,32 +24,40 @@ switch ($cmsAction) {
 
         // Test unique login
         $users = $db->selectQuery('users', '*', ' login = "' . $user['login'] . '"');
-        if (count($users) > 1 || $users[0]['ID'] !== $usersId) {
+        if (count($users) > 1 || (count($users) > 0 && $users[0]['ID'] !== $usersId)) {
           $result['error'] = gTxt('Login exist');
           break;
+        }
+
+        $user['customization'] = $user['customization'] ?? [];
+
+        // Only one login
+        if ($user['onlyOne']) {
+          $user['customization']['onlyOne'] = true;
         }
 
         $param[$usersId] = [
           'name'          => $userName,
           'login'         => $user['login'],
-          'contacts'      => json_encode($user['fields'] ?? []), // todo
-          'customization' => $user['customization'] ?? '{}',
+          'contacts'      => json_encode($user['fields'] ?? []),
+          'customization' => json_encode($user['customization']),
         ];
 
         // Check password
         if (!empty($user['password']) && $user['password'] === $user['passwordRepeat']) {
           $param[$usersId]['password'] = password_hash($user['password'], PASSWORD_BCRYPT);
+          $param[$usersId]['hash'] = password_hash($user['password'], PASSWORD_BCRYPT);
         }
 
         // Save user
         $columns = $db->getColumnsTable('users');
-        $result['error'] = $db->insert($columns, 'users', $param, true);
+        $result = $db->insert($columns, 'users', $param, true);
 
         // Set new User Params
         if (empty($result['error'])) {
           $_SESSION['login'] = $user['login'];
           $_SESSION['name'] = $userName;
-          isset($param[$usersId]['password']) && $_SESSION['hash'] = $param[$usersId]['password'];
+          isset($param[$usersId]['hash']) && $_SESSION['hash'] = $param[$usersId]['hash'];
         }
       }
 
@@ -70,24 +78,21 @@ switch ($cmsAction) {
             continue;
           }
 
+          $field = [
+            'name'       => $permission['name'],
+            'properties' => json_encode($permission['properties']),
+          ];
+
           // Js random 0 - 1
-          if ($id < 1) {
-            $param['new'][uniqid()] = [
-              'name'       => $permission['name'],
-              'properties' => json_encode($permission['properties']),
-            ];
-          } else {
-            $param['change'][$id] = [
-              'name'       => $permission['name'],
-              'properties' => json_encode($permission['properties']),
-            ];
-          }
+          if ($id < 1) $param['new'][uniqid()] = $field;
+          else $param['change'][$id] = $field;
         }
 
         $columns = $db->getColumnsTable('permission');
-        $result['error']['add'] = $db->insert($columns, 'permission', $param['new']);
-        $result['error']['change'] = $db->insert($columns, 'permission', $param['change'], true);
+        $result['error']['addPerm'] = $db->insert($columns, 'permission', $param['new']);
+        $result['error']['changePerm'] = $db->insert($columns, 'permission', $param['change'], true);
       }
+      unset($permissions);
 
       // Статусы
       if (isset($orderStatus)) {
@@ -117,6 +122,44 @@ switch ($cmsAction) {
         $result['error']['statusAdd'] = $db->insert($columns, 'order_status', $param['new']);
         $result['error']['statusChange'] = $db->insert($columns, 'order_status', $param['change'], true);
       }
+
+      // Rate
+      $rate = json_decode($rate ?? '[]', true);
+      if (count($rate)) {
+        // Auto update
+        $main->setSettings('autoRefresh', $rate['autoRefresh']);
+        $main->setSettings('serverRefresh', $rate['serverRefresh']);
+
+        $rate = $rate['data'];
+        $param = [
+          'new'    => [],
+          'change' => [],
+        ];
+
+        foreach ($rate as $item) {
+          $id = $item['ID'];
+
+          if (isset($item['delete']) && boolValue($item['delete']) === true) {
+            $result['error']['del'] = $db->deleteItem('money', [$id]);
+            continue;
+          }
+
+          $field = [
+            'code' => $item['code'],
+            'name' => $item['name'],
+            'short_name' => $item['shortName'],
+            'rate' => $item['rate'],
+            'main' => intval($item['main']),
+          ];
+
+          if ($id === 'new') $param['new'][uniqid()] = $field;
+          else $param['change'][$id] = $field;
+        }
+
+        $columns = $db->getColumnsTable('money');
+        $result['error']['addRate'] = $db->insert($columns, 'money', $param['new']);
+        $result['error']['changeRate'] = $db->insert($columns, 'money', $param['change'], true);
+      }
     } else {
       $hash = '';
 
@@ -142,6 +185,8 @@ switch ($cmsAction) {
 
     // Global other setting
     $main->setSettings('statusDefault', $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
+    $other = json_decode($otherFields ?? '[]', true);
+    $main->setSettings('phoneMaskGlobal', $other['phoneMask']['global'] ?? $main->getSettings('phoneMaskGlobal') ?? '+_ (___) ___ __ __');
 
     $main->saveSettings();
     break;
@@ -164,21 +209,24 @@ switch ($cmsAction) {
 
     if ($property['type'] === 'select') { // Справочник
       $param = [];
-      foreach ($property['fields'] as $id => $value) {
-        $param[translit($value['name'])] = $value['type'];
+      foreach ($property['fields'] as $field) {
+        if ($cmsAction !== 'changeProperty') $param[translit($field['name'])] = $field['type'];
+        else {
+          $param[$field['name']] = [
+            'newName' => $field['newName'],
+            'type'    => $field['type'],
+          ];
+        }
       }
 
       if (!isset($setting[$propName])) {
-        $setting[$propName]['name'] = $tableName;
-        $main->setSettings('optionProperties', $setting)->saveSettings();
         $result['error'] = $db->createPropertyTable($propName, $param);
       } else if ($cmsAction === 'changeProperty') {
-        $db->delPropertyTable([$propName]);
-        $setting[$propName]['name'] = $tableName;
-        $main->setSettings('optionProperties', $setting)->saveSettings();
-        $result['error'] = $db->createPropertyTable($propName, $param);
+        $result['error'] = $db->changePropertyTable($propName, $param);
       } else $result['error'] = 'Property exist';
 
+      $setting[$propName]['name'] = $tableName;
+      $main->setSettings('optionProperties', $setting)->saveSettings();
     } else { // остальные
       $dataType = $property['type'];
 
@@ -197,16 +245,54 @@ switch ($cmsAction) {
     $dbProperties = array_keys($db->getTables('prop'));
 
     if ($setting) {
+      function getField($name, $type) {
+
+        if (includes($name, '_ids')) $type = 'file';
+
+        switch ($type) {
+          case 'varchar(255)': $type = 'string'; break;
+          case 'varchar(1000)': $type = 'textarea'; break;
+          case 'float': case 'double': $type = 'float'; break;
+          case 'decimal(10,4)': $type = 'money'; break;
+          case 'timestamp': $type = 'date'; break;
+          case 'int(1)': $type = 'bool'; break;
+          case 'int(20)': $type = 'int'; break;
+        }
+
+        return [
+          'name' => $name,
+          'type' => $type,
+        ];
+      }
+
+
       foreach ($setting as $code => $table) {
         if (isset($table['type']) || in_array($code, $dbProperties)) {
           $type = $table['type'] ?? 'select';
-
-          $result['optionProperties'][] = [
+          $param = [
             'name' => $table['name'],
             'code' => $code,
             'type' => $type,
-            'typeLang' => gTxtDB('types', $type),
           ];
+
+
+          if ($type === 'select') {
+            $columns = $db->getColumnsTable($code);
+
+            if (count($columns) > 2) {
+              $fields = [];
+
+              foreach ($columns as $column) {
+                if (in_array($column['columnName'], ['ID', 'name'])) continue;
+
+                $fields[] = getField($column['columnName'], $column['type']);
+              }
+
+              $param['fields'] = $fields;
+            }
+          }
+
+          $result['optionProperties'][] = $param;
         }
       }
     }
@@ -216,24 +302,19 @@ switch ($cmsAction) {
       $result['propertyValue'] = $db->getColumnsTable($props); // todo загрузить просто
     }
     break;
-  case 'delProperties':
+  case 'deleteProperties':
     $property = json_decode($property ?? '[]', true);
     $setting = $main->getSettings('optionProperties');
 
-    if (isset($props)) {
-      $props = explode(',', $props);
-
-      $db->delPropertyTable($props);
+    if (!empty($property['fields'])) {
+      $db->delPropertyTable([$property['code']]);
     }
 
-    if (isset($props) && ($setting = getSettingFile()) && isset($setting['propertySetting'])) {
-      $setting['propertySetting'] = array_filter($setting['propertySetting'], function ($item) use ($props) {
-        return !in_array($item, $props);
-      }, ARRAY_FILTER_USE_KEY);
+    if (isset($property['code'])) {
+      unset($setting['prop_' . str_replace('prop_', '', $property['code'])]);
 
-      //setSettingFile($setting);
+      $main->setSettings('optionProperties', $setting)->saveSettings();
     }
-    $main->saveSettings();
     break;
 
 }

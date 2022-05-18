@@ -8,7 +8,7 @@
 $param = [];
 $field = [
   'pageTitle' => 'Заказы',
-  'jsLinks'   => [CORE_JS . 'module/orders.js'],
+  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
 ];
 
 $user = [
@@ -35,7 +35,7 @@ if (!isset($setting->ordersColumnsSort)) {
   }
 }
 
-if (USERS_ORDERS && !isset($setting->ordersVisitorColumnsSort)) {
+if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsSort)) {
   $columns = $main->db->loadVisitorOrder(0, 1);
   if (!empty($columns)) {
     $setting->ordersVisitorColumnsSort = array_map(function ($item) {

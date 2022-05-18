@@ -182,69 +182,12 @@ export class LoaderIcon {
   }
 }
 
-// Всплывающее сообщение
-export class MessageToast {
-  constructor() {
-    this.messageBlock = document.createElement("div");
-    this.messageBlock.classList.add('notification-container');
-    document.body.append(this.messageBlock);
-  }
-
-  checkMsq(msg, type) {
-    if (!type) {
-      this.setMessage(type);
-      this.setColor('error');
-    } else {
-      this.setMessage(msg);
-      this.setColor('success');
-    }
-  }
-
-  setMessage(msg) {
-    this.messageBlock.innerHTML = msg || 'Текст сообщения пустой';
-  }
-
-  setColor(color) {
-    this.messageBlock.classList.remove('success', 'warning', 'error');
-    switch (color) {
-      case 'success':
-        this.messageBlock.classList.add('success');
-        break;
-      case 'warning':
-        this.messageBlock.classList.add('warning');
-        break;
-      case 'error':
-      default:
-        this.messageBlock.classList.add('error');
-        break;
-    }
-  }
-
-  show(msg = 'message body', type = 'success', autoClose = true) {
-    const close = (delay = 3000) => {
-      setTimeout(() => {
-        this.messageBlock.remove();
-      }, delay);
-    }
-
-    if (typeof type !== 'string') this.checkMsq(msg, type);
-    else {
-      this.setMessage(msg);
-      this.setColor(type);
-    }
-
-    if (autoClose) close();
-    else this.messageBlock.addEventListener('click', close.bind(this, 0), {once: true});
-
-    return this.messageBlock;
-  }
-}
-
 // Печать
 export const Print = () => {
   let p   = Object.create(null);
   p.frame = document.createElement("iframe");
   p.data  = 'no content'; // html
+  p.href  = location.pathname;
 
   p.frame.onload = function () {
     history.pushState({print: 'ok'}, '', '/');
@@ -273,22 +216,22 @@ export const Print = () => {
         imagesPromise = [];
 
     nodes.forEach(n => {
-      !n.src.includes('base64') && imagesPromise.push(this.loadImage(n.src));
+      if (n.src.includes('base64')) imagesPromise.push(new Promise(r => r(n)));
+      else imagesPromise.push(this.loadImage(n.src));
     })
 
-    imagesPromise.length
-    && await Promise.all([...imagesPromise])
-                    .then(value => nodes.forEach((n, i) => n.src = value[i].src));
+    await Promise.all([...imagesPromise])
+                 .then(value => nodes.forEach((n, i) => n.src = value[i].src));
 
     return container;
   }
 
   p.setContent = async function (content, classList = []) {
-    let container = document.createElement('div'), cloneN, delay = 0,
+    let container = document.createElement('div'),
         haveImg = content.includes('<img');
-    classList.map(i => container.classList.add(i));
+    container.classList.add(...classList);
     container.innerHTML = content;
-    if(haveImg) {
+    if (haveImg) {
       container = await this.prepareContent(container);
     }
     this.data = container;
@@ -300,12 +243,13 @@ export const Print = () => {
     }).then(async data => {
       const scrollY = window.pageYOffset;
 
-      typeof data.style === 'string' && (content = `<style>${data.style}</style>` + content);
+      typeof data['style'] === 'string' && (content = `<style>${data['style']}</style>` + content);
       await this.setContent(content, classList);
 
       document.body.append(this.frame);
       this.frame.remove();
       window.scrollTo(0, scrollY);
+      history.pushState({print: 'ok'}, '', this.href);
     });
   }
 
@@ -446,23 +390,29 @@ export class Pagination {
   }
 
   template() {
-    return `<div class="text-center d-flex">
-      <div class="col"><button type="button" class="btn-arrow" data-action="prev">&laquo;</i></button></div>
-      <div data-btnwrap class="col d-flex"></div>
-      <div class="col"><button type="button" class="btn-arrow" data-action="next">&raquo;</i></button></div>
+    return `<div class="pagination justify-content-center">
+      <div class="page-item me-2">
+        <button type="button" class="page-link" data-action="prev">&laquo;</button>
+      </div>
+      <div class="page-item pagination" data-btnwrap></div>
+      <div class="page-item ms-2">
+        <button type="button" class="page-link" data-action="next">&raquo;</button>
+      </div>
 
-      <div class="col"><select class="select-width custom-select" data-action="count">
-        <option value="5">5 запись</option>
-        <option value="10">10 записей</option>
-        <option value="20" selected>20 записей</option>
-      </select></div>
+      <div class="page-item ms-5">
+        <select class="form-select d-inline-block" data-action="count">
+          <option value="5">5 запись</option>
+          <option value="10">10 записей</option>
+          <option value="20" selected>20 записей</option>
+        </select>
+      </div>
     </div>`;
   }
 
   templateBtn() {
-    return `<input type="button"
-      value="\${pageValue}" class="ml-1 mr-1 input-paginator"
-      data-action="page" data-page="\${page}">`;
+    return `<div class="page-item"><input type="button"
+      value="\${pageValue}" class="page-link"
+      data-action="page" data-page="\${page}"></div>`;
   }
 }
 
@@ -657,18 +607,11 @@ export class Observer {
   }
 }
 
-// Одноразовые функции
-export class OneTimeFunction {
-  /**
-   *
-   * @param {string} funcName
-   * @param {function} func
-   */
-  constructor(funcName, func) {
-    this.func = Object.create(null);
-
-    funcName && this.add(funcName, func);
-  }
+/**
+ * Одноразовые функции
+ */
+export const oneTimeFunction = {
+  func: Object.create(null),
 
   /**
    *
@@ -677,7 +620,7 @@ export class OneTimeFunction {
    */
   add(name, func) {
     this.func[name] = func;
-  }
+  },
 
   /**
    *
@@ -689,7 +632,7 @@ export class OneTimeFunction {
       this.func[name](...arg);
       this.del(name);
     }
-  }
+  },
 
   /**
    *
@@ -697,5 +640,5 @@ export class OneTimeFunction {
    */
   del(name) {
     this.func[name] && (delete this.func[name]);
-  }
+  },
 }

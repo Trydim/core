@@ -5595,7 +5595,7 @@ export const FullCalendar = (function (exports) {
         root: 'fc-theme-standard',
         tableCellShaded: 'fc-cell-shaded',
         buttonGroup: 'fc-button-group',
-        button: 'fc-button btn-calendar',
+        button: 'fc-button',
         buttonActive: 'fc-button-active'
     };
     StandardTheme.prototype.baseIconClass = 'fc-icon';

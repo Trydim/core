@@ -5,7 +5,7 @@
  */
 
 $dbContent = "";
-$field = ['pageTitle' => PROJECT_TITLE ?? 'Project title'];
+$field = ['pageTitle' => $main->getCmsParam('PROJECT_TITLE')];
 
 require ABS_SITE_PATH . 'public/public.php';
 
@@ -15,7 +15,7 @@ $authStatus = $main->checkStatus('ok');
 if ($authStatus && isset($_GET['orderId'])) {
   $orderId = $_GET['orderId'];
 
-  if (is_finite($orderId)) {
+  if (is_numeric($orderId)) {
     $order = $main->db->loadOrderById($orderId);
 
     if ($order) {
@@ -45,4 +45,4 @@ if (!$authStatus) $field['sideLeft'] = '';
 
 
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
-$html = template(OUTSIDE ? 'outside' : 'base', $field);
+$html = template(OUTSIDE ? '_outside' : 'base', $field);

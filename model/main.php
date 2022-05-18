@@ -8,24 +8,24 @@ $result = [];
 $mode = $mode ?? 'noMode';
 $dbAction = $dbAction ?? 'noAction';
 
-if ($main->checkAction($dbAction) || $mode === 'auth') {
+if ($mode === 'auth' || $main->checkAction($dbAction)) {
   try {
     switch ($mode) {
       case 'auth':
-        require_once 'auth.php';
+        require __DIR__ . '/auth.php';
         break;
       case 'load':
       case 'DB':
-        require_once 'db.php';
+        require __DIR__ . '/db.php';
         break;
       case 'docs':
-        require_once 'docs.php';
+        require __DIR__ . '/docs.php';
         break;
       case 'FM':
-        require_once 'fileManager.php';
+        require __DIR__ . '/fileManager.php';
         break;
       case 'setting':
-        require_once 'setting.php';
+        require __DIR__ . '/setting.php';
         break;
     }
 

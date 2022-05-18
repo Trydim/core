@@ -17,10 +17,11 @@ function prepareData($data) {
 
 $field = [
   'pageTitle' => 'Каталог',
+  'sideRight'     => '',
+  'pageFooter'    => '',
   'footerContent' => '',
-  'sideRight' => '',
-  'cssLinks'  => [CORE_CSS . 'module/catalog.css'],
-  'jsLinks'   => [CORE_JS . 'module/catalog.js'],
+  'cssLinks'  => [CORE_CSS . 'module/catalog.css?ver=8cdf94ab40'],
+  'jsLinks'   => [CORE_JS . 'module/catalog.js?ver=73262afc8e'],
 ];
 
 // Загрузка настройки столбцов
@@ -41,7 +42,7 @@ $value = $db->getMoney();
 $field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($value) . "'>";
 
 // Все свойства
-$value = $main->getSettings('propertySetting');
+$value = $main->getSettings('optionProperties');
 foreach ($db->getTables('prop') as $table) {
   $name = isset($value[$table['dbTable']]) ? $value[$table['dbTable']]['name'] : $table['name'];
 

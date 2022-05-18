@@ -62,10 +62,10 @@ module.exports = env => {
       new VueLoaderPlugin(),
 
       /*new HtmlWebpackPlugin({
-        title: 'title',
-        filename: 'view/content.php',
-        template: `content.php`,
-      }),*/
+       title: 'title',
+       filename: 'view/content.php',
+       template: `content.php`,
+       }),*/
 
       new webpack.DefinePlugin({
         // Drop Options API from bundle

@@ -43,7 +43,7 @@ const users = {
       dbAction : 'loadUsers',
       sortParam: this.queryParam,
     });
-    this.M = f.initModal();
+    this.M = new f.initModal();
     this.query();
 
     this.onEvent();
@@ -58,7 +58,7 @@ const users = {
     data = data.map(item => {
       item['P.name'] && (item['P.name'] = _(item['P.name']));
       if (item.activity) {
-        item.activityValue = !!item.activity;
+        item.activityValue = !!+item.activity;
         item.activity = item.activityValue ? '+' : '-';
       }
 
@@ -138,6 +138,8 @@ const users = {
 
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
+    e.stopImmediatePropagation();
+
     let target = e.target,
         action = target.getAttribute('data-action'),
         form;
@@ -156,9 +158,11 @@ const users = {
       'addUser': () => {
         form = this.tmp.form.cloneNode(true);
         form.querySelector('#changeField').remove();
+
+        new f.Valid({form});
+
         this.confirmMsg = 'Новый пользователь добавлен';
         this.M.show('Добавление пользователя', form);
-        f.initMask(form.querySelector('[name="phone"]'));
       },
       'changeUser': () => {
         if (!this.id.getSelectedSize()) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
@@ -175,7 +179,7 @@ const users = {
         else node.parentNode.remove();
 
         node = form.querySelector('[name="permissionId"]');
-        if (oneElements) node.value = users['permissionId'];
+        if (oneElements) node.value = users['permission_id'];
         else node.value = 1;
 
         node = form.querySelector('[name="login"]');
@@ -208,6 +212,8 @@ const users = {
         node = form.querySelector('[name="activity"]');
         node.checked = oneElements ? users.activityValue : true;
 
+        new f.Valid({form});
+
         this.confirmMsg = 'Изменения сохранены';
         this.M.show('Изменение пользователей', form);
       },
@@ -226,6 +232,8 @@ const users = {
         this.onEventNode(newPass, e => this.changeTextInput(e, repeatPass), {}, 'change');
         this.onEventNode(repeatPass, e => this.changePassword(e, newPass), {}, 'change');
 
+        new f.Valid({form});
+
         this.confirmMsg = 'Новый пароль сохранен';
         this.M.show('Изменить пароль пользователя ' + user['U.name'], form);
       },
@@ -237,6 +245,8 @@ const users = {
 
         this.confirmMsg = 'Удаление успешно';
         this.M.show('Удалить', 'Удалить выбранных пользователя?');
+        this.M.btnConfirm.classList.remove('cl-confirm-disabled');
+        this.M.btnConfirm.removeAttribute('disabled');
       },
     }
 

@@ -1,29 +1,49 @@
 'use strict';
 
-import sf from './settingFunc';
+const conArrToObject = (arr, key) => arr.reduce((r, i) => {r[i[key]] = i; return r;}, Object.create(null));
+
+const loadData = d => {
+  const data = f['cmsSetting'];
+
+  d.mail.target     = data['mailTarget'] || '';
+  d.mail.targetCopy = data['mailTargetCopy'] || '';
+  d.mail.subject    = data['mailSubject'] || '';
+  d.mail.fromName   = data['mailFromName'] || '';
+
+  d.managerFields = data.managerFields || {};
+
+  d.statusDefault = +data.statusDefault || 0;
+
+  d.otherFields = {
+    phoneMask: {
+      users    : data['phoneMaskUsers'] || f.PHONE_MASK_DEFAULT,
+      customers: data['phoneMaskCustomers'] || f.PHONE_MASK_DEFAULT,
+      global   : data['phoneMaskGlobal'] || f.PHONE_MASK_DEFAULT,
+    },
+  };
+
+  return d;
+}
 
 export default {
   components: {},
   data: () => {
     const d = {
       isAdmin: false,
+      userChange: false,
 
       mail: {},
       user: {},
-
-      rate: {
-        autoRefresh: true,
-      },
+      rate: {},
 
       queryParam: {
         mode: 'setting',
       },
-      temp: false,
 
       //loadingPage: true,
     };
 
-    return sf.loadData(d);
+    return loadData(d);
   },
   computed: {},
   watch   : {},
@@ -40,6 +60,7 @@ export default {
       this.queryParam.mail = JSON.stringify(m);
     },
     updateUser(u) {
+      this.userChange = true;
       this.queryParam.user = JSON.stringify(u);
     },
     updatePermission(p) {
@@ -58,6 +79,9 @@ export default {
     updateProperties(p) {
       this.queryParam.properties = JSON.stringify(p);
     },
+    updateOtherFields(p) {
+      this.queryParam.otherFields = JSON.stringify(p);
+    },
 
     query() {
       const data = new FormData();
@@ -72,7 +96,16 @@ export default {
 
     saveSetting() {
       this.queryParam.cmsAction = 'saveSetting';
-      this.query().then(s => s.status && f.showMsg('Сохранено'));
+      this.query().then(s => {
+        if (s.status) {
+          if (this.userChange) {
+            this.userChange = false;
+            this.user = JSON.parse(this.queryParam.user);
+          }
+
+          f.showMsg('Сохранено');
+        }
+      });
     },
   },
   mounted() {
@@ -80,3 +113,7 @@ export default {
     //this.loadingPage = false;
   },
 }
+
+f.HOOKS.beforeCreateApp = f.HOOKS.beforeCreateApp || (() => {});
+f.HOOKS.beforeMoundedApp = f.HOOKS.beforeMoundedApp || (() => {});
+f.HOOKS.afterMoundedApp = f.HOOKS.afterMoundedApp || (() => {});

@@ -11,18 +11,17 @@ $data = [];
 // Если есть отчет
 $reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
 // Если есть номер заказа
-$orderIds = !$reportVal && isset($orderIds) ? json_decode($orderIds) : false;
+$orderId = empty($reportVal) ? ($orderId ?? false) : false;
 // Посмотреть номер заказа в отчете
-!$orderIds && $orderIds = isset($reportVal['orderId']) ? json_decode($reportVal['orderId']) : false;
-$orderIds = is_array($orderIds) && count($orderIds) === 1 ? $orderIds[0] : false;
+!$orderId && $orderId = isset($reportVal['orderId']) ? json_decode($reportVal['orderId']) : false;
 
 // Данные о менеджере
 // ---------------------------------------------------------------------------------------------------------------------
 if (isset($addManager)) {
   if (isset($reportVal['name'])) { // Имя пользователя - неправильно
     $userData = $main->db->getUser($reportVal['userId'] ?? $reportVal['name'], 'name, contacts');
-  } else if (isset($orderIds)) { // Менеджер из сохраненного заказа
-    $userData = $main->db->getUserByOrderId($orderIds);
+  } else if ($orderId) { // Менеджер из сохраненного заказа
+    $userData = $main->db->getUserByOrderId($orderId);
   } else { // Текущий пользователь
     $userData = $main->db->getUserById($main->getLogin('id'));
   }
@@ -39,8 +38,8 @@ if (isset($addManager)) {
 if (isset($addCustomer)) {
   if (isset($customerId)) {
     $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
-  } else if (isset($orderIds)) { // Заказчик из сохраненного заказа
-    $customerData = $main->db->loadCustomerByOrderId($orderIds);
+  } else if ($orderId) { // Заказчик из сохраненного заказа
+    $customerData = $main->db->loadCustomerByOrderId($orderId);
   } else $customerData = $customer ?? '';
 
   if (count($customerData)) {
@@ -52,8 +51,8 @@ if (isset($addCustomer)) {
 
 // Отчет загрузить из БД по ИД
 // ---------------------------------------------------------------------------------------------------------------------
-if ($orderIds) {
-  $reportVal = $main->db->loadOrderById($orderIds);
+if ($orderId) {
+  $reportVal = $main->db->loadOrderById($orderId);
 
   $reportVal['id']           = $reportVal['ID'];
   $reportVal['customerName'] = $reportVal['C.name'];
@@ -74,10 +73,13 @@ $docType = $docType ?? $docsAction;
 
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
-if ($docType !== 'mail') {
-  require_once __DIR__ . '/classes/Docs.php';
-  $docs = new Docs($docType, $data, $fileTpl ?? 'default');
-}
+if (in_array($docType, ['excel', 'pdf', 'print'])) {
+  $docs = new Docs([
+    'docType' => $docType,
+    'library' => $main->getCmsParam('PDF_LIBRARY'),
+    'orientation' => $pdfOrientation ?? $main->getCmsParam('PDF_ORIENTATION'),
+  ], $data, $fileTpl ?? 'default');
+} else $docType = false;
 
 if (isset($docsAction)) {
   switch ($docsAction) {
@@ -88,7 +90,6 @@ if (isset($docsAction)) {
       break;
     case 'mail':
       $docType && $docsPath = $docs->getDocs('save');
-      require_once __DIR__ . '/classes/Mail.php';
       $mail = new Mail($mailTpl ?? 'mailTpl');
       $param = [
         'name'  => $name ?? '',
@@ -100,15 +101,16 @@ if (isset($docsAction)) {
       count($_FILES) && $mail->addOtherFile($_FILES);
       $mail->prepareMail($param);
       $docType && $mail->addFile($docsPath);
-      isset($email) && $mail->addMail($email);
+
+      $otherMail = $otherMail ?? [];
+      isset($email) && !empty($email) && $otherMail[] = $email;
+      $mail->addMail($otherMail);
       $result['mail'] = $mail->send();
       break;
     case 'getPrintStyle':
-      $fileTpl = $fileTpl ?? 'printTpl.css';
+      $fileTpl = ABS_SITE_PATH . 'public/views/docs/' . ($fileTpl ?? 'printTpl.css');
 
-      if (file_exists(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl)) {
-        $result['style'] = file_get_contents(ABS_SITE_PATH . 'public/views/docs/' . $fileTpl);
-      }
+      if (file_exists($fileTpl)) $result['style'] = file_get_contents($fileTpl);
       break;
   }
 }

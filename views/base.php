@@ -16,11 +16,11 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
-  'CSV_DEVELOP'   => CSV_DEVELOP,
+  'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
   'SITE_PATH'     => SITE_PATH,
   'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
-  'PATH_IMG'      => PATH_IMG,
+  'URI_IMG'       => URI_IMG,
   'AUTH_STATUS'   => $main->checkStatus('ok'),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
@@ -29,6 +29,7 @@ $jsGlobalConst = json_encode([
 <!doctype html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -36,13 +37,11 @@ $jsGlobalConst = json_encode([
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
   <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons">
-    <link rel="stylesheet" href="<?= CORE_CSS ?>admin.css?ver=aa9c1c78e8">
+    <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
-    <link rel="stylesheet" href="<?= str_replace('//', '/', $item) ?>">
+    <link rel="stylesheet" href="<?= $item ?>">
   <?php }, $cssLinks ?? []); ?>
 
   <script>
@@ -50,42 +49,45 @@ $jsGlobalConst = json_encode([
   </script>
 </head>
 
-<body>
+<!-- dark -->
+<!-- horizontal -->
+<body
+    data-theme-version="light"
+    data-layout="vertical"
+>
+
+<div id="preloader">
+  <div class="sk-three-bounce">
+    <div class="sk-child sk-bounce1"></div>
+    <div class="sk-child sk-bounce2"></div>
+    <div class="sk-child sk-bounce3"></div>
+  </div>
+</div>
 
 <?php if (!isset($global)) { ?>
-  <main class="container-fluid mx-auto">
-    <section class="wrapper">
+  <main class="main-wrapper mx-auto" id="mainWrapper">
+    <?= $pageHeader; ?>
 
-      <?php if ($sideLeft) { ?>
-        <aside id="sideLeft"><?= $sideLeft; ?></aside>
-      <?php } ?>
+    <div class="container-content">
+      <?= $sideLeft ?>
 
-      <section class="main-panel mx-auto" style="<?= !$sideLeft ? 'width: 100%' : '' ?>">
-        <?= $pageHeader ?>
-
-        <div class="content mt-0 p-1">
-          <div class="row justify-center"> <!-- возможно убрать justify-center -->
-            <!-- стили временно-->
-            <div class="col-12 <?= $sideRight ? 'col-xl-10' : '' ?>"><?= $content ?></div>
-
-            <?php if ($sideRight) { ?>
-              <aside id="right" class="col-12 col-md-2"><?= $sideRight ?></aside>
-            <?php } ?>
-
-          </div>
-        </div>
-        <footer class="footer"><?= $pageFooter ?></footer>
+      <section class="content-body">
+        <div class="px-md-4 pt-md-4 pb-5 h-100"><?= $content ?? '' ?></div>
+        <?= $pageFooter ?>
       </section>
+      <?php if ($sideRight) { ?>
+        <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight ?></section>
+      <?php } ?>
+    </div>
 
-    </section>
   </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src="<?= CORE_JS ?>src.js?ver=f9c8274b32"></script>
-<script defer type="module" src="<?= CORE_JS ?>main.js?ver=6e2c6398dc"></script>
+<script defer type="module" src='<?= CORE_JS ?>src.js?ver=35453966479'></script>
+<script defer type="module" src='<?= CORE_JS ?>main.js?ver=684eab4bb6f'></script>
 
 <?php array_map(function ($item) { ?>
-  <script defer type="module" src="<?= str_replace('//', '/', $item) ?>"></script>
+  <script defer type="module" src="<?= $item ?>"></script>
 <?php }, $jsLinks ?? []); ?>
 
 <?= $footerContent ?? '' ?>

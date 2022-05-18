@@ -6,9 +6,11 @@
 
 if (!defined('MAIN_ACCESS')) die('access denied!');
 
-!isset($authAction) && ($authAction = 'noAuthAction');
-!isset($login) && ($login = '');
-!isset($password) && ($password = '');
+$authAction = $authAction ?? 'noAuthAction';
+$login = $login ?? '';
+$password = $password ?? '';
+
+!isset($_SESSION) && session_start();
 
 switch ($authAction) {
   case 'login':

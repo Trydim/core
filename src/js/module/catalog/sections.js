@@ -175,11 +175,15 @@ export const methods = {
 
   sectionConfirm() {
     this.sectionLoading = true;
-    this.queryParam = Object.assign(this.queryParam, this.section);
+    this.queryParam = {
+      ...this.queryParam,
+      section: JSON.stringify(this.section),
+    };
     this.query();
     this.sectionModal.display = false;
+    this.sectionLoading = false;
   },
   sectionCancel() {
     this.sectionModal.display = false;
-  }
+  },
 }

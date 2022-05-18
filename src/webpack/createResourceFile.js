@@ -41,7 +41,7 @@ function addEntry(path, mName, js = false) {
 }
 
 function addModule(mName) {
-  if (menu.includes(mName) || mName === 'setting') {
+  if (menu.includes(mName.toLowerCase()) || mName === 'setting') {
     //addImport(coreSrcCssModulePath, mName);
     addEntry(coreSrcJsModulePath, mName, true);
     console.log('Added module: ' + mName);
@@ -58,7 +58,7 @@ acceptMenu = configRows.filter((r) => r.includes('\'ACCESS_MENU\''));
 menu = acceptMenu[0].toLowerCase();
 
 // Администрирование БД
-let modules = ['admindb', 'calendar', 'catalog', 'customers', 'filemanager', 'orders', 'setting', 'statistic', 'users'];
+let modules = ['admindb', 'calendar', 'catalog', 'customers', 'fileManager', 'orders', 'setting', 'statistic', 'users'];
 modules.forEach((name) => {
   addModule(name);
 });

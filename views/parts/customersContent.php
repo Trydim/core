@@ -1,6 +1,6 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!'); ?>
 
-<div class="d-flex justify-content-between p-bottom-25" id="actionBtnWrap">
+<div class="d-flex justify-content-between pb-3" id="actionBtnWrap">
   <div>
     <input type="button" class="btn btn-success" value="Добавить" data-action="addCustomer">
     <input type="button" class="btn btn-warning" value="Изменить" data-action="changeCustomer">
@@ -9,14 +9,15 @@
     <input type="button" class="btn btn-danger" value="Удалить" data-action="delCustomer">
   </div>
 </div>
-<div class="p-bottom-25 d-none" id="confirmField">
+<div class="d-none pb-3" id="confirmField">
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning" value="Отмена" data-action="confirmNo">
 </div>
 <div class="res-table">
 
-  <div class="form-group">
-    <label class="w-100">Поиск: <input type="text" id="search" name="search" value="" class="form-control" autocomplete="off"></label>
+  <div class="input-group">
+    <span class="input-group-text">Поиск:</span>
+    <input type="text" id="search" class="form-control" value="" autocomplete="off">
   </div>
 
   <table id="customersTable" class="text-center table table-striped">
@@ -49,3 +50,4 @@
     </tfoot>
   </table>
 </div>
+<div id="paginator" class="w-100"></div>

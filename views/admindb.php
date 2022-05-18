@@ -6,11 +6,11 @@
  */
 
 $legendHtml = '';
-if (PATH_LEGEND && isset($legend[$tableActive])) {
+if ($main->getCmsParam('PATH_LEGEND') && isset($legend[$tableActive])) {
   $legendHtml = "<template id='dataTableLegend'><div>" . $legend[$tableActive] . "</div></template>";
 }
 
-if (!DB_TABLE_IN_SIDEMENU) { // Если таблицы не в подменю
+if (!$main->getCmsParam('DB_TABLE_IN_SIDEMENU')) { // Если таблицы не в подменю
   $field['sideRight'] = <<<sideRight
 <ul id="DBTablesWrap"></ul>
 <div>
@@ -31,42 +31,39 @@ $field['content'] = <<<main
     <button type="button" class="btn btn-primary" id="btnSave" disabled>Сохранить</button>
     <button type="button" class="btn btn-primary d-none" id="btnRefresh">Обновить Конфиг</button>
   </div>
-  <div id="viewField" class="d-flex" style="justify-content: left">
-    <div>
-      <label title="Удобный для редактирования">
-        <input type="radio" name="adminType" value="form" data-action="adminType">
-        Режим форм</label>
+  <div id="viewField" class="d-flex">
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" disabled data-action="adminType">
+      <label class="form-check-label" for="formMode">Режим форм</label>
     </div>
-    <div class="ml-1">
-      <label title="Редактирования в режиме таблицы">
-        <input type="radio" name="adminType" value="table" checked data-action="adminType">
-        Режим таблицы</label>
+    <div class="form-check ms-1">
+      <input class="form-check-input" type="radio" name="adminType" value="table" id="formTable" checked data-action="adminType">
+      <label class="form-check-label" for="formTable">Режим таблицы</label>
     </div>
-    <div class="ml-1">
-      <label title="Настройка режима форм">
-        <input type="radio" name="adminType" value="config" data-action="adminType">
-        Настройка формы (Для опытных)</label>
+    <div class="form-check ms-1">
+      <input class="form-check-input" type="radio" name="adminType" value="config" id="setupMode" disabled data-action="adminType">
+      <label class="form-check-label" for="setupMode">Настройка формы (Для опытных)</label>
     </div>
   </div>
 </div>
-<div id="insertToDB" style="min-height: 100px"></div>
-<div style="position: fixed; bottom: 0; right: 0">
-  <input type="button" id="legend" class="btn btn-primary btn-white" value="Помощь">
+<div id="insertToDB" class="h-25"></div>
+<div class="position-fixed bottom-0 end-0" style="z-index: 10">
+  <input type="button" id="legend" class="btn btn-outline-primary m-1" value="Помощь">
 </div>
 main;
 
 $field['footerContent'] = <<<temp
 $legendHtml
-<template id="FormViesTmp">
+<template id="formViewsTmp">
   <form action="#"></form>
 </template>
-<template id="FormRowTmp">
+<template id="formRowTmp">
   <div class="d-flex justify-content-between">
     <p data-field="description" style="width: 30%"></p>
     <div data-field="params" class="d-flex justify-content-around" style="width: 70%"></div>
   </div>
 </template>
-<template id="FormParamTmp">
+<template id="formParamTmp">
   <section>
     <div data-type="string" class="w-100 text-center">
       <input type="text" class="w-90">
@@ -118,7 +115,7 @@ $legendHtml
   </div>
 </template>
 <template id="rowParamTemplate">
-  <div style="cursor: pointer">
+  <div role="button">
     <label>
       <span data-field="key"></span>
       <span data-field="type"></span>

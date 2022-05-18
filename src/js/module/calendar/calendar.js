@@ -243,7 +243,7 @@ const orders = {
 }
 
 const calendar = {
-  M: f.initModal({showDefaultButton: false}),
+  M: new f.initModal({showDefaultButton: false}),
 
   init() {
     orders.init();

@@ -9,8 +9,6 @@
   'extensions_for_editor' => array('ab', 'txt', 'php', 'js', 'tpl', 'html', 'htm', 'css', 'text', 'json', 'lng', 'xml', 'ini', 'sql')
 ];*/
 
-define('ROOT', SHARE_DIR);
-
 function tree($path) {
   if (stream_resolve_include_path($path)) {
 
@@ -51,8 +49,10 @@ $field = [
 	'pageTitle' => 'File manager',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/fileManager.css'];
-$field['jsLinks'] = [CORE_JS . 'module/fileManager.js'];
+$field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=fda1c25660'];
+$field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=45223fc11b'];
 
+ob_start();
 require $pathTarget;
+$field['content'] = ob_get_clean();
 $html = template('base', $field);

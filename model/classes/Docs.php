@@ -2,10 +2,23 @@
 
 /* Папка для временных файлов */
 const RESULT_PATH = 'shared/';
-!defined('PDF_LIBRARY') && define('PDF_LIBRARY', 'mpdf');
 !defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
+
+  /**
+   * What library use
+   *
+   * @var string [mpdf/html2pdf]
+   */
+  private $pdfLibrary;
+
+  /**
+   * Page orientation
+   *
+   * @var string [P/L]
+   */
+  private $pdfOrientation;
 
   /**
    * Create name for new pdf file (Work only if DESTINATION=save)
@@ -35,7 +48,7 @@ class Docs {
   /**
    * @var string
    */
-  private $docsType, $fileTpl, $filePath, $content, $footerPage = '', $imgPath, $fileName;
+  private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $fileName;
 
   /**
    * @var object
@@ -54,15 +67,29 @@ class Docs {
    */
   private $tmpFiles = [];
 
-  public function __construct($docsType, $data, $fileTpl = 'default') {
-    $this->docsType = $docsType;
+  /**
+   * Docs constructor.
+   * @param array $param {library: string, orientation: string, docType: string}
+   * @param $data
+   * @param string $fileTpl
+   */
+  public function __construct(array $param, $data, string $fileTpl = 'default') {
+    $this->pdfLibrary = $param['library'] ?? 'mpdf';
+    $this->pdfOrientation = $param['orientation'] ?? 'P';
+    $this->docsType = $param['docType'] ?? 'pdf';
     $this->data = $data;
 
     $this->setFileTpl($fileTpl);
     $this->setDefaultParam();
     $this->getFileName();
-    in_array($docsType, ['pdf', 'print']) && $this->prepareTemplate();
-    $docsType === 'excel' && $this->setExcelData();
+    switch ($this->docsType) {
+      case 'pdf': $this->prepareTemplate(); break;
+      case 'print':
+        $this->pdfLibrary = 'print';
+        $this->prepareTemplate();
+        break;
+      case 'excel': $this->setExcelData(); break;
+    }
 
     $func = 'init' . $this->getFunc();
     $this->$func();
@@ -102,15 +129,16 @@ class Docs {
       'margin_bottom' => 5,
       'margin_header' => 0,
       'margin_footer' => 5,
-      /*'orientation'   => 'L',*/
+      'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = ($this->docsType !== 'print' ? $_SERVER['DOCUMENT_ROOT'] : '') . PATH_IMG;
+    $this->imgPath = $this->docsType === 'print' ? URI_IMG : PATH_IMG;
   }
 
   private function prepareTemplate() {
     if ($this->useDefault) { $this->setPdfDefaultData(); return; }
 
+    $this->setCss();
     $footerPage = '';
 
     ob_start();
@@ -129,9 +157,9 @@ class Docs {
   }
 
   private function initPdf() {
-    require_once ABS_SITE_PATH . CORE . 'libs/vendor/autoload.php';
+    require_once CORE . 'libs/vendor/autoload.php';
 
-    switch (PDF_LIBRARY) {
+    switch ($this->pdfLibrary) {
       case 'mpdf':
         try {
           $this->docs = new Mpdf\Mpdf($this->pdfParam);
@@ -139,7 +167,7 @@ class Docs {
           //$this->pdf->useOnlyCoreFonts = true;
           //$this->pdf->SetDisplayMode('fullpage');
 
-          $this->setCss();
+          $this->docs->WriteHTML($this->styleContent, \Mpdf\HTMLParserMode::HEADER_CSS);
 
           //$this->pdf->SetHTMLHeader('');
           $this->docs->SetHTMLFooter($this->footerPage);
@@ -158,12 +186,12 @@ class Docs {
             $this->pdfParam['margin_right'],
             $this->pdfParam['margin_bottom'],
           ];
-          $this->docs = new Spipu\Html2Pdf\Html2Pdf('P', $format, 'ru', true, 'UTF-8', $param);
+          $this->docs = new Spipu\Html2Pdf\Html2Pdf($this->pdfOrientation, $format, 'ru', true, 'UTF-8', $param);
 
           DEBUG && $this->docs->setModeDebug();
           $this->docs->setDefaultFont('freesans');
 
-          $this->setCss();
+          $this->docs->writeHTML('<style>' . $this->styleContent . '</style>');
           $this->docs->writeHTML($this->content);
 
         } catch (Spipu\Html2Pdf\Exception\Html2PdfException $e) {
@@ -176,7 +204,7 @@ class Docs {
   }
 
   private function initPrint() {
-    $this->initPdf();
+    $this->content .= '<style>' . $this->styleContent . '</style>';
   }
 
   private function initExcel() {
@@ -194,15 +222,7 @@ class Docs {
   private function setCss() {
     $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css";
     if (file_exists($path)) {
-      $stylesheet = file_get_contents($path);
-      switch (PDF_LIBRARY) {
-        case 'mpdf':
-          $this->docs->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
-          break;
-        case 'html2pdf':
-          $this->docs->WriteHTML('<style>' . $stylesheet . '</style>');
-          break;
-      }
+      $this->styleContent = file_get_contents($path);
     }
   }
 
@@ -219,12 +239,20 @@ class Docs {
    * Return file as:
    * save - save on server in RESULT_PATH, any other value send to browser
    * I - inline, D - DOWNLOAD, F - save local file, S - string
-   * @param {string} $path
-   * @param {string} $dest
+   * @param string $path
+   * @param string $dest
+   * @return array|false|string
    */
-  private function getPdf($path, $dest) {
+  private function getPdf(string $path, string $dest) {
+    if (isset($_REQUEST['resource'])) {
+      return [
+        'css'  => $this->styleContent,
+        'html' => $this->content,
+      ];
+    }
 
-    switch (PDF_LIBRARY) {
+
+    switch ($this->pdfLibrary) {
       case 'mpdf':
       /** Default: \Mpdf\Output\Destination::INLINE
        *        Values:
@@ -269,7 +297,12 @@ class Docs {
     return false;
   }
 
-  private function getPrint($path, $dest) {
+  /**
+   * @param string $path
+   * @param string $dest
+   * @return array|string
+   */
+  private function getPrint(string $path, string $dest) {
     switch ($dest) {
       case 'save':
         file_put_contents($path . $this->fileName, $this->content);
@@ -283,7 +316,12 @@ class Docs {
     }
   }
 
-  private function getExcel($path, $dest) {
+  /**
+   * @param string $path
+   * @param string $dest
+   * @return array|string
+   */
+  private function getExcel(string $path, string $dest) {
     switch ($dest) {
       case 'save':
         $this->docs->writeToFile($path . $this->fileName);

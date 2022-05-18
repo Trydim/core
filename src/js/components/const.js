@@ -3,19 +3,19 @@
 /**
  * Global variables and simple functions
  */
-window.CMS_CONST = JSON.parse(window.CMS_CONST) || {};
+const cms = JSON.parse(window.CMS_CONST || '{}');
 
 export default {
-  DEBUG        : window.CMS_CONST['DEBUG'] || false,
-  CSV_DEVELOP  : !!window.CMS_CONST['CSV_DEVELOP'] || false,
-  OUTSIDE      : window.CMS_CONST['CL_OUTSIDE'],
-  SITE_PATH    : window.CMS_CONST['SITE_PATH'] || '/',
-  MAIN_PHP_PATH: (window.CMS_CONST['SITE_PATH'] || '/') + 'index.php',
-  PATH_IMG     : (window.CMS_CONST['PATH_IMG'] || 'public/images/'),
-  AUTH_STATUS  : window.CMS_CONST['AUTH_STATUS'] || false,
-  INIT_SETTING : window.CMS_CONST['INIT_SETTING'] || false,
+  DEBUG        : cms['DEBUG'] || false,
+  CSV_DEVELOP  : !!cms['CSV_DEVELOP'] || false,
+  OUTSIDE      : cms['CL_OUTSIDE'],
+  SITE_PATH    : cms['SITE_PATH'] || '/',
+  MAIN_PHP_PATH: (cms['SITE_PATH'] || '/') + 'index.php',
+  PATH_IMG     : (cms['URI_IMG'] || 'public/images/'),
+  AUTH_STATUS  : cms['AUTH_STATUS'] || false,
+  INIT_SETTING : cms['INIT_SETTING'] || false,
 
-  PHONE_MASK: '+_ (___) ___ __ __',
+  PHONE_MASK_DEFAULT: '+_ (___) ___ __ __',
 
   // Global IDs
   // ------------------------------------------------------------------------------------------------
@@ -36,8 +36,6 @@ export default {
     HIDDEN_NODE: 'd-none',
     // css класс который добавляется неактивным элементам
     DISABLED_NODE: 'disabled',
-    // css класс который добавляется при загрузке
-    LOADING: 'loading-st1',
   },
 
   HOOKS: {},

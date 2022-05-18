@@ -12,8 +12,12 @@
   "require": {
     "phpunit/phpunit": "9.5.12",
     "phpmailer/phpmailer": "^6.2",
-    "mpdf/mpdf": "^8.0",
+    "mpdf/mpdf": "v8.0.17",
     "ext-json": "*",
-    "ext-zlib": "*"
+    "ext-zlib": "*",
+    "ext-mbstring": "*",
+    "ext-iconv": "*",
+    "ext-gettext": "*",
+    "ext-simplexml": "*"
   }
 }

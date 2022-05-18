@@ -22,7 +22,7 @@ $field['footerContent'] = <<<footerContent
           <label for="name" class="modal-content__label">Имя</label>
           <input type="text" id="name" name="name" value="" class="modal-content__input">
         </div>
-  
+
         <div class="modal-content__field d-flex">
           <label for="phone" class="modal-content__label">Телефон</label>
           <input type="tel" id="phone" name="phone" class="modal-content__input">

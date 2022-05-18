@@ -1,3 +1,4 @@
+.idea/
 /libs/vendor/
 !/libs/vendor/autoload.php
 /assets/

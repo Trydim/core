@@ -1,7 +1,5 @@
 <?php
 
-namespace RedBeanPHP;
-
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 require __DIR__ . '/rb.php';
@@ -16,7 +14,7 @@ class Db extends \R {
    * @param $type
    * @param $count
    *
-   * @return array|OODBBean|null
+   * @return array|\RedBeanPHP\OODBBean|null
    */
   private function dis($type, $count) {
     return self::getRedBean()->dispense($type, $count);
@@ -72,6 +70,18 @@ class Db extends \R {
 
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
+
+  private function getConvertDbType(string $type) {
+    if (stripos($type, 'int') === 0) {
+      return function ($v) { return intval($v); };
+    }
+
+    if (stripos($type, 'decimal') === 0 || stripos($type, 'float') === 0 || stripos($type, 'double') === 0) {
+      return function ($v) { return floatval($v); };
+    }
+
+    return function ($v) {return $v;};
+  }
 
   /**
    * @param string $dbTable name of table
@@ -169,12 +179,27 @@ class Db extends \R {
 
   /**
    * select all (*)
-   * @param $dbTable
+   * @param string $dbTable
+   * @param bool $typed
    *
    * @return array|null
    */
-  public function loadTable($dbTable): ?array {
-    return self::getAll('SELECT * FROM ' . $dbTable);
+  public function loadTable(string $dbTable, bool $typed = false): ?array {
+    $result = self::getAll('SELECT * FROM ' . $dbTable);
+
+    if ($typed) {
+      $columns = [];
+      foreach ($this->getColumnsTable($dbTable) as $col) {
+        $columns[$col['columnName']] = $this->getConvertDbType($col['type']);
+      }
+
+      $result = array_map(function ($row) use ($columns) {
+        foreach ($columns as $name => $func) $row[$name] = $func($row[$name]);
+        return $row;
+      }, $result);
+    }
+
+    return $result;
   }
 
   /**
@@ -186,7 +211,7 @@ class Db extends \R {
    */
   public function checkHaveRows($dbTable, $columnName, $value): int {
     return intval(self::getCell("SELECT count(*) FROM $dbTable
-                                 WHERE $columnName = :value", [':value' => $value]));
+                                     WHERE $columnName = :value", [':value' => $value]));
   }
 
   /**
@@ -222,6 +247,19 @@ class Db extends \R {
   }
 
   /**
+   * @param string $table
+   * @param array  $requireParam
+   * @return mixed
+   */
+  public function getLastID(string $table, array $requireParam = []) {
+    $bean = self::xdispense($table);
+    foreach ($requireParam as $field => $value) $bean->$field = $value;
+    self::store($bean);
+
+    return $bean->getID();
+  }
+
+  /**
    * @param string $like
    * @return mixed|null
    */
@@ -247,12 +285,11 @@ class Db extends \R {
    */
   public function getColumnsTable($dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
-                           COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
-                         FROM information_schema.COLUMNS 
-                         WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
+                               COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
+                             FROM information_schema.COLUMNS 
+                             WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
       [':dbName'  => $this->dbName,
-       ':dbTable' => $dbTable
-      ]);
+       ':dbTable' => $dbTable]);
   }
 
   /**
@@ -285,7 +322,7 @@ class Db extends \R {
    */
   public function insert(array $curTable, string $dbTable, array $param, bool $change = false): array {
     if (count($param) === 0) return [];
-    $result = $this->checkTableBefore($curTable, $dbTable, $param, $change);
+    $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
 
     $beans = self::xdispense($dbTable, count($param));
 
@@ -328,6 +365,7 @@ class Db extends \R {
           }
         }
         self::store($beans);
+
       } else {
 
         $i = 0;
@@ -349,6 +387,10 @@ class Db extends \R {
       ];
     }
 
+    if ($change === false && count($param) === 1) {
+      $result [$dbTable . 'Id'] = $beans->getID();
+    }
+
     return $result;
   }
 
@@ -366,9 +408,9 @@ class Db extends \R {
     return $this->selectQuery('files', '*', $filters);
   }
 
-  public function setFiles(&$result, $imageIds) {
+  public function setFiles(&$result, $imageIds): string {
     $dbDir = 'upload/';
-    $uploadDir = SHARE_DIR . $dbDir;
+    $uploadDir = SHARE_PATH . $dbDir;
 
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
@@ -382,13 +424,13 @@ class Db extends \R {
 
         // Если файл существует
         if (file_exists($uploadFile)) {
-          !isset($result['fileExist']) && $result['fileExist'] = [];
-
+          $result['fileExist'] = $result['fileExist'] ?? [];
           $result['fileExist'][] = $file['name'];
+
           if (filesize($uploadFile) === $file['size']) {
             $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
-            if (count($id) === 1) { $imageIds[] = $id[0]; continue;
-            } else unlink($uploadFile);
+            if (count($id) === 1) { $imageIds[] = $id[0]; continue; }
+            else unlink($uploadFile);
 
           } else {
             $name = pathinfo($file['name'], PATHINFO_BASENAME) . '_' . rand();
@@ -401,12 +443,13 @@ class Db extends \R {
         }
 
         if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-          $this->insert([], 'files', ['0' => [
+          $lastId = $this->getLastID('files');
+          $imageIds[] = $lastId;
+          $this->insert([], 'files', [$lastId => [
             'name'   => $file['name'],
             'path'   => $dbFile,
             'format' => $file['type'],
-          ]]);
-          $imageIds[] = $this->getLastID('files');
+          ]], true);
         } else $result['error'] = 'Mover file error: ' . $file['name'];
       }
     }
@@ -417,29 +460,29 @@ class Db extends \R {
   // Elements
   //------------------------------------------------------------------------------------------------------------------
 
-  public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
+  public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): ?array {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
                    C.symbol_code AS 'symbolCode', C.name AS 'codeName'
-    FROM elements E
-    JOIN codes C on C.symbol_code = E.element_type_code
-    WHERE E.section_parent_id = $sectionID
-    ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
+            FROM elements E
+            JOIN codes C on C.symbol_code = E.element_type_code
+            WHERE E.section_parent_id = $sectionID
+            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
   }
 
-  public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false) {
+  public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): array {
     $pageNumber *= $countPerPage;
     $searchValue = str_replace(' ', '%', $searchValue);
 
     $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
                    C.symbol_code AS 'symbolCode', C.name AS 'codeName'
-    FROM elements E
-    JOIN codes C on C.symbol_code = E.element_type_code
-    WHERE E.name LIKE '%$searchValue%'
-    ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
+            FROM elements E
+            JOIN codes C on C.symbol_code = E.element_type_code
+            WHERE E.name LIKE '%$searchValue%'
+            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
 
     //$countPerPage OFFSET $pageNumber;
 
@@ -457,9 +500,12 @@ class Db extends \R {
   private function setImages(string $imagesIds = ''): array {
     $images = $this->getFiles($imagesIds);
     return array_map(function ($item) {
-      $path = findingFile(substr(PATH_IMG , 0, -1), mb_strtolower($item['path']));
+      $path = findingFile(substr(SHARE_PATH, 0, -1), mb_strtolower($item['path']));
       $item['id'] = $item['ID'];
-      $item['src'] = $path ? $path : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
+      $item['path'] = $item['src'] = $path
+        ? URI . str_replace(ABS_SITE_PATH, '', $path)
+        : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
+
       unset($item['ID']);
       return $item;
     }, $images);
@@ -479,14 +525,14 @@ class Db extends \R {
 
   /**
    * Для страницы Catalog
-   * @param false $elementID
+   * @param string $elementID
    * @return array|null
    */
-  public function openOptions($elementID = false): ?array {
+  public function openOptions(string $elementID): ?array {
     $sql = "SELECT O.ID AS 'id',
                    MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId', 
                    MO.short_name as 'moneyOutputName', MO.ID AS 'moneyOutputId',
-                   images_ids AS 'images', property,
+                   images_ids AS 'images', properties,
                    O.name AS 'name', U.ID AS 'unitId', U.name AS 'unitName', O.last_edit_date AS 'lastEditDate', O.activity AS 'activity', sort,
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
             FROM options_elements O
@@ -500,7 +546,7 @@ class Db extends \R {
       $option['images'] = strlen($option['images']) ? $this->setImages($option['images']) : [];
 
       // set property
-      $option['property'] = json_decode($option['property'] ?: '[]');
+      $option['properties'] = json_decode($option['properties'] ?: '[]');
 
       return $option;
     }, self::getAll($sql));
@@ -514,18 +560,19 @@ class Db extends \R {
    * @return array
    */
   public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
-    $sql = "SELECT O.ID AS 'id', element_id as 'elementId', 
+    $sql = "SELECT O.ID AS 'id', element_id AS 'elementId', 
                    E.element_type_code AS 'type', E.sort AS 'elementSort',
-                   O.name AS 'name', U.short_name as 'unit', O.activity AS 'activity',
-                   O.sort AS 'sort', O.last_edit_date as 'lastDate', property, images_ids AS 'images',
+                   O.name AS 'name', U.short_name AS 'unit', O.activity AS 'activity',
+                   O.sort AS 'sort', O.last_edit_date AS 'lastDate', properties, images_ids AS 'images',
                    MI.code AS 'moneyInput', MO.code AS 'moneyOutput',
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
             FROM options_elements O
-            JOIN elements E on E.ID = O.element_id
-            JOIN money MI on MI.ID = O.money_input_id
-            JOIN money MO on MO.ID = O.money_output_id
-            JOIN units U on U.ID = O.unit_id
-            WHERE (E.activity <> 0 OR O.activity <> 0)";
+            JOIN elements E ON E.ID = O.element_id
+            JOIN section S ON S.ID = E.section_parent_id
+            JOIN money MI ON MI.ID = O.money_input_id
+            JOIN money MO ON MO.ID = O.money_output_id
+            JOIN units U ON U.ID = O.unit_id
+            WHERE S.active <> 0 AND E.activity <> 0 AND O.activity <> 0";
 
     // Filter
     if (count($filter)) {
@@ -542,7 +589,7 @@ class Db extends \R {
       }
 
       $sql .= ' AND ' . implode(' AND ', $filterArr);
-      unset($filterArr, $filter, $k, $values, $str, $index);
+      unset($filterArr, $filter, $k, $v, $values, $str, $index);
     }
     // Sorting
     $sql .= ' ORDER BY E.sort, O.sort';
@@ -557,16 +604,16 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        //$option['images'] = [['path' => PATH_IMG . 'stone/a001_raffia.jpg']]; TODO удалить
-        $option['images'] = $this->setImages($option['images']);
+        $option['images'] = [['path' => URI . 'shared/upload/stone/1-corian-lime-ice.jpg']]; // TODO удалить
+        //$option['images'] = $this->setImages($option['images']);
       }
 
       // set property
-      $properties = json_decode($option['property'] ?: '[]', true);
-      $option['property'] = [];
+      $properties = json_decode($option['properties'] ?: '[]', true);
+      $option['properties'] = [];
       foreach ($properties as $property => $id) {
         $propName = str_replace('prop_', '', $property);
-        $option['property'][$propName] = $this->getPropertyTable($id, $property);
+        $option['properties'][$propName] = $this->getPropertyTable($id, $property);
       }
 
       return $option;
@@ -587,14 +634,30 @@ class Db extends \R {
     }
   }
 
+  private function parseDbProperty($prop, $type) {
+    $str = " `$prop` ";
+
+    switch ($type) {
+      case 'file': return " `$prop". "_ids` varchar(255)";
+      case 'string': return $str . "varchar(255)";
+      case 'textarea': return $str . "varchar(1000)";
+      case 'int': return $str . "int(20) NOT NULL DEFAULT 1";
+      case 'float': return $str . "float NOT NULL DEFAULT 1";
+      case 'double': return $str . "double NOT NULL DEFAULT 1";
+      case 'money': return $str . "decimal(10,4) NOT NULL DEFAULT 1.0000";
+      case 'date': return $str . "timestamp";
+      case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
+    }
+  }
+
   private function getPropertyTable($propValue, $propName) {
     static $propTables, $props;
 
     if (!$propTables) {
       $props = [];
       // Простые параметры
-      if (($setting = getSettingFile()) && isset($setting['propertySetting'])) {
-        foreach ($setting['propertySetting'] as $prop => $value) {
+      if (($setting = getSettingFile()) && isset($setting['optionProperties'])) {
+        foreach ($setting['optionProperties'] as $prop => $value) {
           $props[$prop] = array_merge($value, ['simple' => true]);
         }
       }
@@ -607,9 +670,9 @@ class Db extends \R {
         // TODO временно
         if ($table['dbTable'] === 'prop_brand') {
           $tmp = array_map(function ($it) {
-            if($it['logo_ids']) {
+            if ($it['logo_ids']) {
               $it['logo_ids'] = $this->setImages($it['logo_ids']);
-              $it['logo'] = $it['logo_ids'][0]['path'];
+              $it['logo'] = $it['logo_ids'][0]['src'];
             }
             return $it;
           }, $props[$table['dbTable']]);
@@ -628,28 +691,14 @@ class Db extends \R {
     return ['name' => "Prop item: $propValue in $propName - not found!"];
   }
 
-  public function createPropertyTable($dbTable, $param) {
+  public function createPropertyTable(string $dbTable, array $param) {
     $sql = "CREATE TABLE $dbTable (
             `ID` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
 
     if (count($param)) {
-      function getParam($prop, $type) {
-        $str = ", `$prop` ";
-
-        switch ($type) {
-          case 'file': return ", `$prop". "_ids` varchar(255)";
-          case 'string': return $str . "varchar(255)";
-          case 'textarea': return $str . "varchar(1000)";
-          case 'double': return $str . "double NOT NULL DEFAULT 1";
-          case 'money': return $str . "decimal(10,4) NOT NULL DEFAULT 1.0000";
-          case 'date': return $str . "timestamp";
-          case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
-        }
-      }
-
       foreach ($param as $prop => $type) {
-        $sql .= getParam($prop, $type);
+        $sql .= ', ' . $this->parseDbProperty($prop, $type);
       }
     }
 
@@ -658,6 +707,48 @@ class Db extends \R {
         ADD PRIMARY KEY (`ID`)");
     return self::exec("ALTER TABLE `$dbTable`
         MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
+  }
+
+  /**
+   * @param string $dbTable
+   * @param array $params
+   * @return array
+   */
+  public function changePropertyTable(string $dbTable, array $params) {
+    // `prop_kategoriya` ADD `scale` INT NOT NULL AFTER `work`;
+    //ALTER TABLE `prop_kategoriya` CHANGE `scale` `scale1` FLOAT(11) NOT NULL;
+    //ALTER TABLE `prop_kategoriya` DROP `scale`;
+
+    $error = [];
+    $query = [];
+    $sSql = "ALTER TABLE $dbTable";
+
+    if (count($params)) {
+      $haveColumns = array_map(function ($column) {return $column['columnName'];}, $this->getColumnsTable($dbTable));
+      array_shift($haveColumns);
+      array_shift($haveColumns);
+
+      // Add and change properties
+      foreach ($params as $columnName => $param) {
+        if (!in_array($columnName, $haveColumns)) {
+          $query[] = $sSql . ' ADD ' . $this->parseDbProperty($columnName, $param['type']);
+        } else {
+          $query[] = $sSql . " CHANGE `$columnName` " . $this->parseDbProperty($param['newName'], $param['type']);
+        }
+      }
+
+      // Drop properties
+      $param = array_keys($params);
+      foreach ($haveColumns as $column) {
+        if (!in_array($column, $param)) {
+          $query[] = $sSql . " DROP `$column`";
+        }
+      }
+
+      foreach ($query as $sql) $error[] = self::exec($sql);
+    }
+
+    return $error;
   }
 
   public function delPropertyTable($dbTables) {
@@ -792,10 +883,6 @@ class Db extends \R {
   // Customers
   //--------------------------------------------------------------------------------------------------------------------
 
-  public function getLastID($table) { // TODO плохо
-    return self::getRow("SELECT MAX(ID) AS 'ID' FROM $table")['ID'];
-  }
-
   /**
    * @param int $pageNumber
    * @param int $countPerPage
@@ -825,11 +912,10 @@ class Db extends \R {
     return self::getAll($sql);
   }
 
-  public function loadCustomerByOrderId($orderIds) {
-
+  public function loadCustomerByOrderId($orderId) {
     $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts FROM orders 
         LEFT JOIN customers C ON C.ID = orders.customer_id
-        WHERE orders.ID = $orderIds";
+        WHERE orders.ID = $orderId";
 
     return self::getRow($sql);
   }
@@ -846,6 +932,7 @@ class Db extends \R {
       unset($item['short_name']);
       $item['lastEditDate'] = $item['last_edit_date'];
       unset($item['last_edit_date']);
+      $item['scale'] = floatval($item['scale']);
       $item['rate'] = floatval($item['rate']);
 
       $res[$item['code']] = $item;
@@ -859,6 +946,7 @@ class Db extends \R {
     $date = date('Y-m-d h:i:s');
     foreach ($rate as $currency) {
       $beans->id = $currency['ID'];
+      $beans->scale = $currency['scale'];
       $beans->rate = $currency['rate'];
       $beans->lastEditDate = $date;
       self::store($beans);
@@ -925,7 +1013,7 @@ class Db extends \R {
    */
   public function getUserByLogin($login) {
     return self::getRow("SELECT login, users.name AS 'name', hash, password, customization, 
-            p.ID as 'permId', p.name as 'permName', properties as 'permValue'
+            p.ID as 'permId', p.name as 'permName', properties as 'permValue', activity
             FROM users
             LEFT JOIN permission p on users.permission_id = p.ID
             WHERE login = :login", [':login' => $login]);
@@ -945,12 +1033,13 @@ class Db extends \R {
 
   public function checkPassword($login, $password) {
     if (USE_DATABASE) {
-      $user = $this->getUser($login, 'ID, name, login, password');
+      $user = $this->getUser($login, 'ID, name, login, password, activity');
     } else {
       return $this->getUserFromFile($login, $password);
     }
 
-    return count($user) && password_verify($password, $user['password']) ? $user : false;
+    return count($user) && boolValue($user['activity'])
+           && password_verify($password, $user['password']) ? $user : false;
   }
 
   public function changeUser($loginId, $param) {
@@ -1004,12 +1093,14 @@ class Db extends \R {
   public function checkUserHash($session) {
     if (USE_DATABASE) {
       $user = $this->getUserByLogin($session['login']);
-      if (!count($user)) return false;
+      if (!count($user) || !boolValue($user['activity'])) return false;
+
+      $customization = json_decode($user['customization'], true);
 
       $userParam = [
         'permissionId'  => intval($user['permId']),
-        'onlyOne'       => isset(json_decode($user['customization'])->onlyOne),
-        'customization' => json_decode($user['customization'], true),
+        'onlyOne'       => isset($customization['onlyOne']),
+        'customization' => $customization,
         'permission'    => json_decode($user['permValue'], true),
       ];
     } else {
@@ -1034,8 +1125,8 @@ class Db extends \R {
 
     if ($userParam['onlyOne']) $ok = $session['hash'] === $user['hash'];
     else {
-      $ok = USE_DATABASE ? password_verify($_SESSION['password'], $user['password'])
-                         : $_SESSION['password'] === $user['password'];
+      $ok = USE_DATABASE ? password_verify($session['password'], $user['password'])
+                         : $session['password'] === $user['password'];
     }
 
     return $ok ? $userParam : false;
@@ -1094,9 +1185,11 @@ trait MainCsv {
             'name'     => gTxt(str_replace('.csv', '', $item)),
           ];
         } else {
+          global $main;
+          $csvPath = $main->getCmsParam('PATH_CSV');
           $link && $link .= '/';
-          if (filetype(PATH_CSV . $link . $item) === 'dir') {
-            $r[$item] = self::scanDirCsv(PATH_CSV . $link . $item, $link . $item);
+          if (filetype($csvPath . $link . $item) === 'dir') {
+            $r[$item] = self::scanDirCsv($csvPath . $link . $item, $link . $item);
           }
         }
       }
@@ -1106,13 +1199,17 @@ trait MainCsv {
   }
 
   public function openCsv() {
-    if (($file = fopen(PATH_CSV . $this->csvTable, 'r'))) {
+    global $main;
+    $csvPath = $main->getCmsParam('PATH_CSV') . $this->csvTable;
+
+    if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
       $result = [];
       while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) {
+        /* Это не работает
         $cells = array_map(function ($cell) {
-          if (!mb_detect_encoding($cell, 'UTF-8', true)) $cell = iconv('cp1251', 'UTF-8', $cell);
-          return $cell;
-        }, $cells);
+          return mb_detect_encoding($cell, 'UTF-8', true) === 'UTF-8' ? $cell
+                 : iconv('cp1251', 'UTF-8', $cell);
+        }, $cells);*/
         $result[] = $cells;
       }
       return $result;
@@ -1121,7 +1218,8 @@ trait MainCsv {
   }
 
   public function fileForceDownload() {
-    $file = PATH_CSV . $this->csvTable;
+    global $main;
+    $file = $main->getCmsParam('PATH_CSV') . $this->csvTable;
 
     if (file_exists($file)) {
       // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
@@ -1150,7 +1248,10 @@ trait MainCsv {
    * @return $this
    */
   public function saveCsv($csvData) {
-    if (file_exists(PATH_CSV . $this->csvTable)) {
+    global $main;
+    $csvPath = $main->getCmsParam('PATH_CSV');
+
+    if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];
       $length = count($csvData[0]);
 
@@ -1159,8 +1260,8 @@ trait MainCsv {
         $fileStrings[] = implode(CSV_DELIMITER, $v);
       }
 
-      file_put_contents(PATH_CSV . $this->csvTable, $fileStrings);
-      file_exists(CSV_CACHE_FILE) && unlink(CSV_CACHE_FILE);
+      file_put_contents($csvPath . $this->csvTable, $fileStrings);
+      file_exists(CSV_CACHE) && unlink(CSV_CACHE);
     }
     return $this;
   }

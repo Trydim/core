@@ -46,10 +46,10 @@ module.exports = env => {
       new VueLoaderPlugin(),
 
       /*new HtmlWebpackPlugin({
-        title: 'title',
-        filename: 'view/content.php',
-        template: `content.php`,
-      }),*/
+       title: 'title',
+       filename: 'view/content.php',
+       template: `content.php`,
+       }),*/
 
       new webpack.DefinePlugin({
         // Drop Options API from bundle
@@ -83,8 +83,8 @@ module.exports = env => {
  * asset - автоматический выбор от размера по умолчанию 8к */
 
 /*const generator = {
-  publicPath: '../', // папка относительно собранных файлов.
-}*/
+ publicPath: '../', // папка относительно собранных файлов.
+ }*/
 
 /**
  * Vue

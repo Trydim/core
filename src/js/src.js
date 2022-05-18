@@ -1,6 +1,6 @@
 "use strict";
 
-import '../css/admin/admin.scss';
+import '../css/style.scss';
 
 import c from "./components/const.js";
 import f from "./components/func.js";
@@ -13,17 +13,15 @@ import {CustomSelect} from './components/CustomSelect.js';
 import LocalStorage from "./components/LocalStorage.js";
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
+import {ToastClass, toast} from "./components/toast/index.js";
 import {Valid} from "./components/Valid";
 import {searching} from "./components/SearchCustomers";
 import User from "./components/User";
 
 const m = {
-  /**
-   * Debugger
-   */
   Debugger,
 
-
+  Modal,
   initModal : Modal,
   initPrint : module.Print,
   initShadow: param => new shadowNode(param),
@@ -56,10 +54,10 @@ const m = {
   LocalStorage,
 
   /**
-   * @param {string} name
-   * @param {function} func
+   * @type object
+   * add, exec, del
    */
-  OneTimeFunction: module.OneTimeFunction,
+  oneTimeFunction: module.oneTimeFunction,
 
   Pagination: module.Pagination,
 
@@ -91,33 +89,40 @@ const m = {
   SelectedRow: SelectedRow,
 
   /**
-   * @param {string} msg
-   * @param {string} type (success, warning, error)
-   * @param {boolean} autoClose
+   * @type class
+   * https://f3oall.github.io/awesome-notifications/docs/
+   * @param {object} options
    */
-  showMsg: (msg, type = 'success', autoClose = true) => new module.MessageToast().show(msg, type, autoClose),
+  Toast: ToastClass,
+
+  /**
+   * Alias for Toast
+   * @param {string} msg
+   * @param {string} type (tip, info, success|ok, warning, error|alert)
+   * @param {boolean|object} options https://f3oall.github.io/awesome-notifications/docs/
+   */
+  showMsg: toast,
 
   /**
    * Validation component
    * autodetect input field with attribute "require" and show error/valid.
    *
    * @param {{sendFunc: function,
-   * formNode: HTMLFormElement,
-   * formSelector: string,
-   * submitNode: HTMLElement,
-   * submitSelector: string,
+   * form: string|HTMLElement,
+   * submit: string|HTMLElement,
    * fileFieldSelector: string,
    * initMask: boolean,
    * phoneMask: string,
    * cssMask: object}} param <p>
    * @param {function} param.sendFunc - exec func for event click (default = () => {}), <p>
-   * @param {string/HTMLElement} param.formSelector - form selector (default: #authForm), <p>
-   * @param {string/HTMLElement} param.submitSelector - btn selector (default: #btnConfirm), <p>
+   * @param {string/HTMLElement} param.formSelector - form selector (default: '#authForm'), <p>
+   * @param {string/HTMLElement} param.submitSelector - btn selector (default: '.confirmYes'), <p>
    * @param {string} param.fileFieldSelector - field selector for show attachment files information, <p>
    * @param {object} param.cssClass = { <p>
    *     error: will be added class for node (default: 'cl-input-error'), <p>
    *     valid: will be added class for node (default: 'cl-input-valid'), <p>
    *   }, <p>
+   * @param {string} param.classPrefix: prefix for validation class (def: 'cl-'),
    * @param {boolean} param.debug: submit btn be activated (def: false), <p>
    * @param {boolean} param.initMask: use mask for field whit type "tel" (def: true), <p>
    * @param {string} param.phoneMask: mask matrix (def: from global constant),

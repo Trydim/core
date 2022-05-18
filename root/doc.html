@@ -1,0 +1,14 @@
+<div id="calcField">Загрузка</div>
+<script type="text/javascript">
+  (() => {
+          // Путь к папке с калькулятором
+    const path = '/admin_calc/',
+          // Target string selector or HTMLElement
+          node = '#calcField';
+
+    /* в файле outside.php */
+    fetch(path + 'outside.php?osd=+').then(d => d.json()).then(data => {
+      (new Function('node', 'data', data['initJs']))(node, data);
+    });
+  })();
+</script>

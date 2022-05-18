@@ -2,8 +2,15 @@
 
 import './_loading.scss';
 
-export default {
+const cacheStringFunction = fn => {
+  const cache = Object.create(null);
+  return (str => {
+    const hit = cache[str];
+    return hit || (cache[str] = fn(str));
+  });
+};
 
+export default {
   // Simple and often used function
   // ------------------------------------------------------------------------------------------------
 
@@ -11,6 +18,14 @@ export default {
    * @param {string} msg
    */
   log: msg => f.DEBUG && console.log('Error:' + msg),
+
+  capitalize: cacheStringFunction(str => str.charAt(0).toUpperCase() + str.slice(1)),
+
+  camelize: cacheStringFunction(str => {
+    return str.toLowerCase()
+              .replace(/\W(\w+)/g, (_, w) => w ? f.capitalize(w) : '')
+              .replace(/\s|-|_/g, '');
+  }),
 
   /**
    * Create element from string or
@@ -27,14 +42,14 @@ export default {
    * @param {string} id String that specifies the ID value.
    * @return {HTMLElement} HtmlElement
    */
-  gI: id => (f['calcWrap'] || document).getElementById(id) || f.log('not found note by id -' + id),
+  gI: id => (window.shadowCalc || document).getElementById(id) || f.log('not found note by id -' + id),
 
   /**
    * @param {string} selector
    * @param {HTMLElement} node
    * @return {HTMLElement | {}}
    */
-  qS: (selector = '', node = f['calcWrap']) =>
+  qS: (selector = '', node = window.shadowCalc) =>
     (node || document).querySelector(selector) || f.log(selector),
 
   /**
@@ -45,7 +60,7 @@ export default {
    * @return NodeListOf<HTMLElementTagNameMap[*]>|object
    */
   qA: (selector, nodeKey = null, value = null) => {
-    let nodeList = (f['calcWrap'] || document).querySelectorAll(selector);
+    let nodeList = (window.shadowCalc || document).querySelectorAll(selector);
     if (!nodeList) return [];
     if (nodeKey && value) nodeList.forEach(item => {
       if (typeof value === 'function') {
@@ -99,7 +114,7 @@ export default {
     }
 
     return arr.reduce((r, i, index) => {
-      let idKey = i['id'] || i['key'] || Math.random() * 1000 | 0;
+      let idKey = i['id'] || i['key'] || Math.random() * 10000 | 0;
       r[idKey] && (idKey += index.toString());
       r[idKey] = oneValue ? i[oneValue] : i;
       return r;
@@ -326,15 +341,17 @@ export default {
   /**
    * Маска для телефона
    * @param {HTMLElement} node
-   * @param {string} phoneMask
+   * @param {string?} phoneMask
    */
   initMask: (node, phoneMask) => {
-    if (!node) return;
-    const minValue = 2;
+    const minValue = 2,
+          maskGl = f.cmsSetting && f.cmsSetting['phoneMaskGlobal'],
+          matrix = phoneMask || maskGl || f.PHONE_MASK_DEFAULT;
+
+    if (!node || maskGl === '') return;
 
     const mask = e => {
       let target = e.target, i = 0,
-          matrix = phoneMask || f.PHONE_MASK,
           def = matrix.replace(/\D/g, ""),
           val = target.value.replace(/\D/g, "");
 
@@ -343,9 +360,10 @@ export default {
         a => /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a );
 
       if (e.type === "blur" && target.value.length <= minValue) target.value = "";
-    }
+    };
 
-    ['input', 'focus', 'blur'].map(e => node.addEventListener(e, mask));
+    node.dataset.mask = matrix;
+    ['input', 'blur'].map(e => node.addEventListener(e, mask));
   },
 
   /**
@@ -379,32 +397,117 @@ export default {
   /**
    * Добавить иконку загрузки
    * @param {HTMLElement} node
+   * @param {boolean?} isLight
    */
-  setLoading: node => node && node.classList.add(f.CLASS_NAME.LOADING),
+  setLoading: (node, isLight = false) => {
+    if (!(node instanceof HTMLElement)) {
+      console.warn('Loading - node is not HTMLElement');
+      return;
+    }
+
+    const isSingleTag = ['INPUT', 'HR', 'IMG'].includes(node.tagName),
+          cStyle = window.getComputedStyle(node),
+          c = node.getBoundingClientRect(),
+          side = Math.min(c.width, c.height),
+          size = side > 150 ? '-big' : side < 40 ? '-sm' : '';
+
+    if (cStyle.position === 'fixed') {
+      const loaderW = document.createElement('div'),
+            loader  = document.createElement('div');
+
+      loaderW.id = 'cmsLoaderWrapper';
+      loaderW.style.cssText = `position: fixed; 
+        left: ${node.offsetLeft}px; top: ${node.offsetTop}px;
+        z-index: ${typeof cStyle.zIndex === "number" ? cStyle.zIndex + 1 : +1}`;
+      loader.style.cssText = `width: ${c.width}px; height: ${c.height}px;`;
+
+      loaderW.append(loader);
+      document.body.append(loaderW);
+      node = loader;
+    } else if (isSingleTag) {
+      const loader = document.createElement('div');
+
+      loader.id = 'cmsLoaderWrapper';
+      loader.style.cssText = `display: ${cStyle.display}; width: ${c.width}px; height: ${c.height}px;`;
+
+      node.parentNode.append(loader);
+      loader.append(node);
+      node = loader;
+    }
+
+    node.classList.add('loading-st1' + size);
+    isLight && node.classList.add('loading-st1-light');
+
+    // Определить цвет?
+    /*    const rgb2hsl = ([r, g, b]) => {
+     const max = Math.max(r, g, b),
+     min = Math.min(r, g, b),
+     d = max - min;
+
+     let h, l = (max + min) / 2;
+
+     if (max === min) {
+     h = 0;
+     } else {
+     //s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+     switch (max) {
+     case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+     case g: h = (b - r) / d + 2; break;
+     case b: h = (r - g) / d + 4; break;
+     }
+     h /= 6;
+     }
+
+     // H - цветовой тон, S - насыщенность, L - светлота
+     return (h < 0.55 && l >= 0.5) || (h > 0.55 && l >= 0.75);
+     //return [h, s, l];
+     }
+
+
+     debugger
+     const color = window.getComputedStyle(node).backgroundColor,
+     rgb = /(\d+),? (\d+),? (\d+)/.exec(color)[0].split(','),
+     bool = rgb2hsl(rgb);*/
+  },
   /**
    * Удалить иконку загрузки
    * @param {HTMLElement} node
    */
-  removeLoading: node => node && node.classList.remove(f.CLASS_NAME.LOADING),
+  removeLoading: node => {
+    if (!(node instanceof HTMLElement)) {
+      console.warn('Loading - node is not HTMLElement');
+      return;
+    }
+
+    if (window.getComputedStyle(node).position === 'fixed') {
+      f.gI('cmsLoaderWrapper').remove();
+    }
+    if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
+      node.parentNode.parentNode.append(node);
+      f.gI('cmsLoaderWrapper').remove();
+    } else {
+      node.classList.remove('loading-st1', 'loading-st1-sm', 'loading-st1-big', 'loading-st1-light');
+    }
+  },
 
   /**
    * Функция печати по умолчанию
    * @param {object} report
-   * @param {number} number
    * @returns {string}
    */
-  printReport: (report, number = 1) => {
-    let table = f.gTNode('#printTable'),
-        html = '';
+  printReport: (report) => {
+    let html = '';
 
+    if (report.number)  html += `<span>Orders №${report.number}</span>${html}`;
+
+    html += '<table>';
     Object.values(report).map(i => {
-      html += `<tr><td>${i[0]}</td><td>${i[1]}</td><td>${i[2]}</td></tr>`;
+      html += '<tr><td>' + Object.values(i).join('</td><td>') + '</td></tr>';
     });
+    html += '</table>';
 
-    if (number) table.querySelector('#number').innerHTML = number.toString();
-    else table.querySelector('#numberWrap').classList.add(f.CLASS_NAME.HIDDEN_NODE);
-    table.querySelector('tbody').innerHTML = html;
-    return table.outerHTML;
+    return f.createElement(html);
   },
 
   /**
@@ -413,6 +516,7 @@ export default {
    * @param {object} report - send to pdf
    * @param {string?} report.fileName - result file name without extension
    * @param {string?} report.fileTpl - pdf template file without extension
+   * @param {string?} report.pdfOrientation ['P', 'L'] - pdf orientation
    * @param {FormData?} data - object of formData to send in query Body
    * @param {function?} finishOk
    * @param {function?} err
@@ -424,7 +528,10 @@ export default {
     let fileName = report.fileName || false;
     data.set('mode', 'docs');
     data.set('docsAction', 'pdf');
-    data.set('fileTpl', report.fileTpl || 'default');
+
+    report.fileTpl && data.set('fileTpl', report.fileTpl);
+    report.pdfOrientation && data.set('pdfOrientation', report.pdfOrientation.toString().toUpperCase());
+
     data.set('reportVal', JSON.stringify(report));
 
     f.Post({data}).then(data => {
@@ -439,6 +546,13 @@ export default {
         finishOk();
       }
     });
+
+    if (f.DEBUG || true) {
+      window.pdfResources = () => {
+        data.set('resource', 'true');
+        f.Post({data}).then(data => {console.log(data['css']); console.log(data['html'])});
+      }
+    }
   },
 
   /**
@@ -492,6 +606,8 @@ export default {
    * send report to mail
    * @param {object} param
    *
+   * @param {?formData} param.data - docType param (email)
+   *
    * @param {?string} param.docType - docType param (email)
    * @param {?string} param.email - target email
    *
@@ -516,12 +632,12 @@ export default {
    * @return {object} - result {status}
    */
   sendOrder(param) {
-    const data = new FormData(),
+    const data = param.data || new FormData(),
           p    = param;
 
     data.set('mode', 'docs');
     data.set('docsAction', 'mail');
-    data.set('email', p.email || p.customer.email);
+    !data.has('email') && data.set('email', p.email || p.customer.email);
     p.docType && data.set('docType', p.docType);
 
     // Показать информацию о Менеджере
@@ -530,7 +646,7 @@ export default {
     // Пользователь взять из сохранненного заказа или из найденного, если не изменен
     p.addCustomerInfo && data.set('addCustomer', 'true');
 
-    if (f.AUTH_STATUS && p.customer.id && !p.customerChange) {
+    if (f.AUTH_STATUS && p.customer && p.customer.id && !p.customerChange) {
       data.set('customerId', p.customer.id.toString());
     } else if (p.customer) {
       data.set('name', p.customer.name || '');
@@ -542,10 +658,9 @@ export default {
 
     // Расчет загружен или сохранен и не изменен
     if (f.AUTH_STATUS && p.orderId && !p.orderChanged) {
-      data.set('orderId', p.orderId.toString()); // Отчет из сохранненого заказа
+      !data.has('orderId') && data.set('orderId', p.orderId.toString()); // Отчет из сохранненого заказа
     } else {
-      data.set('saveVal', JSON.stringify(p.saveVal || {}));
-      data.set('reportVal', JSON.stringify(p.reportVal || {}));
+      !data.has('reportVal') && data.set('reportVal', JSON.stringify(p.reportVal || {}));
     }
 
     return f.Post({data});
@@ -557,9 +672,25 @@ export default {
    * @return {object}
    */
   getRate: (dataSelector = '#dataRate') => {
-    let node = f.qS(dataSelector), json;
-    node && (json = JSON.parse(node.value)) && node.remove();
-    return json || Object.create(null);
+    let node = f.qS(dataSelector), rate;
+
+    try {
+      let main, k;
+      rate = JSON.parse(node.value);
+
+      main = Object.values(rate).find(r => f.toNumber(r.main));
+      k = main.scale / main.rate;
+
+      Object.values(rate).forEach(r => {
+        r.rate = k * (r.rate / r.scale);
+      });
+
+      node.remove();
+    } catch (e) {
+      f.showMsg('Load rate error: ' + e.message, 'error');
+      rate = Object.create(null);
+    }
+    return rate;
   },
 
   /**
@@ -581,6 +712,25 @@ export default {
       node.style.boxShadow = def || 'none';
     }, delay);
   },
+
+  /**
+   * Random int number
+   * @param {number} min - from number or count digit
+   * @param {number} max - until number or undefined
+   * @return {number}
+   */
+  random: (min = 5, max= 0) => {
+    return max ? Math.floor(Math.random() * (max - min + 1) + min)
+               : Math.random() * Math.pow(10, min) | 0;
+  },
+  /**
+   * Generate unique string
+   * @param {number?} countChar - count of chars
+   */
+  unique: (countChar = 5) => new Array(countChar).fill('').map(n => {
+    const r = Math.random();
+    return String.fromCharCode(r < 0.334 ? f.random(48, 57) : r < 0.667 ? f.random(65, 90) : f.random(97, 122))
+  }).join(''),
 
   /**
    * Try parse to float number from any value

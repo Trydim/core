@@ -6,12 +6,19 @@
       <p class="col-8">Автоматически обновлять курсы</p>
       <div class="col-4 d-inline-flex">
         <p class="col text-center">Нет</p>
-        <p-switch v-model="rate.autoRefresh"></p-switch>
+        <p-switch v-model="autoRefresh"></p-switch>
         <p class="col text-center">Да</p>
       </div>
     </div>
 
-    <div v-if="!rate.autoRefresh" class="col-12 text-center mb-3">
+    <div v-if="autoRefresh" class="col-12 row mb-3">
+      <div v-for="(label, key) of serverName" class="col-4 d-flex align-items-center">
+        <p-radiobutton v-model="serverRefresh" :value="key" :id="'server' + key"></p-radiobutton>
+        <label class="ms-1" :for="'server' + key">{{ label }}</label>
+      </div>
+    </div>
+
+    <div v-if="!autoRefresh" class="col-12 text-center mb-3">
       <p-button v-tooltip.bottom="'Редактировать курсы'" icon="pi pi-sliders-h" class="p-button-success"
                 label="Редактировать курсы"
                 @click="editRate"
@@ -25,50 +32,58 @@
     </template>
 
     <p-table :value="rate"
-             :bodyClass="'text-center'"
+             :class="'text-center user-select-none'"
+             :rowClass="rowClass"
              :resizableColumns="true" columnResizeMode="fit" showGridlines
              :scrollable="true"
              editMode="cell"
              responsiveLayout="scroll"
              @cell-edit-complete="onEditComplete"
+             style="width: 60vw; user-select: none;"
     >
       <p-t-column field="ID" header="ID"></p-t-column>
       <p-t-column field="code" :sortable="true" header="Код">
-        <template #editor="{ data, field }">
-          <p-input-text v-model="data[field]"></p-input-text>
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
         </template>
       </p-t-column>
-      <p-t-column field="name" :sortable="true" header="name">
-        <template #editor="{ data, field }">
-          <p-input-text v-model="data[field]"></p-input-text>
+      <p-t-column field="name" :sortable="true" header="Название">
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
         </template>
       </p-t-column>
-      <p-t-column field="lastEditDate" header="Дата обновления">
-        <template #editor="{ data, field }">
-          <p-calendar v-model="data[field]"></p-calendar>
+      <p-t-column field="scale" header="Номинал">
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]"></p-input-text>
         </template>
       </p-t-column>
-      <p-t-column field="rate" header="rate">
-        <template #editor="{ data, field }">
-          <p-input-number v-model.number="data[field]"></p-input-number>
+      <p-t-column field="rate" header="Курс">
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]"></p-input-text>
         </template>
       </p-t-column>
-      <p-t-column field="shortName" header="shortName">
-        <template #editor="{ data, field }">
-          <p-input-text v-model="data[field]"></p-input-text>
+      <p-t-column field="shortName" header="Обозначение">
+        <template #editor="{data, field}">
+          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
         </template>
       </p-t-column>
       <p-t-column field="main" header="Основная">
         <template #body="slotProps">
-          <p-checkbox type="radio" name="main" :binary="true" v-model="slotProps.data.main"
+          <p-checkbox type="radio" class="mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
                       @click="setMain(slotProps.data.ID)"
           ></p-checkbox>
+        </template>
+      </p-t-column>
+      <p-t-column field="lastEditDate" header="Удалить">
+        <template #body="slotProps">
+          <p-button class="mx-auto p-button-rounded p-button-text p-button-sm" icon="pi pi-times" @click="deleteRate(slotProps.data.ID)"></p-button>
         </template>
       </p-t-column>
     </p-table>
 
     <template #footer>
-      <p-button label="Yes" icon="pi pi-check" @click="modalHide"></p-button>
+      <p-button class="float-start p-button-success" label="Добавить" icon="pi pi-plus" @click="addRate()"></p-button>
+      <p-button label="Закрыть" icon="pi pi-check" @click="modalHide"></p-button>
     </template>
   </p-dialog>
 </template>
@@ -78,9 +93,21 @@ export default {
   name: "rate",
   emits: ['update'],
   data: () => ({
+    serverName: {
+      BYN: 'ЦБ РБ',
+      RUS: 'ЦБ РФ',
+    },
+
+    autoRefresh: f['cmsSetting']['autoRefresh'] || false,
+    serverRefresh: f['cmsSetting']['serverRefresh'] || 'RUS',
+
     display: false,
     rate: {},
   }),
+  watch: {
+    autoRefresh() { this.update(); },
+    serverRefresh() { this.update(); },
+  },
   methods: {
     loadData() {
       const node = f.qS('#dataRate');
@@ -90,34 +117,30 @@ export default {
 
       node.remove();
     },
-
+    rowClass(data) {
+      return data.delete ? 'bg-danger' : '';
+    },
     setMain(ID) {
-      this.rate.forEach(rate => {
-        if (rate.ID !== ID) rate.main = false;
+      this.$nextTick(() => {
+        let notMain = true;
+
+        this.rate.forEach(rate => {
+          if (rate.ID !== ID) rate.main = false;
+          if (notMain && rate.main) notMain = false;
+        });
+
+        if (notMain) this.rate[0].main = true;
       });
     },
-
-    modalHide() {
-      this.display = false;
-    },
-
-    editRate() {
-      this.display = true;
-    },
-
     onEditComplete(event) {
-      debugger
-      let { data, newValue, field } = event;
+      let {data, newValue, field} = event;
 
       switch (field) {
         case 'code':
         case 'name':
-          if (newValue) {
-            data[field] = newValue;
-          }
+          if (newValue) data[field] = newValue;
           else event.preventDefault();
           break;
-
         case 'lastEditDate':
           data[field] = newValue.toLocaleDateString('en-US');
           break;
@@ -125,7 +148,38 @@ export default {
           if (newValue > 0) data[field] = newValue;
           else event.preventDefault();
           break;
+
+        default: data[field] = newValue; break;
       }
+    },
+    update() {
+      this.$emit('update', {
+        data: this.rate,
+        autoRefresh: this.autoRefresh,
+        serverRefresh: this.serverRefresh,
+      });
+    },
+
+    modalHide() {
+      this.display = false;
+    },
+    addRate() {
+      const newRate = Object.entries(this.rate[0]).reduce((r, [k]) => {
+        if (k === 'ID') r[k] = 'new';
+        else if (k === 'lastEditDate') r[k] = new Date().toLocaleString().slice(0, 10);
+        else r[k] = '';
+        return r;
+      }, {});
+
+      this.rate.push(newRate);
+    },
+    editRate() {
+      this.display = true;
+    },
+    deleteRate(id) {
+      this.rate.forEach(i => {
+        if (i.ID === id) i.delete = i.delete !== undefined ? !i.delete : true;
+      });
     },
   },
   created() {
@@ -133,9 +187,7 @@ export default {
 
     this.$watch('rate', {
       deep: true,
-      handler() {
-        debugger;
-      }
+      handler: this.update,
     });
   },
 }

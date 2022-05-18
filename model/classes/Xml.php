@@ -35,15 +35,18 @@ XML;
   }
 
   static function checkXml($cvs, $link = '') {
+    global $main;
+    $csvPath = $main->getCmsParam('PATH_CSV');
     $link !== '' && $link .= '/';
+    $xmlDir = SHARE_PATH . 'xml';
 
     foreach ($cvs as $key => $file) {
       if (!is_numeric($key)) { self::checkXml($file, $link . $key); continue; }
 
       $file = '../xml/' . $link . pathinfo($file['fileName'], PATHINFO_FILENAME) . '.xml';
-      if (!file_exists(PATH_CSV . '../xml')) mkdir(PATH_CSV . '../xml');
-      if (!file_exists(PATH_CSV . '../xml/' . $link)) mkdir(PATH_CSV . '../xml/' . $link);
-      if (!file_exists(PATH_CSV . $file)) file_put_contents(PATH_CSV . $file, self::getXMLTemplate());
+      if (!file_exists($xmlDir)) mkdir($xmlDir);
+      if (!file_exists($xmlDir . '/' . $link)) mkdir($xmlDir . '/' . $link);
+      if (!file_exists($csvPath . $file)) file_put_contents($csvPath . $file, self::getXMLTemplate());
     }
   }
 
@@ -99,10 +102,12 @@ XML;
   }
 
   static function saveXml($dbTable, $data) {
+    global $main;
+
     $xml = new SimpleXMLElement(self::getXMLTemplate());
     try {
       self::arrayToXml($data, $xml);
-      $filePath = PATH_CSV . '../xml' . str_replace('csv', 'xml', $dbTable);
+      $filePath = $main->getCmsParam('PATH_CSV') . '../xml' . str_replace('csv', 'xml', $dbTable);
       file_put_contents($filePath, $xml->asXML());
     } catch (Exception $e) {
       return $e->getMessage();

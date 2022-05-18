@@ -1,0 +1,198 @@
+.sidebar {
+  width: var(--theme-sidebar-width);
+  top: $theme-header-height;
+  z-index: 10;
+  background-color: $l-theme-sidebar-color;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  transition: all .2s ease;
+  padding: 0 !important;
+  color: #bdbdc7;
+  // @include respond('phone-land') {
+  //     background-color: $white;
+  //     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  // }
+  // @include respond('big-desktop') {
+  //     left: 6rem;
+  // }
+
+
+
+  /*@include customMedia($min: 800px, $max: 1350px) {
+    width: var(--theme-sidebar-width) * 0.75;
+  }
+  @include customMedia($min: 350px, $max: 800px) {
+    width: 100%;
+  }*/
+
+  .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 95vh;
+
+    ul {
+      transition: all .2s ease-in-out;
+    }
+
+    .nav-label {
+      font-size: 0.75em;
+      margin: 0 25px 0;
+      padding: 1.5625rem 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05rem;
+      // border-top: 1px solid $l-border;
+      // @at-root [data-theme-version="dark"] & {
+      //     border-color: $d-border;
+      // }
+      // &.first {
+      //     border: 0px;
+      //     margin-top: 0px;
+      // }
+    }
+
+    .nav-item {
+      display: block;
+      padding: 0.8125rem 1.25rem;
+      font-weight: 300;
+      color: #bdbdc7;
+      text-decoration: none;
+
+      & + .nav-item {
+        padding-left: 1.25rem;
+      }
+
+      & > i {
+        position: relative;
+        font-size: 1.125rem;
+        display: inline-block;
+        vertical-align: middle;
+        padding: 0 0.3rem;
+        font-weight: 700;
+        top: -2px;
+      }
+
+      &:hover,
+      &:focus {
+        background-color: lighten($color: $primary, $amount: 5%);
+        color: $white;
+        // @include respond('desktop') {
+        //     background-color: $body-bg;
+        // }
+        // &::after {
+        //     border-color: blue;
+        // }
+      }
+
+      &.active {
+        color: $white;
+      }
+    }
+
+    .nav-text {
+      padding: 0.8125rem 0.25rem;
+      outline-width: 0;
+    }
+
+    .has-arrow {
+      position: relative;
+
+      &:after {
+        position: absolute;
+        content: "";
+        width: 0.35em;
+        height: 0.35em;
+        border-width: 1px 0 0 1px;
+        border-style: solid;
+        border-color: initial;
+        right: 1em;
+        -webkit-transform: rotate(135deg) translateY(-50%);
+        transform: rotate(135deg) translateY(-50%);
+        -webkit-transform-origin: top;
+        transform-origin: top;
+        top: 48%;
+        transition: all .3s ease-out;
+      }
+    }
+
+    .has-arrow[aria-expanded=true]:after,
+    .active > .has-arrow:after {
+      -webkit-transform: rotate(225deg) translateY(-50%);
+      transform: rotate(225deg) translateY(-50%);
+    }
+
+    &::-webkit-scrollbar {
+      width: 3px;
+      /* ширина для вертикального скролла */
+      height: 1px;
+      /* высота для горизонтального скролла */
+    }
+    /* ползунок скроллбара */
+    &::-webkit-scrollbar-thumb {
+      background-color: #9F3A3A;
+      border-radius: 10em;
+    }
+
+    /* Стрелки */
+    &::-webkit-scrollbar-button:vertical:start:decrement {
+      display: none;
+    }
+    &::-webkit-scrollbar-button:vertical:end:increment {
+      display: none;
+    }
+    &::-webkit-scrollbar-button:horizontal:start:decrement {
+      display: none;
+    }
+    &::-webkit-scrollbar-button:horizontal:end:increment {
+      display: none;
+    }
+  }
+}
+
+/* Компактное меню */
+.menu-toggle {
+  .nav-label {
+    display: none;
+  }
+
+  .nav-item {
+    padding: 0.8125rem;
+  }
+
+  /*.sidebar {
+    width: 3.5rem;
+  }*/
+
+
+  .sidebar-menu {
+    align-items: center;
+    overflow: visible;
+
+    > li {
+      position: relative;
+
+      > .nav-item > .nav-text {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: calc(100% - 0.4rem);
+        padding-left: 1rem;
+        width: $theme-sidebar-width;
+        background-color: $l-theme-sidebar-color;
+      }
+
+      > ul {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: calc(100% - 1.4rem);
+        width: $theme-sidebar-width;
+        background-color: #1c0f54;
+      }
+
+      &:hover > .nav-item > .nav-text,
+      &:hover > ul {
+        display: block;
+      }
+    }
+  }
+}

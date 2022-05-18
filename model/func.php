@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * @param string $class
+ */
+function cmsAutoloader(string $class) {
+  $path = __DIR__ . '/classes/' . $class . '.php';
+  if (file_exists($path)) require_once $path;
+}
+
+/**
  *
  * @param $number
  * @param $reportVal
@@ -19,7 +27,7 @@ function addCpNumber($number, $reportVal) {
  */
 function addCssLink(string $cssLink) {
   global $main;
-  if ($main instanceof cms\Main) return $main->addControllerField('cssLinks', $cssLink);
+  if ($main instanceof Main) return $main->addControllerField('cssLinks', $cssLink);
   return false;
 }
 
@@ -34,7 +42,7 @@ function addCssLink(string $cssLink) {
  */
 function addJsLink(string $jsLink, string $position = 'last') {
   global $main;
-  if ($main instanceof cms\Main) return $main->addControllerField('jsLinks', $jsLink, $position);
+  if ($main instanceof Main) return $main->addControllerField('jsLinks', $jsLink, $position);
   return false;
 }
 
@@ -45,7 +53,23 @@ function addJsLink(string $jsLink, string $position = 'last') {
  */
 function addHook($hookName, $callable) {
   global $main;
-  if ($main instanceof cms\Main) $main->addHook($hookName, $callable);
+  if ($main instanceof Main) $main->addHook($hookName, $callable);
+}
+
+/**
+ *
+ * @param mixed $var
+ * @return bool
+ */
+function boolValue($var): bool {
+  if (is_bool($var)) return $var;
+  if (is_string($var)) {
+    return !(empty($var) || $var === '-' || $var === 'false');
+  }
+  if (is_numeric($var)) {
+    return boolval($var);
+  }
+  return !empty($var);
 }
 
 /**
@@ -55,16 +79,16 @@ function addHook($hookName, $callable) {
  */
 function checkError(array &$result): void {
   $error = [];
-  if (is_array($result['error'] ?? false)) {
-    if (empty($result['error'])) unset($result['error']);
-    else array_walk_recursive($result['error'], function($v, $k) use (&$error) {
-      if (empty($v)) return;
-      $error[] = [$k => $v];
-    });
+  if (!empty($result['error'])) {
+    if (is_array($result['error'])) {
+      array_walk_recursive($result['error'], function ($v, $k) use (&$error) {
+        if (empty($v)) return;
+        $error[] = [$k => $v];
+      });
+    } else $error = true;
   }
 
-  $result['status'] = empty($error);
-  if (empty($error)) unset($result['error']);
+  if ($result['status'] = empty($error)) unset($result['error']);
   else $result['error'] = $error;
 }
 
@@ -116,13 +140,28 @@ function convertToArray($value) {
 
 /**
  * @param $var
- * @param int $die
+ * @param bool $die
  */
-function de($var, int $die = 1) {
+function de($var, bool $die = true) {
   echo '<pre>';
   var_dump($var);
   echo '</pre>';
   if ($die) die();
+}
+
+/**
+ * @param string $hayStack
+ * @param $search
+ * @return bool
+ */
+function includes(string $hayStack, $search) {
+  if (is_array($search)) {
+    foreach ($search as $w) {
+      if (includes($hayStack, $w)) return true;
+    }
+  } else {
+   return stripos($hayStack, $search) !== false;
+  }
 }
 
 /**
@@ -138,13 +177,14 @@ function getLimitLevenshtein($word) {
   return ceil(iconv_strlen($word) / 2);
 }
 
-function getPageAsString($data, $wrapId = 'wrapCalcNode') {
-  $html = "<div class=\"shadow-calc\" id=\"shadow-calc\"><shadow-calc></shadow-calc></div>";
-  $html .= "<div id=\"$wrapId\" style='display:none;'>" . $data['cssLinksArr'];
-  $html .= $data['globalWindowJsValue'];
-  $html .= $data['content'];
-  $html .= $data['jsLinksArr'];
-  $html .= $data['footerContent'] . '</div>';
+function getPageAsString($data) {
+  $id = 'wrapCalcNode' . uniqid();
+  $initJs = $data['initJs'];
+  unset($data['initJs']);
+
+  $html = "<div id='$id'><script>window.node = '#$id';";
+  $html .= 'window.data = ' . json_encode($data) . '</script>';
+  $html .= '<script>' . $initJs . '</script></div>';
 
   return $html;
 }
@@ -214,7 +254,7 @@ function gTxtDB(string $db, string $str): string {
  *
  * @return integer or string - int: return index of position keyword in array
  */
-function findword($input, $cell, $inCharset = 'windows-1251', $index = false) {
+function findWord($input, $cell, $inCharset = 'windows-1251', $index = false) {
   $input = mb_strtolower($input, 'UTF-8');
   $shortest = -1;
   $gc = false;
@@ -249,7 +289,7 @@ function findword($input, $cell, $inCharset = 'windows-1251', $index = false) {
  *
  * @return string - keys or false
  */
-function findkey($cell, $input) {
+function findKey($cell, $input) {
   $count = count($input); // теперь всегда 1
   $input = '/(' . implode('|', $input) . ')/i';
   foreach ($cell as $key => $item) {
@@ -262,22 +302,22 @@ function findkey($cell, $input) {
 }
 
 /**
- * @param $dir {string} - path without slash on the end
+ * @param $path {string} - path without slash on the end
  * @param $fileName {string} - only file name without slash
  * @return false|string
  */
-function findingFile($dir, $fileName) {
-  $absolutePath = $_SERVER['DOCUMENT_ROOT'] . $dir;
-  if (!file_exists($absolutePath)) return false;
-  if (file_exists($absolutePath . '/' . $fileName)) return $dir . '/' . $fileName;
+function findingFile($path, $fileName) {
+  $path = $path ?? SHARE_PATH;
+  if (!file_exists($path)) return false;
+  if (file_exists($path . '/' . $fileName)) return $path . '/' . $fileName;
 
-  $arrDir = array_values(array_filter(scandir($absolutePath), function ($dir) use ($absolutePath) {
-    return !($dir === '.' || $dir === '..' || is_file($absolutePath . '/' . $dir));
+  $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path) {
+    return !($dir === '.' || $dir === '..' || is_file($path . '/' . $dir));
   }));
 
   $length = count($arrDir);
   for ($i = 0; $i < $length; $i++) {
-    $result = findingFile($dir . '/' . $arrDir[$i], $fileName);
+    $result = findingFile($path . '/' . $arrDir[$i], $fileName);
     if ($result) return $result;
   }
 
@@ -294,12 +334,13 @@ function findingFile($dir, $fileName) {
  * @return mixed array or bool
  */
 function loadCVS($dict, $filename, $one_rang = false) {
-  $filename = file_exists($filename) ? $filename : PATH_CSV . $filename;
+  global $main;
+  $filename = file_exists($filename) ? $filename : $main->getCmsParam('PATH_CSV') . $filename;
   $result = [];
 
   if (!count($dict)) return loadFullCVS($filename);
 
-  if (file_exists($filename) && ($handle = fopen($filename, "r")) !== false) {
+  if (file_exists($filename) && ($handle = fopen($filename, "rt")) !== false) {
     if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
       $keyIndex = [];
 
@@ -308,7 +349,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
       foreach ($dict as $key => $word) {
         $bool = is_array($word);
         $keyWord = $bool ? $word[0] : $word;
-        $i = findword($keyWord, $data, $inCharset);
+        $i = findWord($keyWord, $data, $inCharset);
         if ($i !== false) {
           if ($bool) $keyIndex[$key] = [$i, $word[1]];
           else $keyIndex[$key] = $i;
@@ -358,7 +399,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
  */
 function loadFullCVS($path) {
 
-  if (file_exists($path) && ($handle = fopen($path, "r")) !== false) {
+  if (file_exists($path) && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
     $emptyRow = 0;
     while ($emptyRow < 5) { // Пять пустрых строк характеристик считаем что больше нету
@@ -434,7 +475,7 @@ function template(string $path = 'base', array $vars = []): string {
   ob_start();
 
   // Абсолютный путь файла
-  if (file_exists($path)) {
+  if (file_exists($path) && md5_file($path) !== md5_file('.' . $_SERVER['SCRIPT_NAME'])) {
     include $path;
   }
   // В корне сайта в public

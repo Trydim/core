@@ -1,0 +1,44 @@
+
+.main-wrapper {
+  --theme-sidebar-width: 17rem;/*$theme-sidebar-width;*/
+  opacity: 0;
+  transition: all 0.25s ease-in;
+  /*overflow: auto;*/
+  position: relative;
+  min-height: 100vh;
+  max-width: 100vw;
+
+  &.show {
+    opacity: 1;
+  }
+  &.menu-toggle {
+    --theme-sidebar-width: 3.5rem;/*$theme-sidebar-width-compact;*/
+  }
+}
+
+@include customMedia($min: 800px, $max: 1350px) {
+  .main-wrapper {
+    --theme-sidebar-width: calc(17rem * 0.75);/*$theme-sidebar-width;*/
+  }
+}
+
+[data-action="clickSection"] {
+  border: 1px solid transparent;
+}
+
+.closeSection + .subSection {
+  display: none!important;
+}
+
+.openSection + .subSection {
+  display: block!important;
+}
+
+.focused {
+  border-color: blue;
+}
+
+.mouseSelected {
+  background-color: var(--bs-table-hover-bg);
+  color: var(--bs-table-hover-color);
+}

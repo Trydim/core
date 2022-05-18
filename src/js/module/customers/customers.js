@@ -128,7 +128,7 @@ const customers = {
   usersList: new Map(),
 
   init() {
-    this.M = f.initModal();
+    this.M = new f.initModal();
     this.p = new f.Pagination( '#paginator',{
       dbAction : 'loadCustomers',
       query    : this.query.bind(this),
@@ -162,9 +162,7 @@ const customers = {
           value = JSON.parse(item['contacts']);
           item['contactsParse'] = value;
           if (Object.values(value).length) {
-            let arr = Object.entries(value).map(n => {
-              return {key: _(n[0]), value: n[1]}
-            });
+            let arr = Object.entries(value).map(n => ({key: _(n[0]), value: n[1]}));
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
         } catch (e) {
@@ -254,9 +252,11 @@ const customers = {
 
         ['name', 'phone', 'email', 'address', 'ITN'].map(i => {
           let node = form.querySelector(`[name="${i}"]`);
-          i === 'phone' && f.initMask(node, '+375 (__) ___ __ __');
+          i === 'phone' && f.initMask(node);
           i === 'ITN' && f.initMask(node, '_________');
         });
+
+        form.querySelector('#cTypeI').checked = true;
 
         this.confirmMsg = 'Клиент добавлен';
         this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
@@ -264,7 +264,7 @@ const customers = {
         f.relatedOption(form);
       },
       'changeCustomer': () => {
-        if (this.selected.getSelectedSize() !== 1) { f.showMsg('Выберите клиента!'); return; }
+        if (this.selected.getSelectedSize() !== 1) { f.showMsg('Выберите одного клиента!'); return; }
 
         let node,
             id = this.selected.getSelected(),
@@ -280,7 +280,7 @@ const customers = {
         let {phone = '', email = '', address = ''} = customer['contactsParse'];
 
         node = form.querySelector(`[name="phone"]`);
-        f.initMask(node, '+375 (__) ___ __ __');
+        f.initMask(node);
         node.value = phone;
 
         node = form.querySelector(`[name="email"]`);
@@ -288,6 +288,9 @@ const customers = {
 
         node = form.querySelector(`[name="address"]`);
         node.value = address;
+
+        node = form.querySelector(customer['ITN'] ? '#cTypeB' : '#cTypeI');
+        node.checked = true;
 
         node = form.querySelector(`[name="ITN"]`);
         f.initMask(node, '_________');

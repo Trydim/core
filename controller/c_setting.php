@@ -8,8 +8,8 @@
 $field = [
   'pageTitle' => 'Настройки',
   'footerContent' => '',
-  'cssLinks'   => [CORE_CSS . 'module/setting.css'],
-  'jsLinks'    => [CORE_JS . 'module/setting.js'],
+  'cssLinks'   => [CORE_CSS . 'module/setting.css?ver=096616aa6f'],
+  'jsLinks'    => [CORE_JS . 'module/setting.js?ver=2239ad0927'],
 ];
 
 $user = $main->db->getUserById($main->getLogin('id'));
@@ -21,7 +21,7 @@ $user = [
   'customization'=> $user['customization'],
 ];
 $field['footerContent'] .= "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>"
-                         . "<input type='hidden' id='dataSettings' value='" . $main->getSettings('json') . "'>";
+                         . $main->getSettings('json', true);
 
 if (USE_DATABASE && $user['isAdmin']) {
   $permissions['permissions'] = $main->db->loadTable('permission');

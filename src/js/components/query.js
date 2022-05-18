@@ -6,7 +6,12 @@ const checkJSON = data => {
     if (response['error']) throw response['error'];
     return response;
   }
-  catch (e) { f.showMsg(e['xdebug_message'] || e.message || data, 'error', false); return {status: false}; }
+  catch (e) {
+    e['xdebug_message'] && f.showMsg(e['xdebug_message'], 'error', false);
+    e.message && f.showMsg(e.message, 'error', false);
+    data && f.showMsg(data, 'error', false);
+    return {status: false};
+  }
 };
 
 const downloadBody = async data => {

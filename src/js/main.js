@@ -58,7 +58,7 @@ const setLinkMenu = () => {
   let menu = f.qS('#sideMenu');
   if (!menu) return;
 
-  let target = menu.querySelector('.nav-item.active');
+  let target = menu.querySelector('.active');
   while (target) {
     let wrap = target.closest('[data-role="link"]');
     if (!wrap) return;
@@ -68,6 +68,7 @@ const setLinkMenu = () => {
 }
 
 const stopPreloader = () => {
+  if (f.OUTSIDE) return;
   f.gI('preloader').remove();
   f.gI('mainWrapper').classList.add('show');
 }
@@ -83,7 +84,7 @@ const menuToggle = () => {
 }
 
 const cmsEvent = function() {
-  let action = this.dataset.action;
+  let action = this.dataset.actionCms;
 
   let select = {
     'menuToggle': menuToggle,
@@ -95,14 +96,30 @@ const cmsEvent = function() {
   select[action] && select[action]();
 };
 
-const sideMenuExpanded = (e, node) => {
+const sideMenuExpanded = function(e) {
   e.preventDefault();
-  if (node.getAttribute('aria-expanded') === 'true') {
-    node.setAttribute('aria-expanded', 'false');
-    f.hide(node.nextElementSibling);
+
+  const nodeS  = this.nextElementSibling,
+        count  = nodeS.childElementCount,
+        height = count * 50;//e.target.parentNode.offsetHeight;
+
+  if (this.getAttribute('aria-expanded') === 'true') {
+    this.setAttribute('aria-expanded', 'false');
+    //setParentHeight(node, node.nextElementSibling.offsetHeight * -1);
+    nodeS.style.height = nodeS.dataset.height;
+
+    setTimeout(() => {
+      nodeS.style.height = '0';
+    }, 0);
+
   } else {
-    node.setAttribute('aria-expanded', 'true');
-    f.show(node.nextElementSibling);
+    this.setAttribute('aria-expanded', 'true');
+    nodeS.dataset.height = height + 'px';
+    nodeS.style.height = height + 'px';
+    //setParentHeight(node, height);
+    setTimeout(() => {
+      nodeS.style.height = 'auto';
+    }, 300);
   }
 }
 
@@ -116,8 +133,9 @@ const onEvent = () => {
               .forEach(n => n.addEventListener('click', cmsEvent));
 
   // Menu Action
-  f.qA('#sideMenu a[href^="#"]').forEach(n =>
-    n.addEventListener('click', (e) => sideMenuExpanded(e, n)));
+  f.qA('#sideMenu [role="button"]', 'click', sideMenuExpanded);
+
+  f.qA('[data-action-cms]', 'click', cmsEvent);
 }
 
 // Entrance function
@@ -126,16 +144,60 @@ const onEvent = () => {
   page = (page && !f.OUTSIDE) ? page[1] : 'public';
 
   if (f.gI('authForm')) return;
+
   cancelFormSubmit();
   dictionaryInit();
   f.getSetting();
   f.relatedOption();
   storageLoad();
   onEvent();
-  setLinkMenu(); // after bind events
+  setLinkMenu(page || '/'); // after bind events
 
-  setTimeout(() => { // todo разобраться с синхронизацией
-    f.initShadow(); // todo убрать отсюда
-  }, 100);
-  //stopPreloader();
+  stopPreloader();
 })();
+
+function testT() {
+  const nodes = f.qA('[data-tooltip]');
+
+  // top end bottom start
+  const getArrow = side => {
+    switch (side) {
+
+    }
+  }
+
+  nodes.forEach(n => {
+    const position = n.computedStyleMap().get('position'),
+          coord = n.getBoundingClientRect(),
+          start = { top: coord.y + coord.height / 2, left: coord.x},
+          top = { top: coord.y, left: coord.x + coord.width / 2},
+          end = { top: coord.y + coord.height / 2, left: coord.x + coord.width},
+          bottom = { top: coord.y + coord.height, left: coord.x + coord.width / 2};
+
+    position === 'static' && (n.style.position = 'relative');
+
+    n.addEventListener('mouseenter', function () {
+      if (position !== 'static') {
+
+      }
+
+      const tool = document.createElement('div');
+      tool.style.value = 'position-fixed';
+      tool.style.top = coord;
+    });
+    n.addEventListener('mouseleave', function () {
+      if (position !== 'static') {
+
+      }
+    });
+  });
+
+
+
+  /*<div class="tooltip fade show bs-tooltip-end" role="tooltip"
+   style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(632px, 1922px);"
+   data-popper-placement="right">
+   <div class="tooltip-arrow" style="position: absolute; top: 0px; transform: translate(0px, 8px);"></div>
+   <div class="tooltip-inner">Tooltip on right</div>
+   </div>*/
+}

@@ -1,15 +1,16 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
-use cms\Main;
 /**
  * @var $main - global
- * @var $dbConfig - from root config
  */
 
-require_once __DIR__ . '/cmsSetting.php';
+// todo пропускать запросы к файлам. (почему не все файлы?)
+$uri = str_replace('?' . $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
+preg_match("/\..+$/i", $uri, $match);
+if (!empty($match) && !in_array($match[0], ['.php', '.csv'])) die();
+unset($uri, $match);
 
-$main = new Main(USE_DATABASE ? $dbConfig : []);
-$main->setHooks();
+require __DIR__ . '/cmsSetting.php';
 
 if (isset($_REQUEST['mode'])) require __DIR__ . '/model/main.php';
 else {
@@ -26,7 +27,7 @@ else {
   }
 
   $target === '' && $target = 'public';
-  require CORE . "controller/c_$target.php";
+  require __DIR__ . "/controller/c_$target.php";
   echo $html;
 }
 

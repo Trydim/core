@@ -2,7 +2,7 @@
 
 // Orders list for search
 
-class allOrdersList {
+class AllOrdersList {
   constructor(param) {
     const {node = false} = param;
     if (!node) return;
@@ -65,7 +65,7 @@ class allOrdersList {
     if (resultIds.length) {
       f.setLoading(this.node);
       this.FD.set('search', '1');
-      this.FD.set('orderIds', JSON.stringify(resultIds));
+      this.FD.set('orderId', JSON.stringify(resultIds));
 
       f.Post({data: this.FD}).then(data => {
         f.removeLoading(this.node);
@@ -76,7 +76,7 @@ class allOrdersList {
 }
 
 const orders = {
-  M: f.initModal(),
+  M: new f.initModal(),
   form: new FormData(),
 
   needReload: false,
@@ -242,7 +242,7 @@ const orders = {
         selectedSize   = this.selected.getSelectedSize();
 
     if (!selectedSize && !('orderType').includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
-    this.queryParam.orderIds = JSON.stringify(this.selected.getSelected());
+    this.queryParam.orderIds = this.selected.getSelected();
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
 
     let select = {
@@ -266,7 +266,7 @@ const orders = {
         if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
         this.form.set('dbAction', 'loadOrder');
-        this.form.set( 'orderIds', this.queryParam.orderIds);
+        this.form.set( 'orderId', this.queryParam.orderIds);
         f.Post({data: this.form})
           .then((data) => this.showOrder(data));
       },
@@ -294,7 +294,7 @@ const orders = {
 
         data.set('mode', 'docs');
         data.set('docsAction', 'print');
-        data.set('orderIds', this.queryParam.orderIds);
+        data.set('orderId', this.queryParam.orderIds);
         data.set('addManager', 'true');
         data.set('addCustomer', 'true');
 
@@ -314,7 +314,7 @@ const orders = {
 
         let data = new FormData();
         data.set('addCustomer', 'true');
-        data.set('orderIds', this.queryParam.orderIds);
+        data.set('orderId', this.queryParam.orderIds);
 
         f.downloadPdf(target, {}, data, () => target.blur());
       },
@@ -326,10 +326,10 @@ const orders = {
         let fd = new FormData();
         fd.set('mode', 'DB');
         fd.set('dbAction', 'loadCustomerByOrder');
-        fd.set('orderIds', this.queryParam.orderIds);
+        fd.set('orderId', this.queryParam.orderIds);
         f.Post({data: fd})
           .then(data => {
-            if(data['customer'] && data['customer']['contacts']) {
+            if (data['customer'] && data['customer']['contacts']) {
               let contacts = JSON.parse(data['customer']['contacts']),
                   user = data['users'],
                   node = form.querySelector('[name="email"]');
@@ -337,6 +337,7 @@ const orders = {
               this.queryParam.mode = 'docs';
               this.queryParam.docsAction = 'mail';
               this.queryParam.docType = 'pdf';
+              this.queryParam.orderId = this.queryParam.orderIds;
               this.queryParam.name = user.name || user['login'];
               this.queryParam.phone = user.contacts.phone || '';
               this.queryParam.email = contacts['email'];
@@ -391,7 +392,7 @@ const orders = {
       f.hide(this.confirm, f.qS('#selectStatus'), f.qS('#printTypeField'));
       f.show(f.qS('#actionBtnWrap'));
 
-      if(action === 'confirmYes') {
+      if (action === 'confirmYes') {
         this.queryParam.commonValues = this.queryParam.orderIds;
         this.query();
       }
@@ -416,7 +417,7 @@ const orders = {
                      ? 'loadOrders'
                      : 'loadVisitorOrders';
 
-    new allOrdersList({dbAction, node: e.target, tableType: orders.table.dataset.type});
+    new AllOrdersList({dbAction, node: e.target, tableType: orders.table.dataset.type});
   },
 
   // Bind events

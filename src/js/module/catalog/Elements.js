@@ -39,8 +39,12 @@ export const watch = {
     this.elementParentModalSelected = {[this.element.parentId]: true};
   },
 
-  'element.name'() {
-    this.elementsModal.confirmDisabled = !this.element.name;
+  element: {
+    deep: true,
+    handler() {
+      if (this.elementsSelected.length !== 1) return;
+      this.elementsModal.confirmDisabled = !this.element.name;
+    },
   },
 }
 
@@ -50,7 +54,7 @@ export const computed = {
   },
 
   getSectionId() {
-    return this.sectionLoaded || this.sectionTreeModal[0].key;
+    return this.getSectionSelectedId() || this.sectionTreeModal[0].key;
   },
 
   getElementsSelectedId() {
@@ -80,6 +84,7 @@ export const methods = {
     this.query().then(data => {
       this.elements        = prepareData(data['elements']);
       this.elementsLoading = false;
+      this.clearAll();
     });
   },
 
@@ -117,8 +122,10 @@ export const methods = {
   },
 
   setElementModal(title, confirmDisabled, single) {
-    single && this.enableField();
-    this.elementsModal = {display: true, confirmDisabled, title, single};
+    this.$nextTick(() => {
+      single && this.enableField();
+      this.elementsModal = {display: true, confirmDisabled, title, single};
+    });
   },
 
   // Events function
@@ -168,7 +175,7 @@ export const methods = {
     this.element.activity = single ? !!el.activity : true;
     this.element.sort     = single ? f.toNumber(el.sort) : this.getAvgSort(this.elementsSelected);
 
-    this.setElementModal('Редактировать элемент', false, single);
+    this.setElementModal('Редактировать элемент', single, single);
     this.reloadAction = reload(this);
   },
   copyElement() {
@@ -207,7 +214,11 @@ export const methods = {
 
   elementConfirm() {
     //this.elementsLoading = true;
-    this.queryParam = Object.assign(this.queryParam, this.element, {fieldChange: JSON.stringify(this.fieldChange)});
+    this.queryParam = {
+      ...this.queryParam,
+      element: JSON.stringify(this.element),
+      fieldChange: JSON.stringify(this.fieldChange)
+    };
     this.query();
     this.elementsModal.display = false;
   },

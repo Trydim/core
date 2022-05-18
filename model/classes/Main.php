@@ -1,11 +1,5 @@
 <?php
 
-namespace cms;
-
-use Course;
-use RedBeanPHP;
-use Xml\Xml;
-
 /**
  * Trait Authorization
  * @package cms
@@ -16,8 +10,6 @@ trait Authorization {
    * @var string[]
    */
   static $AVAILABLE_ACTION = ['loadCVS', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
-
-
 
   /**
    * @var string
@@ -116,8 +108,8 @@ trait Authorization {
       if (($target === '' && ONLY_LOGIN) || $target !== 'login') reDirect('login');
       if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
     } else {
-      if ($target === '' && !PUBLIC_PAGE) reDirect($this->getSideMenu(true));
-      if ($target !== '' && !in_array($target, $this->getSideMenu())) reDirect('404');
+      if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) reDirect($this->getSideMenu(true));
+      if (!in_array($target, ['', '404', 'js']) && !$this->availablePage($target)) reDirect('404');
     }
 
     session_abort();
@@ -126,12 +118,12 @@ trait Authorization {
 
   private function setSideMenu() {
     if (USE_DATABASE) {
-      $menuAccess = $this->getSettings('permission')['menu'] ?? '';
+      $menuAccess = $this->getLogin('permission')['menu'] ?? '';
       $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
-      $this->sideMenu = $menuAccess ?: ACCESS_MENU;
+      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
     } else {
       $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
-      $this->sideMenu = array_filter(ACCESS_MENU, function ($m) use ($filterMenu) {
+      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);
       });
     }
@@ -186,7 +178,7 @@ trait Page {
    */
   public function setTarget($get) {
     $this->target = (isset($get['targetPage']) && $get['targetPage'] !== '') ?
-      str_replace('/', '', $get['targetPage']) : HOME_PAGE;
+      str_replace('/', '', $get['targetPage']) : '/'; // HOME_PAGE
   }
 }
 
@@ -238,11 +230,11 @@ trait Cache {
    * @return bool if loaded, then return true
    */
   public function loadCsvCache(&...$vars) {
-    if (file_exists(CSV_CACHE_FILE)) {
-      $this->checkEditTime(CSV_CACHE_FILE);
+    if (file_exists(CSV_CACHE)) {
+      $this->checkEditTime(CSV_CACHE);
 
       if (!$this->needCsvCached) {
-        $data = json_decode(gzuncompress(file_get_contents(CSV_CACHE_FILE)), true);
+        $data = json_decode(gzuncompress(file_get_contents(CSV_CACHE)), true);
         $this->setCsvVariable(array_keys($data));
         foreach (array_values($data) as $index => $var) {
           $vars[$index] = $var;
@@ -258,11 +250,11 @@ trait Cache {
   public function saveCsvCache(...$vars) {
     $data = [];
     foreach ($this->cvsVars as $index => $key) $data[$key] = $vars[$index];
-    file_put_contents(CSV_CACHE_FILE, gzcompress(json_encode($data), 1));
+    file_put_contents(CSV_CACHE, gzcompress(json_encode($data), 1));
   }
 
   public function loadPageCache() {
-    if (file_exists(PAGE_CACHE_FILE)) {
+    /*if (file_exists(PAGE_CACHE_FILE)) {
       $this->checkEditTime(PAGE_CACHE_FILE);
 
       if (!$this->needCsvCached) {
@@ -270,7 +262,7 @@ trait Cache {
       }
     } else {
       $this->needCsvCached = true;
-    }
+    }*/
     return false;
   }
 
@@ -279,7 +271,7 @@ trait Cache {
    */
   public function savePageCache($data) {
     //if (gettype($data) === 'string')
-    file_put_contents(CSV_CACHE_FILE, gzcompress(json_encode($data), 1));
+    file_put_contents(CSV_CACHE, gzcompress(json_encode($data), 1));
   }
 
 }
@@ -337,6 +329,11 @@ final class Main {
   private $setting = [];
 
   /**
+   * @var array - global Cms param
+   */
+  private $cmsParam = [];
+
+  /**
    * @var array - data base config array
    */
   private $dbConfig;
@@ -361,34 +358,90 @@ final class Main {
    */
   public $frontSettingInit = false;
 
-  public function __construct($dbConfig) {
+  /**
+   * Main constructor.
+   * @param array $cmsParam
+   * @param array $dbConfig
+   */
+  public function __construct(array $cmsParam, array $dbConfig) {
+    $this->setCmsParams($cmsParam);
     $this->dbConfig = $dbConfig;
     $this->loadSetting();
   }
 
   public function __get($value) {
     if ($value === 'db') {
-      require_once CORE . 'model/classes/Db.php';
-      $this->db = new RedBeanPHP\Db($this->dbConfig);
+      $this->db = new Db($this->dbConfig);
       return $this->db;
     }
 
     return $this->$value;
   }
 
+  private function checkXml() {
+    Xml::checkXml($this->dbTables);
+  }
+
+/* ---------------------------------------------------------------------------------------------------------------------
+  cms Params
+----------------------------------------------------------------------------------------------------------------------*/
+
+  /**
+   * setCmsSetting from config
+   * @param array $cmsParam
+   */
+  private function setCmsParams(array $cmsParam) {
+    $this->cmsParam = array_merge($this->cmsParam, $cmsParam);
+
+    $this->cmsParam['PROJECT_TITLE'] = $this->cmsParam['PROJECT_TITLE'] ?? 'Project title';
+    $this->cmsParam['PATH_LEGEND'] = $this->cmsParam['PATH_LEGEND'] ?? ABS_SITE_PATH . 'public/views/legend.php';
+    $this->cmsParam['DB_TABLE_IN_SIDEMENU'] = $this->cmsParam['DB_TABLE_IN_SIDEMENU'] ?? true;
+
+    $this->cmsParam['ACCESS_MENU'] = $this->cmsParam['ACCESS_MENU']
+                                     ?? ['calendar', 'catalog', 'statistic', 'orders', 'customers', 'admindb', 'users', 'fileManager'];
+
+    $this->setCmsParam('PATH_CSV',
+      isset($this->cmsParam['PATH_CSV']) ? ABS_SITE_PATH . $this->cmsParam['PATH_CSV'] : SHARE_PATH . 'csv/'
+    );
+  }
+
+  /**
+   * @param string $param
+   * @param $value
+   * @return Main
+   */
+  public function setCmsParam(string $param, $value): Main {
+    $this->cmsParam[$param] = $value;
+    return $this;
+  }
+
   /**
    *
+   * @param string $param
+   * @return mixed|string|null
+   */
+  public function getCmsParam(string $param) {
+    return $this->cmsParam[$param] ?? null;
+  }
+
+
+/* ---------------------------------------------------------------------------------------------------------------------
+  Settings
+----------------------------------------------------------------------------------------------------------------------*/
+
+  /**
+   * Load setting from file
    */
   private function loadSetting() {
     $this->setting = getSettingFile();
   }
 
-  private function checkXml() {
-    require_once CORE . 'model/classes/Xml.php';
-    Xml::checkXml($this->dbTables);
-  }
-
-  public function setSettings($key, $value): Main {
+  /**
+   * @param string $key
+   * @param $value
+   * @return $this
+   */
+  public function setSettings(string $key, $value): Main {
     $this->setting[$key] = $value;
     return $this;
   }
@@ -413,10 +466,10 @@ final class Main {
    * 'mailFromName' - <p>
    * 'optionProperties' - <p>
    * @param boolean $front if true - ready html input ]
-   * @return false|mixed|string
+   * @return mixed
    */
-  public function getSettings(string $key, bool $front = false) {
-    $data = isset($this->setting[$key]) ? $this->setting[$key] : null;
+  public function getSettings(string $key = '', bool $front = false) {
+    $data = $this->setting[$key] ?? null;
     $jsonData = $key === 'json' || $front ? json_encode($data ?: $this->setting) : '';
 
     if ($front) {
@@ -425,8 +478,7 @@ final class Main {
     }
     else if ($key === 'json') return $jsonData;
 
-    if (isset($this->setting[$key])) return $this->setting[$key];
-    return false;
+    return empty($key) ? $this->setting : $this->setting[$key] ?? null;
   }
 
   /**
@@ -438,26 +490,26 @@ final class Main {
       // Меню
       $this->setSideMenu();
 
-      if ($this->availablePage('admindb') && DB_TABLE_IN_SIDEMENU) {
+      if ($this->availablePage('admindb') && $this->getCmsParam('DB_TABLE_IN_SIDEMENU')) {
         $dbTables = [];
         if (USE_DATABASE) {
           if (CHANGE_DATABASE) {
             $dbTables = array_merge($dbTables, $this->db->getTables());
-          } else if (in_array('catalog', ACCESS_MENU)) {
+          } else if ($this->availablePage('catalog')) {
             $props = array_merge([[
               'dbTable' => 'codes',
               'name' => gTxtDB('codes', 'codes')
             ]], $this->db->getTables('prop'));
 
             $props = array_map(function ($prop) {
-              $setting = $this->getSettings('propertySetting')[$prop['dbTable']] ?? false;
+              $setting = $this->getSettings('optionProperties')[$prop['dbTable']] ?? false;
               $setting && $setting['name'] && $prop['name'] = $setting['name'];
               return $prop;
             }, $props);
             $dbTables = array_merge($dbTables, ['z_prop' => $props]);
           }
         }
-        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv(PATH_CSV));
+        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam('PATH_CSV')));
         //$this->checkXml();
       }
     }
@@ -543,7 +595,7 @@ final class Main {
     return $this->dbTables;
   }
 
-  public function getDB(): RedBeanPHP\Db {
+  public function getDB(): Db {
     return $this->db;
   }
 
@@ -555,9 +607,12 @@ final class Main {
    * @default $justRate = false
    */
   public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
-    require_once CORE . 'model/classes/Course.php';
-    $rate = new Course($this->db);
-    $rate = $justRate ? array_map(function ($rate) { return $rate['rate'];}, $rate->rate) : $rate->rate;
+    $rateParam = [
+      'autoRefresh' => $this->getSettings('autoRefresh'),
+      'serverRefresh' => $this->getSettings('serverRefresh'),
+    ];
+    $rate = new Course($rateParam, $this->db);
+    $rate = $justRate ? array_map(function ($rate) { return $rate['rate']; }, $rate->rate) : $rate->rate;
     $rate = json_encode($rate);
     return "<input type='hidden' id='$dataId' value='$rate'>";
   }
