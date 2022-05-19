@@ -104,9 +104,12 @@ trait Authorization {
    */
   public function applyAuth(string $target = ''): Main {
     if ($this->checkStatus('no')) {
-      $target !== 'login' && $_SESSION['target'] = $target;
-      if (($target === '' && ONLY_LOGIN) || $target !== 'login') reDirect('login');
-      if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
+      if ($target === 'login') {
+        isset($_REQUEST['status']) && $this->setLoginStatus('error');
+      } else {
+        $_SESSION['target'] = $target;
+        if (ONLY_LOGIN || !PUBLIC_PAGE) reDirect('login');
+      }
     } else {
       if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) reDirect($this->getSideMenu(true));
       if (!in_array($target, ['', '404', 'js']) && !$this->availablePage($target)) reDirect('404');

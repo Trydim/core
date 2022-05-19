@@ -10,7 +10,7 @@
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
-$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . SITE_PATH . PUBLIC_PAGE . '">Открытая страница</a>' : '';
+$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . SITE_PATH . '">Открытая страница</a>' : '';
 
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global
