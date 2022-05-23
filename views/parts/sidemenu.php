@@ -20,13 +20,14 @@ item;
 
   function subSideMenu($title, $items, $root) {
     $icon = $root ? 'pi-book' : 'pi-folder';
+    $rootClass = $root ? 'overflow-scroll' : 'overflow-hidden';
     $idWrap = $root ? 'id="DBTablesWrap"' : '';
     return <<<menu
       <span class="nav-item has-arrow" role="button" aria-expanded="false">
         <i class="pi $icon"></i>
         <span class="nav-text">$title</span>
       </span>
-      <ul aria-expanded="false" class="ms-3 overflow-hidden" $idWrap data-role="link" style="height: 0">$items</ul>
+      <ul aria-expanded="false" class="ms-3 $rootClass" $idWrap data-role="link" style="height: 0">$items</ul>
 menu;
   }
 
