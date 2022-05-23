@@ -94,6 +94,19 @@ const component = {
         /*console.log('Event: ' + info.event.title);
         console.log('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
         console.log('View: ' + info.view.type);*/
+      },
+      eventContent: (arg) => {
+        const order = arg.event.extendedProps.order,
+              line = str => `<div style="padding: 0 4px">${str}</div>`;
+
+        const lines =
+        [
+          `№${order['O.ID']} - ${order['C.name']}`,
+          `${Math.round(order.total).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} руб / ${order['S.name']}`
+        ];
+        const html = lines.reduce((acc, el) => acc + line(el), '');
+
+        return {html}
       }
     }));
     this.calendar.setOption('locale', 'ru');
@@ -210,20 +223,20 @@ const orders = {
   },
 
   showOrders() { // TODO привязать к настройкам
-    Object.entries(this.data).map(([id, o]) => {
+    Object.entries(this.data).map(([id, order]) => {
       if (this.orderIds.has(id)) return;
       this.orderIds.add(id);
 
-      let title, temp;
+      //let title, temp;
 
       //o[1].importantValue && (temp = this.formatImportant(o[1].importantValue));
 
-      title = id + ' / ' + o.total + ' руб.';
+      //title = id + ' / ' + o.total + ' руб.';
       //title += temp;
 
       // Мой статус для цвета кружка
-      component.addOrder({id: id, title, start: o['createDate'], status: 'ok'});
-    })
+      component.addOrder({id: id, title: '', start: order['createDate'], order});
+    });
   },
 
   formatImportant(value) {
