@@ -1,0 +1,21 @@
+@import "_calendar.css";
+
+.fc-daygrid-dot-event {
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #a52834;
+  color: #fff;
+}
+.fc-event {
+  &:hover {
+    cursor: pointer;
+  }
+}
+.select {
+  &__item {
+    option {
+      font-size: 17px;
+      text-align: left;
+    }
+  }
+}

@@ -612,6 +612,8 @@ export default {
     data.set('importantVal', JSON.stringify(param.importantVal || {}));
     data.set('saveVal', JSON.stringify(param.saveVal || {}));
     data.set('reportVal', JSON.stringify(param.reportVal || {}));
+    data.set('startShippingDate', JSON.stringify(param.startShippingDate || ''));
+    data.set('endShippingDate', JSON.stringify(param.startShippingDate || ''));
 
     return f.Post({data});
   },

@@ -780,7 +780,8 @@ class Db extends \R {
 
     /*important_value AS 'importantValue', */
     $sql = "SELECT O.ID AS 'O.ID', create_date AS 'createDate',
-            last_edit_date AS 'lastEditDate', users.name, C.name as 'C.name', total,
+            last_edit_date AS 'lastEditDate', start_shipping_date AS 'startShippingDate',
+            end_shipping_date AS 'endShippingDate', users.name, C.name as 'C.name', total,
             S.name AS 'S.name'
       FROM orders O
       LEFT JOIN users ON user_id = users.ID

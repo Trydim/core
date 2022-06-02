@@ -2,7 +2,10 @@
 if ($main && $main->checkStatus('ok')) { ?>
 <div class="nav-header">
   <a href="<?= SITE_PATH ?>" class="brand-logo">
-    <img class="logo-abbr" src="<?= URI_IMG ?>logo.webp" alt="">
+    <picture class="logo-abbr">
+      <source srcset="<?= URI_IMG ?>logo.webp type="image/webp">
+      <img src="<?= URI_IMG ?>logo.svg" alt="logo">
+    </picture>
     <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
   </a>
 
