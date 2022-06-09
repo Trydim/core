@@ -99,6 +99,7 @@ if (isset($docsAction)) {
         'data'  => $data,
       ];
       count($_FILES) && $mail->addOtherFile($_FILES);
+      $mail->setSubject($mailSubject ?? $subject ?? '');
       $mail->prepareMail($param);
       $docType && $mail->addFile($docsPath);
 
