@@ -68,6 +68,21 @@ class Db extends \R {
     return AQueryWriter::camelsSnake($varName) . " AS '$varName'";
   }
 
+  /**
+   * @param string|integer $date
+   * @return false|string|null
+   */
+  public function getDbDateString($date) {
+    $dbFormat = 'Y-m-d H:i:s';
+
+    if (empty($date)) return null;
+    if (is_numeric($date) && strlen($date) >= 10) {
+      return date($dbFormat, intval(substr($date, 0, 10)));
+    }
+    $date = date_create($date);
+    return $date ? $date->format($dbFormat) : null;
+  }
+
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
 
