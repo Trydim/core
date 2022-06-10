@@ -127,13 +127,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Orders
     case 'saveOrder':
-      function testDateRegExp($str) {
-        if (preg_match('/\d{4}(-\d{2}){2}\s(\d{2}:){2}\d{2}/', $str)) {
-          //может добавить проверку чтобы например месяц не был больше 12 и так же с каждым числом?
-          return $str;
-        }
-        return null;
-      }
       if (isset($reportVal)) {
         $customerId = intval($customerId ?? 0);
         $customerChange = $customerId === 0 ? true : boolValue($customerChange ?? true);
@@ -162,6 +155,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             ]);
         $orderTotal = $orderTotal ?? 0;
 
+        $startShippingDate = '15-10-2021';
+
         $param = [$orderId => [
           'user_id'     => $main->getLogin('id'),
           'customer_id' => $customerId,
@@ -170,8 +165,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'status_id'       => $main->getSettings('statusDefault'),
           'save_value'      => $saveVal ?? '{}',
           'report_value'    => addCpNumber($orderId, $reportVal),
-          'start_shipping_date' => testDateRegExp($startShippingDate),
-          'end_shipping_date'   => testDateRegExp($endShippingDate),
+          'start_shipping_date' => $db->getDbDateString($startShippingDate ?? ''),
+          'end_shipping_date'   => $db->getDbDateString($endShippingDate ?? ''),
         ]];
 
         $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
