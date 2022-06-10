@@ -42,7 +42,7 @@ if ($main && $main->checkStatus('ok')) { ?>
   </div>
 </div>
 <?php } else { ?>
-<div>
+<div class="header">
   <a href="<?= SITE_PATH?>login"><?= gTxt('Login') ?></a>
 </div>
 <?php } ?>

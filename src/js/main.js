@@ -43,7 +43,8 @@ const storageLoad = () => {
   if (!storage.length) return;
 
   // Set Menu Toggle
-  if (storage.get('menuToggle') === 'true') f.gI('mainWrapper').classList.add(menuClass);
+  const node = f.gI('mainWrapper');
+  if (node && storage.get('menuToggle') === 'true') node.classList.add(menuClass);
 }
 
 const setParentHeight = (target, height) => {
