@@ -6,6 +6,7 @@ export const data = {
     confirmDisabled: true,
     title          : '',
     single         : true,
+    loading        : false,
   },
 
   elements: [],
@@ -18,6 +19,7 @@ export const data = {
     name    : '',
     activity: true,
     sort    : 100,
+    simple  : false,
   },
 
   fieldChange: {
@@ -63,7 +65,8 @@ export const computed = {
 }
 
 const prepareData = data => data.map(el => {
-  el['activity'] = f.toNumber(el['activity']);
+  el.activity = f.toNumber(el.activity);
+  el.simple = f.toNumber(el.simple);
   return el;
 });
 
@@ -85,6 +88,16 @@ export const methods = {
       this.elements        = prepareData(data['elements']);
       this.elementsLoading = false;
       this.clearAll();
+    });
+  },
+  loadSimpleOptions(id) {
+    this.queryParam.dbAction   = 'openElement';
+    this.queryParam.elementsId = id;
+    this.elementsModal.loading = true;
+
+    return this.query().then(data => {
+      this.options = data['options'];
+      this.elementsModal.loading = false;
     });
   },
 
@@ -162,7 +175,7 @@ export const methods = {
     this.reloadAction = reload(this);
   },
   changeElements() {
-    if (!this.elementsSelected.length) { return; }
+    if (!this.elementsSelected.length) { f.showMsg('Ничего не выбрано', 'error'); return; }
     const el     = this.elementsSelected[0],
           single = this.elementsSelected.length === 1;
 
@@ -174,12 +187,35 @@ export const methods = {
     this.element.parentId = this.getSectionId;
     this.element.activity = single ? !!el.activity : true;
     this.element.sort     = single ? f.toNumber(el.sort) : this.getAvgSort(this.elementsSelected);
+    this.element.simple   = single && el.simple && el.id; // TODO
 
     this.setElementModal('Редактировать элемент', single, single);
     this.reloadAction = reload(this);
+
+    if (this.element.simple) this.loadSimpleOptions(el.id);
+  },
+  changeSimpleElements() {
+    this.elementLoaded = this.element.simple;
+    this.optionsSelected = [this.options[0]];
+    this.changeOptions();
+  },
+  changeQuickSimpleElement(id) {
+    this.elementsSelected = [];
+    this.options = [];
+
+    const interval = setInterval(() => {
+      if (this.options.length) {
+        clearInterval(interval);
+
+        this.optionsSelected = [this.options[0]];
+        this.changeOptions();
+      }
+    }, 100);
+
+    this.loadSimpleOptions(id);
   },
   copyElement() {
-    if (this.elementsSelected.length !== 1) { return; }
+    if (this.elementsSelected.length !== 1) { f.showMsg('Выберите только один элемент', 'error'); return; }
     const el = this.elementsSelected[0];
 
     this.queryParam.dbAction = 'copyElement';

@@ -153,8 +153,10 @@ export const methods = {
     this.fieldChange = {
       unitId       : true,
       moneyInputId : true,
+      moneyInput   : true,
       percent      : true,
       moneyOutputId: true,
+      moneyOutput  : true,
       activity     : true,
       sort         : true,
       properties   : false,

@@ -516,6 +516,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       $param = [];
       $user = json_decode($authForm ?? '[]', true);
 
+      $haveName = $db->selectQuery('users', 'ID', ' login = "' . $user['login'] . '"');
+      if (count($haveName) > 1) { $result['error'] = 'login_exits'; break; }
+
       $contacts = [];
       foreach ($user as $k => $v) {
         if (in_array($k, ['login', 'name', 'permissionId'])) $param[$k] = $v;
@@ -533,6 +536,11 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
       if (count($usersId)) {
         $param = [];
+
+        if (count($usersId) === 1) {
+          $haveName = $db->selectQuery('users', ['ID', 'login'], ' login = "' . $authForm['login'] . '"');
+          if (count($haveName) && $haveName[0]['ID'] !== $usersId[0]) { $result['error'] = 'login_exits'; break; }
+        }
 
         foreach ($usersId as $id) {
           $param[$id] = ['activity' => '0'];

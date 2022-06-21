@@ -56,12 +56,12 @@ $field['footerContent'] .= <<<footerContent
     </div>
 
     <div class="form-floating mb-3">
-      <input type="tel" class="form-control" id="pPhone" placeholder="Телефон" name="phone" required>
+      <input type="tel" class="form-control" id="pPhone" placeholder="Телефон" name="phone">
       <label for="pPhone">Телефон</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="email" class="form-control" id="pEmail" placeholder="Почта" name="email" required>
+      <input type="email" class="form-control" id="pEmail" placeholder="Почта" name="email">
       <label for="pEmail">Почта</label>
     </div>
 

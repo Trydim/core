@@ -120,15 +120,27 @@
                   </div>
                 </template>
               </p-t-column>
-              <p-t-column field="codeName" :sortable="true" header="<?= gTxtDB('elements', 'id') ?>"></p-t-column>
-              <p-t-column field="name" :sortable="true" header="<?= gTxtDB('elements', 'name') ?>"></p-t-column>
-              <p-t-column field="activity" :sortable="true" header="<?= gTxtDB('elements', 'activity') ?>" :class="'text-center'">
+              <p-t-column field="simple" :sortable="true" header="<?= gTxtDB('elements', 'simple') ?>">
                 <template #body="slotProps">
-                  <span v-if="!!slotProps.data.activity" class="pi pi-check" style="color: green"></span>
-                  <span v-else class="pi pi-times" style="color: red"></span>
+                  <div class="d-flex justify-content-around">
+                    <template v-if="slotProps.data.simple">
+                      <span class="pi pi-check pi-green"></span>
+                      <span class="pi pi-cog pi-blue" v-tooltip.bottom="'Редактировать простой элемент'"
+                            @click="changeQuickSimpleElement(slotProps.data.id)"></span>
+                    </template>
+                    <span v-else class="pi pi-times pi-red"></span>
+                  </div>
                 </template>
               </p-t-column>
-              <p-t-column field="sort" :sortable="true" header="<?= gTxtDB('elements', 'sort') ?>" :class="'text-center'"></p-t-column>
+              <p-t-column field="codeName" :sortable="true" header="<?= gTxtDB('elements', 'codeName') ?>"></p-t-column>
+              <p-t-column field="name" :sortable="true" header="<?= gTxtDB('elements', 'name') ?>"></p-t-column>
+              <p-t-column field="activity" :sortable="true" header="<?= gTxtDB('elements', 'activity') ?>" class="text-center">
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.activity" class="pi pi-check pi-green"></span>
+                  <span v-else class="pi pi-times pi-red"></span>
+                </template>
+              </p-t-column>
+              <p-t-column field="sort" :sortable="true" header="<?= gTxtDB('elements', 'sort') ?>" class="text-center"></p-t-column>
               <p-t-column field="lastEditDate" :sortable="true" header="<?= gTxtDB('elements', 'lastEditDate') ?>"></p-t-column>
             </p-table>
 
@@ -200,7 +212,7 @@
                 <!-- Раздел -->
                 <div class="p-inputgroup my-2">
                   <span class="p-inputgroup-addon col-5">
-                    Родительский раздел <i class="pi pi-question" v-tooltip.bottom="'Выберите раздел!'" style="color: red"></i>:
+                    Родительский раздел <i class="pi pi-question pi-red" v-tooltip.bottom="'Выберите раздел!'"></i>:
                   </span>
                   <span v-if="!elementsModal.single" class="p-inputgroup-addon">
                     <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.parentId"></p-checkbox>
@@ -238,6 +250,7 @@
               </div>
 
               <template #footer>
+                <p-button v-if="element.simple" label="Редактировать" icon="pi pi-credit-card" @click="changeSimpleElements()"></p-button>
                 <p-button label="Подтвердить" icon="pi pi-check" :disabled="elementsModal.confirmDisabled" @click="elementConfirm()"></p-button>
                 <p-button label="Отмена" icon="pi pi-times" class="p-button-text" @click="elementCancel()"></p-button>
               </template>
@@ -288,8 +301,8 @@
       <p-t-column v-if="checkColumn('unitName')" field="unitName" header="<?= gTxtDB('options', 'unitName') ?>"></p-t-column>
       <p-t-column v-if="checkColumn('activity')" field="activity" :sortable="true" header="<?= gTxtDB('options', 'activity') ?>" :class="'text-center'">
         <template #body="slotProps">
-          <span v-if="!!+slotProps.data.activity" class="pi pi-check" style="color: green"></span>
-          <span v-else class="pi pi-times" style="color: red"></span>
+          <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
+          <span v-else class="pi pi-times pi-red"></span>
         </template>
       </p-t-column>
       <p-t-column v-if="checkColumn('sort')" field="sort" :sortable="true" header="<?= gTxtDB('options', 'sort') ?>" :class="'text-center'"></p-t-column>
@@ -394,7 +407,10 @@
             <span v-if="!optionsModal.single" class="p-inputgroup-addon">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyInput"></p-checkbox>
             </span>
-            <p-input-number mode="decimal" :min-fraction-digits="2" v-model="option.inputPrice"></p-input-number>
+            <p-input-number mode="decimal" :min-fraction-digits="2"
+                            :disabled="!fieldChange.moneyInput"
+                            v-model="option.inputPrice"
+            ></p-input-number>
           </div>
 
           <!-- Выходная цена -->
@@ -430,6 +446,7 @@
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyOutput"></p-checkbox>
             </span>
             <p-input-number mode="decimal" :min-fraction-digits="2"
+                            :disabled="!fieldChange.moneyOutput"
                             v-model="option.outputPrice"
                             @input="changeOutputPrice()"
                             @blur="changeOutputPrice()"

@@ -83,7 +83,7 @@ export default {
     query(action = '') {
       let data = new FormData();
 
-      Object.entries(Object.assign({}, this.queryParam))
+      Object.entries({...this.queryParam})
             .map(param => data.set(param[0], param[1]));
       //action && data.set('dbAction', action);
 
