@@ -139,6 +139,16 @@ function convertToArray($value) {
 }
 
 /**
+ * @param string $file1
+ * @param string $file2
+ * @return bool
+ */
+function compareFiles(string $file1, string $file2): bool {
+  return file_exists($file1) && file_exists($file2)
+         && md5_file($file1) === md5_file($file2);
+}
+
+/**
  * @param $var
  * @param bool $die
  */
@@ -475,7 +485,7 @@ function template(string $path = 'base', array $vars = []): string {
   ob_start();
 
   // Абсолютный путь файла
-  if (file_exists($path) && md5_file($path) !== md5_file('.' . $_SERVER['SCRIPT_NAME'])) {
+  if (file_exists($path)) {
     include $path;
   }
   // В корне сайта в public

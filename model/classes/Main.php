@@ -104,9 +104,12 @@ trait Authorization {
    */
   public function applyAuth(string $target = ''): Main {
     if ($this->checkStatus('no')) {
-      $target !== 'login' && $_SESSION['target'] = $target;
-      if (($target === '' && ONLY_LOGIN) || $target !== 'login') reDirect('login');
-      if ($target === 'login' && isset($_REQUEST['status'])) $this->setLoginStatus('error');
+      if ($target === 'login') {
+        isset($_REQUEST['status']) && $this->setLoginStatus('error');
+      } else {
+        $_SESSION['target'] = $target;
+        if (ONLY_LOGIN || !PUBLIC_PAGE) reDirect('login');
+      }
     } else {
       if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) reDirect($this->getSideMenu(true));
       if (!in_array($target, ['', '404', 'js']) && !$this->availablePage($target)) reDirect('404');
@@ -514,6 +517,81 @@ final class Main {
       }
     }
     return $this;
+  }
+
+  /**
+   * @param mixed $field
+   * @return Main
+   */
+  public function setControllerField(&$field): Main {
+    $this->controllerField =& $field;
+    return $this;
+  }
+
+  /**
+   * @param mixed ...$args
+   * @return Main
+   */
+  public function setControllerParam(...$args): Main {
+    array_map(function ($arg) {
+      $this->controllerParam = $arg;
+    }, $args);
+
+    return $this;
+  }
+
+  /**
+   * @param string $key
+   * @param mixed $value
+   * @param mixed $position [optional] <p>
+   * head - in head <p>
+   * before - before all script, after cms libs<p>
+   * last - before end body <p>
+   * @return $this
+   */
+  public function addControllerField(string $key, $value, string $position = 'last'): Main {
+    if (isset($this->controllerField[$key])) {
+      $field =& $this->controllerField[$key];
+
+      if (is_array($field)) {
+        if ($position === 'head') array_unshift($field, $value);
+        else if ($position === 'before') array_unshift($field, $value);
+        if ($position === 'last') $field[] = $value;
+      }
+      else if (is_object($field)) $field->$key = $value;
+
+    } else {
+      $this->controllerField[$key] = $value;
+    }
+    return $this;
+  }
+
+  /*
+   * @param string $key
+   * @param mixed $value
+   * @return $this
+   */
+  /*public function addControllerField(string $key, $value): Main {
+    if (!isset($this->controllerParam['field'])) $this->controllerParam['field'] = [];
+
+    if (isset($this->controllerParam['field'][$key])) {
+      $field =& $this->controllerParam['field'][$key];
+
+      if (is_array($field)) $field[] = $value;
+      else if (is_object($field)) $field->$key = $value;
+
+    } else {
+      $this->controllerParam['field'][$key] = $value;
+    }
+    return $this;
+  }*/
+
+  public function getControllerField() {
+    return $this->controllerField;
+  }
+
+  public function getControllerParam(string $key) {
+    return $this->controllerParam[$key] ?: false;
   }
 
   /**

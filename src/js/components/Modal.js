@@ -12,9 +12,9 @@ const getCustomElements = () => new Promise(resolve => {
   });
 });
 
-const templatePopup = (pr, modalId) => {
+const templatePopup = pr => {
   return `
-    <div class="${pr}modal-overlay" id="${modalId}">
+    <div class="${pr}modal-overlay">
       <div class="${pr}modal" data-role="window">
         <div class="${pr}modal-header">
           <div class="${pr}modal-title" data-role="title">Title</div>
@@ -50,6 +50,16 @@ export const Modal = function (param = {}) {
         btnConfig = false,
       } = param;
 
+  modal.setParam = function (param) {
+    this.wrap.id = param.modalId || '';
+    //this.window   =
+    //this.title    =
+    //this.content  =
+    //this.btnField =
+
+    if (this.btnConfirm && typeof param.beforeConfirm === 'function') this.btnConfirm.addEventListener('mousedown', param.beforeConfirm);
+    if (this.btnCancel && typeof param.beforeCancel === 'function') this.btnCancel.addEventListener('mousedown', param.beforeCancel);
+  }
   modal.bindBtn = function () {
     this.wrap.querySelectorAll(`.${prefix}modal-close, .confirmYes, .closeBtn`)
         .forEach(n => n.addEventListener('click', () => this.hide()));
@@ -74,14 +84,23 @@ export const Modal = function (param = {}) {
    * Show modal window
    * @param {string|HTMLElement} title
    * @param {string|HTMLElement} content
+   * @param {object} param
+   * @param {string} param.modalId - add wrap id
+   * @param {function} param.beforeConfirm - add wrap id
+   * @param {function} param.beforeCancel - add wrap id
    */
-  modal.show = function (title, content = '') {
-    this.title && title !== undefined && f.eraseNode(this.title).append(title);
+  modal.show = function (title, content = '', param= {}) {
+    if (this.title && title) {
+      f.eraseNode(this.title);
+      typeof title === 'string' ? this.title.insertAdjacentHTML('afterbegin', title)
+                                : this.title.append(title);
+    }
     if (this.content && content) {
       f.eraseNode(this.content);
       typeof content === 'string' ? this.content.insertAdjacentHTML('afterbegin', content)
                                   : this.content.append(content);
     }
+    this.setParam(param);
 
     data.bodyOver = document.body.style.overflow;
     data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
@@ -124,7 +143,7 @@ export const Modal = function (param = {}) {
     this.wrap.remove();
   }
 
-  modal.setTemplate = async function () {
+  modal.setTemplate = function () {
     //const sNode = await getCustomElements();
     const node = document.createElement('div');
     node.insertAdjacentHTML('afterbegin', template || templatePopup(prefix, modalId));
@@ -149,6 +168,7 @@ export const Modal = function (param = {}) {
   }
 
   modal.setTemplate();
+  modal.setParam(param);
   document.body.append(modal.wrap);
   //document.body.insertAdjacentHTML('beforeend', '<shadow-modal></shadow-modal>');
 

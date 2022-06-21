@@ -155,6 +155,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             ]);
         $orderTotal = $orderTotal ?? 0;
 
+        $startShippingDate = '15-10-2021';
+
         $param = [$orderId => [
           'user_id'     => $main->getLogin('id'),
           'customer_id' => $customerId,
@@ -163,6 +165,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'status_id'       => $main->getSettings('statusDefault'),
           'save_value'      => $saveVal ?? '{}',
           'report_value'    => addCpNumber($orderId, $reportVal),
+          'start_shipping_date' => $db->getDbDateString($startShippingDate ?? ''),
+          'end_shipping_date'   => $db->getDbDateString($endShippingDate ?? ''),
         ]];
 
         $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);

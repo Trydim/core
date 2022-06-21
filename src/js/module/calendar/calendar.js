@@ -1,6 +1,6 @@
 'use strict';
 
-import '../../../css/module/calendar/calendar.css';
+import '../../../css/module/calendar/calendar.scss';
 import {FullCalendar} from './fullCalendar.js';
 
 /*const importLocale = async (locale) => {
@@ -15,6 +15,16 @@ import {FullCalendar} from './fullCalendar.js';
 }*/
 
 const component = {
+  filterTemplate: `
+    <div class="fc-button-group select">
+      <select class="select__item fc-today-button fc-button" id="orderFilter">
+        <option value="all">Все заказы</option>  
+        <option value="create">По созданию</option>  
+        <option value="shipping">По отгрузке</option>    
+      </select>
+    </div>
+  `,
+  filter: 'all',
   default: {
     height: window.innerHeight * 0.9,
     initialView  : 'dayGridMonth', // Вид по умолчанию dayGridMonth timeGridWeek timeGridDay
@@ -52,7 +62,7 @@ const component = {
     },*/
 
     // И как это связать с настройками добавить цвета
-    eventClassNames: (arg) => orders.status.call(orders, arg),
+    //eventClassNames: (arg) => orders.status.call(orders, arg),
 
     buttonText: {
       today: "Сегодня",
@@ -94,6 +104,18 @@ const component = {
         /*console.log('Event: ' + info.event.title);
         console.log('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
         console.log('View: ' + info.view.type);*/
+      },
+      eventContent: (arg) => {
+        const order = arg.event.extendedProps.order,
+              line = str => `<div>${str}</div>`;
+
+        const lines = [
+          `№${order['O.ID']} - ${order['C.name']}`,
+          `${Math.round(order.total).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} руб / ${order['S.name']}`
+        ];
+        const html = lines.reduce((acc, el) => acc + line(el), '');
+
+        return {html}
       }
     }));
     this.calendar.setOption('locale', 'ru');
@@ -101,6 +123,8 @@ const component = {
     //calendar.changeView('timeGridDay');
 
     this.calendar.render();
+    //потому что в fullcalendar селектов нет, только кнопки
+    f.qS('#calendar>div>div').insertAdjacentHTML('beforeend', component.filterTemplate);
     this.onEvent();
   },
 
@@ -156,11 +180,25 @@ const component = {
     });
   },
 
+  changeFilter(context, event) {
+    //удалить все события
+    context.calendar.getEvents().forEach(e => {
+      e.remove();
+    })
+    //устанавливаем новое значение фильтра
+    context.filter = event.target.value;
+    //очищаем id уже как бы отрисованных
+    orders.orderIds.clear();
+    //рисуем новые события
+    orders.showOrders();
+  },
+
   // Event bind
   // -------------------------------------------------------------------------------------------------------------------
 
   onEvent() {
     f.qA('#calendar button', 'click', this.changeDateRange.bind(this));
+    f.qS('#orderFilter').addEventListener('change', (event) => this.changeFilter(this, event));
   }
 }
 
@@ -210,20 +248,27 @@ const orders = {
   },
 
   showOrders() { // TODO привязать к настройкам
-    Object.entries(this.data).map(([id, o]) => {
+    Object.entries(this.data).map(([id, order]) => {
       if (this.orderIds.has(id)) return;
       this.orderIds.add(id);
 
-      let title, temp;
-
-      //o[1].importantValue && (temp = this.formatImportant(o[1].importantValue));
-
-      title = id + ' / ' + o.total + ' руб.';
-      //title += temp;
-
-      // Мой статус для цвета кружка
-      component.addOrder({id: id, title, start: o['createDate'], status: 'ok'});
-    })
+      const general = {id, order},
+            createOrder = {
+              color: '#0f9d58',
+              allDay: true,
+              start: order['createDate']
+            },
+            shippingOrder = {
+              color: '#a52834', //так же заменять цвет в стилях! .fc-daygrid-dot-event
+              allDay: false,
+              start: order['startShippingDate'],
+              end: order['endShippingDate']
+            };
+      //событие даты заказа
+      component.filter !== 'shipping' && component.addOrder(Object.assign(general, createOrder));
+      //событие даты отгрузки
+      component.filter !== 'create' && component.addOrder(Object.assign(general, shippingOrder));
+    });
   },
 
   formatImportant(value) {

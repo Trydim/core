@@ -5,5 +5,5 @@
  */
 
 ob_start();
-if(isset($pathTarget)) include($pathTarget);
+if (isset($pathTarget)) include($pathTarget);
 $html = ob_get_clean();

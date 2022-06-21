@@ -43,7 +43,8 @@ const storageLoad = () => {
   if (!storage.length) return;
 
   // Set Menu Toggle
-  if (storage.get('menuToggle') === 'true') f.gI('mainWrapper').classList.add(menuClass);
+  const node = f.gI('mainWrapper');
+  if (node && storage.get('menuToggle') === 'true') node.classList.add(menuClass);
 }
 
 const setParentHeight = (target, height) => {
@@ -71,6 +72,14 @@ const stopPreloader = () => {
   if (f.OUTSIDE) return;
   f.gI('preloader').remove();
   f.gI('mainWrapper').classList.add('show');
+}
+
+const setSideMenuStyle = () => {
+  const node = f.gI('DBTablesWrap');
+  if (!node) return;
+
+  const h = window.innerHeight - node.parentElement.getBoundingClientRect().top - 18;
+  node.style.maxHeight = h + 'px';
 }
 
 // Event function
@@ -150,6 +159,7 @@ const onEvent = () => {
   f.getSetting();
   f.relatedOption();
   storageLoad();
+  setSideMenuStyle();
   onEvent();
   setLinkMenu(page || '/'); // after bind events
 

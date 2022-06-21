@@ -19,13 +19,27 @@ export default {
    */
   log: msg => f.DEBUG && console.log('Error:' + msg),
 
+  // String
+  // -------------------------------------------------------------------------------------------------------------------
   capitalize: cacheStringFunction(str => str.charAt(0).toUpperCase() + str.slice(1)),
-
   camelize: cacheStringFunction(str => {
     return str.toLowerCase()
               .replace(/\W(\w+)/g, (_, w) => w ? f.capitalize(w) : '')
               .replace(/\s|-|_/g, '');
   }),
+
+  // Array
+  // -------------------------------------------------------------------------------------------------------------------
+
+  /**
+   *
+   * @param {array} arr
+   * @param item
+   */
+  arrRemoveItem: (arr, item) => !!arr.splice(arr.indexOf(item), 1).length,
+
+  // DOM
+  // -------------------------------------------------------------------------------------------------------------------
 
   /**
    * Create element from string or
@@ -430,7 +444,7 @@ export default {
       loader.id = 'cmsLoaderWrapper';
       loader.style.cssText = `display: ${cStyle.display}; width: ${c.width}px; height: ${c.height}px;`;
 
-      node.parentNode.append(loader);
+      node.after(loader);
       loader.append(node);
       node = loader;
     }
@@ -598,6 +612,8 @@ export default {
     data.set('importantVal', JSON.stringify(param.importantVal || {}));
     data.set('saveVal', JSON.stringify(param.saveVal || {}));
     data.set('reportVal', JSON.stringify(param.reportVal || {}));
+    data.set('startShippingDate', JSON.stringify(param.startShippingDate || ''));
+    data.set('endShippingDate', JSON.stringify(param.startShippingDate || ''));
 
     return f.Post({data});
   },

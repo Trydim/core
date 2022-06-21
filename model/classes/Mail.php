@@ -70,7 +70,7 @@ class Mail {
       strlen($setting['mailTargetCopy'] ?? '') && $this->otherMail[] = $setting['mailTargetCopy'];
       strlen($setting['mailFromName'] ?? '') && $this->fromName = $setting['mailFromName'];
 
-      $this->subject = $setting['mailSubject'] ?? MAIL_SUBJECT_DEFAULT;
+      $this->setSubject($setting['mailSubject'] ?? MAIL_SUBJECT_DEFAULT);
     }
   }
 
@@ -82,7 +82,7 @@ class Mail {
     ob_start();
 
     // Шаблон в public
-    if (file_exists(ABS_SITE_PATH . 'public/views/docs/' . $this->mailTpl . '.php'))
+    if (file_exists(ABS_SITE_PATH . "public/views/docs/$this->mailTpl.php"))
       include ABS_SITE_PATH . "public/views/docs/$this->mailTpl.php";
     else if (file_exists($this->mailTpl)) include $this->mailTpl;
     else {
@@ -97,7 +97,7 @@ class Mail {
    * @param string $str
    */
   public function setSubject(string $str): void {
-    $this->subject = $str;
+    !empty($str) && $this->subject = $str;
   }
 
   /**

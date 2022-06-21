@@ -34,7 +34,7 @@ if (USE_DATABASE && $user['isAdmin']) {
     return $row;
   }, $permissions['permissions']);
 
-  $permissions['menu'] =  array_map(function ($menu) {
+  $permissions['menu'] = array_map(function ($menu) {
     return ['id' => $menu, 'name' => gTxt($menu)];
   }, $main->getSideMenu());
 
