@@ -444,7 +444,7 @@ export default {
       loader.id = 'cmsLoaderWrapper';
       loader.style.cssText = `display: ${cStyle.display}; width: ${c.width}px; height: ${c.height}px;`;
 
-      node.parentNode.append(loader);
+      node.after(loader);
       loader.append(node);
       node = loader;
     }
