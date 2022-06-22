@@ -155,8 +155,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             ]);
         $orderTotal = $orderTotal ?? 0;
 
-        $startShippingDate = '15-10-2021';
-
         $param = [$orderId => [
           'user_id'     => $main->getLogin('id'),
           'customer_id' => $customerId,

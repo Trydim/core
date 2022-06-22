@@ -5,8 +5,10 @@
  * @var string $pathTarget
  */
 
-$curMonth = date('Y-m');
-$dateRange = ["$curMonth-01 00:00:01", "$curMonth-31 23:59:59"];
+$curYear = date('Y');
+$curMonth = date('m');
+$daysInMonth = date('t', mktime(0, 0, 0, $curMonth, 1, $curYear));
+$dateRange = ["$curYear-$curMonth-01 00:00:00", "$curYear-$curMonth-$daysInMonth 23:59:59"];
 $ordersStatus = $main->db->loadTable('order_status');
 $orders = $main->db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
