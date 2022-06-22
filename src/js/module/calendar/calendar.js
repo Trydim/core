@@ -61,9 +61,6 @@ const component = {
       meridiem: false
     },*/
 
-    // И как это связать с настройками добавить цвета
-    //eventClassNames: (arg) => orders.status.call(orders, arg),
-
     buttonText: {
       today: "Сегодня",
       month: "Месяц",
