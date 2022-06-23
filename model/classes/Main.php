@@ -594,7 +594,6 @@ final class Main {
     return $this->controllerParam[$key] ?: false;
   }
 
-
   public function getBaseTable(): array {
     return $this->dbTables;
   }

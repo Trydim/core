@@ -20,6 +20,7 @@
     "cypressDeployProd": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=true"
   },
   "dependencies": {
+    "@tinymce/tinymce-vue": "next",
     "mustache": "latest",
     "normalize-scss": "latest",
     "primevue": "^3.10.0",

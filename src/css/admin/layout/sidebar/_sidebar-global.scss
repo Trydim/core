@@ -120,29 +120,23 @@
       transform: rotate(225deg) translateY(-50%);
     }
 
-    *::-webkit-scrollbar {
+    & *::-webkit-scrollbar {
       width: 3px;
       /* ширина для вертикального скролла */
       height: 1px;
       /* высота для горизонтального скролла */
     }
     /* ползунок скроллбара */
-    *::-webkit-scrollbar-thumb {
+    & *::-webkit-scrollbar-thumb {
       background-color: #9F3A3A;
       border-radius: 10em;
     }
 
     /* Стрелки */
-    *::-webkit-scrollbar-button:vertical:start:decrement {
-      display: none;
-    }
-    *::-webkit-scrollbar-button:vertical:end:increment {
-      display: none;
-    }
-    *::-webkit-scrollbar-button:horizontal:start:decrement {
-      display: none;
-    }
-    *::-webkit-scrollbar-button:horizontal:end:increment {
+    & *::-webkit-scrollbar-button:vertical:start:decrement,
+    & *::-webkit-scrollbar-button:vertical:end:increment,
+    & *::-webkit-scrollbar-button:horizontal:start:decrement,
+    & *::-webkit-scrollbar-button:horizontal:end:increment {
       display: none;
     }
   }
@@ -157,11 +151,6 @@
   .nav-item {
     padding: 0.8125rem;
   }
-
-  /*.sidebar {
-    width: 3.5rem;
-  }*/
-
 
   .sidebar-menu {
     align-items: center;

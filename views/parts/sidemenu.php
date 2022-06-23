@@ -132,6 +132,14 @@ menu;
               </a>
             </li>
             <?php break;
+          case 'dealers': ?>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH ?>dealers" aria-expanded="false">
+                <i class="pi pi-money-bill"></i>
+                <span class="nav-text"><?= gTxt('dealers') ?></span>
+              </a>
+            </li>
+            <?php break;
         }
       } ?>
       <?php if (in_array('setting', $main->getSideMenu()) || $main->getLogin('admin')) { ?>
