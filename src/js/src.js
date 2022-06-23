@@ -13,7 +13,7 @@ import {CustomSelect} from './components/CustomSelect.js';
 import LocalStorage from "./components/LocalStorage.js";
 import {shadowNode} from './components/shadownode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
-import {ToastClass, toast} from "./components/toast/index.js";
+import {ToastClass, toast} from "./components/toast";
 import {Valid} from "./components/Valid";
 import {searching} from "./components/SearchCustomers";
 import User from "./components/User";

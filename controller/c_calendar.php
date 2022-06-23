@@ -12,11 +12,12 @@ $dateRange = ["$curYear-$curMonth-01 00:00:00", "$curYear-$curMonth-$daysInMonth
 $ordersStatus = $main->db->loadTable('order_status');
 $orders = $main->db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
-$field = [];
-$field['cssLinks'] = [CORE_CSS . 'module/calendar.css?ver=1dbd460d5c'];
-$field['jsLinks'] = [CORE_JS . 'module/calendar.js?ver=960857bb87'];
-$field['pageTitle'] = 'Календарь';
-$field['footerContent'] = '';
+$field = [
+  'pageTitle'     => 'Календарь',
+  'cssLinks'      => CORE_CSS . 'module/calendar.css?ver=1dbd460d5c',
+  'jsLinks'       => CORE_JS . 'module/calendar.js?ver=960857bb87',
+  'footerContent' => '',
+];
 
 if (count($orders)) {
   $orders = json_encode($orders);

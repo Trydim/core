@@ -30,7 +30,7 @@ export class ToastClass {
   alert(msg, options) {
     return this._addToast(msg, "alert", options).el;
   }
-  async (promise, onResolve, onReject, msg, options) {
+  async(promise, onResolve, onReject, msg, options) {
     let asyncToast = this._addToast(msg, "async", options);
     return this._afterAsync(promise, onResolve, onReject, options, asyncToast);
   }

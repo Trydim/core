@@ -1,10 +1,10 @@
-Ядро CMS
-git submodule add 
+Ядро CMS:\
+git submodule add \
 git submodule update --remote
 
-константы:
- OUTSIDE = false - по умолчанию
- OUTSIDE = true - возврат страницы в json с кучей параметров. Обращаться к index.php
+константы: \
+ OUTSIDE = false - по умолчанию \
+ OUTSIDE = true - возврат страницы в json с кучей параметров. Обращаться к index.php \
  OUTSIDE = 'S'  - возврат страницы в виде строки
  
  
@@ -28,6 +28,9 @@ git submodule update --remote
 
 Изменяя доступные страницы запустить createResourceFile из package.json
 
+[tooltips](https://f3oall.github.io/awesome-notifications/docs/) \
+[sweetalert2](https://sweetalert2.github.io/)
+
 name | type | desc
 ---|---|---
 f.gI() | function | getElementById + поиск в shadowDom
@@ -39,6 +42,7 @@ f.getDataAsAssoc() | function | Дата из input[hidden] как объект
 f.getDataAsMap() | function | Дата из input[hidden] как Map
 f.getDataAsSet() | function | Дата из input[hidden] как Set
 f.getDataAsArray() | function | Дата из input[hidden] как массив
+f.createElement() | function | Создать node из string
 f.show() | function | показать node (убрать d-none)
 f.hide() | function | скрыть node (добавить d-none)
 f.eraseNode() | function | Очистить node
@@ -55,9 +59,7 @@ f.printReport() | function | Печать по умолчанию (исполь�
 f.downloadPdf() | function | Скачать PDF файл отправив объект с отчетом
 f.saveOrder() | function | Сохранить отчет (доработать)
 f.sendOrder() | function | Отправить отчет на почту (доработать)
-f.sendOrder() | function | Отправить отчет на почту (доработать)
 f.getRate() | function | Получить курсы из input[hidden]
-f.flashNode() | function | Подсветка узла
 f.flashNode() | function | Подсветка узла
 f.toNumber() | function | Попытка перевести любую строку в число
 f.parseNumber() | function | Аналогично toNumber
@@ -65,7 +67,8 @@ f.setFormat() | function | Формат 1 000
 f.transLit() | function | Транслитерация с русского на латиницу
 f.getSetting() | function | Получить пользовательские настройки cms
 f.Debugger() | class | Отчет для калькуляторов (доработать)
-f.initModal() | function | Модальное окно.
+f.Modal() | function | Модальное окно.
+f.initModal() | function | Аналогично f.Modal()
 f.initPrint() | function | Функция печати с ожиданиями картинок и стилей с сервера.
 f.observer() | function | Паттерн observer
 f.searchInit() | function | Поиск (обычно пользователей)
