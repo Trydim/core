@@ -3,6 +3,7 @@
 import {TableValues} from "./TableValues";
 import {FormViews} from "./FormViews";
 import {XMLTable} from "./XMLTable";
+import ContentEditor from './contentEditor/ContentEditor';
 
 /**
  * Erase template from ${}
@@ -22,10 +23,15 @@ const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
 const admindb = {
   init() {
     this.onEvent();
-    this.setDefault();
+    if (this.checkLoadContentEditor()) this.switchAdminType('content');
+    else this.setDefault();
   },
   setDefault() {
     setTimeout(() => f.qS('input[data-action]:checked').click(), 0);
+  },
+
+  checkLoadContentEditor() {
+    return new URLSearchParams(location.search).get('tableName').includes('content-js');
   },
 
   commonClick(e) {
@@ -33,13 +39,13 @@ const admindb = {
         action = target.dataset.action;
 
     let select = {
-      'adminType': () => this.switchAdminType(target),
+      'adminType': () => this.switchAdminType(target.value),
     }
 
     select[action] && select[action]();
   },
-  switchAdminType(target) {
-    switch (target.value) {
+  switchAdminType(value) {
+    switch (value) {
       case 'form':
         //f.hide(this.btnRefresh);
         //this.dbAction('loadFormConfig');
@@ -55,9 +61,13 @@ const admindb = {
         //}
         break;
       case 'config':
-        //f.show(this.btnRefresh);
-        //this.dbAction('loadXmlConfig');
-        //new XMLTable();
+        /*f.show(this.btnRefresh);
+        this.dbAction('loadXmlConfig');
+        new XMLTable();*/
+        break;
+      case 'content':
+
+        new ContentEditor();
         break;
     }
   },

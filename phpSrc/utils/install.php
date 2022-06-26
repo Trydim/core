@@ -4,7 +4,7 @@ define('INSTALL_PATH', 'model/');
 
 // Папка сайта
 $root = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
-$dir = str_replace($root, '', __DIR__ . '/');
+$dir = str_replace($root, '', __DIR__ . 'install.php/');
 $dir = str_replace(INSTALL_PATH, '', $dir);
 
 //echo var_dump($_GET);

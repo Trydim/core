@@ -19,12 +19,10 @@ if (!isset($setting)) {
     $columns = array_map(function ($item) {
       $dbName = $item;
 
-      $item = [
+      return [
         'dbName' => $dbName,
         'name' => gTxtDB('users', $dbName),
       ];
-
-      return $item;
     }, $columns);
   }
 }

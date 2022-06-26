@@ -380,6 +380,22 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`ID`, `permission_id`, `login`, `password`, `name`, `contacts`, `register_date`, `activity`, `customization`, `hash`) VALUES
 (1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'admin', '{}', '2020-07-28 21:00:00', 1, '{}', '$2y$10$BViKvxpmTvyz4TdALZEwLeXPFLGZ0KLv3CIDhWvNYAajBZOcqzWRy');
 
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `dealers`
+--
+
+CREATE TABLE `dealers` (
+  `ID` int(10) UNSIGNED NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `contacts` varchar(255) CHARACTER SET utf8 DEFAULT '{}',
+  `register_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `activity` int(1) NOT NULL DEFAULT 1,
+  `settings` varchar(1000) CHARACTER SET utf8 DEFAULT '{}'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 --
 -- Индексы сохранённых таблиц
 --
@@ -477,6 +493,13 @@ ALTER TABLE `users`
   ADD KEY `permission_id` (`permission_id`);
 
 --
+-- Индексы таблицы `dealers`
+--
+ALTER TABLE `dealers`
+    ADD PRIMARY KEY (`ID`);
+
+
+--
 -- AUTO_INCREMENT для сохранённых таблиц
 --
 
@@ -497,6 +520,12 @@ ALTER TABLE `customers`
 --
 ALTER TABLE `elements`
   MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `files`
+--
+ALTER TABLE `files`
+    MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `money`
@@ -545,6 +574,12 @@ ALTER TABLE `units`
 --
 ALTER TABLE `users`
   MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `dealers`
+--
+ALTER TABLE `dealers`
+    MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

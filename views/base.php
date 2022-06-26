@@ -21,7 +21,7 @@ $jsGlobalConst = json_encode([
   'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
-  'AUTH_STATUS'   => $main->checkStatus('ok'),
+  'AUTH_STATUS'   => $main->checkStatus(),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 
@@ -36,12 +36,12 @@ $jsGlobalConst = json_encode([
   <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
-  <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
+  <?php if ($main->checkStatus() || $target === 'login') { ?>
     <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
-    <link rel="stylesheet" href="<?= $item ?>">
+    <link rel="stylesheet" href="<?= includes($item, 'core') ? $item : URI_CSS . $item ?>">
   <?php }, $cssLinks ?? []); ?>
 
   <script>
@@ -87,7 +87,7 @@ $jsGlobalConst = json_encode([
 <script defer type="module" src='<?= CORE_JS ?>main.js?ver=684eab4bb6f'></script>
 
 <?php array_map(function ($item) { ?>
-  <script defer type="module" src="<?= $item ?>"></script>
+  <script defer type="module" src="<?= includes($item, 'core') ? $item : URI_CSS . $item ?>"></script>
 <?php }, $jsLinks ?? []); ?>
 
 <?= $footerContent ?? '' ?>

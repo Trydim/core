@@ -46,14 +46,14 @@ class Test extends TestCase {
   }
 
   public function testGTxt() {
-    define('ABS_SITE_PATH', __DIR__ . '/../../../');
+    define('ABS_SITE_PATH', __DIR__ . '/../../visCms/');
     require_once __DIR__ . '/../func.php';
 
     gTxt('calculator');
   }
 
   public function gTxtDB() {
-    define('ABS_SITE_PATH', __DIR__ . '/../../../');
+    define('ABS_SITE_PATH', __DIR__ . '/../../visCms/');
     require_once __DIR__ . '/../func.php';
 
     gTxtDB('codes', 'codes');

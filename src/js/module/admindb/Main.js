@@ -1,9 +1,9 @@
 "use strict";
 
-import '../../../css/module/admindb/handsontable.full.min.css';
+import '../../../css/module/admindb/handsontable.min.css';
 import mustache from 'mustache';
 
-import {Handsontable} from "./handsontable.full.min";
+import "./handsontable.full.min";
 import {handson} from "./handsontable.option";
 
 export class Main {
@@ -50,6 +50,8 @@ export class Main {
           return 'csv';
         } else if (data['XMLValues']) {
           return 'XMLValues';
+        } else if (data['content']) {
+          return 'content';
         }
       }
       this.loaderTable.stop();
@@ -88,7 +90,7 @@ export class Main {
     // Table empty
     if (!data.length) data.push(new Array(columns.length).fill(''));
 
-    this.handsontable = new Handsontable(div, Object.assign(handson.optionCommon, handson.optionDb, {
+    this.handsontable = new window.Handsontable(div, Object.assign(handson.optionCommon, handson.optionDb, {
       data: handson.removeSlashesData(data), colHeaders,
       cells(row, col) {
         const colParam = columns[col],

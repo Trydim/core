@@ -1,9 +1,9 @@
 <?php global $main;
-if ($main && $main->checkStatus('ok')) { ?>
+if ($main && $main->checkStatus()) { ?>
 <div class="nav-header">
   <a href="<?= SITE_PATH ?>" class="brand-logo">
     <picture class="logo-abbr">
-      <source srcset="<?= URI_IMG ?>logo.webp type="image/webp">
+      <!--<source srcset="<?/*= URI_IMG */?>logo.webp type="image/webp">-->
       <img src="<?= URI_IMG ?>logo.svg" alt="logo">
     </picture>
     <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>

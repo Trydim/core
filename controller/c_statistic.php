@@ -5,7 +5,10 @@
 
 $field = [
   'pageTitle' => 'Статистика',
-  'jsLinks'   => [CORE_JS . 'module/statistic.js?ver=d9712ad6ef'],
+  'jsLinks'   => [
+    CORE_JS . 'libs/canvasjs.min.js?ver=d9712ad6ef',
+    CORE_JS . 'module/statistic.js?ver=d9712ad6ef',
+  ],
 ];
 
 require $pathTarget;

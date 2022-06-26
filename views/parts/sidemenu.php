@@ -100,7 +100,7 @@ menu;
             <li>
               <a class="nav-item" href="<?= SITE_PATH ?>statistic" aria-expanded="false">
                 <i class="pi pi-chart-line"></i>
-                <span class="nav-text"><?= gTxt('Calculator') ?></span>
+                <span class="nav-text"><?= gTxt('statistic') ?></span>
               </a>
             </li>
             <?php break;

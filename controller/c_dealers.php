@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $main
+ * @var object $main - global
  * @var string $pathTarget
  */
 
@@ -10,9 +10,12 @@ $field = [
   'sideRight'     => '',
   'pageFooter'    => '',
   'footerContent' => '',
-  //'cssLinks'  => [CORE_CSS . 'module/dea.css?ver=8cdf94ab40'],
+  'cssLinks'  => [CORE_CSS . 'module/dealers.css?ver=8cdf94ab40'],
   'jsLinks'   => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],
 ];
+
+$dealers = $main->db->loadDealers();
+$field['footerContent'] .= "<input type='hidden' id='dealersData' value='". json_encode($dealers) ."'>";
 
 ob_start();
 require $pathTarget;

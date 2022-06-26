@@ -132,7 +132,7 @@ class Docs {
       'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = $this->docsType === 'print' ? URI_IMG : PATH_IMG;
+    $this->imgPath = $this->docsType === 'print' ? URI_IMG : PATH_IMG; // Todo путь к диллеру. (зав
   }
 
   private function prepareTemplate() {
@@ -366,7 +366,7 @@ class Docs {
    * @return mixed
    */
   public function getDocs(string $dest = 'S') {
-    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
+    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH); // TODO тупой путь
     if (!is_dir($path)) mkdir($path);
 
     $func = 'get' . $this->getFunc();

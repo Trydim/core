@@ -19,7 +19,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $columns = [];
   if ($dbTable) {
     if (stripos($dbTable, '.csv')) $db->setCsvTable($dbTable);
-    else if (USE_DATABASE) {
+    else if (USE_DATABASE && $dbTable !== 'content-js') {
       $columns = $db->getColumnsTable($dbTable);
       if (!count($columns)) {
         $dbTable = $db->getTables($dbTable);
@@ -40,6 +40,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'showTable':
       $result['columns'] = $columns;
       if (is_string($dbTable) && stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
+      elseif (is_string($dbTable) && $dbTable === 'content-js') $result['content'] = $db->loadContentEditorData();
       else {
         if (CHANGE_DATABASE) {
           USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
@@ -91,6 +92,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       else if (isset($csvData) && !empty($csvData)) {
         $db->saveCsv(json_decode($csvData));
+      } else if (isset($contentData) && !empty($contentData)) {
+        $db->saveContentEditorData($contentData);
+      } else {
+        $result['error'] = 'Nothing to save!';
       }
       break;
     case 'loadCVS': $db->fileForceDownload(); break;
@@ -525,7 +530,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       foreach ($user as $k => $v) {
         if (in_array($k, ['login', 'name', 'permissionId'])) $param[$k] = $v;
         else if ($k === 'password') $param[$k] = password_hash($v, PASSWORD_BCRYPT);
-        else if ($k === 'activity') $param[$k] = '1';
+        else if ($k === 'activity') $param[$k] = '1'; // TODO
         else $contacts[$k] = $v;
       }
       $param['contacts'] = json_encode($contacts);
@@ -549,7 +554,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $contacts = [];
           foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permissionId'])) $param[$id][$k] = $v;
-            else if ($k === 'activity') $param[$id][$k] = '1';
+            else if ($k === 'activity') $param[$id][$k] = '1'; // TODO
             else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
@@ -576,12 +581,38 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     // Files
+    case 'uploadFiles':
+      $db->setFiles($result);
+      break;
     case 'loadFiles':
       $result['files'] = $db->loadFiles();
       break;
 
     case 'openOrders': /* TODO когда это отправляется */
       break;
+
+    case 'addDealer':
+      if (isset($dealer)) {
+        $dealer = json_decode($dealer, true);
+        $param = [];
+
+        $id = 2;// $db->getLastID('dealers', ['name' => 'tmp']);
+
+        $contacts = [];
+        foreach ($dealer as $k => $v) {
+          if (in_array($k, ['login', 'name'])) $param[$k] = $v;
+          else if ($k === 'activity') $param[$k] = intval(boolValue($v));
+          else $contacts[$k] = $v;
+        }
+        $param['contacts'] = json_encode($contacts);
+
+        //$result = $db->insert($columns, 'dealers', ['0' => $param]);
+        $main->dealer->create($id);
+      }
+      break;
+    /*case 'changeDealer': break;
+    case 'setupDealer': break;
+    case 'deleteDealer': break;*/
 
     default:
       echo 'SWITCH default DB.php' . var_dump($_REQUEST);

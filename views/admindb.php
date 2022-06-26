@@ -10,18 +10,6 @@ if ($main->getCmsParam('PATH_LEGEND') && isset($legend[$tableActive])) {
   $legendHtml = "<template id='dataTableLegend'><div>" . $legend[$tableActive] . "</div></template>";
 }
 
-if (!$main->getCmsParam('DB_TABLE_IN_SIDEMENU')) { // Если таблицы не в подменю
-  $field['sideRight'] = <<<sideRight
-<ul id="DBTablesWrap"></ul>
-<div>
-  <h2></h2>
-  <input type="button" value="Показать" id="btnRowsAdd" data-dbaction="showTable">
-  <input type="button" value="Скачать CSV" id="btnLoadCSV" data-dbaction="loadCVS" class="fade">
-  <input type="button" value="Удалить" id="btnRowsDel" data-dbaction="showDelete">
-</div>
-sideRight;
-}
-
 $field['content'] = <<<main
 <div class="d-flex justify-content-around">
   <div class="text-center mr-5">

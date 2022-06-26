@@ -1,10 +1,10 @@
 'use strict';
 
-import {CanvasJSModule as CanvasJS} from './canvasjs.min.js';
+import './canvasjs.min.js';
 
 // TODO click custom btn
-const initCharts = (dataPoints) => {
-  let chart = new CanvasJS.Chart("statistic", {
+const initCharts = () => {
+  let chart = new CanvasJSModule.Chart("statistic", {
     animationEnabled: true,
     theme: "light2",
     title:{

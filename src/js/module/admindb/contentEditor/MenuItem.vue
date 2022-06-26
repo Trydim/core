@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import remixiconUrl from './remixicon.symbol.svg';
+import remixiconUrl from '../../../../svg/remixicon.symbol.svg';
 
 export default {
   props: {
@@ -65,7 +65,7 @@ export default {
   &.is-active,
   &:hover {
     color: #FFF;
-    background-color: #0D0D0D;
+    background-color: #343957;
   }
 }
 </style>

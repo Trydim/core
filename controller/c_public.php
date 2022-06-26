@@ -9,7 +9,7 @@ $field = ['pageTitle' => $main->getCmsParam('PROJECT_TITLE')];
 
 require ABS_SITE_PATH . 'public/public.php';
 
-$authStatus = $main->checkStatus('ok');
+$authStatus = $main->checkStatus();
 
 // Если загрузка
 if ($authStatus && isset($_GET['orderId'])) {
@@ -43,6 +43,6 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
 
 if (!$authStatus) $field['sideLeft'] = '';
 
-
+// если сейчас дилер
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
 $html = template(OUTSIDE ? '_outside' : 'base', $field);

@@ -26,7 +26,7 @@ $jsGlobalConst = json_encode([
   'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
-  'AUTH_STATUS'   => $main->checkStatus('ok'),
+  'AUTH_STATUS'   => $main->checkStatus(),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 

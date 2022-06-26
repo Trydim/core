@@ -9,7 +9,7 @@ const defaults = {
     warning: "Attention",
     alert: "Error",
     async: "Loading",
-    confirm: "Confirmation required",
+    confirm: '', //"Confirmation required",
     confirmOk: "OK",
     confirmCancel: "Cancel"
   },

@@ -1,19 +1,22 @@
 <template>
   <div>
     <template v-for="(item, index) in items">
-      <div class="divider" v-if="item.type === 'divider'" :key="`divider${index}`" />
-      <menu-item v-else :key="index" v-bind="item" />
+      <div class="divider" v-if="item.type === 'divider'" :key="`divider${index}`"></div>
+      <menu-item v-else :key="index" v-bind="item"></menu-item>
     </template>
+
+    <ImageModal v-if="imageModal" @image="setImage"></ImageModal>
   </div>
 </template>
 
 <script>
 
-import MenuItem from './MenuItem.vue'
+import MenuItem from './MenuItem.vue';
+import ImageModal from './ImageModal.vue';
 
 export default {
   components: {
-    MenuItem,
+    MenuItem, ImageModal,
   },
 
   props: {
@@ -25,7 +28,20 @@ export default {
 
   data() {
     return {
+      imageModal: false,
+
       items: [
+        {
+          icon: 'arrow-go-back-line',
+          title: 'Undo',
+          action: () => this.editor.chain().focus().undo().run(),
+        },
+        {
+          icon: 'arrow-go-forward-line',
+          title: 'Redo',
+          action: () => this.editor.chain().focus().redo().run(),
+        },
+        { type: 'divider' },
         {
           icon: 'bold',
           title: 'Bold',
@@ -51,8 +67,37 @@ export default {
           isActive: () => this.editor.isActive('code'),
         },
         {
-          type: 'divider',
+          icon: 'font-color',
+          title: 'Color',
+          action: e => this.editor.chain().focus().setColor(e.target.value).run(),
+          isActive: () => {},
         },
+        {
+          icon: 'terminal-box-fill',
+          title: 'Background-color',
+          action: e => this.editor.chain().focus().toggleHighlight({ color: '#ffc078' }).run(),
+          isActive: () => this.editor.isActive('highlight', { color: '#ffc078' }),
+        },
+        { type: 'divider' },
+        {
+          icon: 'align-left',
+          title: 'Left',
+          action: () => this.editor.chain().focus().setTextAlign('left').run(),
+          isActive: () => this.editor.isActive({ textAlign: 'left' }),
+        },
+        {
+          icon: 'align-center',
+          title: 'Center',
+          action: () => this.editor.chain().focus().setTextAlign('center').run(),
+          isActive: () => this.editor.isActive({ textAlign: 'center' }),
+        },
+        {
+          icon: 'align-right',
+          title: 'Right',
+          action: () => this.editor.chain().focus().setTextAlign('right').run(),
+          isActive: () => this.editor.isActive({ textAlign: 'right' }),
+        },
+        { type: 'divider' },
         {
           icon: 'h-1',
           title: 'Heading 1',
@@ -83,21 +128,19 @@ export default {
           action: () => this.editor.chain().focus().toggleOrderedList().run(),
           isActive: () => this.editor.isActive('orderedList'),
         },
-        {
+        /*{
           icon: 'list-check-2',
           title: 'Task List',
           action: () => this.editor.chain().focus().toggleTaskList().run(),
           isActive: () => this.editor.isActive('taskList'),
-        },
+        },*/
         {
           icon: 'code-box-line',
           title: 'Code Block',
           action: () => this.editor.chain().focus().toggleCodeBlock().run(),
           isActive: () => this.editor.isActive('codeBlock'),
         },
-        {
-          type: 'divider',
-        },
+        { type: 'divider' },
         {
           icon: 'double-quotes-l',
           title: 'Blockquote',
@@ -109,38 +152,43 @@ export default {
           title: 'Horizontal Rule',
           action: () => this.editor.chain().focus().setHorizontalRule().run(),
         },
-        {
-          type: 'divider',
-        },
+        { type: 'divider' },
         {
           icon: 'text-wrap',
           title: 'Hard Break',
           action: () => this.editor.chain().focus().setHardBreak().run(),
         },
         {
-          icon: 'format-clear',
-          title: 'Clear Format',
-          action: () => this.editor.chain()
-                            .focus()
-                            .clearNodes()
-                            .unsetAllMarks()
-                            .run(),
+          icon: 'link',
+          title: 'Set Link',
+          action: () => {
+            const url = window.prompt('URL')
+
+            if (url) {
+              this.editor.chain().focus().setImage({ src: url }).run()
+            }
+          },
+          isActive: () => this.editor.isActive('link'),
         },
         {
-          type: 'divider',
+          icon: 'link-unlink',
+          title: 'Remove Link',
+          action: () => this.editor.chain().focus().unsetLink().run(),
         },
+        { type: 'divider' },
         {
-          icon: 'arrow-go-back-line',
-          title: 'Undo',
-          action: () => this.editor.chain().focus().undo().run(),
-        },
-        {
-          icon: 'arrow-go-forward-line',
-          title: 'Redo',
-          action: () => this.editor.chain().focus().redo().run(),
+          icon: 'image-fill',
+          title: 'Set Image',
+          action: () => this.imageModal = true,
         },
       ],
     }
+  },
+  methods: {
+    setImage(src) {
+      this.editor.chain().focus().setImage({ src }).run();
+      this.imageModal = false;
+    },
   },
 }
 </script>

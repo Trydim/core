@@ -453,13 +453,6 @@ $link-hover-decoration:                   null !default;
 $stretched-link-pseudo-element:           after !default;
 $stretched-link-z-index:                  1 !default;
 
-// Paragraphs
-//
-// Style p element.
-
-$paragraph-margin-bottom:   1rem !default;
-
-
 // Grid breakpoints
 //
 // Define the minimum dimensions at which your layout will change,
@@ -665,9 +658,6 @@ $blockquote-font-size:        $font-size-base * 1.25 !default;
 $blockquote-footer-color:     $gray-600 !default;
 $blockquote-footer-font-size: $small-font-size !default;
 
-$hr-margin-y:                 $spacer !default;
-$hr-color:                    inherit !default;
-$hr-height:                   $border-width !default;
 $hr-opacity:                  .25 !default;
 
 $legend-margin-bottom:        .5rem !default;

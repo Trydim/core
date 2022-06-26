@@ -257,7 +257,9 @@ trait Cache {
   }
 
   public function loadPageCache() {
-    /*if (file_exists(PAGE_CACHE_FILE)) {
+    /*
+     const PAGE_CACHE_FILE = SHARE_PATH . 'pageCache.bin';
+     if (file_exists(PAGE_CACHE_FILE)) {
       $this->checkEditTime(PAGE_CACHE_FILE);
 
       if (!$this->needCsvCached) {
@@ -284,6 +286,7 @@ trait Cache {
  * @package cms
  */
 trait Hooks {
+  private $hooksPath = ABS_SITE_PATH . 'public/hooks.php';
   private $hooks = [];
 
   public function addHook($hookName, $callable) {
@@ -297,7 +300,7 @@ trait Hooks {
    */
   public function setHooks() {
     require_once CORE . 'model/hooks.php';
-    if (file_exists(HOOKS_PATH)) require_once HOOKS_PATH;
+    if (file_exists($this->hooksPath)) require_once $this->hooksPath;
   }
 
   /**
@@ -334,7 +337,12 @@ final class Main {
   /**
    * @var array - global Cms param
    */
-  private $cmsParam = [];
+  private $cmsParam = [
+    'PROJECT_TITLE' => 'Project title',
+    'PATH_LEGEND'   => ['public/views/legend.php'],
+    'ACCESS_MENU'   => ['admindb',  'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
+    'PATH_CSV'      => [SHARE_PATH . 'csv/'],
+  ];
 
   /**
    * @var array - data base config array
@@ -367,6 +375,7 @@ final class Main {
    * @param array $dbConfig
    */
   public function __construct(array $cmsParam, array $dbConfig) {
+    $this->isDealer();
     $this->setCmsParams($cmsParam);
     $this->dbConfig = $dbConfig;
     $this->loadSetting();
@@ -376,6 +385,10 @@ final class Main {
     if ($value === 'db') {
       $this->db = new Db($this->dbConfig);
       return $this->db;
+    }
+    else if ($value === 'dealer') {
+      $this->dealer = new Dealer();
+      return $this->dealer;
     }
 
     return $this->$value;
@@ -389,32 +402,40 @@ final class Main {
   cms Params
 ----------------------------------------------------------------------------------------------------------------------*/
 
-  /**
-   * setCmsSetting from config
-   * @param array $cmsParam
-   */
-  private function setCmsParams(array $cmsParam) {
-    $this->cmsParam = array_merge($this->cmsParam, $cmsParam);
+  private function isDealer() {
+    $requestUri = $_SERVER['REQUEST_URI'];
+    $isDealer = includes($requestUri, '/dealers/');
 
-    $this->cmsParam['PROJECT_TITLE'] = $this->cmsParam['PROJECT_TITLE'] ?? 'Project title';
-    $this->cmsParam['PATH_LEGEND'] = $this->cmsParam['PATH_LEGEND'] ?? ABS_SITE_PATH . 'public/views/legend.php';
-    $this->cmsParam['DB_TABLE_IN_SIDEMENU'] = $this->cmsParam['DB_TABLE_IN_SIDEMENU'] ?? true;
+    if ($isDealer) {
+      preg_match('/dealers(?:\/)(\d+)(?:\/)/', $requestUri, $match); // получить ID дилера
 
-    $this->cmsParam['ACCESS_MENU'] = $this->cmsParam['ACCESS_MENU']
-                                     ?? ['calendar', 'catalog', 'statistic', 'orders', 'customers', 'admindb', 'users', 'fileManager'];
+      if (!isset($match[1])) die('Dealer id not found!');
 
-    $this->setCmsParam('PATH_CSV',
-      isset($this->cmsParam['PATH_CSV']) ? ABS_SITE_PATH . $this->cmsParam['PATH_CSV'] : SHARE_PATH . 'csv/'
-    );
+      $this->setCmsParams('dealerPath', ABS_SITE_PATH . '/dealers/' . $match[1] . '/');
+    }
+
+    $this->setCmsParams('isDealer', $isDealer);
   }
 
   /**
-   * @param string $param
+   * setCmsSetting from config
+   * @param $cmsParam
    * @param $value
+   *
    * @return Main
    */
-  public function setCmsParam(string $param, $value): Main {
-    $this->cmsParam[$param] = $value;
+  public function setCmsParams($cmsParam, $value = null): Main {
+    if (is_array($cmsParam)) {
+      $this->cmsParam = array_merge($this->cmsParam, $cmsParam);
+      if (isset($this->cmsParam['PATH_CSV']))
+        $this->cmsParam['PATH_CSV'] = ABS_SITE_PATH . $this->cmsParam['PATH_CSV'];
+    }
+
+    else if (!empty($value)) {
+      if ()
+      $this->cmsParam[$cmsParam] = $value;
+    }
+
     return $this;
   }
 
@@ -489,11 +510,11 @@ final class Main {
    * @return $this
    */
   public function setAccount(): Main {
-    if ($this->checkStatus('ok')) {
+    if ($this->checkStatus()) {
       // Меню
       $this->setSideMenu();
 
-      if ($this->availablePage('admindb') && $this->getCmsParam('DB_TABLE_IN_SIDEMENU')) {
+      if ($this->availablePage('admindb')) {
         $dbTables = [];
         if (USE_DATABASE) {
           if (CHANGE_DATABASE) {
@@ -514,6 +535,13 @@ final class Main {
         }
         $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam('PATH_CSV')));
         //$this->checkXml();
+
+        if (USE_CONTENT_EDITOR) {
+          $this->dbTables[] = [
+            'fileName' => 'content-js',
+            'name' => gTxt('Content editor'),
+          ];
+        }
       }
     }
     return $this;

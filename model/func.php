@@ -99,17 +99,19 @@ function checkError(array &$result): void {
  * @return string path to file name
  */
 function checkTemplate(string $tmpFile): string {
+  $view = CORE . 'views/';
+
   if ($tmpFile === '' && PUBLIC_PAGE
       && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php')) {
     return ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
   } else if (file_exists(ABS_SITE_PATH . 'public/views/' . "$tmpFile.php")) {
     return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
-  } else if (file_exists(VIEW . "$tmpFile.php")) {
-    return VIEW . "$tmpFile.php";
-  } else if (file_exists(VIEW . $tmpFile . "/$tmpFile.php")) {
-    return VIEW . $tmpFile . "/$tmpFile.php";
+  } else if (file_exists($view . "$tmpFile.php")) {
+    return $view . "$tmpFile.php";
+  } else if (file_exists($view . $tmpFile . "/$tmpFile.php")) {
+    return $view . $tmpFile . "/$tmpFile.php";
   } else {
-    require VIEW . '404.php'; die();
+    require $view . '404.php'; die();
   }
 }
 
@@ -160,18 +162,19 @@ function de($var, bool $die = true) {
 }
 
 /**
- * @param string $hayStack
- * @param $search
+ * @param string[]|string $hayStack
+ * @param string $search
  * @return bool
  */
-function includes(string $hayStack, $search) {
+function includes($hayStack, string $search): bool {
   if (is_array($search)) {
     foreach ($search as $w) {
       if (includes($hayStack, $w)) return true;
     }
   } else {
-   return stripos($hayStack, $search) !== false;
+    return stripos($hayStack, $search) !== false;
   }
+  return false;
 }
 
 /**
@@ -447,8 +450,6 @@ function setUserLocale($lang = 'ru_RU') {
       setlocale (LC_ALL,"English", "en", "en_US.UTF8");
   }*/
 
-  //$locale = ABS_SITE_PATH . SITE_PATH . "lang";
-
   putenv('LANG=ru_RU.UTF8');
   putenv('LANGUAGE=ru_RU.UTF8');
   setlocale(LC_ALL, $lang . '.UTF8');
@@ -468,7 +469,7 @@ function reDirect(string $target = '') {
     $target = $_SESSION['target'] ?? '';
     isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
   }
-  header('location: ' . SITE_PATH . $target);
+  header('location: ' . SITE_PATH . $target); // Todo попробовать убрать
   die;
 }
 

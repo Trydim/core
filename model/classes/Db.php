@@ -2,7 +2,7 @@
 
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
-require __DIR__ . '/rb.php';
+require __DIR__ . '/Rb.php';
 
 class Db extends \R {
   private $currentUserID = 2;
@@ -417,13 +417,19 @@ class Db extends \R {
    *
    * @return array
    */
-  public function getFiles($ids = false) {
+  public function getFiles($ids = false): array {
     if (is_string($ids) && !empty($ids)) $ids = explode(',', $ids);
     $filters = $ids ? ' ID = ' . implode(' or ID = ', $ids) : '';
     return $this->selectQuery('files', '*', $filters);
   }
 
-  public function setFiles(&$result, $imageIds): string {
+  /**
+   * @param $result
+   * @param array $imageIds
+   * @return string
+   */
+  public function setFiles(&$result, array $imageIds = []): string {
+    $result['files'] = [];
     $dbDir = 'upload/';
     $uploadDir = SHARE_PATH . $dbDir;
 
@@ -444,7 +450,8 @@ class Db extends \R {
 
           if (filesize($uploadFile) === $file['size']) {
             $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
-            if (count($id) === 1) { $imageIds[] = $id[0]; continue; }
+
+            if (count($id) === 1) $imageIds[] = $id[0];
             else unlink($uploadFile);
 
           } else {
@@ -457,15 +464,24 @@ class Db extends \R {
           }
         }
 
-        if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-          $lastId = $this->getLastID('files');
-          $imageIds[] = $lastId;
-          $this->insert([], 'files', [$lastId => [
+        else if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
+          $id = $this->getLastID('files', ['path' => 'tmp']);
+          $imageIds[] = $id;
+          $this->insert([], 'files', [$id => [
             'name'   => $file['name'],
             'path'   => $dbFile,
             'format' => $file['type'],
           ]], true);
+
+          $result['result'] = [];
         } else $result['error'] = 'Mover file error: ' . $file['name'];
+
+        if (isset($id)) {
+          $result['files'][] = [
+            'id' => $id,
+            'path' => URI . 'shared/' . $dbFile,
+          ];
+        }
       }
     }
 
@@ -984,7 +1000,6 @@ class Db extends \R {
    * @return array|false
    */
   public function getUserFromFile(string $login = '', string $password = '', bool $status = false) {
-
     if (file_exists(SYSTEM_PATH)) {
       $value = file(SYSTEM_PATH)[0];
       $value && $value = explode('|||', $value);
@@ -1172,7 +1187,18 @@ class Db extends \R {
     return json_decode('{}');
   }
 
+  // Dealers
+  //--------------------------------------------------------------------------------------------------------------------
+
+  public function loadDealers(): ?array {
+    $sql = "SELECT ID AS 'id', name, contacts, register_date AS 'registerDate', activity, settings
+            FROM dealers";
+
+    return self::getAll($sql);
+  }
+
   use MainCsv;
+  use ContentEditor;
 }
 
 /**
@@ -1282,5 +1308,55 @@ trait MainCsv {
       file_exists(CSV_CACHE) && unlink(CSV_CACHE);
     }
     return $this;
+  }
+}
+
+
+trait ContentEditor {
+  private $contentFile = SHARE_PATH . 'content.json';
+
+  private function checkContentFile(): void {
+    if (!file_exists($this->contentFile)) {
+      file_put_contents($this->contentFile, '{}');
+    }
+  }
+
+  /**
+   * @param bool $jsonDecode
+   * @param bool $assoc
+   * @return mixed
+   */
+  public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false) {
+    $this->checkContentFile();
+
+    $data = file_get_contents($this->contentFile);
+
+    return $jsonDecode ? json_decode($data, $assoc) : $data;
+  }
+
+  public function saveContentEditorData($data) {
+    if (!is_string($data)) $data = json_encode($data);
+
+    return file_put_contents($this->contentFile, $data);
+  }
+
+  /**
+   * @param bool $flatten
+   * @return array
+   */
+  public function getContentData(bool $flatten = true) {
+    $data = $this->loadContentEditorData(true, true);
+
+    if ($flatten) {
+      $data = array_reduce($data, function($r, $section) {
+        foreach ($section['fields'] as $key => $value) {
+          $r[$key] = $value['value'];
+        }
+
+        return $r;
+      }, []);
+    }
+
+    return $data;
   }
 }

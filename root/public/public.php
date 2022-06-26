@@ -1,6 +1,16 @@
 <?php
 
-if (!isset($field)) $field = [];
+/**
+ * @var array $field
+ * @var string $field['pageTitle']
+ * @var string $field['headContent']
+ * @var string[] $field['cssLinks'] - относительно /public/css/
+ * @var string[] $field['jsLinks'] - относительно /public/js/
+ * @var string $field['pageHeader'] - По умолчанию пусто.
+ * @var string $field['pageFooter'] - По умолчанию плашка.
+ */
+$field = $field ?? [];
+
 /*// Прайс
 $param = [
   'id'    => 'id-product',
@@ -16,14 +26,15 @@ $price = json_encode(array_filter($price, function ($i) {
   return boolval(strlen($i['id']));
 }));*/
 
-$field = [];
 
-$field['headContent'] = '<meta name="Public"><meta name="description" content="Public">';
-$field['cssLinks']    = [PATH_CSS . 'styles.css'];
-$field['jsLinks']     = [PATH_JS . 'calculator.min.js'];
-$field['pageTitle']   = 'Public';
-$field['pageFooter']  = '';
-//$field['pageHeader']  = '';
+$field = [
+  'headContent' => '<meta name="Public"><meta name="description" content="Public">',
+  'cssLinks'    => ['styles.css'],
+  'jsLinks'     => ['calculator.min.js'],
+
+  //'pageHeader' => '',
+  'pageFooter'  => '',
+];
 
 /*$dbContent = "<input type='hidden' id='dataPrice' value='$price'>" .
              "<input type='hidden' id='dataConfig' value='$config'>";*/

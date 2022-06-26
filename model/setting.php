@@ -168,7 +168,7 @@ switch ($cmsAction) {
         $password = $hash = password_hash($user['password'], PASSWORD_BCRYPT);
       }
 
-      file_put_contents(SYSTEM_PATH, implode('|||', [$user['login'], $user['password'], $hash]));
+      file_put_contents(SYSTEM_PATH, implode('|||', [$user['login'], $user['password'], $hash])); // todo перенести в DB
       //$setting['onlyOne'] = boolval($user['onlyOne']);
     }
 
@@ -192,7 +192,7 @@ switch ($cmsAction) {
     break;
   case 'load':
     if (USE_DATABASE) $result['user'] = $db->getUser($main->getLogin(), 'ID, login, customization');
-    else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus('ok'));
+    else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus());
 
     $result['setting'] = getSettingFile();
     break;
