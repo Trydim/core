@@ -1,9 +1,9 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global main object
+ * @var Main $main - global main object
  *
- * @var $cmsAction - fromQuery
+ * @var string $cmsAction - fromQuery
  *
  * @var $user - from Query
  */

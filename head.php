@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global
+ * @var Main $main - global
  */
 
 // todo пропускать запросы к файлам. (почему не все файлы?)
@@ -16,7 +16,12 @@ if (isset($_REQUEST['mode'])) require __DIR__ . '/model/main.php';
 else {
   $html = '';
 
-  $target = getTargetPage($_GET);
+  if ($main->isDealer()) {
+    $targetPage = str_replace($main->getCmsParam('dealerPath'), '', $_GET['targetPage'] ?? '');
+    $target = getTargetPage($targetPage);
+  } else {
+    $target = getTargetPage($_GET['targetPage'] ?? '');
+  }
   $pathTarget = checkTemplate($target);
 
   if (OUTSIDE) $main->setLoginStatus('no');
@@ -29,6 +34,8 @@ else {
   $target === '' && $target = 'public';
   require __DIR__ . "/controller/c_$target.php";
   echo $html;
+
+  unset($html, $target, $pathTarget, $dbContent, $field);
 }
 
-unset($target, $pathTarget, $html, $authStatus, $dbContent, $field, $orderId, $main);
+unset($authStatus, $dbContent, $main);

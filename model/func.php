@@ -167,9 +167,9 @@ function de($var, bool $die = true) {
  * @return bool
  */
 function includes($hayStack, string $search): bool {
-  if (is_array($search)) {
-    foreach ($search as $w) {
-      if (includes($hayStack, $w)) return true;
+  if (is_array($hayStack)) {
+    foreach ($hayStack as $item) {
+      if (includes($item, $search)) return true;
     }
   } else {
     return stripos($hayStack, $search) !== false;
@@ -203,11 +203,11 @@ function getPageAsString($data) {
 }
 
 /**
- * @param $get
+ * @param string $targetPage
  * @return array|string|string[]
  */
-function getTargetPage($get) {
-  $target = isset($get['targetPage']) ? str_replace('/', '', $get['targetPage']) : '';
+function getTargetPage($targetPage = '') {
+  $target = str_replace('/', '', $targetPage);
   if (PUBLIC_PAGE) {
     if ($target === 'public') return '';
     if ($target === PUBLIC_PAGE) reDirect();
@@ -320,7 +320,7 @@ function findKey($cell, $input) {
  * @return false|string
  */
 function findingFile($path, $fileName) {
-  $path = $path ?? SHARE_PATH;
+  $path = $path ?? ABS_SITE_PATH . SHARE_PATH;
   if (!file_exists($path)) return false;
   if (file_exists($path . '/' . $fileName)) return $path . '/' . $fileName;
 

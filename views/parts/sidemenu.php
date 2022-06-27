@@ -1,4 +1,5 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
+
 global $main;
 
 $adminMenu = '';

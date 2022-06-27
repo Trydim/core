@@ -330,24 +330,29 @@ final class Main {
   use Hooks;
 
   /**
+   * @const array
+   */
+  const DEALER_MENU = ['catalog', 'dealers'];
+
+  /**
+   * @var array - global Cms param
+   */
+  const CMS_PARAM = [
+    'PROJECT_TITLE' => 'Project title',
+    'PATH_LEGEND'   => 'public/views/legend.php',
+    'ACCESS_MENU'   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
+    'PATH_CSV'      => SHARE_PATH . 'csv/',
+  ];
+
+  /**
    * @var array
    */
   private $setting = [];
 
   /**
-   * @var array - global Cms param
+   * @var CmsParam
    */
-  private $cmsParam = [
-    'PROJECT_TITLE' => 'Project title',
-    'PATH_LEGEND'   => ['public/views/legend.php'],
-    'ACCESS_MENU'   => ['admindb',  'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
-    'PATH_CSV'      => [SHARE_PATH . 'csv/'],
-  ];
-
-  /**
-   * @var array - data base config array
-   */
-  private $dbConfig;
+  private $cmsParam;
 
   /**
    * @var array
@@ -375,15 +380,17 @@ final class Main {
    * @param array $dbConfig
    */
   public function __construct(array $cmsParam, array $dbConfig) {
-    $this->isDealer();
-    $this->setCmsParams($cmsParam);
-    $this->dbConfig = $dbConfig;
+    $this->cmsParam = new CmsParam();
+
+    $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
+    $this->checkDealer();
     $this->loadSetting();
+    $this->setSettings('dbConfig', $dbConfig);
   }
 
   public function __get($value) {
     if ($value === 'db') {
-      $this->db = new Db($this->dbConfig);
+      $this->db = new Db($this->getSettings('dbConfig'));
       return $this->db;
     }
     else if ($value === 'dealer') {
@@ -402,19 +409,43 @@ final class Main {
   cms Params
 ----------------------------------------------------------------------------------------------------------------------*/
 
-  private function isDealer() {
+  private function setDealerParam(): Main {
+    // Remove access menu for dealer
+    $filter = $this::DEALER_MENU;
+
+    $this->setCmsParam('ACCESS_MENU',
+      array_filter($this->getCmsParam('ACCESS_MENU'),
+        function ($item) use ($filter) {
+          return !includes($filter, $item);
+        }
+      )
+    );
+
+    return $this;
+  }
+
+  private function checkDealer() {
     $requestUri = $_SERVER['REQUEST_URI'];
-    $isDealer = includes($requestUri, '/dealers/');
+    $isDealer = includes($requestUri, DEALERS_PATH);
 
     if ($isDealer) {
-      preg_match('/dealers(?:\/)(\d+)(?:\/)/', $requestUri, $match); // получить ID дилера
+      preg_match('/dealer(?:\/)(\d+)(?:\/)/', $requestUri, $match); // получить ID дилера
 
       if (!isset($match[1])) die('Dealer id not found!');
 
-      $this->setCmsParams('dealerPath', ABS_SITE_PATH . '/dealers/' . $match[1] . '/');
+      $this->setCmsParam('dealerPath', DEALERS_PATH . $match[1] . '/')
+           ->setCmsParam('dealerId', $match[1])
+           ->setDealerParam();
+
+
     }
 
-    $this->setCmsParams('isDealer', $isDealer);
+    $this->user['isDealer'] = $isDealer;
+    $this->setCmsParam('isDealer', $isDealer);
+  }
+
+  public function isDealer() {
+    return $this->user['isDealer'];
   }
 
   /**
@@ -424,16 +455,17 @@ final class Main {
    *
    * @return Main
    */
-  public function setCmsParams($cmsParam, $value = null): Main {
+  public function setCmsParam($cmsParam, $value = null): Main {
     if (is_array($cmsParam)) {
-      $this->cmsParam = array_merge($this->cmsParam, $cmsParam);
-      if (isset($this->cmsParam['PATH_CSV']))
-        $this->cmsParam['PATH_CSV'] = ABS_SITE_PATH . $this->cmsParam['PATH_CSV'];
+      array_walk($cmsParam, function ($item, $key) {
+        if ($key === 'PATH_CSV') $item = ABS_SITE_PATH . $item;
+
+        $this->cmsParam->$key = $item;
+      });
     }
 
-    else if (!empty($value)) {
-      if ()
-      $this->cmsParam[$cmsParam] = $value;
+    else if ($value !== null) {
+      $this->cmsParam->$cmsParam = $value;
     }
 
     return $this;
@@ -445,7 +477,7 @@ final class Main {
    * @return mixed|string|null
    */
   public function getCmsParam(string $param) {
-    return $this->cmsParam[$param] ?? null;
+    return $this->cmsParam->$param;
   }
 
 

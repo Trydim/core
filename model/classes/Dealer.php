@@ -1,7 +1,7 @@
 <?php
 
 class Dealer {
-  const FOLDER = ABS_SITE_PATH . 'dealers/';
+  const FOLDER = ABS_SITE_PATH . DEALERS_PATH;
 
   /**
    * @var string

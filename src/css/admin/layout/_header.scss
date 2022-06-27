@@ -26,13 +26,10 @@
   }*/
 
   .logo-abbr {
-    source,
-    img {
-      min-width: 32px;
-      min-height: 32px;
-      max-width: 45px;
-      max-height: 45px;
-    }
+    min-width: 32px;
+    min-height: 32px;
+    max-width: 45px;
+    max-height: 45px;
   }
 
   .brand-logo {
@@ -313,7 +310,3 @@
     }
   }
 }
-
-
-
-

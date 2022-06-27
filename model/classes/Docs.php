@@ -1,10 +1,16 @@
 <?php
 
-/* Папка для временных файлов */
-const RESULT_PATH = 'shared/';
-!defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
+/**
+ * @var Main $main - global
+ */
+
+!defined('PATH_IMG') && define('PATH_IMG', $main->getCmsParam('imgPath'));
 
 class Docs {
+  /**
+   * Папка для временных файлов
+   */
+  const RESULT_PATH = 'shared/';
 
   /**
    * What library use
@@ -366,7 +372,7 @@ class Docs {
    * @return mixed
    */
   public function getDocs(string $dest = 'S') {
-    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH); // TODO тупой путь
+    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . $this::RESULT_PATH); // TODO тупой путь
     if (!is_dir($path)) mkdir($path);
 
     $func = 'get' . $this->getFunc();
