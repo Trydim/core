@@ -41,7 +41,7 @@
     <!-- left panel -->
     <div class="col-4">
       <div id="tree">
-        <div id="home" data-fo="<?= SHARE_PATH ?>" class="closed selected"><?= SHARE_PATH ?></div>
+        <div id="home" data-fo="<?= ABS_SITE_PATH . SHARE_PATH ?>" class="closed selected"><?= ABS_SITE_PATH . SHARE_PATH ?></div>
 
         <?php tree(ABS_SITE_PATH . SHARE_PATH); ?>
       </div>
@@ -51,5 +51,5 @@
   </div>
 </div>
 
-<input type="hidden" id="rootDirData" value="<?= SHARE_PATH ?>">
+<input type="hidden" id="rootDirData" value="<?= ABS_SITE_PATH . SHARE_PATH ?>">
 <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>

@@ -11,7 +11,14 @@ export default {
   OUTSIDE      : cms['CL_OUTSIDE'],
   SITE_PATH    : cms['SITE_PATH'] || '/',
   MAIN_PHP_PATH: (cms['SITE_PATH'] || '/') + 'index.php',
-  PATH_IMG     : (cms['URI_IMG'] || 'public/images/'),
+
+  /**
+   * @var {string} PATH_IMG
+   * @deprecated use URI_IMG
+   */
+  PATH_IMG     : (cms['URI_IMG'] || 'public/images/'), // для обратной совместимости
+  URI_IMG      : (cms['URI_IMG'] || 'public/images/'),
+
   AUTH_STATUS  : cms['AUTH_STATUS'] || false,
   INIT_SETTING : cms['INIT_SETTING'] || false,
 

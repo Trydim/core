@@ -101,7 +101,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadCVS': $db->fileForceDownload(); break;
     case 'loadFormConfig':
       if (isset($dbTable)) {
-        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath) && filesize($filePath) > 60) {
           $result['csvValues'] = $db->openCsv();
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -115,7 +115,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
-        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath)) {
           if (filesize($filePath) < 60) Xml::createXmlDefault($filePath, substr($dbTable, 1));
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -124,7 +124,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'refreshXMLConfig':
       if (isset($dbTable)) {
-        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         Xml::createXmlDefault($filePath, substr($dbTable, 1));
         $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
       }

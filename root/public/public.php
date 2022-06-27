@@ -1,15 +1,23 @@
 <?php
 
 /**
+ * @var Main $main - global
+ *
  * @var array $field
  * @var string $field['pageTitle']
  * @var string $field['headContent']
- * @var string[] $field['cssLinks'] - относительно /public/css/
- * @var string[] $field['jsLinks'] - относительно /public/js/
+ * @var string[] $field['cssLinks'] - использовать с , для css админки добавить CORE_CSS
+ * @var string[] $field['jsLinks'] - относительно /public/js/, для js админки добавить CORE_JS
  * @var string $field['pageHeader'] - По умолчанию пусто.
  * @var string $field['pageFooter'] - По умолчанию плашка.
+ *
+ * @var string $publicCss
+ * @var string $publicJs
  */
-$field = $field ?? [];
+$field = $field ?? [
+  'cssLinks' => [],
+  'jsLinks'  => [],
+];
 
 /*// Прайс
 $param = [
@@ -27,14 +35,10 @@ $price = json_encode(array_filter($price, function ($i) {
 }));*/
 
 
-$field = [
-  'headContent' => '<meta name="Public"><meta name="description" content="Public">',
-  'cssLinks'    => ['styles.css'],
-  'jsLinks'     => ['calculator.min.js'],
-
-  //'pageHeader' => '',
-  'pageFooter'  => '',
-];
+$field['cssLinks'][] = $publicCss . 'styles.css';
+$field['jsLinks'][] = $publicJs . 'calculator.min.js';
+//$field['pageHeader'] = '';
+$field['pageFooter'] = '';
 
 /*$dbContent = "<input type='hidden' id='dataPrice' value='$price'>" .
              "<input type='hidden' id='dataConfig' value='$config'>";*/

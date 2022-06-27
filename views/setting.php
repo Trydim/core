@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global object
+ * @var Main $main - global
  * @var $admin - from controller
  */
 

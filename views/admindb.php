@@ -1,8 +1,8 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main {object} - global
- * @var $tableActive {string} - global
+ * @var Main $main - global
+ * @var string $tableActive - global
  */
 
 $legendHtml = '';

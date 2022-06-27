@@ -41,7 +41,7 @@ $jsGlobalConst = json_encode([
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
-    <link rel="stylesheet" href="<?= includes($item, 'core') ? $item : URI_CSS . $item ?>">
+    <link rel="stylesheet" href="<?= $item ?>">
   <?php }, $cssLinks ?? []); ?>
 
   <script>
@@ -87,7 +87,7 @@ $jsGlobalConst = json_encode([
 <script defer type="module" src='<?= CORE_JS ?>main.js?ver=684eab4bb6f'></script>
 
 <?php array_map(function ($item) { ?>
-  <script defer type="module" src="<?= includes($item, 'core') ? $item : URI_CSS . $item ?>"></script>
+  <script defer type="module" src="<?= $item ?>"></script>
 <?php }, $jsLinks ?? []); ?>
 
 <?= $footerContent ?? '' ?>

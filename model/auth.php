@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var $main {class} - global from
+ * @var Main $main - global
  */
 
 if (!defined('MAIN_ACCESS')) die('access denied!');

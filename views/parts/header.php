@@ -3,8 +3,11 @@ if ($main && $main->checkStatus()) { ?>
 <div class="nav-header">
   <a href="<?= SITE_PATH ?>" class="brand-logo">
     <picture class="logo-abbr">
-      <!--<source srcset="<?/*= URI_IMG */?>logo.webp type="image/webp">-->
-      <img src="<?= URI_IMG ?>logo.svg" alt="logo">
+      <?php
+        $imgSrc = URI_IMG . 'logo.webp';
+        if (!file_exists($imgSrc) || filesize($imgSrc) < 512) $imgSrc = URI_IMG . 'logo.svg';
+      ?>
+      <img class="logo-abbr" src="<?= $imgSrc ?>" alt="logo">
     </picture>
     <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
   </a>

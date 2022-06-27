@@ -26,17 +26,25 @@ class UrlGenerator {
    */
   private $scheme;
 
+  /**
+   * @var string
+   */
   private $host;
 
   /**
-   * @var
+   * @var string
    */
   private $coreUri;
 
   /**
-   * @var
+   * @var string
    */
   private $fullUri;
+
+  /**
+   * @var string
+   */
+  private $dealerUri;
 
   /**
    * UrlGenerator constructor.
@@ -49,8 +57,9 @@ class UrlGenerator {
     $this->setSitePath();
     $this->setScheme();
     $this->setHost();
-    $this->setCoreUri();
     $this->setFullUri();
+    $this->setCoreUri();
+    $this->setDealerUri();
   }
 
   private function setSitePath() {
@@ -65,7 +74,11 @@ class UrlGenerator {
   }
 
   private function setHost() {
-    $this->host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
+    $this->host = $this->scheme . $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
+  }
+
+  private function setFullUri() {
+    $this->fullUri = $this->getHost() . $this->getSitePath();
   }
 
   private function setCoreUri() {
@@ -76,11 +89,15 @@ class UrlGenerator {
     //$coreLevel = count(explode(' ', $corePath));*/
     //$coreUri = str_repeat('../', $siteLevel) . 'core/';
 
-    $this->coreUri = $this->scheme . $this->host . $this->getSitePath() . $this->corePath;
+    $this->coreUri = $this->getFullUri() . $this->corePath;
   }
 
-  private function setFullUri() {
-    $this->fullUri = $this->scheme . $this->host . $this->getSitePath();
+  private function setDealerUri() {
+    global $main;
+
+    if ($main->isDealer()) {
+      $this->dealerUri = $this->getFullUri() . $main->getCmsParam('dealerPath');
+    }
   }
 
   /**
@@ -94,7 +111,7 @@ class UrlGenerator {
    * @return string
    */
   public function getCorePath() {
-    return $this->corePath . '/';
+    return $this->corePath;
   }
 
   /**
@@ -107,7 +124,18 @@ class UrlGenerator {
   /**
    * @return string
    */
-  public function getUri() {
+  public function getHost() {
+    return $this->host;
+  }
+
+  /**
+   * @return string
+   */
+  public function getFullUri() {
     return $this->fullUri;
+  }
+
+  public function getDealerUri() {
+    return $this->dealerUri;
   }
 }

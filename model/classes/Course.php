@@ -1,7 +1,7 @@
 <?php
 
 class Course {
-  const COURSE_CACHE = SHARE_PATH . 'courseCache.bin';
+  const COURSE_CACHE = ABS_SITE_PATH . SHARE_PATH . 'courseCache.bin';
   const REFRESH_INTERVAL = 36000;
   const LINK_PARAM = '';
   const DEFAULT_CURRENCY = 'RUS'; // Определить валюту по умолчанию по домену
