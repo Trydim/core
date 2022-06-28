@@ -1367,21 +1367,28 @@ trait ContentEditor {
 
   public function saveContentEditorData($data) {
     if (!is_string($data)) $data = json_encode($data);
+    file_exists(CSV_CACHE) && unlink(CSV_CACHE);
 
     return file_put_contents($this->contentFile, $data);
   }
 
   /**
    * @param bool $flatten
+   * @param bool $assoc
+   *
    * @return array
    */
-  public function getContentData(bool $flatten = true) {
+  public function getContentData(bool $flatten = true, bool $assoc = false): array {
     $data = $this->loadContentEditorData(true, true);
 
     if ($flatten) {
-      $data = array_reduce($data, function($r, $section) {
+      $data = array_reduce($data, function($r, $section) use ($assoc) {
         foreach ($section['fields'] as $key => $value) {
-          $r[$key] = $value['value'];
+          if ($assoc) $r[$key] = $value['value'];
+          else $r[] = [
+            'id' => $key,
+            'value' => $value['value'],
+          ];
         }
 
         return $r;

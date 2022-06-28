@@ -78,10 +78,8 @@ export default {
     queryParam: {},
   }),
   computed: {
-
   },
   watch: {
-
   },
   methods: {
     query() {
@@ -95,6 +93,7 @@ export default {
       });
 
       f.Post({data}).then(data => {
+        alert('ok');
       });
     },
     loadData() {
@@ -104,7 +103,7 @@ export default {
     checkColumn() { return true; },
 
     addDealer() {
-
+      this.query();
     },
     changeDealer() {},
     setupDealer() {},

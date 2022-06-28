@@ -1,15 +1,17 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var Main $main - global
  * @var boolean $wrongPass - from controller
  * @var string $login - from Request
  * @var string $pass - from Request
  */
 
+$siteLink = $main->isDealer() ? $main->url->getDealerUri() : $main->url->getFullUri();
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
-$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . SITE_PATH . '">Открытая страница</a>' : '';
+$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . $siteLink . '">Открытая страница</a>' : '';
 
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global
@@ -45,6 +47,7 @@ $field['global'] = <<<global
 
         <input name="mode" type="hidden" value="auth">
         <input name="authAction" type="hidden" value="login">
+        <input name="REQUEST_URI" type="hidden" value="$siteLink">
       </form>
       <div class="new-account mt-3">
         <p>$publicLink</p>

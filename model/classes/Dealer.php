@@ -30,7 +30,7 @@ class Dealer {
     }
   }
   private function createFolder(string $id) {
-    $this->dealerDir = $this::FOLDER . '/' . $id;
+    $this->dealerDir = $this::FOLDER . $id;
 
     /*if (is_dir($this->dealerDir)) {
       die('Folder for dealer exist!');
@@ -82,6 +82,8 @@ class Dealer {
   }
 
   public function drop(string $id, string $prefix) {
+    unlink($this::FOLDER . '/' . $id);
+
     $this->migrateDb = new MigrateDb($prefix);
     // удалить все таблица с префиксом
     $this->migrateDb->drop($prefix);

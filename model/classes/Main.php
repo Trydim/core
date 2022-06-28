@@ -428,7 +428,7 @@ final class Main {
   }
 
   private function checkDealer() {
-    $requestUri = $_SERVER['REQUEST_METHOD'] === 'GET' ? $_SERVER['REQUEST_URI'] : $_POST['REQUEST_URI'];
+    $requestUri = $_SERVER['REQUEST_METHOD'] === 'GET' ? $_SERVER['REQUEST_URI'] : $_POST['REQUEST_URI'] ?? '';
     $isDealer = includes($requestUri, DEALERS_PATH);
 
     if ($isDealer) {

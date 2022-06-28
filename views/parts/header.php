@@ -1,7 +1,11 @@
-<?php global $main;
-if ($main && $main->checkStatus()) { ?>
+<?php
+global $main;
+
+$siteLink = $main->isDealer() ? $main->url->getDealerUri() : $main->url->getFullUri();
+
+if ($main->checkStatus()) { ?>
 <div class="nav-header">
-  <a href="<?= SITE_PATH ?>" class="brand-logo">
+  <a href="<?= $siteLink ?>" class="brand-logo">
     <picture class="logo-abbr">
       <?php
         $imgSrc = URI_IMG . 'logo.webp';
@@ -46,6 +50,6 @@ if ($main && $main->checkStatus()) { ?>
 </div>
 <?php } else { ?>
 <div class="header">
-  <a href="<?= SITE_PATH?>login"><?= gTxt('Login') ?></a>
+  <a href="<?= $siteLink ?>login"><?= gTxt('Login') ?></a>
 </div>
 <?php } ?>
