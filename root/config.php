@@ -8,10 +8,6 @@ $publicConfig = [
   'PROJECT_TITLE' => 'PROJECT_TITLE',
   /** Любое значение включает режим отладки */
   //'DEBUG' => true,
-  /** Путь к родительскому конфигу (только для созависимых админок)  */
-  //'PATH_MAIN_CONFIG' => '',
-  /** Относительный путь к админке (если расположение не site.com/core) */
-  //'PATH_CORE' => '',
 
   /** Почта */
   //'MAIL_TARGET_DEBUG' => 'trydim@mail.ru',

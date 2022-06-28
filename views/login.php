@@ -6,7 +6,6 @@
  * @var string $pass - from Request
  */
 
-!isset($pageTarget) && $pageTarget = '';
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
@@ -46,7 +45,6 @@ $field['global'] = <<<global
 
         <input name="mode" type="hidden" value="auth">
         <input name="authAction" type="hidden" value="login">
-        <input name="clientPageTarget" type="hidden" value="$pageTarget">
       </form>
       <div class="new-account mt-3">
         <p>$publicLink</p>

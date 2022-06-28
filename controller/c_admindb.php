@@ -17,8 +17,7 @@ $field['jsLinks'] = [
 
 if (isset($_GET['tableName'])) $tableActive = $_GET['tableName'];
 else {
-  global $dbTables;
-  count($dbTables) && reDirect('admindb?tableName=' . $dbTables[0]['fileName']);
+  count($main->dbTables) && $main->reDirect('admindb?tableName=' . $main->dbTables[0]['fileName']);
 }
 
 $pathLegend = ABS_SITE_PATH . $main->getCmsParam('PATH_LEGEND');

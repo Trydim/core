@@ -17,13 +17,12 @@ const readFileAsArray = path => {
 const writeArrayToFile = (path, data) => {
   fs.writeFileSync(path, data.join('\n'));
 }
-/*
 
 // Создать папки для дилеров
 mkDir(dealerDir);
 mkDir(dealerResourceDir);
 mkDir(dealerSrcDir);
-
+/*
 // Скопировать необходимые файлы
 // .htaccess
 //param = [6, 12, 15] // Строки заменить
@@ -43,6 +42,7 @@ writeArrayToFile(dealerResourceDir + 'index.php', fileContent);
 fileContent = `<?php
 
 $publicConfig = [
+  'IS_DEALER' => true,
   'PROJECT_TITLE' => '\${dealerName}',
 ];
 
@@ -50,6 +50,7 @@ $publicConfig = [
 // DB connect/config
 
 $dbConfig = [
+  'dbPrefix'   => '\${dealerDbPrefix}',
   'dbHost'     => 'localhost',
   'dbName'     => '\${dealerDbName}',
   'dbUsername' => '\${dealerDbUser}',

@@ -35,6 +35,7 @@ const downloadBody = async data => {
 
 const query = (url, data, type = 'json') => {
   type === 'file' && (type = 'body');
+  data.set('REQUEST_URI', location.href);
   return fetch(url, {method: 'post', body: data})
     .then(res => type === 'json' ? res.text() : res).then(
       data => {
@@ -63,7 +64,7 @@ export default {
    * @return {Promise<Response>}
    * @constructor
    */
-  Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url + '?' + data, '', type),
+  Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url + '?' + data, new FormData(), type),
 
   /**
    * Fetch Post

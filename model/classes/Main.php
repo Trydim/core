@@ -9,7 +9,7 @@ trait Authorization {
   /**
    * @var string[]
    */
-  static $AVAILABLE_ACTION = ['loadCVS', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
+  static $AVAILABLE_ACTION = ['loadCSV', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
 
   /**
    * @var string
@@ -25,6 +25,21 @@ trait Authorization {
    * @var object [admin, login, id, name]
    */
   private $user = [];
+
+  private function setSideMenu() {
+    if (USE_DATABASE) {
+      $menuAccess = $this->getLogin('permission')['menu'] ?? '';
+      $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
+      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
+    } else {
+      $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
+      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
+        return !in_array($m, $filterMenu);
+      });
+    }
+    PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
+    $this->sideMenu[] = 'setting';
+  }
 
   /**
    * @param $field
@@ -85,14 +100,6 @@ trait Authorization {
     return $this;
   }
 
-  /** Нужна ли регистрация для действия
-   * @param string $action
-   * @return bool|Main
-   */
-  public function checkAction(string $action) {
-    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth();
-  }
-
   /**
    * Если отк. страница доступна без регистрации, то перейти
    * Если отк. стр-ца не доступна без регистрации, то перейти на login
@@ -108,30 +115,23 @@ trait Authorization {
         isset($_REQUEST['status']) && $this->setLoginStatus('error');
       } else {
         $_SESSION['target'] = $target;
-        if (ONLY_LOGIN || !PUBLIC_PAGE) reDirect('login');
+        if (ONLY_LOGIN || $target !== '' || !PUBLIC_PAGE) $this->reDirect('login');
       }
     } else {
-      if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) reDirect($this->getSideMenu(true));
-      if (!in_array($target, ['', '404', 'js']) && !$this->availablePage($target)) reDirect('404');
+      if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) $this->reDirect($this->getSideMenu(true));
+      if (!in_array($target, ['', '404', 'js']) && !$this->availablePage($target)) $this->reDirect('404');
     }
 
     session_abort();
     return $this;
   }
 
-  private function setSideMenu() {
-    if (USE_DATABASE) {
-      $menuAccess = $this->getLogin('permission')['menu'] ?? '';
-      $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
-      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
-    } else {
-      $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
-      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
-        return !in_array($m, $filterMenu);
-      });
-    }
-    PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
-    $this->sideMenu[] = 'setting';
+  /** Нужна ли регистрация для действия
+   * @param string $action
+   * @return bool|Main
+   */
+  public function checkAction(string $action) {
+    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth();
   }
 
   /**
@@ -332,7 +332,7 @@ final class Main {
   /**
    * @const array
    */
-  const DEALER_MENU = ['catalog', 'dealers'];
+  const DEALER_MENU = ['dealers'];
 
   /**
    * @var array - global Cms param
@@ -380,7 +380,7 @@ final class Main {
    * @param array $dbConfig
    */
   public function __construct(array $cmsParam, array $dbConfig) {
-    $this->cmsParam = new CmsParam();
+    $this->cmsParam = [];
 
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
     $this->checkDealer();
@@ -389,12 +389,15 @@ final class Main {
   }
 
   public function __get($value) {
-    if ($value === 'db') {
+    if ($value === 'url') {
+      $this->url = new UrlGenerator('core/');
+    }
+    else if ($value === 'db') {
       $this->db = new Db($this->getSettings('dbConfig'));
       return $this->db;
     }
     else if ($value === 'dealer') {
-      $this->dealer = new Dealer();
+      $this->dealer = new Dealer($this->db);
       return $this->dealer;
     }
 
@@ -425,7 +428,7 @@ final class Main {
   }
 
   private function checkDealer() {
-    $requestUri = $_SERVER['REQUEST_URI'];
+    $requestUri = $_SERVER['REQUEST_METHOD'] === 'GET' ? $_SERVER['REQUEST_URI'] : $_POST['REQUEST_URI'];
     $isDealer = includes($requestUri, DEALERS_PATH);
 
     if ($isDealer) {
@@ -436,8 +439,6 @@ final class Main {
       $this->setCmsParam('dealerPath', DEALERS_PATH . $match[1] . '/')
            ->setCmsParam('dealerId', $match[1])
            ->setDealerParam();
-
-
     }
 
     $this->user['isDealer'] = $isDealer;
@@ -450,22 +451,22 @@ final class Main {
 
   /**
    * setCmsSetting from config
-   * @param $cmsParam
+   * @param string[]|string $param
    * @param $value
    *
    * @return Main
    */
-  public function setCmsParam($cmsParam, $value = null): Main {
-    if (is_array($cmsParam)) {
-      array_walk($cmsParam, function ($item, $key) {
+  public function setCmsParam($param, $value = null): Main {
+    if (is_array($param)) {
+      array_walk($param, function ($item, $key) {
         if ($key === 'PATH_CSV') $item = ABS_SITE_PATH . $item;
 
-        $this->cmsParam->$key = $item;
+        $this->cmsParam[$key] = $item;
       });
     }
 
     else if ($value !== null) {
-      $this->cmsParam->$cmsParam = $value;
+      $this->cmsParam[$param] = $value;
     }
 
     return $this;
@@ -477,9 +478,8 @@ final class Main {
    * @return mixed|string|null
    */
   public function getCmsParam(string $param) {
-    return $this->cmsParam->$param;
+    return $this->cmsParam[$param] ?? null;
   }
-
 
 /* ---------------------------------------------------------------------------------------------------------------------
   Settings
@@ -630,8 +630,8 @@ final class Main {
    * @param string $key
    * @param mixed $value
    * @return $this
-   */
-  /*public function addControllerField(string $key, $value): Main {
+   *!/
+  public function addControllerField(string $key, $value): Main {
     if (!isset($this->controllerParam['field'])) $this->controllerParam['field'] = [];
 
     if (isset($this->controllerParam['field'][$key])) {
@@ -646,7 +646,7 @@ final class Main {
     return $this;
   }*/
 
-  public function getControllerField() {
+  public function getControllerField(): array {
     return $this->controllerField;
   }
 
@@ -660,6 +660,16 @@ final class Main {
 
   public function getDB(): Db {
     return $this->db;
+  }
+
+  public function reDirect(string $target = '') {
+    if ($target === '') {
+      $target = $_SESSION['target'] ?? '';
+      isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
+    }
+    $uri = $this->isDealer() ? $this->url->getDealerUri() : $this->url->getFullUri();
+    header('location: ' . $uri . $target);
+    die;
   }
 
   /**

@@ -28,7 +28,7 @@ $param = [
   'value' => ['Стоимость, руб.', 'float'],
 ];
 
-$price = loadCVS($param, 'price.csv');
+$price = loadCSV($param, 'price.csv');
 
 $price = json_encode(array_filter($price, function ($i) {
   return boolval(strlen($i['id']));

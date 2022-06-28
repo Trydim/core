@@ -8,18 +8,27 @@ class Dealer {
    */
   private $dealerDir;
 
-  public function __construct() {}
+  /**
+   * @var string
+   */
+  private $dbType;
+
+  /**
+   * @var MigrateDb;
+   */
+  private $migrateDb;
+
+  public function __construct() { }
 
   private function createFolderDealers() {
     if (!is_dir($this::FOLDER)) {
       try {
-        mkdir($this::FOLDER, 0777);
+        mkdir($this::FOLDER);
       } catch (\ErrorException $e) {
-        die('Folder for dealers not created');
+        die('Folder for dealers not created.');
       }
     }
   }
-
   private function createFolder(string $id) {
     $this->dealerDir = $this::FOLDER . '/' . $id;
 
@@ -28,8 +37,8 @@ class Dealer {
     }*/
 
     try {
-      mkdir($this->dealerDir, 0777);
-    } catch (\ErrorException $e) {
+      mkdir($this->dealerDir);
+    } catch (\Exception $e) {
       die("Folder for $this->dealerDir dealer not created");
     }
   }
@@ -46,14 +55,36 @@ class Dealer {
     }
   }
 
+  private function updateDb(string $prefix, $login, $pass) {
+    $this->migrateDb = new MigrateDb($prefix);
+
+    $this->migrateDb->createFiles();
+    $this->migrateDb->createCustomers();
+    $this->migrateDb->createOrderStatus();
+    $this->migrateDb->createPermission();
+    $this->migrateDb->createUsers();
+    $this->migrateDb->createOrders();
+
+    $this->migrateDb->createAdmin($login, $pass);
+  }
+
   /**
    * @param string $id
+   * @param string $prefix
    */
-  public function create(string $id) {
+  public function create(string $id, string $prefix, $login, $pass) {
     $this->createFolderDealers();
     $this->createFolder($id);
     $this->copyFiles();
-    //
+
+    $this->updateDb($prefix, $login, $pass);
+
+  }
+
+  public function drop(string $id, string $prefix) {
+    $this->migrateDb = new MigrateDb($prefix);
+    // удалить все таблица с префиксом
+    $this->migrateDb->drop($prefix);
   }
 
 }

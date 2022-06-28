@@ -34,6 +34,11 @@ class UrlGenerator {
   /**
    * @var string
    */
+  private $method;
+
+  /**
+   * @var string
+   */
   private $coreUri;
 
   /**
@@ -53,6 +58,7 @@ class UrlGenerator {
   public function __construct(string $corePath) {
     $this->absolutePath = str_replace('\\', '/', ABS_SITE_PATH);
     $this->corePath = str_replace('\\', '/', $corePath);
+    $this->method = $_SERVER['REQUEST_METHOD'];
 
     $this->setSitePath();
     $this->setScheme();

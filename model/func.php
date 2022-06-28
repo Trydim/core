@@ -206,12 +206,11 @@ function getPageAsString($data) {
  * @param string $targetPage
  * @return array|string|string[]
  */
-function getTargetPage($targetPage = '') {
+function getTargetPage(string $targetPage = '') {
   $target = str_replace('/', '', $targetPage);
-  if (PUBLIC_PAGE) {
-    if ($target === 'public') return '';
-    if ($target === PUBLIC_PAGE) reDirect();
-  }
+
+  if (PUBLIC_PAGE && ($target === 'public' || $target === PUBLIC_PAGE)) return '';
+
   return $target;
 }
 
@@ -346,12 +345,12 @@ function findingFile($path, $fileName) {
  *
  * @return mixed array or bool
  */
-function loadCVS($dict, $filename, $one_rang = false) {
+function loadCSV($dict, $filename, $one_rang = false) {
   global $main;
   $filename = file_exists($filename) ? $filename : $main->getCmsParam('PATH_CSV') . $filename;
   $result = [];
 
-  if (!count($dict)) return loadFullCVS($filename);
+  if (!count($dict)) return loadFullCSV($filename);
 
   if (file_exists($filename) && ($handle = fopen($filename, "rt")) !== false) {
     if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
@@ -410,7 +409,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
  * @param $path
  * @return array|bool
  */
-function loadFullCVS($path) {
+function loadFullCSV($path) {
 
   if (file_exists($path) && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
@@ -459,18 +458,6 @@ function setUserLocale($lang = 'ru_RU') {
 
   bindtextdomain($lang, './lang');
   textdomain($lang);
-}
-
-/**
- * @param string $target
- */
-function reDirect(string $target = '') {
-  if ($target === '') {
-    $target = $_SESSION['target'] ?? '';
-    isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
-  }
-  header('location: ' . SITE_PATH . $target); // Todo попробовать убрать
-  die;
 }
 
 /**

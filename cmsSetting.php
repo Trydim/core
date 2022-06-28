@@ -17,7 +17,7 @@ const CORE          = __DIR__ . '/',
       SYSTEM_PATH   = ABS_SITE_PATH . SHARE_PATH . 'system.php'; // TODO перенести в DB
 
 $main = new Main($publicConfig, $dbConfig ?? []);
-$url = new UrlGenerator('core/');
+$url = $main->url;
 
 define('DEBUG', array_key_exists('DEBUG', $publicConfig));
 define('URI', $url->getHost());
@@ -38,16 +38,25 @@ $main->setCmsParam('imgPath', ABS_SITE_PATH . ($publicConfig['PATH_IMG'] ?? 'pub
      ->setCmsParam('uriJs', $url->getFullUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 
 if ($main->isDealer()) {
-  require $main->getCmsParam('dealerPath') . 'config.php';
-  $main->setSettings('dbConfig', $dbConfig ?? []);
+  $main->setCmsParam('MAIN_CSV', $main->getCmsParam('PATH_CSV')); // TODO не удобно
 
+  require $main->getCmsParam('dealerPath') . 'config.php';
+  $dealPath = $main->getCmsParam('dealerPath');
+
+  $main->setCmsParam('PATH_CSV', ABS_SITE_PATH . $dealPath . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
+  unset($publicConfig['PATH_CSV']);
+
+  $main->setCmsParam($publicConfig);
+  $main->setSettings('dbConfig', $dbConfig ?? []);
   if (isset($publicConfig['PATH_IMG'])) {
-    $main->setCmsParam('imgPath', ABS_SITE_PATH . $main->getCmsParam('dealerPath') . $publicConfig['PATH_IMG']);
+    $main->setCmsParam('imgPath', ABS_SITE_PATH . $dealPath . $publicConfig['PATH_IMG'])
+         ->setCmsParam('uriImg', $url->getDealerUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'));
   }
 
-  $main->setCmsParam('uriImg', $url->getDealerUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
-    ->setCmsParam('uriCss', $url->getDealerUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
-    ->setCmsParam('uriJs', $url->getDealerUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
+  $main->setCmsParam('dealUriCss', $url->getDealerUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
+       ->setCmsParam('dealUriJs', $url->getDealerUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
+
+  unset($dealPath);
 }
 
 define('URI_IMG', $main->getCmsParam('uriImg'));

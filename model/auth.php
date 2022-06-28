@@ -23,20 +23,18 @@ switch ($authAction) {
       $_SESSION['PHPSESSID'] = $_COOKIE['PHPSESSID'];
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
-      /*$main->getSettings('onlyOne') && */
       $main->db->setUserHash($user['ID'], $_SESSION['hash']);
 
-      reDirect(isset($clientPageTarget) && $clientPageTarget !== 'login' ? $clientPageTarget : '');
-    } else reDirect("login?status=error&login=$login");
+      $main->reDirect();
+    } else $main->reDirect("login?status=error&login=$login");
     break;
   case 'exit':
     if (isset($_SESSION['id'])) {
       $hash = password_hash(uniqid(), PASSWORD_BCRYPT);
-      /*$main->getSettings('onlyOne') &&*/
       $main->db->setUserHash($_SESSION['id'], $hash);
       $_SESSION['password'] = uniqid();
       $_SESSION['target'] = '';
-      reDirect();
+      $main->reDirect();
     }
     break;
 

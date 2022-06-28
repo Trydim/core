@@ -98,7 +98,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $result['error'] = 'Nothing to save!';
       }
       break;
-    case 'loadCVS': $db->fileForceDownload(); break;
+    case 'loadCSV': $db->fileForceDownload(); break;
     case 'loadFormConfig':
       if (isset($dbTable)) {
         $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
@@ -594,20 +594,26 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'addDealer':
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
-        $param = [];
+
+        $login = $dealer['login'] ?? null;
+        $pass = isset($dealer['pass']) ? password_hash($dealer['pass'], PASSWORD_BCRYPT) : null;
 
         $id = 2;// $db->getLastID('dealers', ['name' => 'tmp']);
 
-        $contacts = [];
-        foreach ($dealer as $k => $v) {
-          if (in_array($k, ['login', 'name'])) $param[$k] = $v;
-          else if ($k === 'activity') $param[$k] = intval(boolValue($v));
-          else $contacts[$k] = $v;
-        }
-        $param['contacts'] = json_encode($contacts);
+        $param = [
+          'name' => $dealer['name'],
+          'activity' => intval(boolValue($dealer['activity'])),
+          'contacts' => json_encode([
+            'address' => $dealer['address'] ?? '',
+            'email' => $dealer['email'] ?? '',
+            'phone' => $dealer['phone'] ?? '',
+          ]),
+        ];
 
-        //$result = $db->insert($columns, 'dealers', ['0' => $param]);
-        $main->dealer->create($id);
+        //$result = $db->insert($columns, 'dealers', [$id => $param], true);
+        $prefix = strtolower(substr($dealer['name'], 0, 3)) ;
+
+        $main->dealer->create($id, $prefix, $login, $pass);
       }
       break;
     /*case 'changeDealer': break;

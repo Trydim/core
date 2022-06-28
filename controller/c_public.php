@@ -5,12 +5,14 @@
  */
 
 $authStatus = $main->checkStatus();
+$isDealer = $main->isDealer();
 $dbContent = "";
 $field = [
   'pageTitle' => $main->getCmsParam('PROJECT_TITLE'),
   'headContent' => '<meta name="Public"><meta name="description" content="Public">',
   'cssLinks' => [],
   'jsLinks'  => [],
+  'sideLeft' => $authStatus ? null : '',
 ];
 $publicCss = $main->getCmsParam('uriCss');
 $publicJs = $main->getCmsParam('uriJs');
@@ -53,13 +55,17 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
   unset($order, $orderId);
 }
 
-if (!$authStatus) $field['sideLeft'] = '';
+if ($isDealer) { // TODO не очень
+  $dealCsvPath = $main->getCmsParam('PATH_CSV');
+  $main->setCmsParam('PATH_CSV', $main->getCmsParam('MAIN_CSV'));
+}
 
 require ABS_SITE_PATH . 'public/public.php';
-if ($main->isDealer()) {
+if ($isDealer) {
   $dealPublic = ABS_SITE_PATH . $main->getCmsParam('dealerPath') . 'public/public.php';
 
   if (file_exists($dealPublic)) {
+    $main->setCmsParam('PATH_CSV', $dealCsvPath);
     $publicCss = $main->getCmsParam('uriCss');
     $publicJs = $main->getCmsParam('uriJs');
     require $dealPublic;
@@ -67,13 +73,13 @@ if ($main->isDealer()) {
 }
 
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
-if ($main->isDealer()) {
+if ($isDealer) {
   $dealPublic = ABS_SITE_PATH . $main->getCmsParam('dealerPath') . 'public/views/' . PUBLIC_PAGE . '.php';
   if (file_exists($dealPublic)) {
     require $dealPublic;
   }
 
-  unset($dealPublic);
+  unset($dealPublic, $dealCsvPath);
 }
 
 $html = template(OUTSIDE ? '_outside' : 'base', $field);

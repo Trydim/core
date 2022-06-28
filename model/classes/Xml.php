@@ -67,7 +67,7 @@ XML;
   }
 
   static function createXmlDefault($xmlFileName, $fileName) {
-    $csv = loadCVS([], $fileName);
+    $csv = loadCSV([], $fileName);
     if (count($csv)) {
       $xml = new SimpleXMLElement(self::getXMLTemplate());
       $param = [];

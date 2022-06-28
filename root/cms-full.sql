@@ -377,8 +377,8 @@ CREATE TABLE `users` (
 -- Дамп данных таблицы `users`
 --
 
-INSERT INTO `users` (`ID`, `permission_id`, `login`, `password`, `name`, `contacts`, `register_date`, `activity`, `customization`, `hash`) VALUES
-(1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'admin', '{}', '2020-07-28 21:00:00', 1, '{}', '$2y$10$BViKvxpmTvyz4TdALZEwLeXPFLGZ0KLv3CIDhWvNYAajBZOcqzWRy');
+INSERT INTO `users` (`ID`, `permission_id`, `login`, `password`, `name`) VALUES
+(1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'admin');
 
 -- --------------------------------------------------------
 

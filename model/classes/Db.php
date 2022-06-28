@@ -5,8 +5,8 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 require __DIR__ . '/Rb.php';
 
 class Db extends \R {
-  const DB_DATA_FORMAT = 'Y-m-d H:i:s';
 
+  const DB_DATA_FORMAT = 'Y-m-d H:i:s';
 
   /**
    * @var int
@@ -76,10 +76,7 @@ class Db extends \R {
         $dbConfig['dbPass']
       );
 
-      if (!self::testConnection()) {
-        is_callable('reDirect') && reDirect('404&dbError=true');
-        exit('Data Base connect error!');
-      }
+      !self::testConnection() && die('Data Base connect error!');
 
       $this->setting();
 
@@ -117,7 +114,7 @@ class Db extends \R {
    * @param string $type
    * @return Closure
    */
-  private function getConvertDbType(string $type) {
+  private function getConvertDbType(string $type): Closure {
     if (stripos($type, 'int') === 0) {
       return function ($v) { return intval($v); };
     }
@@ -840,10 +837,10 @@ class Db extends \R {
     /*important_value AS 'importantValue', */
     $sql = "SELECT O.ID AS 'O.ID', create_date AS 'createDate',
             last_edit_date AS 'lastEditDate', start_shipping_date AS 'startShippingDate',
-            end_shipping_date AS 'endShippingDate', users.name, C.name as 'C.name', total,
+            end_shipping_date AS 'endShippingDate', U.name, C.name as 'C.name', total,
             S.name AS 'S.name'
       FROM " . $this->pf('orders') . " O
-      LEFT JOIN " . $this->pf('users') . " ON O.user_id = users.ID
+      LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
       LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
       JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID\n";
 
@@ -1053,11 +1050,8 @@ class Db extends \R {
    * @return array|null
    */
   public function getUser($login, $column = 'ID') {
-    $result = self::getRow("SELECT $column FROM :users WHERE login = :login",
-      [
-        ':users' => $this->pf('users'),
-        ':login' => $login,
-      ]
+    $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
+      [':login' => $login]
     );
 
     if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
