@@ -44,12 +44,17 @@ class UrlGenerator {
   /**
    * @var string
    */
+  private $fullPath;
+
+  /**
+   * @var string
+   */
   private $fullUri;
 
   /**
    * @var string
    */
-  private $dealerUri;
+  private $;
 
   /**
    * UrlGenerator constructor.
@@ -60,33 +65,34 @@ class UrlGenerator {
     $this->corePath = str_replace('\\', '/', $corePath);
     $this->method = $_SERVER['REQUEST_METHOD'];
 
+    $this->setRoute();
     $this->setSitePath();
     $this->setScheme();
     $this->setHost();
+    $this->setFullPath();
     $this->setFullUri();
     $this->setCoreUri();
-    $this->setDealerUri();
   }
 
+  private function setRoute() {
+    $this->
+  },
   private function setSitePath() {
-    $sitePath = str_replace($_SERVER['DOCUMENT_ROOT'], '/', $this->absolutePath);
-
-    $this->sitePath = str_replace('//', '/', $sitePath);
+    $this->sitePath = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->absolutePath);
   }
-
   private function setScheme() {
     $https = $_SERVER['HTTPS'] ?? false;
     $this->scheme = ($https ? 'https' : 'http') . '://';
   }
-
   private function setHost() {
     $this->host = $this->scheme . $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
   }
-
-  private function setFullUri() {
-    $this->fullUri = $this->getHost() . $this->getSitePath();
+  private function setFullPath(string $path = '') {
+    $this->fullPath = $this->absolutePath . substr($this->getSitePath(), 1) . $path;
   }
-
+  private function setFullUri(string $path = '') {
+    $this->fullUri = $this->getHost() . $this->getSitePath() . $path;
+  }
   private function setCoreUri() {
     // Определять автоматом.
     /*$sitePath = trim(str_replace('/', ' ', $this->sitePath));
@@ -96,14 +102,6 @@ class UrlGenerator {
     //$coreUri = str_repeat('../', $siteLevel) . 'core/';
 
     $this->coreUri = $this->getFullUri() . $this->corePath;
-  }
-
-  private function setDealerUri() {
-    global $main;
-
-    if ($main->isDealer()) {
-      $this->dealerUri = $this->getFullUri() . $main->getCmsParam('dealerPath');
-    }
   }
 
   /**
@@ -134,6 +132,10 @@ class UrlGenerator {
     return $this->host;
   }
 
+  public function getFullPath() {
+    return $this->fullPath;
+  }
+
   /**
    * @return string
    */
@@ -141,7 +143,8 @@ class UrlGenerator {
     return $this->fullUri;
   }
 
-  public function getDealerUri() {
-    return $this->dealerUri;
+  public function updateDealer(string $dealPath) {
+    $this->setFullPath($dealPath);
+    $this->setFullUri($dealPath);
   }
 }

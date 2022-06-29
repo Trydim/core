@@ -58,7 +58,9 @@ class Dealer {
   private function updateDb(string $prefix, $login, $pass) {
     $this->migrateDb = new MigrateDb($prefix);
 
+    $this->migrateDb->createMoney();
     $this->migrateDb->createFiles();
+
     $this->migrateDb->createCustomers();
     $this->migrateDb->createOrderStatus();
     $this->migrateDb->createPermission();

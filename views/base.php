@@ -5,11 +5,12 @@
  */
 
 global $main, $target;
+$isAuth = $main->checkStatus();
 
 if (!isset($global)) {
   $pageHeader = $pageHeader ?? template('parts/header');
-  $pageFooter = $pageFooter ?? template('parts/footer');
-  $sideLeft = $sideLeft ?? template('parts/sidemenu');
+  $pageFooter = $pageFooter ?? ($isAuth ? template('parts/footer'): '');
+  $sideLeft = $sideLeft ?? ($isAuth ? template('parts/sidemenu') : '');
   $sideRight = $sideRight ?? '';
 }
 $footerContentBase = $footerContentBase ?? template('parts/footerBase');
@@ -21,7 +22,7 @@ $jsGlobalConst = json_encode([
   'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
-  'AUTH_STATUS'   => $main->checkStatus(),
+  'AUTH_STATUS'   => $isAuth,
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 
@@ -36,8 +37,10 @@ $jsGlobalConst = json_encode([
   <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
-  <?php if ($main->checkStatus() || $target === 'login') { ?>
+  <?php if ($isAuth || $target === 'login') { ?>
     <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
+  <?php } else { ?>
+    <style>.main-wrapper {--theme-sidebar-width: 0;}</style>
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
@@ -51,10 +54,7 @@ $jsGlobalConst = json_encode([
 
 <!-- dark -->
 <!-- horizontal -->
-<body
-    data-theme-version="light"
-    data-layout="vertical"
->
+<body data-theme-version="light" data-layout="vertical">
 
 <div id="preloader">
   <div class="sk-three-bounce">

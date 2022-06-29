@@ -592,7 +592,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     case 'addDealer':
-      $dealer = '{"name":"door"}';
+      $dealer = '{"name":"test"}';
 
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
@@ -616,6 +616,18 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $prefix = strtolower(substr(translit($dealer['name']), 0, 3)) ;
 
         $main->dealer->create($id, $prefix, $login, $pass);
+      }
+      break;
+    case 'loadDealers':
+      $result['dealers'] = $main->db->loadDealers();
+      break;
+    case 'setupDealer':
+      if (isset($dealer)) {
+        $dealer = json_decode($dealer, true);
+
+        $param['settings'] = json_encode($dealer['settings']);
+
+        $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);;
       }
       break;
     /*case 'changeDealer': break;

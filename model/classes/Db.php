@@ -488,7 +488,7 @@ class Db extends \R {
             $file['name'] = $name . $ext;
 
             $dbFile = $dbDir . $file['name'];
-            $uploadFile = $uploadDir . $file['name'];
+            //$uploadFile = $uploadDir . $file['name'];
           }
         }
 
@@ -507,7 +507,7 @@ class Db extends \R {
         if (isset($id)) {
           $result['files'][] = [
             'id' => $id,
-            'path' => URI . 'shared/' . $dbFile,
+            'path' => URI . 'shared/' . $dbFile, // TODO разные пути
           ];
         }
       }
@@ -563,7 +563,7 @@ class Db extends \R {
       $path = findingFile(substr(ABS_SITE_PATH . SHARE_PATH, 0, -1), mb_strtolower($item['path']));
       $item['id'] = $item['ID'];
       $item['path'] = $item['src'] = $path
-        ? URI . str_replace(ABS_SITE_PATH, '', $path)
+        ? URI . str_replace(ABS_SITE_PATH, '', $path) // TODO путь к файлу относительно самого файла
         : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
 
       unset($item['ID']);
@@ -1342,13 +1342,20 @@ trait MainCsv {
   }
 }
 
-
 trait ContentEditor {
-  private $contentFile = ABS_SITE_PATH . SHARE_PATH . 'content.json';
+  private $contentPath = '';
+  private $contentFile = '{}';
+
+  private function setContentPath(): void {
+    global $main;
+    $this->contentPath = $main->url->getFullPath() . SHARE_PATH . 'content.json';
+  }
 
   private function checkContentFile(): void {
-    if (!file_exists($this->contentFile)) {
-      file_put_contents($this->contentFile, '{}');
+    $this->setContentPath();
+
+    if (!file_exists($this->contentPath)) {
+      file_put_contents($this->contentPath, $this->contentFile);
     }
   }
 
@@ -1360,16 +1367,18 @@ trait ContentEditor {
   public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false) {
     $this->checkContentFile();
 
-    $data = file_get_contents($this->contentFile);
+    $data = file_get_contents($this->contentPath);
 
     return $jsonDecode ? json_decode($data, $assoc) : $data;
   }
 
   public function saveContentEditorData($data) {
+    $this->checkContentFile();
+
     if (!is_string($data)) $data = json_encode($data);
     file_exists(CSV_CACHE) && unlink(CSV_CACHE);
 
-    return file_put_contents($this->contentFile, $data);
+    return file_put_contents($this->contentPath, $data);
   }
 
   /**

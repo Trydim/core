@@ -7,7 +7,7 @@
  * @var string $pass - from Request
  */
 
-$siteLink = $main->isDealer() ? $main->url->getDealerUri() : $main->url->getFullUri();
+$siteLink = $main->url->getFullUri();
 $actionLink = 'index.php';
 $wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 

@@ -22,14 +22,10 @@ else {
   } else {
     $target = getTargetPage($_GET['targetPage'] ?? '');
   }
+
   $pathTarget = checkTemplate($target);
 
-  if (OUTSIDE) $main->setLoginStatus('no');
-  else {
-    $main->checkAuth()
-         ->setAccount()
-         ->applyAuth($target);
-  }
+  $main->beforeController($target);
 
   $target === '' && $target = 'public';
   require __DIR__ . "/controller/c_$target.php";

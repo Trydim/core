@@ -15,6 +15,7 @@
 
 .content-body {
   width: calc(100% - var(--theme-sidebar-width));
+  margin: 0 auto;
   z-index: 1;
 }
 

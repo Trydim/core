@@ -14,9 +14,6 @@ $field = [
   'jsLinks'   => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],
 ];
 
-$dealers = $main->db->loadDealers();
-$field['footerContent'] .= "<input type='hidden' id='dealersData' value='". json_encode($dealers) ."'>";
-
 ob_start();
 require $pathTarget;
 $field['content'] = ob_get_clean();

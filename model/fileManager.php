@@ -73,7 +73,7 @@ if (isset($fmAction)) {
             if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) !== 'dir') {
               $filepath = slashes($dir . $file);
 
-              $url = str_replace(slashes(ABS_SITE_PATH), URI, $filepath); // исрпавить
+              $url = str_replace(slashes(ABS_SITE_PATH), URI, $filepath); // TODO свои пути
 
               $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 

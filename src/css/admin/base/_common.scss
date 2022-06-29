@@ -1,6 +1,7 @@
+$theme-sidebar-width: 17rem !default;
 
 .main-wrapper {
-  --theme-sidebar-width: 17rem;/*$theme-sidebar-width;*/
+  --theme-sidebar-width: 17rem;
   opacity: 0;
   transition: all 0.25s ease-in;
   /*overflow: auto;*/
@@ -18,7 +19,7 @@
 
 @include customMedia($min: 800px, $max: 1350px) {
   .main-wrapper {
-    --theme-sidebar-width: calc(17rem * 0.75);/*$theme-sidebar-width;*/
+    --theme-sidebar-width: calc(17rem * 0.75);
   }
 }
 

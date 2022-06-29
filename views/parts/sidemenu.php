@@ -4,9 +4,9 @@ global $main;
 
 $adminMenu = '';
 $dbTables = $main->getBaseTable();
-$siteLink = $main->isDealer() ? $main->url->getDealerUri() : $main->url->getFullUri();
+$siteLink = $main->url->getFullUri();
 
-if(is_array($dbTables)) {
+if (is_array($dbTables)) {
 
   class CreateMenu {
     private $siteLink;

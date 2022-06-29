@@ -1,17 +1,19 @@
 <?php
 global $main;
 
-$siteLink = $main->isDealer() ? $main->url->getDealerUri() : $main->url->getFullUri();
+$siteLink = $main->url->getFullUri();
+$imgSrc = $main->getCmsParam('imgPath') . 'logo.';
 
 if ($main->checkStatus()) { ?>
 <div class="nav-header">
   <a href="<?= $siteLink ?>" class="brand-logo">
     <picture class="logo-abbr">
-      <?php
-        $imgSrc = URI_IMG . 'logo.webp';
-        if (!file_exists($imgSrc) || filesize($imgSrc) < 512) $imgSrc = URI_IMG . 'logo.svg';
-      ?>
-      <img class="logo-abbr" src="<?= $imgSrc ?>" alt="logo">
+      <?php if (file_exists($imgSrc . 'webp')) { ?>
+        <source srcset="<?= URI_IMG . 'logo.webp' ?>" type="image/webp">
+      <? } ?>
+      <?php if (file_exists($imgSrc . 'jpg')) { ?>
+        <img src="<?= URI_IMG . 'logo.jpg' ?>" alt="logo">
+      <? } ?>
     </picture>
     <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
   </a>

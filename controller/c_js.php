@@ -11,7 +11,7 @@ $field = [
   'jsLinks'   => [
     'https://unpkg.com/chai/chai.js',
     'https://unpkg.com/mocha/mocha.js',
-    URI . 'core/src/js/test/test.js',
+    $main->uri->getHost() . 'core/src/js/test/test.js',
   ],
 ];
 
