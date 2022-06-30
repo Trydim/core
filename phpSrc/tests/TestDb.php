@@ -1,7 +1,6 @@
 <?php
 
 const ABS_SITE_PATH = __DIR__ . '/../../visCms/';
-const SITE_PATH = '/';
 const USE_DATABASE = true;
 
 use PHPUnit\Framework\TestCase;

@@ -1,9 +1,10 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var Main $main - global
  * @var string $pathTarget
  */
 
 ob_start();
-if (isset($pathTarget)) include($pathTarget);
+include($pathTarget);
 $html = ob_get_clean();

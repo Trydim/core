@@ -1,10 +1,8 @@
-<?php
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
  * @var Main $main - global
  */
-
-if (!defined('MAIN_ACCESS')) die('access denied!');
 
 $authAction = $authAction ?? 'noAuthAction';
 $login = $login ?? '';

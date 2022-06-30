@@ -18,8 +18,8 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
   'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
-  'SITE_PATH'     => SITE_PATH,
-  'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
+  'SITE_PATH'     => $main->url->getBaseSitePath(),
+  'MAIN_PHP_PATH' => $main->url->getBaseSitePath() . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
   'AUTH_STATUS'   => $isAuth,
@@ -36,7 +36,7 @@ $jsGlobalConst = json_encode([
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
-  <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
+  <link rel="icon" href="<?= $main->url->getSitePath() ?>favicon.ico">
   <?php if ($isAuth || $target === 'login') { ?>
     <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
   <?php } else { ?>

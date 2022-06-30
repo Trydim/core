@@ -93,29 +93,6 @@ function checkError(array &$result): void {
 }
 
 /**
- * Check exist template file in views directory
- * @param string $tmpFile
- *
- * @return string path to file name
- */
-function checkTemplate(string $tmpFile): string {
-  $view = CORE . 'views/';
-
-  if ($tmpFile === '' && PUBLIC_PAGE
-      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php')) {
-    return ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
-  } else if (file_exists(ABS_SITE_PATH . 'public/views/' . "$tmpFile.php")) {
-    return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
-  } else if (file_exists($view . "$tmpFile.php")) {
-    return $view . "$tmpFile.php";
-  } else if (file_exists($view . $tmpFile . "/$tmpFile.php")) {
-    return $view . $tmpFile . "/$tmpFile.php";
-  } else {
-    require $view . '404.php'; die();
-  }
-}
-
-/**
  * for param by load csv
  * @param $type
  * @param $value
@@ -200,18 +177,6 @@ function getPageAsString($data) {
   $html .= '<script>' . $initJs . '</script></div>';
 
   return $html;
-}
-
-/**
- * @param string $targetPage
- * @return array|string|string[]
- */
-function getTargetPage(string $targetPage = '') {
-  $target = str_replace('/', '', $targetPage);
-
-  if (PUBLIC_PAGE && ($target === 'public' || $target === PUBLIC_PAGE)) return '';
-
-  return $target;
 }
 
 /**
@@ -504,4 +469,14 @@ function translit($value): string {
   ];
 
   return strtr(mb_strtolower($value), $converter);
+}
+
+/**---------------------------------------------------------------------------------------------------------------------
+ * PHP8 polyfills
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+if (!function_exists('str_starts_with')) {
+  function str_starts_with(string $haystack, string $needle): bool {
+    return strncmp($haystack, $needle, strlen($needle)) === 0;
+  }
 }

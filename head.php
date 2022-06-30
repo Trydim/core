@@ -15,19 +15,11 @@ require __DIR__ . '/cmsSetting.php';
 if (isset($_REQUEST['mode'])) require __DIR__ . '/model/main.php';
 else {
   $html = '';
-
-  if ($main->isDealer()) {
-    $targetPage = str_replace($main->getCmsParam('dealerPath'), '', $_GET['targetPage'] ?? '');
-    $target = getTargetPage($targetPage);
-  } else {
-    $target = getTargetPage($_GET['targetPage'] ?? '');
-  }
-
-  $pathTarget = checkTemplate($target);
+  $target = $main->url->getRoute();
+  $pathTarget = $main->url->getRoutePath();
 
   $main->beforeController($target);
 
-  $target === '' && $target = 'public';
   require __DIR__ . "/controller/c_$target.php";
   echo $html;
 

@@ -8,7 +8,7 @@
  */
 
 $siteLink = $main->url->getFullUri();
-$actionLink = 'index.php';
+$actionLink = $main->url->getFullUri() . 'index.php';
 $wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
 $publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . $siteLink . '">Открытая страница</a>' : '';
@@ -47,7 +47,6 @@ $field['global'] = <<<global
 
         <input name="mode" type="hidden" value="auth">
         <input name="authAction" type="hidden" value="login">
-        <input name="REQUEST_URI" type="hidden" value="$siteLink">
       </form>
       <div class="new-account mt-3">
         <p>$publicLink</p>

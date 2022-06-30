@@ -63,12 +63,11 @@ final class Main {
     $this->cmsParam = [];
 
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
-    $this->checkDealer();
     $this->setSettings('dbConfig', $dbConfig);
   }
   public function __get($value) {
     if ($value === 'url') {
-      $this->url = new UrlGenerator('core/');
+      $this->url = new UrlGenerator($this, 'core/');
     }
     else if ($value === 'db') {
       $this->db = new Db($this->getSettings('dbConfig'));
@@ -81,22 +80,20 @@ final class Main {
 
     return $this->$value;
   }
-
-  private function checkXml() {
-    Xml::checkXml($this->dbTables);
-  }
-
   public function afterConstDefine() {
     $this->loadSetting()
       ->setHooks();
   }
-
   public function beforeController(string $target) {
+    if ($target === '404') return;
+
     if (!OUTSIDE) {
       $this->checkAuth()
         ->setAccount()
         ->applyAuth($target);
     }
+
+    $this->isDealer() && $this->setDealerParam();
   }
 
   /* ---------------------------------------------------------------------------------------------------------------------
@@ -116,23 +113,6 @@ final class Main {
     );
 
     return $this;
-  }
-  private function checkDealer() {
-    $requestUri = $_SERVER['REQUEST_METHOD'] === 'GET' ? $_SERVER['REQUEST_URI'] : $_POST['REQUEST_URI'] ?? '';
-    $isDealer = includes($requestUri, DEALERS_PATH);
-
-    if ($isDealer) {
-      preg_match('/dealer(?:\/)(\d+)(?:\/)/', $requestUri, $match); // получить ID дилера
-
-      if (!isset($match[1])) die('Dealer id not found!');
-
-      $this->setCmsParam('dealerPath', DEALERS_PATH . $match[1] . '/')
-           ->setCmsParam('dealerId', $match[1])
-           ->setDealerParam();
-    }
-
-    $this->user['isDealer'] = $isDealer;
-    $this->setCmsParam('isDealer', $isDealer);
   }
 
   /**
@@ -179,6 +159,9 @@ final class Main {
   private function loadSetting(): Main {
     $this->setting = array_merge($this->setting, getSettingFile());
     return $this;
+  }
+  private function checkXml() {
+    Xml::checkXml($this->dbTables);
   }
   /**
    * Установка всех параметров для аккаунта
@@ -266,7 +249,6 @@ final class Main {
 
     return empty($key) ? $this->setting : $this->setting[$key] ?? null;
   }
-
 
   /**
    * @param mixed $field
@@ -376,5 +358,28 @@ final class Main {
     $rate = $justRate ? array_map(function ($rate) { return $rate['rate']; }, $rate->rate) : $rate->rate;
     $rate = json_encode($rate);
     return "<input type='hidden' id='$dataId' value='$rate'>";
+  }
+
+  /**
+   * @var bool
+   */
+  public $dealer = false;
+  /**
+   * @var string
+   */
+  private $dealCsvPath = '';
+
+
+  public function publicMain() {
+    $this->dealer = false;
+    $this->dealCsvPath = $this->getCmsParam('PATH_CSV');
+    $this->setCmsParam('PATH_CSV', $this->getCmsParam('MAIN_CSV'));
+  }
+
+  public function publicDealer() {
+    if ($this->isDealer()) {
+      $this->dealer = true;
+      $this->setCmsParam('PATH_CSV', $this->dealCsvPath);
+    }
   }
 }

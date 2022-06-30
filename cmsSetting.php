@@ -11,19 +11,11 @@ spl_autoload_register('cmsAutoloader');
 
 const CORE          = __DIR__ . '/',
       SHARE_PATH    = 'shared/',
-      DEALERS_PATH  = 'dealer/',
+      DEALERS_PATH  = 'dealer',
       CSV_CACHE     = ABS_SITE_PATH . SHARE_PATH . 'csvCache.bin',
       SYSTEM_PATH   = ABS_SITE_PATH . SHARE_PATH . 'system.php'; // TODO перенести в DB
 
-$main = new Main($publicConfig, $dbConfig ?? []);
-$url = $main->url;
-
 define('DEBUG', array_key_exists('DEBUG', $publicConfig));
-define('URI', $url->getHost()); //
-define('SITE_PATH', $url->getSitePath());
-define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
-define('CORE_JS', $url->getCoreUri() . 'assets/js/');
-
 define('PUBLIC_PAGE', $publicConfig['PUBLIC_PAGE'] ?? false);
 define('USE_DATABASE', $publicConfig['USE_DATABASE'] ?? true);
 define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig['CHANGE_DATABASE'] ?? false) : false);
@@ -31,15 +23,20 @@ define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig['CHANGE_DATABASE'] ?? fa
 define('CSV_DELIMITER', $publicConfig['CSV_DELIMITER'] ?? ';');
 define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);
 
-$main->setCmsParam('imgPath', $url->getFullPath() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
-     ->setCmsParam('uriImg', $url->getFullUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
-     ->setCmsParam('uriCss', $url->getFullUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
-     ->setCmsParam('uriJs', $url->getFullUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
+$main = new Main($publicConfig, $dbConfig ?? []);
+$url = $main->url;
+
+define('HOST', $url->getBaseUri());
+define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
+define('CORE_JS', $url->getCoreUri() . 'assets/js/');
+
+$main->setCmsParam('imgPath', HOST . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
+     ->setCmsParam('uriImg', HOST . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
+     ->setCmsParam('uriCss', HOST . ($publicConfig['URI_CSS'] ?? 'public/css/'))
+     ->setCmsParam('uriJs', HOST . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 
 if ($main->isDealer()) {
-  require $main->getCmsParam('dealerPath') . 'config.php';
-  $dealPath = $main->getCmsParam('dealerPath');
-  $main->url->updateDealer($dealPath);
+  require $url->getFullPath() . 'config.php';
 
   $main->setCmsParam('PATH_CSV', $url->getFullPath() . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
   unset($publicConfig['PATH_CSV']);
@@ -53,8 +50,6 @@ if ($main->isDealer()) {
 
   $main->setCmsParam('dealUriCss', $url->getFullUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
        ->setCmsParam('dealUriJs', $url->getFullUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
-
-  unset($dealPath);
 }
 
 define('SETTINGS_PATH', $url->getFullPath() . SHARE_PATH . 'settingSave.json');

@@ -55,26 +55,24 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
   unset($order, $orderId);
 }
 
-if ($isDealer) { // TODO не очень
-  $dealCsvPath = $main->getCmsParam('PATH_CSV');
-  $main->setCmsParam('PATH_CSV', $main->getCmsParam('MAIN_CSV'));
-}
-
+$main->publicMain();
 require ABS_SITE_PATH . 'public/public.php';
 if ($isDealer) {
-  $dealPublic = ABS_SITE_PATH . $main->getCmsParam('dealerPath') . 'public/public.php';
+  $main->publicDealer();
+  $dealPublic = $main->url->getFullPath() . 'public/public.php';
 
   if (file_exists($dealPublic)) {
-    $main->setCmsParam('PATH_CSV', $dealCsvPath);
     $publicCss = $main->getCmsParam('uriCss');
     $publicJs = $main->getCmsParam('uriJs');
     require $dealPublic;
   }
 }
 
+$main->publicMain();
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
 if ($isDealer) {
-  $dealPublic = ABS_SITE_PATH . $main->getCmsParam('dealerPath') . 'public/views/' . PUBLIC_PAGE . '.php';
+  $main->publicDealer();
+  $dealPublic = $main->url->getFullPath() . 'public/views/' . PUBLIC_PAGE . '.php';
   if (file_exists($dealPublic)) {
     require $dealPublic;
   }

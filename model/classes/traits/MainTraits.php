@@ -116,8 +116,8 @@ trait Authorization {
         if (ONLY_LOGIN || $target !== '' || !PUBLIC_PAGE) $this->reDirect('login');
       }
     } else {
-      if ($target === 'login' || ($target === '' && !PUBLIC_PAGE)) $this->reDirect($this->getSideMenu(true));
-      if (!in_array($target, ['', '404', 'js']) && !$this->availablePage($target)) $this->reDirect('404');
+      if ($target === 'login' || ($target === 'public' && !PUBLIC_PAGE)) $this->reDirect($this->getSideMenu(true));
+      if (!in_array($target, ['public', '404', 'js']) && !$this->availablePage($target)) $this->reDirect('404');
     }
 
     session_abort();
@@ -155,7 +155,7 @@ trait Authorization {
    * @return bool
    */
   public function isDealer(): bool {
-    return $this->user['isDealer'];
+    return $this->getCmsParam('isDealer');
   }
 }
 

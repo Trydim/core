@@ -28,6 +28,8 @@ class Db extends \R {
    */
   private $login;
 
+
+
   /**
    * Plugin readBean for special name
    * @param $type
@@ -1348,7 +1350,10 @@ trait ContentEditor {
 
   private function setContentPath(): void {
     global $main;
-    $this->contentPath = $main->url->getFullPath() . SHARE_PATH . 'content.json';
+
+    $path = $main->dealer ? $main->url->getFullPath() : ABS_SITE_PATH;
+
+    $this->contentPath = $path . SHARE_PATH . 'content.json';
   }
 
   private function checkContentFile(): void {
