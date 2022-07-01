@@ -59,11 +59,15 @@ $publicConfig = [
   //'PDF_ORIENTATION' => 'L',
 
   /** Пункты меню какие показывать и последовательность (по умолчанию все страницы)
-  'orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog', 'fileManager', 'dealers',
-  заказы     календарь   клиенты     менеджеры статистика  админ-ние каталог     ФМ              дилеры
-  options - настройки
+  'admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'fileManager', 'statistic', 'users'
+  админ-ние   календарь   каталог    клиенты      дилеры     заказы    ФМ             статистика   мен-ры
    */
-  'ACCESS_MENU' => ['calendar', 'orders', 'customers', 'admindb', 'dealers', 'users'],
+  'ACCESS_MENU' => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'users'],
+
+  /**
+   * Просмотр заказов дилеров
+   */
+  'DEALERS_ORDERS_SHOW' => true,
 
   /** Папка по умолчанию для файлового менеджера */
   // 'SHARE_PATH' => 'public/images/',

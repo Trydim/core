@@ -66,10 +66,6 @@ class UrlGenerator {
    */
   private $requestUri;
   /**
-   * @var string
-   */
-  private $fullPath;
-  /**
    * @var void
    */
   private $baseUri;
@@ -77,10 +73,6 @@ class UrlGenerator {
    * @var string|null
    */
   private $baseUrl;
-  /**
-   * @var string
-   */
-  private $fullUri;
 
   /**
    * UrlGenerator constructor.
@@ -97,10 +89,7 @@ class UrlGenerator {
 
     $this->setScheme();
     $this->setHost();
-    $this->setRoute($main)->setRoutePath();
-
-    $this->setFullPath();
-    $this->setFullUri();
+    $this->setRoute($main);
     $this->setCoreUri();
   }
 
@@ -261,7 +250,7 @@ class UrlGenerator {
     return $requestUri;
   }
   private function setBaseSitePath() {
-    $sitePath = $this->getSitePath();
+    $sitePath = $this->getPath();
 
     if (includes($sitePath, DEALERS_PATH)) {
       $sitePath = substr($sitePath, 0, stripos($sitePath, DEALERS_PATH));
@@ -297,6 +286,12 @@ class UrlGenerator {
   private function setRoute($main) {
     $this->checkDealer($main);
 
+    if (isset($_REQUEST['mode'])) {
+      $main->setCmsParam('mode', $_REQUEST['mode']);
+      $this->route = false;
+      return $this;
+    }
+
     if ($main->isDealer()) {
       preg_match('/^\/' . DEALERS_PATH . '\/(?:\d+)\/(\w+)/', $this->getRequestUri(), $match);
     } else {
@@ -308,29 +303,20 @@ class UrlGenerator {
 
     return $this;
   }
-  /**
-   * Check exist template file in views directory
-   */
-  private function setRoutePath() {
+  private function setRoutePath(): string {
     $route = $this->route === 'public' ? PUBLIC_PAGE : $this->route;
     $view = CORE . 'views/';
-    $routePath = ABS_SITE_PATH . "public/views/$route.php";
+    $routePath = $this->getPath(true) . "public/views/$route.php";
 
     if (file_exists($routePath)) {
-      $this->routePath = $routePath;
+      return $routePath;
     } else if (file_exists($view . "$route.php")) {
-      $this->routePath = $view . "$route.php";
+      return $view . "$route.php";
     } else if (file_exists($view . $route . "/$route.php")) {
-      $this->routePath = $view . $route . "/$route.php";
+      return $view . $route . "/$route.php";
     } else {
-      $this->routePath = $view . '404.php';
+      return $view . '404.php';
     }
-  }
-  private function setFullPath() {
-    $this->fullPath = $this->absolutePath . substr($this->getSitePath(), 1);
-  }
-  private function setFullUri() {
-    $this->fullUri = $this->getHost() . $this->getSitePath();
   }
   private function setCoreUri() {
     // Определять автоматом.
@@ -348,7 +334,7 @@ class UrlGenerator {
    */
   private function checkDealer(Main $main) {
     $requestUri = $this->getRequestUri();
-    $isDealer = includes($requestUri, DEALERS_PATH);
+    $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
     if ($isDealer) {
       preg_match('/' . DEALERS_PATH . '\/(\d+)\//', $requestUri, $match); // получить ID дилера
@@ -361,41 +347,42 @@ class UrlGenerator {
     $main->setCmsParam('isDealer', $isDealer);
   }
 
-  /**
-   * @return string
-   */
-  public function getHost() {
+  public function getHost(): string {
     return $this->host;
   }
-  public function getBaseSitePath() {
+  public function getBaseUri() {
+    if ($this->baseUri === null) {
+      $this->baseUri = $this->setBaseUri();
+    }
+
+    return $this->baseUri;
+  }
+  public function getUri() {
+    return $this->getHost() . $this->getPath();
+  }
+
+  public function getCorePath(bool $absolute = false): string {
+    return ($absolute ? $this->absolutePath : '') . $this->corePath;
+  }
+  public function getCoreUri(): string {
+    return $this->coreUri;
+  }
+
+  public function getBaseSitePath(bool $absolute = false): string {
     if ($this->baseSitePath === null) {
       $this->baseSitePath = $this->setBaseSitePath();
     }
 
-    return $this->baseSitePath;
+    return $absolute ? $this->absolutePath . substr($this->baseSitePath, 1) : $this->baseSitePath;
   }
-  /**
-   * @return string
-   */
-  public function getSitePath() {
+  public function getPath(bool $absolute = false): string {
     if ($this->sitePath === null) {
       $this->sitePath = $this->setSitePath();
     }
 
-    return $this->sitePath;
+    return $absolute ? $this->absolutePath . substr($this->sitePath, 1) : $this->sitePath;
   }
-  /**
-   * @return string
-   */
-  public function getCorePath() {
-    return $this->corePath;
-  }
-  /**
-   * @return string
-   */
-  public function getCoreUri() {
-    return $this->coreUri;
-  }
+
   /**
    * Returns the requested URI (path and query string).
    *
@@ -413,19 +400,10 @@ class UrlGenerator {
     return $this->route;
   }
   public function getRoutePath() {
-    return $this->routePath;
-  }
-  public function getFullPath() {
-    return $this->fullPath;
-  }
-  public function getBaseUri() {
-    if ($this->baseUri === null) {
-      $this->baseUri = $this->setBaseUri();
+    if ($this->routePath === null) {
+      $this->routePath = $this->setRoutePath();
     }
 
-    return $this->baseUri;
-  }
-  public function getFullUri() {
-    return $this->fullUri;
+    return $this->routePath;
   }
 }

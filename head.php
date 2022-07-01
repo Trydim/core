@@ -12,18 +12,15 @@ unset($uri, $match);
 
 require __DIR__ . '/cmsSetting.php';
 
-if (isset($_REQUEST['mode'])) require __DIR__ . '/model/main.php';
+if ($main->getCmsParam('mode')) require CORE . '/model/main.php';
 else {
   $html = '';
-  $target = $main->url->getRoute();
-  $pathTarget = $main->url->getRoutePath();
+  $main->beforeController();
 
-  $main->beforeController($target);
-
-  require __DIR__ . "/controller/c_$target.php";
+  require CORE . 'controller/c_' . $main->url->getRoute() . '.php';
   echo $html;
 
-  unset($html, $target, $pathTarget, $dbContent, $field);
+  unset($html, $field);
 }
 
 unset($authStatus, $dbContent, $main);

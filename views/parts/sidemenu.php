@@ -1,10 +1,12 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
-global $main;
+/**
+ * @var Main $main - global
+ */
 
 $adminMenu = '';
 $dbTables = $main->getBaseTable();
-$siteLink = $main->url->getFullUri();
+$siteLink = $main->url->getUri();
 
 if (is_array($dbTables)) {
 

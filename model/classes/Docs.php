@@ -4,9 +4,11 @@
  * @var Main $main - global
  */
 
-!defined('PATH_IMG') && define('PATH_IMG', $main->getCmsParam('imgPath'));
+!defined('ABS_SITE_PATH') && define('ABS_SITE_PATH', $_SERVER['DOCUMENT_ROOT']);
+!defined('URI_IMG') && define('URI_IMG', $_SERVER['HTTP_REFERER'] . '/images/');
 
 class Docs {
+  const PATH_IMG = ABS_SITE_PATH . '/images/';
   /**
    * Папка для временных файлов
    */
@@ -72,14 +74,21 @@ class Docs {
    * @var array
    */
   private $tmpFiles = [];
+  /**
+   * @var Main|null
+   */
+  private $main;
 
   /**
    * Docs constructor.
+   * @param Main $main
    * @param array $param {library: string, orientation: string, docType: string}
    * @param $data
    * @param string $fileTpl
    */
-  public function __construct(array $param, $data, string $fileTpl = 'default') {
+  public function __construct(Main $main, array $param, $data, string $fileTpl = 'default') {
+    $this->main = $main ?? null;
+
     $this->pdfLibrary = $param['library'] ?? 'mpdf';
     $this->pdfOrientation = $param['orientation'] ?? 'P';
     $this->docsType = $param['docType'] ?? 'pdf';
@@ -120,9 +129,16 @@ class Docs {
     $this->fileTpl = $fileTpl !== 'default' ?
       $fileTpl : (in_array($this->docsType, ['pdf', 'print']) ? 'pdfTpl' : 'excelTpl');
 
-    $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.php";
-    if (file_exists($path)) $this->filePath = $path;
-    else $this->useDefault = true;
+    $path = "public/views/docs/$this->fileTpl.php";
+    $fullPath = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $path;
+
+    if (file_exists($path)) $this->filePath = $fullPath;
+    else {
+      $fullPath = $this->main->url->getBasePath(true) . $path;
+
+      if (file_exists($path)) $this->filePath = $fullPath;
+      $this->useDefault = true;
+    }
   }
 
   private function setDefaultParam() {
@@ -138,7 +154,8 @@ class Docs {
       'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = $this->docsType === 'print' ? URI_IMG : PATH_IMG; // Todo путь к диллеру. (зав
+    $this->imgPath = $this->docsType === 'print' ? URI_IMG
+      : isset($main) ? $main->getCmsParam('imgPath') : $this::PATH_IMG;
   }
 
   private function prepareTemplate() {
@@ -226,9 +243,17 @@ class Docs {
    * Add separate css to pdf
    */
   private function setCss() {
-    $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css";
-    if (file_exists($path)) {
+    $path = "public/views/docs/$this->fileTpl.css";
+    $fullPath = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $path;
+
+    if (file_exists($fullPath)) {
       $this->styleContent = file_get_contents($path);
+    } else {
+      $fullPath = $this->main->url->getBasePath(true) . $path;
+
+      if (file_exists($fullPath)) {
+        $this->styleContent = file_get_contents($path);
+      }
     }
   }
 
@@ -372,7 +397,7 @@ class Docs {
    * @return mixed
    */
   public function getDocs(string $dest = 'S') {
-    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . $this::RESULT_PATH); // TODO тупой путь
+    $path = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $this::RESULT_PATH;
     if (!is_dir($path)) mkdir($path);
 
     $func = 'get' . $this->getFunc();

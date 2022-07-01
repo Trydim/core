@@ -2,9 +2,8 @@
 
 /**
  * @var Main $main - global
- * @var string $pathTarget
  */
 
 ob_start();
-include($pathTarget);
+include $main->url->getRoutePath();
 $html = ob_get_clean();

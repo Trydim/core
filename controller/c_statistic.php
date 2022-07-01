@@ -1,6 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
+
 /**
- * @var string $pathTarget
+ * @var Main $main - global
  */
 
 $field = [
@@ -11,5 +12,5 @@ $field = [
   ],
 ];
 
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

@@ -400,7 +400,6 @@ function loadFullCSV($path) {
  * @param string $lang
  */
 function setUserLocale($lang = 'ru_RU') {
-
   /*switch ($lang) {
     case 'ru_RU':
       putenv('LANG=ru_RU.UTF8');
@@ -433,6 +432,7 @@ function setUserLocale($lang = 'ru_RU') {
  * @return string
  */
 function template(string $path = 'base', array $vars = []): string {
+  global $main;
   $path .= '.php';
   extract($vars);
   ob_start();

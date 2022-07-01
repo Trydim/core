@@ -9,6 +9,11 @@ class Db extends \R {
   const DB_DATA_FORMAT = 'Y-m-d H:i:s';
 
   /**
+   * @var Main
+   */
+  private $main;
+
+  /**
    * @var int
    */
   private $currentUserID = 2;
@@ -27,8 +32,6 @@ class Db extends \R {
    * @var string
    */
   private $login;
-
-
 
   /**
    * Plugin readBean for special name
@@ -56,16 +59,14 @@ class Db extends \R {
     return $this->prefix . str_replace($this->prefix, '', $table);
   }
 
-  /**
-   * db constructor
-   *
-   * @param array $dbConfig
-   * @param bool  $freeze
-   */
-  public function __construct(array $dbConfig = [], bool $freeze = true) {
+  public function __construct(Main $main, bool $freeze = true) {
+    $this->main = $main;
+
     if (USE_DATABASE) {
+      $dbConfig = $main->getSettings('dbConfig');
+
       if (!count($dbConfig)) {
-        require ABS_SITE_PATH . 'config.php';
+        require $main->url->getPath(true) . 'config.php';
         if (!count($dbConfig)) exit('Configs error');
       }
 
@@ -1208,8 +1209,7 @@ class Db extends \R {
    */
   public function getUserSetting(string $currentUser = '', string $columns = 'customization') {
     if (!$currentUser) {
-      global $main;
-      $currentUser = $main->getLogin();
+      $currentUser = $this->main->getLogin();
     }
     $result = self::getAssocRow("SELECT $columns from " . $this->pf('users') . " WHERE login = ?", [$currentUser]);
 
@@ -1276,8 +1276,7 @@ trait MainCsv {
   }
 
   public function openCsv() {
-    global $main;
-    $csvPath = $main->getCmsParam('PATH_CSV') . $this->csvTable;
+    $csvPath = $this->main->getCmsParam('PATH_CSV') . $this->csvTable;
 
     if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
       $result = [];
@@ -1295,8 +1294,7 @@ trait MainCsv {
   }
 
   public function fileForceDownload() {
-    global $main;
-    $file = $main->getCmsParam('PATH_CSV') . $this->csvTable;
+    $file = $this->main->getCmsParam('PATH_CSV') . $this->csvTable;
 
     if (file_exists($file)) {
       // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
@@ -1325,8 +1323,8 @@ trait MainCsv {
    * @return $this
    */
   public function saveCsv($csvData) {
-    global $main;
-    $csvPath = $main->getCmsParam('PATH_CSV');
+    $csvPath = $this->main->getCmsParam('PATH_CSV');
+    $cachePath = $this->main->cachePath();
 
     if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];
@@ -1338,29 +1336,32 @@ trait MainCsv {
       }
 
       file_put_contents($csvPath . $this->csvTable, $fileStrings);
-      file_exists(CSV_CACHE) && unlink(CSV_CACHE);
+      file_exists($cachePath) && unlink($cachePath);
     }
     return $this;
   }
 }
 
 trait ContentEditor {
-  private $contentPath = '';
-  private $contentFile = '{}';
+  private $CONTENT_PATH = SHARE_PATH . 'content.json';
+  private $contentData = '{}';
+  private $contentLoaded;
 
-  private function setContentPath(): void {
-    global $main;
+  private function contentPath(): string {
+    if ($this->main->url->getRoute() === 'public') {
+      $path = $this->main->dealer ? $this->main->url->getPath(true) : ABS_SITE_PATH;
+    } else {
+      $path = $this->main->url->getPath(true);
+    }
 
-    $path = $main->dealer ? $main->url->getFullPath() : ABS_SITE_PATH;
-
-    $this->contentPath = $path . SHARE_PATH . 'content.json';
+    return $path . $this->CONTENT_PATH;
   }
 
   private function checkContentFile(): void {
-    $this->setContentPath();
+    $path = $this->contentPath();
 
-    if (!file_exists($this->contentPath)) {
-      file_put_contents($this->contentPath, $this->contentFile);
+    if (!file_exists($path)) {
+      file_put_contents($path, $this->contentData);
     }
   }
 
@@ -1372,7 +1373,7 @@ trait ContentEditor {
   public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false) {
     $this->checkContentFile();
 
-    $data = file_get_contents($this->contentPath);
+    $data = file_get_contents($this->contentPath());
 
     return $jsonDecode ? json_decode($data, $assoc) : $data;
   }
@@ -1381,9 +1382,12 @@ trait ContentEditor {
     $this->checkContentFile();
 
     if (!is_string($data)) $data = json_encode($data);
-    file_exists(CSV_CACHE) && unlink(CSV_CACHE);
 
-    return file_put_contents($this->contentPath, $data);
+    return file_put_contents($this->contentPath(), $data);
+  }
+
+  public function mergeContentData() {
+    $this->contentLoaded = $this->getContentData(false);
   }
 
   /**
@@ -1394,6 +1398,10 @@ trait ContentEditor {
    */
   public function getContentData(bool $flatten = true, bool $assoc = false): array {
     $data = $this->loadContentEditorData(true, true);
+
+    if (is_array($this->contentLoaded)) {
+      $data = array_merge($data, $this->contentLoaded);
+    }
 
     if ($flatten) {
       $data = array_reduce($data, function($r, $section) use ($assoc) {

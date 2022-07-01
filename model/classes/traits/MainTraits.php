@@ -104,20 +104,22 @@ trait Authorization {
    *
    *   Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт
    * или нет регистрации и целевая страница не открыта
-   * @param string $target
+   *
    * @return $this|Main
    */
-  private function applyAuth(string $target = ''): Main {
+  private function applyAuth(): Main {
+    $route = $this->url->getRoute();
+
     if ($this->checkStatus('no')) {
-      if ($target === 'login') {
+      if ($route === 'login') {
         isset($_REQUEST['status']) && $this->setLoginStatus('error');
       } else {
-        $_SESSION['target'] = $target;
-        if (ONLY_LOGIN || $target !== '' || !PUBLIC_PAGE) $this->reDirect('login');
+        $_SESSION['target'] = $route;
+        if (ONLY_LOGIN || $route !== 'public' || !PUBLIC_PAGE) $this->reDirect('login');
       }
     } else {
-      if ($target === 'login' || ($target === 'public' && !PUBLIC_PAGE)) $this->reDirect($this->getSideMenu(true));
-      if (!in_array($target, ['public', '404', 'js']) && !$this->availablePage($target)) $this->reDirect('404');
+      if ($route === 'login' || ($route === 'public' && !PUBLIC_PAGE)) $this->reDirect($this->getSideMenu(true));
+      if (!in_array($route, ['public', '404', 'js']) && !$this->availablePage($route)) $this->reDirect('404');
     }
 
     session_abort();
@@ -210,55 +212,66 @@ trait Dictionary {
 
 /** Trait Cache */
 trait Cache {
+  /**
+   * @var array - const
+   */
+  private $CACHE = [
+    'FILE_NAME' => SHARE_PATH . 'csvCache.bin',
+    'UPDATE_TIME' => 1209600, // 2 Недели.
+  ];
 
-  private $updateTime = 1209600; // 2 Недели.
+  /**
+   * @var string
+   */
+  private $cachePath;
+
   /**
    * @var array
    */
-  private $cvsVars = ['all'];
-  /**
-   * @var bool
-   */
-  private $needCsvCached = false;
+  private $cacheVars = ['all'];
 
-  /**
-   * @param string $file
-   */
-  private function checkEditTime(string $file) {
-    $this->needCsvCached = time() - filemtime($file) > $this->updateTime;
+  private function cachePath() {
+    if ($this->url->getRoute() === 'public') {
+      $cachePath = $this->dealer ? $this->url->getPath(true) : ABS_SITE_PATH;
+    } else {
+      $cachePath = $this->url->getPath(true);
+    }
+
+    return $cachePath . $this->CACHE['FILE_NAME'];
+  }
+  private function cacheIsActual(string $cachePath) {
+    return time() - filemtime($cachePath) < $this->CACHE['UPDATE_TIME'];
   }
 
   public function setCsvVariable(array $vars) {
-    $this->cvsVars = $vars;
+    $this->cacheVars = $vars;
     return $this;
   }
 
   /**
    * @param mixed ...$vars
-   * @return bool if loaded, then return true
+   * @return bool
    */
-  public function loadCsvCache(&...$vars) {
-    if (file_exists(CSV_CACHE)) {
-      $this->checkEditTime(CSV_CACHE);
+  public function loadCsvCache(&...$vars): bool {
+    $cachePath = $this->cachePath();
 
-      if (!$this->needCsvCached) {
-        $data = json_decode(gzuncompress(file_get_contents(CSV_CACHE)), true);
+    if (file_exists($cachePath)) {
+      if ($this->cacheIsActual($cachePath)) {
+        $data = json_decode(gzuncompress(file_get_contents($cachePath)), true);
         $this->setCsvVariable(array_keys($data));
         foreach (array_values($data) as $index => $var) {
           $vars[$index] = $var;
         }
         return true;
       }
-    } else {
-      $this->needCsvCached = true;
     }
     return false;
   }
 
   public function saveCsvCache(...$vars) {
     $data = [];
-    foreach ($this->cvsVars as $index => $key) $data[$key] = $vars[$index];
-    file_put_contents(CSV_CACHE, gzcompress(json_encode($data), 1));
+    foreach ($this->cacheVars as $index => $key) $data[$key] = $vars[$index];
+    file_put_contents($this->cachePath(), gzcompress(json_encode($data), 1));
   }
 
   public function loadPageCache() {
@@ -280,10 +293,8 @@ trait Cache {
    * @param {any} $data
    */
   public function savePageCache($data) {
-    //if (gettype($data) === 'string')
-    file_put_contents(CSV_CACHE, gzcompress(json_encode($data), 1));
+    file_put_contents($this->cachePath(), gzcompress(json_encode($data), 1));
   }
-
 }
 
 /**

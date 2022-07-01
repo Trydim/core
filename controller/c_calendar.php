@@ -2,7 +2,6 @@
 
 /**
  * @var object $main - global
- * @var string $pathTarget
  */
 
 $curYear = date('Y');
@@ -33,5 +32,5 @@ if (count($ordersStatus)) {
 }
 
 $main->setControllerField($field)->fireHook('calendarTemplate', $field);
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

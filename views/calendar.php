@@ -1,5 +1,9 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var Main $main - global
+ */
+
 $block = template('parts/authBlock');
 // $field['pageHeader']  = <<<pageHeader
 // pageHeader;
@@ -8,7 +12,7 @@ $field['content'] = <<<CONTENT
 <div class="calendar" id="calendar"></div>
 CONTENT;
 
-$field['footerContent'] .= '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
+$field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="orderTemplate">
   <div>

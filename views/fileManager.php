@@ -1,4 +1,12 @@
-<?php if (!defined('MAIN_ACCESS')) die('access denied!'); ?>
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
+
+/**
+ * @var Main $main - global
+ */
+
+$startPath = $main->url->getPath(true) . SHARE_PATH;
+
+?>
 <div class="container-fluid ab-filemanager" id="ab-main">
   <div class="row" id="ab-content">
 
@@ -41,9 +49,9 @@
     <!-- left panel -->
     <div class="col-4">
       <div id="tree">
-        <div id="home" data-fo="<?= ABS_SITE_PATH . SHARE_PATH ?>" class="closed selected"><?= ABS_SITE_PATH . SHARE_PATH ?></div>
+        <div id="home" data-fo="<?= $startPath ?>" class="closed selected"><?= $startPath ?></div>
 
-        <?php tree(ABS_SITE_PATH . SHARE_PATH); ?>
+        <?php tree($startPath); ?>
       </div>
     </div>
     <!-- table data -->
@@ -51,5 +59,5 @@
   </div>
 </div>
 
-<input type="hidden" id="rootDirData" value="<?= ABS_SITE_PATH . SHARE_PATH ?>">
+<input type="hidden" id="rootDirData" value="<?= $startPath ?>">
 <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>

@@ -2,7 +2,6 @@
 
 /**
  * @var object $main - global
- * @var string $pathTarget
  */
 
 $field = [
@@ -24,5 +23,5 @@ $pathLegend = ABS_SITE_PATH . $main->getCmsParam('PATH_LEGEND');
 if ($pathLegend && file_exists($pathLegend)) require $pathLegend;
 unset($pathLegend);
 
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

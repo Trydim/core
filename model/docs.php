@@ -74,11 +74,16 @@ $docType = $docType ?? $docsAction;
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
 if (in_array($docType, ['excel', 'pdf', 'print'])) {
-  $docs = new Docs([
-    'docType' => $docType,
-    'library' => $main->getCmsParam('PDF_LIBRARY'),
-    'orientation' => $pdfOrientation ?? $main->getCmsParam('PDF_ORIENTATION'),
-  ], $data, $fileTpl ?? 'default');
+  $docs = new Docs(
+    $main,
+    [
+      'docType' => $docType,
+      'library' => $main->getCmsParam('PDF_LIBRARY'),
+      'orientation' => $pdfOrientation ?? $main->getCmsParam('PDF_ORIENTATION'),
+    ],
+    $data,
+    $fileTpl ?? 'default'
+  );
 } else $docType = false;
 
 if (isset($docsAction)) {

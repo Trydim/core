@@ -2,7 +2,6 @@
 
 /**
  * @var object $main
- * @var string $pathTarget
  */
 
 $field['pageTitle'] = $main->getCmsParam('PROJECT_TITLE');
@@ -16,5 +15,5 @@ $wrongPass = $main->checkStatus('error');
 $login     = $_REQUEST['login'] ?? '';
 $pass      = $_REQUEST['password'] ?? '';
 
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

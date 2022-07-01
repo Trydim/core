@@ -2,10 +2,11 @@
 /**
  * @var object $main
  * @var array $dbConfig
- * @var string $pathTarget
  */
 
-$param = [];
+$param = [
+  'showFilter' => $main->availablePage('dealers') && $main->getCmsParam('DEALERS_ORDERS_SHOW'),
+];
 $field = [
   'pageTitle' => 'Заказы',
   'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
@@ -49,6 +50,14 @@ if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsS
   }
 }
 
+if ($param['showFilter']) {
+  $param['dealers'] = $main->db->selectQuery('dealers', ['id', 'name']);
+  $param['dealers'] = array_merge([[
+    'id' => '0',
+    'name' => $main->getCmsParam('PROJECT_TITLE'),
+  ]], $param['dealers']);
+}
+
 $main->setControllerField($field)->fireHook('orderTemplate', $field);
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

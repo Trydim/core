@@ -37,11 +37,6 @@ final class Main {
   /**
    * @var array
    */
-  private $controllerParam;
-
-  /**
-   * @var array
-   */
   private $controllerField;
 
   /**
@@ -70,7 +65,7 @@ final class Main {
       $this->url = new UrlGenerator($this, 'core/');
     }
     else if ($value === 'db') {
-      $this->db = new Db($this->getSettings('dbConfig'));
+      $this->db = new Db($this);
       return $this->db;
     }
     else if ($value === 'dealer') {
@@ -84,13 +79,13 @@ final class Main {
     $this->loadSetting()
       ->setHooks();
   }
-  public function beforeController(string $target) {
-    if ($target === '404') return;
+  public function beforeController() {
+    if ($this->url->getRoute() === '404') return;
 
     if (!OUTSIDE) {
       $this->checkAuth()
         ->setAccount()
-        ->applyAuth($target);
+        ->applyAuth();
     }
 
     $this->isDealer() && $this->setDealerParam();
@@ -263,13 +258,7 @@ final class Main {
    * @param mixed ...$args
    * @return Main
    */
-  public function setControllerParam(...$args): Main {
-    array_map(function ($arg) {
-      $this->controllerParam = $arg;
-    }, $args);
-
-    return $this;
-  }
+  public function setControllerParam(...$args): Main {}
 
   /**
    * @param string $key
@@ -322,7 +311,7 @@ final class Main {
   }
 
   public function getControllerParam(string $key) {
-    return $this->controllerParam[$key] ?: false;
+    //return $this->controllerParam[$key] ?: false;
   }
 
   public function getBaseTable(): array {
@@ -338,7 +327,7 @@ final class Main {
       $target = $_SESSION['target'] ?? '';
       isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
     }
-    header('location: ' . $this->url->getFullUri() . $target);
+    header('location: ' . $this->url->getUri() . $target);
     die;
   }
 
@@ -368,7 +357,6 @@ final class Main {
    * @var string
    */
   private $dealCsvPath = '';
-
 
   public function publicMain() {
     $this->dealer = false;

@@ -205,13 +205,13 @@ const orders = {
     this.M.show('Заказ ' + data['order']['ID'], html);
   },
 
-  query() {
+  query(url = f.MAIN_PHP_PATH) {
     Object.entries(this.queryParam).map(param => {
-      this.form.set(param[0], param[1]);
+      this.form.set(param[0], param[1].toString());
     })
 
     this.loaderTable.start();
-    f.Post({data: this.form}).then(data => {
+    f.Post({url, data: this.form}).then(data => {
       if(this.needReload) {
         this.needReload = false;
         this.selected.clear();
@@ -223,9 +223,9 @@ const orders = {
         this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
       }
 
-      if(data['orders']) this.fillTable(data['orders']);
-      if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
-      if(data['statusOrders']) this.fillSelectStatus(data['statusOrders']);
+      if (data['orders']) this.fillTable(data['orders']);
+      if (data['countRows']) this.p.setCountPageBtn(data['countRows']);
+      if (data['statusOrders']) this.fillSelectStatus(data['statusOrders']);
 
       this.loaderTable.stop();
     });
@@ -402,6 +402,24 @@ const orders = {
     }
   },
 
+  actionSelect(e) {
+    let target = e.target,
+        action = target.dataset.action;
+
+    let select = {
+      'filterChange': () => {
+        const id = target.value,
+              dealerPath = 'dealer/' + target.value + '/';
+
+        this.queryParam.dbAction = 'loadOrders';
+
+        this.query(+id ? f.SITE_PATH + dealerPath : undefined);
+      },
+    }
+
+    select[action] && select[action]();
+  },
+
   // Добавить проверку почты
   changeTextInput(e) {
     if (e.target.value.length === 0) return;
@@ -430,12 +448,15 @@ const orders = {
    * @param eventType {string}
    */
   onEventNode(node, func, options = {}, eventType = 'click') {
-    node.addEventListener(eventType, (e) => func.call(this, e), options);
+    node.addEventListener(eventType, e => func.call(this, e), options);
   },
 
   onEvent() {
     // Top buttons
-    f.qA('input[data-action]', 'click', (e) => this.actionBtn.call(this, e));
+    f.qA('input[data-action]', 'click', e => this.actionBtn.call(this, e));
+
+    // Select
+    f.qA('select[data-action]', 'change', e => this.actionSelect.call(this, e));
   },
 
   onSearchFocus() {

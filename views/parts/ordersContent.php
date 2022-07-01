@@ -1,5 +1,11 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var Main $main - global
+ * @var bool $showFilter - from controller
+ * @var array $dealers - from controller
+ */
+
 $ordersColumns = $ordersColumns ?? [];
 $ordersVisitorColumns = $ordersVisitorColumns ?? [];
 ?>
@@ -23,6 +29,9 @@ $ordersVisitorColumns = $ordersVisitorColumns ?? [];
   <input type="button" class="btn btn-warning ms-1" value="Отмена" data-action="confirmNo">
 </div>
 <div class="pb-4 d-none" id="printTypeField">
+  <input type="button" class="btn btn-primary"
+         data-action="printReport" data-type="printType"
+         value="Печать">
   <input type="button" class="btn btn-warning" data-action="cancelPrint" value="Отмена">
 </div>
 <?php if (isset($param['ordersVisitorColumns'])) { ?>
@@ -43,9 +52,21 @@ $ordersVisitorColumns = $ordersVisitorColumns ?? [];
 <?php } ?>
 <div class="res-table">
 
-  <div class="input-group">
-    <span class="input-group-text">Поиск:</span>
-    <input type="text" id="search" class="form-control" value="" autocomplete="off">
+  <div class="row">
+    <div class="col input-group">
+      <span class="input-group-text">Поиск:</span>
+      <input type="text" id="search" class="form-control" value="" autocomplete="off">
+    </div>
+    <div class="col input-group">
+      <?php if ($showFilter) { ?>
+        <span class="input-group-text">Фильтр:</span>
+        <select class="form-select" data-action="filterChange">
+          <?php foreach ($dealers as $dealer) { ?>
+            <option value="<?= $dealer['id'] ?>"><?= $dealer['name'] ?></option>
+          <?php } ?>
+        </select>
+      <?php } ?>
+    </div>
   </div>
 
   <table id="commonTable" class="text-center table table-striped"></table>

@@ -12,7 +12,6 @@ spl_autoload_register('cmsAutoloader');
 const CORE          = __DIR__ . '/',
       SHARE_PATH    = 'shared/',
       DEALERS_PATH  = 'dealer',
-      CSV_CACHE     = ABS_SITE_PATH . SHARE_PATH . 'csvCache.bin',
       SYSTEM_PATH   = ABS_SITE_PATH . SHARE_PATH . 'system.php'; // TODO перенести в DB
 
 define('DEBUG', array_key_exists('DEBUG', $publicConfig));
@@ -26,33 +25,34 @@ define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);
 $main = new Main($publicConfig, $dbConfig ?? []);
 $url = $main->url;
 
-define('HOST', $url->getBaseUri());
-define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
-define('CORE_JS', $url->getCoreUri() . 'assets/js/');
+define('CORE_CSS', $url->getCoreUri(true) . 'assets/css/');
+define('CORE_JS', $url->getCoreUri(true) . 'assets/js/');
 
-$main->setCmsParam('imgPath', HOST . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
-     ->setCmsParam('uriImg', HOST . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
-     ->setCmsParam('uriCss', HOST . ($publicConfig['URI_CSS'] ?? 'public/css/'))
-     ->setCmsParam('uriJs', HOST . ($publicConfig['PATH_JS'] ?? 'public/js/'));
+// переместить в head, т.к. если есть $mode это все не надо
+$main->setCmsParam('imgPath', $url->getPath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
+     ->setCmsParam('uriImg', $url->getBaseUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
+     ->setCmsParam('uriCss', $url->getBaseUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
+     ->setCmsParam('uriJs', $url->getBaseUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 
 if ($main->isDealer()) {
-  require $url->getFullPath() . 'config.php';
+  require $url->getPath(true) . 'config.php';
 
-  $main->setCmsParam('PATH_CSV', $url->getFullPath() . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
+  // переместить в head, т.к. если есть $mode это все не надо
+  $main->setCmsParam('PATH_CSV', $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
   unset($publicConfig['PATH_CSV']);
 
   $main->setCmsParam($publicConfig);
   $main->setSettings('dbConfig', $dbConfig ?? []);
   if (isset($publicConfig['PATH_IMG'])) {
-    $main->setCmsParam('imgPath', $url->getFullPath() . $publicConfig['PATH_IMG'])
-         ->setCmsParam('uriImg', $url->getFullUri() . $publicConfig['PATH_IMG']);
+    $main->setCmsParam('imgPath', $url->getPath(true) . $publicConfig['PATH_IMG'])
+         ->setCmsParam('uriImg', $url->getUri() . $publicConfig['PATH_IMG']);
   }
 
-  $main->setCmsParam('dealUriCss', $url->getFullUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
-       ->setCmsParam('dealUriJs', $url->getFullUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
+  $main->setCmsParam('dealUriCss', $url->getUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
+       ->setCmsParam('dealUriJs', $url->getUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 }
 
-define('SETTINGS_PATH', $url->getFullPath() . SHARE_PATH . 'settingSave.json');
+define('SETTINGS_PATH', $url->getPath(true) . SHARE_PATH . 'settingSave.json');
 
 define('URI_IMG', $main->getCmsParam('uriImg'));
 define('ONLY_LOGIN', $publicConfig['ONLY_LOGIN'] ?? !boolval(PUBLIC_PAGE)); // Можно перенести в main

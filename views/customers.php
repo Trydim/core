@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $main
+ * @var Main $main - global
  * @var array $param
  */
 
@@ -68,5 +68,5 @@ $field['footerContent'] .= <<<footerContent
 </template>
 footerContent;
 
-$field['footerContent'] .= '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
+$field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>';
 $field['footerContent'] .= $main->initDictionary();

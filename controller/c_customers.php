@@ -1,8 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $main
- * @var string $pathTarget
+ * @var Main $main - global
  */
 
 $field = [
@@ -33,5 +32,5 @@ if (!isset($setting)) {
 }
 
 $param['columns'] = $columns;
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

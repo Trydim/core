@@ -1,10 +1,10 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var Main $main - global
  * @var array $vars extract param
  */
 
-global $main, $target;
 $isAuth = $main->checkStatus();
 
 if (!isset($global)) {
@@ -18,8 +18,8 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
   'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
-  'SITE_PATH'     => $main->url->getBaseSitePath(),
-  'MAIN_PHP_PATH' => $main->url->getBaseSitePath() . 'index.php',
+  'SITE_PATH'     => $main->url->getPath(),
+  'MAIN_PHP_PATH' => $main->url->getPath() . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
   'AUTH_STATUS'   => $isAuth,
@@ -36,8 +36,8 @@ $jsGlobalConst = json_encode([
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
-  <link rel="icon" href="<?= $main->url->getSitePath() ?>favicon.ico">
-  <?php if ($isAuth || $target === 'login') { ?>
+  <link rel="icon" href="<?= $main->url->getPath() ?>favicon.ico">
+  <?php if ($isAuth || $main->url->getRoute() === 'login') { ?>
     <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
   <?php } else { ?>
     <style>.main-wrapper {--theme-sidebar-width: 0;}</style>

@@ -2,7 +2,6 @@
 
 /**
  * @var object $main
- * @var string $pathTarget
  */
 
 $field = [
@@ -22,6 +21,6 @@ $field['pageFooter'] = '';
 $field['sideRight']  = '';
 
 ob_start();
-require $pathTarget;
+require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
 $html = template('base', $field);

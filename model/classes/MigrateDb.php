@@ -3,6 +3,7 @@
 class MigrateDb {
   const DEAL_LOGIN = 'deal';
   const DEAL_PASS = '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS';
+  const ORDER_STATUS = 'order created';
   /**
    * @var string
    */
@@ -357,9 +358,14 @@ class MigrateDb {
     $bean->login = $login ?? $this::DEAL_LOGIN;
     $bean->password = $pass ?? $this::DEAL_PASS;
     $bean->name = $login ?? $this::DEAL_LOGIN;
-
+    $this->db->store($bean);
   }
-
+  public function createStatus() {
+    $bean = self::xdispense($this->pf('order_status'));
+    $bean->ID = 1;
+    $bean->name = $this::ORDER_STATUS;
+    $this->db->store($bean);
+  }
 
   public function drop($prefix) {
     $tables = $this->db->getTables($prefix);

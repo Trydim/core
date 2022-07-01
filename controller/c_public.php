@@ -59,7 +59,7 @@ $main->publicMain();
 require ABS_SITE_PATH . 'public/public.php';
 if ($isDealer) {
   $main->publicDealer();
-  $dealPublic = $main->url->getFullPath() . 'public/public.php';
+  $dealPublic = $main->url->getPath(true) . 'public/public.php';
 
   if (file_exists($dealPublic)) {
     $publicCss = $main->getCmsParam('uriCss');
@@ -72,7 +72,7 @@ $main->publicMain();
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
 if ($isDealer) {
   $main->publicDealer();
-  $dealPublic = $main->url->getFullPath() . 'public/views/' . PUBLIC_PAGE . '.php';
+  $dealPublic = $main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php';
   if (file_exists($dealPublic)) {
     require $dealPublic;
   }

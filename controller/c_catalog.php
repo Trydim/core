@@ -2,7 +2,6 @@
 
 /**
  * @var object $main
- * @var string $pathTarget
  */
 
 $db = $main->getDB();
@@ -59,6 +58,6 @@ $field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . 
 unset($value, $propSetting, $mess);
 
 ob_start();
-require $pathTarget;
+require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
 $html = template('base', $field);

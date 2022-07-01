@@ -1,7 +1,10 @@
 <?php
-global $main;
 
-$siteLink = $main->url->getFullUri();
+/**
+ * @var Main $main - global
+ */
+
+$siteLink = $main->url->getUri();
 $imgSrc = $main->getCmsParam('imgPath') . 'logo.';
 
 if ($main->checkStatus()) { ?>
