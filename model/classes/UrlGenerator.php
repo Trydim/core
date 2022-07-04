@@ -1,7 +1,7 @@
 <?php
 
-use Helpers\HeaderBag;
 use Helpers\ServerBag;
+use Helpers\HeaderBag;
 
 class UrlGenerator {
   /**
@@ -66,13 +66,9 @@ class UrlGenerator {
    */
   private $requestUri;
   /**
-   * @var void
+   * @var string
    */
   private $baseUri;
-  /**
-   * @var string|null
-   */
-  private $baseUrl;
 
   /**
    * UrlGenerator constructor.
@@ -89,6 +85,7 @@ class UrlGenerator {
 
     $this->setScheme();
     $this->setHost();
+    $this->setBaseSitePath();
     $this->setRoute($main);
     $this->setCoreUri();
   }
@@ -106,27 +103,7 @@ class UrlGenerator {
 
     $this->host = $this->scheme . $host;
   }
-  /**
-   * Returns the prefix as encoded in the string when the string starts with
-   * the given prefix, null otherwise.
-   * @param string $string
-   * @param string $prefix
-   * @return string|null
-   */
-  private function getUrlencodedPrefix(string $string, string $prefix): ?string {
-    if (!str_starts_with(rawurldecode($string), $prefix)) {
-      return null;
-    }
-
-    $len = strlen($prefix);
-
-    if (preg_match(sprintf('#^(%%[[:xdigit:]]{2}|.){%d}#', $len), $string, $match)) {
-      return $match[0];
-    }
-
-    return null;
-  }
-  private function setBaseUrl() {
+  private function setBaseSitePath() {
     $filename = basename($this->server->get('SCRIPT_FILENAME', ''));
 
     if (basename($this->server->get('SCRIPT_NAME', '')) === $filename) {
@@ -152,62 +129,39 @@ class UrlGenerator {
       } while ($last > $index && (false !== $pos = strpos($path, $baseUrl)) && 0 != $pos);
     }
 
-    // Does the baseUrl have anything in common with the request_uri?
-    $requestUri = $this->getRequestUri();
-    if ($requestUri !== '' && $requestUri[0] !== '/') {
-      $requestUri = '/' . $requestUri;
-    }
-
-    if ($baseUrl && ($prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) !== null) {
-      // full $baseUrl matches
-      return $prefix;
-    }
-
-    if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, rtrim(dirname($baseUrl), '/' . DIRECTORY_SEPARATOR).'/')) {
-      // directory portion of $baseUrl matches
-      return rtrim($prefix, '/' . DIRECTORY_SEPARATOR);
-    }
-
-    $truncatedRequestUri = $requestUri;
-    if (false !== $pos = strpos($requestUri, '?')) {
-      $truncatedRequestUri = substr($requestUri, 0, $pos);
-    }
-
-    $basename = basename($baseUrl ?? '');
-    if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
-      // no match whatsoever; set it blank
-      return '';
-    }
-
-    // If using mod_rewrite or ISAPI_Rewrite strip the script filename
-    // out of baseUrl. $pos !== 0 makes sure it is not matching a value
-    // from PATH_INFO or QUERY_STRING
-    if (strlen($requestUri) >= strlen($baseUrl) && (false !== $pos = strpos($requestUri, $baseUrl)) && 0 !== $pos) {
-      $baseUrl = substr($requestUri, 0, $pos + strlen($baseUrl));
-    }
-
-    return rtrim($baseUrl, '/' . DIRECTORY_SEPARATOR);
+    $this->baseSitePath = str_replace($filename, '', $baseUrl);
+    $this->requestUri = str_replace($this->baseSitePath, '/', $this->getRequestUri());
   }
-  private function setBaseUri() {
-    return $this->getHost() . $this->getBaseSitePath();
+  private function setSitePath(): string {
+    return $this->getBasePath() . substr($this->getRequestUri(), 1);
   }
   /**
-   * Returns the real base URL received by the webserver from which this request is executed.
-   * The URL does not include trusted reverse proxy prefix.
-   *
-   * @return string The raw URL (i.e. not url decoded)
+   * Returns the prefix as encoded in the string when the string starts with
+   * the given prefix, null otherwise.
+   * @param string $string
+   * @param string $prefix
+   * @return string|null
    */
-  private function getBaseUrl() {
-    if (null === $this->baseUrl) {
-      $this->baseUrl = $this->setBaseUrl();
+  private function getUrlencodedPrefix(string $string, string $prefix): ?string {
+    if (!str_starts_with(rawurldecode($string), $prefix)) {
+      return null;
     }
 
-    return $this->baseUrl;
+    $len = strlen($prefix);
+
+    if (preg_match(sprintf('#^(%%[[:xdigit:]]{2}|.){%d}#', $len), $string, $match)) {
+      return $match[0];
+    }
+
+    return null;
+  }
+  private function setBaseUri(): string {
+    return $this->getHost() . $this->getBasePath();
   }
   private function setRequestUri() {
     $requestUri = '';
 
-    if ('1' == $this->server->get('IIS_WasUrlRewritten') && '' != $this->server->get('UNENCODED_URL')) {
+    if ($this->server->get('IIS_WasUrlRewritten') == '1' && $this->server->get('UNENCODED_URL') != '') {
       // IIS7 with URL Rewrite: make sure we get the unencoded URL (double slash problem)
       $requestUri = $this->server->get('UNENCODED_URL');
       $this->server->remove('UNENCODED_URL');
@@ -244,52 +198,22 @@ class UrlGenerator {
 
     $requestUri = str_replace('index.php', '', $requestUri);
 
+    if (false !== $pos = strpos($requestUri, '?')) {
+      $requestUri = substr($requestUri, 0, $pos);
+    }
+
     // normalize the request URI to ease creating sub-requests from this request
     $this->server->set('REQUEST_URI', $requestUri);
 
     return $requestUri;
   }
-  private function setBaseSitePath() {
-    $sitePath = $this->getPath();
-
-    if (includes($sitePath, DEALERS_PATH)) {
-      $sitePath = substr($sitePath, 0, stripos($sitePath, DEALERS_PATH));
-    }
-
-    return $sitePath;
-  }
-  private function setSitePath() {
-    if (($requestUri = $this->getRequestUri()) === null) {
-      return '/';
-    }
-
-    // Remove the query string from REQUEST_URI
-    if (false !== $pos = strpos($requestUri, '?')) {
-      $requestUri = substr($requestUri, 0, $pos);
-    }
-    if ('' !== $requestUri && '/' !== $requestUri[0]) {
-      $requestUri = '/'.$requestUri;
-    }
-
-    if (($baseUrl = $this->getBaseUrl()) === null) {
-      return $requestUri;
-    }
-
-    $pathInfo = substr($requestUri, strlen($baseUrl));
-    if (false === $pathInfo || '' === $pathInfo) {
-      // If substr() returns false then PATH_INFO is set to an empty string
-      return '/';
-    }
-
-    return (string) $pathInfo;
-  }
-  private function setRoute($main) {
+  private function setRoute($main): void {
     $this->checkDealer($main);
 
     if (isset($_REQUEST['mode'])) {
       $main->setCmsParam('mode', $_REQUEST['mode']);
       $this->route = false;
-      return $this;
+      return;
     }
 
     if ($main->isDealer()) {
@@ -301,7 +225,7 @@ class UrlGenerator {
     $this->route = $match[1] ?? (PUBLIC_PAGE ? 'public' : 'firstPage');
     $this->requestUri = str_replace($this->route . '/', '', $this->requestUri);
 
-    return $this;
+    if (PUBLIC_PAGE && $this->route === PUBLIC_PAGE) $this->route = 'public';
   }
   private function setRoutePath(): string {
     $route = $this->route === 'public' ? PUBLIC_PAGE : $this->route;
@@ -350,14 +274,14 @@ class UrlGenerator {
   public function getHost(): string {
     return $this->host;
   }
-  public function getBaseUri() {
+  public function getBaseUri(): string {
     if ($this->baseUri === null) {
       $this->baseUri = $this->setBaseUri();
     }
 
     return $this->baseUri;
   }
-  public function getUri() {
+  public function getUri(): string {
     return $this->getHost() . $this->getPath();
   }
 
@@ -368,19 +292,22 @@ class UrlGenerator {
     return $this->coreUri;
   }
 
-  public function getBaseSitePath(bool $absolute = false): string {
-    if ($this->baseSitePath === null) {
-      $this->baseSitePath = $this->setBaseSitePath();
-    }
-
-    return $absolute ? $this->absolutePath . substr($this->baseSitePath, 1) : $this->baseSitePath;
+  public function getBasePath(bool $absolute = false): string {
+    return $absolute ? $this->absolutePath : $this->baseSitePath;
   }
   public function getPath(bool $absolute = false): string {
+    $absolutePath = $absolute ? $this->absolutePath : '';
+
     if ($this->sitePath === null) {
       $this->sitePath = $this->setSitePath();
     }
 
-    return $absolute ? $this->absolutePath . substr($this->sitePath, 1) : $this->sitePath;
+    if ($absolute) {
+      if ($this->baseSitePath !== '/') $absolutePath = str_replace($this->baseSitePath, '', $this->absolutePath);
+      else $absolutePath = substr($absolutePath, 0, strlen($absolutePath) - 1);
+    }
+
+    return $absolutePath . $this->sitePath;
   }
 
   /**
@@ -388,7 +315,7 @@ class UrlGenerator {
    *
    * @return string The raw URI (i.e. not URI decoded)
    */
-  public function getRequestUri() {
+  public function getRequestUri(): string {
     if ($this->requestUri === null) {
       $this->requestUri = $this->setRequestUri();
     }
@@ -396,10 +323,10 @@ class UrlGenerator {
     return $this->requestUri;
   }
 
-  public function getRoute() {
+  public function getRoute(): string {
     return $this->route;
   }
-  public function getRoutePath() {
+  public function getRoutePath(): string {
     if ($this->routePath === null) {
       $this->routePath = $this->setRoutePath();
     }

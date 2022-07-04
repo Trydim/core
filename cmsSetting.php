@@ -25,11 +25,11 @@ define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);
 $main = new Main($publicConfig, $dbConfig ?? []);
 $url = $main->url;
 
-define('CORE_CSS', $url->getCoreUri(true) . 'assets/css/');
-define('CORE_JS', $url->getCoreUri(true) . 'assets/js/');
+define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
+define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 
 // переместить в head, т.к. если есть $mode это все не надо
-$main->setCmsParam('imgPath', $url->getPath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
+$main->setCmsParam('imgPath', $url->getBasePath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam('uriImg', $url->getBaseUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam('uriCss', $url->getBaseUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
      ->setCmsParam('uriJs', $url->getBaseUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));

@@ -16,8 +16,8 @@
     "coreDev": "webpack --config ./webpack/webpack.config.js",
     "coreModuleDev": "webpack --config ./webpack/webpack.module.js",
 
-    "localCypressTest": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=false",
-    "cypressDeployProd": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=true"
+    "createCypress": "node ./test/createCypressConfig.js",
+    "localCypressTest": "cypress open --project ../../ --config-file ./core/src/test/cypress.json"
   },
   "dependencies": {
     "@tinymce/tinymce-vue": "next",

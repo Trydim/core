@@ -3,3 +3,4 @@
 !/libs/vendor/autoload.php
 /assets/
 
+/src/test/cypress.json
