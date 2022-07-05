@@ -7,16 +7,15 @@
 $param = [
   'showFilter' => $main->availablePage('dealers') && $main->getCmsParam('DEALERS_ORDERS_SHOW'),
 ];
-$field = [
-  'pageTitle' => 'Заказы',
-  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
-];
-
 $user = [
   'permission' => $main->getSettings('permission'),
   'isAdmin'    => $main->getLogin('admin'),
 ];
-$field['footerContent'] = "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>";
+$field = [
+  'pageTitle' => 'Заказы',
+  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
+  'footerContent' => "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>",
+];
 
 // получить конфиг текущего пользователя
 $setting = $main->getSettings('customization');
@@ -52,10 +51,6 @@ if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsS
 
 if ($param['showFilter']) {
   $param['dealers'] = $main->db->selectQuery('dealers', ['id', 'name']);
-  $param['dealers'] = array_merge([[
-    'id' => '0',
-    'name' => $main->getCmsParam('PROJECT_TITLE'),
-  ]], $param['dealers']);
 }
 
 $main->setControllerField($field)->fireHook('orderTemplate', $field);

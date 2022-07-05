@@ -25,6 +25,8 @@ const admindb = {
     this.onEvent();
     if (this.checkLoadContentEditor()) this.switchAdminType('content');
     else this.setDefault();
+
+    return this;
   },
   setDefault() {
     setTimeout(() => f.qS('input[data-action]:checked').click(), 0);
@@ -49,7 +51,7 @@ const admindb = {
       case 'form':
         //f.hide(this.btnRefresh);
         //this.dbAction('loadFormConfig');
-        //new FormViews();
+        //this.adminType = new FormViews();
         break;
       case 'table':
         //f.hide(this.btnRefresh);
@@ -57,17 +59,16 @@ const admindb = {
          f.Get({data: 'mode=load&dbAction=tables'})
          .then(data => this.showTablesName(data));
          } else {*/
-        new TableValues();
+        this.adminType = new TableValues();
         //}
         break;
       case 'config':
         /*f.show(this.btnRefresh);
         this.dbAction('loadXmlConfig');
-        new XMLTable();*/
+         this.adminType = new XMLTable();*/
         break;
       case 'content':
-
-        new ContentEditor();
+        this.adminType = new ContentEditor();
         break;
     }
   },
@@ -77,4 +78,4 @@ const admindb = {
   },
 }
 
-admindb.init();
+window.AdminDbInstance = admindb.init();

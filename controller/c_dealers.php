@@ -7,7 +7,6 @@
 $field = [
   'pageTitle'     => 'Дилеры',
   'sideRight'     => '',
-  'pageFooter'    => '',
   'footerContent' => '',
   'cssLinks'  => [CORE_CSS . 'module/dealers.css?ver=8cdf94ab40'],
   'jsLinks'   => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],

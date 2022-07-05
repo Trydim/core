@@ -155,7 +155,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $orderId = $orderId !== 0 ? $orderId
           : $db->getLastID('orders',
             [
-              'status_id' => $main->getSettings('statusDefault'),
+              'status_id' => $main->getSettings('statusDefault') ?? 1,
               'customer_id' => $customerId
             ]);
         $orderTotal = $orderTotal ?? 0;
@@ -165,7 +165,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'customer_id' => $customerId,
           'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
           'important_value' => $importantVal ?? '{}',
-          'status_id'       => $main->getSettings('statusDefault'),
           'save_value'      => $saveVal ?? '{}',
           'report_value'    => addCpNumber($orderId, $reportVal),
           'start_shipping_date' => $db->getDbDateString($startShippingDate ?? ''),
@@ -182,7 +181,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadOrders':
       $sortColumn = $sortColumn ?? 'create_date';
 
-      $orderIds = json_decode($orderIds ?? '[]'); // TODO Зачем это
+      $orderIds = json_decode($orderIds ?? '[]');
       $dateRange = json_decode($dateRange ?? '[]');
 
       // Значит нужны все заказы (поиск)
@@ -468,7 +467,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Customers
     case 'loadCustomerByOrder':
-      if (isset($orderId)) {
+      if (isset($orderId) && is_numeric($orderId)) {
         $result['customer'] = $db->loadCustomerByOrderId($orderId);
         $result['users'] = $db->getUserByOrderId($orderId);
       }

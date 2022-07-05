@@ -6,10 +6,4 @@
  */
 ?>
 
-<!--<style>
-  #dealerApp .p-button {
-    display: none;
-  }
-</style>-->
-
 <div id="dealerApp" v-cloak></div>

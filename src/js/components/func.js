@@ -430,7 +430,7 @@ export default {
             loader  = document.createElement('div');
 
       loaderW.id = 'cmsLoaderWrapper';
-      loaderW.style.cssText = `position: fixed; 
+      loaderW.style.cssText = `position: fixed;
         left: ${node.offsetLeft}px; top: ${node.offsetTop}px;
         z-index: ${typeof cStyle.zIndex === "number" ? cStyle.zIndex + 1 : +1}`;
       loader.style.cssText = `width: ${c.width}px; height: ${c.height}px;`;
@@ -498,7 +498,7 @@ export default {
       f.gI('cmsLoaderWrapper').remove();
     }
     if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
-      node.parentNode.parentNode.append(node);
+      node.parentNode['after'](node);
       f.gI('cmsLoaderWrapper').remove();
     } else {
       node.classList.remove('loading-st1', 'loading-st1-sm', 'loading-st1-big', 'loading-st1-light');
@@ -561,6 +561,7 @@ export default {
       }
     });
 
+    // Get resource last created Pdf
     if (f.DEBUG || true) {
       window.pdfResources = () => {
         data.set('resource', 'true');

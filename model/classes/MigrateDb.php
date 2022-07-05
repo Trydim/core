@@ -278,7 +278,7 @@ class MigrateDb {
       `important_value` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '{}',
       `status_id` int(2) UNSIGNED NOT NULL DEFAULT 1,
       `save_value` varchar(500) CHARACTER SET utf8 NOT NULL DEFAULT '{}',
-      `report_value` varbinary(2000) DEFAULT NULL
+      `report_value` mediumblob DEFAULT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
     $error = $this->db->exec($sql);

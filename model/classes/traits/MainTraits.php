@@ -83,6 +83,16 @@ trait Authorization {
     return $this;
   }
 
+  private function checkDealer() {
+    $dealer = $this->db->getDealerById($this->getCmsParam('dealerId'));
+
+    // Activity
+    if (boolValue($dealer['activity']) === false) {
+      $this->reDirect('404');
+    }
+
+    $this->setCmsParam('dealer', $dealer);
+  }
   /**
    * Проверка пароля
    * @return $this|Main

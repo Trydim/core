@@ -33,10 +33,9 @@ const downloadBody = async data => {
   return Object.assign(new Blob(chunks), {fileName});
 }
 
-const query = (url, data, type = 'json') => {
+const query = (url, body, type = 'json') => {
   type === 'file' && (type = 'body');
-  data.set('REQUEST_URI', location.href);
-  return fetch(url, {method: 'post', body: data})
+  return fetch(url, {method: 'post', body})
     .then(res => type === 'json' ? res.text() : res).then(
       data => {
         if (type === 'json') return checkJSON(data, type);

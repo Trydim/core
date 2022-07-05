@@ -295,4 +295,4 @@ const users = {
   },
 }
 
-users.init();
+window.UsersInstance = users.init();

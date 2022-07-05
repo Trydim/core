@@ -34,6 +34,8 @@ const statistic = {
   init() {
     //orders.init();
     initCharts();
+
+    return this;
   },
 
   addOrder(order) {},
@@ -97,4 +99,4 @@ const orders = {
   },
 }
 
-statistic.init();
+window.StatisticInstance = statistic.init();

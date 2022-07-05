@@ -59,6 +59,28 @@ class Db extends \R {
     return $this->prefix . str_replace($this->prefix, '', $table);
   }
 
+  /**
+   * @param array $dealers
+   * @param array $fields
+   * @return array
+   */
+  private function parseJsonField(array $dealers, array $fields): array {
+    $result = [];
+
+    if (isset($dealers['contacts'])) {
+      $result = $dealers;
+      foreach ($fields as $field) {
+        $result[$field] = json_decode($result[$field], true);
+      }
+    } else {
+      foreach ($dealers as $dealer) {
+        $result[] = $this->parseJsonField($dealer, $fields);
+      }
+    }
+
+    return $result;
+  }
+
   public function __construct(Main $main, bool $freeze = true) {
     $this->main = $main;
 
@@ -834,7 +856,7 @@ class Db extends \R {
    *
    * @return array|null
    */
-  public function loadOrder($pageNumber = 0, $countPerPage = 20, $sortColumn = 'last_edit_date', $sortDirect = false, $dateRange = [], $ids = []) {
+  public function loadOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'last_edit_date', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
     $pageNumber *= $countPerPage;
 
     /*important_value AS 'importantValue', */
@@ -867,12 +889,12 @@ class Db extends \R {
    */
   public function loadOrderById($id) {
     $sql = "SELECT O.ID AS 'ID', create_date AS 'createDate', last_edit_date AS 'lastEditDate',
-                   users.name AS 'name', users.ID AS 'userId',
-                   users.contacts AS 'contacts', C.name AS 'C.name', total, S.name AS 'Status', 
+                   U.name AS 'name', U.ID AS 'userId',
+                   U.contacts AS 'contacts', C.name AS 'C.name', total, S.name AS 'Status', 
                    important_value AS 'importantValue', save_value AS 'saveValue',
                    report_value AS 'reportValue'
             FROM " . $this->pf('orders') . " O
-            LEFT JOIN " . $this->pf('users') . " ON O.user_id = users.ID
+            LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
             LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
             JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID
             WHERE O.ID = :id";
@@ -976,9 +998,9 @@ class Db extends \R {
     $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts
       FROM " . $this->pf('orders') . " O 
       LEFT JOIN " . $this->pf('customers') . " C ON C.ID = O.customer_id
-      WHERE O.ID = $orderId";
+      WHERE O.ID = :id";
 
-    return self::getRow($sql);
+    return self::getRow($sql, [':id' => $orderId]);
   }
 
   // Money
@@ -1227,7 +1249,16 @@ class Db extends \R {
     $sql = "SELECT ID AS 'id', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 
-    return self::getAll($sql);
+    return $this->parseJsonField(self::getAll($sql), ['contacts', 'settings']);
+  }
+
+  public function getDealerById(string $id): array {
+    $sql = "SELECT ID AS 'id', name, contacts,
+                   register_date AS 'registerDate', activity, settings
+            FROM dealers
+            WHERE ID = :id";
+
+    return $this->parseJsonField(self::getRow($sql, [':id' => $id]), ['contacts', 'settings']);
   }
 
   use MainCsv;

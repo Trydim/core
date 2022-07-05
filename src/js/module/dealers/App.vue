@@ -1,7 +1,7 @@
 <template>
-  <div v-if="true" class="d-flex justify-content-between mb-3">
-    <Button type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
-    <Button type="button" class="ms-auto btn btn-danger" @click="delDealer">Удалить</Button>
+  <div class="d-flex justify-content-between mb-3">
+    <Button v-if="false" type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
+    <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="delDealer">Удалить</Button>
   </div>
 
   <DataTable v-if="dealers.length"
@@ -193,11 +193,7 @@ export default {
       });
     },
     setData(data) {
-      this.dealers = data.map(d => {
-        d.contacts = JSON.parse(d.contacts);
-        d.settings = JSON.parse(d.settings);
-        return d;
-      });
+      this.dealers = data;
       this.selected = {};
     },
     setModal(title, confirmDisabled) {

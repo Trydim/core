@@ -5,10 +5,10 @@
  */
 
 !defined('ABS_SITE_PATH') && define('ABS_SITE_PATH', $_SERVER['DOCUMENT_ROOT']);
-!defined('URI_IMG') && define('URI_IMG', $_SERVER['HTTP_REFERER'] . '/images/');
+!defined('URI_IMG') && define('URI_IMG', $_SERVER['HTTP_REFERER'] . 'images/');
 
 class Docs {
-  const PATH_IMG = ABS_SITE_PATH . '/images/';
+  const PATH_IMG = ABS_SITE_PATH . 'images/';
   /**
    * Папка для временных файлов
    */
@@ -155,7 +155,7 @@ class Docs {
     ];
 
     $this->imgPath = $this->docsType === 'print' ? URI_IMG
-      : isset($main) ? $main->getCmsParam('imgPath') : $this::PATH_IMG;
+      : (isset($this->main) ? $this->main->getCmsParam('imgPath') : $this::PATH_IMG);
   }
 
   private function prepareTemplate() {

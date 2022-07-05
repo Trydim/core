@@ -233,6 +233,7 @@ const fileManager = {
       })
     }
 
+    return this;
   },
 
 
@@ -256,4 +257,4 @@ const fileManager = {
   },
 }
 
-fileManager.init();
+window.FileManagerInstance = fileManager.init();

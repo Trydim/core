@@ -22,27 +22,39 @@ function addCpNumber($number, $reportVal) {
 
 /**
  * alias for $main->addControllerField('cssLinks')
+ *
  * @param string $cssLink
- * @return mixed - false or Main object
+ * @return Main|bool - false or Main object
  */
 function addCssLink(string $cssLink) {
   global $main;
-  if ($main instanceof Main) return $main->addControllerField('cssLinks', $cssLink);
+
+  if ($main instanceof Main) {
+    $cssLink = str_replace('//', '/', $main->url->getUri() . $cssLink);
+    return $main->addControllerField('cssLinks', $cssLink);
+  }
+
   return false;
 }
 
 /**
  * alias for $main->addControllerField('jsLinks')
+ *
  * @param string $jsLink
  * @param mixed $position [optional] <p>
  * head - in head <p>
  * before - before all script, after cms libs<p>
  * last - before end body <p>
- * @return mixed - false or Main object
+ * @return Main|bool - false or Main object
  */
 function addJsLink(string $jsLink, string $position = 'last') {
   global $main;
-  if ($main instanceof Main) return $main->addControllerField('jsLinks', $jsLink, $position);
+
+  if ($main instanceof Main) {
+    $jsLink = str_replace('//', '/', $main->url->getPath() . $jsLink);
+    return $main->addControllerField('jsLinks', $jsLink, $position);
+  }
+
   return false;
 }
 
@@ -299,6 +311,21 @@ function findingFile($path, $fileName) {
   }
 
   return false;
+}
+
+/**
+ * Determines whether a string can be considered JSON or not.
+ *
+ * @param string $value value to determine json of.
+ *
+ * @return boolean
+ */
+function isJSON(string $value) {
+  return (
+    is_string($value) &&
+    is_array(json_decode($value, true)) &&
+    (json_last_error() == JSON_ERROR_NONE)
+  );
 }
 
 /**

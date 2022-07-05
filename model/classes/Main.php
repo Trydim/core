@@ -82,10 +82,14 @@ final class Main {
   public function beforeController() {
     if ($this->url->getRoute() === '404') return;
 
+    if ($this->isDealer()) {
+      $this->checkDealer();
+    }
+
     if (!OUTSIDE) {
       $this->checkAuth()
-        ->setAccount()
-        ->applyAuth();
+           ->setAccount()
+           ->applyAuth();
     }
 
     $this->isDealer() && $this->setDealerParam();
@@ -139,7 +143,13 @@ final class Main {
    * @return mixed|string|null
    */
   public function getCmsParam(string $param) {
-    return $this->cmsParam[$param] ?? null;
+    $param = explode('.', $param);
+
+    if (count($param) === 1) {
+      return $this->cmsParam[$param[0]] ?? null;
+    } else {
+      return $this->cmsParam[$param[0]][$param[1]] ?? null;
+    }
   }
 
   /* ---------------------------------------------------------------------------------------------------------------------

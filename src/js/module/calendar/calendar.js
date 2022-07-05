@@ -296,4 +296,4 @@ const calendar = {
   }
 }
 
-calendar.init();
+window.CalendarInstance = calendar.init();
