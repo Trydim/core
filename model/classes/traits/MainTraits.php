@@ -284,6 +284,11 @@ trait Cache {
     file_put_contents($this->cachePath(), gzcompress(json_encode($data), 1));
   }
 
+  public function deleteCsvCache() {
+    $cachePath = $this->cachePath();
+    file_exists($cachePath) && unlink($cachePath);
+  }
+
   public function loadPageCache() {
     /*
      const PAGE_CACHE_FILE = SHARE_PATH . 'pageCache.bin';

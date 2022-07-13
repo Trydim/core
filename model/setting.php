@@ -89,8 +89,8 @@ switch ($cmsAction) {
         }
 
         $columns = $db->getColumnsTable('permission');
-        $result['error']['addPerm'] = $db->insert($columns, 'permission', $param['new']);
-        $result['error']['changePerm'] = $db->insert($columns, 'permission', $param['change'], true);
+        $result = $db->insert($columns, 'permission', $param['new']);
+        $result = $db->insert($columns, 'permission', $param['change'], true);
       }
       unset($permissions);
 

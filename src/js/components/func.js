@@ -699,7 +699,8 @@ export default {
       k = main.scale / main.rate;
 
       Object.values(rate).forEach(r => {
-        r.rate = k * (r.rate / r.scale);
+        //r.rate = k * (r.rate / r.scale);
+        r.rate = r.scale / rate / k;
       });
 
       node.remove();

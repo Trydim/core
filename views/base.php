@@ -23,6 +23,7 @@ $jsGlobalConst = json_encode([
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
   'AUTH_STATUS'   => $isAuth,
+  'IS_DEAL'       => $main->isDealer(),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 

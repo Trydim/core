@@ -278,7 +278,7 @@ class Db extends \R {
    */
   public function checkHaveRows($dbTable, $columnName, $value): int {
     return intval(self::getCell("SELECT count(*) FROM " . $this->pf($dbTable) .
-                                    "WHERE $columnName = :value", [':value' => $value]));
+                                    " WHERE $columnName = :value", [':value' => $value]));
   }
 
   /**
@@ -1355,7 +1355,6 @@ trait MainCsv {
    */
   public function saveCsv($csvData) {
     $csvPath = $this->main->getCmsParam('PATH_CSV');
-    $cachePath = $this->main->cachePath();
 
     if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];
@@ -1367,7 +1366,7 @@ trait MainCsv {
       }
 
       file_put_contents($csvPath . $this->csvTable, $fileStrings);
-      file_exists($cachePath) && unlink($cachePath);
+      $this->main->deleteCsvCache();
     }
     return $this;
   }

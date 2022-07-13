@@ -23,6 +23,7 @@ if (!$setting) $setting = new stdClass();
 
 if (!isset($setting->ordersColumnsSort)) {
   $columns = $main->db->loadOrder(0, 1);
+
   if (!empty($columns)) {
     $setting->ordersColumnsSort = array_map(function ($item) {
       return [
@@ -30,9 +31,9 @@ if (!isset($setting->ordersColumnsSort)) {
         'name'   => gTxtDB('orders', $item),
       ];
     }, array_keys($columns[0]));
-
-    $param['ordersColumns'] = $setting->ordersColumnsSort;
   }
+
+  $param['ordersColumns'] = $setting->ordersColumnsSort;
 }
 
 if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsSort)) {

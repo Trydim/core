@@ -40,7 +40,7 @@ if (isset($addCustomer)) {
     $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
   } else if ($orderId) { // Заказчик из сохраненного заказа
     $customerData = $main->db->loadCustomerByOrderId($orderId);
-  } else $customerData = $customer ?? '';
+  } else $customerData = $customer ?? [];
 
   if (count($customerData)) {
     $userData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);

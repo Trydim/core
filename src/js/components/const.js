@@ -20,6 +20,7 @@ export default {
   URI_IMG      : (cms['URI_IMG'] || 'public/images/'),
 
   AUTH_STATUS  : cms['AUTH_STATUS'] || false,
+  IS_DEAL      : cms['IS_DEAL'] || false,
   INIT_SETTING : cms['INIT_SETTING'] || false,
 
   PHONE_MASK_DEFAULT: '+_ (___) ___ __ __',

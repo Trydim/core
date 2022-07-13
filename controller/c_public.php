@@ -62,8 +62,8 @@ if ($isDealer) {
   $dealPublic = $main->url->getPath(true) . 'public/public.php';
 
   if (file_exists($dealPublic)) {
-    $publicCss = $main->getCmsParam('uriCss');
-    $publicJs = $main->getCmsParam('uriJs');
+    $publicCss = $main->getCmsParam('dealUriCss');
+    $publicJs = $main->getCmsParam('dealUriJs');
     require $dealPublic;
   }
 }

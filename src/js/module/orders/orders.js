@@ -115,6 +115,7 @@ class Orders {
       order    : f.gTNode('#orderTableTmp'),
       impValue : f.gT('#tableImportantValue'),
       searchMsg: f.gT('#noFoundSearchMsg'),
+      columns  : f.gT('#orderColumnsTableTmp'),
     }
 
     let node = f.qS('#orderVisitorTableTmp');
@@ -246,7 +247,7 @@ class Orders {
 
   onEvent() {
     // Top buttons
-    f.qA('input[data-action]', 'click', e => this.actionBtn.call(this, e));
+    f.qA('input[data-action], button[data-action]', 'click', e => this.actionBtn.call(this, e));
 
     // Select
     f.qA('select[data-action]', 'change', e => this.actionSelect.call(this, e));
@@ -273,7 +274,7 @@ class Orders {
         action         = target.dataset.action,
         selectedSize   = this.selected.getSelectedSize();
 
-    if (!selectedSize && !('orderType').includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
+    if (!selectedSize && !(['setupColumns', 'orderType']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
     this.queryParam.orderIds = this.selected.getSelected();
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
 
@@ -430,6 +431,10 @@ class Orders {
 
     this.setTableTemplate(this.table.dataset.type);
     this.query();
+  }
+
+  setupColumns() {
+    this.M.show('Настройка колонок', this.template.columns);
   }
 
   actionSelect(e) {
