@@ -1,5 +1,5 @@
 Ядро CMS:\
-git submodule add \
+git submodule add https://github.com/Trydim/core\
 git submodule update --remote
 
 константы: \
