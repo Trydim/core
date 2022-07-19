@@ -47,4 +47,5 @@ export default {
   },
 
   HOOKS: {},
+  CMS_SETTING: {},
 };

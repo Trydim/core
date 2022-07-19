@@ -1,11 +1,8 @@
 <?php
 
-/**
- * @var Main $main - global
- */
-
-!defined('ABS_SITE_PATH') && define('ABS_SITE_PATH', $_SERVER['DOCUMENT_ROOT']);
-!defined('URI_IMG') && define('URI_IMG', $_SERVER['HTTP_REFERER'] . 'images/');
+/* Папка для временных файлов */
+  const RESULT_PATH = 'shared/';
+!defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
   const PATH_IMG = ABS_SITE_PATH . 'images/';
@@ -89,7 +86,7 @@ class Docs {
   public function __construct(Main $main, array $param, $data, string $fileTpl = 'default') {
     $this->main = $main ?? null;
 
-    $this->pdfLibrary = $param['library'] ?? 'mpdf';
+    $this->pdfLibrary = $param['library'] ?? 'dompdf';
     $this->pdfOrientation = $param['orientation'] ?? 'P';
     $this->docsType = $param['docType'] ?? 'pdf';
     $this->data = $data;
@@ -154,8 +151,7 @@ class Docs {
       'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = $this->docsType === 'print' ? URI_IMG
-      : (isset($this->main) ? $this->main->getCmsParam('imgPath') : $this::PATH_IMG);
+    $this->imgPath = $this->docsType === 'print' ? URI_IMG : URI_IMG;
   }
 
   private function prepareTemplate() {
@@ -183,6 +179,22 @@ class Docs {
     require_once CORE . 'libs/vendor/autoload.php';
 
     switch ($this->pdfLibrary) {
+      case 'dompdf':
+        try {
+          $this->docs = new Dompdf\Dompdf($this->pdfParam);
+
+          $this->docs->setPaper('A4', $this->pdfParam['orientation'] === 'P' ? 'portrait' : 'landscape');
+
+          //$this->docs->getOptions()->setDebugLayout(true);
+          //$this->docs->getOptions()->setDebugPng(true);
+          $this->docs->getOptions()->setIsRemoteEnabled(true);
+          $this->docs->getOptions()->setIsPhpEnabled(true);
+
+          $this->docs->loadHtml('<style>' . ($this->styleContent ?? '') . '</style>' . $this->content);
+        } catch (\Mpdf\MpdfException $e) {
+          echo $e->getMessage();
+        }
+        break;
       case 'mpdf':
         try {
           $this->docs = new Mpdf\Mpdf($this->pdfParam);
@@ -284,6 +296,18 @@ class Docs {
 
 
     switch ($this->pdfLibrary) {
+      case 'dompdf':
+        $this->docs->render();
+
+        if ($dest === 'save') {
+          file_put_contents($path . $this->fileName, $this->docs->output());
+          return $path . $this->fileName;
+        } else {
+          return [
+            'name'    => $this->fileName,
+            'pdfBody' => base64_encode($this->docs->output()),
+          ];
+        }
       case 'mpdf':
       /** Default: \Mpdf\Output\Destination::INLINE
        *        Values:

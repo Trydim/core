@@ -42,7 +42,10 @@ $field['pageFooter'] = '';
 
 /*$dbContent = "<input type='hidden' id='dataPrice' value='$price'>" .
              "<input type='hidden' id='dataConfig' value='$config'>";*/
-/*
+
+// Настройки
+// $dbContent .= $main->getSettings('json', true);
+
 // Курс
-$dbContent .= $main->getCourse();
-*/
+//$dbContent .= $main->getCourse();
+

@@ -359,7 +359,7 @@ export default {
    */
   initMask: (node, phoneMask) => {
     const minValue = 2,
-          maskGl = f.cmsSetting && f.cmsSetting['phoneMaskGlobal'],
+          maskGl = f.getSetting('phoneMaskGlobal').toString(),
           matrix = phoneMask || maskGl || f.PHONE_MASK_DEFAULT;
 
     if (!node || maskGl === '') return;
@@ -700,7 +700,7 @@ export default {
 
       Object.values(rate).forEach(r => {
         //r.rate = k * (r.rate / r.scale);
-        r.rate = r.scale / rate / k;
+        r.rate = r.scale / r.rate / k;
       });
 
       node.remove();
@@ -788,8 +788,8 @@ export default {
 
   /**
    * trance literate
-   * @param value
-   * @returns {string}
+   * @param {string} value
+   * @return {string}
    */
   transLit(value) {
     const cyrillic = 'А-а-Б-б-В-в-Г-г-Д-д-Е-е-Ё-ё-Ж-ж-З-з-И-и-Й-й-К-к-Л-л-М-м-Н-н-О-о-П-п-Р-р-С-с-Т-т-У-у-Ф-ф-Х-х-Ц-ц-Ч-ч-Ш-ш-Щ-щ-Ъ-ъ-Ы-ы-Ь-ь-Э-э-Ю-ю-Я-я'.split('-'),
@@ -802,12 +802,16 @@ export default {
 
   /**
    *
+   * @param {string?} key - possible values: mailTarget, mailTargetCopy, mailSubject, mailFromName <p>
+   *   managerFields, statusDefault, phoneMaskGlobal, ...
+   * @return mixed
    */
-  getSetting() {
-    if (!f.INIT_SETTING) return;
+  getSetting(key) {
+    if (key) return f.CMS_SETTING[key] || false;
+    if (!f.INIT_SETTING || Object.keys(f.CMS_SETTING).length > 0) return;
 
     let node = f.gI('dataSettings');
-    node && (f.cmsSetting = JSON.parse(node.value));
+    node && (f.CMS_SETTING = JSON.parse(node.value));
     node && node.remove();
   },
 }

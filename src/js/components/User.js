@@ -22,17 +22,15 @@ export default class {
     if (f.INIT_SETTING) {
       let interval,
           applySetting = () => {
-        if (f.cmsSetting) {
-          Object.entries(f.cmsSetting).forEach(([id, setting]) => {
-            if (this.data.fields[id] !== undefined) {
-              this.data.fields[id] = {value: this.data.fields[id], ...setting};
-            }
-          });
-          clearInterval(interval);
-        }
+        Object.entries(f.CMS_SETTING).forEach(([id, setting]) => {
+          if (this.data.fields[id] !== undefined) {
+            this.data.fields[id] = {value: this.data.fields[id], ...setting};
+          }
+        });
+        clearInterval(interval);
       }
 
-      if (f.cmsSetting) applySetting();
+      if (f.CMS_SETTING) applySetting();
       else interval = setInterval(applySetting, 90);
       setTimeout(() => clearInterval(interval), 300);
     }
