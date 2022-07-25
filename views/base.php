@@ -84,8 +84,8 @@ $jsGlobalConst = json_encode([
   </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src='<?= CORE_JS ?>src.js?ver=35453966479'></script>
-<script defer type="module" src='<?= CORE_JS ?>main.js?ver=684eab4bb6f'></script>
+<script defer type="module" src="<?= CORE_JS ?>src.js?ver=1353431"></script>
+<script defer type="module" src="<?= CORE_JS ?>main.js?ver=16844b1b6f1"></script>
 
 <?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= $item ?>"></script>

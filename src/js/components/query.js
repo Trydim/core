@@ -14,8 +14,19 @@ const checkJSON = data => {
   }
 };
 
+const getFileName = data => {
+  let fileName = data.headers.get('Content-Disposition');
+
+  if (typeof fileName === 'string') {
+    const match = /(?:filename=")\w+\.\w+(?=")/i.exec(fileName); // safari error
+    fileName = Array.isArray(match) && match.length === 1 && match[0];
+    if (fileName.replace) fileName = fileName.replace('filename="', '');
+  }
+
+  return fileName || JSON.parse(data.headers.get('fileName')) || '';
+}
 const downloadBody = async data => {
-  const fileName = JSON.parse(data.headers.get('fileName')),
+  const fileName = getFileName(data),
         reader   = data.body.getReader();
   let chunks    = [],
       countSize = 0;

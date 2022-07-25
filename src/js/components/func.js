@@ -167,46 +167,6 @@ export default {
   },
 
   /**
-   * Replace latin to cyrillic symbol
-   * @param {string} value
-   * @return {void | string}
-   */
-  replaceLetter: value => {
-    let cyrillic = 'УКЕНХВАРОСМТ',
-        latin    = 'YKEHXBAPOCMT',
-        replacer = (match) => cyrillic.charAt(latin.indexOf(match)),
-        letters  = new RegExp(`(${latin.split('').join('|')})`, 'gi');
-    return value.replace(letters, replacer).replace(/(&nbsp| | )/g, '').toLowerCase(); // какой-то пробел
-  },
-
-  /**
-   * replace ${key from obj} from template to value from obj
-   * @param {string} tmpString html string template
-   * @param {array|object} arrayObjects - array of object
-   * @return {string}
-   */
-  replaceTemplate: (tmpString, arrayObjects) => {
-    let html = '';
-
-    if (tmpString) {
-      if (!arrayObjects.map) arrayObjects = [arrayObjects];
-
-      arrayObjects.map(item => {
-        let tmp = tmpString.trim();
-        Object.entries(item).map(v => {
-          if (!v[1]) v[1] = '';
-          let reg = new RegExp(`\\\${${v[0]}}`, 'mgi');
-          tmp     = tmp.replace(reg, v[1].toString().replace(/"/g, '\'')); // replace ${key from obj} from template to value from obj //не помогло
-        });
-
-        html += tmp;
-      })
-    }
-
-    return html;
-  },
-
-  /**
    * Input будет давать true, когда активен(checked)
    * для определения цели добавить input-у data-target="targetClass"
    * Цели добавить в data-relation в виде логического выражения
@@ -253,7 +213,7 @@ export default {
       } else console.warn('Event relatedOption: target not found' + key);
 
       return targetNodes[key];
-      }
+    }
     const checkedTarget = (node, member) => {
       let {relation, relationT} = member;
 
@@ -323,6 +283,37 @@ export default {
   },
 
   /**
+   * Активировать элементы
+   * @param {NodeList} collection
+   */
+  enable: (...collection) => {
+    collection.map(nodes => {
+      if (!nodes.forEach) nodes = [nodes];
+      nodes.forEach(n => {
+        n.classList.remove(f.CLASS_NAME.DISABLED_NODE);
+        n.removeAttribute('disabled');
+      });
+    });
+  },
+
+  /**
+   * Деактивировать элементы
+   * @param {NodeList} collection
+   */
+  disable: (...collection) => {
+    collection.map(nodes => {
+      if(!nodes.forEach) nodes = [nodes];
+      nodes.forEach(n => {
+        n.classList.add(f.CLASS_NAME.DISABLED_NODE);
+        n.setAttribute('disabled', 'disabled');
+      });
+    });
+  },
+
+  // Utilities
+  // -------------------------------------------------------------------------------------------------------------------
+
+  /**
    * Получить и скачать файл
    * @param {string} fileName
    * @return {HTMLAnchorElement}
@@ -330,14 +321,22 @@ export default {
   createLink: fileName => {
     //let date = new Date();
     //fileName += '_' + date.getDate() + ("0" + (date.getMonth() + 1)).slice(-2) + (date.getYear() - 100) + '_' + date.getHours() + date.getMinutes() + date.getSeconds() + '.pdf';
-    let a = document.createElement('a');
+    let a = document.createElement('a'),
+        span = document.createElement('span');
+
     a.setAttribute('download', fileName);
+    a.append(span);
+
+    span.onclick = () => {};
+
     return a;
   },
 
   /**
    * Save file from browser
-   * @param data {{'name', 'type' , 'blob'}}
+   * @param {object} data
+   * @param {string} data.name
+   * @param {string|Blob} data.blob
    *
    * @example for PDF:
    * {name: 'file.pdf',
@@ -345,12 +344,58 @@ export default {
    * blob: 'data:application/pdf;base64,' + data['pdfBody']}
    */
   saveFile: data => {
-    const {name = 'download.file', blob} = data;
-    let link = f.createLink(name);
-    if (data.type === 'base64') link.href = blob;
+    const {name = 'download.file', blob} = data,
+          link = f.createLink(name);
+
+    if (data['type'] === 'base64') link.href = blob;
     else link.href = URL.createObjectURL(blob);
-    link.click();
+
+    document.body.append(link);
+    link.firstElementChild['click']();
+    link.remove();
   },
+
+  /**
+   * Replace latin to cyrillic symbol
+   * @param {string} value
+   * @return {void | string}
+   */
+  replaceLetter: value => {
+    let cyrillic = 'УКЕНХВАРОСМТ',
+        latin    = 'YKEHXBAPOCMT',
+        replacer = (match) => cyrillic.charAt(latin.indexOf(match)),
+        letters  = new RegExp(`(${latin.split('').join('|')})`, 'gi');
+    return value.replace(letters, replacer).replace(/(&nbsp| | )/g, '').toLowerCase(); // какой-то пробел
+  },
+
+  /**
+   * replace ${key from obj} from template to value from obj
+   * @param {string} tmpString html string template
+   * @param {array|object} arrayObjects - array of object
+   * @return {string}
+   */
+  replaceTemplate: (tmpString, arrayObjects) => {
+    let html = '';
+
+    if (tmpString) {
+      if (!arrayObjects.map) arrayObjects = [arrayObjects];
+
+      arrayObjects.map(item => {
+        let tmp = tmpString.trim();
+        Object.entries(item).map(v => {
+          if (!v[1]) v[1] = '';
+          let reg = new RegExp(`\\\${${v[0]}}`, 'mgi');
+          tmp     = tmp.replace(reg, v[1].toString().replace(/"/g, '\'')); // replace ${key from obj} from template to value from obj //не помогло
+        });
+
+        html += tmp;
+      })
+    }
+
+    return html;
+  },
+
+  isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
 
   /**
    * Маска для телефона
@@ -378,34 +423,6 @@ export default {
 
     node.dataset.mask = matrix;
     ['input', 'blur'].map(e => node.addEventListener(e, mask));
-  },
-
-  /**
-   * Активировать элементы
-   * @param {NodeList} collection
-   */
-  enable: (...collection) => {
-    collection.map(nodes => {
-      if (!nodes.forEach) nodes = [nodes];
-      nodes.forEach(n => {
-        n.classList.remove(f.CLASS_NAME.DISABLED_NODE);
-        n.removeAttribute('disabled');
-      });
-    });
-  },
-
-  /**
-   * Деактивировать элементы
-   * @param {NodeList} collection
-   */
-  disable: (...collection) => {
-    collection.map(nodes => {
-      if(!nodes.forEach) nodes = [nodes];
-      nodes.forEach(n => {
-        n.classList.add(f.CLASS_NAME.DISABLED_NODE);
-        n.setAttribute('disabled', 'disabled');
-      });
-    });
   },
 
   /**
@@ -536,29 +553,35 @@ export default {
    * @param {function?} err
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
+    let fileName = report.fileName || false;
+
     f.setLoading(target);
     target.setAttribute('disabled', 'disabled');
 
-    let fileName = report.fileName || false;
     data.set('mode', 'docs');
     data.set('docsAction', 'pdf');
+    data.set('reportVal', JSON.stringify(report));
 
     report.fileTpl && data.set('fileTpl', report.fileTpl);
     report.pdfOrientation && data.set('pdfOrientation', report.pdfOrientation.toString().toUpperCase());
 
-    data.set('reportVal', JSON.stringify(report));
-
-    f.Post({data}).then(data => {
+    f.Post({data, type: f.isSafari() ? 'file' : 'json'}).then(data => {
       f.removeLoading(target);
       target.removeAttribute('disabled');
       if (data['pdfBody']) {
         f.saveFile({
           name: fileName || data['name'],
           type: 'base64',
-          blob: 'data:application/pdf;base64,' + data['pdfBody']
+          blob: 'data:application/pdf;base64,' + data['pdfBody'],
         });
-        finishOk();
       }
+      if (data instanceof Blob) {
+        f.saveFile({
+          name: fileName || data.fileName || 'pdf.pdf',
+          blob: data,
+        });
+      }
+      finishOk();
     });
 
     // Get resource last created Pdf

@@ -357,3 +357,17 @@ trait Hooks {
     return isset($this->hooks[$hookName]);
   }
 }
+
+/**
+ * Trait Page
+ * @package cms
+ */
+trait Utilities {
+
+  /**
+   * @return bool
+   */
+  public function isSafari() {
+    return boolValue(preg_match("/^((?!chrome|android).)*safari/", strtolower($_SERVER['HTTP_USER_AGENT'])));
+  }
+}

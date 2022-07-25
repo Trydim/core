@@ -151,6 +151,14 @@ function de($var, bool $die = true) {
 }
 
 /**
+ * @return bool
+ */
+function isSafari() {
+  global $main;
+  return $main->isSafari();
+}
+
+/**
  * @param string[]|string $hayStack
  * @param string $search
  * @return bool

@@ -294,7 +294,6 @@ class Docs {
       ];
     }
 
-
     switch ($this->pdfLibrary) {
       case 'dompdf':
         $this->docs->render();
@@ -303,6 +302,11 @@ class Docs {
           file_put_contents($path . $this->fileName, $this->docs->output());
           return $path . $this->fileName;
         } else {
+          if ($this->main->isSafari()) {
+            $this->docs->stream($this->fileName, ["Attachment" => false]);
+            exit();
+          }
+
           return [
             'name'    => $this->fileName,
             'pdfBody' => base64_encode($this->docs->output()),
