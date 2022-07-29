@@ -47,10 +47,10 @@ export default {
   }),
   watch: {
     value() {
-      while (this.value.includes('"')) {
+      /*while (this.value.includes('"')) {
         this.value = this.value.replace('"', '«');
         this.value = this.value.replace('"', '»');
-      }
+      }*/
 
       this.fields[this.selectedField].value = this.value;
     },

@@ -40,6 +40,8 @@ export class Valid {
     // Form
     this.inputNodes = this.form.querySelectorAll('input[required]');
     this.inputNodes.forEach(n => {
+      if (!n.id) n.id = 'valid' + f.random();
+
       this.countNodes++;
       if (n.type === 'checkbox') n.addEventListener('click', e => this.validate(e));
       else {
