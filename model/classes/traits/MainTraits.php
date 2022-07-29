@@ -141,7 +141,7 @@ trait Authorization {
    * @return bool|Main
    */
   public function checkAction(string $action) {
-    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth();
+    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth()->checkStatus();
   }
 
   /**
@@ -242,7 +242,7 @@ trait Cache {
 
   private function cachePath() {
     if ($this->url->getRoute() === 'public') {
-      $cachePath = $this->dealer ? $this->url->getPath(true) : ABS_SITE_PATH;
+      $cachePath = $this->publicDealer ? $this->url->getPath(true) : ABS_SITE_PATH;
     } else {
       $cachePath = $this->url->getPath(true);
     }

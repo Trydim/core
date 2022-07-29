@@ -70,7 +70,7 @@ final class Main {
       return $this->db;
     }
     else if ($value === 'dealer') {
-      $this->dealer = new Dealer($this->db);
+      $this->dealer = new Dealer($this);
       return $this->dealer;
     }
 
@@ -78,7 +78,7 @@ final class Main {
   }
   public function afterConstDefine() {
     $this->loadSetting()
-      ->setHooks();
+         ->setHooks();
   }
   public function beforeController() {
     if ($this->url->getRoute() === '404') return;
@@ -225,7 +225,10 @@ final class Main {
    */
   public function saveSettings() {
     $content = $this->setting;
+
     unset($content['permission']);
+    unset($content['dbConfig']);
+
     file_put_contents(SETTINGS_PATH, json_encode($content));
   }
 
@@ -362,21 +365,21 @@ final class Main {
   /**
    * @var bool
    */
-  public $dealer = false;
+  public $publicDealer = false;
   /**
    * @var string
    */
   private $dealCsvPath = '';
 
   public function publicMain() {
-    $this->dealer = false;
+    $this->publicDealer = false;
     $this->dealCsvPath = $this->getCmsParam('PATH_CSV');
     $this->setCmsParam('PATH_CSV', $this->getCmsParam('MAIN_CSV'));
   }
 
   public function publicDealer() {
     if ($this->isDealer()) {
-      $this->dealer = true;
+      $this->publicDealer = true;
       $this->setCmsParam('PATH_CSV', $this->dealCsvPath);
     }
   }

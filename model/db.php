@@ -591,19 +591,31 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     case 'addDealer':
-      $dealer = '{"name":"test"}';
+      $dealer = '{"name":"dpp.by"}';
 
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
 
-        $login = $dealer['login'] ?? null;
-        $pass = isset($dealer['pass']) ? password_hash($dealer['pass'], PASSWORD_BCRYPT) : null;
+        $login = $dealer['login'] ?? false;
+        $pass = password_hash($dealer['pass'] ?? 123, PASSWORD_BCRYPT);
+        $prefix = strtolower(substr(translit($dealer['name']), 0, 3));
 
-        $id = 1;// $db->getLastID('dealers', ['name' => 'tmp']);
+        $haveDealers = $db->selectQuery('dealers', 'cms_param');
+        if (count($haveDealers)) {
+          $haveDealers = array_filter($haveDealers, function ($param) use ($prefix) {
+            $param = json_decode($param);
+            return ($param->prefix ?? false) === $prefix . '_';
+          });
+          if (count($haveDealers)) $prefix .= substr(uniqid(), -3, 3);
+          unset($haveDealers);
+        }
+
+        $id = $db->getLastID('dealers', ['name' => 'tmp']);
 
         $param = [
           'name' => $dealer['name'],
-          'activity' => intval(boolValue($dealer['activity'])),
+          'cms_param' => json_encode(['prefix' => $prefix]),
+          'activity' => intval(boolValue($dealer['activity'] ?? true)),
           'contacts' => json_encode([
             'address' => $dealer['address'] ?? '',
             'email' => $dealer['email'] ?? '',
@@ -611,10 +623,20 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           ]),
         ];
 
-        //$result = $db->insert($columns, 'dealers', [$id => $param], true);
-        $prefix = strtolower(substr(translit($dealer['name']), 0, 3)) ;
+        $result = $db->insert($columns, 'dealers', [$id => $param], true);
 
-        $main->dealer->create($id, $prefix, $login, $pass);
+        if ($login === false) $login = 'dealer' . $id;
+
+        $main->dealer->create($id,
+          [
+            'dealerName' => $dealer['name'],
+            'dbConfig' => $main->getSettings('dbConfig'),
+          ],
+          [
+            'prefix' => $prefix,
+            'login' => $login,
+            'pass'  => $pass,
+          ]);
       }
       break;
     case 'loadDealers':

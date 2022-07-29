@@ -1379,7 +1379,7 @@ trait ContentEditor {
 
   private function contentPath(): string {
     if ($this->main->url->getRoute() === 'public') {
-      $path = $this->main->dealer ? $this->main->url->getPath(true) : ABS_SITE_PATH;
+      $path = $this->main->publicDealer ? $this->main->url->getPath(true) : ABS_SITE_PATH;
     } else {
       $path = $this->main->url->getPath(true);
     }

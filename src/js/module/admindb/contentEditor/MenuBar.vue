@@ -162,10 +162,10 @@ export default {
           icon: 'link',
           title: 'Set Link',
           action: () => {
-            const url = window.prompt('URL')
+            const href = window.prompt('URL')
 
-            if (url) {
-              this.editor.chain().focus().setImage({ src: url }).run()
+            if (href) {
+              this.editor.chain().focus().setLink({ href }).run()
             }
           },
           isActive: () => this.editor.isActive('link'),

@@ -264,8 +264,9 @@ class UrlGenerator {
       preg_match('/' . DEALERS_PATH . '\/(\d+)\//', $requestUri, $match); // получить ID дилера
 
       if (!isset($match[1])) die('Dealer id not found!');
+      if (!is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
 
-      $main->setCmsParam('dealerId', $match[1]);
+      else $main->setCmsParam('dealerId', $match[1]);
     }
 
     $main->setCmsParam('isDealer', $isDealer);

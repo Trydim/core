@@ -15,6 +15,11 @@ class MigrateDb {
   private $charset = 'utf8mb4';
 
   /**
+   * @var Main
+   */
+  private $main;
+
+  /**
    * @var Db
    */
   private $db;
@@ -49,10 +54,11 @@ class MigrateDb {
   }
 
   /**
+   * @param Main $main
    * @param string $prefix
    */
-  public function __construct(string $prefix) {
-    global $main;
+  public function __construct(Main $main, string $prefix) {
+    $this->main = $main;
 
     $this->prefix = $this->preparePrefix($prefix ?? $this->prefix);
     $this->db     = $main->db;
@@ -343,17 +349,15 @@ class MigrateDb {
     SIDES
   --------------------------------------------------------------------------------------------------------------------*/
 
-  public function createAdmin($login, $pass) {
-    $bean = self::xdispense($this->pf('permission'));
-    $bean->ID = 1;
+  public function createAdmin(string $login, string $pass) {
+    $bean = $this->db::xdispense($this->pf('permission'));
     $bean->name = 'Администратор';
     $bean->properties = '{"menu":"","tags":"guard admin"}';
     $this->db->store($bean);
 
     $permId = $bean->getID();
 
-    $bean = self::xdispense($this->pf('users'));
-    $bean->ID = 1;
+    $bean = $this->db::xdispense($this->pf('users'));
     $bean->permission_id = $permId;
     $bean->login = $login ?? $this::DEAL_LOGIN;
     $bean->password = $pass ?? $this::DEAL_PASS;
@@ -361,9 +365,32 @@ class MigrateDb {
     $this->db->store($bean);
   }
   public function createStatus() {
-    $bean = self::xdispense($this->pf('order_status'));
-    $bean->ID = 1;
+    $bean = $this->db::xdispense($this->pf('order_status'));
     $bean->name = $this::ORDER_STATUS;
+    $this->db->store($bean);
+  }
+  public function createMoneyRate() {
+    $bean = $this->db::xdispense($this->pf('money'));
+    $bean->code = 'USD';
+    $bean->name = 'United State Dollar';
+    $bean->short_name = '$';
+    $bean->scale = 1;
+    $bean->rate = 2.5;
+    $bean->main = 1;
+    $this->db->store($bean);
+
+    $bean->code = 'RUB';
+    $bean->name = 'Российский рубль';
+    $bean->short_name = 'руб.';
+    $bean->scale = 100;
+    $bean->rate  = 60;
+    $this->db->store($bean);
+
+    $bean->code = 'BYN';
+    $bean->name = 'Белорусский рубль';
+    $bean->short_name = 'руб.';
+    $bean->scale = 1;
+    $bean->rate  = 1;
     $this->db->store($bean);
   }
 
