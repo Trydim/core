@@ -1,10 +1,12 @@
 <template>
   <div>
     <template v-for="(item, index) in items">
-      <div class="divider" v-if="item.type === 'divider'" :key="`divider${index}`"></div>
-      <menu-item v-else :key="index" v-bind="item"></menu-item>
+      <div v-if="item.type === 'divider'" class="divider" :key="`divider${index}`"></div>
+      <MenuItem v-else :ref="'menu-' + (item.id || index)" :key="index" v-bind="item"></MenuItem>
     </template>
 
+    <ColorPicker v-if="colorPick" :editor="editor" v-model="color[colorKey]" @close="colorPick = false"></ColorPicker>
+    <FontSize v-if="fontSizeEditor" :editor="editor" @close="fontSizeEditor = false"></FontSize>
     <ImageModal v-if="imageModal" @image="setImage"></ImageModal>
   </div>
 </template>
@@ -12,11 +14,15 @@
 <script>
 
 import MenuItem from './MenuItem.vue';
+import ColorPicker from './ColorPicker.vue';
+import FontSize from './FontSize.vue';
 import ImageModal from './ImageModal.vue';
+
+const invertColor = value => '#' + (parseInt(value.substring(1), 16) ^ 0xffffff | 0x1000000).toString(16).substring(1);
 
 export default {
   components: {
-    MenuItem, ImageModal,
+    MenuItem, ColorPicker, FontSize, ImageModal,
   },
 
   props: {
@@ -28,55 +34,90 @@ export default {
 
   data() {
     return {
+      colorPick: false,
+      fontSizeEditor: false,
       imageModal: false,
+      colorKey: undefined, // font/bg
+      color: {
+        font: '#000000',
+        bg: '#ffffff',
+      },
 
       items: [
         {
-          icon: 'arrow-go-back-line',
           title: 'Undo',
+          icon: 'arrow-go-back-line',
           action: () => this.editor.chain().focus().undo().run(),
         },
         {
-          icon: 'arrow-go-forward-line',
           title: 'Redo',
+          icon: 'arrow-go-forward-line',
           action: () => this.editor.chain().focus().redo().run(),
         },
         { type: 'divider' },
         {
-          icon: 'bold',
           title: 'Bold',
+          icon: 'bold',
           action: () => this.editor.chain().focus().toggleBold().run(),
           isActive: () => this.editor.isActive('bold'),
         },
         {
-          icon: 'italic',
           title: 'Italic',
+          icon: 'italic',
           action: () => this.editor.chain().focus().toggleItalic().run(),
           isActive: () => this.editor.isActive('italic'),
         },
         {
-          icon: 'strikethrough',
           title: 'Strike',
+          icon: 'strikethrough',
           action: () => this.editor.chain().focus().toggleStrike().run(),
           isActive: () => this.editor.isActive('strike'),
         },
         {
-          icon: 'code-view',
           title: 'Code',
+          icon: 'code-view',
           action: () => this.editor.chain().focus().toggleCode().run(),
           isActive: () => this.editor.isActive('code'),
         },
         {
-          icon: 'font-color',
-          title: 'Color',
-          action: e => this.editor.chain().focus().setColor(e.target.value).run(),
-          isActive: () => {},
+          id: 'fontColor',
+          title: 'Selected color: #000000',
+          type: 'color',
+          icon: 'paint-line',
+          action: () => {
+            this.colorPick = true;
+            this.colorKey = 'font';
+          }
         },
         {
-          icon: 'terminal-box-fill',
+          title: 'Set color',
+          icon: 'font-color',
+          action: () => {
+            let style = this.editor.getAttributes('textStyle'),
+                fontSize = '';
+
+            if (style.color && style.color.includes('font-size')) {
+              fontSize = style.color.slice(style.color.indexOf(';'));
+            }
+
+            return this.editor.chain().focus().setColor(this.color.font + fontSize).run();
+          },
+        },
+        {
+          id: 'bgColor',
+          title: 'Selected background: #ffffff',
+          type: 'color',
+          icon: 'paint-brush-line',
+          action: () => {
+            this.colorPick = true;
+            this.colorKey = 'bg';
+          }
+        },
+        {
           title: 'Background-color',
-          action: e => this.editor.chain().focus().toggleHighlight({ color: '#ffc078' }).run(),
-          isActive: () => this.editor.isActive('highlight', { color: '#ffc078' }),
+          icon: 'terminal-box-fill',
+          action: () => this.editor.chain().focus().toggleHighlight({ color: this.color.bg }).run(),
+          isActive: () => this.editor.isActive('highlight'),
         },
         { type: 'divider' },
         {
@@ -111,10 +152,27 @@ export default {
           isActive: () => this.editor.isActive('heading', { level: 2 }),
         },
         {
+          icon: 'h-3',
+          title: 'Heading 3',
+          action: () => this.editor.chain().focus().toggleHeading({ level: 3 }).run(),
+          isActive: () => this.editor.isActive('heading', { level: 3 }),
+        },
+        {
+          icon: 'h-4',
+          title: 'Heading 4',
+          action: () => this.editor.chain().focus().toggleHeading({ level: 4 }).run(),
+          isActive: () => this.editor.isActive('heading', { level: 4 }),
+        },
+        {
           icon: 'paragraph',
           title: 'Paragraph',
           action: () => this.editor.chain().focus().setParagraph().run(),
           isActive: () => this.editor.isActive('paragraph'),
+        },
+        {
+          icon: 'font-size',
+          title: 'Set Font-Size',
+          action: () => this.fontSizeEditor = true,
         },
         {
           icon: 'list-unordered',
@@ -160,9 +218,9 @@ export default {
         },
         {
           icon: 'link',
-          title: 'Set Link',
+          title: 'Set Link by selected text',
           action: () => {
-            const href = window.prompt('URL')
+            const href = window.prompt('URL');
 
             if (href) {
               this.editor.chain().focus().setLink({ href }).run()
@@ -183,6 +241,24 @@ export default {
         },
       ],
     }
+  },
+  watch: {
+    color: {
+      deep: true,
+      handler() {
+        let btn = this.$refs['menu-fontColor'][0].$el;
+        btn.style.color = this.color.font;
+        btn.style.background = invertColor(this.color.font);
+        btn.title = 'Selected color: ' + this.color.font;
+
+        btn = this.$refs['menu-bgColor'][0].$el;
+        btn.style.color = invertColor(this.color.bg);
+        btn.style.background = this.color.bg;
+        btn.title = 'Selected background: ' + this.color.bg;
+      },
+    },
+    fontColor() {
+    },
   },
   methods: {
     setImage(src) {

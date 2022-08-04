@@ -1,5 +1,8 @@
 "use strict";
 
+import './codeMirror/codemirror.css';
+import './codeMirror/show-hint.css';
+
 import * as Vue from 'vue';
 
 import {Main} from '../Main.js';

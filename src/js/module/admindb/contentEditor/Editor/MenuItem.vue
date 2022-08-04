@@ -12,31 +12,20 @@
 </template>
 
 <script>
-import remixiconUrl from '../../../../svg/remixicon.symbol.svg';
+import remixiconUrl from '../../../../../svg/remixicon.symbol.svg';
 
 export default {
+  name: 'menuItem',
   props: {
-    icon: {
-      type: String,
-      required: true,
-    },
-
-    title: {
-      type: String,
-      required: true,
-    },
-
-    action: {
-      type: Function,
-      required: true,
-    },
+    icon: String,
+    title: String,
+    action: Function,
 
     isActive: {
       type: Function,
       default: null,
     },
   },
-
   data() {
     return {
       remixiconUrl,

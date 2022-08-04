@@ -484,7 +484,7 @@ class Db extends \R {
   public function setFiles(&$result, array $imageIds = []): string {
     $result['files'] = [];
     $dbDir = 'upload/';
-    $uploadDir = ABS_SITE_PATH . SHARE_PATH . $dbDir;
+    $uploadDir = $this->main->url->getPath(true) . SHARE_PATH . $dbDir;
 
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
@@ -532,7 +532,7 @@ class Db extends \R {
         if (isset($id)) {
           $result['files'][] = [
             'id' => $id,
-            'path' => URI . 'shared/' . $dbFile, // TODO разные пути
+            'path' => $this->main->url->getUri() . 'shared/' . $dbFile,
           ];
         }
       }
@@ -690,7 +690,7 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => URI . 'shared/upload/stone/1-corian-lime-ice.jpg']]; // TODO удалить
+        $option['images'] = [['path' => $this->main->url->getUri() . 'shared/upload/stone/1-corian-lime-ice.jpg']]; // TODO удалить
         //$option['images'] = $this->setImages($option['images']);
       }
 

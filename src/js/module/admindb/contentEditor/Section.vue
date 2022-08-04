@@ -1,6 +1,6 @@
 <template>
   <ul class="nav nav-tabs">
-    <li v-for="(item, key) of contentData" :key="key" class="nav-item" style="cursor: pointer"
+    <li v-for="(item, key) of contentData" :key="key" class="nav-item pb-0 pointer"
         @click="selectSection(key)">
       <span class="nav-link" :class="{'active': selected === key}">
         {{ item.name }}
@@ -19,7 +19,7 @@
         </span>
       </span>
     </li>
-    <li class="nav-item">
+    <li class="nav-item pb-0">
       <button class="btn btn-primary" @click="addSection()"><i class="mt-2 pi pi-plus-circle"></i></button>
     </li>
   </ul>

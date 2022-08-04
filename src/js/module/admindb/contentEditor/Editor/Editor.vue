@@ -37,8 +37,8 @@ export default {
   },
   emits: ['update:modelValue'],
   components: {
-    EditorContent,
     MenuBar,
+    EditorContent,
   },
   data: () => ({
     selectedNode: null,
@@ -66,12 +66,19 @@ export default {
       return this.selectedNode && this.selectedNode.tagName === 'IMG';
     },
     getSizePosition() {
-      const size = this.selectedNode.getBoundingClientRect();
+      const editorSize = this.editor.rootEl.getBoundingClientRect(),
+            size = this.selectedNode.getBoundingClientRect();
+
+      let top = size.top,
+          left = size.left;
 
       this.param1 = size.width;
       this.param2 = size.height;
 
-      return `top: ${size.top}px; left: ${size.left}px; width: 150px`;
+      if (top < editorSize.top) top = editorSize.top;
+      if (left < editorSize.left) left = editorSize.left
+
+      return `top: ${top}px; left: ${left}px; width: 150px`;
     },
   },
   methods: {
@@ -104,6 +111,8 @@ export default {
           this.update();
         },
       });
+
+      this.$nextTick(() => this.editor.rootEl = this.$refs.editor.rootEl);
     },
     destroy() {
       this.editor && this.editor.destroy();
@@ -116,7 +125,7 @@ export default {
     clickEditor() {
       if (this.editor.isActive('image')) {
         //this.rulesCss = [];
-        this.selectedNode = this.$refs.editor.rootEl.querySelector('.ProseMirror-selectednode');
+        this.selectedNode = this.editor.rootEl.querySelector('.ProseMirror-selectednode');
       }
       else this.selectedNode = null;
     },
@@ -126,7 +135,6 @@ export default {
     },
     updateImage() {
       this.selectedNode.focus();
-      console.log(this.rulesCss.join('; '));
       this.editor.chain().focus().setStyle({ style: this.rulesCss.join('; ') }).run();
     }
   },
