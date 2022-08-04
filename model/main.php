@@ -8,7 +8,7 @@ $result = [];
 $mode = $mode ?? 'noMode';
 $dbAction = $dbAction ?? 'noAction';
 
-if ($mode === 'auth' || $main->checkAction($dbAction)) {
+if (in_array($mode, ['auth', 'docs']) || $main->checkAction($dbAction)) {
   try {
     switch ($mode) {
       case 'auth':

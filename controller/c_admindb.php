@@ -19,7 +19,7 @@ else {
   count($main->dbTables) && $main->reDirect('admindb?tableName=' . $main->dbTables[0]['fileName']);
 }
 
-$pathLegend = ABS_SITE_PATH . $main->getCmsParam('PATH_LEGEND');
+$pathLegend = $main->getCmsParam('PATH_LEGEND');
 if ($pathLegend && file_exists($pathLegend)) require $pathLegend;
 unset($pathLegend);
 

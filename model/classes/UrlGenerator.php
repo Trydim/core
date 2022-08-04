@@ -106,7 +106,11 @@ class UrlGenerator {
   private function setBaseSitePath() {
     $filename = basename($this->server->get('SCRIPT_FILENAME', ''));
 
-    if (basename($this->server->get('SCRIPT_NAME', '')) === $filename) {
+    if (defined('OUTSIDE')) {
+      $this->baseSitePath = '/' . basename(ABS_SITE_PATH) . '/';
+      $this->requestUri = '/';
+      return;
+    } elseif (basename($this->server->get('SCRIPT_NAME', '')) === $filename) {
       $baseUrl = $this->server->get('SCRIPT_NAME');
     } elseif (basename($this->server->get('PHP_SELF', '')) === $filename) {
       $baseUrl = $this->server->get('PHP_SELF');
@@ -209,6 +213,11 @@ class UrlGenerator {
   }
   private function setRoute($main): void {
     $this->checkDealer($main);
+
+    if (defined('OUTSIDE')) {
+      $this->route = 'public';
+      return;
+    }
 
     if (isset($_REQUEST['mode'])) {
       $main->setCmsParam('mode', $_REQUEST['mode']);

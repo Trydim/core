@@ -19,10 +19,7 @@ final class Main {
    */
   const CMS_PARAM = [
     'PROJECT_TITLE' => 'Project title',
-    'PATH_LEGEND'   => 'public/views/legend.php',
     'ACCESS_MENU'   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
-    'MAIN_CSV'      => SHARE_PATH . 'csv/',
-    'PATH_CSV'      => SHARE_PATH . 'csv/',
   ];
 
   /**

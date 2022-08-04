@@ -6,7 +6,7 @@
  */
 
 $legendHtml = '';
-if ($main->getCmsParam('PATH_LEGEND') && isset($legend[$tableActive])) {
+if (isset($legend[$tableActive])) {
   $legendHtml = "<template id='dataTableLegend'><div>" . $legend[$tableActive] . "</div></template>";
 }
 
