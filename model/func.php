@@ -304,17 +304,19 @@ function findKey($cell, $input) {
  * @return false|string
  */
 function findingFile($path, $fileName) {
+  $sep = DIRECTORY_SEPARATOR;
   $path = $path ?? ABS_SITE_PATH . SHARE_PATH;
+
   if (!file_exists($path)) return false;
-  if (file_exists($path . '/' . $fileName)) return $path . '/' . $fileName;
+  if (file_exists($path . $sep . $fileName)) return $path . $sep . $fileName;
 
   $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path) {
-    return !($dir === '.' || $dir === '..' || is_file($path . '/' . $dir));
+    return !($dir === '.' || $dir === '..' || is_file($path . $sep . $dir));
   }));
 
   $length = count($arrDir);
   for ($i = 0; $i < $length; $i++) {
-    $result = findingFile($path . '/' . $arrDir[$i], $fileName);
+    $result = findingFile($path . $sep . $arrDir[$i], $fileName);
     if ($result) return $result;
   }
 

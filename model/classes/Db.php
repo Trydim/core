@@ -456,7 +456,7 @@ class Db extends \R {
     }
 
     if ($change === false && count($param) === 1) {
-      $result [$dbTable . 'Id'] = $beans->getID();
+      $result[$dbTable . 'Id'] = $beans->getID();
     }
 
     return $result;
@@ -483,21 +483,19 @@ class Db extends \R {
    */
   public function setFiles(&$result, array $imageIds = []): string {
     $result['files'] = [];
-    $dbDir = 'upload/';
-    $uploadDir = $this->main->url->getPath(true) . SHARE_PATH . $dbDir;
+    $result['result'] = [];
+    $uploadDir = $this->main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
 
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
     if (isset($_FILES) && count($_FILES)) {
       foreach ($_FILES as $file) {
-        $dbFile = $dbDir . $file['name'];
+        $dbFile = $file['name'];
         $uploadFile = $uploadDir . $file['name'];
 
-        // Проверить все
-        if (!$file['size']) continue;
+        if (!$file['size']) continue; // Проверить все
 
-        // Если файл существует
-        if (file_exists($uploadFile)) {
+        if (file_exists($uploadFile)) { // Если файл существует
           $result['fileExist'] = $result['fileExist'] ?? [];
           $result['fileExist'][] = $file['name'];
 
@@ -512,27 +510,25 @@ class Db extends \R {
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
             $file['name'] = $name . $ext;
 
-            $dbFile = $dbDir . $file['name'];
+            $dbFile = $file['name'];
             //$uploadFile = $uploadDir . $file['name'];
           }
         }
 
         else if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-          $id = $this->getLastID('files', ['path' => 'tmp']);
-          $imageIds[] = $id;
-          $this->insert([], 'files', [$id => [
+          $inserted = $this->insert([], 'files', [[
             'name'   => $file['name'],
             'path'   => $dbFile,
             'format' => $file['type'],
-          ]], true);
+          ]]);
+        } else $result['error'] = 'Moving file error: ' . $file['name'];
 
-          $result['result'] = [];
-        } else $result['error'] = 'Mover file error: ' . $file['name'];
+        if (isset($inserted['filesId']) && is_numeric($inserted['filesId'])) {
+          $imageIds[] = $inserted['filesId'];
 
-        if (isset($id)) {
           $result['files'][] = [
-            'id' => $id,
-            'path' => $this->main->url->getUri() . 'shared/' . $dbFile,
+            'id' => $inserted['filesId'],
+            'path' => $this->main->url->getUri() . SHARE_PATH . $dbFile,
           ];
         }
       }
@@ -585,10 +581,10 @@ class Db extends \R {
     $images = $this->getFiles($imagesIds);
 
     return array_map(function ($item) {
-      $path = findingFile(substr(ABS_SITE_PATH . SHARE_PATH, 0, -1), mb_strtolower($item['path']));
+      $path = findingFile(ABS_SITE_PATH . SHARE_PATH . 'upload', $item['path']);
       $item['id'] = $item['ID'];
       $item['path'] = $item['src'] = $path
-        ? URI . str_replace(ABS_SITE_PATH, '', $path) // TODO путь к файлу относительно самого файла
+        ? $this->main->url->getUri() . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)
         : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
 
       unset($item['ID']);
@@ -690,8 +686,8 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => $this->main->url->getUri() . 'shared/upload/stone/1-corian-lime-ice.jpg']]; // TODO удалить
-        //$option['images'] = $this->setImages($option['images']);
+        //$option['images'] = [['path' => $this->main->url->getUri() . 'shared/upload/stone/1-corian-lime-ice.jpg']];
+        $option['images'] = $this->setImages($option['images']);
       }
 
       // set property

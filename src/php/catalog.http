@@ -1,0 +1,10 @@
+###
+POST http://graddoor/index.php
+Content-Type: application/json
+
+{
+  "mode": "DB",
+  "dbAction": "loadOptions"
+}
+
+###

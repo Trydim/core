@@ -2,8 +2,10 @@
 
 use PHPUnit\Framework\TestCase;
 
+const CORE = __DIR__ . '/../../../';
+
 class Test extends TestCase {
-  const FUNC_PATH = __DIR__ . '/../../model/func.php';
+  const FUNC_PATH = CORE . 'model/func.php';
 
   public function testCheckError() {
     require_once self::FUNC_PATH;

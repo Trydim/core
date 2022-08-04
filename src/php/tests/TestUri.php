@@ -2,7 +2,9 @@
 
 use PHPUnit\Framework\TestCase;
 
-require __DIR__ . '/../classes/UrlGenerator.php';
+const CORE = __DIR__ . '/../../../';
+
+require CORE . '/model/classes/UrlGenerator.php';
 
 class TestUri extends TestCase {
 
