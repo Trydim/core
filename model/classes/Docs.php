@@ -26,26 +26,6 @@ class Docs {
   private $pdfOrientation;
 
   /**
-   * Create name for new pdf file (Work only if DESTINATION=save)
-   * if position = 0, then will use not
-   * @var array
-   */
-  private $FILE_NAME = [
-    'name'      => [
-      'position' => 0,
-      'value'    => '',
-    ],
-    'unique'    => [
-      'position'    => 1,
-      'countSymbol' => 5,
-    ],
-    'date'      => [
-      'position' => 3,
-      'format'   => 'dmY', // 'd.m.y' = '31.12.20' / 'Ymd' = '20010310' / 'H:i:s' = '23:59:59'
-    ],
-  ];
-
-  /**
    * @var array
    */
   private $data, $excelHeader = [], $pdfParam;
@@ -108,13 +88,10 @@ class Docs {
   }
 
   private function getFileName() {
-    $arr = $this->FILE_NAME;
-    $file = '';
-    for ($i = 1; $i < 4; $i++) {
-      if ($arr['name']['position'] === $i) $file .= $arr['name']['value'];
-      if ($arr['unique']['position'] === $i) $file .= substr(uniqid(), 0, $arr['unique']['countSymbol']);
-      if ($arr['date']['position'] === $i) $file .= date($arr['date']['format']);
-    }
+    $file = str_replace($this->main->url->getScheme(), '', $this->main->url->getHost())
+      . '_' . substr(uniqid(), 9, 4)
+      . '_' . date('dmY');
+
     switch ($this->docsType) {
       case 'pdf': $file .= '.pdf'; break;
       case 'excel': $file .= '.xlsx'; break;

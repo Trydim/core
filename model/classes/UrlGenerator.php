@@ -281,6 +281,9 @@ class UrlGenerator {
     $main->setCmsParam('isDealer', $isDealer);
   }
 
+  public function getScheme(): string {
+    return $this->scheme;
+  }
   public function getHost(): string {
     return $this->host;
   }
