@@ -307,10 +307,10 @@ function findingFile($path, $fileName) {
   $sep = DIRECTORY_SEPARATOR;
   $path = $path ?? ABS_SITE_PATH . SHARE_PATH;
 
-  if (!file_exists($path)) return false;
+  if (!is_dir($path)) return false;
   if (file_exists($path . $sep . $fileName)) return $path . $sep . $fileName;
 
-  $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path) {
+  $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path, $sep) {
     return !($dir === '.' || $dir === '..' || is_file($path . $sep . $dir));
   }));
 
