@@ -16,12 +16,12 @@ export default {
     M: new f.Modal(),
   }),
   mounted() {
-    const m = this.M = new f.Modal({});
-    m.btnConfirm.addEventListener('click', () => {
-      this.$emit('confirm');
-    });
+    const m = this.M;
 
     m.show(this.title, this.$refs.content);
+
+    m.btnConfirm.addEventListener('click', () => this.$emit('confirm'));
+    m.btnCancel.forEach(n => n.addEventListener('mouseup', () => this.$emit('cancel')));
   },
   unmounted() {
     this.M.destroy();

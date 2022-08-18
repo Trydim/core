@@ -158,9 +158,9 @@ export const Modal = function (param = {}) {
     else this.btnField && !showDefaultButton && f.eraseNode(this.btnField);
 
     let btnY = this.wrap.querySelector('.confirmYes, [data-action="confirmYes"], [data-target="confirmBtn"]'),
-        btnN = this.wrap.querySelector('.closeBtn, [data-action="confirmNo"], [data-target="cancelBtn"]');
+        btnN = this.wrap.querySelectorAll('.closeBtn, [data-action="confirmNo"], [data-target="cancelBtn"]');
     btnY && (this.btnConfirm = btnY);
-    btnN && (this.btnCancel = btnN);
+    btnN && (this.btnCancel = btnN.length === 1 ? btnN[0] : btnN);
 
     //sNode.insertAdjacentHTML('afterbegin', '');
     //sNode.append(this.wrap);

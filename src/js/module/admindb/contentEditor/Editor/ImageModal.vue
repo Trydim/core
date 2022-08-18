@@ -2,6 +2,7 @@
   <Modal
     title="Вставка картинки"
     @confirm="confirmImage"
+    @cancel="$emit('close')"
   >
     <div class="form-floating">
       <input type="text" id="imgSrc" class="form-control" placeholder="Путь" v-model="src">
@@ -29,7 +30,7 @@ export default {
   name: 'image-modal',
   props: {},
   components: {Modal},
-  emits: ['image'],
+  emits: ['image', 'close'],
   data: () => ({
     src: '',
     files: undefined,

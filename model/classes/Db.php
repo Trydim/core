@@ -502,7 +502,7 @@ class Db extends \R {
           if (filesize($uploadFile) === $file['size']) {
             $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
 
-            if (count($id) === 1) $imageIds[] = $id[0];
+            if (count($id) === 1) $inserted['filesId'] = $id[0];
             else unlink($uploadFile);
 
           } else {
@@ -528,7 +528,7 @@ class Db extends \R {
 
           $result['files'][] = [
             'id' => $inserted['filesId'],
-            'path' => $this->main->url->getUri() . SHARE_PATH . $dbFile,
+            'path' => $this->main->url->getUri() . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR . $dbFile,
           ];
         }
       }
