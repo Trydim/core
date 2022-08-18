@@ -106,7 +106,7 @@ export const Modal = function (param = {}) {
     data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
     document.body.style.overflow = 'hidden';
 
-    if (document.documentElement.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
+    if (document.body.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
       data.bodyPaddingRight = document.body.style.paddingRight;
       document.body.style.paddingRight = '16px';
     }
@@ -121,12 +121,14 @@ export const Modal = function (param = {}) {
   }
 
   modal.hide = function () {
+    const scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
+
     this.wrap.classList.remove(prefix + 'active');
     this.window.classList.remove(prefix + 'active');
+    scrollY !== data.scrollY && window.scrollTo(0, data.scrollY);
 
     setTimeout(() => {
       document.body.style.overflow = data.bodyOver || 'initial';
-      window.scrollTo(0, data.scrollY);
       if (document.body.style.paddingRight === '16px')
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
 
