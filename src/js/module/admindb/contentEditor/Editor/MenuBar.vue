@@ -7,7 +7,7 @@
 
     <ColorPicker v-if="colorPick" :editor="editor" v-model="color[colorKey]" @close="colorPick = false"></ColorPicker>
     <FontSize v-if="fontSizeEditor" :editor="editor" @close="fontSizeEditor = false"></FontSize>
-    <ImageModal v-if="imageModal" @image="setImage"></ImageModal>
+    <ImageModal v-if="imageModal" @image="setImage" @close="closeImageModal"></ImageModal>
   </div>
 </template>
 
@@ -263,8 +263,12 @@ export default {
   methods: {
     setImage(src) {
       this.editor.chain().focus().setImage({ src }).run();
-      this.imageModal = false;
+      this.closeImageModal();
     },
+
+    closeImageModal() {
+      this.imageModal = false;
+    }
   },
 }
 </script>

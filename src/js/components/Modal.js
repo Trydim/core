@@ -106,7 +106,7 @@ export const Modal = function (param = {}) {
     data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
     document.body.style.overflow = 'hidden';
 
-    if (document.documentElement.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
+    if (document.body.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
       data.bodyPaddingRight = document.body.style.paddingRight;
       document.body.style.paddingRight = '16px';
     }
@@ -121,12 +121,14 @@ export const Modal = function (param = {}) {
   }
 
   modal.hide = function () {
+    const scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
+
     this.wrap.classList.remove(prefix + 'active');
     this.window.classList.remove(prefix + 'active');
+    scrollY !== data.scrollY && window.scrollTo(0, data.scrollY);
 
     setTimeout(() => {
       document.body.style.overflow = data.bodyOver || 'initial';
-      window.scrollTo(0, data.scrollY);
       if (document.body.style.paddingRight === '16px')
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
 
@@ -158,9 +160,9 @@ export const Modal = function (param = {}) {
     else this.btnField && !showDefaultButton && f.eraseNode(this.btnField);
 
     let btnY = this.wrap.querySelector('.confirmYes, [data-action="confirmYes"], [data-target="confirmBtn"]'),
-        btnN = this.wrap.querySelector('.closeBtn, [data-action="confirmNo"], [data-target="cancelBtn"]');
+        btnN = this.wrap.querySelectorAll('.closeBtn, [data-action="confirmNo"], [data-target="cancelBtn"]');
     btnY && (this.btnConfirm = btnY);
-    btnN && (this.btnCancel = btnN);
+    btnN && (this.btnCancel = btnN.length === 1 ? btnN[0] : btnN);
 
     //sNode.insertAdjacentHTML('afterbegin', '');
     //sNode.append(this.wrap);

@@ -103,6 +103,7 @@ export default {
             inline: true,
             HTMLAttributes: {
               class: 'image',
+              style: 'max-width: 100%',
             },
           }),
           Link,
