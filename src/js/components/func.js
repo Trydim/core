@@ -21,7 +21,7 @@ export default {
 
   // String
   // -------------------------------------------------------------------------------------------------------------------
-  capitalize: cacheStringFunction(str => str.charAt(0).toUpperCase() + str.slice(1)),
+  capitalize: cacheStringFunction(str => str.trimLeft().charAt(0).toUpperCase() + str.slice(1)),
   camelize: cacheStringFunction(str => {
     return str.toLowerCase()
               .replace(/\W(\w+)/g, (_, w) => w ? f.capitalize(w) : '')
@@ -314,6 +314,25 @@ export default {
   // -------------------------------------------------------------------------------------------------------------------
 
   /**
+   * flatten
+   * @param {any[]} obj
+   * @return {array}
+   */
+  objectFlat: obj => {
+    let res = [];
+
+    if (typeof obj !== 'object' || obj === null) return obj;
+    if (!Array.isArray(obj)) obj = [...Object.keys(obj), ...Object.values(obj)];
+
+    for (const item of obj.flat()) {
+      if (typeof item === 'object') res = res.concat(objectFlat(item));
+      else res.push(item);
+    }
+
+    return res;
+  },
+
+  /**
    * Получить и скачать файл
    * @param {string} fileName
    * @return {HTMLAnchorElement}
@@ -395,6 +414,7 @@ export default {
     return html;
   },
 
+  isMobile: () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
   isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
 
   /**
@@ -404,10 +424,10 @@ export default {
    */
   initMask: (node, phoneMask) => {
     const minValue = 2,
-          maskGl = f.getSetting('phoneMaskGlobal').toString(),
+          maskGl = f.getSetting('phoneMaskGlobal'),
           matrix = phoneMask || maskGl || f.PHONE_MASK_DEFAULT;
 
-    if (!node || maskGl === '') return;
+    if (!node || !f.toBool(matrix)) return;
 
     const mask = e => {
       let target = e.target, i = 0,
@@ -772,6 +792,27 @@ export default {
     const r = Math.random();
     return String.fromCharCode(r < 0.334 ? f.random(48, 57) : r < 0.667 ? f.random(65, 90) : f.random(97, 122))
   }).join(''),
+
+  /**
+   * Return false if<br>
+   * - string contain '', '-' or 'false',
+   * - array empty or contain empty, undefined, 0 or false values,
+   * - empty object
+   * @param v
+   * @return {boolean}
+   */
+  toBool: v => {
+    switch (typeof v) {
+      case "boolean": return v;
+      case "undefined": case "number": return !!v;
+      case "string": return !['', '0', '-', 'false'].includes(v.trim());
+      case "object":
+        if (v === null) return false;
+        if (Array.isArray(v))
+          return v.length ? v.reduce((r, i) => r || f.toBool(i), false) : false;
+        return Object.keys(v).length !== 0;
+    }
+  },
 
   /**
    * Try parse to float number from any value
