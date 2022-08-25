@@ -14,8 +14,8 @@ $orders = $main->db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 
 $field = [
   'pageTitle'     => 'Календарь',
-  'cssLinks'      => CORE_CSS . 'module/calendar.css?ver=1dbd460d5c',
-  'jsLinks'       => CORE_JS . 'module/calendar.js?ver=960857bb87',
+  'cssLinks'      => [CORE_CSS . 'module/calendar.css?ver=1dbd460d5c'],
+  'jsLinks'       => [CORE_JS . 'module/calendar.js?ver=960857bb87'],
   'footerContent' => '',
 ];
 
