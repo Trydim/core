@@ -114,8 +114,7 @@ const burgerVisible = () => {
   const sideLeft = f.qS('#sideLeft');
   const node = f.qS('.main-wrapper');
 
-  sideLeft.style.setProperty('position', 'absolute');
-  document.querySelector('.header').style.setProperty('padding', 0);
+  sideLeft.style.position = 'absolute';
 
   navControl && navControl.addEventListener('click', () => {
     if (window.innerWidth <= 440) {
@@ -136,14 +135,6 @@ const burgerVisible = () => {
       } else {
         sideLeft.classList.remove('d-block');
         containerContent.style.setProperty('--theme-sidebar-width', 0);
-      }
-    } else {
-      if (node.classList.contains('menu-toggle')) {
-        sideLeft.classList.add('d-block');
-        containerContent.style.setProperty('--theme-sidebar-width', 17 + 'rem');
-      } else {
-        sideLeft.classList.remove('d-block');
-        containerContent.style.setProperty('--theme-sidebar-width', 3.5 + 'rem');
       }
     }
   });
@@ -203,7 +194,7 @@ const onEvent = () => {
   f.getSetting();
   f.relatedOption();
   storageLoad();
-  burgerVisible();
+  f.isMobile() && burgerVisible();
   setSideMenuStyle();
   onEvent();
   setLinkMenu(page || '/'); // after bind events
