@@ -9,7 +9,7 @@
   z-index: 10;
   min-height: calc(100% - $theme-header-height);
 
-  @include respond(md) {
+  @include respond(tab) {
     position: absolute;
     left: 0;
   }
