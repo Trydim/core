@@ -1,6 +1,5 @@
-
 .main-wrapper {
-  --theme-sidebar-width: $theme-sidebar-width;
+  --theme-sidebar-width: #{$theme-sidebar-width};
   opacity: 0;
   transition: all 0.25s ease-in;
   /*overflow: auto;*/
@@ -12,13 +11,13 @@
     opacity: 1;
   }
   &.menu-toggle {
-    --theme-sidebar-width: $theme-sidebar-width-compact;
+    --theme-sidebar-width: #{$theme-sidebar-width-compact};
   }
 }
 
 @include customMedia($min: 800px, $max: 1350px) {
   .main-wrapper {
-    --theme-sidebar-width: calc(17rem * 0.75);/*$theme-sidebar-width;*/
+    --theme-sidebar-width: calc(#{$theme-sidebar-width} * 0.75);
   }
 }
 
