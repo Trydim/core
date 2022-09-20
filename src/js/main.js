@@ -42,7 +42,7 @@ const dictionaryInit = () => {
 const storageLoad = () => {
   if (!storage.length) return;
   // Mobile check
-  if (window.innerWidth <= 440) storage.set('menuToggle', 'true');
+  if (f.isMobile()) storage.set('menuToggle', 'true');
 
   // Set Menu Toggle
   const node = f.gI('mainWrapper');
@@ -98,47 +98,12 @@ const cmsEvent = function() {
   let action = this.dataset.actionCms;
 
   let select = {
-    'menuToggle': menuToggle,
-    'exit': () => {
-      location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
-    },
+    menuToggle: menuToggle,
+    exit: () => location.href = f.SITE_PATH + `?mode=auth&authAction=exit`,
   };
 
   select[action] && select[action]();
 };
-
-const burgerVisible = () => {
-  const navControl = f.qS('.nav-control');
-  const navHeader = f.qS('.nav-header');
-  const containerContent = f.qS('.container-content');
-  const sideLeft = f.qS('#sideLeft');
-  const node = f.qS('.main-wrapper');
-
-  sideLeft.style.position = 'absolute';
-
-  navControl && navControl.addEventListener('click', () => {
-    if (window.innerWidth <= 440) {
-      navHeader.style.setProperty('width', 3.5 + 'rem')
-      if (node.classList.contains('menu-toggle')) {
-        sideLeft.classList.add('d-block');
-        sideLeft.style.width = '100%';
-        containerContent.style.setProperty('--theme-sidebar-width', 17 + 'rem');
-      } else {
-        sideLeft.classList.remove('d-block');
-        sideLeft.style.width = '0';
-        containerContent.style.setProperty('--theme-sidebar-width', 0);
-      }
-    } else if (window.innerWidth <= 768) {
-      if (node.classList.contains('menu-toggle')) {
-        sideLeft.classList.add('d-block');
-        containerContent.style.setProperty('--theme-sidebar-width', 17 + 'rem');
-      } else {
-        sideLeft.classList.remove('d-block');
-        containerContent.style.setProperty('--theme-sidebar-width', 0);
-      }
-    }
-  });
-}
 
 const sideMenuExpanded = function(e) {
   e.preventDefault();
@@ -194,7 +159,6 @@ const onEvent = () => {
   f.getSetting();
   f.relatedOption();
   storageLoad();
-  f.isMobile() && burgerVisible();
   setSideMenuStyle();
   onEvent();
   setLinkMenu(page || '/'); // after bind events

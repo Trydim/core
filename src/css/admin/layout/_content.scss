@@ -16,6 +16,10 @@
 .content-body {
   width: calc(100% - var(--theme-sidebar-width));
   z-index: 1;
+
+  @include respond(sm) {
+    width: 100%;
+  }
 }
 
 /* компактное меню

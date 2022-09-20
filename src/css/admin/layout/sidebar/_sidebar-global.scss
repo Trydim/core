@@ -1,28 +1,33 @@
 .sidebar {
-  width: var(--theme-sidebar-width);
+  padding: 0 !important;
   top: $theme-header-height;
-  z-index: 10;
+  width: var(--theme-sidebar-width);
   background-color: $l-theme-sidebar-color;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  transition: all .2s ease;
-  padding: 0 !important;
   color: #bdbdc7;
-  // @include respond('phone-land') {
-  //     background-color: $white;
-  //     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  // }
-  // @include respond('big-desktop') {
-  //     left: 6rem;
-  // }
+  transition: all .2s ease;
+  z-index: 10;
+  min-height: calc(100% - $theme-header-height);
 
-
-
-  /*@include customMedia($min: 800px, $max: 1350px) {
-    width: var(--theme-sidebar-width) * 0.75;
+  @include respond(md) {
+    position: absolute;
+    left: 0;
   }
-  @include customMedia($min: 350px, $max: 800px) {
-    width: 100%;
-  }*/
+  @include respond(sm) {
+    width: 100vw;
+  }
+
+  /*
+  .sidebar {
+    display: none;
+
+    @include respond(no-sm) {
+      display: block;
+      position: absolute;
+      height: 100%;
+    }
+  }
+  */
 
   .sidebar-menu {
     display: flex;
@@ -158,10 +163,12 @@
     padding: 0.8125rem;
   }
 
-  /*.sidebar {
-    width: 3.5rem;
-  }*/
-
+  @include respond(sm) {
+    .sidebar {
+      width: 3.5rem;
+      left: -100%;
+    }
+  }
 
   .sidebar-menu {
     align-items: center;

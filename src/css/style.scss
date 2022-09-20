@@ -3,15 +3,15 @@
 // Core Bootstrap
 @import "bootstrap/bootstrap";
 
-// icons
+// Icons (prime)
 @import "icons/icons";
-
-// Admin
-@import "admin/utilities/utilities";
 
 // Theme
 @import './variable';
+@import "./admin/functions";
+@import "./admin/mixin";
 @import "./admin/abstracts/abstracts";
+@import "admin/utilities/utilities";
 
 @import "admin/preloader";
 
@@ -20,9 +20,3 @@
 @import "admin/layout/layout";
 
 @import "admin/pages";
-
-
-
-
-
-
