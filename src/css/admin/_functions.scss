@@ -1,0 +1,16 @@
+@use "sass:math";
+
+// Px to rem
+@function rem($px) {
+  @if (type-of($px) != number) {
+    @return $px;
+  }
+  @return math.div($px, 16) + rem;
+}
+// Px to em
+@function em($px, $current: 16) {
+  @if (type-of($px) != number) {
+    @return $px;
+  }
+  @return math.div($px, $current) + em;
+}

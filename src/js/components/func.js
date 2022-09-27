@@ -38,6 +38,9 @@ export default {
    */
   arrRemoveItem: (arr, item) => !!arr.splice(arr.indexOf(item), 1).length,
 
+  // Helpers
+  isMobile: (ua = navigator.userAgent) => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || window.innerWidth < 578,
+
   // DOM
   // -------------------------------------------------------------------------------------------------------------------
 

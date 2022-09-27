@@ -1,11 +1,9 @@
-
 .container-content {
   display: flex;
-  flex-wrap: wrap;
   width: 100%;
   min-height: 100vh;
-  padding-top: $theme-header-height;
   margin: 0 auto;
+  padding-top: $theme-header-height;
   transition: all .2s ease;
 
   /*@include customMedia($min: 1200px, $max: 1350px) {
@@ -15,11 +13,9 @@
 
 .content-body {
   width: calc(100% - var(--theme-sidebar-width));
-  margin: 0 auto;
   z-index: 1;
+
+  @include respond(tab) {
+    width: 100%;
+  }
 }
-
-/* компактное меню
-.menu-toggle {
-
-}*/

@@ -41,6 +41,8 @@ const dictionaryInit = () => {
 
 const storageLoad = () => {
   if (!storage.length) return;
+  // Mobile check
+  if (f.isMobile()) storage.set('menuToggle', 'true');
 
   // Set Menu Toggle
   const node = f.gI('mainWrapper');
@@ -96,10 +98,8 @@ const cmsEvent = function() {
   let action = this.dataset.actionCms;
 
   let select = {
-    'menuToggle': menuToggle,
-    'exit': () => {
-      location.href = f.SITE_PATH + `?mode=auth&authAction=exit`;
-    },
+    menuToggle: menuToggle,
+    exit: () => location.href = f.SITE_PATH + `?mode=auth&authAction=exit`,
   };
 
   select[action] && select[action]();
