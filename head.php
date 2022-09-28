@@ -27,8 +27,11 @@ else {
   }
 
   $target === '' && $target = 'public';
-  require __DIR__ . "/controller/c_$target.php";
+  $pathController = __DIR__ . "/controller/c_$target.php";
+  if (file_exists($pathController)) require $pathController;
+  else $main->initDefaultController($html, $target, $pathTarget);
+
   echo $html;
 }
 
-unset($target, $pathTarget, $html, $authStatus, $dbContent, $field, $orderId, $main);
+unset($target, $pathTarget, $pathController, $html, $authStatus, $dbContent, $field, $orderId, $main);

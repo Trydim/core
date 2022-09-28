@@ -31,7 +31,7 @@ trait Authorization {
    * @return mixed
    */
   public function getLogin(string $field = 'login') {
-    return $this->user[$field];
+    return $this->user[$field] ?? null;
   }
 
   /**
@@ -125,7 +125,7 @@ trait Authorization {
       $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
       $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
     } else {
-      $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
+      $filterMenu = ['calendar', 'catalog', 'customers', 'orders', 'statistic', 'users'];
       $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);
       });
@@ -529,18 +529,6 @@ final class Main {
   }
 
   /**
-   * @param mixed ...$args
-   * @return Main
-   */
-  public function setControllerParam(...$args): Main {
-    array_map(function ($arg) {
-      $this->controllerParam = $arg;
-    }, $args);
-
-    return $this;
-  }
-
-  /**
    * @param string $key
    * @param mixed $value
    * @param mixed $position [optional] <p>
@@ -594,6 +582,33 @@ final class Main {
     return $this->controllerParam[$key] ?: false;
   }
 
+  public function initDefaultController(string &$html,string $target, string $pathTarget): Main {
+    $field = [
+      'headContent' => '',
+      'pageTitle' => gTxt($target),
+      'cssLinks' => [],
+      'jsLinks'  => [],
+
+      'pageHeader' => null,
+      'sideLeft'   => null,
+      'sideRight'  => null,
+      'pageFooter' => null,
+      'footerContent' => null,
+      'footerContentBase' => null,
+
+      'global'   => null,
+    ];
+
+    $this->setControllerField($field)->fireHook($target . 'Template', $field);
+
+    ob_start();
+    include $pathTarget;
+    $templateContent = ob_get_clean();
+    $field['content'] = $field['content'] ?? (empty($templateContent) ? $target . ' default content.' : $templateContent);
+    $html = template('base', $field);
+
+    return $this;
+  }
 
   public function getBaseTable(): array {
     return $this->dbTables;

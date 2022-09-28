@@ -17,23 +17,11 @@
     width: 100vw;
   }
 
-  /*
-  .sidebar {
-    display: none;
-
-    @include respond(no-sm) {
-      display: block;
-      position: absolute;
-      height: 100%;
-    }
-  }
-  */
-
   .sidebar-menu {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    height: 95vh;
+    height: calc(100vh - 4rem);
 
     ul {
       transition: all .2s ease-in-out;

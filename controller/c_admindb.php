@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $main - global
+ * @var Main $main - global
  * @var string $pathTarget
  */
 
@@ -24,5 +24,6 @@ $pathLegend = $main->getCmsParam('PATH_LEGEND');
 if ($pathLegend && file_exists($pathLegend)) require $pathLegend;
 unset($pathLegend);
 
+$main->setControllerField($field)->fireHook('admindbTemplate', $field);
 require $pathTarget;
 $html = template('base', $field);

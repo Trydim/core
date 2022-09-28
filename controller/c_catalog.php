@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $main
+ * @var Main $main - global
  * @var string $pathTarget
  */
 
@@ -58,6 +58,7 @@ $field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . 
 
 unset($value, $propSetting, $mess);
 
+$main->setControllerField($field)->fireHook('catalogTemplate', $field);
 ob_start();
 require $pathTarget;
 $field['content'] = ob_get_clean();

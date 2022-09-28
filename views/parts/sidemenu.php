@@ -48,95 +48,104 @@ menu;
   }
 
   $adminMenu = createMenu('Администрирование', $dbTables);
-}
-?>
+} ?>
 <aside id="sideLeft" class="sidebar"> <!-- data-background-color="white"-->
   <div class="position-sticky top-0">
     <ul class="sidebar-menu show" id="sideMenu">
       <li class="nav-label">Main Menu</li>
       <?php if (PUBLIC_PAGE) { ?>
         <li>
-          <a class="nav-item" href="<?= SITE_PATH ?>" aria-expanded="false">
+          <a class="nav-item" href="<?= SITE_PATH ?>">
             <i class="pi pi-globe"></i>
             <span class="nav-text"><?= gTxt('calculator') ?></span>
           </a>
         </li>
-      <?php } ?>
-      <?php foreach ($main->getSideMenu() as $item) {
+      <?php }
+
+      foreach ($main->getSideMenu() as $item) {
+        if (in_array($item, [PUBLIC_PAGE, 'setting'])) continue;
+
         switch ($item) {
           case 'orders': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>orders" aria-expanded="false">
+              <a class="nav-item" href="<?= SITE_PATH ?>orders">
                 <i class="pi pi-inbox"></i>
                 <span class="nav-text"><?= gTxt('orders') ?></span>
               </a>
             </li>
-            <?php break;
+          <?php break;
           case 'calendar': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>calendar" aria-expanded="false">
+              <a class="nav-item" href="<?= SITE_PATH ?>calendar">
                 <i class="pi pi-table"></i>
                 <span class="nav-text"><?= gTxt('calendar') ?></span>
               </a>
             </li>
-            <?php break;
+          <?php break;
           case 'customers': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>customers" aria-expanded="false">
+              <a class="nav-item" href="<?= SITE_PATH ?>customers">
                 <i class="pi pi-dollar"></i>
                 <span class="nav-text"><?= gTxt('customers') ?></span>
               </a>
             </li>
-            <?php break;
+          <?php break;
           case 'users': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>users" aria-expanded="false">
+              <a class="nav-item" href="<?= SITE_PATH ?>users">
                 <i class="pi pi-users"></i>
                 <span class="nav-text"><?= gTxt('users') ?></span>
               </a>
             </li>
-            <?php break;
+          <?php break;
           case 'statistic': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>statistic" aria-expanded="false">
+              <a class="nav-item" href="<?= SITE_PATH ?>statistic">
                 <i class="pi pi-chart-line"></i>
                 <span class="nav-text"><?= gTxt('Calculator') ?></span>
               </a>
             </li>
-            <?php break;
+          <?php break;
           case 'admindb': ?>
             <li>
-              <?php if($adminMenu) { ?>
-                <?= $adminMenu ?>
-              <? } else { ?>
+              <?php if ($adminMenu) echo $adminMenu; else { ?>
                 <a class="nav-item" href="<?= SITE_PATH ?>admindb" aria-expanded="false">
                   <i class="pi pi-user"></i>
                   <span class="nav-text"><?= gTxt('admindb') ?></span>
                 </a>
               <?php } ?>
             </li>
-            <?php break;
+          <?php break;
           case 'catalog': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>catalog" aria-expanded="false">
+              <a class="nav-item" href="<?= SITE_PATH ?>catalog">
                 <i class="pi pi-user"></i>
                 <span class="nav-text"><?= gTxt('catalog') ?></span>
               </a>
             </li>
-            <?php break;
+          <?php break;
           case 'fileManager': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>fileManager" aria-expanded="false">
+              <a class="nav-item" href="<?= SITE_PATH ?>fileManager">
                 <i class="pi pi-folder-open"></i>
                 <span class="nav-text"><?= gTxt('fileManager') ?></span>
               </a>
             </li>
-            <?php break;
+          <?php break;
+          default: ?>
+            <li>
+              <a class="nav-item" href="<?= SITE_PATH . $item?>">
+                <i class="pi pi-circle"></i>
+                <span class="nav-text"><?= gTxt($item) ?></span>
+              </a>
+            </li>
+          <?php break;
         }
-      } ?>
-      <?php if (in_array('setting', $main->getSideMenu()) || $main->getLogin('admin')) { ?>
+      }
+
+      if (in_array('setting', $main->getSideMenu()) || $main->getLogin('admin')) { ?>
         <li>
-          <a class="nav-item" href="<?= SITE_PATH ?>setting" aria-expanded="false">
+          <a class="nav-item" href="<?= SITE_PATH ?>setting">
             <i class="pi pi-sliders-h"></i>
             <span class="nav-text"><?= gTxt('setting') ?></span>
           </a>

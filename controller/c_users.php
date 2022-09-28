@@ -1,6 +1,6 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 /**
- * @var object $main global
+ * @var Main $main - global
  * @var string $pathTarget
  */
 
@@ -38,6 +38,7 @@ $param['permission'] = $permission = implode('', array_map(function ($item) {
 $managerField = $main->getSettings('managerFields');
 if (!$managerField) $managerField = [];
 
+$main->setControllerField($field)->fireHook('usersTemplate', $field);
 $param['columns'] = $columns ?? '';
 require $pathTarget;
 $html = template('base', $field);

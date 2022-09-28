@@ -1,7 +1,6 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 /**
- * @var object $main
- * @var array $dbConfig
+ * @var Main $main - global
  * @var string $pathTarget
  */
 

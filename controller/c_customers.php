@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $main
+ * @var Main $main
  * @var string $pathTarget
  */
 
@@ -32,6 +32,7 @@ if (!isset($setting)) {
   }
 }
 
+$main->setControllerField($field)->fireHook('customersTemplate', $field);
 $param['columns'] = $columns;
 require $pathTarget;
 $html = template('base', $field);

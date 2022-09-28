@@ -1,16 +1,18 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var boolean $wrongPass - from controller
- * @var string $login - from Request
- * @var string $pass - from Request
+ * @var Main $this
  */
 
-!isset($pageTarget) && $pageTarget = '';
 $actionLink = 'index.php';
-$wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
+$pageTarget = $pageTarget ?? '';
+$login     = $_REQUEST['login'] ?? '';
+$pass      = $_REQUEST['password'] ?? '';
+$wrongString = $this->checkStatus('error') ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
 $publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . SITE_PATH . '">Открытая страница</a>' : '';
+
+$field['pageTitle'] = $this->getCmsParam('PROJECT_TITLE');
 
 /* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
 $field['global'] = <<<global
