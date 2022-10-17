@@ -40,6 +40,7 @@ export default {
 
   // Helpers
   isMobile: (ua = navigator.userAgent) => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || window.innerWidth < 578,
+  isSafari: (ua = navigator.userAgent) => /^((?!chrome|android).)*safari/i.test(ua),
 
   // DOM
   // -------------------------------------------------------------------------------------------------------------------
@@ -328,7 +329,7 @@ export default {
     if (!Array.isArray(obj)) obj = [...Object.keys(obj), ...Object.values(obj)];
 
     for (const item of obj.flat()) {
-      if (typeof item === 'object') res = res.concat(objectFlat(item));
+      if (typeof item === 'object') res = res.concat(f.objectFlat(item));
       else res.push(item);
     }
 
@@ -416,9 +417,6 @@ export default {
 
     return html;
   },
-
-  isMobile: () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-  isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
 
   /**
    * Маска для телефона
@@ -548,7 +546,7 @@ export default {
   /**
    * Функция печати по умолчанию
    * @param {object} report
-   * @returns {string}
+   * @returns {Node}
    */
   printReport: (report) => {
     let html = '';
@@ -659,8 +657,8 @@ export default {
     data.set('importantVal', JSON.stringify(param.importantVal || {}));
     data.set('saveVal', JSON.stringify(param.saveVal || {}));
     data.set('reportVal', JSON.stringify(param.reportVal || {}));
-    data.set('startShippingDate', JSON.stringify(param.startShippingDate || ''));
-    data.set('endShippingDate', JSON.stringify(param.startShippingDate || ''));
+    data.set('startShippingDate', JSON.stringify(param['startShippingDate'] || ''));
+    data.set('endShippingDate', JSON.stringify(param['startShippingDate'] || ''));
 
     return f.Post({data});
   },
@@ -791,7 +789,7 @@ export default {
    * Generate unique string
    * @param {number?} countChar - count of chars
    */
-  unique: (countChar = 5) => new Array(countChar).fill('').map(n => {
+  unique: (countChar = 5) => new Array(countChar).fill('').map(() => {
     const r = Math.random();
     return String.fromCharCode(r < 0.334 ? f.random(48, 57) : r < 0.667 ? f.random(65, 90) : f.random(97, 122))
   }).join(''),
@@ -875,7 +873,7 @@ export default {
    */
   getSetting(key) {
     if (key) return f.CMS_SETTING[key] || false;
-    if (!f.INIT_SETTING || Object.keys(f.CMS_SETTING).length > 0) return;
+    if (!f.INIT_SETTING || Object.keys(f.CMS_SETTING).length > 0) return null;
 
     let node = f.gI('dataSettings');
     node && (f.CMS_SETTING = JSON.parse(node.value));
