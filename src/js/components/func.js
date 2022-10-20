@@ -21,7 +21,7 @@ export default {
 
   // String
   // -------------------------------------------------------------------------------------------------------------------
-  capitalize: cacheStringFunction(str => str.charAt(0).toUpperCase() + str.slice(1)),
+  capitalize: cacheStringFunction(str => str.trimLeft().charAt(0).toUpperCase() + str.slice(1)),
   camelize: cacheStringFunction(str => {
     return str.toLowerCase()
               .replace(/\W(\w+)/g, (_, w) => w ? f.capitalize(w) : '')
@@ -40,6 +40,7 @@ export default {
 
   // Helpers
   isMobile: (ua = navigator.userAgent) => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || window.innerWidth < 578,
+  isSafari: (ua = navigator.userAgent) => /^((?!chrome|android).)*safari/i.test(ua),
 
   // DOM
   // -------------------------------------------------------------------------------------------------------------------
@@ -170,46 +171,6 @@ export default {
   },
 
   /**
-   * Replace latin to cyrillic symbol
-   * @param {string} value
-   * @return {void | string}
-   */
-  replaceLetter: value => {
-    let cyrillic = 'УКЕНХВАРОСМТ',
-        latin    = 'YKEHXBAPOCMT',
-        replacer = (match) => cyrillic.charAt(latin.indexOf(match)),
-        letters  = new RegExp(`(${latin.split('').join('|')})`, 'gi');
-    return value.replace(letters, replacer).replace(/(&nbsp| | )/g, '').toLowerCase(); // какой-то пробел
-  },
-
-  /**
-   * replace ${key from obj} from template to value from obj
-   * @param {string} tmpString html string template
-   * @param {array|object} arrayObjects - array of object
-   * @return {string}
-   */
-  replaceTemplate: (tmpString, arrayObjects) => {
-    let html = '';
-
-    if (tmpString) {
-      if (!arrayObjects.map) arrayObjects = [arrayObjects];
-
-      arrayObjects.map(item => {
-        let tmp = tmpString.trim();
-        Object.entries(item).map(v => {
-          if (!v[1]) v[1] = '';
-          let reg = new RegExp(`\\\${${v[0]}}`, 'mgi');
-          tmp     = tmp.replace(reg, v[1].toString().replace(/"/g, '\'')); // replace ${key from obj} from template to value from obj //не помогло
-        });
-
-        html += tmp;
-      })
-    }
-
-    return html;
-  },
-
-  /**
    * Input будет давать true, когда активен(checked)
    * для определения цели добавить input-у data-target="targetClass"
    * Цели добавить в data-relation в виде логического выражения
@@ -326,64 +287,6 @@ export default {
   },
 
   /**
-   * Получить и скачать файл
-   * @param {string} fileName
-   * @return {HTMLAnchorElement}
-   */
-  createLink: fileName => {
-    //let date = new Date();
-    //fileName += '_' + date.getDate() + ("0" + (date.getMonth() + 1)).slice(-2) + (date.getYear() - 100) + '_' + date.getHours() + date.getMinutes() + date.getSeconds() + '.pdf';
-    let a = document.createElement('a');
-    a.setAttribute('download', fileName);
-    return a;
-  },
-
-  /**
-   * Save file from browser
-   * @param data {{'name', 'type' , 'blob'}}
-   *
-   * @example for PDF:
-   * {name: 'file.pdf',
-   * type: 'base64',
-   * blob: 'data:application/pdf;base64,' + data['pdfBody']}
-   */
-  saveFile: data => {
-    const {name = 'download.file', blob} = data;
-    let link = f.createLink(name);
-    if (data.type === 'base64') link.href = blob;
-    else link.href = URL.createObjectURL(blob);
-    link.click();
-  },
-
-  /**
-   * Маска для телефона
-   * @param {HTMLElement} node
-   * @param {string?} phoneMask
-   */
-  initMask: (node, phoneMask) => {
-    const minValue = 2,
-          maskGl = f.cmsSetting && f.cmsSetting['phoneMaskGlobal'],
-          matrix = phoneMask || maskGl || f.PHONE_MASK_DEFAULT;
-
-    if (!node || maskGl === '') return;
-
-    const mask = e => {
-      let target = e.target, i = 0,
-          def = matrix.replace(/\D/g, ""),
-          val = target.value.replace(/\D/g, "");
-
-      if (def.length >= val.length) val = def;
-      target.value = matrix.replace(/./g,
-        a => /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a );
-
-      if (e.type === "blur" && target.value.length <= minValue) target.value = "";
-    };
-
-    node.dataset.mask = matrix;
-    ['input', 'blur'].map(e => node.addEventListener(e, mask));
-  },
-
-  /**
    * Активировать элементы
    * @param {NodeList} collection
    */
@@ -409,6 +312,137 @@ export default {
         n.setAttribute('disabled', 'disabled');
       });
     });
+  },
+
+  // Utilities
+  // -------------------------------------------------------------------------------------------------------------------
+
+  /**
+   * flatten
+   * @param {any[]} obj
+   * @return {array}
+   */
+  objectFlat: obj => {
+    let res = [];
+
+    if (typeof obj !== 'object' || obj === null) return obj;
+    if (!Array.isArray(obj)) obj = [...Object.keys(obj), ...Object.values(obj)];
+
+    for (const item of obj.flat()) {
+      if (typeof item === 'object') res = res.concat(f.objectFlat(item));
+      else res.push(item);
+    }
+
+    return res;
+  },
+
+  /**
+   * Получить и скачать файл
+   * @param {string} fileName
+   * @return {HTMLAnchorElement}
+   */
+  createLink: fileName => {
+    //let date = new Date();
+    //fileName += '_' + date.getDate() + ("0" + (date.getMonth() + 1)).slice(-2) + (date.getYear() - 100) + '_' + date.getHours() + date.getMinutes() + date.getSeconds() + '.pdf';
+    let a = document.createElement('a'),
+        span = document.createElement('span');
+
+    a.setAttribute('download', fileName);
+    a.append(span);
+    span.onclick = () => {};
+    return a;
+  },
+
+  /**
+   * Save file from browser
+   * @param {object} data
+   * @param {string} data.name
+   * @param {string} data.type
+   * @param {string|Blob} data.blob
+   *
+   * @example for PDF:
+   * {name: 'file.pdf',
+   * type: 'base64',
+   * blob: 'data:application/pdf;base64,' + data['pdfBody']}
+   */
+  saveFile: data => {
+    const {name = 'download.file', blob} = data,
+          link = f.createLink(name);
+
+    if (data.type === 'base64') link.href = blob;
+    else link.href = URL.createObjectURL(blob);
+
+    document.body.append(link);
+    link.firstElementChild['click']();
+    link.remove();
+  },
+
+  /**
+   * Replace latin to cyrillic symbol
+   * @param {string} value
+   * @return {void | string}
+   */
+  replaceLetter: value => {
+    let cyrillic = 'УКЕНХВАРОСМТ',
+        latin    = 'YKEHXBAPOCMT',
+        replacer = (match) => cyrillic.charAt(latin.indexOf(match)),
+        letters  = new RegExp(`(${latin.split('').join('|')})`, 'gi');
+    return value.replace(letters, replacer).replace(/(&nbsp| | )/g, '').toLowerCase(); // какой-то пробел
+  },
+
+  /**
+   * replace ${key from obj} from template to value from obj
+   * @param {string} tmpString html string template
+   * @param {array|object} arrayObjects - array of object
+   * @return {string}
+   */
+  replaceTemplate: (tmpString, arrayObjects) => {
+    let html = '';
+
+    if (tmpString) {
+      if (!arrayObjects.map) arrayObjects = [arrayObjects];
+
+      arrayObjects.map(item => {
+        let tmp = tmpString.trim();
+        Object.entries(item).map(v => {
+          if (!v[1]) v[1] = '';
+          let reg = new RegExp(`\\\${${v[0]}}`, 'mgi');
+          tmp     = tmp.replace(reg, v[1].toString().replace(/"/g, '\'')); // replace ${key from obj} from template to value from obj //не помогло
+        });
+
+        html += tmp;
+      })
+    }
+
+    return html;
+  },
+
+  /**
+   * Маска для телефона
+   * @param {HTMLElement} node
+   * @param {string?} phoneMask
+   */
+  initMask: (node, phoneMask) => {
+    const minValue = 2,
+          maskGl = f.getSetting('phoneMaskGlobal'),
+          matrix = phoneMask || maskGl || f.PHONE_MASK_DEFAULT;
+
+    if (!node || !f.toBool(matrix)) return;
+
+    const mask = e => {
+      let target = e.target, i = 0,
+          def = matrix.replace(/\D/g, ""),
+          val = target.value.replace(/\D/g, "");
+
+      if (def.length >= val.length) val = def;
+      target.value = matrix.replace(/./g,
+        a => /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a );
+
+      if (e.type === "blur" && target.value.length <= minValue) target.value = "";
+    };
+
+    node.dataset.mask = matrix;
+    ['input', 'blur'].map(e => node.addEventListener(e, mask));
   },
 
   /**
@@ -501,7 +535,7 @@ export default {
       f.gI('cmsLoaderWrapper').remove();
     }
     if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
-      node.parentNode.parentNode.append(node);
+      node.parentNode['after'](node);
       f.gI('cmsLoaderWrapper').remove();
     } else {
       node.classList.remove('loading-st1', 'loading-st1-sm', 'loading-st1-big', 'loading-st1-light');
@@ -511,7 +545,7 @@ export default {
   /**
    * Функция печати по умолчанию
    * @param {object} report
-   * @returns {string}
+   * @returns {Node}
    */
   printReport: (report) => {
     let html = '';
@@ -539,31 +573,38 @@ export default {
    * @param {function?} err
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
+    let fileName = report.fileName || false;
+
     f.setLoading(target);
     target.setAttribute('disabled', 'disabled');
 
-    let fileName = report.fileName || false;
     data.set('mode', 'docs');
     data.set('docsAction', 'pdf');
+    data.set('reportVal', JSON.stringify(report));
 
     report.fileTpl && data.set('fileTpl', report.fileTpl);
     report.pdfOrientation && data.set('pdfOrientation', report.pdfOrientation.toString().toUpperCase());
 
-    data.set('reportVal', JSON.stringify(report));
-
-    f.Post({data}).then(data => {
+    f.Post({data, type: f.isSafari() ? 'file' : 'json'}).then(data => {
       f.removeLoading(target);
       target.removeAttribute('disabled');
       if (data['pdfBody']) {
         f.saveFile({
           name: fileName || data['name'],
           type: 'base64',
-          blob: 'data:application/pdf;base64,' + data['pdfBody']
+          blob: 'data:application/pdf;base64,' + data['pdfBody'],
         });
-        finishOk();
       }
+      if (data instanceof Blob) {
+        f.saveFile({
+          name: fileName || data.fileName || 'pdf.pdf',
+          blob: data,
+        });
+      }
+      finishOk();
     });
 
+    // Get resource last created Pdf
     if (f.DEBUG || true) {
       window.pdfResources = () => {
         data.set('resource', 'true');
@@ -615,8 +656,8 @@ export default {
     data.set('importantVal', JSON.stringify(param.importantVal || {}));
     data.set('saveVal', JSON.stringify(param.saveVal || {}));
     data.set('reportVal', JSON.stringify(param.reportVal || {}));
-    data.set('startShippingDate', JSON.stringify(param.startShippingDate || ''));
-    data.set('endShippingDate', JSON.stringify(param.startShippingDate || ''));
+    data.set('startShippingDate', JSON.stringify(param['startShippingDate'] || ''));
+    data.set('endShippingDate', JSON.stringify(param['startShippingDate'] || ''));
 
     return f.Post({data});
   },
@@ -701,7 +742,8 @@ export default {
       k = main.scale / main.rate;
 
       Object.values(rate).forEach(r => {
-        r.rate = k * (r.rate / r.scale);
+        //r.rate = k * (r.rate / r.scale);
+        r.rate = r.scale / r.rate / k;
       });
 
       node.remove();
@@ -746,10 +788,31 @@ export default {
    * Generate unique string
    * @param {number?} countChar - count of chars
    */
-  unique: (countChar = 5) => new Array(countChar).fill('').map(n => {
+  unique: (countChar = 5) => new Array(countChar).fill('').map(() => {
     const r = Math.random();
     return String.fromCharCode(r < 0.334 ? f.random(48, 57) : r < 0.667 ? f.random(65, 90) : f.random(97, 122))
   }).join(''),
+
+  /**
+   * Return false if<br>
+   * - string contain '', '-' or 'false',
+   * - array empty or contain empty, undefined, 0 or false values,
+   * - empty object
+   * @param v
+   * @return {boolean}
+   */
+  toBool: v => {
+    switch (typeof v) {
+      case "boolean": return v;
+      case "undefined": case "number": return !!v;
+      case "string": return !['', '0', '-', 'false'].includes(v.trim());
+      case "object":
+        if (v === null) return false;
+        if (Array.isArray(v))
+          return v.length ? v.reduce((r, i) => r || f.toBool(i), false) : false;
+        return Object.keys(v).length !== 0;
+    }
+  },
 
   /**
    * Try parse to float number from any value
@@ -789,8 +852,8 @@ export default {
 
   /**
    * trance literate
-   * @param value
-   * @returns {string}
+   * @param {string} value
+   * @return {string}
    */
   transLit(value) {
     const cyrillic = 'А-а-Б-б-В-в-Г-г-Д-д-Е-е-Ё-ё-Ж-ж-З-з-И-и-Й-й-К-к-Л-л-М-м-Н-н-О-о-П-п-Р-р-С-с-Т-т-У-у-Ф-ф-Х-х-Ц-ц-Ч-ч-Ш-ш-Щ-щ-Ъ-ъ-Ы-ы-Ь-ь-Э-э-Ю-ю-Я-я'.split('-'),
@@ -803,12 +866,16 @@ export default {
 
   /**
    *
+   * @param {string?} key - possible values: mailTarget, mailTargetCopy, mailSubject, mailFromName <p>
+   *   managerFields, statusDefault, phoneMaskGlobal, ...
+   * @return mixed
    */
-  getSetting() {
-    if (!f.INIT_SETTING) return;
+  getSetting(key) {
+    if (key) return f.CMS_SETTING[key] || false;
+    if (!f.INIT_SETTING || Object.keys(f.CMS_SETTING).length > 0) return null;
 
     let node = f.gI('dataSettings');
-    node && (f.cmsSetting = JSON.parse(node.value));
+    node && (f.CMS_SETTING = JSON.parse(node.value));
     node && node.remove();
   },
 }
