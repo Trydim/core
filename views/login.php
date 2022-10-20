@@ -2,14 +2,13 @@
 
 /**
  * @var Main $this - global
- * @var boolean $wrongPass - from controller
- * @var string $login - from Request
- * @var string $pass - from Request
  */
 
-$siteLink = $main->url->getUri();
-$actionLink = $main->url->getUri() . 'index.php';
-$wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
+$siteLink   = $this->url->getUri();
+$actionLink = $this->url->getUri() . 'index.php';
+$login      = $_REQUEST['login'] ?? '';
+$pass       = $_REQUEST['password'] ?? '';
+$wrongString = $this->checkStatus('error') ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
 $publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . $siteLink . '">Открытая страница</a>' : '';
 

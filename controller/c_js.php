@@ -22,6 +22,6 @@ $field['pageFooter'] = '';
 $field['sideRight']  = '';
 
 ob_start();
-require $main->url->getRoutePath();
+include $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
 $html = template('base', $field);

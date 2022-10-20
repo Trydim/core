@@ -1290,7 +1290,7 @@ trait MainCsv {
           ];
         } else {
           global $main;
-          $csvPath = $main->getCmsParam('PATH_CSV');
+          $csvPath = $main->getCmsParam('csvPath');
           $link && $link .= '/';
           if (filetype($csvPath . $link . $item) === 'dir') {
             $r[$item] = self::scanDirCsv($csvPath . $link . $item, $link . $item);
@@ -1303,7 +1303,7 @@ trait MainCsv {
   }
 
   public function openCsv() {
-    $csvPath = $this->main->getCmsParam('PATH_CSV') . $this->csvTable;
+    $csvPath = $this->main->getCmsParam('csvPath') . $this->csvTable;
 
     if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
       $result = [];
@@ -1321,7 +1321,7 @@ trait MainCsv {
   }
 
   public function fileForceDownload() {
-    $file = $this->main->getCmsParam('PATH_CSV') . $this->csvTable;
+    $file = $this->main->getCmsParam('csvPath') . $this->csvTable;
 
     if (file_exists($file)) {
       // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
@@ -1350,7 +1350,7 @@ trait MainCsv {
    * @return $this
    */
   public function saveCsv($csvData) {
-    $csvPath = $this->main->getCmsParam('PATH_CSV');
+    $csvPath = $this->main->getCmsParam('csvPath');
 
     if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];

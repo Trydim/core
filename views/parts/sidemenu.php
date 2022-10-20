@@ -12,6 +12,7 @@ if (is_array($dbTables)) {
 
   class CreateMenu {
     private $siteLink;
+
     public function __construct($siteLink) {
       $this->siteLink = $siteLink;
     }
@@ -153,7 +154,7 @@ menu;
           <?php break;
           default: ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH . $item?>">
+              <a class="nav-item" href="<?= $siteLink . $item?>">
                 <i class="pi pi-circle"></i>
                 <span class="nav-text"><?= gTxt($item) ?></span>
               </a>

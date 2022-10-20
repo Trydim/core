@@ -42,9 +42,9 @@ $jsGlobalConst = json_encode([
     <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
   <?php } else { ?>
     <style>.main-wrapper {--theme-sidebar-width: 0;}</style>
-  <?php } ?>
+  <?php }
 
-  <?php array_map(function ($item) { ?>
+  array_map(function ($item) { ?>
     <link rel="stylesheet" href="<?= $item ?>">
   <?php }, $cssLinks ?? []); ?>
 

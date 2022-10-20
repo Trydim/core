@@ -14,7 +14,10 @@ let entry;
 if (fs.existsSync(absPath + 'public/' + resFileName)) {
   let rd = fs.readFileSync(absPath + 'public/' + resFileName, {encoding: 'utf8'});
   entry  = JSON.parse(rd);
-} else return;
+} else {
+  console.log("\x1b[31m", 'Error.\nFile webpackModule.json not exist. Check config.php and run createResourceFile!');
+  process.exit();
+}
 
 
 module.exports = env => {

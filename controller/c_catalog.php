@@ -2,7 +2,6 @@
 
 /**
  * @var Main $main - global
- * @var string $pathTarget
  */
 
 $db = $main->getDB();

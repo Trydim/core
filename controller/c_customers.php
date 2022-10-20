@@ -2,9 +2,9 @@
 
 /**
  * @var Main $main
- * @var string $pathTarget
  */
 
+$param = [];
 $field = [
   'pageTitle' => 'Клиенты',
   'jsLinks'   => [CORE_JS . 'module/customers.js?ver=6347eef0e2'],
@@ -29,10 +29,11 @@ if (!isset($setting)) {
 
       return $item;
     }, $columns);
+
+    $param['columns'] = $columns;
   }
 }
 
 $main->setControllerField($field)->fireHook('customersTemplate', $field);
-$param['columns'] = $columns;
 require $main->url->getRoutePath();
 $html = template('base', $field);

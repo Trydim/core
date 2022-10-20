@@ -29,8 +29,8 @@ define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
 define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 
 // переместить в head, т.к. если есть $mode это все не надо
-$main->setCmsParam('PATH_CSV', $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
-     ->setCmsParam('PATH_LEGEND', $url->getPath(true) . ($publicConfig['PATH_IMG'] ?? 'public/views/legend.php'))
+$main->setCmsParam('csvPath', $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
+     ->setCmsParam('legendPath', $url->getPath(true) . ($publicConfig['PATH_IMG'] ?? 'public/views/legend.php'))
      ->setCmsParam('imgPath', $url->getBasePath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam('uriImg', $url->getBaseUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam('uriCss', $url->getBaseUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
@@ -40,8 +40,8 @@ if ($main->isDealer()) {
   require $url->getPath(true) . 'config.php';
 
   // переместить в head, т.к. если есть $mode это все не надо
-  $main->setCmsParam('MAIN_CSV', $url->getBasePath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
-       ->setCmsParam('PATH_CSV', $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
+  $main->setCmsParam('csvMain', $main->getCmsParam('csvPath'))
+       ->setCmsParam('csvPath', $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
   unset($publicConfig['PATH_CSV']);
 
   $main->setCmsParam($publicConfig);

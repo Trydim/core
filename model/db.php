@@ -14,7 +14,7 @@ stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
 
 if ($dbAction === 'tables') { // todo добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
-  $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam('PATH_CSV'));
+  $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam('csvPath'));
 } else {
   $columns = [];
   if ($dbTable) {

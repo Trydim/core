@@ -1,27 +1,11 @@
 <?php
 
-/**
- * @var Main $main - global
- */
+$main = $main ?? $this;
+$field['cssLinks'][] = CORE_CSS . 'admin.css';
 
 $dbError = isset($_REQUEST['dbError']);
 ?>
-<!DOCTYPE html>
-<html lang="en" class="h-100">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Страница не найдена</title>
-  <!-- Favicon icon -->
-  <link rel="icon" href="/favicon.ico">
-  <link rel="stylesheet" href="/core/assets/css/admin.css">
-
-</head>
-
-<body class="h-100">
-<div class="authincation h-100">
+<div class="authincation" style="height: 100vh">
   <div class="container-fluid h-100">
     <div class="row justify-content-center h-100 align-items-center">
       <div class="col-md-5">
@@ -52,6 +36,3 @@ $dbError = isset($_REQUEST['dbError']);
     </div>
   </div>
 </div>
-</body>
-
-</html>

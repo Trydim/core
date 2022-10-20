@@ -122,11 +122,12 @@ function convert($type, $value) {
   return $value;
 }
 
-function convertToArray($value) {
+function convertToArray($value): array {
   if (is_array($value)) return $value;
   if (is_string($value)) {
     return array_map(function ($item) { return trim($item); }, explode(',', $value));
   }
+  return [];
 }
 
 /**
@@ -349,7 +350,7 @@ function isJSON(string $value) {
  */
 function loadCSV($dict, $filename, $one_rang = false) {
   global $main;
-  $filename = file_exists($filename) ? $filename : $main->getCmsParam('PATH_CSV') . $filename;
+  $filename = file_exists($filename) ? $filename : $main->getCmsParam('csvPath') . $filename;
   $result = [];
 
   if (!count($dict)) return loadFullCSV($filename);

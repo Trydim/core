@@ -17,23 +17,9 @@ else {
   $html = '';
   $main->beforeController();
 
-  // dealer branch
-  // require CORE . 'controller/c_' . $main->url->getRoute() . '.php';
-
-  $target = getTargetPage($_GET);
-  $pathTarget = checkTemplate($target);
-
-  if (OUTSIDE) $main->setLoginStatus('no');
-  else {
-    $main->checkAuth()
-         ->setAccount()
-         ->applyAuth($target);
-  }
-
-  $target === '' && $target = 'public';
-  $pathController = __DIR__ . "/controller/c_$target.php";
+  $pathController = CORE . 'controller/c_' . $main->url->getRoute() . '.php';
   if (file_exists($pathController)) require $pathController;
-  else $main->initDefaultController($html, $target, $pathTarget);
+  else $main->initDefaultController($html);
 
   echo $html;
   unset($html, $field);

@@ -122,7 +122,7 @@ final class Main {
   public function setCmsParam($param, $value = null): Main {
     if (is_array($param)) {
       array_walk($param, function ($item, $key) {
-        if ($key === 'PATH_CSV') $item = ABS_SITE_PATH . $item;
+        if ($key === 'csvPath') $item = ABS_SITE_PATH . $item;
 
         $this->cmsParam[$key] = $item;
       });
@@ -193,7 +193,7 @@ final class Main {
             $dbTables = array_merge($dbTables, ['z_prop' => $props]);
           }
         }
-        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam('PATH_CSV')));
+        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam('csvPath')));
         //$this->checkXml();
 
         if (USE_CONTENT_EDITOR) {
@@ -317,29 +317,32 @@ final class Main {
     //return $this->controllerParam[$key] ?: false;
   }
 
-  public function initDefaultController(string &$html,string $target, string $pathTarget): Main {
+  public function initDefaultController(string &$html): Main {
+    $target = $this->url->getRoute();
+
     $field = [
+      'main'        => $this,
       'headContent' => '',
-      'pageTitle' => gTxt($target),
-      'cssLinks' => [],
-      'jsLinks'  => [],
+      'pageTitle'   => gTxt($target),
+      'cssLinks'    => [],
+      'jsLinks'     => [],
 
       'pageHeader' => null,
       'sideLeft'   => null,
       'sideRight'  => null,
       'pageFooter' => null,
-      'footerContent' => null,
+      'footerContent'     => null,
       'footerContentBase' => null,
 
       'global'   => null,
     ];
 
     $this->setControllerField($field)->fireHook($target . 'Template', $field);
-
     ob_start();
-    include $pathTarget;
+    include $this->url->getRoutePath();
     $templateContent = ob_get_clean();
     $field['content'] = $field['content'] ?? (empty($templateContent) ? $target . ' default content.' : $templateContent);
+    if ($target === '404') $field['global'] = $field['content'];
     $html = template('base', $field);
 
     return $this;
@@ -391,14 +394,14 @@ final class Main {
 
   public function publicMain() {
     $this->publicDealer = false;
-    $this->dealCsvPath = $this->getCmsParam('PATH_CSV');
-    $this->setCmsParam('PATH_CSV', $this->getCmsParam('MAIN_CSV'));
+    $this->dealCsvPath = $this->getCmsParam('csvPath');
+    $this->setCmsParam('csvPath', $this->getCmsParam('csvMain'));
   }
 
   public function publicDealer() {
     if ($this->isDealer()) {
       $this->publicDealer = true;
-      $this->setCmsParam('PATH_CSV', $this->dealCsvPath);
+      $this->setCmsParam('csvPath', $this->dealCsvPath);
     }
   }
 }
