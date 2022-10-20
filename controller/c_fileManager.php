@@ -55,6 +55,6 @@ $field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=45223fc11b'];
 
 $main->setControllerField($field)->fireHook('fileManagerTemplate', $field);
 ob_start();
-require $pathTarget;
+require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
 $html = template('base', $field);

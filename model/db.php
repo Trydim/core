@@ -19,7 +19,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $columns = [];
   if ($dbTable) {
     if (stripos($dbTable, '.csv')) $db->setCsvTable($dbTable);
-    else if (USE_DATABASE) {
+    else if (USE_DATABASE && $dbTable !== 'content-js') {
       $columns = $db->getColumnsTable($dbTable);
       if (!count($columns)) {
         $dbTable = $db->getTables($dbTable);
@@ -40,6 +40,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'showTable':
       $result['columns'] = $columns;
       if (is_string($dbTable) && stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
+      elseif (is_string($dbTable) && $dbTable === 'content-js') $result['content'] = $db->loadContentEditorData();
       else {
         if (CHANGE_DATABASE) {
           USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
@@ -91,12 +92,16 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       else if (isset($csvData) && !empty($csvData)) {
         $db->saveCsv(json_decode($csvData));
+      } else if (isset($contentData) && !empty($contentData)) {
+        $db->saveContentEditorData($contentData);
+      } else {
+        $result['error'] = 'Nothing to save!';
       }
       break;
-    case 'loadCVS': $db->fileForceDownload(); break;
+    case 'loadCSV': $db->fileForceDownload(); break;
     case 'loadFormConfig':
       if (isset($dbTable)) {
-        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath) && filesize($filePath) > 60) {
           $result['csvValues'] = $db->openCsv();
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -110,7 +115,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
-        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         if (file_exists($filePath)) {
           if (filesize($filePath) < 60) Xml::createXmlDefault($filePath, substr($dbTable, 1));
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
@@ -119,7 +124,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'refreshXMLConfig':
       if (isset($dbTable)) {
-        $filePath = SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
         Xml::createXmlDefault($filePath, substr($dbTable, 1));
         $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
       }
@@ -150,7 +155,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $orderId = $orderId !== 0 ? $orderId
           : $db->getLastID('orders',
             [
-              'status_id' => $main->getSettings('statusDefault'),
+              'status_id' => $main->getSettings('statusDefault') ?? 1,
               'customer_id' => $customerId
             ]);
         $orderTotal = $orderTotal ?? 0;
@@ -160,7 +165,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'customer_id' => $customerId,
           'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
           'important_value' => $importantVal ?? '{}',
-          'status_id'       => $main->getSettings('statusDefault'),
           'save_value'      => $saveVal ?? '{}',
           'report_value'    => addCpNumber($orderId, $reportVal),
           'start_shipping_date' => $db->getDbDateString($startShippingDate ?? ''),
@@ -177,7 +181,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadOrders':
       $sortColumn = $sortColumn ?? 'create_date';
 
-      $orderIds = json_decode($orderIds ?? '[]'); // TODO Зачем это
+      $orderIds = json_decode($orderIds ?? '[]');
       $dateRange = json_decode($dateRange ?? '[]');
 
       // Значит нужны все заказы (поиск)
@@ -463,7 +467,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Customers
     case 'loadCustomerByOrder':
-      if (isset($orderId)) {
+      if (isset($orderId) && is_numeric($orderId)) {
         $result['customer'] = $db->loadCustomerByOrderId($orderId);
         $result['users'] = $db->getUserByOrderId($orderId);
       }
@@ -525,7 +529,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       foreach ($user as $k => $v) {
         if (in_array($k, ['login', 'name', 'permissionId'])) $param[$k] = $v;
         else if ($k === 'password') $param[$k] = password_hash($v, PASSWORD_BCRYPT);
-        else if ($k === 'activity') $param[$k] = '1';
+        else if ($k === 'activity') $param[$k] = '1'; // TODO
         else $contacts[$k] = $v;
       }
       $param['contacts'] = json_encode($contacts);
@@ -549,7 +553,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           $contacts = [];
           foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permissionId'])) $param[$id][$k] = $v;
-            else if ($k === 'activity') $param[$id][$k] = '1';
+            else if ($k === 'activity') $param[$id][$k] = '1'; // TODO
             else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
@@ -576,12 +580,80 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     // Files
+    case 'uploadFiles':
+      $db->setFiles($result);
+      break;
     case 'loadFiles':
       $result['files'] = $db->loadFiles();
       break;
 
     case 'openOrders': /* TODO когда это отправляется */
       break;
+
+    case 'addDealer':
+      $dealer = '{"name":"dpp.by"}';
+
+      if (isset($dealer)) {
+        $dealer = json_decode($dealer, true);
+
+        $login = $dealer['login'] ?? false;
+        $pass = password_hash($dealer['pass'] ?? 123, PASSWORD_BCRYPT);
+        $prefix = strtolower(substr(translit($dealer['name']), 0, 3));
+
+        $haveDealers = $db->selectQuery('dealers', 'cms_param');
+        if (count($haveDealers)) {
+          $haveDealers = array_filter($haveDealers, function ($param) use ($prefix) {
+            $param = json_decode($param);
+            return ($param->prefix ?? false) === $prefix . '_';
+          });
+          if (count($haveDealers)) $prefix .= substr(uniqid(), -3, 3);
+          unset($haveDealers);
+        }
+
+        $id = $db->getLastID('dealers', ['name' => 'tmp']);
+
+        $param = [
+          'name' => $dealer['name'],
+          'cms_param' => json_encode(['prefix' => $prefix]),
+          'activity' => intval(boolValue($dealer['activity'] ?? true)),
+          'contacts' => json_encode([
+            'address' => $dealer['address'] ?? '',
+            'email' => $dealer['email'] ?? '',
+            'phone' => $dealer['phone'] ?? '',
+          ]),
+        ];
+
+        $result = $db->insert($columns, 'dealers', [$id => $param], true);
+
+        if ($login === false) $login = 'dealer' . $id;
+
+        $main->dealer->create($id,
+          [
+            'dealerName' => $dealer['name'],
+            'dbConfig' => $main->getSettings('dbConfig'),
+          ],
+          [
+            'prefix' => $prefix,
+            'login' => $login,
+            'pass'  => $pass,
+          ]);
+      }
+      break;
+    case 'loadDealers':
+      $result['dealers'] = $main->db->loadDealers();
+      break;
+    case 'setupDealer':
+      if (isset($dealer)) {
+        $dealer = json_decode($dealer, true);
+
+        $param['settings'] = json_encode($dealer['settings']);
+
+        $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);;
+      }
+      break;
+    /*case 'changeDealer': break;
+    case 'setupDealer': break;
+    case 'deleteDealer': break;*/
 
     default:
       echo 'SWITCH default DB.php' . var_dump($_REQUEST);

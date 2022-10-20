@@ -11,7 +11,7 @@ $field = [
   'jsLinks'   => [
     'https://unpkg.com/chai/chai.js',
     'https://unpkg.com/mocha/mocha.js',
-    URI . 'core/src/js/test/test.js',
+    $main->uri->getHost() . 'core/src/js/test/test.js',
   ],
 ];
 
@@ -22,6 +22,6 @@ $field['pageFooter'] = '';
 $field['sideRight']  = '';
 
 ob_start();
-require $pathTarget;
+require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
 $html = template('base', $field);

@@ -2,7 +2,6 @@
 
 /**
  * @var Main $main - global
- * @var string $pathTarget
  */
 
 $field = [
@@ -52,5 +51,5 @@ if (USE_DATABASE && $user['isAdmin']) {
 }
 
 $main->setControllerField($field)->fireHook('settingTemplate', $field);
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

@@ -1,10 +1,8 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var array $vars extract param
+ * @var Main $main - global
  */
-
-global $main, $target;
 
 $isFetch = preg_match('/outside\.php/', $_SERVER['REQUEST_URI']) && isset($_GET['osd']);
 $inline = strtolower(OUTSIDE);
@@ -22,11 +20,11 @@ $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
   'CL_OUTSIDE'    => true,
   'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
-  'SITE_PATH'     => SITE_PATH,
-  'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
+  'SITE_PATH'     => $main->url->getPath(),
+  'MAIN_PHP_PATH' => $main->url->getPath() . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
-  'AUTH_STATUS'   => $main->checkStatus('ok'),
+  'AUTH_STATUS'   => $main->checkStatus(),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 

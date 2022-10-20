@@ -217,7 +217,7 @@ export default {
       } else console.warn('Event relatedOption: target not found' + key);
 
       return targetNodes[key];
-      }
+    }
     const checkedTarget = (node, member) => {
       let {relation, relationT} = member;
 
@@ -467,7 +467,7 @@ export default {
             loader  = document.createElement('div');
 
       loaderW.id = 'cmsLoaderWrapper';
-      loaderW.style.cssText = `position: fixed; 
+      loaderW.style.cssText = `position: fixed;
         left: ${node.offsetLeft}px; top: ${node.offsetTop}px;
         z-index: ${typeof cStyle.zIndex === "number" ? cStyle.zIndex + 1 : +1}`;
       loader.style.cssText = `width: ${c.width}px; height: ${c.height}px;`;

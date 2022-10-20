@@ -1,14 +1,14 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global
+ * @var Main $main - global
  */
 extract($_REQUEST);
 $result = [];
 $mode = $mode ?? 'noMode';
 $dbAction = $dbAction ?? 'noAction';
 
-if ($mode === 'auth' || $main->checkAction($dbAction)) {
+if (in_array($mode, ['auth', 'docs']) || $main->checkAction($dbAction)) {
   try {
     switch ($mode) {
       case 'auth':

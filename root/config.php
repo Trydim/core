@@ -8,10 +8,6 @@ $publicConfig = [
   'PROJECT_TITLE' => 'PROJECT_TITLE',
   /** Любое значение включает режим отладки */
   //'DEBUG' => true,
-  /** Путь к родительскому конфигу (только для созависимых админок)  */
-  //'PATH_MAIN_CONFIG' => '',
-  /** Относительный путь к админке (если расположение не site.com/core) */
-  //'PATH_CORE' => '',
 
   /** Почта */
   //'MAIL_TARGET_DEBUG' => 'trydim@mail.ru',
@@ -44,9 +40,6 @@ $publicConfig = [
   /** Разделитель в csv */
   //'CSV_DELIMITER'     => ';',
 
-  /** Отображать таблицы в меню */
-  //'DB_TABLE_IN_SIDEMENU' => true,
-
   /** Сохранять пользовательские расчеты */
   //'USERS_ORDERS' => false,
 
@@ -66,13 +59,21 @@ $publicConfig = [
   //'PDF_ORIENTATION' => 'L',
 
   /** Пункты меню какие показывать и последовательность (по умолчанию все страницы)
-    'orders', 'calendar', 'customers', 'users', 'statistic', 'admindb', 'catalog', 'fileManager'
-    заказы     календарь   клиенты   менеджеры статистика администрирование каталог файловый менеджер
+  'admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'fileManager', 'statistic', 'users'
+  админ-ние   календарь   каталог    клиенты      дилеры     заказы    ФМ             статистика   мен-ры
   */
-  'ACCESS_MENU' => ['calendar', 'orders', 'customers', 'admindb', 'users', 'customPage'],
+  'ACCESS_MENU' => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'users', 'customPage'],
+
+  /**
+   * Просмотр заказов дилеров
+   */
+  'DEALERS_ORDERS_SHOW' => true,
 
   /** Папка по умолчанию для файлового менеджера */
   // 'SHARE_PATH' => 'public/images/',
+
+  /** Контент редактор */
+  // 'USE_CONTENT_EDITOR' => true,
 ];
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -15,7 +15,10 @@ $orders = $main->db->loadOrder(0, 1000,	'last_edit_date', false, $dateRange);
 $field = [
   'pageTitle'     => 'Календарь',
   'cssLinks'      => [CORE_CSS . 'module/calendar.css?ver=1dbd460d5c'],
-  'jsLinks'       => [CORE_JS . 'module/calendar.js?ver=960857bb87'],
+  'jsLinks'       => [
+    CORE_JS . 'libs/fullCalendar.min.js?ver=960857bb87',
+    CORE_JS . 'module/calendar.js?ver=960857bb87',
+  ],
   'footerContent' => '',
 ];
 
@@ -30,5 +33,5 @@ if (count($ordersStatus)) {
 }
 
 $main->setControllerField($field)->fireHook('calendarTemplate', $field);
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

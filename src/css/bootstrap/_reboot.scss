@@ -70,21 +70,6 @@ body {
 }
 // scss-docs-end reboot-body-rules
 
-
-// Content grouping
-//
-// 1. Reset Firefox's gray color
-// 2. Set correct height and prevent the `size` attribute to make the `hr` look like an input field
-
-hr {
-  margin: $hr-margin-y 0;
-  color: $hr-color; // 1
-  background-color: currentColor;
-  border: 0;
-  opacity: $hr-opacity;
-}
-
-
 // Typography
 //
 // 1. Remove top margins from headings
@@ -131,23 +116,7 @@ h6 {
   @include font-size($h6-font-size);
 }
 
-
-// Reset margins on paragraphs
-//
-// Similarly, the top margin on `<p>`s get reset. However, we also reset the
-// bottom margin to use `rem` units instead of `em`.
-
-p {
-  margin-top: 0;
-  margin-bottom: $paragraph-margin-bottom;
-}
-
 // Lists
-
-/*ol,
-ul {
-  padding-left: 2rem;
-}*/
 
 ol,
 ul,

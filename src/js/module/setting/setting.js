@@ -103,5 +103,6 @@ app.config.errorHandler = (err, vm, info) => {
 f.HOOKS.beforeMoundedApp({vueApp: app, App, template: node});
 
 const that = app.mount(node);
+window.SettingsInstance = app;
 
 f.HOOKS.afterMoundedApp({vueApp: app, App, that});

@@ -4,12 +4,22 @@
  * @var Main $main - global
  */
 
+$authStatus = $main->checkStatus();
+$isDealer = $main->isDealer();
 $dbContent = "";
-$field = ['pageTitle' => $main->getCmsParam('PROJECT_TITLE')];
+$field = [
+  'pageTitle' => $main->getCmsParam('PROJECT_TITLE'),
+  'headContent' => '<meta name="Public"><meta name="description" content="Public">',
+  'cssLinks' => [],
+  'jsLinks'  => [],
+  'sideLeft' => $authStatus ? null : '',
+];
+$publicCss = $main->getCmsParam('uriCss');
+$publicJs = $main->getCmsParam('uriJs');
 
-require ABS_SITE_PATH . 'public/public.php';
-
-$authStatus = $main->checkStatus('ok');
+/** для совместимовсти */
+define('PATH_CSS' , $publicCss);
+define('PATH_JS' , $publicJs);
 
 // Если загрузка
 if ($authStatus && isset($_GET['orderId'])) {
@@ -27,6 +37,8 @@ if ($authStatus && isset($_GET['orderId'])) {
       }
     }
   }
+
+  unset($orderId, $order, $customer);
 }
 
 if ($authStatus && isset($_GET['orderVisitorId'])) {
@@ -39,10 +51,33 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
       $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='" . json_encode($order[0]) . "'>";
     }
   }
+
+  unset($order, $orderId);
 }
 
-if (!$authStatus) $field['sideLeft'] = '';
+$main->publicMain();
+require ABS_SITE_PATH . 'public/public.php';
+if ($isDealer) {
+  $main->publicDealer();
+  $dealPublic = $main->url->getPath(true) . 'public/public.php';
 
+  if (file_exists($dealPublic)) {
+    $publicCss = $main->getCmsParam('dealUriCss');
+    $publicJs = $main->getCmsParam('dealUriJs');
+    require $dealPublic;
+  }
+}
 
+$main->publicMain();
 require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
+if ($isDealer) {
+  $main->publicDealer();
+  $dealPublic = $main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php';
+  if (file_exists($dealPublic)) {
+    require $dealPublic;
+  }
+
+  unset($dealPublic, $dealCsvPath);
+}
+
 $html = template(OUTSIDE ? '_outside' : 'base', $field);

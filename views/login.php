@@ -1,16 +1,17 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var Main $this
+ * @var Main $this - global
+ * @var boolean $wrongPass - from controller
+ * @var string $login - from Request
+ * @var string $pass - from Request
  */
 
-$actionLink = 'index.php';
-$pageTarget = $pageTarget ?? '';
-$login     = $_REQUEST['login'] ?? '';
-$pass      = $_REQUEST['password'] ?? '';
-$wrongString = $this->checkStatus('error') ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
+$siteLink = $main->url->getUri();
+$actionLink = $main->url->getUri() . 'index.php';
+$wrongString = $wrongPass ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
-$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . SITE_PATH . '">Открытая страница</a>' : '';
+$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . $siteLink . '">Открытая страница</a>' : '';
 
 $field['pageTitle'] = $this->getCmsParam('PROJECT_TITLE');
 
@@ -48,7 +49,6 @@ $field['global'] = <<<global
 
         <input name="mode" type="hidden" value="auth">
         <input name="authAction" type="hidden" value="login">
-        <input name="clientPageTarget" type="hidden" value="$pageTarget">
       </form>
       <div class="new-account mt-3">
         <p>$publicLink</p>

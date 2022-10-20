@@ -33,6 +33,9 @@ git submodule update --remote
 
 name | type | desc
 ---|---|---
+f.log() | function | обычный консоль лог, проверяет перменную Debug
+f.capitalize() | function | Первый символ строки в верхний регистр
+f.camelize() | function | строку в camelCase
 f.gI() | function | getElementById + поиск в shadowDom
 f.qS() | function | querySelector + поиск в shadowDom
 f.qA() | function | querySelectorAll + поиск в shadowDom. Быстрая установка свойств
@@ -48,7 +51,7 @@ f.hide() | function | скрыть node (добавить d-none)
 f.eraseNode() | function | Очистить node
 f.replaceLetter() | function | Заменить Аналогичные Русские Символы на Латинские. Например для поиска
 f.replaceTemplate() | function | Рендер шаблона
-f.relatedOption() | function | Зависимые поля как у Vue
+f.relatedOption() | function | Зависимые поля похоже на у Vue
 f.saveFile() | function | Скачать заданный объект как файл
 f.initMask() | function | Маска ввода
 f.enable() | function | Активировать элементы (убрать disabled и класс disabled)
@@ -61,6 +64,8 @@ f.saveOrder() | function | Сохранить отчет (доработать)
 f.sendOrder() | function | Отправить отчет на почту (доработать)
 f.getRate() | function | Получить курсы из input[hidden]
 f.flashNode() | function | Подсветка узла
+f.objectFlat() | function | Приведение любой перменной в одномерный массив
+f.toBool() | function | Приведение любой переменной в бинарный тип
 f.toNumber() | function | Попытка перевести любую строку в число
 f.parseNumber() | function | Аналогично toNumber
 f.setFormat() | function | Формат 1 000

@@ -1,7 +1,6 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 /**
  * @var Main $main - global
- * @var string $pathTarget
  */
 
 $field = [
@@ -19,12 +18,10 @@ if (!isset($setting)) {
     $columns = array_map(function ($item) {
       $dbName = $item;
 
-      $item = [
+      return [
         'dbName' => $dbName,
         'name' => gTxtDB('users', $dbName),
       ];
-
-      return $item;
     }, $columns);
   }
 }
@@ -40,5 +37,5 @@ if (!$managerField) $managerField = [];
 
 $main->setControllerField($field)->fireHook('usersTemplate', $field);
 $param['columns'] = $columns ?? '';
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

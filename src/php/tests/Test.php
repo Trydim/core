@@ -2,10 +2,13 @@
 
 use PHPUnit\Framework\TestCase;
 
+const CORE = __DIR__ . '/../../../';
+
 class Test extends TestCase {
+  const FUNC_PATH = CORE . 'model/func.php';
 
   public function testCheckError() {
-    require_once __DIR__ . '/../func.php';
+    require_once self::FUNC_PATH;
 
     // Empty array must do return array with index "status" value "true"
     $arr = [];
@@ -46,21 +49,20 @@ class Test extends TestCase {
   }
 
   public function testGTxt() {
-    define('ABS_SITE_PATH', __DIR__ . '/../../../');
-    require_once __DIR__ . '/../func.php';
+    define('ABS_SITE_PATH', __DIR__ . '/../../visCms/');
+    require_once self::FUNC_PATH;
 
     gTxt('calculator');
   }
 
   public function gTxtDB() {
-    define('ABS_SITE_PATH', __DIR__ . '/../../../');
-    require_once __DIR__ . '/../func.php';
+    define('ABS_SITE_PATH', __DIR__ . '/../../visCms/');
+    require_once self::FUNC_PATH;
 
     gTxtDB('codes', 'codes');
   }
 
   public function testPushAndPop() {
-    echo 1;
     $stack = [];
     $this->assertSame(0, count($stack));
 
@@ -73,7 +75,7 @@ class Test extends TestCase {
   }
 
   public function testBoolValue() {
-    require_once __DIR__ . '/../func.php';
+    require_once self::FUNC_PATH;
 
     // Boolean
     $this->assertSame(boolValue(true), true);
@@ -96,5 +98,11 @@ class Test extends TestCase {
 
     // Object
     $this->assertSame(boolValue(new class {}), true);
+  }
+
+  public function testIncludes() {
+    require_once self::FUNC_PATH;
+
+
   }
 }

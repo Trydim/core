@@ -1,9 +1,9 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global main object
+ * @var Main $main - global main object
  *
- * @var $cmsAction - fromQuery
+ * @var string $cmsAction - fromQuery
  *
  * @var $user - from Query
  */
@@ -89,8 +89,8 @@ switch ($cmsAction) {
         }
 
         $columns = $db->getColumnsTable('permission');
-        $result['error']['addPerm'] = $db->insert($columns, 'permission', $param['new']);
-        $result['error']['changePerm'] = $db->insert($columns, 'permission', $param['change'], true);
+        $result = $db->insert($columns, 'permission', $param['new']);
+        $result = $db->insert($columns, 'permission', $param['change'], true);
       }
       unset($permissions);
 
@@ -168,7 +168,7 @@ switch ($cmsAction) {
         $password = $hash = password_hash($user['password'], PASSWORD_BCRYPT);
       }
 
-      file_put_contents(SYSTEM_PATH, implode('|||', [$user['login'], $user['password'], $hash]));
+      file_put_contents(SYSTEM_PATH, implode('|||', [$user['login'], $user['password'], $hash])); // todo перенести в DB
       //$setting['onlyOne'] = boolval($user['onlyOne']);
     }
 
@@ -192,7 +192,7 @@ switch ($cmsAction) {
     break;
   case 'load':
     if (USE_DATABASE) $result['user'] = $db->getUser($main->getLogin(), 'ID, login, customization');
-    else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus('ok'));
+    else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus());
 
     $result['setting'] = getSettingFile();
     break;

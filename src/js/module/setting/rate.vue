@@ -98,8 +98,8 @@ export default {
       RUS: 'ЦБ РФ',
     },
 
-    autoRefresh: f['cmsSetting']['autoRefresh'] || false,
-    serverRefresh: f['cmsSetting']['serverRefresh'] || 'RUS',
+    autoRefresh: f['CMS_SETTING']['autoRefresh'] || false,
+    serverRefresh: f['CMS_SETTING']['serverRefresh'] || 'RUS',
 
     display: false,
     rate: {},

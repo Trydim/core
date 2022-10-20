@@ -2,11 +2,35 @@
 
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
-require __DIR__ . '/rb.php';
+require __DIR__ . '/Rb.php';
 
 class Db extends \R {
+
+  const DB_DATA_FORMAT = 'Y-m-d H:i:s';
+
+  /**
+   * @var Main
+   */
+  private $main;
+
+  /**
+   * @var int
+   */
   private $currentUserID = 2;
+
+  /**
+   * @var string
+   */
+  private $prefix = '';
+
+  /**
+   * @var string
+   */
   private $dbName;
+
+  /**
+   * @var string
+   */
   private $login;
 
   /**
@@ -27,18 +51,48 @@ class Db extends \R {
   }
 
   /**
-   * db constructor
-   *
-   * @param array $dbConfig
-   * @param bool  $freeze
+   * get Table with Prefix
+   * @param string $table
+   * @return string
    */
-  public function __construct(array $dbConfig = [], bool $freeze = true) {
+  private function pf(string $table): string {
+    return $this->prefix . str_replace($this->prefix, '', $table);
+  }
+
+  /**
+   * @param array $dealers
+   * @param array $fields
+   * @return array
+   */
+  private function parseJsonField(array $dealers, array $fields): array {
+    $result = [];
+
+    if (isset($dealers['contacts'])) {
+      $result = $dealers;
+      foreach ($fields as $field) {
+        $result[$field] = json_decode($result[$field], true);
+      }
+    } else {
+      foreach ($dealers as $dealer) {
+        $result[] = $this->parseJsonField($dealer, $fields);
+      }
+    }
+
+    return $result;
+  }
+
+  public function __construct(Main $main, bool $freeze = true) {
+    $this->main = $main;
+
     if (USE_DATABASE) {
+      $dbConfig = $main->getSettings('dbConfig');
+
       if (!count($dbConfig)) {
-        require ABS_SITE_PATH . 'config.php';
+        require $main->url->getPath(true) . 'config.php';
         if (!count($dbConfig)) exit('Configs error');
       }
 
+      $this->prefix = $dbConfig['dbPrefix'] ?? $this->prefix;
       $this->dbName = $dbConfig['dbName'];
 
       self::setup(
@@ -47,10 +101,7 @@ class Db extends \R {
         $dbConfig['dbPass']
       );
 
-      if (!self::testConnection()) {
-        is_callable('reDirect') && reDirect('404&dbError=true');
-        exit('Data Base connect error!');
-      }
+      !self::testConnection() && die('Data Base connect error!');
 
       $this->setting();
 
@@ -73,20 +124,22 @@ class Db extends \R {
    * @return false|string|null
    */
   public function getDbDateString($date) {
-    $dbFormat = 'Y-m-d H:i:s';
-
     if (empty($date)) return null;
     if (is_numeric($date) && strlen($date) >= 10) {
-      return date($dbFormat, intval(substr($date, 0, 10)));
+      return date($this::DB_DATA_FORMAT, intval(substr($date, 0, 10)));
     }
     $date = date_create($date);
-    return $date ? $date->format($dbFormat) : null;
+    return $date ? $date->format($this::DB_DATA_FORMAT) : null;
   }
 
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
 
-  private function getConvertDbType(string $type) {
+  /**
+   * @param string $type
+   * @return Closure
+   */
+  private function getConvertDbType(string $type): Closure {
     if (stripos($type, 'int') === 0) {
       return function ($v) { return intval($v); };
     }
@@ -97,28 +150,6 @@ class Db extends \R {
 
     return function ($v) {return $v;};
   }
-
-  /**
-   * @param string $dbTable name of table
-   * @param array|string $columns of columns, if size of array is 1 (except all column '*') return simple array,
-   * @param $filters string filter
-   *
-   * @return array
-   */
-  public function selectQuery(string $dbTable, $columns = '*', string $filters = ''): array {
-    $simple = false;
-    if (!is_array($columns)) {
-      $simple = $columns !== '*';
-      $columns = [$columns];
-    }
-
-    $columns[0] !== '*' && $columns = array_map(function ($item) { return $this->setQueryAs($item); }, $columns);
-    $sql = 'SELECT ' . implode(', ',  $columns) . ' FROM ' . $dbTable;
-    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
-
-    return $simple ? self::getCol($sql) : self::getAll($sql);
-  }
-
   /**
    * Проверка таблицы перед добавлениями/изменениями
    *
@@ -128,7 +159,7 @@ class Db extends \R {
    * @param boolean $change - link
    * @return array
    */
-  public function checkTableBefore($curTable, string $dbTable, &$param, bool $change): array {
+  private function checkTableBefore($curTable, string $dbTable, &$param, bool $change): array {
     $result = [];
 
     array_map(function ($col) use (&$result, $dbTable, &$param, $change) {
@@ -193,6 +224,27 @@ class Db extends \R {
   }
 
   /**
+   * @param string $dbTable name of table
+   * @param array|string $columns of columns, if size of array is 1 (except all column '*') return simple array,
+   * @param $filters string filter
+   *
+   * @return array
+   */
+  public function selectQuery(string $dbTable, $columns = '*', string $filters = ''): array {
+    $simple = false;
+    if (!is_array($columns)) {
+      $simple = $columns !== '*';
+      $columns = [$columns];
+    }
+
+    $columns[0] !== '*' && $columns = array_map(function ($item) { return $this->setQueryAs($item); }, $columns);
+    $sql = 'SELECT ' . implode(', ',  $columns) . ' FROM ' . $this->pf($dbTable);
+    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
+
+    return $simple ? self::getCol($sql) : self::getAll($sql);
+  }
+
+  /**
    * select all (*)
    * @param string $dbTable
    * @param bool $typed
@@ -200,7 +252,7 @@ class Db extends \R {
    * @return array|null
    */
   public function loadTable(string $dbTable, bool $typed = false): ?array {
-    $result = self::getAll('SELECT * FROM ' . $dbTable);
+    $result = self::getAll('SELECT * FROM ' . $this->pf($dbTable));
 
     if ($typed) {
       $columns = [];
@@ -225,8 +277,8 @@ class Db extends \R {
    * @return integer
    */
   public function checkHaveRows($dbTable, $columnName, $value): int {
-    return intval(self::getCell("SELECT count(*) FROM $dbTable
-                                     WHERE $columnName = :value", [':value' => $value]));
+    return intval(self::getCell("SELECT count(*) FROM " . $this->pf($dbTable) .
+                                    " WHERE $columnName = :value", [':value' => $value]));
   }
 
   /**
@@ -237,6 +289,7 @@ class Db extends \R {
    * @return int
    */
   public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'ID'): int {
+    $dbTable = $this->pf($dbTable);
     $count = 0;
     if ($primaryKey !== 'ID') {
       foreach ($ids as $id) {
@@ -262,12 +315,12 @@ class Db extends \R {
   }
 
   /**
-   * @param string $table
+   * @param string $dbTable
    * @param array  $requireParam
    * @return mixed
    */
-  public function getLastID(string $table, array $requireParam = []) {
-    $bean = self::xdispense($table);
+  public function getLastID(string $dbTable, array $requireParam = []) {
+    $bean = self::xdispense($this->pf($dbTable));
     foreach ($requireParam as $field => $value) $bean->$field = $value;
     self::store($bean);
 
@@ -279,6 +332,7 @@ class Db extends \R {
    * @return mixed|null
    */
   public function getTables(string $like = '') {
+    $like = $this->pf($like);
     $sql = "SHOW TABLES
             FROM `$this->dbName`
             WHERE `Tables_in_$this->dbName` LIKE '%$like%'";
@@ -299,12 +353,12 @@ class Db extends \R {
    * @return array|null
    */
   public function getColumnsTable($dbTable): ?array {
-    return self::getAll('SELECT COLUMN_NAME as "columnName", COLUMN_TYPE as "type",
-                               COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE as "null"
-                             FROM information_schema.COLUMNS 
+    return self::getAll('SELECT COLUMN_NAME AS "columnName", COLUMN_TYPE AS "type",
+                                    COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE AS "null"
+                             FROM information_schema.COLUMNS
                              WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
       [':dbName'  => $this->dbName,
-       ':dbTable' => $dbTable]);
+       ':dbTable' => $this->pf($dbTable)]);
   }
 
   /**
@@ -314,12 +368,11 @@ class Db extends \R {
    * @return integer
    */
   public function getCountRows($dbTable, string $filters = ''): int {
-    $sql = "SELECT COUNT(*) as 'count' from $dbTable";
+    $sql = "SELECT COUNT(*) AS 'count' from " . $this->pf($dbTable);
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
 
     $result = self::getRow($sql);
-    //$result = self::getRow("SELECT COUNT(*) as 'count' from :dbTable", [':dbTable' => $dbTable]);
 
     if (count($result)) return $result['count'];
     return 0;
@@ -339,7 +392,7 @@ class Db extends \R {
     if (count($param) === 0) return [];
     $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
 
-    $beans = self::xdispense($dbTable, count($param));
+    $beans = self::xdispense($this->pf($dbTable), count($param));
 
     $idColName = 'id';
     foreach ($curTable as $col) {
@@ -403,7 +456,7 @@ class Db extends \R {
     }
 
     if ($change === false && count($param) === 1) {
-      $result [$dbTable . 'Id'] = $beans->getID();
+      $result[$dbTable . 'Id'] = $beans->getID();
     }
 
     return $result;
@@ -417,34 +470,39 @@ class Db extends \R {
    *
    * @return array
    */
-  public function getFiles($ids = false) {
+  public function getFiles($ids = false): array {
     if (is_string($ids) && !empty($ids)) $ids = explode(',', $ids);
     $filters = $ids ? ' ID = ' . implode(' or ID = ', $ids) : '';
     return $this->selectQuery('files', '*', $filters);
   }
 
-  public function setFiles(&$result, $imageIds): string {
-    $dbDir = 'upload/';
-    $uploadDir = SHARE_PATH . $dbDir;
+  /**
+   * @param $result
+   * @param array $imageIds
+   * @return string
+   */
+  public function setFiles(&$result, array $imageIds = []): string {
+    $result['files'] = [];
+    $result['result'] = [];
+    $uploadDir = $this->main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
 
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
     if (isset($_FILES) && count($_FILES)) {
       foreach ($_FILES as $file) {
-        $dbFile = $dbDir . $file['name'];
+        $dbFile = $file['name'];
         $uploadFile = $uploadDir . $file['name'];
 
-        // Проверить все
-        if (!$file['size']) continue;
+        if (!$file['size']) continue; // Проверить все
 
-        // Если файл существует
-        if (file_exists($uploadFile)) {
+        if (file_exists($uploadFile)) { // Если файл существует
           $result['fileExist'] = $result['fileExist'] ?? [];
           $result['fileExist'][] = $file['name'];
 
           if (filesize($uploadFile) === $file['size']) {
             $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
-            if (count($id) === 1) { $imageIds[] = $id[0]; continue; }
+
+            if (count($id) === 1) $inserted['filesId'] = $id[0];
             else unlink($uploadFile);
 
           } else {
@@ -452,20 +510,27 @@ class Db extends \R {
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
             $file['name'] = $name . $ext;
 
-            $dbFile = $dbDir . $file['name'];
-            $uploadFile = $uploadDir . $file['name'];
+            $dbFile = $file['name'];
+            //$uploadFile = $uploadDir . $file['name'];
           }
         }
 
-        if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-          $lastId = $this->getLastID('files');
-          $imageIds[] = $lastId;
-          $this->insert([], 'files', [$lastId => [
+        else if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
+          $inserted = $this->insert([], 'files', [[
             'name'   => $file['name'],
             'path'   => $dbFile,
             'format' => $file['type'],
-          ]], true);
-        } else $result['error'] = 'Mover file error: ' . $file['name'];
+          ]]);
+        } else $result['error'] = 'Moving file error: ' . $file['name'];
+
+        if (isset($inserted['filesId']) && is_numeric($inserted['filesId'])) {
+          $imageIds[] = $inserted['filesId'];
+
+          $result['files'][] = [
+            'id' => $inserted['filesId'],
+            'path' => $this->main->url->getUri() . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR . $dbFile,
+          ];
+        }
       }
     }
 
@@ -480,9 +545,9 @@ class Db extends \R {
 
     $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
                    C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.name) = 1, true, false) AS 'simple'
-            FROM elements E
-            JOIN codes C on C.symbol_code = E.element_type_code
-            JOIN options_elements O on E.ID = O.element_id
+            FROM " . $this->pf('elements') . " E
+            JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
+            JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
             WHERE E.section_parent_id = $sectionID
             GROUP BY E.name
             ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
@@ -496,12 +561,10 @@ class Db extends \R {
 
     $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
                    C.symbol_code AS 'symbolCode', C.name AS 'codeName'
-            FROM elements E
-            JOIN codes C on C.symbol_code = E.element_type_code
+            FROM " . $this->pf('elements') . " E
+            JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
             WHERE E.name LIKE '%$searchValue%'
             ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
-
-    //$countPerPage OFFSET $pageNumber;
 
     $res = self::getAll($sql);
 
@@ -516,11 +579,12 @@ class Db extends \R {
 
   private function setImages(string $imagesIds = ''): array {
     $images = $this->getFiles($imagesIds);
+
     return array_map(function ($item) {
-      $path = findingFile(substr(SHARE_PATH, 0, -1), mb_strtolower($item['path']));
+      $path = findingFile(ABS_SITE_PATH . SHARE_PATH . 'upload', $item['path']);
       $item['id'] = $item['ID'];
       $item['path'] = $item['src'] = $path
-        ? URI . str_replace(ABS_SITE_PATH, '', $path)
+        ? $this->main->url->getUri() . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)
         : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
 
       unset($item['ID']);
@@ -531,6 +595,7 @@ class Db extends \R {
     $tables = ['codes.', 'money.', 'elements.', 'options_elements.', 'units.'];
     $alias = ['C.', 'M.', 'E.', 'O.', 'U.'];
     $table = str_replace($tables, $alias, $table);
+
     $cols = ['.id', '.type', '.unit', '.lastDate'];
     $alias = ['.ID', '.element_type_code', '.short_name', '.last_edit_date'];
     return str_replace($cols, $alias, $table);
@@ -552,10 +617,10 @@ class Db extends \R {
                    images_ids AS 'images', properties,
                    O.name AS 'name', U.ID AS 'unitId', U.name AS 'unitName', O.last_edit_date AS 'lastEditDate', O.activity AS 'activity', sort,
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
-            FROM options_elements O
-            JOIN money MI on MI.ID = O.money_input_id
-            JOIN money MO on MO.ID = O.money_output_id
-            JOIN units U on U.ID = O.unit_id
+            FROM " . $this->pf('options_elements') . " O
+            JOIN " . $this->pf('money') . " MI on MI.ID = O.money_input_id
+            JOIN " . $this->pf('money') . " MO on MO.ID = O.money_output_id
+            JOIN " . $this->pf('units') . " U on U.ID = O.unit_id
             WHERE element_id = $elementID";
 
     return array_map(function ($option) {
@@ -583,12 +648,12 @@ class Db extends \R {
                    O.sort AS 'sort', O.last_edit_date AS 'lastDate', properties, images_ids AS 'images',
                    MI.code AS 'moneyInput', MO.code AS 'moneyOutput',
                    input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
-            FROM options_elements O
-            JOIN elements E ON E.ID = O.element_id
+            FROM " . $this->pf('options_elements') . " O
+            JOIN " . $this->pf('elements') . " E ON E.ID = O.element_id
             JOIN section S ON S.ID = E.section_parent_id
-            JOIN money MI ON MI.ID = O.money_input_id
-            JOIN money MO ON MO.ID = O.money_output_id
-            JOIN units U ON U.ID = O.unit_id
+            JOIN " . $this->pf('money') . " MI ON MI.ID = O.money_input_id
+            JOIN " . $this->pf('money') . " MO ON MO.ID = O.money_output_id
+            JOIN " . $this->pf('units') . " U ON U.ID = O.unit_id
             WHERE S.active <> 0 AND E.activity <> 0 AND O.activity <> 0";
 
     // Filter
@@ -621,8 +686,8 @@ class Db extends \R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        $option['images'] = [['path' => URI . 'shared/upload/stone/1-corian-lime-ice.jpg']]; // TODO удалить
-        //$option['images'] = $this->setImages($option['images']);
+        //$option['images'] = [['path' => $this->main->url->getUri() . 'shared/upload/stone/1-corian-lime-ice.jpg']];
+        $option['images'] = $this->setImages($option['images']);
       }
 
       // set property
@@ -650,7 +715,6 @@ class Db extends \R {
       case 'bool': return boolval($value);
     }
   }
-
   private function parseDbProperty($prop, $type) {
     $str = " `$prop` ";
 
@@ -666,7 +730,6 @@ class Db extends \R {
       case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
     }
   }
-
   private function getPropertyTable($propValue, $propName) {
     static $propTables, $props;
 
@@ -709,6 +772,8 @@ class Db extends \R {
   }
 
   public function createPropertyTable(string $dbTable, array $param) {
+    $dbTable = $this->pf($dbTable);
+
     $sql = "CREATE TABLE $dbTable (
             `ID` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
@@ -720,10 +785,9 @@ class Db extends \R {
     }
 
     $error = self::exec($sql . ')');
-    !$error && $error = self::exec("ALTER TABLE `$dbTable`
-        ADD PRIMARY KEY (`ID`)");
-    return self::exec("ALTER TABLE `$dbTable`
-        MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
+    !$error && $error = self::exec("ALTER TABLE `$dbTable` ADD PRIMARY KEY (`ID`)");
+
+    return self::exec("ALTER TABLE `$dbTable` MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
   }
 
   /**
@@ -732,13 +796,9 @@ class Db extends \R {
    * @return array
    */
   public function changePropertyTable(string $dbTable, array $params) {
-    // `prop_kategoriya` ADD `scale` INT NOT NULL AFTER `work`;
-    //ALTER TABLE `prop_kategoriya` CHANGE `scale` `scale1` FLOAT(11) NOT NULL;
-    //ALTER TABLE `prop_kategoriya` DROP `scale`;
-
     $error = [];
     $query = [];
-    $sSql = "ALTER TABLE $dbTable";
+    $sSql = "ALTER TABLE " . $this->pf($dbTable);
 
     if (count($params)) {
       $haveColumns = array_map(function ($column) {return $column['columnName'];}, $this->getColumnsTable($dbTable));
@@ -792,18 +852,18 @@ class Db extends \R {
    *
    * @return array|null
    */
-  public function loadOrder($pageNumber = 0, $countPerPage = 20, $sortColumn = 'last_edit_date', $sortDirect = false, $dateRange = [], $ids = []) {
+  public function loadOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'last_edit_date', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
     $pageNumber *= $countPerPage;
 
     /*important_value AS 'importantValue', */
     $sql = "SELECT O.ID AS 'O.ID', create_date AS 'createDate',
             last_edit_date AS 'lastEditDate', start_shipping_date AS 'startShippingDate',
-            end_shipping_date AS 'endShippingDate', users.name, C.name as 'C.name', total,
+            end_shipping_date AS 'endShippingDate', U.name, C.name as 'C.name', total,
             S.name AS 'S.name'
-      FROM orders O
-      LEFT JOIN users ON user_id = users.ID
-      LEFT JOIN customers C ON customer_id = C.ID
-      JOIN order_status S ON status_id = S.ID\n";
+      FROM " . $this->pf('orders') . " O
+      LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
+      LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
+      JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID\n";
 
     if (count($dateRange)) $sql .= "WHERE O.last_edit_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
     if (count($ids)) {
@@ -824,16 +884,15 @@ class Db extends \R {
    * @return array rows
    */
   public function loadOrderById($id) {
-
     $sql = "SELECT O.ID AS 'ID', create_date AS 'createDate', last_edit_date AS 'lastEditDate',
-                   users.name AS 'name', users.ID AS 'userId',
-                   users.contacts AS 'contacts', C.name AS 'C.name', total, S.name AS 'Status', 
+                   U.name AS 'name', U.ID AS 'userId',
+                   U.contacts AS 'contacts', C.name AS 'C.name', total, S.name AS 'Status', 
                    important_value AS 'importantValue', save_value AS 'saveValue',
                    report_value AS 'reportValue'
-            FROM orders O
-            LEFT JOIN users ON user_id = users.ID
-            LEFT JOIN customers C ON customer_id = C.ID
-            JOIN order_status S ON status_id = S.ID
+            FROM " . $this->pf('orders') . " O
+            LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
+            LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
+            JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID
             WHERE O.ID = :id";
 
     $res = self::getAll($sql, [':id' => $id]);
@@ -862,8 +921,9 @@ class Db extends \R {
   //------------------------------------------------------------------------------------------------------------------
 
   public function saveVisitorOrder($param) {
-    $bean = self::xdispense('client_orders');
-    //$bean->create_date = date('Y-m-d G:i:s');
+    $bean = self::xdispense($this->pf('client_orders'));
+
+    $bean->create_date = date($this::DB_DATA_FORMAT);
     foreach ($param as $key => $value) {
       $bean->$key = $value;
     }
@@ -883,7 +943,7 @@ class Db extends \R {
   public function loadVisitorOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'createDate', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT cp_number, create_date, important_value, total FROM client_orders\n";
+    $sql = "SELECT cp_number, create_date, important_value, total FROM " . $this->pf('client_orders') . "\n";
 
     if (count($dateRange)) $sql .= "WHERE create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
     if (count($ids)) {
@@ -914,8 +974,8 @@ class Db extends \R {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT C.ID as 'id', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
-     FROM customers C
-     LEFT JOIN orders O on C.ID = O.customer_id\n";
+      FROM " . $this->pf('customers') . " C
+      LEFT JOIN " . $this->pf('orders') . " O on C.ID = O.customer_id\n";
 
     if (count($ids)) {
       $sql .= "WHERE C.ID = ";
@@ -931,11 +991,12 @@ class Db extends \R {
   }
 
   public function loadCustomerByOrderId($orderId) {
-    $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts FROM orders 
-        LEFT JOIN customers C ON C.ID = orders.customer_id
-        WHERE orders.ID = $orderId";
+    $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts
+      FROM " . $this->pf('orders') . " O 
+      LEFT JOIN " . $this->pf('customers') . " C ON C.ID = O.customer_id
+      WHERE O.ID = :id";
 
-    return self::getRow($sql);
+    return self::getRow($sql, [':id' => $orderId]);
   }
 
   // Money
@@ -960,8 +1021,9 @@ class Db extends \R {
   }
 
   public function setMoney($rate) {
-    $beans = self::xdispense('money', 1);
-    $date = date('Y-m-d h:i:s');
+    $beans = self::xdispense($this->pf('money'), 1);
+    $date = date($this::DB_DATA_FORMAT);
+
     foreach ($rate as $currency) {
       $beans->id = $currency['ID'];
       $beans->scale = $currency['scale'];
@@ -984,7 +1046,6 @@ class Db extends \R {
    * @return array|false
    */
   public function getUserFromFile(string $login = '', string $password = '', bool $status = false) {
-
     if (file_exists(SYSTEM_PATH)) {
       $value = file(SYSTEM_PATH)[0];
       $value && $value = explode('|||', $value);
@@ -1010,7 +1071,9 @@ class Db extends \R {
    * @return array|null
    */
   public function getUser($login, $column = 'ID') {
-    $result = self::getRow("SELECT $column FROM users WHERE login = :login", [':login' => $login]);
+    $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
+      [':login' => $login]
+    );
 
     if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
     return $result;
@@ -1022,7 +1085,9 @@ class Db extends \R {
    * @return array|null
    */
   public function getUserById($userId) {
-    return self::getRow("SELECT * FROM users WHERE ID = :id", [':id' => $userId]);
+    return self::getRow("SELECT * FROM " . $this->pf('users') . " WHERE ID = :id",
+      [':id' => $userId]
+    );
   }
 
   /**
@@ -1030,11 +1095,13 @@ class Db extends \R {
    * @return array|null
    */
   public function getUserByLogin($login) {
-    return self::getRow("SELECT login, users.name AS 'name', hash, password, customization, 
-            p.ID as 'permId', p.name as 'permName', properties as 'permValue', activity
-            FROM users
-            LEFT JOIN permission p on users.permission_id = p.ID
-            WHERE login = :login", [':login' => $login]);
+    $sql = "SELECT login, U.name AS 'name', hash, password, customization, 
+                   P.ID AS 'permId', P.name AS 'permName', properties AS 'permValue', activity
+            FROM " . $this->pf('users') . " U
+            LEFT JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
+            WHERE login = :login";
+
+    return self::getRow($sql, [':login' => $login]);
   }
 
   /**
@@ -1043,9 +1110,9 @@ class Db extends \R {
    * @return mixed
    */
   public function getUserByOrderId($id) {
-    return self::getRow("SELECT U.name as 'name', U.contacts as 'contacts'
-            FROM users U 
-            JOIN orders O ON U.ID = O.user_id
+    return self::getRow("SELECT U.name AS 'name', U.contacts AS 'contacts'
+            FROM " . $this->pf('users') . " U 
+            JOIN " . $this->pf('orders') . " O ON U.ID = O.user_id
             WHERE O.ID = :id", [':id' => $id]);
   }
 
@@ -1061,7 +1128,7 @@ class Db extends \R {
   }
 
   public function changeUser($loginId, $param) {
-    $user = self::xdispense('users');
+    $user = self::xdispense($this->pf('users'));
     $user->ID = $loginId;
     foreach ($param as $key => $value) {
       $user->$key = $value;
@@ -1082,8 +1149,8 @@ class Db extends \R {
     $sortColumn = AQueryWriter::camelsSnake($sortColumn);
 
     $sql = "SELECT U.ID AS 'U.ID', permission_id, P.name AS 'P.name', login, U.name AS 'U.name', contacts, register_date, activity
-    FROM users U
-    LEFT JOIN permission P ON permission_id = P.ID\n";
+    FROM " . $this->pf('users') . " U
+    LEFT JOIN " . $this->pf('permission') . " P ON U.permission_id = P.ID\n";
 
     $sql .= "ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
@@ -1092,7 +1159,7 @@ class Db extends \R {
 
   public function setUserHash($loginId, $hash) {
     if (USE_DATABASE) {
-      $user = self::xdispense('users');
+      $user = self::xdispense($this->pf('users'));
       $user->ID = $loginId;
       $user->hash = $hash;
       self::store($user);
@@ -1160,10 +1227,9 @@ class Db extends \R {
    */
   public function getUserSetting(string $currentUser = '', string $columns = 'customization') {
     if (!$currentUser) {
-      global $main;
-      $currentUser = $main->getLogin();
+      $currentUser = $this->main->getLogin();
     }
-    $result = self::getAssocRow("SELECT $columns from users WHERE login = ?", [$currentUser]);
+    $result = self::getAssocRow("SELECT $columns from " . $this->pf('users') . " WHERE login = ?", [$currentUser]);
 
     if (count($result) === 1) {
       if ($columns === 'customization') return json_decode($result[0]['customization']);
@@ -1172,7 +1238,27 @@ class Db extends \R {
     return json_decode('{}');
   }
 
+  // Dealers
+  //--------------------------------------------------------------------------------------------------------------------
+
+  public function loadDealers(): ?array {
+    $sql = "SELECT ID AS 'id', name, contacts, register_date AS 'registerDate', activity, settings
+            FROM dealers";
+
+    return $this->parseJsonField(self::getAll($sql), ['contacts', 'settings']);
+  }
+
+  public function getDealerById(string $id): array {
+    $sql = "SELECT ID AS 'id', name, contacts,
+                   register_date AS 'registerDate', activity, settings
+            FROM dealers
+            WHERE ID = :id";
+
+    return $this->parseJsonField(self::getRow($sql, [':id' => $id]), ['contacts', 'settings']);
+  }
+
   use MainCsv;
+  use ContentEditor;
 }
 
 /**
@@ -1217,8 +1303,7 @@ trait MainCsv {
   }
 
   public function openCsv() {
-    global $main;
-    $csvPath = $main->getCmsParam('PATH_CSV') . $this->csvTable;
+    $csvPath = $this->main->getCmsParam('PATH_CSV') . $this->csvTable;
 
     if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
       $result = [];
@@ -1236,8 +1321,7 @@ trait MainCsv {
   }
 
   public function fileForceDownload() {
-    global $main;
-    $file = $main->getCmsParam('PATH_CSV') . $this->csvTable;
+    $file = $this->main->getCmsParam('PATH_CSV') . $this->csvTable;
 
     if (file_exists($file)) {
       // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
@@ -1266,8 +1350,7 @@ trait MainCsv {
    * @return $this
    */
   public function saveCsv($csvData) {
-    global $main;
-    $csvPath = $main->getCmsParam('PATH_CSV');
+    $csvPath = $this->main->getCmsParam('PATH_CSV');
 
     if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];
@@ -1279,8 +1362,87 @@ trait MainCsv {
       }
 
       file_put_contents($csvPath . $this->csvTable, $fileStrings);
-      file_exists(CSV_CACHE) && unlink(CSV_CACHE);
+      $this->main->deleteCsvCache();
     }
     return $this;
+  }
+}
+
+trait ContentEditor {
+  private $CONTENT_PATH = SHARE_PATH . 'content.json';
+  private $contentData = '{}';
+  private $contentLoaded;
+
+  private function contentPath(): string {
+    if ($this->main->url->getRoute() === 'public') {
+      $path = $this->main->publicDealer ? $this->main->url->getPath(true) : ABS_SITE_PATH;
+    } else {
+      $path = $this->main->url->getPath(true);
+    }
+
+    return $path . $this->CONTENT_PATH;
+  }
+
+  private function checkContentFile(): void {
+    $path = $this->contentPath();
+
+    if (!file_exists($path)) {
+      file_put_contents($path, $this->contentData);
+    }
+  }
+
+  /**
+   * @param bool $jsonDecode
+   * @param bool $assoc
+   * @return mixed
+   */
+  public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false) {
+    $this->checkContentFile();
+
+    $data = file_get_contents($this->contentPath());
+
+    return $jsonDecode ? json_decode($data, $assoc) : $data;
+  }
+
+  public function saveContentEditorData($data) {
+    $this->checkContentFile();
+
+    if (!is_string($data)) $data = json_encode($data);
+
+    return file_put_contents($this->contentPath(), $data);
+  }
+
+  public function mergeContentData() {
+    $this->contentLoaded = $this->getContentData(false);
+  }
+
+  /**
+   * @param bool $flatten
+   * @param bool $assoc
+   *
+   * @return array
+   */
+  public function getContentData(bool $flatten = true, bool $assoc = false): array {
+    $data = $this->loadContentEditorData(true, true);
+
+    if (is_array($this->contentLoaded)) {
+      $data = array_merge($data, $this->contentLoaded);
+    }
+
+    if ($flatten) {
+      $data = array_reduce($data, function($r, $section) use ($assoc) {
+        foreach ($section['fields'] as $key => $value) {
+          if ($assoc) $r[$key] = $value['value'];
+          else $r[] = [
+            'id' => $key,
+            'value' => $value['value'],
+          ];
+        }
+
+        return $r;
+      }, []);
+    }
+
+    return $data;
   }
 }

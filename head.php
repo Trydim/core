@@ -1,7 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global
+ * @var Main $main - global
  */
 
 // todo пропускать запросы к файлам. (почему не все файлы?)
@@ -12,9 +12,13 @@ unset($uri, $match);
 
 require __DIR__ . '/cmsSetting.php';
 
-if (isset($_REQUEST['mode'])) require __DIR__ . '/model/main.php';
+if ($main->getCmsParam('mode')) require CORE . '/model/main.php';
 else {
   $html = '';
+  $main->beforeController();
+
+  // dealer branch
+  // require CORE . 'controller/c_' . $main->url->getRoute() . '.php';
 
   $target = getTargetPage($_GET);
   $pathTarget = checkTemplate($target);
@@ -32,6 +36,7 @@ else {
   else $main->initDefaultController($html, $target, $pathTarget);
 
   echo $html;
+  unset($html, $field);
 }
 
-unset($target, $pathTarget, $pathController, $html, $authStatus, $dbContent, $field, $orderId, $main);
+unset($target, $pathTarget, $pathController, $authStatus, $dbContent, $main);

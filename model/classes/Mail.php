@@ -1,5 +1,9 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
+/**
+ * @var Main $main - global
+ */
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 

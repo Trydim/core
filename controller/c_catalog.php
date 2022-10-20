@@ -60,6 +60,6 @@ unset($value, $propSetting, $mess);
 
 $main->setControllerField($field)->fireHook('catalogTemplate', $field);
 ob_start();
-require $pathTarget;
+require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
 $html = template('base', $field);

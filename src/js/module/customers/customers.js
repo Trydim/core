@@ -144,6 +144,7 @@ const customers = {
 
     this.query();
     this.onEvent();
+    return this;
   },
 
   setUsers(data) {
@@ -373,4 +374,4 @@ const customers = {
   },
 }
 
-customers.init();
+window.CustomersInstance = customers.init();

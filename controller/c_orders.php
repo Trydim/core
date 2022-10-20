@@ -1,20 +1,20 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 /**
  * @var Main $main - global
- * @var string $pathTarget
  */
 
-$param = [];
-$field = [
-  'pageTitle' => 'Заказы',
-  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
+$param = [
+  'showFilter' => $main->availablePage('dealers') && $main->getCmsParam('DEALERS_ORDERS_SHOW'),
 ];
-
 $user = [
   'permission' => $main->getSettings('permission'),
   'isAdmin'    => $main->getLogin('admin'),
 ];
-$field['footerContent'] = "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>";
+$field = [
+  'pageTitle' => 'Заказы',
+  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
+  'footerContent' => "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>",
+];
 
 // получить конфиг текущего пользователя
 $setting = $main->getSettings('customization');
@@ -22,6 +22,7 @@ if (!$setting) $setting = new stdClass();
 
 if (!isset($setting->ordersColumnsSort)) {
   $columns = $main->db->loadOrder(0, 1);
+
   if (!empty($columns)) {
     $setting->ordersColumnsSort = array_map(function ($item) {
       return [
@@ -29,9 +30,9 @@ if (!isset($setting->ordersColumnsSort)) {
         'name'   => gTxtDB('orders', $item),
       ];
     }, array_keys($columns[0]));
-
-    $param['ordersColumns'] = $setting->ordersColumnsSort;
   }
+
+  $param['ordersColumns'] = $setting->ordersColumnsSort;
 }
 
 if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsSort)) {
@@ -48,6 +49,10 @@ if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsS
   }
 }
 
+if ($param['showFilter']) {
+  $param['dealers'] = $main->db->selectQuery('dealers', ['id', 'name']);
+}
+
 $main->setControllerField($field)->fireHook('orderTemplate', $field);
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

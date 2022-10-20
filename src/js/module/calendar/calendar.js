@@ -1,7 +1,7 @@
 'use strict';
 
 import '../../../css/module/calendar/calendar.scss';
-import {FullCalendar} from './fullCalendar.js';
+import './fullCalendar.min.js';
 
 /*const importLocale = async (locale) => {
   try {
@@ -18,9 +18,9 @@ const component = {
   filterTemplate: `
     <div class="fc-button-group select">
       <select class="select__item fc-today-button fc-button" id="orderFilter">
-        <option value="all">Все заказы</option>  
-        <option value="create">По созданию</option>  
-        <option value="shipping">По отгрузке</option>    
+        <option value="all">Все заказы</option>
+        <option value="create">По созданию</option>
+        <option value="shipping">По отгрузке</option>
       </select>
     </div>
   `,
@@ -229,7 +229,7 @@ const orders = {
   },
 
   setStatus(data) {
-    console.log(data);
+    //console.log(data);
     this.getStatusClass = function (status) {
       /*switch (arg.event._def.extendedProps.status) {
        case "fulfilled": return 'myClass1';
@@ -296,4 +296,4 @@ const calendar = {
   }
 }
 
-calendar.init();
+window.CalendarInstance = calendar.init();

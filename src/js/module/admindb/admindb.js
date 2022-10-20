@@ -3,6 +3,7 @@
 import {TableValues} from "./TableValues";
 import {FormViews} from "./FormViews";
 import {XMLTable} from "./XMLTable";
+import ContentEditor from './contentEditor/ContentEditor';
 
 /**
  * Erase template from ${}
@@ -22,10 +23,17 @@ const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
 const admindb = {
   init() {
     this.onEvent();
-    this.setDefault();
+    if (this.checkLoadContentEditor()) this.switchAdminType('content');
+    else this.setDefault();
+
+    return this;
   },
   setDefault() {
     setTimeout(() => f.qS('input[data-action]:checked').click(), 0);
+  },
+
+  checkLoadContentEditor() {
+    return new URLSearchParams(location.search).get('tableName').includes('content-js');
   },
 
   commonClick(e) {
@@ -33,17 +41,17 @@ const admindb = {
         action = target.dataset.action;
 
     let select = {
-      'adminType': () => this.switchAdminType(target),
+      'adminType': () => this.switchAdminType(target.value),
     }
 
     select[action] && select[action]();
   },
-  switchAdminType(target) {
-    switch (target.value) {
+  switchAdminType(value) {
+    switch (value) {
       case 'form':
         //f.hide(this.btnRefresh);
         //this.dbAction('loadFormConfig');
-        //new FormViews();
+        //this.adminType = new FormViews();
         break;
       case 'table':
         //f.hide(this.btnRefresh);
@@ -51,13 +59,16 @@ const admindb = {
          f.Get({data: 'mode=load&dbAction=tables'})
          .then(data => this.showTablesName(data));
          } else {*/
-        new TableValues();
+        this.adminType = new TableValues();
         //}
         break;
       case 'config':
-        //f.show(this.btnRefresh);
-        //this.dbAction('loadXmlConfig');
-        //new XMLTable();
+        /*f.show(this.btnRefresh);
+        this.dbAction('loadXmlConfig');
+         this.adminType = new XMLTable();*/
+        break;
+      case 'content':
+        this.adminType = new ContentEditor();
         break;
     }
   },
@@ -67,4 +78,4 @@ const admindb = {
   },
 }
 
-admindb.init();
+window.AdminDbInstance = admindb.init();

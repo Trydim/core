@@ -1,10 +1,22 @@
-<?php global $main;
-if ($main && $main->checkStatus('ok')) { ?>
+<?php
+
+/**
+ * @var Main $main - global
+ */
+
+$siteLink = $main->url->getUri();
+$imgSrc = $main->getCmsParam('imgPath');
+
+if ($main->checkStatus()) { ?>
 <div class="nav-header">
-  <a href="<?= SITE_PATH ?>" class="brand-logo">
+  <a href="<?= $siteLink ?>" class="brand-logo">
     <picture class="logo-abbr">
-      <source srcset="<?= URI_IMG ?>logo.webp" type="image/webp">
-      <img src="<?= URI_IMG ?>logo.svg" alt="logo">
+      <?php if (file_exists($imgSrc . 'logo.webp')) { ?>
+        <source srcset="<?= URI_IMG . 'logo.webp' ?>" type="image/webp">
+      <? } ?>
+      <?php if (file_exists($imgSrc . 'logo.jpg')) { ?>
+        <img src="<?= URI_IMG . 'logo.jpg' ?>" alt="logo">
+      <? } ?>
     </picture>
     <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
   </a>
@@ -43,6 +55,6 @@ if ($main && $main->checkStatus('ok')) { ?>
 </div>
 <?php } else { ?>
 <div class="header">
-  <a href="<?= SITE_PATH?>login"><?= gTxt('Login') ?></a>
+  <a href="<?= $siteLink ?>login"><?= gTxt('Login') ?></a>
 </div>
 <?php } ?>

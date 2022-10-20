@@ -4,7 +4,7 @@
  * @param string $class
  */
 function cmsAutoloader(string $class) {
-  $path = __DIR__ . '/classes/' . $class . '.php';
+  $path = str_replace('\\', DIRECTORY_SEPARATOR, __DIR__ . '/classes/' . $class . '.php');
   if (file_exists($path)) require_once $path;
 }
 
@@ -22,27 +22,39 @@ function addCpNumber($number, $reportVal) {
 
 /**
  * alias for $main->addControllerField('cssLinks')
+ *
  * @param string $cssLink
- * @return mixed - false or Main object
+ * @return Main|bool - false or Main object
  */
 function addCssLink(string $cssLink) {
   global $main;
-  if ($main instanceof Main) return $main->addControllerField('cssLinks', $cssLink);
+
+  if ($main instanceof Main) {
+    $cssLink = str_replace('//', '/', $main->url->getUri() . $cssLink);
+    return $main->addControllerField('cssLinks', $cssLink);
+  }
+
   return false;
 }
 
 /**
  * alias for $main->addControllerField('jsLinks')
+ *
  * @param string $jsLink
  * @param mixed $position [optional] <p>
  * head - in head <p>
  * before - before all script, after cms libs<p>
  * last - before end body <p>
- * @return mixed - false or Main object
+ * @return Main|bool - false or Main object
  */
 function addJsLink(string $jsLink, string $position = 'last') {
   global $main;
-  if ($main instanceof Main) return $main->addControllerField('jsLinks', $jsLink, $position);
+
+  if ($main instanceof Main) {
+    $jsLink = str_replace('//', '/', $main->url->getPath() . $jsLink);
+    return $main->addControllerField('jsLinks', $jsLink, $position);
+  }
+
   return false;
 }
 
@@ -93,27 +105,6 @@ function checkError(array &$result): void {
 }
 
 /**
- * Check exist template file in views directory
- * @param string $tmpFile
- *
- * @return string path to file name
- */
-function checkTemplate(string $tmpFile): string {
-  if ($tmpFile === '' && PUBLIC_PAGE
-      && file_exists(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php')) {
-    return ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
-  } else if (file_exists(ABS_SITE_PATH . 'public/views/' . "$tmpFile.php")) {
-    return ABS_SITE_PATH . 'public/views/' . "$tmpFile.php";
-  } else if (file_exists(VIEW . "$tmpFile.php")) {
-    return VIEW . "$tmpFile.php";
-  } else if (file_exists(VIEW . $tmpFile . "/$tmpFile.php")) {
-    return VIEW . $tmpFile . "/$tmpFile.php";
-  } else {
-    require VIEW . '404.php'; die();
-  }
-}
-
-/**
  * for param by load csv
  * @param $type
  * @param $value
@@ -160,18 +151,27 @@ function de($var, bool $die = true) {
 }
 
 /**
- * @param string $hayStack
- * @param $search
  * @return bool
  */
-function includes(string $hayStack, $search) {
-  if (is_array($search)) {
-    foreach ($search as $w) {
-      if (includes($hayStack, $w)) return true;
+function isSafari() {
+  global $main;
+  return $main->isSafari();
+}
+
+/**
+ * @param string[]|string $hayStack
+ * @param string $search
+ * @return bool
+ */
+function includes($hayStack, string $search): bool {
+  if (is_array($hayStack)) {
+    foreach ($hayStack as $item) {
+      if (includes($item, $search)) return true;
     }
   } else {
-   return stripos($hayStack, $search) !== false;
+    return stripos($hayStack, $search) !== false;
   }
+  return false;
 }
 
 /**
@@ -197,19 +197,6 @@ function getPageAsString($data) {
   $html .= '<script>' . $initJs . '</script></div>';
 
   return $html;
-}
-
-/**
- * @param $get
- * @return array|string|string[]
- */
-function getTargetPage($get) {
-  $target = isset($get['targetPage']) ? str_replace('/', '', $get['targetPage']) : '';
-  if (PUBLIC_PAGE) {
-    if ($target === 'public') return '';
-    if ($target === PUBLIC_PAGE) reDirect();
-  }
-  return $target;
 }
 
 /**
@@ -317,21 +304,38 @@ function findKey($cell, $input) {
  * @return false|string
  */
 function findingFile($path, $fileName) {
-  $path = $path ?? SHARE_PATH;
-  if (!file_exists($path)) return false;
-  if (file_exists($path . '/' . $fileName)) return $path . '/' . $fileName;
+  $sep = DIRECTORY_SEPARATOR;
+  $path = $path ?? ABS_SITE_PATH . SHARE_PATH;
 
-  $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path) {
-    return !($dir === '.' || $dir === '..' || is_file($path . '/' . $dir));
+  if (!is_dir($path)) return false;
+  if (file_exists($path . $sep . $fileName)) return $path . $sep . $fileName;
+
+  $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path, $sep) {
+    return !($dir === '.' || $dir === '..' || is_file($path . $sep . $dir));
   }));
 
   $length = count($arrDir);
   for ($i = 0; $i < $length; $i++) {
-    $result = findingFile($path . '/' . $arrDir[$i], $fileName);
+    $result = findingFile($path . $sep . $arrDir[$i], $fileName);
     if ($result) return $result;
   }
 
   return false;
+}
+
+/**
+ * Determines whether a string can be considered JSON or not.
+ *
+ * @param string $value value to determine json of.
+ *
+ * @return boolean
+ */
+function isJSON(string $value) {
+  return (
+    is_string($value) &&
+    is_array(json_decode($value, true)) &&
+    (json_last_error() == JSON_ERROR_NONE)
+  );
 }
 
 /**
@@ -343,12 +347,12 @@ function findingFile($path, $fileName) {
  *
  * @return mixed array or bool
  */
-function loadCVS($dict, $filename, $one_rang = false) {
+function loadCSV($dict, $filename, $one_rang = false) {
   global $main;
   $filename = file_exists($filename) ? $filename : $main->getCmsParam('PATH_CSV') . $filename;
   $result = [];
 
-  if (!count($dict)) return loadFullCVS($filename);
+  if (!count($dict)) return loadFullCSV($filename);
 
   if (file_exists($filename) && ($handle = fopen($filename, "rt")) !== false) {
     if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
@@ -407,7 +411,7 @@ function loadCVS($dict, $filename, $one_rang = false) {
  * @param $path
  * @return array|bool
  */
-function loadFullCVS($path) {
+function loadFullCSV($path) {
 
   if (file_exists($path) && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
@@ -433,7 +437,6 @@ function loadFullCVS($path) {
  * @param string $lang
  */
 function setUserLocale($lang = 'ru_RU') {
-
   /*switch ($lang) {
     case 'ru_RU':
       putenv('LANG=ru_RU.UTF8');
@@ -447,8 +450,6 @@ function setUserLocale($lang = 'ru_RU') {
       setlocale (LC_ALL,"English", "en", "en_US.UTF8");
   }*/
 
-  //$locale = ABS_SITE_PATH . SITE_PATH . "lang";
-
   putenv('LANG=ru_RU.UTF8');
   putenv('LANGUAGE=ru_RU.UTF8');
   setlocale(LC_ALL, $lang . '.UTF8');
@@ -461,18 +462,6 @@ function setUserLocale($lang = 'ru_RU') {
 }
 
 /**
- * @param string $target
- */
-function reDirect(string $target = '') {
-  if ($target === '') {
-    $target = $_SESSION['target'] ?? '';
-    isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
-  }
-  header('location: ' . SITE_PATH . $target);
-  die;
-}
-
-/**
  * get template from directory view
  * @param string $path whit out
  * @param array  $vars
@@ -480,6 +469,7 @@ function reDirect(string $target = '') {
  * @return string
  */
 function template(string $path = 'base', array $vars = []): string {
+  global $main;
   $path .= '.php';
   extract($vars);
   ob_start();
@@ -516,4 +506,14 @@ function translit($value): string {
   ];
 
   return strtr(mb_strtolower($value), $converter);
+}
+
+/**---------------------------------------------------------------------------------------------------------------------
+ * PHP8 polyfills
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+if (!function_exists('str_starts_with')) {
+  function str_starts_with(string $haystack, string $needle): bool {
+    return strncmp($haystack, $needle, strlen($needle)) === 0;
+  }
 }

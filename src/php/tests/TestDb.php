@@ -1,7 +1,7 @@
 <?php
 
-const ABS_SITE_PATH = __DIR__ . '/../../../';
-const SITE_PATH = '/';
+const CORE = __DIR__ . '/../../../';
+const ABS_SITE_PATH = CORE . '/../';
 const USE_DATABASE = true;
 
 use PHPUnit\Framework\TestCase;
@@ -15,7 +15,7 @@ class Test extends TestCase {
 
   private function connectToDb(): \RedBeanPHP\Db {
     require ABS_SITE_PATH . 'config.php';
-    require __DIR__ . '/../classes/Db.php';
+    require CORE . 'model/classes/Db.php';
     $this->db = new RedBeanPHP\Db($dbConfig ?? []);
     return $this->db;
   }

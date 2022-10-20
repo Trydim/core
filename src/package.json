@@ -16,10 +16,18 @@
     "coreDev": "webpack --config ./webpack/webpack.config.js",
     "coreModuleDev": "webpack --config ./webpack/webpack.module.js",
 
-    "localCypressTest": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=false",
-    "cypressDeployProd": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=true"
+    "createCypress": "node ./test/createCypressConfig.js",
+    "localCypressTest": "cypress open --project ../../ --config-file ./core/src/test/cypress.json"
   },
   "dependencies": {
+    "@tinymce/tinymce-vue": "next",
+    "@tiptap/extension-color": "^2.0.0-beta.12",
+    "@tiptap/extension-highlight": "^2.0.0-beta.35",
+    "@tiptap/extension-link": "^2.0.0-beta.43",
+    "@tiptap/extension-text-align": "^2.0.0-beta.31",
+    "@tiptap/extension-text-style": "^2.0.0-beta.26",
+    "@tiptap/starter-kit": "^2.0.0-beta.190",
+    "@tiptap/vue-3": "^2.0.0-beta.96",
     "mustache": "latest",
     "normalize-scss": "latest",
     "primevue": "^3.10.0",

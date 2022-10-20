@@ -1,10 +1,15 @@
 <?php
 
 /* Папка для временных файлов */
-const RESULT_PATH = 'shared/';
+  const RESULT_PATH = 'shared/';
 !defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
+  const PATH_IMG = ABS_SITE_PATH . 'images/';
+  /**
+   * Папка для временных файлов
+   */
+  const RESULT_PATH = 'shared/';
 
   /**
    * What library use
@@ -19,26 +24,6 @@ class Docs {
    * @var string [P/L]
    */
   private $pdfOrientation;
-
-  /**
-   * Create name for new pdf file (Work only if DESTINATION=save)
-   * if position = 0, then will use not
-   * @var array
-   */
-  private $FILE_NAME = [
-    'name'      => [
-      'position' => 0,
-      'value'    => '',
-    ],
-    'unique'    => [
-      'position'    => 1,
-      'countSymbol' => 5,
-    ],
-    'date'      => [
-      'position' => 3,
-      'format'   => 'dmY', // 'd.m.y' = '31.12.20' / 'Ymd' = '20010310' / 'H:i:s' = '23:59:59'
-    ],
-  ];
 
   /**
    * @var array
@@ -66,15 +51,22 @@ class Docs {
    * @var array
    */
   private $tmpFiles = [];
+  /**
+   * @var Main|null
+   */
+  private $main;
 
   /**
    * Docs constructor.
+   * @param Main $main
    * @param array $param {library: string, orientation: string, docType: string}
    * @param $data
    * @param string $fileTpl
    */
-  public function __construct(array $param, $data, string $fileTpl = 'default') {
-    $this->pdfLibrary = $param['library'] ?? 'mpdf';
+  public function __construct(Main $main, array $param, $data, string $fileTpl = 'default') {
+    $this->main = $main ?? null;
+
+    $this->pdfLibrary = $param['library'] ?? 'dompdf';
     $this->pdfOrientation = $param['orientation'] ?? 'P';
     $this->docsType = $param['docType'] ?? 'pdf';
     $this->data = $data;
@@ -96,13 +88,10 @@ class Docs {
   }
 
   private function getFileName() {
-    $arr = $this->FILE_NAME;
-    $file = '';
-    for ($i = 1; $i < 4; $i++) {
-      if ($arr['name']['position'] === $i) $file .= $arr['name']['value'];
-      if ($arr['unique']['position'] === $i) $file .= substr(uniqid(), 0, $arr['unique']['countSymbol']);
-      if ($arr['date']['position'] === $i) $file .= date($arr['date']['format']);
-    }
+    $file = str_replace($this->main->url->getScheme(), '', $this->main->url->getHost())
+      . '_' . substr(uniqid(), 9, 4)
+      . '_' . date('dmY');
+
     switch ($this->docsType) {
       case 'pdf': $file .= '.pdf'; break;
       case 'excel': $file .= '.xlsx'; break;
@@ -114,9 +103,16 @@ class Docs {
     $this->fileTpl = $fileTpl !== 'default' ?
       $fileTpl : (in_array($this->docsType, ['pdf', 'print']) ? 'pdfTpl' : 'excelTpl');
 
-    $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.php";
-    if (file_exists($path)) $this->filePath = $path;
-    else $this->useDefault = true;
+    $path = "public/views/docs/$this->fileTpl.php";
+    $fullPath = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $path;
+
+    if (file_exists($path)) $this->filePath = $fullPath;
+    else {
+      $fullPath = $this->main->url->getBasePath(true) . $path;
+
+      if (file_exists($path)) $this->filePath = $fullPath;
+      $this->useDefault = true;
+    }
   }
 
   private function setDefaultParam() {
@@ -132,7 +128,7 @@ class Docs {
       'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = $this->docsType === 'print' ? URI_IMG : PATH_IMG;
+    $this->imgPath = $this->main->getCmsParam('uriImg');
   }
 
   private function prepareTemplate() {
@@ -160,6 +156,22 @@ class Docs {
     require_once CORE . 'libs/vendor/autoload.php';
 
     switch ($this->pdfLibrary) {
+      case 'dompdf':
+        try {
+          $this->docs = new Dompdf\Dompdf($this->pdfParam);
+
+          $this->docs->setPaper('A4', $this->pdfParam['orientation'] === 'P' ? 'portrait' : 'landscape');
+
+          //$this->docs->getOptions()->setDebugLayout(true);
+          //$this->docs->getOptions()->setDebugPng(true);
+          $this->docs->getOptions()->setIsRemoteEnabled(true);
+          $this->docs->getOptions()->setIsPhpEnabled(true);
+
+          $this->docs->loadHtml('<style>' . ($this->styleContent ?? '') . '</style>' . $this->content);
+        } catch (\Mpdf\MpdfException $e) {
+          echo $e->getMessage();
+        }
+        break;
       case 'mpdf':
         try {
           $this->docs = new Mpdf\Mpdf($this->pdfParam);
@@ -220,9 +232,17 @@ class Docs {
    * Add separate css to pdf
    */
   private function setCss() {
-    $path = ABS_SITE_PATH . "public/views/docs/$this->fileTpl.css";
-    if (file_exists($path)) {
+    $path = "public/views/docs/$this->fileTpl.css";
+    $fullPath = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $path;
+
+    if (file_exists($fullPath)) {
       $this->styleContent = file_get_contents($path);
+    } else {
+      $fullPath = $this->main->url->getBasePath(true) . $path;
+
+      if (file_exists($fullPath)) {
+        $this->styleContent = file_get_contents($path);
+      }
     }
   }
 
@@ -251,8 +271,24 @@ class Docs {
       ];
     }
 
-
     switch ($this->pdfLibrary) {
+      case 'dompdf':
+        $this->docs->render();
+
+        if ($dest === 'save') {
+          file_put_contents($path . $this->fileName, $this->docs->output());
+          return $path . $this->fileName;
+        } else {
+          if ($this->main->isSafari()) {
+            $this->docs->stream($this->fileName, ["Attachment" => false]);
+            exit();
+          }
+
+          return [
+            'name'    => $this->fileName,
+            'pdfBody' => base64_encode($this->docs->output()),
+          ];
+        }
       case 'mpdf':
       /** Default: \Mpdf\Output\Destination::INLINE
        *        Values:
@@ -366,7 +402,7 @@ class Docs {
    * @return mixed
    */
   public function getDocs(string $dest = 'S') {
-    $path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . SITE_PATH . RESULT_PATH);
+    $path = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $this::RESULT_PATH;
     if (!is_dir($path)) mkdir($path);
 
     $func = 'get' . $this->getFunc();

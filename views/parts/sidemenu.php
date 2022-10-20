@@ -1,14 +1,24 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
-global $main;
+
+/**
+ * @var Main $main - global
+ */
 
 $adminMenu = '';
 $dbTables = $main->getBaseTable();
+$siteLink = $main->url->getUri();
 
-if(is_array($dbTables)) {
+if (is_array($dbTables)) {
 
-  function subSideMenuItem($fileName, $name, $active) {
-    $sitePath = SITE_PATH . "admindb?tableName=" . $fileName;
-    return <<<item
+  class CreateMenu {
+    private $siteLink;
+    public function __construct($siteLink) {
+      $this->siteLink = $siteLink;
+    }
+
+    public function subSideMenuItem($fileName, $name, $active): string {
+      $sitePath = $this->siteLink . "admindb?tableName=" . $fileName;
+      return <<<item
       <li>
         <a class="nav-item pl-5 $active" href="$sitePath">
           <i class="pi pi-file-excel"></i>
@@ -16,38 +26,39 @@ if(is_array($dbTables)) {
         </a>
       </li>
 item;
-  }
+    }
 
-  function subSideMenu($title, $items, $root) {
-    $icon = $root ? 'pi-book' : 'pi-folder';
-    $rootClass = $root ? 'overflow-scroll' : 'overflow-hidden';
-    $idWrap = $root ? 'id="DBTablesWrap"' : '';
-    return <<<menu
+    public function subSideMenu($title, $items, $root): string {
+      $icon = $root ? 'pi-book' : 'pi-folder';
+      $rootClass = $root ? 'overflow-scroll' : 'overflow-hidden';
+      $idWrap = $root ? 'id="DBTablesWrap"' : '';
+      return <<<menu
       <span class="nav-item has-arrow" role="button" aria-expanded="false">
         <i class="pi $icon"></i>
         <span class="nav-text">$title</span>
       </span>
       <ul aria-expanded="false" class="ms-3 $rootClass" $idWrap data-role="link" style="height: 0">$items</ul>
 menu;
-  }
-
-  function createMenu($title, $tables, $link = '', $root = true) {
-    $items = '';
-    foreach ($tables as $key => $item) {
-      if (!is_numeric($key)) {
-        $items .= '<li>' . createMenu($key, $item, $link . '/' . $key, false) . '</li>';
-        continue;
-      }
-
-      global $tableActive;
-      $linkTarget = $item['fileName'] ?? $item['dbTable'] ?? $item['name'];
-      $active = $tableActive === $link . '/' . $linkTarget ? 'active' : '';
-      $items .= subSideMenuItem($link . '/' . $linkTarget, $item['name'], $active);
     }
-    return subSideMenu(gTxt($title), $items, $root);
+
+    public function create($title, $tables, $link = '', $root = true): string {
+      $items = '';
+      foreach ($tables as $key => $item) {
+        if (!is_numeric($key)) {
+          $items .= '<li>' . $this->create($key, $item, $link . '/' . $key, false) . '</li>';
+          continue;
+        }
+
+        global $tableActive;
+        $linkTarget = $item['fileName'] ?? $item['dbTable'] ?? $item['name'];
+        $active = $tableActive === $link . '/' . $linkTarget ? 'active' : '';
+        $items .= $this->subSideMenuItem($link . '/' . $linkTarget, $item['name'], $active);
+      }
+      return $this->subSideMenu(gTxt($title), $items, $root);
+    }
   }
 
-  $adminMenu = createMenu('Администрирование', $dbTables);
+  $adminMenu = (new CreateMenu($siteLink))->create('Администрирование', $dbTables);
 } ?>
 <aside id="sideLeft" class="sidebar"> <!-- data-background-color="white"-->
   <div class="position-sticky top-0">
@@ -55,7 +66,7 @@ menu;
       <li class="nav-label">Main Menu</li>
       <?php if (PUBLIC_PAGE) { ?>
         <li>
-          <a class="nav-item" href="<?= SITE_PATH ?>">
+          <a class="nav-item" href="<?= $siteLink ?>" aria-expanded="false">
             <i class="pi pi-globe"></i>
             <span class="nav-text"><?= gTxt('calculator') ?></span>
           </a>
@@ -68,7 +79,7 @@ menu;
         switch ($item) {
           case 'orders': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>orders">
+              <a class="nav-item" href="<?= $siteLink ?>orders">
                 <i class="pi pi-inbox"></i>
                 <span class="nav-text"><?= gTxt('orders') ?></span>
               </a>
@@ -76,7 +87,7 @@ menu;
           <?php break;
           case 'calendar': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>calendar">
+              <a class="nav-item" href="<?= $siteLink ?>calendar">
                 <i class="pi pi-table"></i>
                 <span class="nav-text"><?= gTxt('calendar') ?></span>
               </a>
@@ -84,7 +95,7 @@ menu;
           <?php break;
           case 'customers': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>customers">
+              <a class="nav-item" href="<?= $siteLink ?>customers">
                 <i class="pi pi-dollar"></i>
                 <span class="nav-text"><?= gTxt('customers') ?></span>
               </a>
@@ -92,7 +103,7 @@ menu;
           <?php break;
           case 'users': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>users">
+              <a class="nav-item" href="<?= $siteLink ?>users">
                 <i class="pi pi-users"></i>
                 <span class="nav-text"><?= gTxt('users') ?></span>
               </a>
@@ -100,16 +111,16 @@ menu;
           <?php break;
           case 'statistic': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>statistic">
+              <a class="nav-item" href="<?= $siteLink ?>statistic">
                 <i class="pi pi-chart-line"></i>
-                <span class="nav-text"><?= gTxt('Calculator') ?></span>
+                <span class="nav-text"><?= gTxt('statistic') ?></span>
               </a>
             </li>
           <?php break;
           case 'admindb': ?>
             <li>
               <?php if ($adminMenu) echo $adminMenu; else { ?>
-                <a class="nav-item" href="<?= SITE_PATH ?>admindb" aria-expanded="false">
+                <a class="nav-item" href="<?= $siteLink ?>admindb">
                   <i class="pi pi-user"></i>
                   <span class="nav-text"><?= gTxt('admindb') ?></span>
                 </a>
@@ -118,7 +129,7 @@ menu;
           <?php break;
           case 'catalog': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>catalog">
+              <a class="nav-item" href="<?= $siteLink ?>catalog">
                 <i class="pi pi-user"></i>
                 <span class="nav-text"><?= gTxt('catalog') ?></span>
               </a>
@@ -126,9 +137,17 @@ menu;
           <?php break;
           case 'fileManager': ?>
             <li>
-              <a class="nav-item" href="<?= SITE_PATH ?>fileManager">
+              <a class="nav-item" href="<?= $siteLink ?>fileManager">
                 <i class="pi pi-folder-open"></i>
                 <span class="nav-text"><?= gTxt('fileManager') ?></span>
+              </a>
+            </li>
+          <?php break;
+          case 'dealers': ?>
+            <li>
+              <a class="nav-item" href="<?= $siteLink ?>dealers" aria-expanded="false">
+                <i class="pi pi-money-bill"></i>
+                <span class="nav-text"><?= gTxt('dealers') ?></span>
               </a>
             </li>
           <?php break;
@@ -140,12 +159,12 @@ menu;
               </a>
             </li>
           <?php break;
+          }
         }
-      }
 
       if (in_array('setting', $main->getSideMenu()) || $main->getLogin('admin')) { ?>
         <li>
-          <a class="nav-item" href="<?= SITE_PATH ?>setting">
+          <a class="nav-item" href="<?= $siteLink ?>setting">
             <i class="pi pi-sliders-h"></i>
             <span class="nav-text"><?= gTxt('setting') ?></span>
           </a>

@@ -40,7 +40,7 @@ if (isset($addCustomer)) {
     $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
   } else if ($orderId) { // Заказчик из сохраненного заказа
     $customerData = $main->db->loadCustomerByOrderId($orderId);
-  } else $customerData = $customer ?? '';
+  } else $customerData = $customer ?? [];
 
   if (count($customerData)) {
     $userData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);
@@ -74,11 +74,16 @@ $docType = $docType ?? $docsAction;
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
 if (in_array($docType, ['excel', 'pdf', 'print'])) {
-  $docs = new Docs([
-    'docType' => $docType,
-    'library' => $main->getCmsParam('PDF_LIBRARY'),
-    'orientation' => $pdfOrientation ?? $main->getCmsParam('PDF_ORIENTATION'),
-  ], $data, $fileTpl ?? 'default');
+  $docs = new Docs(
+    $main,
+    [
+      'docType' => $docType,
+      'library' => $main->getCmsParam('PDF_LIBRARY'),
+      'orientation' => $pdfOrientation ?? 'P',
+    ],
+    $data,
+    $fileTpl ?? 'default'
+  );
 } else $docType = false;
 
 if (isset($docsAction)) {

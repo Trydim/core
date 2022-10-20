@@ -1,6 +1,7 @@
 <?php
 
 class Course {
+  const COURSE_CACHE = ABS_SITE_PATH . SHARE_PATH . 'courseCache.bin';
   const REFRESH_INTERVAL = 36000;
   const LINK_PARAM = '';
   const DEFAULT_CURRENCY = 'RUS'; // Определить валюту по умолчанию по домену
@@ -29,7 +30,8 @@ class Course {
    * @param array  $refreshParam
    * @param string $dataFile
    */
-  public function __construct(array $refreshParam, &$db,  string $dataFile = COURSE_CACHE) {
+  public function __construct(array $refreshParam, &$db,  string $dataFile = '') {
+    $dataFile = empty($dataFile) ? $this::COURSE_CACHE : $dataFile;
     $this->sourceKey = $refreshParam['serverRefresh'] ?: $this::DEFAULT_CURRENCY;
 
     if (is_object($db)) $this->getRateFromDb($db);

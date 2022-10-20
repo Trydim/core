@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @var Main $main - global
+ */
+
 $dbError = isset($_REQUEST['dbError']);
 ?>
 <!DOCTYPE html>
@@ -23,7 +28,7 @@ $dbError = isset($_REQUEST['dbError']);
         <?php if (!$dbError) { ?>
         <div class="form-input-content text-center">
           <div class="mb-5">
-            <a class="btn btn-primary" href="/">Главная</a>
+            <a class="btn btn-primary" href="<?= $main->url->getUri() ?>">Главная</a>
           </div>
           <h1 class="error-text font-weight-bold">404</h1>
           <h4 class="mt-4">

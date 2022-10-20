@@ -1,0 +1,31 @@
+<template>
+  <div ref="content">
+    <slot></slot>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: 'modal',
+  props: {
+    title: String,
+  },
+  emits: ['confirm', 'cancel'],
+  data: () => ({
+    M: new f.Modal(),
+  }),
+  mounted() {
+    const m = this.M;
+
+    m.show(this.title, this.$refs.content);
+
+    m.btnConfirm.addEventListener('click', () => this.$emit('confirm'));
+    m.btnCancel.forEach(n => n.addEventListener('mouseup', () => this.$emit('cancel')));
+  },
+  unmounted() {
+    this.M.destroy();
+  }
+}
+
+</script>

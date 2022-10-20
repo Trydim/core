@@ -1,6 +1,7 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var Main $main - global
  * @var string $fmAction
  */
 
@@ -73,7 +74,7 @@ if (isset($fmAction)) {
             if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) !== 'dir') {
               $filepath = slashes($dir . $file);
 
-              $url = str_replace(slashes(ABS_SITE_PATH), URI, $filepath); // исрпавить
+              $url = str_replace(slashes($main->url->getPath(true)), $main->url->getUri(true), $filepath);
 
               $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 

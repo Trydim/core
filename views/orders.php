@@ -1,17 +1,13 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main - global
+ * @var Main $main - global
  * @var $param - from controller c_orders.php
  */
 
-// $auth = template('parts/authBlock');
-// $field['pageHeader'] = <<<pageHeader
-
-// pageHeader;
 $field['content'] = template('parts/ordersContent', $param);
 
-$field['footerContent'] .= '<a id="publicPageLink" href="' . SITE_PATH . '" hidden></a>';
+$field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>';
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>

@@ -34,5 +34,5 @@ if (!isset($setting)) {
 
 $main->setControllerField($field)->fireHook('customersTemplate', $field);
 $param['columns'] = $columns;
-require $pathTarget;
+require $main->url->getRoutePath();
 $html = template('base', $field);

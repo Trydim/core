@@ -91,6 +91,7 @@ export const methods = {
     });
   },
   loadSimpleOptions(id) {
+    const elSelected = this.elementsSelected;
     this.queryParam.dbAction   = 'openElement';
     this.queryParam.elementsId = id;
     this.elementsModal.loading = true;
@@ -98,6 +99,7 @@ export const methods = {
     return this.query().then(data => {
       this.options = data['options'];
       this.elementsModal.loading = false;
+      this.elementsSelected = elSelected;
     });
   },
 

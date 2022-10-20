@@ -1,15 +1,16 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var Main $main - global
  * @var array $vars extract param
  */
 
-global $main, $target;
+$isAuth = $main->checkStatus();
 
 if (!isset($global)) {
   $pageHeader = $pageHeader ?? template('parts/header');
-  $pageFooter = $pageFooter ?? template('parts/footer');
-  $sideLeft = $sideLeft ?? template('parts/sidemenu');
+  $pageFooter = $pageFooter ?? ($isAuth ? template('parts/footer'): '');
+  $sideLeft = $sideLeft ?? ($isAuth ? template('parts/sidemenu') : '');
   $sideRight = $sideRight ?? '';
 }
 $footerContentBase = $footerContentBase ?? template('parts/footerBase');
@@ -17,11 +18,12 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
   'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
-  'SITE_PATH'     => SITE_PATH,
-  'MAIN_PHP_PATH' => SITE_PATH . 'index.php',
+  'SITE_PATH'     => $main->url->getPath(),
+  'MAIN_PHP_PATH' => $main->url->getPath() . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
-  'AUTH_STATUS'   => $main->checkStatus('ok'),
+  'AUTH_STATUS'   => $isAuth,
+  'IS_DEAL'       => $main->isDealer(),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 
@@ -35,9 +37,11 @@ $jsGlobalConst = json_encode([
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
-  <link rel="icon" href="<?= SITE_PATH ?>favicon.ico">
-  <?php if ($main->checkStatus('ok') || $target === 'login') { ?>
+  <link rel="icon" href="<?= $main->url->getPath() ?>favicon.ico">
+  <?php if ($isAuth || $main->url->getRoute() === 'login') { ?>
     <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
+  <?php } else { ?>
+    <style>.main-wrapper {--theme-sidebar-width: 0;}</style>
   <?php } ?>
 
   <?php array_map(function ($item) { ?>
@@ -51,10 +55,7 @@ $jsGlobalConst = json_encode([
 
 <!-- dark -->
 <!-- horizontal -->
-<body
-    data-theme-version="light"
-    data-layout="vertical"
->
+<body data-theme-version="light" data-layout="vertical">
 
 <div id="preloader">
   <div class="sk-three-bounce">
@@ -83,8 +84,8 @@ $jsGlobalConst = json_encode([
   </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src='<?= CORE_JS ?>src.js?ver=35453966479'></script>
-<script defer type="module" src='<?= CORE_JS ?>main.js?ver=684eab4bb6f'></script>
+<script defer type="module" src="<?= CORE_JS ?>src.js?ver=1353431"></script>
+<script defer type="module" src="<?= CORE_JS ?>main.js?ver=16844b1b6f1"></script>
 
 <?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= $item ?>"></script>

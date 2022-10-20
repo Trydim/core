@@ -38,7 +38,7 @@ XML;
     global $main;
     $csvPath = $main->getCmsParam('PATH_CSV');
     $link !== '' && $link .= '/';
-    $xmlDir = SHARE_PATH . 'xml';
+    $xmlDir = ABS_SITE_PATH . SHARE_PATH . 'xml';
 
     foreach ($cvs as $key => $file) {
       if (!is_numeric($key)) { self::checkXml($file, $link . $key); continue; }
@@ -67,7 +67,7 @@ XML;
   }
 
   static function createXmlDefault($xmlFileName, $fileName) {
-    $csv = loadCVS([], $fileName);
+    $csv = loadCSV([], $fileName);
     if (count($csv)) {
       $xml = new SimpleXMLElement(self::getXMLTemplate());
       $param = [];

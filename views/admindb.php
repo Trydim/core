@@ -1,25 +1,13 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var $main {object} - global
- * @var $tableActive {string} - global
+ * @var Main $main - global
+ * @var string $tableActive - global
  */
 
 $legendHtml = '';
-if ($main->getCmsParam('PATH_LEGEND') && isset($legend[$tableActive])) {
+if (isset($legend[$tableActive])) {
   $legendHtml = "<template id='dataTableLegend'><div>" . $legend[$tableActive] . "</div></template>";
-}
-
-if (!$main->getCmsParam('DB_TABLE_IN_SIDEMENU')) { // Если таблицы не в подменю
-  $field['sideRight'] = <<<sideRight
-<ul id="DBTablesWrap"></ul>
-<div>
-  <h2></h2>
-  <input type="button" value="Показать" id="btnRowsAdd" data-dbaction="showTable">
-  <input type="button" value="Скачать CSV" id="btnLoadCSV" data-dbaction="loadCVS" class="fade">
-  <input type="button" value="Удалить" id="btnRowsDel" data-dbaction="showDelete">
-</div>
-sideRight;
 }
 
 $field['content'] = <<<main
