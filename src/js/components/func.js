@@ -63,6 +63,7 @@ export default {
   gI: id => (window.shadowCalc || document).getElementById(id) || f.log('not found note by id -' + id),
 
   /**
+   * document.querySelector
    * @param {string} selector
    * @param {HTMLElement} node
    * @return {HTMLElement | {}}
