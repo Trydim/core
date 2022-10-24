@@ -24,13 +24,13 @@ type CMSGlobalObject = {
    * @param {string} id String that specifies the ID value.
    * @return {HTMLElement} HtmlElement
    */
-  gI(id: string): HTMLElement
+  gI(id: string): HTMLElement | any
 
   /**
    * @param {string} selector
    * @param {HTMLElement} node
    */
-  qS(selector: string, node?: HTMLElement): HTMLElement
+  qS(selector: string, node?: HTMLElement): HTMLElement | any
 
   /**
    *
@@ -38,7 +38,7 @@ type CMSGlobalObject = {
    * @param nodeKey - param/key
    * @param value - value or function (this, Node list, current selector)
    */
-  qA(selector: string, nodeKey?: string, value?: string | Function): NodeList
+  qA(selector: string, nodeKey?: string, value?: string | Function): NodeList | Iterable<any>
 
   /**
    * получить html шаблона
@@ -62,7 +62,15 @@ type CMSGlobalObject = {
   /**
    * replace ${key from obj} from template to value from obj
    */
-  replaceTemplate(tmpString: string, arrayObjects: object[]): string
+  replaceTemplate(tmpString: string, arrayObjects: object): string
+
+  /**
+   * show Toast
+   */
+  showMsg(message: string,
+          type?: 'tip' | 'info' | 'success' | 'ok' | 'warning' | 'error' | 'alert',
+          options?: boolean | object
+  ): void
 }
 
 interface Window {
