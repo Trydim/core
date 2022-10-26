@@ -71,6 +71,19 @@ type CMSGlobalObject = {
           type?: 'tip' | 'info' | 'success' | 'ok' | 'warning' | 'error' | 'alert',
           options?: boolean | object
   ): void
+
+
+  Get(obj: {
+    url?: string,
+    data?: string,
+    type?: string | 'text' | 'json' | 'blob'
+  }): Promise<Response>
+
+  Post(obj: {
+    url?: string,
+    data: BodyInit,
+    type?: string | 'text' | 'json' | 'blob'
+  }): Promise<Response>
 }
 
 interface Window {
