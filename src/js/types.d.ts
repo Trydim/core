@@ -1,4 +1,19 @@
-type CMSGlobalObject = {
+
+class LoaderIcon {
+  constructor(
+    field: string | HTMLElement | any,
+    showNow?: boolean,
+    param?: {
+      wrap?: boolean | string,
+      loader?: boolean | string
+      loaderS?: boolean | string
+      big?: boolean | string
+    },
+  )
+}
+
+declare type CMSGlobalObject = {
+  LoaderIcon
   /**
    * @param {string} msg
    */
