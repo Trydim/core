@@ -399,7 +399,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
         $imageIds = [];
         foreach ($_REQUEST as $k => $v) {
-          stripos($k, 'files') === 0 && $param['0']['images_id'][] = $v;
+          stripos($k, 'files') === 0 && $imageIds[] = $v;
         }
         $param['0']['images_ids'] = $db->setFiles($result, $imageIds);
 
@@ -413,6 +413,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $single = count($optionsId) === 1;
         $option = json_decode($option ?? '[]', true);
         $fieldChange = json_decode($fieldChange ?? '[]', true);
+        $filesInfo = json_decode($filesInfo ?? '[]', true);
         $name = $option['name'] ?? '';
 
         if ($single) {
@@ -448,10 +449,44 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           }
 
           // Images
-          if ($single) {
+          if ($single && count($filesInfo)) {
             $imageIds = [];
-            foreach ($_REQUEST as $k => $v) {
-              stripos($k, 'files') === 0 && $imageIds[] = $v;
+
+            foreach ($filesInfo as $file) {
+              $id = $file['id'];
+
+              if (isset($_FILES['files' . $id])) {
+                $db->setFiles($result, $imageIds);
+                // оптимизация нового файла
+                if (($file['optimize'] ?? false) === true) {
+                  $fileRequest = $_FILES['files' . $id];
+                  $fileExt = pathinfo($fileRequest['name'], PATHINFO_EXTENSION);
+
+                  $fileRes = createImageFile($fileRequest['tmp_name'], $fileRequest['type']);
+                  // размер
+                  /*if (imagesx($fileRes) > 1000 || imagesy($fileRes) > 1000) {
+                    $fileRes = imageResize($fileRes, 1000, 1000, true);
+                  }*/
+
+                  if ($fileRequest['type'] !== 'image/wepb') { // добавить webp
+                    $uploadDir = $main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
+                    $uploadFile = str_replace('.' . $fileExt, '.webp', $fileRequest['name']);
+                    imagewebp($fileRes, $uploadDir . $uploadFile, 95);
+                  } else if ($fileRequest['type'] === 'image/wepb') { // добавить png
+                    $uploadDir = $main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
+                    $uploadFile = str_replace('.' . $fileExt, '.png', $fileRequest['name']);
+                    imagepng($fileRes, $uploadDir . $uploadFile, 95);
+                  }
+                }
+
+              } else {
+                // оптимизация имеющегося файла.
+                if (($file['optimize'] ?? false) === true) {
+                  //
+                  $fileRes = $main->db->getFiles([$id]);
+                }
+                $imageIds[] = $id;
+              }
             }
             $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
           }

@@ -301,18 +301,19 @@ export const methods = {
 
   addFile(e) {
     Object.values(e.target.files).forEach(file => {
-      let id    = Math.random() * 10000 | 0,
+      let id    = f.random(),
           error = false;
 
-      file.fileError = file.size > 1024*1024;
+      file.fileError = file.size > 1024 * 1024;
       if (file.fileError && !error) error = true;
 
-      this.queryFiles.id && (id += '1');
+      this.queryFiles[id] && (id += '1');
       this.queryFiles[id] = file;
       this.files[id] = {
         name: file.name,
         src: URL.createObjectURL(file),
         error,
+        optimize: true,
       };
     });
     this.clearFiles(e.target);
@@ -324,6 +325,7 @@ export const methods = {
   },
   chooseUploadedFiles() {
     this.optionsModal.chooseFileDisplay = true;
+    //this.filesUpSelected = [];
 
     if (this.loadedFiles) return;
     this.filesLoading = true;

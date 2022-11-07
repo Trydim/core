@@ -509,6 +509,76 @@ function translit($value): string {
   return strtr(mb_strtolower($value), $converter);
 }
 
+/**
+ * @param string $url
+ * @param array $config - 'method', 'json', 'json_assoc'
+ * @param array<string, string> $params - assoc array
+ * @return string
+ */
+function httpRequest(string $url, array $config = [], array $params = []): string {
+  $curlConfig = [
+    CURLOPT_URL => $url,
+    CURLOPT_RETURNTRANSFER => true,
+  ];
+
+  if (strtolower($config['method'] ?? 'get') === 'get') {
+    $curlConfig[CURLOPT_HTTPGET] = true;
+    $curlConfig[CURLOPT_URL] .= '?' . http_build_query($params);
+  } else {
+    $curlConfig[CURLOPT_PORT] = true;
+    $curlConfig[CURLOPT_POSTFIELDS] = http_build_query($params);
+  }
+
+  $myCurl = curl_init();
+  curl_setopt_array($myCurl, $curlConfig);
+  $response = curl_exec($myCurl);
+  curl_close($myCurl);
+
+  if (($config['json'] ?? '') === 'json') {
+    try {
+      return json_decode($response, $config['json_assoc'] ?? true);
+    } catch (Exception $e) {
+      return die('Json error: ' . $e->getMessage());
+    }
+  }
+
+  return $response;
+}
+
+function imageResize($resource, $width, $height, $saveRatio = false) {
+  $rWidth = imagesx($resource);
+  $rHeight = imagesy($resource);
+
+  if ($saveRatio) {
+    if ($width < $height) {
+      $ratio = $width / $rWidth;
+      $height = ceil($rHeight * $ratio);
+    } else {
+      $ratio = $height / $rHeight;
+      $width = ceil($rWidth * $ratio);
+    }
+  }
+
+  $destination = imagecreatetruecolor($width, $height);
+  $backgroundColor = imagecolorallocate($destination, 255, 255, 255);
+  imagefill($destination, 0, 0, $backgroundColor);
+  imagefilledrectangle($destination, 0, 0, $width, $height, $backgroundColor);
+  imagecopyresized($destination, $resource, 0, 0, 0, 0, $width, $height, $rWidth, $rHeight);
+  return $destination;
+}
+
+function createImageFile($file, $ext = null) {
+  switch ($ext ?? pathinfo($file, PATHINFO_EXTENSION)) {
+    default:
+    case 'jpg': case 'jpeg': case 'image/jpeg':
+      return imagecreatefromjpeg($file);
+    case 'png': case 'image/png':
+      return imagecreatefrompng($file);
+    case 'webp': case 'image/webp':
+      return imagecreatefromwebp($file);
+  }
+}
+
 /**---------------------------------------------------------------------------------------------------------------------
  * PHP8 polyfills
  *--------------------------------------------------------------------------------------------------------------------*/

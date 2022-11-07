@@ -592,8 +592,8 @@ class Db extends \R {
     }, $images);
   }
   private function getAlias(string $table): string {
-    $tables = ['codes.', 'money.', 'elements.', 'options_elements.', 'units.'];
-    $alias = ['C.', 'M.', 'E.', 'O.', 'U.'];
+    $tables = ['codes.', 'money.', 'options_elements.', 'elements.', 'units.'];
+    $alias = ['C.', 'M.', 'O.', 'E.', 'U.'];
     $table = str_replace($tables, $alias, $table);
 
     $cols = ['.id', '.type', '.unit', '.lastDate'];

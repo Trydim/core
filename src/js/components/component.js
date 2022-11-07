@@ -9,6 +9,10 @@ export class LoaderIcon {
    * @param {boolean} showNow
    * @param {boolean} targetBlock
    * @param {object} param
+   * @param {boolean|string} param.wrap
+   * @param {boolean|string} param.loader
+   * @param {boolean|string} param.loaderS
+   * @param {boolean|string} param.small
    */
   constructor(field, showNow = true, targetBlock = true, param = {}) {
     this.node = typeof field === 'string' ? f.qS(field) : field;
@@ -16,7 +20,7 @@ export class LoaderIcon {
     //this.block         = targetBlock;
     this.customWrap    = param.wrap || false;
     this.customLoader  = param.loader || false;
-    this.customLoaderS = param['loaderS'] || false;
+    this.customLoaderS = param.loaderS || false;
     this.big           = !param.small || true;
     showNow && this.start();
   }

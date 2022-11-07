@@ -58,6 +58,10 @@ type CMSGlobalObject = {
   toNumber(v: any): number
   parseNumber(v: any): number
 
+  /**
+   * return random number
+   */
+  random(min?: number, max?: number): number,
 
   /**
    * replace ${key from obj} from template to value from obj
@@ -71,6 +75,23 @@ type CMSGlobalObject = {
           type?: 'tip' | 'info' | 'success' | 'ok' | 'warning' | 'error' | 'alert',
           options?: boolean | object
   ): void
+
+  /**
+   * LocalStorage
+   */
+  LocalStorage()
+
+  Get(obj: {
+    url?: string,
+    data?: string,
+    type?: string | 'text' | 'json' | 'blob'
+  }): Promise<Response>
+
+  Post(obj: {
+    url?: string,
+    data: BodyInit,
+    type?: string | 'text' | 'json' | 'blob'
+  }): Promise<Response>
 }
 
 interface Window {

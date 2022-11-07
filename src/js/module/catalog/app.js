@@ -81,16 +81,21 @@ export default {
     },
 
     query(action = '') {
-      let data = new FormData();
+      let data = new FormData(),
+          FDFiles = [];
 
       Object.entries({...this.queryParam})
-            .map(param => data.set(param[0], param[1]));
+            .map(param => data.set(param[0], param[1].toString()));
       //action && data.set('dbAction', action);
 
       Object.entries(this.queryFiles).forEach(([id, file]) => {
+        const fileP = this.files[id];
+
         if (file instanceof File) data.append('files' + id, file, file.name);
-        else data.set('files' + id, file.toString());
+
+        FDFiles.push({id: fileP.id || id, optimize: fileP.optimize});
       });
+      FDFiles.length && data.set('filesInfo', JSON.stringify(FDFiles))
       data.delete('files');
 
       this.queryFiles = Object.create(null);

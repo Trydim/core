@@ -497,13 +497,19 @@
                  class="row my-1 align-items-center text-center"
                  :class="{'error': file.fileError}"
                  :key="id"
-                 :data-id="id"
-            >
+                 :data-id="id">
               <div class="col-2">
                 <p-image :src="file.src" :alt="file.name" preview
                          image-style="max-width: 70px; max-height: 70px">
               </div>
-              <span class="col-8 text-nowrap overflow-hidden">{{ file.name }}</span>
+              <div class="col-6 text-nowrap overflow-hidden">{{ file.name }}</div>
+              <div class="col-2">
+                <i class="pi pi-cog"
+                   :class="{'pi-red': !file.optimize, 'pi-green': file.optimize}"
+                   v-tooltip.bottom="'Оптимизировать: webp+jpeg + размер до 1000px'"
+                   @click="file.optimize = !file.optimize"
+                ></i>
+              </div>
               <div class="col-2">
                 <p-button icon="pi pi-times" @click="removeFile"></p-button>
               </div>
