@@ -385,6 +385,8 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementsId' and name = '$name' ");
         if (count($haveOption)) { $result['error'] = 'option_name_exist'; break; }
 
+        $filesInfo = json_decode($filesInfo ?? '[]', true);
+
         $param['0']['element_id'] = $elementsId;
         $param['0']['name'] = $name;
         $param['0']['money_input_id'] = $moneyInputId ?? 1;
@@ -397,11 +399,30 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $param['0']['sort'] = $sort ?? 100;
         $param['0']['properties'] = $propertiesJson ?? '{}';
 
-        $imageIds = [];
-        foreach ($_REQUEST as $k => $v) {
-          stripos($k, 'files') === 0 && $imageIds[] = $v;
+        // Images
+        if (count($filesInfo)) {
+          $imageIds = [];
+          $result['files'] = [];
+          $fileSystem = new FS($main);
+
+          foreach ($filesInfo as $file) {
+            $fileId = $file['id'];
+
+            $saveResult = $fileSystem->saveFromRequest('files' . $fileId, $file['optimize']);
+
+            if (is_object($saveResult)) {
+              $saveResult = $db->setFiles($saveResult);
+              $imageIds[] = $saveResult['id'];
+              $result['files'][] = $saveResult;
+            }
+            else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
+            else $result['error'] = $saveResult;
+          }
+
+          $param[0]['images_ids'] = implode(',', $imageIds);
+        } else {
+          $param[0]['images_ids'] = '';
         }
-        $param['0']['images_ids'] = $db->setFiles($result, $imageIds);
 
         $result = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param);
       }
@@ -451,44 +472,34 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           // Images
           if ($single && count($filesInfo)) {
             $imageIds = [];
+            $result['files'] = [];
+            $fileSystem = new FS($main);
 
             foreach ($filesInfo as $file) {
-              $id = $file['id'];
+              $fileId = $file['id'];
+              $optimize = $file['optimize'] ?? false;
 
-              if (isset($_FILES['files' . $id])) {
-                $db->setFiles($result, $imageIds);
-                // оптимизация нового файла
-                if (($file['optimize'] ?? false) === true) {
-                  $fileRequest = $_FILES['files' . $id];
-                  $fileExt = pathinfo($fileRequest['name'], PATHINFO_EXTENSION);
+              if (is_numeric($fileId)) {
+                $saveResult = $fileId;
 
-                  $fileRes = createImageFile($fileRequest['tmp_name'], $fileRequest['type']);
-                  // размер
-                  /*if (imagesx($fileRes) > 1000 || imagesy($fileRes) > 1000) {
-                    $fileRes = imageResize($fileRes, 1000, 1000, true);
-                  }*/
-
-                  if ($fileRequest['type'] !== 'image/wepb') { // добавить webp
-                    $uploadDir = $main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
-                    $uploadFile = str_replace('.' . $fileExt, '.webp', $fileRequest['name']);
-                    imagewebp($fileRes, $uploadDir . $uploadFile, 95);
-                  } else if ($fileRequest['type'] === 'image/wepb') { // добавить png
-                    $uploadDir = $main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
-                    $uploadFile = str_replace('.' . $fileExt, '.png', $fileRequest['name']);
-                    imagepng($fileRes, $uploadDir . $uploadFile, 95);
-                  }
+                if ($optimize) {
+                  $file = $main->db->getFiles($fileId);
                 }
-
-              } else {
-                // оптимизация имеющегося файла.
-                if (($file['optimize'] ?? false) === true) {
-                  //
-                  $fileRes = $main->db->getFiles([$id]);
-                }
-                $imageIds[] = $id;
               }
+              else $saveResult = $fileSystem->saveFromRequest($fileId, $optimize);
+
+              if (is_object($saveResult)) {
+                $saveResult = $db->setFiles($saveResult);
+                $imageIds[] = $saveResult['id'];
+                $result['files'][] = $saveResult;
+              }
+              else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
+              else $result['error'] = $saveResult;
             }
-            $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
+
+            $param[$id]['images_ids'] = implode(',', $imageIds);
+          } else {
+            $param[$id]['images_ids'] = '';
           }
         }
 
@@ -616,7 +627,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Files
     case 'uploadFiles':
-      $db->setFiles($result);
+      $result = (new FS($main))->saveAllFromRequest();
       break;
     case 'loadFiles':
       $result['files'] = $db->loadFiles();

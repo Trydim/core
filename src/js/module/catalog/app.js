@@ -80,7 +80,7 @@ export default {
       this.reloadAction = false;
     },
 
-    query(action = '') {
+    query() {
       let data = new FormData(),
           FDFiles = [];
 
@@ -93,7 +93,7 @@ export default {
 
         if (file instanceof File) data.append('files' + id, file, file.name);
 
-        FDFiles.push({id: fileP.id || id, optimize: fileP.optimize});
+        FDFiles.push({id: fileP.id || 'files' + id, optimize: fileP.optimize || false});
       });
       FDFiles.length && data.set('filesInfo', JSON.stringify(FDFiles))
       data.delete('files');

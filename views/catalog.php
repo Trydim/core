@@ -504,11 +504,11 @@
               </div>
               <div class="col-6 text-nowrap overflow-hidden">{{ file.name }}</div>
               <div class="col-2">
-                <i class="pi pi-cog"
-                   :class="{'pi-red': !file.optimize, 'pi-green': file.optimize}"
-                   v-tooltip.bottom="'Оптимизировать: webp+jpeg + размер до 1000px'"
-                   @click="file.optimize = !file.optimize"
-                ></i>
+                <p-toggle-button on-icon="bg-primary" off-icon="bg-light" class="pi pi-cog"
+                                 on-label="" off-label=""
+                                 v-tooltip.bottom="'Оптимизировать: webp+jpeg + размер до 1000px'"
+                                 v-model="file.optimize"
+                ></p-toggle-button>
               </div>
               <div class="col-2">
                 <p-button icon="pi pi-times" @click="removeFile"></p-button>

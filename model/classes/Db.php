@@ -4,7 +4,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 require __DIR__ . '/Rb.php';
 
-class Db extends \R {
+class Db extends R {
 
   const DB_DATA_FORMAT = 'Y-m-d H:i:s';
 
@@ -210,9 +210,9 @@ class Db extends \R {
         foreach ($param as $k => $item) {
           if (isset($item[$col['columnName']])) {
             preg_match('/\w+(?=\()/', $col['type'], $match);
-            if (count($match)) {
-              //$item[$col['columnName']] = $this->convertType($match[0], item);
-            }
+            //if (count($match)) {
+              // $item[$col['columnName']] = $this->convertType($match[0], item);
+            //}
           }
         }
       }
@@ -477,64 +477,33 @@ class Db extends \R {
   }
 
   /**
-   * @param $result
-   * @param array $imageIds
-   * @return string
+   * @param object $file
+   * @return array
    */
-  public function setFiles(&$result, array $imageIds = []): string {
-    $result['files'] = [];
-    $result['result'] = [];
-    $uploadDir = $this->main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
+  public function setFiles(object $file) {
+    $files = ['id' => ''];
 
-    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+    $name = $file->name ?? basename($file->path) ?? null;
 
-    if (isset($_FILES) && count($_FILES)) {
-      foreach ($_FILES as $file) {
-        $dbFile = $file['name'];
-        $uploadFile = $uploadDir . $file['name'];
-
-        if (!$file['size']) continue; // Проверить все
-
-        if (file_exists($uploadFile)) { // Если файл существует
-          $result['fileExist'] = $result['fileExist'] ?? [];
-          $result['fileExist'][] = $file['name'];
-
-          if (filesize($uploadFile) === $file['size']) {
-            $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
-
-            if (count($id) === 1) $inserted['filesId'] = $id[0];
-            else unlink($uploadFile);
-
-          } else {
-            $name = pathinfo($file['name'], PATHINFO_BASENAME) . '_' . rand();
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $file['name'] = $name . $ext;
-
-            $dbFile = $file['name'];
-            //$uploadFile = $uploadDir . $file['name'];
-          }
-        }
-
-        else if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-          $inserted = $this->insert([], 'files', [[
-            'name'   => $file['name'],
-            'path'   => $dbFile,
-            'format' => $file['type'],
-          ]]);
-        } else $result['error'] = 'Moving file error: ' . $file['name'];
-
-        if (isset($inserted['filesId']) && is_numeric($inserted['filesId'])) {
-          $imageIds[] = $inserted['filesId'];
-
-          $result['files'][] = [
-            'id' => $inserted['filesId'],
-            'path' => $this->main->url->getUri() . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR . $dbFile,
-          ];
-        }
-      }
+    if (!empty($name)) {
+      $inserted = $this->insert([], 'files', [[
+        'name'   => $name,
+        'path'   => $file->path,
+        'format' => $file->type || pathinfo($name, PATHINFO_EXTENSION),
+      ]]);
+    } else {
+      return ['error' => 'Error insert file info to Db'];
     }
 
-    return implode(',', $imageIds);
+    if (isset($inserted['filesId']) && is_numeric($inserted['filesId'])) {
+      $files = [
+        'id' => $inserted['filesId'],
+        'name' => $file->name,
+        'src' => $file->uri,
+      ];
+    }
+
+    return $files;
   }
 
   // Elements

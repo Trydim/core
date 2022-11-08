@@ -74,7 +74,6 @@ export const watch = {
   option: {
     deep: true,
     handler() {
-      if (this.optionsSelected.length !== 1) return;
       this.optionsModal.confirmDisabled = !this.option.name;
     },
   },
@@ -211,8 +210,10 @@ export const methods = {
 
     this.option.name = '';
     this.option.unitId = this.units[0].id;
+
     this.option.moneyInputId  = this.money[0].id;
     this.option.moneyOutputId = this.money[0].id;
+
     this.option.sort = 100;
     this.setDefaultProperty();
 
