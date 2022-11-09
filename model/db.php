@@ -328,7 +328,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'openElement':
-      if (isset($elementsId) && is_finite($elementsId)) {
+      $elementsId = json_decode($elementsId ?? '[]');
+      if (count($elementsId) === 1) {
+        $elementsId = $elementsId[0];
         $result['countRowsOptions'] = $db->getCountRows('options_elements', " element_id = $elementsId ");
         $result['options'] = $db->openOptions($elementsId);
       }
@@ -345,7 +347,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         if ($single) {
           $elements = $db->selectQuery('elements', ['ID', 'name'], " name = '$name' ");
           if (count($elements) > 1 || empty($name)
-              || (count($elements) === 1 && $elements[0]['ID'] !== $elementsId[0])) {
+              || (count($elements) === 1 && intval($elements[0]['ID']) !== intval($elementsId[0]))) {
             $result['error'] = 'element_name_error'; break;
           }
         }
@@ -380,24 +382,28 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'copyOption':
     case 'createOption':
-      $param = ['0' => []];
-      if (isset($name) && isset($elementsId) && !empty($name)) {
+      if (isset($elementsId)) {
+        $param = [];
+        $option = json_decode($option ?? '[]', true);
+        $filesInfo = json_decode($filesInfo ?? '[]', true);
+
+        $name = $option['name'];
+        if (empty($name)) { $result['error'] = 'option_name_error'; break; }
+
         $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementsId' and name = '$name' ");
         if (count($haveOption)) { $result['error'] = 'option_name_exist'; break; }
 
-        $filesInfo = json_decode($filesInfo ?? '[]', true);
-
-        $param['0']['element_id'] = $elementsId;
-        $param['0']['name'] = $name;
-        $param['0']['money_input_id'] = $moneyInputId ?? 1;
-        $param['0']['input_price'] = $inputPrice ?? 0;
-        $param['0']['money_output_id'] = $moneyOutputId ?? 1;
-        $param['0']['output_percent'] = $outputPercent ?? 0;
-        $param['0']['output_price'] = $outputPrice ?? 0;
-        $param['0']['unit_id'] = $unitId ?? 1;
-        $param['0']['activity'] = intval(isset($activity) && $activity === "true");
-        $param['0']['sort'] = $sort ?? 100;
-        $param['0']['properties'] = $propertiesJson ?? '{}';
+        $param['element_id'] = $elementsId;
+        $param['name'] = $name;
+        $param['money_input_id'] = $option['moneyInputId'] ?? 1;
+        $param['input_price'] = $option['inputPrice'] ?? 0;
+        $param['money_output_id'] = $option['moneyOutputId'] ?? 1;
+        $param['output_percent'] = $option['percent'] ?? 0;
+        $param['output_price'] = $option['outputPrice'] ?? 0;
+        $param['unit_id'] = $option['unitId'] ?? 1;
+        $param['activity'] = intval(($option['activity'] ?? "true") === "true");
+        $param['sort'] = $option['sort'] ?? 100;
+        $param['properties'] = $option['propertiesJson'] ?? '{}';
 
         // Images
         if (count($filesInfo)) {
@@ -407,8 +413,24 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
           foreach ($filesInfo as $file) {
             $fileId = $file['id'];
+            $optimize = $file['optimize'] ?? false;
 
-            $saveResult = $fileSystem->saveFromRequest('files' . $fileId, $file['optimize']);
+            // Exist in DB
+            if (is_numeric($fileId)) {
+              $saveResult = $fileId;
+
+              if ($optimize) {
+                $file = $main->db->getFiles($fileId);
+
+                if (count($file) === 1) {
+                  $file = $file[0];
+                  $file['name'] = $file['path'];
+                  $fileSystem->prepareFile($file)->optimize();
+                }
+              }
+            } else {
+              $saveResult = $fileSystem->saveFromRequest($fileId, $optimize);
+            }
 
             if (is_object($saveResult)) {
               $saveResult = $db->setFiles($saveResult);
@@ -419,12 +441,12 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
             else $result['error'] = $saveResult;
           }
 
-          $param[0]['images_ids'] = implode(',', $imageIds);
+          $param['images_ids'] = implode(',', $imageIds);
         } else {
-          $param[0]['images_ids'] = '';
+          $param['images_ids'] = '';
         }
 
-        $result = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param);
+        $result = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', [0 => $param]);
       }
       break;
     case 'changeOptions':
@@ -479,14 +501,22 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
               $fileId = $file['id'];
               $optimize = $file['optimize'] ?? false;
 
+              // Exist in DB
               if (is_numeric($fileId)) {
                 $saveResult = $fileId;
 
                 if ($optimize) {
                   $file = $main->db->getFiles($fileId);
+
+                  if (count($file) === 1) {
+                    $file = $file[0];
+                    $file['name'] = $file['path'];
+                    $fileSystem->prepareFile($file)->optimize();
+                  }
                 }
+              } else {
+                $saveResult = $fileSystem->saveFromRequest($fileId, $optimize);
               }
-              else $saveResult = $fileSystem->saveFromRequest($fileId, $optimize);
 
               if (is_object($saveResult)) {
                 $saveResult = $db->setFiles($saveResult);

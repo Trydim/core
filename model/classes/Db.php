@@ -550,7 +550,7 @@ class Db extends R {
     $images = $this->getFiles($imagesIds);
 
     return array_map(function ($item) {
-      $path = findingFile(ABS_SITE_PATH . SHARE_PATH . 'upload', $item['path']);
+      $path = FS::findingFile($item['path']);
       $item['id'] = $item['ID'];
       $item['path'] = $item['src'] = $path
         ? $this->main->url->getUri() . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)

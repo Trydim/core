@@ -493,25 +493,24 @@
             <p-button label="Выбрать" @click="chooseUploadedFiles()" class="p-button-warning"></p-button>
           </div>
           <div class="col">
-            <div v-for="(file, id) of files"
+            <div v-for="[id, file] of filesList"
                  class="row my-1 align-items-center text-center"
                  :class="{'error': file.fileError}"
-                 :key="id"
-                 :data-id="id">
+                 :key="id">
               <div class="col-2">
                 <p-image :src="file.src" :alt="file.name" preview
                          image-style="max-width: 70px; max-height: 70px">
               </div>
               <div class="col-6 text-nowrap overflow-hidden">{{ file.name }}</div>
               <div class="col-2">
-                <p-toggle-button on-icon="bg-primary" off-icon="bg-light" class="pi pi-cog"
+                <p-toggle-button on-icon="pi pi-cog" off-icon="pi pi-cog"
                                  on-label="" off-label=""
-                                 v-tooltip.bottom="'Оптимизировать: webp+jpeg + размер до 1000px'"
+                                 v-tooltip.bottom="'Конвертировать: webp+jpeg + размер до 1000px'"
                                  v-model="file.optimize"
                 ></p-toggle-button>
               </div>
               <div class="col-2">
-                <p-button icon="pi pi-times" @click="removeFile"></p-button>
+                <p-button icon="pi pi-times" @click="removeFile(id)"></p-button>
               </div>
             </div>
           </div>
@@ -546,7 +545,7 @@
 
       <template #footer>
         <p-button label="Подтвердить" icon="pi pi-check" :disabled="optionsModal.confirmDisabled" @click="optionsConfirm()"></p-button>
-        <p-button label="Отмена" icon="pi pi-times" class="p-button-text" @click="optionsCancel()"></p-button>
+        <p-button label="Отмена" icon="pi pi-times" class="p-button-text" @click="optionsClose()"></p-button>
       </template>
     </p-dialog>
 

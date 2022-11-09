@@ -90,16 +90,19 @@ export const methods = {
       this.clearAll();
     });
   },
-  loadSimpleOptions(id) {
+  loadSimpleOptions() {
+    const crAction = this.queryParam.dbAction;
+
     const elSelected = this.elementsSelected;
     this.queryParam.dbAction   = 'openElement';
-    this.queryParam.elementsId = id;
     this.elementsModal.loading = true;
 
     return this.query().then(data => {
       this.options = data['options'];
       this.elementsModal.loading = false;
       this.elementsSelected = elSelected;
+      this.queryParam.dbAction = crAction;
+      this.reloadAction = reload(this);
     });
   },
 
@@ -194,7 +197,7 @@ export const methods = {
     this.setElementModal('Редактировать элемент', single, single);
     this.reloadAction = reload(this);
 
-    if (this.element.simple) this.loadSimpleOptions(el.id);
+    if (this.element.simple) this.loadSimpleOptions();
   },
   changeSimpleElements() {
     this.elementLoaded = this.element.simple;

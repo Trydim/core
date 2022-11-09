@@ -31,17 +31,24 @@ class FS {
     $this->checkUploadDir();
   }
 
+
+  private function setPath() {
+    $this->param->path = $this->param->name;
+    $this->param->uri = $this->fileUrl . $this->param->name;
+  }
   private function setFileParam(array $file) {
     $this->param->originalName = $file['name'];
     $this->param->originalFileName = pathinfo($this->param->originalName, PATHINFO_FILENAME);
     $this->param->name = $file['name'];
     $this->param->ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $this->param->type = $file['type'];
-    $this->param->size = $file['size'];
+    $this->param->type = $file['type'] ?? null;
+    $this->param->size = $file['size'] ?? null;
+    $this->setPath();
   }
   private function setNewName() {
     $name = $this->param->originalFileName . '_' . rand();
     $this->param->name = $name . '.' . $this->param->ext;
+    $this->setPath();
   }
   private function checkUploadDir() {
     try {
@@ -78,26 +85,62 @@ class FS {
     return false;
   }
 
+  private function move($file) {
+    if (!move_uploaded_file($file['tmp_name'], $this->absUploadDir . $this->param->name))
+      throw new Error('Moving file error: ' . $this->param->originalName);
+  }
+
   public function optimize() {
     $name = $this->param->name;
     $ext = $this->param->ext;
-    $fileRes = self::createImageFile($this->absUploadDir . $name, $ext);
+    $filePath = $this->absUploadDir . $name;
+
+    if (!file_exists($filePath)) {
+      $filePath = self::findingFile($name);
+    }
+
+    $fileRes = self::createImageFile($filePath, $ext);
 
     // размер
-    /*if (imagesx($fileRes) > 1000 || imagesy($fileRes) > 1000) {
-      $fileRes = imageResize($fileRes, 1000, 1000, true);
-    }*/
+    if (imagesx($fileRes) > 1000 || imagesy($fileRes) > 1000) {
+      $fileRes = self::imageResize($fileRes, 1000, 1000, true);
+    }
 
     // добавить webp
     if (stripos($ext, 'webp') === false) {
       $name = str_replace('.' . $ext, '.webp', $name);
       imagewebp($fileRes, $this->absUploadDir . $name, 95);
     }
-
-    else if (stripos($ext, 'webp') !== false) { // добавить png
+    // добавить png
+    else if (stripos($ext, 'webp') !== false) {
       $name = str_replace('.' . $ext, '.png', $name);
       imagepng($fileRes, $this->absUploadDir . $name, 95);
     }
+  }
+
+  /**
+   * @param $fileName {string} - only file name without slash
+   * @param $path {string} - path without slash on the end
+   * @return false|string
+   */
+  static function findingFile($fileName, $path = null) {
+    $sep = DIRECTORY_SEPARATOR;
+    $path = $path ?? ABS_SITE_PATH . self::UPLOAD_DIR;
+
+    if (!is_dir($path)) return false;
+    if (file_exists($path . $sep . $fileName)) return $path . $sep . $fileName;
+
+    $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path, $sep) {
+      return !($dir === '.' || $dir === '..' || is_file($path . $sep . $dir));
+    }));
+
+    $length = count($arrDir);
+    for ($i = 0; $i < $length; $i++) {
+      $result = self::findingFile($fileName, $path . $sep . $arrDir[$i]);
+      if ($result) return $result;
+    }
+
+    return false;
   }
 
   static function imageResize($resource, $width, $height, $saveRatio = false) {
@@ -126,15 +169,15 @@ class FS {
     return $destination;
   }
 
-  static function createImageFile($file, $ext = null) {
-    switch ($ext ?? pathinfo($file, PATHINFO_EXTENSION)) {
+  static function createImageFile($filePath, $ext = null) {
+    switch ($ext ?? pathinfo($filePath, PATHINFO_EXTENSION)) {
       default:
       case 'jpg': case 'jpeg': case 'image/jpeg':
-      return imagecreatefromjpeg($file);
+      return imagecreatefromjpeg($filePath);
       case 'png': case 'image/png':
-      return imagecreatefrompng($file);
+      return imagecreatefrompng($filePath);
       case 'webp': case 'image/webp':
-      return imagecreatefromwebp($file);
+      return imagecreatefromwebp($filePath);
     }
   }
 
@@ -149,6 +192,16 @@ class FS {
   }
 
   /**
+   * @param array $file
+   * @return FS
+   */
+  public function prepareFile(array $file): FS {
+    $this->setFileParam($file);
+
+    return $this;
+  }
+
+  /**
    * @param string $key
    * @param ?bool $optimize
    * @return string|integer|object
@@ -160,17 +213,11 @@ class FS {
     $file = $_FILES[$key] ?? null;
     if (!isset($file)) return false;
 
-    $this->setFileParam($file);
-
+    $this->prepareFile($file);
     $result = $this->checkUploadFile();
 
     if ($result === self::HAVE_NAME) $this->setNewName();
-
-    $name = $this->param->name;
-    $this->param->path = $this->absUploadDir . $name;
-    $this->param->uri = $this->fileUrl . $name;
-    if (!move_uploaded_file($file['tmp_name'], $this->param->path))
-      return 'Moving file error: ' . $this->param-originalName;
+    if (!is_numeric($result)) $this->move($file);
 
     // Конвертация и размер
     if ($optimize) $this->optimize();

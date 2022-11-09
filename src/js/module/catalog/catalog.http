@@ -31,12 +31,12 @@ Content-Disposition: form-data; name="fieldChange"
 
 {"unitId":true,"moneyInputId":true,"moneyInput":true,"percent":true,"moneyOutputId":true,"moneyOutput":true,"activity":true,"sort":true,"properties":false}
 --WebAppBoundary
-Content-Disposition: form-data; name="files52121"; filename="original.jpg"
+Content-Disposition: form-data; name="files52121"; filename="659.jpg"
 Content-Type: image/jpeg
 
 < ../../../../../shared/659.jpg
 --WebAppBoundary--
 Content-Disposition: form-data; name="filesInfo"
 
-[{"id":"52121","optimize":true}]
+[{"id":"files52121","optimize":true}]
 --WebAppBoundary--

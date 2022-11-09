@@ -300,31 +300,6 @@ function findKey($cell, $input) {
 }
 
 /**
- * @param $path {string} - path without slash on the end
- * @param $fileName {string} - only file name without slash
- * @return false|string
- */
-function findingFile($path, $fileName) {
-  $sep = DIRECTORY_SEPARATOR;
-  $path = $path ?? ABS_SITE_PATH . SHARE_PATH;
-
-  if (!is_dir($path)) return false;
-  if (file_exists($path . $sep . $fileName)) return $path . $sep . $fileName;
-
-  $arrDir = array_values(array_filter(scandir($path), function ($dir) use ($path, $sep) {
-    return !($dir === '.' || $dir === '..' || is_file($path . $sep . $dir));
-  }));
-
-  $length = count($arrDir);
-  for ($i = 0; $i < $length; $i++) {
-    $result = findingFile($path . $sep . $arrDir[$i], $fileName);
-    if ($result) return $result;
-  }
-
-  return false;
-}
-
-/**
  * Determines whether a string can be considered JSON or not.
  *
  * @param string $value value to determine json of.
