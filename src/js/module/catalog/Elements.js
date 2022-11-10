@@ -217,7 +217,7 @@ export const methods = {
       }
     }, 100);
 
-    this.loadSimpleOptions(id);
+    this.loadSimpleOptions();
   },
   copyElement() {
     if (this.elementsSelected.length !== 1) { f.showMsg('Выберите только один элемент', 'error'); return; }

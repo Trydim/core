@@ -5,10 +5,10 @@
     <div class="row">
       <div id="searchField" class="position-relative form-group col-12 pt-2">
         <span v-if="searchShow" class="p-float-label">
-          <p-input-text v-model="search" :class="'w-100'"></p-input-text>
+          <p-input-text v-model="search" class="w-100"></p-input-text>
           <label>Поиск</label>
         </span>
-        <p-button v-tooltip.left="'Скрыть'" :label="searchShow ? '-' : '+'" :class="'position-absolute p-0'"
+        <p-button v-tooltip.left="'Скрыть'" :label="searchShow ? '-' : '+'" class="position-absolute p-0"
                   style="width: 30px; height: 20px; right: 12px; top: 8px;"
                   @click="searchShow = !searchShow"
         ></p-button>
@@ -19,8 +19,9 @@
       <div class="col-3 overflow-auto position-relative"
            :style="{'max-width': sectionShow ? '25%' : '20px'}"
            :class="{'p-0': !sectionShow}">
-        <p-button v-tooltip.bottom="'Скрыть'" :label="sectionShow ? '<' : '>'" :class="'position-absolute p-0 p-button-white'"
-                  style="width: 20px; right: 0; top: 0; bottom: 0;"
+        <p-button v-tooltip.bottom="'Скрыть'" :label="sectionShow ? '<' : '>'"
+                  class="position-absolute p-0 p-button-white end-0 bottom-0 top-0"
+                  style="width: 20px"
                   @click="sectionShow = !sectionShow"
         ></p-button>
 
@@ -30,7 +31,7 @@
                 :expanded-keys="sectionExpanded"
                 selection-mode="single"
                 v-model:selection-keys="sectionSelected"
-                @dblclick="openSection"
+                @click="openSection"
           ></Tree>
 
           <div class="d-flex mt-2 justify-content-center">
@@ -86,14 +87,13 @@
             </template>
           </p-dialog>
         </template>
-
       </div>
 
       <!-- Elements -->
       <div class="col-9">
         <div class="position-relative" :style="{'max-height': elementShow ? '100%' : '30px'}">
           <div style="height: 20px">
-            <p-button v-tooltip.left="'Скрыть'" :label="elementShow ? '-' : '+'" :class="'position-absolute p-0 p-button-white'"
+            <p-button v-tooltip.left="'Скрыть'" :label="elementShow ? '-' : '+'" class="position-absolute p-0 p-button-white"
                       style="width: 30px; height: 20px; right: 1px; top: 1px;"
                       :style="{'z-index': 100}"
                       @click="elementShow = !elementShow"
@@ -284,7 +284,7 @@
         ></p-multi-select>
         <h3 class="d-inline ms-3">Открыт: {{ elementLoaded }} - {{ elementName }}</h3>
       </template>
-      <p-t-column v-if="checkColumn('id')" field="id" :sortable="true" header="<?= gTxtDB('options', 'id') ?>" :class="'text-center'">
+      <p-t-column v-if="checkColumn('id')" field="id" :sortable="true" header="<?= gTxtDB('options', 'id') ?>" class="text-center">
         <template #body="slotProps">
           <span :data-id="slotProps.data.id">{{ slotProps.data.id }}</span>
         </template>
@@ -299,13 +299,13 @@
       </p-t-column>
       <p-t-column field="name" :sortable="true" header="<?= gTxtDB('options', 'name') ?>"></p-t-column>
       <p-t-column v-if="checkColumn('unitName')" field="unitName" header="<?= gTxtDB('options', 'unitName') ?>"></p-t-column>
-      <p-t-column v-if="checkColumn('activity')" field="activity" :sortable="true" header="<?= gTxtDB('options', 'activity') ?>" :class="'text-center'">
+      <p-t-column v-if="checkColumn('activity')" field="activity" :sortable="true" header="<?= gTxtDB('options', 'activity') ?>" class="text-center">
         <template #body="slotProps">
           <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
           <span v-else class="pi pi-times pi-red"></span>
         </template>
       </p-t-column>
-      <p-t-column v-if="checkColumn('sort')" field="sort" :sortable="true" header="<?= gTxtDB('options', 'sort') ?>" :class="'text-center'"></p-t-column>
+      <p-t-column v-if="checkColumn('sort')" field="sort" :sortable="true" header="<?= gTxtDB('options', 'sort') ?>" class="text-center"></p-t-column>
       <p-t-column v-if="checkColumn('moneyInputName')" field="moneyInputName" :sortable="true" header="<?= gTxtDB('options', 'moneyInputName') ?>"></p-t-column>
       <p-t-column v-if="checkColumn('inputPrice')" field="inputPrice" :sortable="true" header="<?= gTxtDB('options', 'inputPrice') ?>">
         <template #body="slotProps">

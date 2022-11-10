@@ -513,12 +513,12 @@ class Db extends R {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.name) = 1, true, false) AS 'simple'
+                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
             FROM " . $this->pf('elements') . " E
             JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
             JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
             WHERE E.section_parent_id = $sectionID
-            GROUP BY E.name
+            GROUP BY E.ID
             ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
@@ -528,11 +528,13 @@ class Db extends R {
     $pageNumber *= $countPerPage;
     $searchValue = str_replace(' ', '%', $searchValue);
 
-    $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName'
+    $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
+                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
             FROM " . $this->pf('elements') . " E
             JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
+            JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
             WHERE E.name LIKE '%$searchValue%'
+            GROUP BY E.ID
             ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
 
     $res = self::getAll($sql);

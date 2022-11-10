@@ -114,7 +114,7 @@ class FS {
     // добавить png
     else if (stripos($ext, 'webp') !== false) {
       $name = str_replace('.' . $ext, '.png', $name);
-      imagepng($fileRes, $this->absUploadDir . $name, 95);
+      imagepng($fileRes, $this->absUploadDir . $name, 1);
     }
   }
 
