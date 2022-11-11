@@ -122,12 +122,10 @@
               </p-t-column>
               <p-t-column field="simple" :sortable="true" header="<?= gTxtDB('elements', 'simple') ?>">
                 <template #body="slotProps">
-                  <div class="d-flex justify-content-around">
-                    <template v-if="slotProps.data.simple">
-                      <span class="pi pi-check pi-green"></span>
-                      <span class="pi pi-cog pi-blue" v-tooltip.bottom="'Редактировать простой элемент'"
-                            @click="changeQuickSimpleElement(slotProps.data.id)"></span>
-                    </template>
+                  <div class="text-center">
+                    <span v-if="slotProps.data.simple"
+                          class="pi pi-cog pi-blue" v-tooltip.bottom="'Редактировать простой элемент'"
+                          @click="changeQuickSimpleElement(slotProps.data.id)"></span>
                     <span v-else class="pi pi-times pi-red"></span>
                   </div>
                 </template>
@@ -246,11 +244,12 @@
                 </div>
               </div>
               <div v-else>
-                Удалить элемент(ы)
+                Удалить элемент(ы):
+                <span>{{ getElementsSelectedId.join(', ') }}</span>
               </div>
 
               <template #footer>
-                <p-button v-if="element.simple" label="Редактировать" icon="pi pi-credit-card" @click="changeSimpleElements()"></p-button>
+                <p-button v-if="element.simple && queryParam.dbAction !== 'deleteElements'" label="Редактировать" icon="pi pi-credit-card" @click="changeSimpleElements()"></p-button>
                 <p-button label="Подтвердить" icon="pi pi-check" :disabled="elementsModal.confirmDisabled" @click="elementConfirm()"></p-button>
                 <p-button label="Отмена" icon="pi pi-times" class="p-button-text" @click="elementCancel()"></p-button>
               </template>
@@ -330,7 +329,8 @@
                     :loading="optionsLoading" @click="changeOptions"></p-button>
           <p-button v-tooltip.bottom="'Копировать вариант'" icon="pi pi-copy" class="p-button-warning me-2"
                     :loading="optionsLoading" @click="copyOption"></p-button>
-          <p-button v-tooltip.bottom="'Удалить вариант'" icon="pi pi-trash" class="p-button-danger me-2"
+          <p-button v-if="checkRemoveOptions"
+                    v-tooltip.bottom="'Удалить вариант'" icon="pi pi-trash" class="p-button-danger me-2"
                     :loading="optionsLoading" @click="deleteOptions"></p-button>
         </span>
       </div>
@@ -568,6 +568,25 @@
 
       <template #footer>
         <p-button label="Закрыть" @click="closeChooseImage()"></p-button>
+      </template>
+    </p-dialog>
+
+    <p-dialog v-model:visible="optionsModal.displayContinue" :modal="true">
+      <template #header>
+        <h4 class="pi-red">Внимание!</h4>
+      </template>
+
+      <h4>Вы уверены?</h4>
+      <p>
+        Почему вы видите это сообщение? <br>
+        Вы выбрали другие элементы,<br>
+        при этом редактировать будете предыдуший.
+      </p>
+      <h4>Продолжить?</h4>
+
+      <template #footer>
+        <p-button label="Продолжить" @click="optionsContinueConfirm"></p-button>
+        <p-button label="Отмена" @click="optionsContinueCancel"></p-button>
       </template>
     </p-dialog>
   </div>

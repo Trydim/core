@@ -124,6 +124,8 @@ export const methods = {
   },
 
   createSection() {
+    if (!this.getSectionSelectedId()) { f.showMsg('Выберите раздел', 'error'); return; }
+
     const id = this.getSectionSelectedId();
     this.queryParam.dbAction = 'createSection';
 
@@ -139,7 +141,7 @@ export const methods = {
     this.reloadAction = reload(this);
   },
   changeSection() {
-    if (!this.getSectionSelectedId()) { return; }
+    if (!this.getSectionSelectedId()) { f.showMsg('Выберите раздел', 'error'); return; }
 
     const id = this.getSectionSelectedId(),
           section = Object.values(this.sections).find(s => s.key === id);
@@ -153,6 +155,7 @@ export const methods = {
     this.section.activity = !!section.activity;
 
     this.sectionModal.title = 'Редактировать раздел';
+    this.sectionModal.codeChange = true;
     this.sectionModal.display = true;
 
     this.reloadAction = reload(this);

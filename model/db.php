@@ -382,7 +382,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'copyOption':
     case 'createOption':
-      if (isset($elementsId)) {
+      $elementsId = json_decode($elementsId ?? '[]');
+      if (count($elementsId) === 1) {
+        $elementId = $elementsId[0];
         $param = [];
         $option = json_decode($option ?? '[]', true);
         $filesInfo = json_decode($filesInfo ?? '[]', true);
@@ -390,10 +392,10 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         $name = $option['name'];
         if (empty($name)) { $result['error'] = 'option_name_error'; break; }
 
-        $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementsId' and name = '$name' ");
+        $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementId' and name = '$name' ");
         if (count($haveOption)) { $result['error'] = 'option_name_exist'; break; }
 
-        $param['element_id'] = $elementsId;
+        $param['element_id'] = $elementId;
         $param['name'] = $name;
         $param['money_input_id'] = $option['moneyInputId'] ?? 1;
         $param['input_price'] = $option['inputPrice'] ?? 0;

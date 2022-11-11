@@ -1,6 +1,5 @@
 'use strict';
 
-
 export const data = {
   optionsModal: {
     display: false,
@@ -8,6 +7,7 @@ export const data = {
     confirmDisabled: true,
     title: '',
     single: true,
+    displayContinue: false,
   },
 
   options: [],
@@ -96,6 +96,10 @@ export const watch = {
 }
 
 export const computed = {
+  optionsCount() {
+    return this.options.length;
+  },
+
   optionsColumnsValues() {
     return this.optionsColumnsSelected.map(v => v.value);
   },
@@ -104,19 +108,31 @@ export const computed = {
     return this.optionsSelected.map(i => i.id);
   },
 
+  /**
+   * true if can remove options
+   */
+  checkRemoveOptions() {
+    return this.optionsCount > 1 && this.optionsCount > Object.keys(this.optionsSelected).length;
+  },
+
   filesList() {
     return [...this.files.entries()];
   },
 }
 
 const getPercent = p => 1 + (p / 100);
-const reload = that => ({
+const reload = (that, checkSimple = false) => ({
   dbAction : 'openElement',
   callback: (fData, aData) => {
     that.options         = aData['options']
     that.optionsLoading  = false;
     that.optionsSelected = [];
     that.files           = new Map();
+
+    if (checkSimple) {
+      const el = that.elements.find(el => +el.id === +that.elementLoaded);
+      el.simple = that.options.length === 1;
+    }
   }
 });
 
@@ -141,6 +157,14 @@ export const methods = {
 
   checkColumn(v) {
     return this.optionsColumnsValues.includes(v);
+  },
+  checkSelectedAndLoadedElements() {
+    // Если false, значит все хорошо.
+    switch (this.getElementsSelectedId.length) {
+      case 0: return false;
+      case 1: return +this.getElementsSelectedId[0] !== this.elementLoaded;
+      default: return true;
+    }
   },
 
   getAvgPrice(type) {
@@ -190,7 +214,10 @@ export const methods = {
   },
   setOptionProperty(el) {
     this.setDefaultProperty();
-    Object.entries(el.properties).map(([key, value]) => this.option.properties[key] = value);
+    Object.entries(el.properties).map(([key, value]) => {
+      if (this.properties[key].type === 'number') value = f.toNumber(value);
+      this.option.properties[key] = value;
+    });
   },
 
   // Events function
@@ -223,10 +250,13 @@ export const methods = {
     this.setDefaultProperty();
 
     this.setOptionModal('Создать', true, true);
-    this.reloadAction = reload(this);
+    this.reloadAction = reload(this, true);
   },
   changeOptions() {
-    if (!this.optionsSelected.length) return;
+    if (this.optionsCount === 1) this.optionsSelected = [this.options[0]];
+    if (!this.optionsSelected.length) { f.showMsg('Ничего не выбрано'); return; }
+    if (this.checkSelectedAndLoadedElements()) setTimeout(() => this.optionsModal.displayContinue = true, 100);
+
     const el = this.optionsSelected[0],
           single = this.optionsSelected.length === 1;
 
@@ -256,7 +286,9 @@ export const methods = {
     this.reloadAction = reload(this);
   },
   copyOption() {
-    if (this.optionsSelected.length !== 1) return;
+    if (this.optionsCount === 1) this.optionsSelected = [this.options[0]];
+    if (this.optionsSelected.length !== 1) { f.showMsg('Выберите только 1 вариант', 'error'); return; }
+
     const el = this.optionsSelected[0];
 
     this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
@@ -273,16 +305,16 @@ export const methods = {
     this.setOptionProperty(el);
 
     this.setOptionModal('Редактировать', false, true);
-    this.reloadAction = reload(this);
+    this.reloadAction = reload(this, true);
   },
   deleteOptions() {
-    if (!this.optionsSelected.length) return;
+    if (!this.optionsSelected.length) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
     this.queryParam.optionsId = JSON.stringify(this.getOptionSelectedId);
     this.queryParam.dbAction   = 'deleteOptions';
 
     this.setOptionModal('Удалить', false, false);
-    this.reloadAction = reload(this);
+    this.reloadAction = reload(this, true);
   },
 
   dblClickOptions(e) {
@@ -371,5 +403,13 @@ export const methods = {
     this.queryFiles = Object.create(null);
     this.files = new Map();
     this.optionsModal.display = false;
+  },
+
+  optionsContinueConfirm() {
+    this.optionsModal.displayContinue = false;
+  },
+  optionsContinueCancel() {
+    this.optionsModal.displayContinue = false;
+    setTimeout(() => this.optionsModal.display = false, 100);
   },
 }

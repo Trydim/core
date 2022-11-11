@@ -61,7 +61,7 @@ export const computed = {
 
   getElementsSelectedId() {
     return this.elementsSelected.map(i => i.id);
-  }
+  },
 }
 
 const prepareData = data => data.map(el => {
@@ -93,21 +93,22 @@ export const methods = {
   loadSimpleOptions() {
     const crAction = this.queryParam.dbAction;
 
-    const elSelected = this.elementsSelected;
     this.queryParam.dbAction   = 'openElement';
     this.elementsModal.loading = true;
 
     return this.query().then(data => {
       this.options = data['options'];
       this.elementsModal.loading = false;
-      this.elementsSelected = elSelected;
       this.queryParam.dbAction = crAction;
       this.reloadAction = reload(this);
     });
   },
 
   checkLoadedElement() {
-    //if (this.elementsSelected.includes(this.elementLoaded)) this.options = [];
+    if (this.getElementsSelectedId.includes(this.elementLoaded.toString())) {
+      this.options         = [];
+      this.optionsSelected = [];
+    }
   },
 
   enableField() {
@@ -205,7 +206,8 @@ export const methods = {
     this.changeOptions();
   },
   changeQuickSimpleElement(id) {
-    this.elementsSelected = [];
+    this.queryParam.elementsId = JSON.stringify([id]);
+    this.elementsSelected = [this.elements.find(el => el.id === id)];
     this.options = [];
 
     const interval = setInterval(() => {
@@ -247,9 +249,10 @@ export const methods = {
         this.checkLoadedElement();
 
         this.elements         = prepareData(aData['elements']);
+        this.elementLoaded    = 0;
         this.elementsLoading  = false;
         this.elementsSelected = [];
-      }
+      },
     };
   },
 
