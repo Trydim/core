@@ -2,7 +2,6 @@
 
 /**
  * @var Main $main - global
- * @var $admin - from controller
  */
 
 $isAdmin = $main->getLogin('admin');
@@ -43,7 +42,6 @@ ob_start();
   <?php if ($main->availablePage('catalog')) { ?>
     <hr>
     <setting-properties :query="query" :query-param="queryParam" @update="updateProperties"></setting-properties>
+    <input type="hidden" value="catalogPage">
   <?php } ?>
 </div>
-<?php
-$field['content'] = ob_get_clean();

@@ -6,6 +6,13 @@ class FS {
 
   const HAVE_NAME = 'exist';
 
+  const MAX_SIZE_WIDTH = 1000;
+  const MAX_SIZE_HEIGHT = 1000;
+  const CREATE_PREV = false;
+  const PREV_MAX_SIZE_WIDTH = 300;
+  const PREV_MAX_SIZE_HEIGHT = 300;
+  const PREV_POSTFIX = '_sm';
+
   /**
    * @var Main
    */
@@ -19,6 +26,10 @@ class FS {
    */
   private $fileUrl;
   /**
+   * @var array
+   */
+  private $config;
+  /**
    * @var object
    */
   private $param;
@@ -28,6 +39,7 @@ class FS {
     $this->absUploadDir = $main->url->getPath(true) . $this::UPLOAD_DIR . DIRECTORY_SEPARATOR;
     $this->fileUrl = $main->url->getUri() . $this::UPLOAD_DIR . '/';
     $this->param = new class {};
+    $this->config = $this->main->getSettings('catalogImageSize');
     $this->checkUploadDir();
   }
 
@@ -91,30 +103,51 @@ class FS {
   }
 
   public function optimize() {
-    $name = $this->param->name;
+    $baseName = $this->param->name;
     $ext = $this->param->ext;
-    $filePath = $this->absUploadDir . $name;
+    $filePath = $this->absUploadDir . $baseName;
 
     if (!file_exists($filePath)) {
-      $filePath = self::findingFile($name);
+      $filePath = self::findingFile($baseName);
     }
 
-    $fileRes = self::createImageFile($filePath, $ext);
+    $fileResUpload = $fileRes = self::createImageFile($filePath, $ext);
 
     // размер
-    if (imagesx($fileRes) > 1000 || imagesy($fileRes) > 1000) {
-      $fileRes = self::imageResize($fileRes, 1000, 1000, true);
+    $maxWidth = $this->config['maxWidth'] ?? self::MAX_SIZE_WIDTH;
+    $maxHeight = $this->config['maxHeight'] ?? self::MAX_SIZE_HEIGHT;
+    if (imagesx($fileResUpload) > $maxWidth || imagesy($fileResUpload) > $maxHeight) {
+      $fileRes = self::imageResize($fileResUpload, $maxWidth, $maxHeight, true);
     }
 
     // добавить webp
     if (stripos($ext, 'webp') === false) {
-      $name = str_replace('.' . $ext, '.webp', $name);
+      $name = str_replace('.' . $ext, '.webp', $baseName);
       imagewebp($fileRes, $this->absUploadDir . $name, 95);
     }
     // добавить png
     else if (stripos($ext, 'webp') !== false) {
-      $name = str_replace('.' . $ext, '.png', $name);
+      $name = str_replace('.' . $ext, '.png', $baseName);
       imagepng($fileRes, $this->absUploadDir . $name, 1);
+    }
+
+    // Добавить миниатюры
+    if ($this->config['createPrev'] ?? self::CREATE_PREV) {
+      $fileResPrev = $fileResUpload;
+
+      // размер
+      $maxWidth = $this->config['prevMaxWidth'] ?? self::PREV_MAX_SIZE_WIDTH;
+      $maxHeight = $this->config['prevMaxHeight'] ?? self::PREV_MAX_SIZE_HEIGHT;
+      if (imagesx($fileResUpload) > $maxWidth || imagesy($fileResUpload) > $maxHeight) {
+        $fileResPrev = self::imageResize($fileResUpload, $maxWidth, $maxHeight, true);
+      }
+
+      // добавить webp
+      $name = str_replace('.' . $ext,  self::PREV_POSTFIX . '.webp', $baseName);
+      imagewebp($fileResPrev, $this->absUploadDir . $name, 95);
+      // добавить png
+      $name = str_replace('.' . $ext, self::PREV_POSTFIX . '.png', $baseName);
+      imagepng($fileResPrev, $this->absUploadDir . $name, 1);
     }
   }
 

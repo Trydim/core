@@ -516,8 +516,6 @@ export default {
      //return [h, s, l];
      }
 
-
-     debugger
      const color = window.getComputedStyle(node).backgroundColor,
      rgb = /(\d+),? (\d+),? (\d+)/.exec(color)[0].split(','),
      bool = rgb2hsl(rgb);*/

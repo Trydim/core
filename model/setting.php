@@ -186,7 +186,8 @@ switch ($cmsAction) {
     // Global other setting
     $main->setSettings('statusDefault', $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
     $other = json_decode($otherFields ?? '[]', true);
-    $main->setSettings('phoneMaskGlobal', $other['phoneMask']['global'] ?? $main->getSettings('phoneMaskGlobal') ?? '+_ (___) ___ __ __');
+    $main->setSettings('phoneMaskGlobal', $other['phoneMask']['global'] ?? $main->getSettings('phoneMaskGlobal') ?? '+_ (___) ___ __ __')
+         ->setSettings('catalogImageSize', $other['catalogImageSize'] ?? []);
 
     $main->saveSettings();
     break;

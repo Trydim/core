@@ -269,7 +269,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'openSection':
-      if (isset($sectionId) && is_finite($sectionId)) {
+      if (isset($sectionId) && is_numeric($sectionId)) {
         $result['countRowsElements'] = $db->getCountRows('elements', " section_parent_id = $sectionId");
         $result['elements'] = $db->loadElements($sectionId, $pageNumber, 10000);
       }

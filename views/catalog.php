@@ -142,7 +142,7 @@
               <p-t-column field="lastEditDate" :sortable="true" header="<?= gTxtDB('elements', 'lastEditDate') ?>"></p-t-column>
             </p-table>
 
-            <div class="mt-1 d-flex justify-content-between">
+            <div v-if="getSectionSelectedId()" class="mt-1 d-flex justify-content-between">
               <span>
                 <p-button v-if="sectionSelected" v-tooltip.bottom="'Создать элемент'" icon="pi pi-plus-circle" class="p-button-success me-2"
                           :loading="elementsLoading" @click="createElement"></p-button>

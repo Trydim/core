@@ -237,7 +237,7 @@ export const methods = {
     this.reloadAction = reload(this);
   },
   deleteElements() {
-    if (!this.elementsSelected.length) return;
+    if (!this.elementsSelected.length) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
     this.queryParam.elementsId = JSON.stringify(this.getElementsSelectedId);
     this.queryParam.dbAction   = 'deleteElements';
