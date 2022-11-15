@@ -139,14 +139,14 @@ class UrlGenerator {
   private function setSitePath(): string {
     return $this->getBasePath() . substr($this->getRequestUri(), 1);
   }
-  /**
+  /*
    * Returns the prefix as encoded in the string when the string starts with
    * the given prefix, null otherwise.
    * @param string $string
    * @param string $prefix
    * @return string|null
    */
-  private function getUrlencodedPrefix(string $string, string $prefix): ?string {
+  /*private function getUrlencodedPrefix(string $string, string $prefix): ?string {
     if (!str_starts_with(rawurldecode($string), $prefix)) {
       return null;
     }
@@ -158,7 +158,7 @@ class UrlGenerator {
     }
 
     return null;
-  }
+  }*/
   private function setBaseUri(): string {
     return $this->getHost() . $this->getBasePath();
   }
@@ -200,7 +200,7 @@ class UrlGenerator {
       $this->server->remove('ORIG_PATH_INFO');
     }
 
-    $requestUri = str_replace('index.php', '', $requestUri);
+    $requestUri = str_replace(basename($this->server->get('SCRIPT_FILENAME', '')), '', $requestUri);
 
     if (false !== $pos = strpos($requestUri, '?')) {
       $requestUri = substr($requestUri, 0, $pos);
@@ -270,7 +270,7 @@ class UrlGenerator {
     $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
     if ($isDealer) {
-      preg_match('/' . DEALERS_PATH . '\/(\d+)\//', $requestUri, $match); // получить ID дилера
+      preg_match('/' . DEALERS_PATH . '/(\d+)//', $requestUri, $match); // получить ID дилера
 
       if (!isset($match[1])) die('Dealer id not found!');
       if (!is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;

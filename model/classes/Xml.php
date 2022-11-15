@@ -1,7 +1,5 @@
 <?php
 
-namespace Xml;
-
 class Array2XML {
   /**
    * Check if the tag name or attribute name contains illegal characters

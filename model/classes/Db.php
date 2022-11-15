@@ -4,7 +4,7 @@ use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 require __DIR__ . '/Rb.php';
 
-class Db extends \R {
+class Db extends R {
 
   const DB_DATA_FORMAT = 'Y-m-d H:i:s';
 
@@ -210,9 +210,9 @@ class Db extends \R {
         foreach ($param as $k => $item) {
           if (isset($item[$col['columnName']])) {
             preg_match('/\w+(?=\()/', $col['type'], $match);
-            if (count($match)) {
-              //$item[$col['columnName']] = $this->convertType($match[0], item);
-            }
+            //if (count($match)) {
+              // $item[$col['columnName']] = $this->convertType($match[0], item);
+            //}
           }
         }
       }
@@ -477,64 +477,33 @@ class Db extends \R {
   }
 
   /**
-   * @param $result
-   * @param array $imageIds
-   * @return string
+   * @param object $file
+   * @return array
    */
-  public function setFiles(&$result, array $imageIds = []): string {
-    $result['files'] = [];
-    $result['result'] = [];
-    $uploadDir = $this->main->url->getPath(true) . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR;
+  public function setFiles(object $file) {
+    $files = ['id' => ''];
 
-    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+    $name = $file->name ?? basename($file->path) ?? null;
 
-    if (isset($_FILES) && count($_FILES)) {
-      foreach ($_FILES as $file) {
-        $dbFile = $file['name'];
-        $uploadFile = $uploadDir . $file['name'];
-
-        if (!$file['size']) continue; // Проверить все
-
-        if (file_exists($uploadFile)) { // Если файл существует
-          $result['fileExist'] = $result['fileExist'] ?? [];
-          $result['fileExist'][] = $file['name'];
-
-          if (filesize($uploadFile) === $file['size']) {
-            $id = $this->selectQuery('files', 'ID', " path = '$dbFile' ");
-
-            if (count($id) === 1) $inserted['filesId'] = $id[0];
-            else unlink($uploadFile);
-
-          } else {
-            $name = pathinfo($file['name'], PATHINFO_BASENAME) . '_' . rand();
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $file['name'] = $name . $ext;
-
-            $dbFile = $file['name'];
-            //$uploadFile = $uploadDir . $file['name'];
-          }
-        }
-
-        else if (move_uploaded_file($file['tmp_name'], $uploadFile)) {
-          $inserted = $this->insert([], 'files', [[
-            'name'   => $file['name'],
-            'path'   => $dbFile,
-            'format' => $file['type'],
-          ]]);
-        } else $result['error'] = 'Moving file error: ' . $file['name'];
-
-        if (isset($inserted['filesId']) && is_numeric($inserted['filesId'])) {
-          $imageIds[] = $inserted['filesId'];
-
-          $result['files'][] = [
-            'id' => $inserted['filesId'],
-            'path' => $this->main->url->getUri() . SHARE_PATH . 'upload' . DIRECTORY_SEPARATOR . $dbFile,
-          ];
-        }
-      }
+    if (!empty($name)) {
+      $inserted = $this->insert([], 'files', [[
+        'name'   => $name,
+        'path'   => $file->path,
+        'format' => $file->type || pathinfo($name, PATHINFO_EXTENSION),
+      ]]);
+    } else {
+      return ['error' => 'Error insert file info to Db'];
     }
 
-    return implode(',', $imageIds);
+    if (isset($inserted['filesId']) && is_numeric($inserted['filesId'])) {
+      $files = [
+        'id' => $inserted['filesId'],
+        'name' => $file->name,
+        'src' => $file->uri,
+      ];
+    }
+
+    return $files;
   }
 
   // Elements
@@ -544,12 +513,12 @@ class Db extends \R {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.name) = 1, true, false) AS 'simple'
+                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
             FROM " . $this->pf('elements') . " E
             JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
             JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
             WHERE E.section_parent_id = $sectionID
-            GROUP BY E.name
+            GROUP BY E.ID
             ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
 
     return self::getAll($sql);
@@ -559,11 +528,13 @@ class Db extends \R {
     $pageNumber *= $countPerPage;
     $searchValue = str_replace(' ', '%', $searchValue);
 
-    $sql = "SELECT ID AS 'id', E.name AS 'name', activity, sort, last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName'
+    $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
+                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
             FROM " . $this->pf('elements') . " E
             JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
+            JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
             WHERE E.name LIKE '%$searchValue%'
+            GROUP BY E.ID
             ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
 
     $res = self::getAll($sql);
@@ -581,7 +552,7 @@ class Db extends \R {
     $images = $this->getFiles($imagesIds);
 
     return array_map(function ($item) {
-      $path = findingFile(ABS_SITE_PATH . SHARE_PATH . 'upload', $item['path']);
+      $path = FS::findingFile($item['path']);
       $item['id'] = $item['ID'];
       $item['path'] = $item['src'] = $path
         ? $this->main->url->getUri() . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)
@@ -592,8 +563,8 @@ class Db extends \R {
     }, $images);
   }
   private function getAlias(string $table): string {
-    $tables = ['codes.', 'money.', 'elements.', 'options_elements.', 'units.'];
-    $alias = ['C.', 'M.', 'E.', 'O.', 'U.'];
+    $tables = ['codes.', 'money.', 'options_elements.', 'elements.', 'units.'];
+    $alias = ['C.', 'M.', 'O.', 'E.', 'U.'];
     $table = str_replace($tables, $alias, $table);
 
     $cols = ['.id', '.type', '.unit', '.lastDate'];

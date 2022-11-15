@@ -51,5 +51,7 @@ if (USE_DATABASE && $user['isAdmin']) {
 }
 
 $main->setControllerField($field)->fireHook('settingTemplate', $field);
+ob_start();
 require $main->url->getRoutePath();
+$field['content'] = ob_get_clean();
 $html = template('base', $field);

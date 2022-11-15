@@ -5,10 +5,10 @@
     <div class="row">
       <div id="searchField" class="position-relative form-group col-12 pt-2">
         <span v-if="searchShow" class="p-float-label">
-          <p-input-text v-model="search" :class="'w-100'"></p-input-text>
+          <p-input-text v-model="search" class="w-100"></p-input-text>
           <label>Поиск</label>
         </span>
-        <p-button v-tooltip.left="'Скрыть'" :label="searchShow ? '-' : '+'" :class="'position-absolute p-0'"
+        <p-button v-tooltip.left="'Скрыть'" :label="searchShow ? '-' : '+'" class="position-absolute p-0"
                   style="width: 30px; height: 20px; right: 12px; top: 8px;"
                   @click="searchShow = !searchShow"
         ></p-button>
@@ -19,8 +19,9 @@
       <div class="col-3 overflow-auto position-relative"
            :style="{'max-width': sectionShow ? '25%' : '20px'}"
            :class="{'p-0': !sectionShow}">
-        <p-button v-tooltip.bottom="'Скрыть'" :label="sectionShow ? '<' : '>'" :class="'position-absolute p-0 p-button-white'"
-                  style="width: 20px; right: 0; top: 0; bottom: 0;"
+        <p-button v-tooltip.bottom="'Скрыть'" :label="sectionShow ? '<' : '>'"
+                  class="position-absolute p-0 p-button-white end-0 bottom-0 top-0"
+                  style="width: 20px"
                   @click="sectionShow = !sectionShow"
         ></p-button>
 
@@ -30,7 +31,7 @@
                 :expanded-keys="sectionExpanded"
                 selection-mode="single"
                 v-model:selection-keys="sectionSelected"
-                @dblclick="openSection"
+                @click="openSection"
           ></Tree>
 
           <div class="d-flex mt-2 justify-content-center">
@@ -86,14 +87,13 @@
             </template>
           </p-dialog>
         </template>
-
       </div>
 
       <!-- Elements -->
       <div class="col-9">
         <div class="position-relative" :style="{'max-height': elementShow ? '100%' : '30px'}">
           <div style="height: 20px">
-            <p-button v-tooltip.left="'Скрыть'" :label="elementShow ? '-' : '+'" :class="'position-absolute p-0 p-button-white'"
+            <p-button v-tooltip.left="'Скрыть'" :label="elementShow ? '-' : '+'" class="position-absolute p-0 p-button-white"
                       style="width: 30px; height: 20px; right: 1px; top: 1px;"
                       :style="{'z-index': 100}"
                       @click="elementShow = !elementShow"
@@ -122,12 +122,10 @@
               </p-t-column>
               <p-t-column field="simple" :sortable="true" header="<?= gTxtDB('elements', 'simple') ?>">
                 <template #body="slotProps">
-                  <div class="d-flex justify-content-around">
-                    <template v-if="slotProps.data.simple">
-                      <span class="pi pi-check pi-green"></span>
-                      <span class="pi pi-cog pi-blue" v-tooltip.bottom="'Редактировать простой элемент'"
-                            @click="changeQuickSimpleElement(slotProps.data.id)"></span>
-                    </template>
+                  <div class="text-center">
+                    <span v-if="slotProps.data.simple"
+                          class="pi pi-cog pi-blue" v-tooltip.bottom="'Редактировать простой элемент'"
+                          @click="changeQuickSimpleElement(slotProps.data.id)"></span>
                     <span v-else class="pi pi-times pi-red"></span>
                   </div>
                 </template>
@@ -144,7 +142,7 @@
               <p-t-column field="lastEditDate" :sortable="true" header="<?= gTxtDB('elements', 'lastEditDate') ?>"></p-t-column>
             </p-table>
 
-            <div class="mt-1 d-flex justify-content-between">
+            <div v-if="getSectionSelectedId()" class="mt-1 d-flex justify-content-between">
               <span>
                 <p-button v-if="sectionSelected" v-tooltip.bottom="'Создать элемент'" icon="pi pi-plus-circle" class="p-button-success me-2"
                           :loading="elementsLoading" @click="createElement"></p-button>
@@ -246,11 +244,12 @@
                 </div>
               </div>
               <div v-else>
-                Удалить элемент(ы)
+                Удалить элемент(ы):
+                <span>{{ getElementsSelectedId.join(', ') }}</span>
               </div>
 
               <template #footer>
-                <p-button v-if="element.simple" label="Редактировать" icon="pi pi-credit-card" @click="changeSimpleElements()"></p-button>
+                <p-button v-if="element.simple && queryParam.dbAction !== 'deleteElements'" label="Редактировать" icon="pi pi-credit-card" @click="changeSimpleElements()"></p-button>
                 <p-button label="Подтвердить" icon="pi pi-check" :disabled="elementsModal.confirmDisabled" @click="elementConfirm()"></p-button>
                 <p-button label="Отмена" icon="pi pi-times" class="p-button-text" @click="elementCancel()"></p-button>
               </template>
@@ -284,7 +283,7 @@
         ></p-multi-select>
         <h3 class="d-inline ms-3">Открыт: {{ elementLoaded }} - {{ elementName }}</h3>
       </template>
-      <p-t-column v-if="checkColumn('id')" field="id" :sortable="true" header="<?= gTxtDB('options', 'id') ?>" :class="'text-center'">
+      <p-t-column v-if="checkColumn('id')" field="id" :sortable="true" header="<?= gTxtDB('options', 'id') ?>" class="text-center">
         <template #body="slotProps">
           <span :data-id="slotProps.data.id">{{ slotProps.data.id }}</span>
         </template>
@@ -299,13 +298,13 @@
       </p-t-column>
       <p-t-column field="name" :sortable="true" header="<?= gTxtDB('options', 'name') ?>"></p-t-column>
       <p-t-column v-if="checkColumn('unitName')" field="unitName" header="<?= gTxtDB('options', 'unitName') ?>"></p-t-column>
-      <p-t-column v-if="checkColumn('activity')" field="activity" :sortable="true" header="<?= gTxtDB('options', 'activity') ?>" :class="'text-center'">
+      <p-t-column v-if="checkColumn('activity')" field="activity" :sortable="true" header="<?= gTxtDB('options', 'activity') ?>" class="text-center">
         <template #body="slotProps">
           <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
           <span v-else class="pi pi-times pi-red"></span>
         </template>
       </p-t-column>
-      <p-t-column v-if="checkColumn('sort')" field="sort" :sortable="true" header="<?= gTxtDB('options', 'sort') ?>" :class="'text-center'"></p-t-column>
+      <p-t-column v-if="checkColumn('sort')" field="sort" :sortable="true" header="<?= gTxtDB('options', 'sort') ?>" class="text-center"></p-t-column>
       <p-t-column v-if="checkColumn('moneyInputName')" field="moneyInputName" :sortable="true" header="<?= gTxtDB('options', 'moneyInputName') ?>"></p-t-column>
       <p-t-column v-if="checkColumn('inputPrice')" field="inputPrice" :sortable="true" header="<?= gTxtDB('options', 'inputPrice') ?>">
         <template #body="slotProps">
@@ -330,7 +329,8 @@
                     :loading="optionsLoading" @click="changeOptions"></p-button>
           <p-button v-tooltip.bottom="'Копировать вариант'" icon="pi pi-copy" class="p-button-warning me-2"
                     :loading="optionsLoading" @click="copyOption"></p-button>
-          <p-button v-tooltip.bottom="'Удалить вариант'" icon="pi pi-trash" class="p-button-danger me-2"
+          <p-button v-if="checkRemoveOptions"
+                    v-tooltip.bottom="'Удалить вариант'" icon="pi pi-trash" class="p-button-danger me-2"
                     :loading="optionsLoading" @click="deleteOptions"></p-button>
         </span>
       </div>
@@ -493,19 +493,24 @@
             <p-button label="Выбрать" @click="chooseUploadedFiles()" class="p-button-warning"></p-button>
           </div>
           <div class="col">
-            <div v-for="(file, id) of files"
+            <div v-for="[id, file] of filesList"
                  class="row my-1 align-items-center text-center"
                  :class="{'error': file.fileError}"
-                 :key="id"
-                 :data-id="id"
-            >
+                 :key="id">
               <div class="col-2">
                 <p-image :src="file.src" :alt="file.name" preview
                          image-style="max-width: 70px; max-height: 70px">
               </div>
-              <span class="col-8 text-nowrap overflow-hidden">{{ file.name }}</span>
+              <div class="col-6 text-nowrap overflow-hidden">{{ file.name }}</div>
               <div class="col-2">
-                <p-button icon="pi pi-times" @click="removeFile"></p-button>
+                <p-toggle-button on-icon="pi pi-cog" off-icon="pi pi-cog"
+                                 on-label="" off-label=""
+                                 v-tooltip.bottom="'Конвертировать: webp+jpeg + размер до 1000px'"
+                                 v-model="file.optimize"
+                ></p-toggle-button>
+              </div>
+              <div class="col-2">
+                <p-button icon="pi pi-times" @click="removeFile(id)"></p-button>
               </div>
             </div>
           </div>
@@ -540,7 +545,7 @@
 
       <template #footer>
         <p-button label="Подтвердить" icon="pi pi-check" :disabled="optionsModal.confirmDisabled" @click="optionsConfirm()"></p-button>
-        <p-button label="Отмена" icon="pi pi-times" class="p-button-text" @click="optionsCancel()"></p-button>
+        <p-button label="Отмена" icon="pi pi-times" class="p-button-text" @click="optionsClose()"></p-button>
       </template>
     </p-dialog>
 
@@ -563,6 +568,25 @@
 
       <template #footer>
         <p-button label="Закрыть" @click="closeChooseImage()"></p-button>
+      </template>
+    </p-dialog>
+
+    <p-dialog v-model:visible="optionsModal.displayContinue" :modal="true">
+      <template #header>
+        <h4 class="pi-red">Внимание!</h4>
+      </template>
+
+      <h4>Вы уверены?</h4>
+      <p>
+        Почему вы видите это сообщение? <br>
+        Вы выбрали другие элементы,<br>
+        при этом редактировать будете предыдуший.
+      </p>
+      <h4>Продолжить?</h4>
+
+      <template #footer>
+        <p-button label="Продолжить" @click="optionsContinueConfirm"></p-button>
+        <p-button label="Отмена" @click="optionsContinueCancel"></p-button>
       </template>
     </p-dialog>
   </div>

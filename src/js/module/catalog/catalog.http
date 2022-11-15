@@ -1,0 +1,42 @@
+### Send a form with the text and file fields
+POST http://akrilika/akrilikaSpbNew/index.php
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="mode"
+
+DB
+--WebAppBoundary
+Content-Disposition: form-data; name="dbAction"
+
+changeOptions
+--WebAppBoundary
+Content-Disposition: form-data; name="sectionId"
+
+2
+--WebAppBoundary
+Content-Disposition: form-data; name="elementsId"
+
+11
+--WebAppBoundary
+Content-Disposition: form-data; name="optionsId"
+
+["11"]
+--WebAppBoundary
+Content-Disposition: form-data; name="option"
+
+{"id":0,"elementId":11,"images":"","name":"вариант-9ZnEW","unitId":"1","activity":true,"sort":100,"percent":0,"moneyInputId":"1","inputPrice":1,"moneyOutputId":"1","outputPrice":1,"propertiesJson":"","properties":{}}
+--WebAppBoundary
+Content-Disposition: form-data; name="fieldChange"
+
+{"unitId":true,"moneyInputId":true,"moneyInput":true,"percent":true,"moneyOutputId":true,"moneyOutput":true,"activity":true,"sort":true,"properties":false}
+--WebAppBoundary
+Content-Disposition: form-data; name="files52121"; filename="659.jpg"
+Content-Type: image/jpeg
+
+< ../../../../../shared/659.jpg
+--WebAppBoundary--
+Content-Disposition: form-data; name="filesInfo"
+
+[{"id":"files52121","optimize":true}]
+--WebAppBoundary--

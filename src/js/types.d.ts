@@ -1,5 +1,5 @@
 
-class LoaderIcon {
+declare class LoaderIcon {
   constructor(
     field: string | HTMLElement | any,
     showNow?: boolean,
@@ -73,6 +73,10 @@ declare type CMSGlobalObject = {
   toNumber(v: any): number
   parseNumber(v: any): number
 
+  /**
+   * return random number
+   */
+  random(min?: number, max?: number): number,
 
   /**
    * replace ${key from obj} from template to value from obj
@@ -87,6 +91,10 @@ declare type CMSGlobalObject = {
           options?: boolean | object
   ): void
 
+  /**
+   * LocalStorage
+   */
+  LocalStorage()
 
   Get(obj: {
     url?: string,

@@ -58,7 +58,11 @@ final class Main {
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
     $this->setSettings('dbConfig', $dbConfig);
   }
-  public function __get($value) {
+  /**
+   * @param string $value
+   * @return Db|Dealer|UrlGenerator
+   */
+  public function __get(string $value) {
     if ($value === 'url') {
       $this->url = new UrlGenerator($this, 'core/');
     }

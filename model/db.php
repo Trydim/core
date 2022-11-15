@@ -269,7 +269,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'openSection':
-      if (isset($sectionId) && is_finite($sectionId)) {
+      if (isset($sectionId) && is_numeric($sectionId)) {
         $result['countRowsElements'] = $db->getCountRows('elements', " section_parent_id = $sectionId");
         $result['elements'] = $db->loadElements($sectionId, $pageNumber, 10000);
       }
@@ -328,7 +328,9 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       }
       break;
     case 'openElement':
-      if (isset($elementsId) && is_finite($elementsId)) {
+      $elementsId = json_decode($elementsId ?? '[]');
+      if (count($elementsId) === 1) {
+        $elementsId = $elementsId[0];
         $result['countRowsOptions'] = $db->getCountRows('options_elements', " element_id = $elementsId ");
         $result['options'] = $db->openOptions($elementsId);
       }
@@ -345,7 +347,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         if ($single) {
           $elements = $db->selectQuery('elements', ['ID', 'name'], " name = '$name' ");
           if (count($elements) > 1 || empty($name)
-              || (count($elements) === 1 && $elements[0]['ID'] !== $elementsId[0])) {
+              || (count($elements) === 1 && intval($elements[0]['ID']) !== intval($elementsId[0]))) {
             $result['error'] = 'element_name_error'; break;
           }
         }
@@ -380,45 +382,90 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
     case 'copyOption':
     case 'createOption':
-      $param = ['0' => []];
-      if (isset($name) && isset($elementsId) && !empty($name)) {
-        $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementsId' and name = '$name' ");
+      $elementsId = json_decode($elementsId ?? '[]');
+      if (count($elementsId) === 1) {
+        $elementId = $elementsId[0];
+        $param = [];
+        $option = json_decode($option ?? '[]', true);
+        $filesInfo = json_decode($filesInfo ?? '[]', true);
+
+        $name = $option['name'];
+        if (empty($name)) { $result['error'] = 'option_name_error'; break; }
+
+        $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementId' and name = '$name' ");
         if (count($haveOption)) { $result['error'] = 'option_name_exist'; break; }
 
-        $param['0']['element_id'] = $elementsId;
-        $param['0']['name'] = $name;
-        $param['0']['money_input_id'] = $moneyInputId ?? 1;
-        $param['0']['input_price'] = $inputPrice ?? 0;
-        $param['0']['money_output_id'] = $moneyOutputId ?? 1;
-        $param['0']['output_percent'] = $outputPercent ?? 0;
-        $param['0']['output_price'] = $outputPrice ?? 0;
-        $param['0']['unit_id'] = $unitId ?? 1;
-        $param['0']['activity'] = intval(isset($activity) && $activity === "true");
-        $param['0']['sort'] = $sort ?? 100;
-        $param['0']['properties'] = $propertiesJson ?? '{}';
+        $param['element_id'] = $elementId;
+        $param['name'] = $name;
+        $param['money_input_id'] = $option['moneyInputId'] ?? 1;
+        $param['input_price'] = $option['inputPrice'] ?? 0;
+        $param['money_output_id'] = $option['moneyOutputId'] ?? 1;
+        $param['output_percent'] = $option['percent'] ?? 0;
+        $param['output_price'] = $option['outputPrice'] ?? 0;
+        $param['unit_id'] = $option['unitId'] ?? 1;
+        $param['activity'] = intval(($option['activity'] ?? "true") === "true");
+        $param['sort'] = $option['sort'] ?? 100;
+        $param['properties'] = $option['propertiesJson'] ?? '{}';
 
-        $imageIds = [];
-        foreach ($_REQUEST as $k => $v) {
-          stripos($k, 'files') === 0 && $param['0']['images_id'][] = $v;
+        // Images
+        if (count($filesInfo)) {
+          $imageIds = [];
+          $result['files'] = [];
+          $fileSystem = new FS($main);
+
+          foreach ($filesInfo as $file) {
+            $fileId = $file['id'];
+            $optimize = $file['optimize'] ?? false;
+
+            // Exist in DB
+            if (is_numeric($fileId)) {
+              $saveResult = $fileId;
+
+              if ($optimize) {
+                $file = $main->db->getFiles($fileId);
+
+                if (count($file) === 1) {
+                  $file = $file[0];
+                  $file['name'] = $file['path'];
+                  $fileSystem->prepareFile($file)->optimize();
+                }
+              }
+            } else {
+              $saveResult = $fileSystem->saveFromRequest($fileId, $optimize);
+            }
+
+            if (is_object($saveResult)) {
+              $saveResult = $db->setFiles($saveResult);
+              $imageIds[] = $saveResult['id'];
+              $result['files'][] = $saveResult;
+            }
+            else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
+            else $result['error'] = $saveResult;
+          }
+
+          $param['images_ids'] = implode(',', $imageIds);
+        } else {
+          $param['images_ids'] = '';
         }
-        $param['0']['images_ids'] = $db->setFiles($result, $imageIds);
 
-        $result = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', $param);
+        $result = $db->insert($db->getColumnsTable('options_elements'), 'options_elements', [0 => $param]);
       }
       break;
     case 'changeOptions':
+      $elementsId = json_decode($elementsId ?? '[]');
       $optionsId = json_decode($optionsId ?? '[]');
-      if (isset($elementsId) && count($optionsId)) {
+      if (count($elementsId) && count($optionsId)) {
         $param = [];
         $single = count($optionsId) === 1;
         $option = json_decode($option ?? '[]', true);
         $fieldChange = json_decode($fieldChange ?? '[]', true);
+        $filesInfo = json_decode($filesInfo ?? '[]', true);
         $name = $option['name'] ?? '';
 
         if ($single) {
-          $options = $db->selectQuery('options_elements', ['ID', 'name'], " element_id = $elementsId AND name = '$name' ");
-          if (count($options) > 1 || empty($name)
-              || (count($options) === 1 && $options[0]['ID'] !== $optionsId[0])) {
+          $elementId = $elementsId[0];
+          $options = $db->selectQuery('options_elements', ['ID', 'name'], " element_id = $elementId AND name = '$name' ");
+          if (count($options) > 1 || empty($name) || (count($options) === 1 && $options[0]['ID'] !== $optionsId[0])) {
             $result['error'] = 'option_name_error'; break;
           }
         } elseif ($fieldChange['percent']) {
@@ -448,12 +495,44 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           }
 
           // Images
-          if ($single) {
+          if ($single && count($filesInfo)) {
             $imageIds = [];
-            foreach ($_REQUEST as $k => $v) {
-              stripos($k, 'files') === 0 && $imageIds[] = $v;
+            $result['files'] = [];
+            $fileSystem = new FS($main);
+
+            foreach ($filesInfo as $file) {
+              $fileId = $file['id'];
+              $optimize = $file['optimize'] ?? false;
+
+              // Exist in DB
+              if (is_numeric($fileId)) {
+                $saveResult = $fileId;
+
+                if ($optimize) {
+                  $file = $main->db->getFiles($fileId);
+
+                  if (count($file) === 1) {
+                    $file = $file[0];
+                    $file['name'] = $file['path'];
+                    $fileSystem->prepareFile($file)->optimize();
+                  }
+                }
+              } else {
+                $saveResult = $fileSystem->saveFromRequest($fileId, $optimize);
+              }
+
+              if (is_object($saveResult)) {
+                $saveResult = $db->setFiles($saveResult);
+                $imageIds[] = $saveResult['id'];
+                $result['files'][] = $saveResult;
+              }
+              else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
+              else $result['error'] = $saveResult;
             }
-            $param[$id]['images_ids'] = $db->setFiles($result, $imageIds);
+
+            $param[$id]['images_ids'] = implode(',', $imageIds);
+          } else {
+            $param[$id]['images_ids'] = '';
           }
         }
 
@@ -581,7 +660,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
 
     // Files
     case 'uploadFiles':
-      $db->setFiles($result);
+      $result = (new FS($main))->saveAllFromRequest();
       break;
     case 'loadFiles':
       $result['files'] = $db->loadFiles();

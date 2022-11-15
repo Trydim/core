@@ -516,8 +516,6 @@ export default {
      //return [h, s, l];
      }
 
-
-     debugger
      const color = window.getComputedStyle(node).backgroundColor,
      rgb = /(\d+),? (\d+),? (\d+)/.exec(color)[0].split(','),
      bool = rgb2hsl(rgb);*/
@@ -781,7 +779,7 @@ export default {
    * @param {number} max - until number or undefined
    * @return {number}
    */
-  random: (min = 5, max= 0) => {
+  random: (min = 5, max = 0) => {
     return max ? Math.floor(Math.random() * (max - min + 1) + min)
                : Math.random() * Math.pow(10, min) | 0;
   },

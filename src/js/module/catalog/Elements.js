@@ -61,7 +61,7 @@ export const computed = {
 
   getElementsSelectedId() {
     return this.elementsSelected.map(i => i.id);
-  }
+  },
 }
 
 const prepareData = data => data.map(el => {
@@ -90,21 +90,25 @@ export const methods = {
       this.clearAll();
     });
   },
-  loadSimpleOptions(id) {
-    const elSelected = this.elementsSelected;
+  loadSimpleOptions() {
+    const crAction = this.queryParam.dbAction;
+
     this.queryParam.dbAction   = 'openElement';
-    this.queryParam.elementsId = id;
     this.elementsModal.loading = true;
 
     return this.query().then(data => {
       this.options = data['options'];
       this.elementsModal.loading = false;
-      this.elementsSelected = elSelected;
+      this.queryParam.dbAction = crAction;
+      this.reloadAction = reload(this);
     });
   },
 
   checkLoadedElement() {
-    //if (this.elementsSelected.includes(this.elementLoaded)) this.options = [];
+    if (this.getElementsSelectedId.includes(this.elementLoaded.toString())) {
+      this.options         = [];
+      this.optionsSelected = [];
+    }
   },
 
   enableField() {
@@ -194,7 +198,7 @@ export const methods = {
     this.setElementModal('Редактировать элемент', single, single);
     this.reloadAction = reload(this);
 
-    if (this.element.simple) this.loadSimpleOptions(el.id);
+    if (this.element.simple) this.loadSimpleOptions();
   },
   changeSimpleElements() {
     this.elementLoaded = this.element.simple;
@@ -202,7 +206,8 @@ export const methods = {
     this.changeOptions();
   },
   changeQuickSimpleElement(id) {
-    this.elementsSelected = [];
+    this.queryParam.elementsId = JSON.stringify([id]);
+    this.elementsSelected = [this.elements.find(el => el.id === id)];
     this.options = [];
 
     const interval = setInterval(() => {
@@ -214,7 +219,7 @@ export const methods = {
       }
     }, 100);
 
-    this.loadSimpleOptions(id);
+    this.loadSimpleOptions();
   },
   copyElement() {
     if (this.elementsSelected.length !== 1) { f.showMsg('Выберите только один элемент', 'error'); return; }
@@ -232,7 +237,7 @@ export const methods = {
     this.reloadAction = reload(this);
   },
   deleteElements() {
-    if (!this.elementsSelected.length) return;
+    if (!this.elementsSelected.length) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
     this.queryParam.elementsId = JSON.stringify(this.getElementsSelectedId);
     this.queryParam.dbAction   = 'deleteElements';
@@ -244,9 +249,10 @@ export const methods = {
         this.checkLoadedElement();
 
         this.elements         = prepareData(aData['elements']);
+        this.elementLoaded    = 0;
         this.elementsLoading  = false;
         this.elementsSelected = [];
-      }
+      },
     };
   },
 

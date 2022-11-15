@@ -80,20 +80,23 @@ export default {
       this.reloadAction = false;
     },
 
-    query(action = '') {
-      let data = new FormData();
+    query() {
+      let data = new FormData(),
+          FDFiles = [];
 
-      Object.entries({...this.queryParam})
-            .map(param => data.set(param[0], param[1]));
+      Object.entries(this.queryParam)
+            .map(param => data.set(param[0], param[1].toString()));
       //action && data.set('dbAction', action);
 
       Object.entries(this.queryFiles).forEach(([id, file]) => {
-        if (file instanceof File) data.append('files' + id, file, file.name);
-        else data.set('files' + id, file.toString());
-      });
-      data.delete('files');
+        const fileP = this.files.get(id);
 
-      this.queryFiles = Object.create(null);
+        if (file instanceof File) data.append('files' + id, file, file.name);
+
+        FDFiles.push({id: fileP.id || 'files' + id, optimize: fileP.optimize || false});
+      });
+      FDFiles.length && data.set('filesInfo', JSON.stringify(FDFiles))
+      data.delete('files');
 
       return f.Post({data}).then(async data => {
         if (this.reloadAction) {
