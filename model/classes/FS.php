@@ -125,11 +125,6 @@ class FS {
       $name = str_replace('.' . $ext, '.webp', $baseName);
       imagewebp($fileRes, $this->absUploadDir . $name, 95);
     }
-    // добавить png
-    else if (stripos($ext, 'webp') !== false) {
-      $name = str_replace('.' . $ext, '.png', $baseName);
-      imagepng($fileRes, $this->absUploadDir . $name, 1);
-    }
 
     // Добавить миниатюры
     if ($this->config['createPrev'] ?? self::CREATE_PREV) {
@@ -145,9 +140,6 @@ class FS {
       // добавить webp
       $name = str_replace('.' . $ext,  self::PREV_POSTFIX . '.webp', $baseName);
       imagewebp($fileResPrev, $this->absUploadDir . $name, 95);
-      // добавить png
-      $name = str_replace('.' . $ext, self::PREV_POSTFIX . '.png', $baseName);
-      imagepng($fileResPrev, $this->absUploadDir . $name, 1);
     }
   }
 
