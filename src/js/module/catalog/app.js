@@ -2,9 +2,9 @@
 
 import Tree from 'primevue/tree';
 
-import {data as sectionData, watch as sectionWatch, methods as sectionMethods} from "./sections";
-import {data as elementsData, watch as elementsWatch, computed as elementsComputed, methods as elementsElements} from "./elements";
-import {data as optionsData, watch as optionsWatch, computed as optionsComputed, methods as optionsMethods} from "./options";
+import {data as sectionData, watch as sectionWatch, methods as sectionMethods} from "./Sections";
+import {data as elementsData, watch as elementsWatch, computed as elementsComputed, methods as elementsElements} from "./Elements";
+import {data as optionsData, watch as optionsWatch, computed as optionsComputed, methods as optionsMethods} from "./Options";
 
 const setData = selector => {
   const node = f.qS(selector),

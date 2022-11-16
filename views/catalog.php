@@ -142,21 +142,21 @@
               <p-t-column field="lastEditDate" :sortable="true" header="<?= gTxtDB('elements', 'lastEditDate') ?>"></p-t-column>
             </p-table>
 
-            <div v-if="getSectionSelectedId()" class="mt-1 d-flex justify-content-between">
+            <div v-if="getSectionSelectedId() || elements.length" class="mt-1 d-flex justify-content-between">
               <span>
                 <p-button v-if="sectionSelected" v-tooltip.bottom="'Создать элемент'" icon="pi pi-plus-circle" class="p-button-success me-2"
                           :loading="elementsLoading" @click="createElement"></p-button>
-                <span v-if="elements.length">
+                <span>
                   <p-button v-tooltip.bottom="'Изменить элемент'" icon="pi pi-cog" class="p-button-warning me-2"
                             :loading="elementsLoading" @click="changeElements"></p-button>
-                  <p-button v-tooltip.bottom="'Копировать элемент'" icon="pi pi-copy" class="p-button-warning me-2"
+                  <p-button v-if="sectionSelected" v-tooltip.bottom="'Копировать элемент'" icon="pi pi-copy" class="p-button-warning me-2"
                             :loading="elementsLoading" @click="copyElement"></p-button>
                   <p-button v-tooltip.bottom="'Удалить элемент'" icon="pi pi-trash" class="p-button-danger me-2"
                             :loading="elementsLoading" @click="deleteElements"></p-button>
                 </span>
               </span>
 
-              <div v-if="elements.length">
+              <div>
                 <p-button v-tooltip.bottom="'Выделить все'" icon="pi pi-check" class="p-button-warning"
                           :loading="elementsLoading" @click="selectedAll"></p-button>
                 <p-button v-if="elementsSelected.length"

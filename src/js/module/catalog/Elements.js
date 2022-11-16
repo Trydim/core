@@ -44,7 +44,6 @@ export const watch = {
   element: {
     deep: true,
     handler() {
-      if (this.elementsSelected.length !== 1) return;
       this.elementsModal.confirmDisabled = !this.element.name;
     },
   },
@@ -73,7 +72,8 @@ const prepareData = data => data.map(el => {
 const reload = that => ({
   dbAction : 'openSection',
   callback: (fData, aData) => {
-    that.elements         = prepareData(aData['elements']);
+    if (aData['elements']) that.elements = prepareData(aData['elements']);
+
     that.elementsLoading  = false;
     that.elementsSelected = [];
   }

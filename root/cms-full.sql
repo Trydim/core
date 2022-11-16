@@ -200,9 +200,9 @@ CREATE TABLE `options_elements` (
   `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `activity` int(1) NOT NULL DEFAULT 1,
   `sort` int(10) NOT NULL DEFAULT 100,
-  `input_price` decimal(10,4) NOT NULL DEFAULT 1.0000,
-  `output_percent` double NOT NULL DEFAULT 1,
-  `output_price` decimal(10,4) NOT NULL DEFAULT 1.0000
+  `input_price` decimal(10,4) NOT NULL DEFAULT 0.0000,
+  `output_percent` double NOT NULL DEFAULT 0,
+  `output_price` decimal(10,4) NOT NULL DEFAULT 0.0000
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Варианты элементов';
 
 --
