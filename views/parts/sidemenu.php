@@ -64,7 +64,7 @@ menu;
 <aside id="sideLeft" class="sidebar"> <!-- data-background-color="white"-->
   <div class="position-sticky top-0">
     <ul class="sidebar-menu show" id="sideMenu">
-      <li class="nav-label">Main Menu</li>
+      <li class="nav-label"><?= gTxt('Main Menu') ?></li>
       <?php if (PUBLIC_PAGE) { ?>
         <li>
           <a class="nav-item" href="<?= $siteLink ?>" aria-expanded="false">
@@ -76,6 +76,10 @@ menu;
 
       foreach ($main->getSideMenu() as $item) {
         if (in_array($item, [PUBLIC_PAGE, 'setting'])) continue;
+
+        if (is_array($item) && isset($item['label'])) { ?>
+          <li class="nav-label"><?= gTxt($item['label']) ?></li>
+        <?php continue; }
 
         switch ($item) {
           case 'orders': ?>
@@ -152,6 +156,11 @@ menu;
               </a>
             </li>
           <?php break;
+          case 'hr': ?>
+            <li>
+              <hr>
+            </li>
+            <?php break;
           default: ?>
             <li>
               <a class="nav-item" href="<?= $siteLink . $item?>">

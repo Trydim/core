@@ -61,6 +61,7 @@ $publicConfig = [
   /** Пункты меню какие показывать и последовательность (по умолчанию все страницы)
   'admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'fileManager', 'statistic', 'users'
   админ-ние   календарь   каталог    клиенты      дилеры     заказы    ФМ             статистика   мен-ры
+  hr - черта в меню
   */
   'ACCESS_MENU' => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'users', 'customPage'],
 
