@@ -390,7 +390,7 @@ class Orders {
           this.queryParam.docType = 'pdf';
           this.queryParam.orderId = this.queryParam.orderIds;
           this.queryParam.name = user.name || user['login'];
-          this.queryParam.phone = user.contacts.phone || '';
+          this.queryParam.phone = contacts.phone || '';
           this.queryParam.email = contacts['email'];
 
           this.onEventNode(node, this.changeSelectInput, {}, 'change');
