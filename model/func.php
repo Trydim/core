@@ -23,14 +23,14 @@ function addCpNumber($number, $reportVal) {
 /**
  * alias for $main->addControllerField('cssLinks')
  *
- * @param string $cssLink
+ * @param string $cssLink - from index.php directory
  * @return Main|bool - false or Main object
  */
 function addCssLink(string $cssLink) {
   global $main;
 
   if ($main instanceof Main) {
-    $cssLink = str_replace('//', '/', $main->url->getUri() . $cssLink);
+    $cssLink = $main->url->getUri() . ltrim($cssLink, '/');
     return $main->addControllerField('cssLinks', $cssLink);
   }
 
@@ -40,7 +40,7 @@ function addCssLink(string $cssLink) {
 /**
  * alias for $main->addControllerField('jsLinks')
  *
- * @param string $jsLink
+ * @param string $jsLink - from index.php directory
  * @param mixed $position [optional] <p>
  * head - in head <p>
  * before - before all script, after cms libs<p>
@@ -51,7 +51,7 @@ function addJsLink(string $jsLink, string $position = 'last') {
   global $main;
 
   if ($main instanceof Main) {
-    $jsLink = str_replace('//', '/', $main->url->getPath() . $jsLink);
+    $jsLink = $main->url->getUri() . ltrim($jsLink, '/');
     return $main->addControllerField('jsLinks', $jsLink, $position);
   }
 
