@@ -124,6 +124,8 @@ class Db extends R {
    * @return false|string|null
    */
   public function getDbDateString($date) {
+    $date = trim($date, '"\'');
+
     if (empty($date)) return null;
     if (is_numeric($date) && strlen($date) >= 10) {
       return date($this::DB_DATA_FORMAT, intval(substr($date, 0, 10)));
@@ -856,6 +858,7 @@ class Db extends R {
    */
   public function loadOrderById($id) {
     $sql = "SELECT O.ID AS 'ID', create_date AS 'createDate', last_edit_date AS 'lastEditDate',
+                   start_shipping_date AS 'startShippingDate', end_shipping_date AS 'endShippingDate',
                    U.name AS 'name', U.ID AS 'userId',
                    U.contacts AS 'contacts', C.name AS 'C.name', total, S.name AS 'Status', 
                    important_value AS 'importantValue', save_value AS 'saveValue',
