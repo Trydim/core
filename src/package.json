@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "description": "cms",
-  "name": "cms-webpack",
+  "description": "CMS project",
+  "name": "core-webpack",
   "private": true,
   "scripts": {
     "update": "git pull && npm run coreProd && npm run createResourceFile && npm run coreModuleProd",

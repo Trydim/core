@@ -578,7 +578,7 @@ export default {
     target.setAttribute('disabled', 'disabled');
 
     data.set('mode', 'docs');
-    data.set('docsAction', 'pdf');
+    data.set('cmsAction', 'pdf');
     data.set('reportVal', JSON.stringify(report));
 
     report.fileTpl && data.set('fileTpl', report.fileTpl);
@@ -695,7 +695,7 @@ export default {
           p    = param;
 
     data.set('mode', 'docs');
-    data.set('docsAction', 'mail');
+    data.set('cmsAction', 'mail');
     !data.has('email') && data.set('email', p.email || p.customer.email);
     p.docType && data.set('docType', p.docType);
 

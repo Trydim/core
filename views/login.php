@@ -47,7 +47,7 @@ $field['global'] = <<<global
         </div>
 
         <input name="mode" type="hidden" value="auth">
-        <input name="authAction" type="hidden" value="login">
+        <input name="cmsAction" type="hidden" value="login">
       </form>
       <div class="new-account mt-3">
         <p>$publicLink</p>

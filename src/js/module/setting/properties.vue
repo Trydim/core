@@ -1,7 +1,7 @@
 <template>
   <div class="col-12" id="propertiesWrap">
     <p-accordion @tab-open="openAccordion()">
-      <p-accordion-tab header="Редактировать параметры каталога">
+      <p-accordion-tab :header="accordionHeader">
         <p-table v-if="propertiesData"
                  :value="propertiesData"
                  :loading="loading"
@@ -48,14 +48,14 @@
         <div class="col-12 row my-1">
           <div class="col">Название свойства:</div>
           <div class="col">
-            <p-input-text class="w-100" v-model="property.name" autofocus></p-input-text>
+            <p-input-text class="w-100" v-model="property.newName" autofocus></p-input-text>
           </div>
         </div>
         <!-- Код свойства -->
         <div class="col-12 row my-1">
           <div class="col">Код свойства:</div>
           <div class="col">
-            <p-input-text class="w-100" v-model="property.code"></p-input-text>
+            <p-input-text class="w-100" v-model="property.newCode"></p-input-text>
           </div>
         </div>
         <!-- Тип данных -->
@@ -114,6 +114,10 @@
 <script>
 export default {
   props: {
+    type: {
+      required: true,
+      type: String,
+    },
     query: {
       type: Function,
     },
@@ -128,7 +132,9 @@ export default {
 
     property: {
       name: '',
+      newName: '',
       code: '',
+      newCode: '',
       type: '',
       fields: {},
     },
@@ -168,20 +174,45 @@ export default {
     ],
   }),
   watch: {
-    'property.name'() {
-      this.property.code = f.transLit(this.property.name);
+    'property.newName'() {
+      this.property.newCode = f.transLit(this.property.newName).toLowerCase().replace(/\s/g, '');
     },
   },
   computed: {
+    accordionHeader() {
+      return this.type === 'catalog' ? 'Редактировать параметры каталога'
+                                     : 'Редактировать параметры дилеров';
+    },
+    responseKey() {
+      return this.type === 'catalog' ? 'optionProperties'
+                                     : 'dealersProperties';
+    },
+    loadAction() {
+      return this.type === 'catalog' ? 'loadProperties'
+                                     : 'loadDealersProperties';
+    },
+    createAction() {
+      return this.type === 'catalog' ? 'createProperty'
+                                     : 'createDealersProperty';
+    },
+    changeAction() {
+      return this.type === 'catalog' ? 'changeProperty'
+                                     : 'changeDealersProperty';
+    },
+    deleteAction() {
+      return this.type === 'catalog' ? 'deleteProperty'
+                                     : 'deleteDealersProperty';
+    },
+
     allTypes() {
       return this.propertiesTypes[0].items.concat(this.propertiesTypes[1].items);
     }
   },
   methods: {
     loadProperties() {
-      this.queryParam.cmsAction = 'loadProperties';
+      this.queryParam.cmsAction = this.loadAction;
       this.query().then(data => {
-        this.propertiesData = data['optionProperties'];
+        this.propertiesData = data[this.responseKey];
         this.loading = false;
       });
     },
@@ -202,7 +233,7 @@ export default {
       this.loadProperties();
     },
     createProperty() {
-      this.queryParam.cmsAction = 'createProperty';
+      this.queryParam.cmsAction = this.createAction;
 
       this.property.name = '';
       this.property.code = '';
@@ -223,11 +254,17 @@ export default {
     },
     changeProperty() {
       if (!this.propertiesSelected) return;
-      this.queryParam.cmsAction = 'changeProperty';
+      this.queryParam.cmsAction = this.changeAction;
 
       this.property = {...this.propertiesSelected};
+      this.property.newName = this.property.name;
+      this.property.newCode = this.property.code;
+
       if (this.property.type === 'select') {
-        Object.values(this.property.fields).forEach(f => f.newName = f.name);
+        Object.values(this.property.fields).forEach(f => {
+          f.newName = f.name;
+          f.newCode = f.code;
+        });
       }
       this.$nextTick(() => this.property.code = this.propertiesSelected.code);
 
@@ -235,7 +272,7 @@ export default {
       this.modal.display = true;
     },
     deleteProperty() {
-      this.queryParam.cmsAction = 'deleteProperties';
+      this.queryParam.cmsAction = this.deleteAction;
 
       this.property = {...this.propertiesSelected};
 
@@ -244,7 +281,7 @@ export default {
     },
 
     addPropertyField() {
-      let random = Math.random() * 10000 | 0;
+      let random = f.random();
 
       this.property.fields[random] = {
         newName: 'field_' + random,

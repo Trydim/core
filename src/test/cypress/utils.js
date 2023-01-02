@@ -36,7 +36,7 @@ export const entryToCms = function (config = oConfig) {
         link = config['baseUrl'];
 
   cy.request({
-    url: `${link}?mode=auth&authAction=login&login=${authLogin}&password=${authPass}`
+    url: `${link}?mode=auth&cmsAction=login&login=${authLogin}&password=${authPass}`
   }).then(() => {});
 }
 

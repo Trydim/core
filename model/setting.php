@@ -3,9 +3,8 @@
 /**
  * @var Main $main - global main object
  *
- * @var string $cmsAction - fromQuery
- *
- * @var $user - from Query
+ * @var string $cmsAction - extract from query in main.php
+ * @var array $user - extract from query
  */
 
 $db = $main->getDB();
@@ -199,19 +198,21 @@ switch ($cmsAction) {
     break;
 
   // Options property
-  case 'createProperty':
-  case 'changeProperty':
-    $property = json_decode($property ?? '[]', true);
+  case 'createProperty': case 'createDealersProperty':
+  case 'changeProperty': case 'changeDealersProperty':
+    $propKey   = in_array($cmsAction, ['createProperty', 'changeProperty']) ? 'optionProperties' : 'dealersProperties';
+    $cmsAction = stripos($cmsAction, 'create') ? 'create' : 'change';
+    $property  = json_decode($property ?? '[]', true);
 
-    $tableName = $property['name'];
-    $tableCode = $property['code'] ?? translit($tableName);
+    $tableName = $property['newName'];
+    $tableCode = $property['newCode'] ?? translit($tableName);
     $propName = 'prop_' . str_replace('prop_', '', $tableCode);
-    $setting = $main->getSettings('optionProperties');
+    $setting = $main->getSettings($propKey);
 
     if ($property['type'] === 'select') { // Справочник
       $param = [];
       foreach ($property['fields'] as $field) {
-        if ($cmsAction !== 'changeProperty') $param[translit($field['name'])] = $field['type'];
+        if ($cmsAction === 'change') $param[translit($field['name'])] = $field['type'];
         else {
           $param[$field['name']] = [
             'newName' => $field['newName'],
@@ -222,42 +223,45 @@ switch ($cmsAction) {
 
       if (!isset($setting[$propName])) {
         $result['error'] = $db->createPropertyTable($propName, $param);
-      } else if ($cmsAction === 'changeProperty') {
+      } else if ($cmsAction === 'change') {
         $result['error'] = $db->changePropertyTable($propName, $param);
       } else $result['error'] = 'Property exist';
 
       $setting[$propName]['name'] = $tableName;
-      $main->setSettings('optionProperties', $setting)->saveSettings();
+      $main->setSettings($propKey, $setting)->saveSettings();
     } else { // остальные
       $dataType = $property['type'];
 
-      if (!isset($setting[$propName]) || $cmsAction === 'changeProperty') {
+      // If changed, else remove old value.
+      if ($cmsAction === 'change') unset($setting[$property['code']]);
+
+      if (!isset($setting[$propName])) {
         $setting[$propName] = [
           'name' => $tableName,
           'type' => $dataType,
         ];
-        $main->setSettings('optionProperties', $setting)->saveSettings();
+        $main->setSettings($propKey, $setting)->saveSettings();
       } else $result['error'] = 'Property exist';
     }
     break;
-  case 'loadProperties':
-    $result['optionProperties'] = [];
-    $setting = $main->getSettings('optionProperties');
+  case 'loadProperties': case 'loadDealersProperties':
+    $propKey = $cmsAction === 'loadProperties' ? 'optionProperties' : 'dealersProperties';
+    $result[$propKey] = [];
+    $setting = $main->getSettings($propKey);
     $dbProperties = array_keys($db->getTables('prop'));
 
-    if ($setting) {
-      function getField($name, $type) {
-
+    if (is_array($setting)) {
+      function getPropertyField($name, $type) {
         if (includes($name, '_ids')) $type = 'file';
 
         switch ($type) {
-          case 'varchar(255)': $type = 'string'; break;
+          case 'varchar(255)':  $type = 'string'; break;
           case 'varchar(1000)': $type = 'textarea'; break;
           case 'float': case 'double': $type = 'float'; break;
           case 'decimal(10,4)': $type = 'money'; break;
-          case 'timestamp': $type = 'date'; break;
-          case 'int(1)': $type = 'bool'; break;
-          case 'int(20)': $type = 'int'; break;
+          case 'timestamp':     $type = 'date'; break;
+          case 'int(1)':        $type = 'bool'; break;
+          case 'int(20)':       $type = 'int'; break;
         }
 
         return [
@@ -265,7 +269,6 @@ switch ($cmsAction) {
           'type' => $type,
         ];
       }
-
 
       foreach ($setting as $code => $table) {
         if (isset($table['type']) || in_array($code, $dbProperties)) {
@@ -276,7 +279,6 @@ switch ($cmsAction) {
             'type' => $type,
           ];
 
-
           if ($type === 'select') {
             $columns = $db->getColumnsTable($code);
 
@@ -286,14 +288,14 @@ switch ($cmsAction) {
               foreach ($columns as $column) {
                 if (in_array($column['columnName'], ['ID', 'name'])) continue;
 
-                $fields[] = getField($column['columnName'], $column['type']);
+                $fields[] = getPropertyField($column['columnName'], $column['type']);
               }
 
               $param['fields'] = $fields;
             }
           }
 
-          $result['optionProperties'][] = $param;
+          $result[$propKey][] = $param;
         }
       }
     }
@@ -303,9 +305,10 @@ switch ($cmsAction) {
       $result['propertyValue'] = $db->getColumnsTable($props); // todo загрузить просто
     }
     break;
-  case 'deleteProperties':
+  case 'deleteProperty':  case 'deleteDealersProperty':
+    $propKey = $cmsAction === 'deleteProperties' ? 'optionProperties' : 'dealersProperties';
     $property = json_decode($property ?? '[]', true);
-    $setting = $main->getSettings('optionProperties');
+    $setting = $main->getSettings($propKey);
 
     if (!empty($property['fields'])) {
       $db->delPropertyTable([$property['code']]);
@@ -314,7 +317,7 @@ switch ($cmsAction) {
     if (isset($property['code'])) {
       unset($setting['prop_' . str_replace('prop_', '', $property['code'])]);
 
-      $main->setSettings('optionProperties', $setting)->saveSettings();
+      $main->setSettings($propKey, $setting)->saveSettings();
     }
     break;
 

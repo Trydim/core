@@ -243,7 +243,7 @@ export const Print = () => {
 
   p.print = function (content, printStyleTpl = 'printTpl.css', classList = []) {
     f.Get({
-      data: 'mode=docs&docsAction=getPrintStyle&fileTpl=' + printStyleTpl
+      data: 'mode=docs&cmsAction=getPrintStyle&fileTpl=' + printStyleTpl
     }).then(async data => {
       const scrollY = window.pageYOffset;
 

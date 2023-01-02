@@ -331,7 +331,7 @@ class Orders {
         data = new FormData();
 
     data.set('mode', 'docs');
-    data.set('docsAction', 'print');
+    data.set('cmsAction', 'print');
     data.set('orderId', this.queryParam.orderIds);
     data.set('addManager', 'true');
     data.set('addCustomer', 'true');
@@ -348,7 +348,7 @@ class Orders {
         url = this.dealerId ? 'dealer/' + this.dealerId + '/' : '';
 
     data.set('mode', 'docs');
-    data.set('docsAction', 'pdf');
+    data.set('cmsAction', 'pdf');
     data.set('addCustomer', 'true');
     data.set('orderId', this.queryParam.orderIds);
     data.set('pdfOrientation', 'P');
@@ -386,7 +386,7 @@ class Orders {
               node = form.querySelector('[name="email"]');
 
           this.queryParam.mode = 'docs';
-          this.queryParam.docsAction = 'mail';
+          this.queryParam.cmsAction = 'mail';
           this.queryParam.docType = 'pdf';
           this.queryParam.orderId = this.queryParam.orderIds;
           this.queryParam.name = user.name || user['login'];

@@ -1,19 +1,19 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
+ * @var Main $main
  * @var array $dbConfig - config from public
- * @var object $main
+ * @var string $cmsAction - extract from query in main.php
  */
 
 $db = $main->getDB();
 
-$dbAction = $dbAction ?? '';
 $dbTable = $dbTable ?? $tableName ?? '';
 
 stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
 
-if ($dbAction === 'tables') { // todo добавить фильтрацию таблиц
-  CHANGE_DATABASE && $result[$dbAction] = $db->getTables();
+if ($cmsAction === 'tables') { // todo добавить фильтрацию таблиц
+  CHANGE_DATABASE && $result[$cmsAction] = $db->getTables();
   $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam('csvPath'));
 } else {
   $columns = [];
@@ -35,7 +35,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
   $countPerPage = $countPerPage ?? 20;
   $sortDirect = isset($sortDirect) && $sortDirect === 'true';
 
-  switch ($dbAction) {
+  switch ($cmsAction) {
     // Tables
     case 'showTable':
       $result['columns'] = $columns;
@@ -249,7 +249,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
         // Проверка есть ли раздел с таким же именем
         $haveSection = $db->selectQuery('section', 'name', " parent_ID = $parentId");
         if (in_array($name, $haveSection)) {
-          if ($dbAction === 'changeSection') {
+          if ($cmsAction === 'changeSection') {
             $haveSection = $db->selectQuery('section', 'ID', " name = '$name'");
             if (count($haveSection) > 2 || $haveSection[0] !== $sectionId) {
               $result['error'] = 'section_exist'; break;
@@ -265,7 +265,7 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
           'code'      => $section['code'] ?? translit($name),
           'active'    => intval($section['activity'] === true),
         ];
-        $result = $db->insert([], 'section', [$sectionId => $param], $dbAction === 'changeSection');
+        $result = $db->insert([], 'section', [$sectionId => $param], $cmsAction === 'changeSection');
       }
       break;
     case 'openSection':
@@ -670,8 +670,6 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
       break;
 
     case 'addDealer':
-      $dealer = '{"name":"dpp.by"}';
-
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
 
@@ -721,18 +719,20 @@ if ($dbAction === 'tables') { // todo добавить фильтрацию та
     case 'loadDealers':
       $result['dealers'] = $main->db->loadDealers();
       break;
-    case 'setupDealer':
+    case 'changeDealer':
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
 
         $param['settings'] = json_encode($dealer['settings']);
 
-        $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);;
+        $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);
       }
       break;
-    /*case 'changeDealer': break;
-    case 'setupDealer': break;
-    case 'deleteDealer': break;*/
+    case 'deleteDealer':
+      if (isset($dealer)) {
+
+      }
+      break;
 
     default:
       echo 'SWITCH default DB.php' . var_dump($_REQUEST);

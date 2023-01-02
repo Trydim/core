@@ -5,8 +5,6 @@
  */
 
 $isAdmin = $main->getLogin('admin');
-
-ob_start();
 ?>
 <div class="row container m-auto" id="settingForm">
   <?php if ($isAdmin) { ?>
@@ -38,10 +36,17 @@ ob_start();
               label="Сохранить" @click="saveSetting"
     ></p-button>
   </div>
+  <hr>
 
   <?php if ($main->availablePage('catalog')) { ?>
-    <hr>
-    <setting-properties :query="query" :query-param="queryParam" @update="updateProperties"></setting-properties>
-    <input type="hidden" value="catalogPage">
+    <setting-properties type="catalog" :query="query" :query-param="queryParam"
+                        @update="updateProperties"
+    ></setting-properties>
+  <?php } ?>
+
+  <?php if ($main->availablePage('dealers')) { ?>
+    <setting-properties type="dealer" title="" :query="query" :query-param="queryParam"
+                        @update="updateDealersProperties"
+    ></setting-properties>
   <?php } ?>
 </div>

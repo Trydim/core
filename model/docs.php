@@ -2,7 +2,7 @@
 
 /**
  * @var array $main - global
- * @var string $docsAction - from query
+ * @var string $cmsAction - extract from query in main.php
  * @var string $docType - from query
  */
 
@@ -68,8 +68,8 @@ if ($orderId) {
   $data['reportValue'] = $reportVal;
 }
 
-$docsAction = $docsAction ?? 'mail';
-$docType = $docType ?? $docsAction;
+$cmsAction = $cmsAction ?? 'mail';
+$docType = $docType ?? $cmsAction;
 
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------
@@ -86,37 +86,35 @@ if (in_array($docType, ['excel', 'pdf', 'print'])) {
   );
 } else $docType = false;
 
-if (isset($docsAction)) {
-  switch ($docsAction) {
-    case 'excel':
-    case 'pdf':
-    case 'print':
-      $docType && $result = $docs->getDocs($mailTpl ?? 'mailTpl');
-      break;
-    case 'mail':
-      $docType && $docsPath = $docs->getDocs('save');
-      $mail = new Mail($mailTpl ?? 'mailTpl');
-      $param = [
-        'name'  => $name ?? '',
-        'phone' => $tel ?? $phone ?? '',
-        'email' => $email ?? '',
-        'info'  => $info ?? '',
-        'data'  => $data,
-      ];
-      count($_FILES) && $mail->addOtherFile($_FILES);
-      $mail->setSubject($mailSubject ?? $subject ?? '');
-      $mail->prepareMail($param);
-      $docType && $mail->addFile($docsPath);
+switch ($cmsAction) {
+  case 'excel':
+  case 'pdf':
+  case 'print':
+    $docType && $result = $docs->getDocs($mailTpl ?? 'mailTpl');
+    break;
+  case 'mail':
+    $docType && $docsPath = $docs->getDocs('save');
+    $mail = new Mail($mailTpl ?? 'mailTpl');
+    $param = [
+      'name'  => $name ?? '',
+      'phone' => $tel ?? $phone ?? '',
+      'email' => $email ?? '',
+      'info'  => $info ?? '',
+      'data'  => $data,
+    ];
+    count($_FILES) && $mail->addOtherFile($_FILES);
+    $mail->setSubject($mailSubject ?? $subject ?? '');
+    $mail->prepareMail($param);
+    $docType && $mail->addFile($docsPath);
 
-      $otherMail = $otherMail ?? [];
-      isset($email) && !empty($email) && $otherMail[] = $email;
-      $mail->addMail($otherMail);
-      $result['mail'] = $mail->send();
-      break;
-    case 'getPrintStyle':
-      $fileTpl = ABS_SITE_PATH . 'public/views/docs/' . ($fileTpl ?? 'printTpl.css');
+    $otherMail = $otherMail ?? [];
+    isset($email) && !empty($email) && $otherMail[] = $email;
+    $mail->addMail($otherMail);
+    $result['mail'] = $mail->send();
+    break;
+  case 'getPrintStyle':
+    $fileTpl = ABS_SITE_PATH . 'public/views/docs/' . ($fileTpl ?? 'printTpl.css');
 
-      if (file_exists($fileTpl)) $result['style'] = file_get_contents($fileTpl);
-      break;
-  }
+    if (file_exists($fileTpl)) $result['style'] = file_get_contents($fileTpl);
+    break;
 }

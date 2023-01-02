@@ -2,15 +2,15 @@
 
 /**
  * @var Main $main - global
+ * @var string $cmsAction - extract from query in main.php
  */
 
-$authAction = $authAction ?? 'noAuthAction';
 $login = $login ?? '';
 $password = $password ?? '';
 
 !isset($_SESSION) && session_start();
 
-switch ($authAction) {
+switch ($cmsAction) {
   case 'login':
     $main->fireHook('authLoginBefore', $main);
     if ($user = $main->db->checkPassword($login, $password)) {

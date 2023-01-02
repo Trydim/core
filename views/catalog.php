@@ -519,7 +519,7 @@
         <!-- Пользовательские параметры -->
         <div v-if="optionsModal.single || fieldChange.properties" class="col-6">
           <div class="form-label text-center mb-3">Параметры</div>
-          <div v-for="(prop, key, index) of properties" class="p-inputgroup mb-2" :key="'t' + key">
+          <div v-for="(prop, key) of properties" class="p-inputgroup mb-2" :key="'t' + key">
             <span class="p-inputgroup-addon col-6 text-nowrap">{{ prop.name }}</span>
             <p-input-text v-if="prop.type === 'text'" v-model="option.properties[key]"></p-input-text>
             <p-input-number v-else-if="prop.type === 'number'" class="p-inputtext-sm" show-buttons

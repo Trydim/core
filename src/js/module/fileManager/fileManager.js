@@ -5,7 +5,7 @@ import '../../../css/module/fileManager/fileManager.css';
 const t = dir => {
   //$body.append('<div id="alerts" class="btn blue">загрузка..</div>');
   //$("#alerts").fadeIn(1e3);
-  fileManager.query({fmAction: 'showTable', dir}, (data) => {
+  fileManager.query({cmsAction: 'showTable', dir}, (data) => {
     $('#ab-container-table').html('').append(data);
     //$("#alerts").hide().remove();
   });
@@ -18,7 +18,7 @@ const fileManager = {
 
   queryParam: {
     mode: 'FM',
-    fmAction: 'showTable',
+    cmsAction: 'showTable',
   },
 
   init() {
@@ -79,7 +79,7 @@ const fileManager = {
         return $body.append('<div id="alerts" class="btn blue">working..<\/div>'),
           $("#alerts").fadeIn(1000),
           f = u + r + "/",
-          this.query({fmAction: 'createFolder', dir: f}, function () {
+          this.query({cmsAction: 'createFolder', dir: f}, function () {
             $("#tree div.selected").next("ul").append('<li><div id="' + r + '" data-fo="' + f + '" class="fo closed">' + r + '<\/div><ul style="display: none;"><\/ul><\/li>');
             t(u)
           }), $("#alerts").hide().remove(), !1
@@ -92,7 +92,7 @@ const fileManager = {
             r = prompt("Name file:", "");
 
       if (r) {
-        fileManager.query({fmAction: 'createFile', fileName: u + r}, function (data) {
+        fileManager.query({cmsAction: 'createFile', fileName: u + r}, function (data) {
           t(u);
           let ext = r.substr(r.lastIndexOf(".") + 1);
           $("#tree div.selected").next("ul")
@@ -114,7 +114,7 @@ const fileManager = {
             o = $(".selected").next("ul").find("li div:contains(" + r + "):last"),
             s = $(this).parents("tr").find("a.delete-directory");
 
-        fileManager.query({fmAction: 'renameFolder', oldName: f, newName: u}, function (t) {
+        fileManager.query({cmsAction: 'renameFolder', oldName: f, newName: u}, function (t) {
           //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
           e.attr("href", u).text(i);
           s.attr("href", u);
@@ -136,7 +136,7 @@ const fileManager = {
             s = $("#ab-list-pages td.ab-tdfile:contains(" + r + "):last"),
             h = $(".selected").next("ul").find("li:contains(" + r + "):last");
 
-        return fileManager.query({fmAction: 'renameFolder', oldName: u, newName: f}, function (t) {
+        return fileManager.query({cmsAction: 'renameFolder', oldName: u, newName: f}, function (t) {
           //$("#alerts").hide().remove();
           //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
           //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
@@ -155,7 +155,7 @@ const fileManager = {
 
       let tr = $(this).parents("tr");
       confirm('Delete folder "' + r + '" ?') &&
-      fileManager.query({fmAction: 'deleteFolder', dir: i},  function (t) {
+      fileManager.query({cmsAction: 'deleteFolder', dir: i},  function (t) {
           //$("#alerts").hide().remove();
           //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
           //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
@@ -173,7 +173,7 @@ const fileManager = {
       let tr = $(this).parents("tr");
 
       confirm('Удалить файл "' + r + '" ?')
-           && fileManager.query({fmAction: 'deleteFile', dir: i},  function (t) {
+           && fileManager.query({cmsAction: 'deleteFile', dir: i},  function (t) {
           tr.hide(100).remove();
           u.remove();
           f.showMsg('Удалено');
@@ -184,10 +184,10 @@ const fileManager = {
       //var t = $(this);
       //t.html('<i class=" fa fa-refresh fa-spin fa-fw" aria-hidden="true"><\/i>');
 
-      let fmAction = this.dataset.action,
+      let cmsAction = this.dataset.action,
           dir = this.dataset.path;
 
-      fileManager.query({fmAction, dir, type: 'body'}, () => {});
+      fileManager.query({cmsAction, dir, type: 'body'}, () => {});
       //setTimeout(function () {t.html('<i class=" fa fa-download" aria-hidden="true"><\/i>')}, 3000)
     });
 
@@ -209,7 +209,7 @@ const fileManager = {
         fileManager.form.append('files[]', file, file['name']);
       });
 
-      fileManager.query({fmAction: 'uploadFile', dir},  function () {
+      fileManager.query({cmsAction: 'uploadFile', dir},  function () {
         t(dir);
 
         f.showMsg('Добавлено');

@@ -99,7 +99,7 @@ const cmsEvent = function() {
 
   let select = {
     menuToggle: menuToggle,
-    exit: () => location.href = f.SITE_PATH + `?mode=auth&authAction=exit`,
+    exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };
 
   select[action] && select[action]();

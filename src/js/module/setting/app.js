@@ -82,6 +82,9 @@ export default {
     updateOtherFields(p) {
       this.queryParam.otherFields = JSON.stringify(p);
     },
+    updateDealersProperties(p) {
+      this.queryParam.dealersProperties = JSON.stringify(p);
+    },
 
     query() {
       const data = new FormData();

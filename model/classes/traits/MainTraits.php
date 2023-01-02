@@ -9,7 +9,9 @@ trait Authorization {
   /**
    * @var string[]
    */
-  static $AVAILABLE_ACTION = ['loadCSV', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles'];
+  static $AVAILABLE_ACTION = [
+    'loadCSV', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles', 'loadDealersProperties'
+  ];
 
   /**
    * @var string
@@ -138,10 +140,10 @@ trait Authorization {
 
   /** Нужна ли регистрация для действия
    * @param string $action
-   * @return bool|Main
+   * @return bool
    */
-  public function checkAction(string $action) {
-    return in_array($action, $this::$AVAILABLE_ACTION) ? true : $this->checkAuth()->checkStatus();
+  public function checkAction(string $action): bool {
+    return in_array($action, $this::$AVAILABLE_ACTION) || $this->checkAuth()->checkStatus();
   }
 
   /**

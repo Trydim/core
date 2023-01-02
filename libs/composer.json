@@ -18,6 +18,7 @@
     "ext-mbstring": "*",
     "ext-iconv": "*",
     "ext-gettext": "*",
-    "ext-simplexml": "*"
+    "ext-simplexml": "*",
+    "ext-mysql_xdevapi": "*"
   }
 }

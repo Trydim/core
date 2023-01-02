@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
     <Button v-if="false" type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
-    <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="delDealer">Удалить</Button>
+    <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="deleteDealer">Удалить</Button>
   </div>
 
   <DataTable v-if="dealers.length"
@@ -44,16 +44,15 @@
     </Column>
     <Column field="settings" :sortable="false" header="Settings">
       <template #body="slotProps">
-        <div v-for="(setting, key) of slotProps.data.settings" :key="key">
-          {{ setting.name }}: {{ setting.value }}
+        <div v-for="(value, key) of slotProps.data.settings" :key="key">
+          <p class="p-0">{{ getPropertiesName(key) }}: {{ value }}</p>
         </div>
       </template>
     </Column>
   </DataTable>
 
   <div class="d-flex my-3">
-    <Button v-if="false" type="button" class="btn btn-warning" @click="changeDealer">Изменить</Button>
-    <Button type="button" class="ms-3 btn btn-warning" @click="setupDealer">Настроить</Button>
+    <Button type="button" class="btn btn-warning" @click="changeDealer">Редактировать</Button>
   </div>
 
   <Dialog v-model:visible="modal.display" :modal="true">
@@ -61,34 +60,52 @@
       <h4>{{ modal.title }}</h4>
     </template>
 
-    <div v-if="queryParam.dbAction === 'changeDealer'" style="min-width: 500px">
-      <!-- Тип элемента -->
-      <div class="p-inputgroup my-2">
-        <span class="p-inputgroup-addon col-5">Название:</span>
-        <!--<input-text v-model="dealer.name" @input="dealerNameInput()" autofocus></input-text>-->
+    <div v-if="queryParam.dbAction === 'changeDealer'" class="row" style="min-width: 500px">
+      <div class="col-6">
+        <!-- Наименование -->
+        <div class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">Название:</span>
+          <InputText class="p-inputtext-sm" v-model="dealer.name" autofocus></InputText>
+        </div>
+        <!-- Контакты номер -->
+        <div class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">Телефон:</span>
+          <InputText class="p-inputtext-sm" v-model="dealer.contacts.phone"></InputText>
+        </div>
+        <!-- Контакты почта -->
+        <div class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">Почта:</span>
+          <InputText class="p-inputtext-sm" v-model="dealer.contacts.email"></InputText>
+        </div>
+        <!-- Контакты адрес -->
+        <div class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">Адрес:</span>
+          <InputText class="p-inputtext-sm" v-model="dealer.contacts.address"></InputText>
+        </div>
+        <!-- Доступен -->
+        <div class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">Доступ:</span>
+          <ToggleButton on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
+                        on-label="Активен" off-label="Неактивен"
+                        v-model="dealer.activity"
+          ></ToggleButton>
+        </div>
       </div>
-      <!-- Имя элемента -->
-      <div class="p-inputgroup my-2">
-        <span class="p-inputgroup-addon col-5">Контакты:</span>
-        <!--<p-input-text v-model="dealer.c" @input="dealerNameInput()" autofocus></p-input-text>-->
-      </div>
-      <!-- Доступен -->
-      <div class="p-inputgroup my-2">
-        <span class="p-inputgroup-addon col-5">Доступ:</span>
-        <ToggleButton on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
-                      on-label="Активен" off-label="Неактивен"
-                      v-model="modal.activity"
-        ></ToggleButton>
-      </div>
-    </div>
-    <div v-else-if="queryParam.dbAction === 'setupDealer'">
-      <div v-for="(setting, key) of this.dealer.settings" :key="key"
-           class="p-inputgroup my-2">
-        <span class="p-inputgroup-addon col-5">{{ setting.name }}</span>
-        <InputNumber v-model="setting.value" autofocus
-                     @focus="this.value = ''"
-                     @input="modal.confirmDisabled = false"
-        ></InputNumber>
+
+      <div class="col-6">
+        <!--<Button label="Обновить" icon="pi pi-refresh" class="w-100 my-2"
+          v-tooltip.bottom="'Обновить свойства'"
+          @click="refreshProperties"
+        ></Button>-->
+        <div v-for="(prop, key) of properties" :key="key"
+             class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">{{ prop.name }}</span>
+
+          <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]"></InputText>
+          <InputNumber v-else-if="prop.type === 'number'" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
+          <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px"></Textarea>
+          <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"></Calendar>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -109,22 +126,19 @@ import 'primevue/resources/primevue.css';
 
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
-import ToggleButton from 'primevue/togglebutton';
-//import Checkbox from 'primevue/checkbox';
-//import InputText from 'primevue/inputtext';
-//import Textarea from 'primevue/textarea';
-import InputNumber from 'primevue/inputnumber';
-//import Dropdown from 'primevue/dropdown';
-//import MultiSelect from 'primevue/multiselect';
-//import TreeSelect from 'primevue/treeselect';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-//import Calendar from 'primevue/calendar';
+import ToggleButton from 'primevue/togglebutton';
+import Checkbox from 'primevue/checkbox';
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import InputNumber from 'primevue/inputnumber';
+import Calendar from 'primevue/calendar';
 
 export default {
   name: 'dealer',
   components: {
-    Button, ToggleButton, InputNumber,
+    Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar,
     DataTable, Column,
     Dialog
   },
@@ -143,11 +157,13 @@ export default {
       activity: undefined,
       settings: {},
     },
+    dealersProperties: {},
 
     reloadFn: undefined,
     queryParam: {
+      mode: 'DB',
       dbTable: 'dealers',
-      dbAction: 'loadDealers',
+      dbAction: undefined,
     },
     msg: {
       text: undefined,
@@ -162,39 +178,45 @@ export default {
     },
   }),
   computed: {
+    properties() {
+      return this.dealersProperties.reduce((r, p) => {
+        r[p.code] = p; return r;
+      }, Object.create(null));
+    },
   },
   watch: {
-    /*dealer: {
+    dealer: {
       deep: true,
       handler() {
-        this.modal.confirmDisabled = false;
+        this.modal.confirmDisabled = !this.dealer.name;
       },
-    }*/
+    },
   },
   methods: {
-    query() {
+    query(dataKey) {
       const data = new FormData();
-      data.set('mode', 'DB');
 
       Object.entries(this.queryParam).forEach(([key, value]) => data.set(key, value.toString()));
 
       f.Post({data}).then(data => {
         if (this.reloadFn) {
-          this.reloadFn();
-          this.reloadFn = () => {};
+          this.reloadFn(data);
+          this.reloadFn = undefined;
           return;
         }
 
-        data['dealers'] && this.setData(data['dealers']);
+        this.setData(dataKey, data);
         if (this.msg.text) {
           f.showMsg(this.msg.text, this.msg.type);
           this.msg.text = '';
         }
       });
     },
-    setData(data) {
-      this.dealers = data;
-      this.selected = {};
+    setData(dataKey, data) {
+      if (dataKey === 'dealers') this.selected = {}
+
+      if (data[dataKey]) this[dataKey] = data[dataKey];
+      else f.showMsg('Query set data error' + dataKey, 'error');
     },
     setModal(title, confirmDisabled) {
       this.$nextTick(() => {
@@ -203,36 +225,68 @@ export default {
     },
     reload() {
       this.queryParam.dbAction = 'loadDealers';
-      this.query();
+      this.query('dealers');
     },
 
     checkColumn() { return true; },
+    getPropertiesName(k) { return this.properties[k].name; },
+    setProperty() {
+      const de = this.dealer;
+      de.settings = {};
+
+      Object.values(this.dealersProperties).forEach(prop => {
+        let v = 0,
+            currentValue = de.settings[prop] ? de.settings[prop].value : null;
+
+        if (prop.type === 'select') v = '1';
+        else {
+          switch (prop.type) {
+            case 'text': case 'textarea': v = ''; break;
+            case 'number': v = '0'; break;
+            case 'date': v = new Date().getTime(); break;
+            case 'bool': v = false; break;
+          }
+        }
+
+        de.settings[prop.code] = currentValue || v;
+      });
+    },
 
     addDealer() {
       this.queryParam.dbAction = 'addDealer';
-      //this.reloadAction = this.reload;
-      this.query();
+
+      this.dealer = {
+        name: '',
+        contacts: {
+          phone: '',
+          email: '',
+          address: '',
+        },
+        activity: true,
+      };
+
+      this.setProperty();
+      this.setModal('Добавить дилера', true);
+      this.reloadAction = this.reload;
     },
-    changeDealer() {},
-    setupDealer() {
-      if (!this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
-      const el = this.dealer = this.selected;
+    changeDealer() {
+      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+      this.queryParam.dbAction = 'changeDealer';
+      this.dealer = {...this.selected}; // TODO глубокое копирование для отмены
+      this.dealer.activity = !!+this.dealer.activity;
 
-      this.queryParam.dbAction = 'setupDealer';
-
-      /*временно*/
-      if (!el.settings.margin) {
-        this.dealer.settings.margin = {
-          name: 'Наценка, %',
-          type: 'number',
-          value: 0,
-        };
-      }
+      if (!this.dealer.settings) this.setProperty();
 
       this.setModal('Настройка для дилера', true);
       this.reloadAction = this.reload;
     },
-    delDealer() {},
+    refreshProperties() {
+      this.setProperty();
+    },
+    deleteDealer() {
+      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+
+    },
 
     dblClick(e) {
       let tr = e.target.closest('tr'),
@@ -251,13 +305,20 @@ export default {
     },
   },
   created() {
+    // Load dealers second
+    this.reloadFn = data => {
+      this.queryParam.mode     = 'DB';
+      this.queryParam.dbAction = 'loadDealers';
+      this.setData('dealersProperties', data);
+      this.query('dealers');
+    };
+
+    // Load properties first
+    this.queryParam.mode     = 'setting';
+    this.queryParam.dbAction = 'loadDealersProperties';
     this.query();
   },
-  mounted() {
-
-  },
+  mounted() { },
 }
 
 </script>
-
-<style lang="scss"></style>

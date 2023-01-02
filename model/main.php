@@ -6,9 +6,9 @@
 extract($_REQUEST);
 $result = [];
 $mode = $mode ?? 'noMode';
-$dbAction = $dbAction ?? 'noAction';
+$cmsAction = $dbAction ?? $cmsAction ?? 'noAction';
 
-if (DEBUG || in_array($mode, ['auth', 'docs']) || $main->checkAction($dbAction)) {
+if (DEBUG || in_array($mode, ['auth', 'docs']) || $main->checkAction($cmsAction)) {
   try {
     switch ($mode) {
       case 'auth':
