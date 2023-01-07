@@ -90,6 +90,7 @@ module.exports = env => {
             filename: 'js/libs/[name][ext]',
           },
         },
+        getTypescriptRules(),
         getVueRules(),
         getScssRules(dev),
         getCssRules(dev),
@@ -109,6 +110,19 @@ module.exports = env => {
  * asset/inline - url-loader - inline базе64
  * asset/source - raw-loader - ?
  * asset - автоматический выбор от размера по умолчанию 8к */
+
+/**
+ * Typescript
+ * @return {object}
+ */
+const getTypescriptRules = () => ({
+  test  : /\.ts$/,
+  loader: 'ts-loader',
+  exclude: /node_modules/,
+  options: {
+    appendTsSuffixTo: [/\.vue$/]
+  },
+});
 
 /**
  * Vue

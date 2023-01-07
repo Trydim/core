@@ -1,3 +1,4 @@
+/// <reference lib="sweetalert2.d.ts" />
 
 declare class LoaderIcon {
   constructor(
@@ -37,6 +38,11 @@ declare type CMSGlobalObject = {
   AUTH_STATUS: boolean
   /** app starting as dealer module */
   IS_DEAL: boolean
+
+  ID: {
+    AUTH_BLOCK: string
+    PUBLIC_PAGE: string
+  }
 
   INIT_SETTING: object|false
   /** global mask for function initMask */
@@ -129,7 +135,7 @@ declare type CMSGlobalObject = {
    * Опциям селектора добавить data-target="targetClass"
    * @param node
    */
-  relatedOption(node: HTMLElement)
+  relatedOption(node?: HTMLElement)
 
   toNumber(v: any): number
   parseNumber(v: any): number
@@ -152,16 +158,18 @@ declare type CMSGlobalObject = {
           options?: boolean | object
   ): void
 
+  getSetting()
+
   /**
    * LocalStorage
    */
-  LocalStorage()
+  LocalStorage
 
   transLit(value: string): string
 
   Get(obj: {
     url?: string,
-    data?: string,
+    data?: any,
     type?: string | 'text' | 'json' | 'blob'
   }): Promise<Response>
 
@@ -172,6 +180,9 @@ declare type CMSGlobalObject = {
   }): Promise<Response>
 
   LoaderIcon: LoaderIcon
+
+  Modal<T = any>(options: SweetAlertOptions|string): SweetAlertResult<Awaited<T>>
+  Modal<T = any>(title: string, html?: string, icon?: SweetAlertIcon): SweetAlertResult<Awaited<T>>
 }
 
 interface Window {

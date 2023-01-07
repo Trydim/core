@@ -1,6 +1,9 @@
 'use strict';
 
-import './_modal.scss';
+//import './_modal.scss';
+
+import 'sweetalert2/src/sweetalert2.scss';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 
 const findNode = (n, role) => n.querySelector(`[data-role="${role}"]`);
 
@@ -38,7 +41,7 @@ const templatePopup = pr => {
  * showDefaultButton: boolean,
  * btnConfig: boolean }}
  */
-export const Modal = function (param = {}) {
+const ModalOld = function (param = {}) {
   let modal = Object.create(null),
       data = Object.create(null),
       destroy = !(this instanceof Modal),
@@ -106,7 +109,7 @@ export const Modal = function (param = {}) {
     data.scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
     document.body.style.overflow = 'hidden';
 
-    if (document.body.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
+    if (document.documentElement.getBoundingClientRect().height > window.innerHeight && window.innerWidth > 800) {
       data.bodyPaddingRight = document.body.style.paddingRight;
       document.body.style.paddingRight = '16px';
     }
@@ -175,4 +178,14 @@ export const Modal = function (param = {}) {
   //document.body.insertAdjacentHTML('beforeend', '<shadow-modal></shadow-modal>');
 
   return modal;
+}
+
+/**
+ *
+ * @param {object} param
+ * @return sweetalert2
+ * @constructor
+ */
+export const Modal = function (param = {}) {
+  return Swal.fire(param);
 }

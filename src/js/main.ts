@@ -4,7 +4,7 @@ const menuClass = 'menu-toggle';
 const storage = new f.LocalStorage();
 
 const cancelFormSubmit = () => {
-  f.qA('form', 'keypress', (e) => {
+  f.qA('form', 'keypress', (e: HTMLElement|any) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       return false;
@@ -20,14 +20,14 @@ const dictionaryInit = () => {
   d.data = JSON.parse(node.value);
   node.remove();
 
-  d.getTitle = key => d.data[key] || key;
+  d.getTitle = (key: string) => d.data[key] || key;
 
   /**
    * Template string can be param (%1, %2)
    * @param key - array, first item must be string
    * @returns {*}
    */
-  d.translate = (...key) => {
+  d.translate = (...key: string[]) => {
     if (key.length === 1) return d.getTitle(key[0]);
 
     let str = d.getTitle(key[0]);
@@ -36,6 +36,7 @@ const dictionaryInit = () => {
     }
     return str;
   };
+  // @ts-ignore
   window._ = d.translate;
 }
 
@@ -49,8 +50,8 @@ const storageLoad = () => {
   if (node && storage.get('menuToggle') === 'true') node.classList.add(menuClass);
 }
 
-const setParentHeight = (target, height) => {
-  const n = target.closest("ul[aria-expanded=\"false\"]");
+const setParentHeight = (target: HTMLElement, height: number) => {
+  const n: HTMLElement|any = target.closest("ul[aria-expanded=\"false\"]");
   if (n) {
     n.style.height = (n.offsetHeight + height) + 'px';
     setParentHeight(n.parentNode, height);
@@ -101,11 +102,11 @@ const cmsEvent = function() {
     menuToggle: menuToggle,
     exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };
-
+  // @ts-ignore
   select[action] && select[action]();
 };
 
-const sideMenuExpanded = function(e) {
+const sideMenuExpanded = function(e: Event) {
   e.preventDefault();
 
   const nodeS  = this.nextElementSibling,
@@ -139,7 +140,7 @@ const onEvent = () => {
   // Block Authorization
   let node = f.gI(f.ID.AUTH_BLOCK);
   node && node.querySelectorAll('[data-action]')
-              .forEach(n => n.addEventListener('click', cmsEvent));
+              .forEach((n: HTMLElement) => n.addEventListener('click', cmsEvent));
 
   // Menu Action
   f.qA('#sideMenu [role="button"]', 'click', sideMenuExpanded);
@@ -149,9 +150,6 @@ const onEvent = () => {
 
 // Entrance function
 (() => {
-  let page = location.pathname.replace(f.SITE_PATH, '').match(/(\w+)/);
-  page = (page && !f.OUTSIDE) ? page[1] : 'public';
-
   if (f.gI('authForm')) return;
 
   cancelFormSubmit();
@@ -161,7 +159,7 @@ const onEvent = () => {
   storageLoad();
   setSideMenuStyle();
   onEvent();
-  setLinkMenu(page || '/'); // after bind events
+  setLinkMenu(); // after bind events
 
   stopPreloader();
 })();

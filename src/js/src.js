@@ -2,9 +2,9 @@
 
 import '../css/style.scss';
 
-import c from "./components/const.js";
+import c from "./components/const.ts";
 import f from "./components/func.js";
-import q from "./components/query.js";
+import q from "./components/query.ts";
 
 import * as module from './components/component.js';
 import {Debugger} from "./components/Debugger";
@@ -134,7 +134,6 @@ const m = {
 
   /**
    * User class
-   *
    */
   User,
 };

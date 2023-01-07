@@ -3,6 +3,7 @@
 /**
  * Global variables and simple functions
  */
+// @ts-ignore
 const cms = JSON.parse(window.CMS_CONST || '{}');
 
 export default {

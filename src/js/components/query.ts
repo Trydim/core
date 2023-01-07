@@ -1,6 +1,6 @@
 // Query Object -----------------------------------------------------------------------------------------------------------------
 
-const checkJSON = data => {
+const checkJSON = (data: string) => {
   try {
     const response = JSON.parse(data);
     if (response['error']) throw response['error'];
@@ -14,7 +14,7 @@ const checkJSON = data => {
   }
 };
 
-const getFileName = data => {
+const getFileName = (data: any) => {
   let fileName = data.headers.get('Content-Disposition');
 
   if (typeof fileName === 'string') {
@@ -25,7 +25,7 @@ const getFileName = data => {
 
   return fileName || JSON.parse(data.headers.get('fileName')) || '';
 }
-const downloadBody = async data => {
+const downloadBody = async (data: any) => {
   const fileName = getFileName(data),
         reader   = data.body.getReader();
   let chunks    = [],
@@ -44,12 +44,12 @@ const downloadBody = async data => {
   return Object.assign(new Blob(chunks), {fileName});
 }
 
-const query = (url, body, type = 'json') => {
+const query = (url: string, body: BodyInit | null, type = 'json') => {
   type === 'file' && (type = 'body');
   return fetch(url, {method: 'post', body})
-    .then(res => type === 'json' ? res.text() : res).then(
+    .then((res: Response | Promise<string> | any) => type === 'json' ? res.text() : res).then(
       data => {
-        if (type === 'json') return checkJSON(data, type);
+        if (type === 'json') return checkJSON(data);
         else if (type === 'body') return downloadBody(data);
         else return data[type]();
       },
@@ -74,17 +74,17 @@ export default {
    * @return {Promise<Response>}
    * @constructor
    */
-  Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url + '?' + data, new FormData(), type),
+  Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}: {url: string, data?: string, type?: string}) => query(url + '?' + data, null, type),
 
   /**
    * Fetch Post
    * @param {object} obj
    * @param {string?|any?: c.MAIN_PHP_PATH} obj.url - link to index.php.
-   * @param {Blob|BufferSource|FormData|URLSearchParams|ReadableStream} obj.data -
+   * @param {BodyInit} obj.data -
    * Any body that you want to add to your request object.
    * Note that a request using the GET or HEAD method cannot have a body.
    * @param {string?: 'json'} obj.type - return type.
    * @return {Promise<Response>}
    */
-  Post: ({url = f.MAIN_PHP_PATH, data, type = 'json'}) => query(url, data, type),
+  Post: ({url = f.MAIN_PHP_PATH, data, type = 'json'}: {url: string, data: BodyInit, type?: string}) => query(url, data, type),
 };
