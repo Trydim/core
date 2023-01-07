@@ -75,7 +75,18 @@ module.exports = env => {
     ],
 
     module: {
+      noParse: /(handsontable\.full\.min\.js|fullCalendar\.min|canvasjs\.min)/,
+      parser: {
+        javascript: {commonjsMagicComments: true},
+      },
       rules: [
+        {
+          test: /(handsontable.full.min.js|fullCalendar.min|canvasjs.min)/,
+          type: "asset/resource",
+          generator: {
+            filename: 'js/libs/[name][ext]',
+          },
+        },
         getVueRules(),
         getScssRules(dev),
         getCssRules(dev),

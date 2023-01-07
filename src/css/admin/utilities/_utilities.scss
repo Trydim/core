@@ -1,5 +1,9 @@
 .content-center {
-  @extend .d-flex;
-  @extend .justify-content-center;
-  @extend .align-items-center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+[v-cloak] {
+  display: none !important;
 }

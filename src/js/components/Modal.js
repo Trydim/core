@@ -1,6 +1,10 @@
 'use strict';
 
-import './_modal.scss';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+
+import 'sweetalert2/src/sweetalert2.scss';
+
+//import './_modal.scss';
 
 const findNode = (n, role) => n.querySelector(`[data-role="${role}"]`);
 
@@ -38,7 +42,7 @@ const templatePopup = pr => {
  * showDefaultButton: boolean,
  * btnConfig: boolean }}
  */
-export const Modal = function (param = {}) {
+const ModalOld = function (param = {}) {
   let modal = Object.create(null),
       data = Object.create(null),
       destroy = !(this instanceof Modal),
@@ -121,12 +125,14 @@ export const Modal = function (param = {}) {
   }
 
   modal.hide = function () {
+    const scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
+
     this.wrap.classList.remove(prefix + 'active');
     this.window.classList.remove(prefix + 'active');
+    scrollY !== data.scrollY && window.scrollTo(0, data.scrollY);
 
     setTimeout(() => {
       document.body.style.overflow = data.bodyOver || 'initial';
-      window.scrollTo(0, data.scrollY);
       if (document.body.style.paddingRight === '16px')
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
 
@@ -158,9 +164,9 @@ export const Modal = function (param = {}) {
     else this.btnField && !showDefaultButton && f.eraseNode(this.btnField);
 
     let btnY = this.wrap.querySelector('.confirmYes, [data-action="confirmYes"], [data-target="confirmBtn"]'),
-        btnN = this.wrap.querySelector('.closeBtn, [data-action="confirmNo"], [data-target="cancelBtn"]');
+        btnN = this.wrap.querySelectorAll('.closeBtn, [data-action="confirmNo"], [data-target="cancelBtn"]');
     btnY && (this.btnConfirm = btnY);
-    btnN && (this.btnCancel = btnN);
+    btnN && (this.btnCancel = btnN.length === 1 ? btnN[0] : btnN);
 
     //sNode.insertAdjacentHTML('afterbegin', '');
     //sNode.append(this.wrap);
@@ -173,4 +179,11 @@ export const Modal = function (param = {}) {
   //document.body.insertAdjacentHTML('beforeend', '<shadow-modal></shadow-modal>');
 
   return modal;
+}
+
+export const Modal = function (param = {}) {
+  const s = Swal;
+
+  debugger
+  return Swal.fire(param);
 }
