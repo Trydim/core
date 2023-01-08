@@ -53,7 +53,10 @@
         </div>
         <!-- Код свойства -->
         <div class="col-12 row my-1">
-          <div class="col">Код свойства:</div>
+          <div class="col">
+            Код свойства:
+            <i class="ms-1 pi pi-tag" v-tooltip.bottom="'При изменении, обновить значение у дилеров'"></i>
+          </div>
           <div class="col">
             <p-input-text class="w-100" v-model="property.newCode"></p-input-text>
           </div>

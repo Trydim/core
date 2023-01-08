@@ -94,7 +94,7 @@ switch ($cmsAction) {
     break;
   case 'mail':
     $docType && $docsPath = $docs->getDocs('save');
-    $mail = new Mail($mailTpl ?? 'mailTpl');
+    $mail = new Mail($main, $mailTpl ?? 'mailTpl');
     $param = [
       'name'  => $name ?? '',
       'phone' => $tel ?? $phone ?? '',

@@ -1,8 +1,7 @@
 <?php
 
 
-class CmsParam
-{
+class CmsParam {
   /**
    * @var array
    */

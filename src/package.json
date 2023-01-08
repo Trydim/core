@@ -44,6 +44,7 @@
     "sass-loader": "latest",
     "style-loader": "latest",
     "svgo-loader": "latest",
+    "typescript": "latest",
     "vue-loader": "next",
     "webpack": "latest",
     "webpack-cli": "latest"

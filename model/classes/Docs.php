@@ -128,7 +128,7 @@ class Docs {
       'orientation'   => $this->pdfOrientation,
     ];
 
-    $this->imgPath = $this->main->getCmsParam('uriImg');
+    $this->imgPath = $this->main->getCmsParam(VC::URI_IMG);
   }
 
   private function prepareTemplate() {

@@ -8,6 +8,8 @@ class Db extends R {
 
   const DB_DATA_FORMAT = 'Y-m-d H:i:s';
 
+  const DB_JSON_FIELDS = ['inputValue', 'saveValue', 'importantValue', 'contacts', 'customization', 'settings', 'cmsParam', 'properties'];
+
   /**
    * @var Main
    */
@@ -60,21 +62,20 @@ class Db extends R {
   }
 
   /**
-   * @param array $dealers
-   * @param array $fields
+   * @param array $arr
    * @return array
    */
-  private function parseJsonField(array $dealers, array $fields): array {
+  private function parseJsonField(array $arr): array {
     $result = [];
+    //$arr = array_flatten($arr);
 
-    if (isset($dealers['contacts'])) {
-      $result = $dealers;
-      foreach ($fields as $field) {
-        $result[$field] = json_decode($result[$field], true);
-      }
-    } else {
-      foreach ($dealers as $dealer) {
-        $result[] = $this->parseJsonField($dealer, $fields);
+    foreach ($arr as $key => $value) {
+      if (is_array($value)) {
+        $result[$key] = $this->parseJsonField($value);
+      } else if (in_array($key, self::DB_JSON_FIELDS)) {
+        $result[$key] = json_decode($value, true);
+      } else {
+        $result[$key] = $value;
       }
     }
 
@@ -85,7 +86,7 @@ class Db extends R {
     $this->main = $main;
 
     if (USE_DATABASE) {
-      $dbConfig = $main->getSettings('dbConfig');
+      $dbConfig = $main->getSettings(VC::DB_CONFIG);
 
       if (!count($dbConfig)) {
         require $main->url->getPath(true) . 'config.php';
@@ -150,7 +151,9 @@ class Db extends R {
       return function ($v) { return floatval($v); };
     }
 
-    return function ($v) {return $v;};
+    return function ($v) {
+      return $v;
+    };
   }
   /**
    * Проверка таблицы перед добавлениями/изменениями
@@ -709,7 +712,7 @@ class Db extends R {
     if (!$propTables) {
       $props = [];
       // Простые параметры
-      if (($setting = getSettingFile()) && isset($setting['optionProperties'])) {
+      if (($setting = $this->main->getSettings()) && isset($setting['optionProperties'])) {
         foreach ($setting['optionProperties'] as $prop => $value) {
           $props[$prop] = array_merge($value, ['simple' => true]);
         }
@@ -768,7 +771,7 @@ class Db extends R {
    * @param array $params
    * @return array
    */
-  public function changePropertyTable(string $dbTable, array $params) {
+  public function changePropertyTable(string $dbTable, array $params): array {
     $error = [];
     $query = [];
     $sSql = "ALTER TABLE " . $this->pf($dbTable);
@@ -1044,7 +1047,7 @@ class Db extends R {
    *
    * @return array|null
    */
-  public function getUser($login, $column = 'ID') {
+  public function getUser($login, string $column = 'ID') {
     $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
       [':login' => $login]
     );
@@ -1219,25 +1222,34 @@ class Db extends R {
     $sql = "SELECT ID AS 'id', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 
-    return $this->parseJsonField(self::getAll($sql), ['contacts', 'settings']);
+    return $this->parseJsonField(self::getAll($sql));
   }
 
   public function getDealerById(string $id): array {
+    $settings = [];
+    $properties = new Properties($this->main);
+
     $sql = "SELECT ID AS 'id', name, contacts,
                    register_date AS 'registerDate', activity, settings
             FROM dealers
             WHERE ID = :id";
 
-    return $this->parseJsonField(self::getRow($sql, [':id' => $id]), ['contacts', 'settings']);
+    $dealer = $this->parseJsonField(self::getRow($sql, [':id' => $id]));
+    $dealer['settings'] = $dealer['settings'] ?? [];
+    foreach ($dealer['settings'] as $prop => $value) {
+      [$propName, $propValue] = $properties->getValue($prop, $value);
+      $settings[$propName] = $propValue;
+    }
+
+    $dealer['settings'] = $settings;
+    return $dealer;
   }
 
   use MainCsv;
   use ContentEditor;
 }
 
-/**
- * Trait Csv
- */
+/** Trait Csv */
 trait MainCsv {
   private $csvTable;
 
@@ -1264,7 +1276,7 @@ trait MainCsv {
           ];
         } else {
           global $main;
-          $csvPath = $main->getCmsParam('csvPath');
+          $csvPath = $main->getCmsParam(VC::CSV_PATH);
           $link && $link .= '/';
           if (filetype($csvPath . $link . $item) === 'dir') {
             $r[$item] = self::scanDirCsv($csvPath . $link . $item, $link . $item);
@@ -1277,7 +1289,7 @@ trait MainCsv {
   }
 
   public function openCsv() {
-    $csvPath = $this->main->getCmsParam('csvPath') . $this->csvTable;
+    $csvPath = $this->main->getCmsParam(VC::CSV_PATH) . $this->csvTable;
 
     if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
       $result = [];
@@ -1295,7 +1307,7 @@ trait MainCsv {
   }
 
   public function fileForceDownload() {
-    $file = $this->main->getCmsParam('csvPath') . $this->csvTable;
+    $file = $this->main->getCmsParam(VC::CSV_PATH) . $this->csvTable;
 
     if (file_exists($file)) {
       // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
@@ -1321,10 +1333,10 @@ trait MainCsv {
   /**
    * @param $csvData
    *
-   * @return $this
+   * @return Db
    */
-  public function saveCsv($csvData) {
-    $csvPath = $this->main->getCmsParam('csvPath');
+  public function saveCsv($csvData): Db {
+    $csvPath = $this->main->getCmsParam(VC::CSV_PATH);
 
     if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];

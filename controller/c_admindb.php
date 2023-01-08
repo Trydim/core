@@ -19,7 +19,7 @@ else {
   count($main->dbTables) && $main->reDirect('admindb?tableName=' . $main->dbTables[0]['fileName']);
 }
 
-$pathLegend = $main->getCmsParam('legendPath');
+$pathLegend = $main->getCmsParam(VC::LEGEND_PATH);
 if ($pathLegend && file_exists($pathLegend)) require $pathLegend;
 unset($pathLegend);
 

@@ -6,6 +6,7 @@
 
   <DataTable v-if="dealers.length"
              :value="dealers" datakey="id"
+             :loading="dealerLoading"
              show-gridlines
              selection-mode="single" :meta-key-selection="false"
              :paginator="dealers.length > 10" :rows="10" :rows-per-page-options="[10,20,50]"
@@ -22,30 +23,33 @@
                       placeholder="Настроить колонки" style="width: 20em"
       ></p-multi-select>
     </template>-->
-    <Column v-if="checkColumn('id')" field="id" :sortable="true" header="id" class="text-center">
+    <Column v-if="checkColumn('id')" field="id" :sortable="true" :header="translate('id')" class="text-center">
       <template #body="slotProps">
         <span :data-id="slotProps.data.id">{{ slotProps.data.id }}</span>
       </template>
     </Column>
-    <Column field="name" :sortable="true" header="Name"></Column>
-    <Column field="contacts" :sortable="false" header="Contacts">
+    <Column field="name" :sortable="true" :header="translate('name')"></Column>
+    <Column field="contacts" :sortable="false" :header="translate('contacts')">
       <template #body="slotProps">
         <div v-if="slotProps.data.contacts.phone">{{ slotProps.data.contacts.phone }}</div>
         <div v-if="slotProps.data.contacts.email">{{ slotProps.data.contacts.email }}</div>
         <div v-if="slotProps.data.contacts.address">{{ slotProps.data.contacts.address }}</div>
       </template>
     </Column>
-    <Column field="registerDate" :sortable="false" header="Register date"></Column>
+    <Column field="registerDate" :sortable="false" :header="translate('Register date')"></Column>
     <Column v-if="checkColumn('activity')" field="activity" :sortable="true" header="Activity" class="text-center">
       <template #body="slotProps">
         <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
         <span v-else class="pi pi-times pi-red"></span>
       </template>
     </Column>
-    <Column field="settings" :sortable="false" header="Settings">
+    <Column field="settings" :sortable="false" :header="translate('setting')">
       <template #body="slotProps">
         <div v-for="(value, key) of slotProps.data.settings" :key="key">
-          <p class="p-0">{{ getPropertiesName(key) }}: {{ value }}</p>
+          <p v-if="getPropertyType(key) === 'bool'" class="m-0">
+            {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="{'pi-green pi-plus': value, 'pi-red pi-times': !value}"></i>
+          </p>
+          <p v-else class="m-0">{{ getPropertyName(key) }}: {{ value }}</p>
         </div>
       </template>
     </Column>
@@ -102,8 +106,13 @@
           <span class="p-inputgroup-addon col-5">{{ prop.name }}</span>
 
           <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]"></InputText>
-          <InputNumber v-else-if="prop.type === 'number'" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
+          <InputNumber v-else-if="prop.type === 'number'" :maxFractionDigits="10" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
           <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px"></Textarea>
+          <ToggleButton v-else-if="prop.type === 'bool'" class="w-100"
+                        on-icon="pi pi-check" off-icon="pi pi-times"
+                        on-label="Да" off-label="Нет"
+                        v-model="dealer.settings[key]"
+          ></ToggleButton>
           <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"></Calendar>
         </div>
       </div>
@@ -135,6 +144,8 @@ import Textarea from 'primevue/textarea';
 import InputNumber from 'primevue/inputnumber';
 import Calendar from 'primevue/calendar';
 
+import cloneDeep from 'lodash/clonedeep';
+
 export default {
   name: 'dealer',
   components: {
@@ -158,6 +169,7 @@ export default {
       settings: {},
     },
     dealersProperties: {},
+    dealerLoading: false,
 
     reloadFn: undefined,
     queryParam: {
@@ -193,8 +205,10 @@ export default {
     },
   },
   methods: {
-    query(dataKey) {
+    translate(str) { return window._(str); },
+    query() {
       const data = new FormData();
+      this.dealerLoading = true;
 
       Object.entries(this.queryParam).forEach(([key, value]) => data.set(key, value.toString()));
 
@@ -205,11 +219,12 @@ export default {
           return;
         }
 
-        this.setData(dataKey, data);
+        this.setData('dealers', data);
         if (this.msg.text) {
           f.showMsg(this.msg.text, this.msg.type);
           this.msg.text = '';
         }
+        this.dealerLoading = false;
       });
     },
     setData(dataKey, data) {
@@ -225,11 +240,12 @@ export default {
     },
     reload() {
       this.queryParam.dbAction = 'loadDealers';
-      this.query('dealers');
+      this.query();
     },
 
     checkColumn() { return true; },
-    getPropertiesName(k) { return this.properties[k].name; },
+    getPropertyName(k) { return this.properties[k] ? this.properties[k].name : k; },
+    getPropertyType(k) { return this.properties[k] ? this.properties[k].type : undefined; },
     setProperty() {
       const de = this.dealer;
       de.settings = {};
@@ -251,6 +267,16 @@ export default {
         de.settings[prop.code] = currentValue || v;
       });
     },
+    updateProperty() {
+      const keys = Object.keys(this.properties);
+
+      Object.keys(this.dealer.settings).forEach(key => {
+        if (!keys.includes(key)) {
+          f.showMsg('Свойство: ' + this.getPropertyName(key) + ' - будет удалено!', 'warning');
+          delete this.dealer.settings[key];
+        }
+      });
+    },
 
     addDealer() {
       this.queryParam.dbAction = 'addDealer';
@@ -267,32 +293,34 @@ export default {
 
       this.setProperty();
       this.setModal('Добавить дилера', true);
-      this.reloadAction = this.reload;
+      this.reloadFn = this.reload;
     },
-    changeDealer() {
+    changeDealer(id) {
+      if (typeof id === 'number') this.selected = this.dealers.find(d => +d.id === id);
       if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+
       this.queryParam.dbAction = 'changeDealer';
-      this.dealer = {...this.selected}; // TODO глубокое копирование для отмены
+      this.dealer = cloneDeep(this.selected);
       this.dealer.activity = !!+this.dealer.activity;
 
       if (!this.dealer.settings) this.setProperty();
+      else this.updateProperty();
 
       this.setModal('Настройка для дилера', true);
-      this.reloadAction = this.reload;
+      this.reloadFn = this.reload;
     },
     refreshProperties() {
       this.setProperty();
     },
     deleteDealer() {
       if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
-
     },
 
     dblClick(e) {
       let tr = e.target.closest('tr'),
           n  = tr && tr.querySelector('[data-id]'),
           id = n && +n.dataset.id;
-      id && this.setupDealer(id);
+      id && this.changeDealer(id);
     },
 
     modalConfirm() {
@@ -310,7 +338,7 @@ export default {
       this.queryParam.mode     = 'DB';
       this.queryParam.dbAction = 'loadDealers';
       this.setData('dealersProperties', data);
-      this.query('dealers');
+      this.query();
     };
 
     // Load properties first

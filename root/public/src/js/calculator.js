@@ -1,3 +1,5 @@
 'use strict';
 
-export const calculator = {};
+import '../css/style.scss';
+
+const calculator = {};

@@ -14,8 +14,8 @@ $field = [
   'jsLinks'  => [],
   'sideLeft' => $authStatus ? null : '',
 ];
-$publicCss = $main->getCmsParam('uriCss');
-$publicJs = $main->getCmsParam('uriJs');
+$publicCss = $main->getCmsParam(VC::URI_CSS);
+$publicJs = $main->getCmsParam(VC::URI_JS);
 
 /** для совместимовсти */
 define('PATH_CSS' , $publicCss);
@@ -62,8 +62,8 @@ if ($isDealer) {
   $dealPublic = $main->url->getPath(true) . 'public/public.php';
 
   if (file_exists($dealPublic)) {
-    $publicCss = $main->getCmsParam('dealUriCss');
-    $publicJs = $main->getCmsParam('dealUriJs');
+    $publicCss = $main->getCmsParam(VC::DEAL_URI_CSS);
+    $publicJs = $main->getCmsParam(VC::DEAL_URI_JS);
     require $dealPublic;
   }
 }

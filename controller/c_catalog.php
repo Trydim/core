@@ -24,7 +24,7 @@ $field = [
 ];
 
 // Загрузка настройки столбцов
-$setting = getSettingFile();
+$setting = $main->getSettings();
 $value = $setting['optionsColumn'] ?? 'ID,C.name,E.name,activity,sort,lastEditDate';
 $field['footerContent'] .= "<input type='hidden' id='elementsColumn' value='$value'>";
 $value = $setting['elementsColumn'] ?? 'ID,images,name,unitId,activity,sort,lastEditDate,moneyInputId,inputPrice,moneyOutputId,outputPercent,outputPrice';
@@ -41,7 +41,7 @@ $value = $db->getMoney();
 $field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($value) . "'>";
 
 // Все свойства
-$value = $main->getSettings('optionProperties');
+$value = $main->getSettings(VC::OPTION_PROPERTIES);
 foreach ($db->getTables('prop') as $table) {
   $name = isset($value[$table['dbTable']]) ? $value[$table['dbTable']]['name'] : $table['name'];
 

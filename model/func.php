@@ -201,21 +201,6 @@ function getPageAsString($data) {
 }
 
 /**
- * Get setting from file
- *
- * @param bool $decode
- * @param bool $assoc
- * @return mixed - array or object
- */
-function getSettingFile(bool $decode = true, bool $assoc = true) {
-  if (file_exists(SETTINGS_PATH)) {
-    $setting = file_get_contents(SETTINGS_PATH);
-    return $decode ? json_decode($setting, $assoc) : $setting;
-  }
-  return $decode ? json_decode('[]', $assoc) : '[]';
-}
-
-/**
  * translate text
  * @param string $str
  * @return string
@@ -325,7 +310,7 @@ function isJSON(string $value) {
  */
 function loadCSV($dict, $filename, $one_rang = false) {
   global $main;
-  $filename = file_exists($filename) ? $filename : $main->getCmsParam('csvPath') . $filename;
+  $filename = file_exists($filename) ? $filename : $main->getCmsParam(VC::CSV_PATH) . $filename;
   $result = [];
 
   if (!count($dict)) return loadFullCSV($filename);

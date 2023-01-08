@@ -102,7 +102,7 @@ class Dealer {
 
     $setParam('prefix', $this->prefix);
     foreach (['dbHost', 'dbName', 'dbUsername', 'dbPass'] as $key) {
-      $setParam($key, $params['dbConfig']);
+      $setParam($key, $params[VC::DB_CONFIG]);
     }
 
     file_put_contents($this->dealerPath . 'config.php', $config);

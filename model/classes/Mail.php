@@ -13,7 +13,6 @@ global $main;
 !defined('MAIL_TARGET') && define('MAIL_TARGET', 'trydim@mail.ru');
 !defined('MAIL_SUBJECT_DEFAULT') && define('MAIL_SUBJECT_DEFAULT', 'Заявка с сайта ' . $_SERVER['SERVER_NAME']);
 !defined('ABS_SITE_PATH') && define('ABS_SITE_PATH', $_SERVER['DOCUMENT_ROOT']);
-!defined('SETTINGS_PATH') && define('SETTINGS_PATH', '');
 
 // MailSetting
 define('MAIL_TARGET_DEBUG', $main->getCmsParam('MAIL_TARGET_DEBUG') ?? 'trydim@mail.ru');
@@ -38,21 +37,16 @@ define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'xmbxqxulvhwcqyta
 */
 
 class Mail {
+  /**
+   * @var Main
+   */
+  private $main;
+
   private $mailTpl, $body = '', $docPath = '', $pdfFileName = '';
   private $mailTarget;
   private $subject, $fromName;
   private $otherMail       = [];
   private $attachmentFiles = [];
-
-
-  /**
-   *
-   * @return array
-   */
-  private function LoadSettingFile(): array {
-    $content = file_get_contents(SETTINGS_PATH);
-    return !empty($content) && is_string($content) ? json_decode($content): [];
-  }
 
   /**
    * @param string $fileName
@@ -65,11 +59,12 @@ class Mail {
   /**
    * @param string $mailTpl
    */
-  public function __construct(string $mailTpl) {
+  public function __construct(Main $main, string $mailTpl) {
+    $this->main = $main;
     $this->mailTpl = $mailTpl;
 
-    if (!DEBUG && file_exists(SETTINGS_PATH)) {
-      $setting = function_exists('getSettingFile') ? getSettingFile() : $this->LoadSettingFile();
+    if (!DEBUG) {
+      $setting = $main->getSettings();
       $this->mailTarget = $setting['mailTarget'];
       strlen($setting['mailTargetCopy'] ?? '') && $this->otherMail[] = $setting['mailTargetCopy'];
       strlen($setting['mailFromName'] ?? '') && $this->fromName = $setting['mailFromName'];

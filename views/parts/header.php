@@ -5,7 +5,7 @@
  */
 
 $siteLink = $main->url->getUri();
-$imgSrc = $main->getCmsParam('imgPath');
+$imgSrc = $main->getCmsParam(VC::IMG_PATH);
 
 if ($main->checkStatus()) { ?>
 <div class="nav-header">

@@ -126,8 +126,8 @@ switch ($cmsAction) {
       $rate = json_decode($rate ?? '[]', true);
       if (count($rate)) {
         // Auto update
-        $main->setSettings('autoRefresh', $rate['autoRefresh']);
-        $main->setSettings('serverRefresh', $rate['serverRefresh']);
+        $main->setSettings(VC::AUTO_REFRESH, $rate[VC::AUTO_REFRESH]);
+        $main->setSettings(VC::SERVER_REFRESH, $rate[VC::SERVER_REFRESH]);
 
         $rate = $rate['data'];
         $param = [
@@ -173,20 +173,20 @@ switch ($cmsAction) {
 
     // Global mail setting
     $mail = json_decode($mail ?? '[]', true);
-    !empty($mail['target']) && $main->setSettings('mailTarget', $mail['target']);
-    !empty($mail['targetCopy']) && $main->setSettings('mailTargetCopy', $mail['targetCopy']);
-    !empty($mail['subject']) && $main->setSettings('mailSubject', $mail['subject']);
-    !empty($mail['fromName']) && $main->setSettings('mailFromName', $mail['fromName']);
+    !empty($mail['target'])     && $main->setSettings(VC::MAIL_TARGET, $mail['target']);
+    !empty($mail['targetCopy']) && $main->setSettings(VC::MAIL_TARGET_COPY, $mail['targetCopy']);
+    !empty($mail['subject'])    && $main->setSettings(VC::MAIL_SUBJECT, $mail['subject']);
+    !empty($mail['fromName'])   && $main->setSettings(VC::MAIL_FROM_NAME, $mail['fromName']);
 
     // Global manager setting
     $managerFields = json_decode($managerFields ?? '[]', true);
-    count($managerFields) && $main->setSettings('managerFields', $managerFields);
+    count($managerFields) && $main->setSettings(VC::MANAGER_FIELDS, $managerFields);
 
     // Global other setting
-    $main->setSettings('statusDefault', $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
+    $main->setSettings(VC::STATUS_DEFAULT, $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
     $other = json_decode($otherFields ?? '[]', true);
-    $main->setSettings('phoneMaskGlobal', $other['phoneMask']['global'] ?? $main->getSettings('phoneMaskGlobal') ?? '+_ (___) ___ __ __')
-         ->setSettings('catalogImageSize', $other['catalogImageSize'] ?? []);
+    $main->setSettings(VC::PHONE_MASK_GLOBAL, $other['phoneMask']['global'] ?? $main->getSettings(VC::PHONE_MASK_GLOBAL) ?? '+_ (___) ___ __ __')
+         ->setSettings(VC::CATALOG_IMAGE_SIZE, $other[VC::CATALOG_IMAGE_SIZE] ?? []);
 
     $main->saveSettings();
     break;
@@ -194,18 +194,18 @@ switch ($cmsAction) {
     if (USE_DATABASE) $result['user'] = $db->getUser($main->getLogin(), 'ID, login, customization');
     else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus());
 
-    $result['setting'] = getSettingFile();
+    $result['setting'] = $main->getSettings();
     break;
 
   // Options property
   case 'createProperty': case 'createDealersProperty':
   case 'changeProperty': case 'changeDealersProperty':
-    $propKey   = in_array($cmsAction, ['createProperty', 'changeProperty']) ? 'optionProperties' : 'dealersProperties';
+    $propKey   = in_array($cmsAction, ['createProperty', 'changeProperty']) ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
     $cmsAction = stripos($cmsAction, 'create') ? 'create' : 'change';
     $property  = json_decode($property ?? '[]', true);
 
     $tableName = $property['newName'];
-    $tableCode = $property['newCode'] ?? translit($tableName);
+    $tableCode = strtolower(translit($property['newCode'] ?? $tableName));
     $propName = 'prop_' . str_replace('prop_', '', $tableCode);
     $setting = $main->getSettings($propKey);
 
@@ -245,7 +245,7 @@ switch ($cmsAction) {
     }
     break;
   case 'loadProperties': case 'loadDealersProperties':
-    $propKey = $cmsAction === 'loadProperties' ? 'optionProperties' : 'dealersProperties';
+    $propKey = $cmsAction === 'loadProperties' ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
     $result[$propKey] = [];
     $setting = $main->getSettings($propKey);
     $dbProperties = array_keys($db->getTables('prop'));
@@ -306,7 +306,7 @@ switch ($cmsAction) {
     }
     break;
   case 'deleteProperty':  case 'deleteDealersProperty':
-    $propKey = $cmsAction === 'deleteProperties' ? 'optionProperties' : 'dealersProperties';
+    $propKey = $cmsAction === 'deleteProperties' ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
     $property = json_decode($property ?? '[]', true);
     $setting = $main->getSettings($propKey);
 
@@ -320,5 +320,4 @@ switch ($cmsAction) {
       $main->setSettings($propKey, $setting)->saveSettings();
     }
     break;
-
 }

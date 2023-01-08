@@ -22,6 +22,8 @@ final class Main {
     'ACCESS_MENU'   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
   ];
 
+  const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';
+
   /**
    * @var array
    */
@@ -56,7 +58,7 @@ final class Main {
     $this->cmsParam = [];
 
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
-    $this->setSettings('dbConfig', $dbConfig);
+    $this->setSettings(VC::DB_CONFIG, $dbConfig);
   }
   /**
    * @param string $value
@@ -126,7 +128,7 @@ final class Main {
   public function setCmsParam($param, $value = null): Main {
     if (is_array($param)) {
       array_walk($param, function ($item, $key) {
-        if ($key === 'csvPath') $item = ABS_SITE_PATH . $item;
+        if ($key === VC::CSV_PATH) $item = ABS_SITE_PATH . $item;
 
         $this->cmsParam[$key] = $item;
       });
@@ -163,7 +165,21 @@ final class Main {
    * @return Main
    */
   private function loadSetting(): Main {
-    $this->setting = array_merge($this->setting, getSettingFile());
+    $setting = [];
+    $settingPath = $this->url->getPath(true) . self::SETTINGS_PATH;
+
+    if (file_exists($settingPath)) {
+      $setting = json_decode(file_get_contents($settingPath), true);
+    }
+
+    $settingPath = $this->url->getBasePath(true) . self::SETTINGS_PATH;
+    if ($this->isDealer()) {
+      $mainSetting = json_decode(file_get_contents($settingPath), true);
+      $setting[VC::OPTION_PROPERTIES] = $mainSetting[VC::OPTION_PROPERTIES] ?? [];
+      $setting[VC::DEALER_PROPERTIES] = $mainSetting[VC::DEALER_PROPERTIES] ?? [];
+    }
+
+    $this->setting = array_merge($this->setting, $setting);
     return $this;
   }
   private function checkXml() {
@@ -190,14 +206,14 @@ final class Main {
             ]], $this->db->getTables('prop'));
 
             $props = array_map(function ($prop) {
-              $setting = $this->getSettings('optionProperties')[$prop['dbTable']] ?? false;
+              $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
               $setting && $setting['name'] && $prop['name'] = $setting['name'];
               return $prop;
             }, $props);
             $dbTables = array_merge($dbTables, ['z_prop' => $props]);
           }
         }
-        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam('csvPath')));
+        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
         //$this->checkXml();
 
         if (USE_CONTENT_EDITOR) {
@@ -227,9 +243,9 @@ final class Main {
   public function saveSettings() {
     $content = $this->setting;
 
-    unset($content['permission'], $content['dbConfig']);
+    unset($content['permission'], $content[VC::DB_CONFIG]);
 
-    file_put_contents(SETTINGS_PATH, json_encode($content));
+    file_put_contents($this->url->getPath(true) . self::SETTINGS_PATH, json_encode($content));
   }
 
   /**
@@ -255,7 +271,7 @@ final class Main {
     }
     else if ($key === 'json') return $jsonData;
 
-    return empty($key) ? $this->setting : $this->setting[$key] ?? null;
+    return empty($key) ? $this->setting : ($this->setting[$key] ?? null);
   }
 
   /**
@@ -378,8 +394,8 @@ final class Main {
    */
   public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
     $rateParam = [
-      'autoRefresh' => $this->getSettings('autoRefresh'),
-      'serverRefresh' => $this->getSettings('serverRefresh'),
+      VC::AUTO_REFRESH   => $this->getSettings(VC::AUTO_REFRESH),
+      VC::SERVER_REFRESH => $this->getSettings(VC::SERVER_REFRESH),
     ];
     $rate = new Course($rateParam, $this->db);
     $rate = $justRate ? array_map(function ($rate) { return $rate['rate']; }, $rate->rate) : $rate->rate;
@@ -398,14 +414,14 @@ final class Main {
 
   public function publicMain() {
     $this->publicDealer = false;
-    $this->dealCsvPath = $this->getCmsParam('csvPath');
-    $this->setCmsParam('csvPath', $this->getCmsParam('csvMain'));
+    $this->dealCsvPath = $this->getCmsParam(VC::CSV_PATH);
+    $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam('csvMain'));
   }
 
   public function publicDealer() {
     if ($this->isDealer()) {
       $this->publicDealer = true;
-      $this->setCmsParam('csvPath', $this->dealCsvPath);
+      $this->setCmsParam(VC::CSV_PATH, $this->dealCsvPath);
     }
   }
 }

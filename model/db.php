@@ -14,7 +14,7 @@ stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
 
 if ($cmsAction === 'tables') { // todo добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$cmsAction] = $db->getTables();
-  $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam('csvPath'));
+  $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam(VC::CSV_PATH));
 } else {
   $columns = [];
   if ($dbTable) {
@@ -155,7 +155,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $orderId = $orderId !== 0 ? $orderId
           : $db->getLastID('orders',
             [
-              'status_id' => $main->getSettings('statusDefault') ?? 1,
+              'status_id' => $main->getSettings(VC::STATUS_DEFAULT) ?? 1,
               'customer_id' => $customerId
             ]);
         $orderTotal = $orderTotal ?? 0;
@@ -707,7 +707,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $main->dealer->create($id,
           [
             'dealerName' => $dealer['name'],
-            'dbConfig' => $main->getSettings('dbConfig'),
+            'dbConfig' => $main->getSettings(VC::DB_CONFIG),
           ],
           [
             'prefix' => $prefix,

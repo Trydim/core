@@ -39,7 +39,7 @@ class FS {
     $this->absUploadDir = $main->url->getPath(true) . $this::UPLOAD_DIR . DIRECTORY_SEPARATOR;
     $this->fileUrl = $main->url->getUri() . $this::UPLOAD_DIR . '/';
     $this->param = new class {};
-    $this->config = $this->main->getSettings('catalogImageSize');
+    $this->config = $this->main->getSettings(VC::CATALOG_IMAGE_SIZE);
     $this->checkUploadDir();
   }
 

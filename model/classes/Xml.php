@@ -34,7 +34,7 @@ XML;
 
   static function checkXml($cvs, $link = '') {
     global $main;
-    $csvPath = $main->getCmsParam('csvPath');
+    $csvPath = $main->getCmsParam(VC::CSV_PATH);
     $link !== '' && $link .= '/';
     $xmlDir = ABS_SITE_PATH . SHARE_PATH . 'xml';
 
@@ -105,7 +105,7 @@ XML;
     $xml = new SimpleXMLElement(self::getXMLTemplate());
     try {
       self::arrayToXml($data, $xml);
-      $filePath = $main->getCmsParam('csvPath') . '../xml' . str_replace('csv', 'xml', $dbTable);
+      $filePath = $main->getCmsParam(VC::CSV_PATH) . '../xml' . str_replace('csv', 'xml', $dbTable);
       file_put_contents($filePath, $xml->asXML());
     } catch (Exception $e) {
       return $e->getMessage();
