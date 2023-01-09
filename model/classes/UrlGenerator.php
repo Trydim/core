@@ -5,6 +5,10 @@ use Helpers\HeaderBag;
 
 class UrlGenerator {
   /**
+   * @var Main
+   */
+  private $main;
+  /**
    * @var ServerBag
    */
   private $server;
@@ -76,6 +80,7 @@ class UrlGenerator {
    * @param string $corePath
    */
   public function __construct(Main $main, string $corePath) {
+    $this->main = $main;
     $this->server = new ServerBag($_SERVER);
     $this->headers = new HeaderBag($this->server->getHeaders());
 
@@ -86,8 +91,9 @@ class UrlGenerator {
     $this->setScheme();
     $this->setHost();
     $this->setBaseSitePath();
-    $this->setRoute($main);
+    $this->setMode();
     $this->setCoreUri();
+    $this->checkDealer();
   }
 
   private function setScheme() {
@@ -137,7 +143,13 @@ class UrlGenerator {
     $this->requestUri = str_replace($this->baseSitePath, '/', $this->getRequestUri());
   }
   private function setSitePath(): string {
-    return $this->getBasePath() . substr($this->getRequestUri(), 1);
+    $dealLink = '';
+
+    if ($this->main->isDealer()) {
+      $dealLink = 'dealer/' . $this->main->getCmsParam('dealerId') . '/';
+    }
+
+    return $this->getBasePath() . $dealLink;
   }
   /*
    * Returns the prefix as encoded in the string when the string starts with
@@ -211,31 +223,13 @@ class UrlGenerator {
 
     return $requestUri;
   }
-  private function setRoute($main): void {
-    $this->checkDealer($main);
-
-    if (defined('OUTSIDE')) {
-      $this->route = 'public';
-      return;
-    }
-
+  private function setMode(): void {
     if (isset($_REQUEST['mode'])) {
-      $main->setCmsParam('mode', $_REQUEST['mode']);
+      $this->main->setCmsParam('mode', $_REQUEST['mode']);
       $this->route = false;
-      return;
     }
-
-    if ($main->isDealer()) {
-      preg_match('/^\/' . DEALERS_PATH . '\/(?:\d+)\/(\w+)/', $this->getRequestUri(), $match);
-    } else {
-      preg_match('/^\/(\w+)/', $this->getRequestUri(), $match);
-    }
-
-    $this->route = $match[1] ?? (PUBLIC_PAGE ? 'public' : 'firstPage');
-    $this->requestUri = str_replace($this->route . '/', '', $this->requestUri);
-
-    if (PUBLIC_PAGE && $this->route === PUBLIC_PAGE) $this->route = 'public';
   }
+
   private function setRoutePath(): string {
     $route = $this->route === 'public' ? PUBLIC_PAGE : $this->route;
     $view = CORE . 'views/';
@@ -262,10 +256,7 @@ class UrlGenerator {
     $this->coreUri = $this->getBaseUri() . $this->corePath;
   }
 
-  /**
-   * @param Main $main
-   */
-  private function checkDealer(Main $main) {
+  private function checkDealer() {
     $requestUri = $this->getRequestUri();
     $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
@@ -275,10 +266,10 @@ class UrlGenerator {
       if (!isset($match[1])) die('Dealer id not found!');
       if (!is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
 
-      else $main->setCmsParam('dealerId', $match[1]);
+      else $this->main->setCmsParam('dealerId', $match[1]);
     }
 
-    $main->setCmsParam('isDealer', $isDealer);
+    $this->main->setCmsParam('isDealer', $isDealer);
   }
 
   public function getScheme(): string {
@@ -336,7 +327,30 @@ class UrlGenerator {
     return $this->requestUri;
   }
 
+  private function setRoute(): string {
+    $main = $this->main;
+
+    if (OUTSIDE) return 'public';
+
+    if ($main->isDealer()) {
+      preg_match('/^\/' . DEALERS_PATH . '\/(?:\d+)\/(\w+)/', $this->getRequestUri(), $match);
+    } else {
+      preg_match('/^\/(\w+)/', $this->getRequestUri(), $match);
+    }
+
+    if (isset($match[1])) {
+      if ($match[1] === PUBLIC_PAGE) $match[1] = 'public';
+      else if (!$main->availablePage($match[1])) $match[1] = '404';
+    }
+    $route = $match[1] ?? ($this->main->availablePage(PUBLIC_PAGE) ? 'public' : $this->main->getSideMenu(true));
+    $this->requestUri = str_replace($route . '/', '', $this->requestUri);
+
+    return $route;
+  }
   public function getRoute(): string {
+    if ($this->route === null) {
+      $this->route = $this->setRoute();
+    }
     return $this->route;
   }
   public function getRoutePath(): string {

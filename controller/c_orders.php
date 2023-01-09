@@ -7,8 +7,8 @@ $param = [
   'showFilter' => $main->availablePage('dealers') && $main->getCmsParam('DEALERS_ORDERS_SHOW'),
 ];
 $user = [
-  'permission' => $main->getSettings('permission'),
-  'isAdmin'    => $main->getLogin('admin'),
+  'permission' => $main->getLogin(VC::USER_PERMISSION),
+  'isAdmin'    => $main->getLogin(VC::USER_IS_ADMIN),
 ];
 $field = [
   'pageTitle' => 'Заказы',
@@ -21,32 +21,25 @@ $setting = $main->getSettings('customization');
 if (!$setting) $setting = new stdClass();
 
 if (!isset($setting->ordersColumnsSort)) {
-  $columns = $main->db->loadOrder(0, 1);
+  $columns = ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
 
-  if (!empty($columns)) {
-    $setting->ordersColumnsSort = array_map(function ($item) {
-      return [
-        'dbName' => $item,
-        'name'   => gTxtDB('orders', $item),
-      ];
-    }, array_keys($columns[0]));
-  }
-
-  $param['ordersColumns'] = $setting->ordersColumnsSort;
+  $param['ordersColumns'] = array_map(function ($item) {
+    return [
+      'dbName' => $item,
+      'name'   => gTxtDB('orders', $item),
+    ];
+  }, $columns);
 }
 
 if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsSort)) {
-  $columns = $main->db->loadVisitorOrder(0, 1);
-  if (!empty($columns)) {
-    $setting->ordersVisitorColumnsSort = array_map(function ($item) {
-      return [
-        'dbName' => $item,
-        'name'   => gTxtDB('visitorOrders', $item),
-      ];
-    }, array_keys($columns[0]));
+  $columns = ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
 
-    $param['ordersVisitorColumns'] = $setting->ordersVisitorColumnsSort;
-  }
+  $param['ordersVisitorColumns'] = array_map(function ($item) {
+    return [
+      'dbName' => $item,
+      'name'   => gTxtDB('visitorOrders', $item),
+    ];
+  }, $columns);
 }
 
 if ($param['showFilter']) {

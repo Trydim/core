@@ -1,6 +1,6 @@
 'use strict';
 
-//import './_modal.scss';
+import './_modal.scss';
 
 import 'sweetalert2/src/sweetalert2.scss';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
@@ -41,7 +41,7 @@ const templatePopup = pr => {
  * showDefaultButton: boolean,
  * btnConfig: boolean }}
  */
-const ModalOld = function (param = {}) {
+export const ModalOur = function (param = {}) {
   let modal = Object.create(null),
       data = Object.create(null),
       destroy = !(this instanceof Modal),

@@ -1,4 +1,4 @@
-use strict";
+"use strict";
 
 import '../../../css/module/fileManager/fileManager.css';
 

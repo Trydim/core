@@ -107,7 +107,7 @@ const component = {
               line = str => `<div>${str}</div>`;
 
         const lines = [
-          `№${order['O.ID']} - ${order['C.name']}`,
+          `№${order['ID']} - ${order['customerName']}`,
           `${Math.round(order.total).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} руб / ${order['S.name']}`
         ];
         const html = lines.reduce((acc, el) => acc + line(el), '');
@@ -138,12 +138,12 @@ const component = {
     if(order) {
       order.importantValue = orders.formatImportant(order.importantValue);
 
-      let title = 'Заказ №' + order['O.ID'],
+      let title = 'Заказ №' + order['ID'],
           div   = document.createElement('div'),
           content = orders.template.orderContentBody.outerHTML;
 
       div.innerHTML = f.replaceTemplate(content, order);
-      orders.template.orderContentBtn.dataset.id = order['O.ID'];
+      orders.template.orderContentBtn.dataset.id = order['ID'];
 
       calendar.M.show(title, div);
       calendar.M.btnField.append(orders.template.orderContentBtn);
@@ -221,7 +221,7 @@ const orders = {
   },
 
   setOrders(orders) {
-    orders.map(i => this.data[i['O.ID']] = i);
+    orders.map(i => this.data[i['ID']] = i);
   },
 
   getOrder(id) {

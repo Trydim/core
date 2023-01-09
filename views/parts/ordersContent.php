@@ -82,7 +82,7 @@ $ordersVisitorColumns = $ordersVisitorColumns ?? [];
       </thead>
       <tbody>
         <tr>
-          <td><input type="checkbox" class="" data-id="${O.ID}"></td>
+          <td><input type="checkbox" class="" data-id="${ID}"></td>
           <?php foreach ($ordersColumns as $item) { ?>
             <td>${<?= $item['dbName']; ?>}</td>
           <?php } ?>

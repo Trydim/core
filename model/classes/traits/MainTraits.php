@@ -12,6 +12,10 @@ trait Authorization {
   static $AVAILABLE_ACTION = [
     'loadCSV', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles', 'loadDealersProperties'
   ];
+  /**
+   * @var string[] anytime and anyone available pages
+   */
+  static $AVAILABLE_PAGE = ['login', '404', 'setting'];
 
   /**
    * @var string
@@ -27,29 +31,6 @@ trait Authorization {
    * @var object [admin, login, id, name]
    */
   private $user = [];
-
-  private function setSideMenu() {
-    if (USE_DATABASE) {
-      $menuAccess = $this->getLogin('permission')['menu'] ?? '';
-      $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
-      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
-    } else {
-      $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
-      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
-        return !in_array($m, $filterMenu);
-      });
-    }
-    PUBLIC_PAGE && $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
-    $this->sideMenu[] = 'setting';
-  }
-
-  /**
-   * @param $field
-   * @return mixed
-   */
-  public function getLogin(string $field = 'login') {
-    return $this->user[$field];
-  }
 
   /**
    * @param array $user
@@ -69,20 +50,55 @@ trait Authorization {
 
   /**
    * @param string $status
-   *
-   * @return bool
-   */
-  public function checkStatus(string $status = 'ok'): bool {
-    return $this->status === $status;
-  }
-
-  /**
-   * @param string $status
    * @return $this|Main
    */
   public function setLoginStatus(string $status): Main {
     $this->status = $status;
     return $this;
+  }
+
+  private function setSideMenu() {
+    if ($this->checkStatus('no') && PUBLIC_PAGE) {
+      $this->sideMenu[] = PUBLIC_PAGE;
+      return;
+    }
+
+    $menuAccess = '';
+
+    if (USE_DATABASE) {
+      $menuAccess = $this->getLogin('permission')['menu'] ?? '';
+      $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
+      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
+    } else {
+      $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
+      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
+        return !in_array($m, $filterMenu);
+      });
+    }
+
+    if (empty($menuAccess) && PUBLIC_PAGE) {
+      $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
+    }
+
+    // Setting allowed for all
+    $this->sideMenu[] = 'setting';
+  }
+
+  /**
+   * @param string $field
+   * @return mixed
+   */
+  public function getLogin(string $field = 'login') {
+    return $this->user[$field];
+  }
+
+  /**
+   * @param string $status
+   *
+   * @return bool
+   */
+  public function checkStatus(string $status = 'ok'): bool {
+    return $this->status === $status;
   }
 
   private function checkDealer() {
@@ -127,7 +143,7 @@ trait Authorization {
         isset($_REQUEST['status']) && $this->setLoginStatus('error');
       } else {
         $_SESSION['target'] = $route;
-        if (ONLY_LOGIN || $route !== 'public' || !PUBLIC_PAGE) $this->reDirect('login');
+        if ($this->getCmsParam(VC::ONLY_LOGIN) || $route !== 'public' || !PUBLIC_PAGE) $this->reDirect('login');
       }
     } else {
       if ($route === 'login' || ($route === 'public' && !PUBLIC_PAGE)) $this->reDirect($this->getSideMenu(true));
@@ -162,7 +178,7 @@ trait Authorization {
    * @return bool
    */
   public function availablePage(string $page): bool {
-    return in_array($page, $this->getSideMenu());
+    return in_array($page, $this::$AVAILABLE_PAGE) || in_array($page, $this->getSideMenu());
   }
 
   /**

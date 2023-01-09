@@ -45,7 +45,7 @@ const statistic = {
     if(order) {
       order.importantValue = orders.formatImportant(order.importantValue);
 
-      let title   = 'Закак №' + order['O.ID'],
+      let title   = 'Закак №' + order['ID'],
           content = f.replaceTemplate(orders.tmp, order);
 
       statistic.M.show(title, content);
@@ -70,7 +70,7 @@ const orders = {
   },
 
   setOrders(orders) {
-    orders.map(i => this.data[i['O.ID']] = i);
+    orders.map(i => this.data[i['ID']] = i);
     this.showOrders();
   },
 

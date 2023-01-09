@@ -9,6 +9,7 @@ class VC {
 
   /** cmsParams */
   const DB_CONFIG   = 'dbConfig',
+        ONLY_LOGIN  = 'onlyLogin',
         CSV_PATH    = 'csvPath',
         LEGEND_PATH = 'legendPath',
         IMG_PATH    = 'imgPath',
@@ -18,6 +19,13 @@ class VC {
         DEAL_URI_CSS = 'dealUriCss',
         DEAL_URI_JS  = 'dealUriJs';
 
+  /** userField */
+  const USER_ID = 'id',
+        USER_IS_ADMIN   = 'admin',
+        USER_LOGIN      = 'login',
+        USER_NAME       = 'name',
+        USER_ONLY_ONE   = 'onlyOne',
+        USER_PERMISSION = 'permission';
 
   /** Setting */
   const MAIL_TARGET      = 'mailTarget',

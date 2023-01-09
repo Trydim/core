@@ -65,7 +65,7 @@ menu;
   <div class="position-sticky top-0">
     <ul class="sidebar-menu show" id="sideMenu">
       <li class="nav-label"><?= gTxt('Main Menu') ?></li>
-      <?php if (PUBLIC_PAGE) { ?>
+      <?php if ($main->availablePage(PUBLIC_PAGE)) { ?>
         <li>
           <a class="nav-item" href="<?= $siteLink ?>" aria-expanded="false">
             <i class="pi pi-globe"></i>

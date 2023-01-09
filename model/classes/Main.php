@@ -30,9 +30,9 @@ final class Main {
   private $setting = [];
 
   /**
-   * @var CmsParam
+   * @var array
    */
-  private $cmsParam;
+  private $cmsParam = [];
 
   /**
    * @var array
@@ -55,9 +55,8 @@ final class Main {
    * @param array $dbConfig
    */
   public function __construct(array $cmsParam, array $dbConfig) {
-    $this->cmsParam = [];
-
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
+    $this->setCmsParam(VC::ONLY_LOGIN, $cmsParam['ONLY_LOGIN'] ?? !boolval(PUBLIC_PAGE));
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
   }
   /**
@@ -84,19 +83,18 @@ final class Main {
          ->setHooks();
   }
   public function beforeController() {
+    if (!OUTSIDE) {
+      $this->checkAuth()
+        ->setAccount()
+        ->applyAuth();
+    }
+
     if ($this->url->getRoute() === '404') return;
 
     if ($this->isDealer()) {
       $this->checkDealer();
+      $this->setDealerParam();
     }
-
-    if (!OUTSIDE) {
-      $this->checkAuth()
-           ->setAccount()
-           ->applyAuth();
-    }
-
-    $this->isDealer() && $this->setDealerParam();
   }
 
   /* -------------------------------------------------------------------------------------------------------------------
@@ -190,38 +188,36 @@ final class Main {
    * @return $this
    */
   private function setAccount(): Main {
-    if ($this->checkStatus()) {
-      // Меню
-      $this->setSideMenu();
+    // Меню
+    $this->setSideMenu();
 
-      if ($this->availablePage('admindb')) {
-        $dbTables = [];
-        if (USE_DATABASE) {
-          if (CHANGE_DATABASE) {
-            $dbTables = array_merge($dbTables, $this->db->getTables());
-          } else if ($this->availablePage('catalog')) {
-            $props = array_merge([[
-              'dbTable' => 'codes',
-              'name' => gTxtDB('codes', 'codes')
-            ]], $this->db->getTables('prop'));
+    if ($this->checkStatus() && $this->availablePage('admindb')) {
+      $dbTables = [];
+      if (USE_DATABASE) {
+        if (CHANGE_DATABASE) {
+          $dbTables = array_merge($dbTables, $this->db->getTables());
+        } else if ($this->availablePage('catalog')) {
+          $props = array_merge([[
+            'dbTable' => 'codes',
+            'name'    => gTxtDB('codes', 'codes')
+          ]], $this->db->getTables('prop'));
 
-            $props = array_map(function ($prop) {
-              $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
-              $setting && $setting['name'] && $prop['name'] = $setting['name'];
-              return $prop;
-            }, $props);
-            $dbTables = array_merge($dbTables, ['z_prop' => $props]);
-          }
+          $props = array_map(function ($prop) {
+            $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
+            $setting && $setting['name'] && $prop['name'] = $setting['name'];
+            return $prop;
+          }, $props);
+          $dbTables = array_merge($dbTables, ['z_prop' => $props]);
         }
-        $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
-        //$this->checkXml();
+      }
+      $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
+      // TODO $this->checkXml();
 
-        if (USE_CONTENT_EDITOR) {
-          $this->dbTables[] = [
-            'fileName' => 'content-js',
-            'name' => gTxt('Content editor'),
-          ];
-        }
+      if (USE_CONTENT_EDITOR) {
+        $this->dbTables[] = [
+          'fileName' => 'content-js',
+          'name'     => gTxt('Content editor'),
+        ];
       }
     }
     return $this;

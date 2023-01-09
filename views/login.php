@@ -10,7 +10,8 @@ $login      = $_REQUEST['login'] ?? '';
 $pass       = $_REQUEST['password'] ?? '';
 $wrongString = $this->checkStatus('error') ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
 
-$publicLink = !ONLY_LOGIN && PUBLIC_PAGE ? '<a class="text-primary" href="' . $siteLink . '">Открытая страница</a>' : '';
+$publicLink = !$this->getCmsParam(VC::ONLY_LOGIN) && PUBLIC_PAGE
+  ? '<a class="text-primary" href="' . $siteLink . '">Открытая страница</a>' : '';
 
 $field['pageTitle'] = $this->getCmsParam('PROJECT_TITLE');
 

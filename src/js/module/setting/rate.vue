@@ -5,9 +5,9 @@
     <div class="col-12 row">
       <p class="col-8">Автоматически обновлять курсы</p>
       <div class="col-4 d-inline-flex">
-        <p class="col text-center">Нет</p>
+        <p class="col mt-0 text-center">Нет</p>
         <p-switch v-model="autoRefresh"></p-switch>
-        <p class="col text-center">Да</p>
+        <p class="col mt-0 text-center">Да</p>
       </div>
     </div>
 

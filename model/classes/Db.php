@@ -824,18 +824,19 @@ class Db extends R {
    * @param string $sortColumn
    * @param bool $sortDirect
    * @param array $dateRange
-   * @param array $ids
+   * @param array|string|number $ids
    *
    * @return array|null
    */
-  public function loadOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'last_edit_date', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
+  public function loadOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'last_edit_date', bool $sortDirect = false, array $dateRange = [], $ids = []) {
     $pageNumber *= $countPerPage;
+    if (!is_array($ids)) $ids = [$ids];
 
     /*important_value AS 'importantValue', */
-    $sql = "SELECT O.ID AS 'O.ID', create_date AS 'createDate',
-            last_edit_date AS 'lastEditDate', start_shipping_date AS 'startShippingDate',
-            end_shipping_date AS 'endShippingDate', U.name, C.name as 'C.name', total,
-            S.name AS 'S.name'
+    $sql = "SELECT O.ID AS 'ID', 
+            create_date AS 'createDate', last_edit_date AS 'lastEditDate', 
+            start_shipping_date AS 'startShippingDate', end_shipping_date AS 'endShippingDate',
+            U.name AS 'userName', C.name AS 'customerName', S.ID AS 'statusId', S.name AS 'status', total
       FROM " . $this->pf('orders') . " O
       LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
       LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
@@ -920,7 +921,8 @@ class Db extends R {
   public function loadVisitorOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'createDate', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
     $pageNumber *= $countPerPage;
 
-    $sql = "SELECT cp_number, create_date, important_value, total FROM " . $this->pf('client_orders') . "\n";
+    $sql = "SELECT cp_number AS 'cpNumber', create_date AS 'createDate', important_value AS 'importantValue', total
+            FROM " . $this->pf('client_orders') . "\n";
 
     if (count($dateRange)) $sql .= "WHERE create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
     if (count($ids)) {

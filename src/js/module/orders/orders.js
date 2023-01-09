@@ -43,8 +43,8 @@ class AllOrdersList {
   prepareSearchData(data) {
     if (this.type === 'order') {
       this.data = data.reduce((r, i) => {
-        this.searchData[i['O.ID']] = i['O.ID'] + i['C.name'] + i['name'];
-        r[i['O.ID']] = i;
+        this.searchData[i['ID']] = i['ID'] + i['customerName'];
+        r[i['ID']] = i;
         return r;
       }, Object.create(null));
     } else {
@@ -144,24 +144,24 @@ class Orders {
       if (item.importantValue) {
         let value = '';
 
-        if (false /* TODO настройки вывода даты*/) {
+        /*if (false /!* TODO настройки вывода даты*!/) {
           for (let i in item) {
             if (i.includes('date')) {
               //let date = new Date(item[i]);
               item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
             }
           }
-        }
+        }*/
 
         try {
           value = JSON.parse(item.importantValue);
           !Array.isArray(value) && (value = Object.values(value).length && [value]);
-          if(value.length) {
+          if (value.length) {
             value = value.map(i => { i.key = _(i.key); return i; });
             value = f.replaceTemplate(this.template.impValue, value);
           } else value = '-';
         }
-        catch (e) { console.log(`Заказ ID:${item['O.ID']} имеет не правильное значение`); }
+        catch (e) { console.log(`Заказ ID:${item['ID']} имеет не правильное значение`); }
         item.importantValue = value;
       }
 
@@ -207,13 +207,19 @@ class Orders {
     else f.enable(this.btnMainOnly);
   }
 
-  query(url = f.MAIN_PHP_PATH) {
-    Object.entries(this.queryParam).map(param => {
+  query(action) {
+    const param = this.queryParam;
+
+    if (action) param.dbAction = action;
+
+    Object.entries(param).map(param => {
       this.form.set(param[0], param[1].toString());
     })
 
+    if (param.dbAction === 'loadOrders') this.form.delete('orderIds');
+
     this.loaderTable.start();
-    f.Post({url, data: this.form}).then(data => {
+    f.Post({data: this.form}).then(data => {
       if(this.needReload) {
         this.needReload = false;
         this.selected.clear();

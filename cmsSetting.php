@@ -28,7 +28,6 @@ $url = $main->url;
 define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
 define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 
-// Переместить в head, т.к. если есть $mode это все не надо
 $main->setCmsParam(VC::CSV_PATH, $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
      ->setCmsParam(VC::LEGEND_PATH, $url->getPath(true) . ($publicConfig['PATH_LEGEND'] ?? 'public/views/legend.php'))
      ->setCmsParam(VC::IMG_PATH, $url->getBasePath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
@@ -39,7 +38,6 @@ $main->setCmsParam(VC::CSV_PATH, $url->getPath(true) . SHARE_PATH . ($publicConf
 if ($main->isDealer()) {
   require $url->getPath(true) . 'config.php';
 
-  // Переместить в head, т.к. если есть $mode это все не надо
   $main->setCmsParam('csvMain', $main->getCmsParam(VC::CSV_PATH))
        ->setCmsParam(VC::CSV_PATH, $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
   unset($publicConfig['PATH_CSV']);
@@ -56,7 +54,6 @@ if ($main->isDealer()) {
 }
 
 define('URI_IMG', $main->getCmsParam(VC::URI_IMG));
-define('ONLY_LOGIN', $publicConfig['ONLY_LOGIN'] ?? !boolval(PUBLIC_PAGE)); // Можно перенести в main
 define('USE_CONTENT_EDITOR', $publicConfig['USE_CONTENT_EDITOR'] ?? false);
 
 !defined('OUTSIDE') && define('OUTSIDE', array_key_exists('outside', $_GET));
