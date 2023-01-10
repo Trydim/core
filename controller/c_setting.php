@@ -41,7 +41,7 @@ if (USE_DATABASE && $user['isAdmin']) {
 
   // if available orders
   if ($main->availablePage('orders')) {
-    $status = json_encode($main->db->loadTable('order_status'));
+    $status = json_encode($main->db->loadOrderStatus());
     $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
   }
 

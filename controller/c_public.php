@@ -26,7 +26,7 @@ if ($authStatus && isset($_GET['orderId'])) {
   $orderId = $_GET['orderId'];
 
   if (is_numeric($orderId)) {
-    $order = $main->db->loadOrderById($orderId);
+    $order = $main->db->loadOrdersById($orderId);
 
     if ($order) {
       $dbContent .= "<input type='hidden' id='dataOrder' value='" . json_encode($order) . "'>";

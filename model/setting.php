@@ -111,9 +111,17 @@ switch ($cmsAction) {
 
           // Js random 0 - 1
           if ($id < 1) {
-            $param['new'][uniqid()]['name'] = $status['name'];
+            $param['new'][uniqid()] = [
+              'code' => $status['code'],
+              'name' => $status['name'],
+              'sort' => $status['sort'],
+            ];
           } else {
-            $param['change'][$id]['name'] = $status['name'];
+            $param['change'][$id] = [
+              'code' => $status['code'],
+              'name' => $status['name'],
+              'sort' => $status['sort'],
+            ];
           }
         }
 

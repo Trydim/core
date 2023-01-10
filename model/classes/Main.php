@@ -61,14 +61,14 @@ final class Main {
   }
   /**
    * @param string $value
-   * @return Db|Dealer|UrlGenerator
+   * @return DbMain|Dealer|UrlGenerator
    */
   public function __get(string $value) {
     if ($value === 'url') {
       $this->url = new UrlGenerator($this, 'core/');
     }
     else if ($value === 'db') {
-      $this->db = new Db($this);
+      $this->db = new DbMain($this);
       return $this->db;
     }
     else if ($value === 'dealer') {
@@ -368,7 +368,7 @@ final class Main {
     return $this->dbTables;
   }
 
-  public function getDB(): Db {
+  public function getDB(): DbMain {
     return $this->db;
   }
 

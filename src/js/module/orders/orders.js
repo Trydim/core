@@ -80,7 +80,7 @@ class Orders {
     this.setQueryParam();
 
     this.p = new f.Pagination( '#paginator', {
-      dbAction : 'loadOrders',
+      dbAction : this.mainAction,
       sortParam: this.queryParam,
       query: this.query.bind(this),
     });
@@ -88,16 +88,17 @@ class Orders {
     new f.SortColumns({
       thead: this.table.querySelector('thead'),
       query: this.query.bind(this),
-      dbAction : 'loadOrders',
+      dbAction : this.mainAction,
       sortParam: this.queryParam,
     });
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
 
-    this.setTableTemplate('order');
-
-    this.query();
-    this.onEvent();
+    setTimeout(() => {
+      this.setTableTemplate('order');
+      this.query();
+      this.onEvent();
+    });
   }
   setParam() {
     this.M = new f.initModal();
@@ -122,9 +123,11 @@ class Orders {
     node && (this.template.visit = node.content.children[0]);
   }
   setQueryParam() {
+    this.mainAction = 'loadOrders';
+
     this.queryParam = {
       mode        : 'DB',
-      dbAction    : 'loadOrders',
+      dbAction    : this.mainAction,
       tableName   : 'orders',
       sortColumn  : 'createDate',
       sortDirect  : false, // true = DESC, false
@@ -180,7 +183,7 @@ class Orders {
   }
   // Заполнить статусы
   fillSelectStatus(data) {
-    let tmp = f.gT('#changeStatus'), html  = '';
+    let tmp = f.gT('#changeStatus'), html = '';
 
     html += f.replaceTemplate(tmp, data);
 
@@ -216,14 +219,14 @@ class Orders {
       this.form.set(param[0], param[1].toString());
     })
 
-    if (param.dbAction === 'loadOrders') this.form.delete('orderIds');
+    if (param.dbAction === this.mainAction) this.form.delete('orderIds');
 
     this.loaderTable.start();
     f.Post({data: this.form}).then(data => {
       if(this.needReload) {
         this.needReload = false;
         this.selected.clear();
-        this.queryParam.dbAction = 'loadOrders';
+        this.queryParam.dbAction = this.mainAction;
         this.queryParam.orderIds = '[]';
         this.query();
         return;
@@ -269,7 +272,7 @@ class Orders {
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
   focusSearch(e) {
-    const dbAction = orders.table.dataset.type === 'order' ? 'loadOrders' : 'loadVisitorOrders';
+    const dbAction = orders.table.dataset.type === 'order' ? this.mainAction : 'loadVisitorOrders';
 
     new AllOrdersList({dbAction, node: e.target, tableType: orders.table.dataset.type});
   }
@@ -317,7 +320,7 @@ class Orders {
   loadOrder(selectedSize) {
     if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
-    this.form.set('dbAction', 'loadOrder');
+    this.form.set('dbAction', 'loadOrderById');
     this.form.set( 'orderId', this.queryParam.orderIds);
 
     f.Post({data: this.form})
@@ -428,7 +431,7 @@ class Orders {
 
       f.hide(f.qS('#orderBtn'));
     } else {
-      this.queryParam.dbAction  = 'loadOrders';
+      this.queryParam.dbAction  = this.mainAction;
       this.queryParam.tableName = 'orders';
       this.table.dataset.type   = 'order';
 
@@ -459,7 +462,7 @@ class Orders {
 
     this.selected.clear();
     this.queryParam.mode = 'DB';
-    this.queryParam.dbAction = 'loadOrders';
+    this.queryParam.dbAction = this.mainAction;
     this.queryParam.orderIds = '[]';
     this.queryParam.currPage = 0;
     this.toggleDisableBtn(+id);

@@ -33,7 +33,14 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
 
   $pageNumber = $currPage ?? 0;
   $countPerPage = $countPerPage ?? 20;
-  $sortDirect = isset($sortDirect) && $sortDirect === 'true';
+  $sortDirect = $sortDirect ?? 'true';
+
+  $pagerParam = [
+    'pageNumber'   => $pageNumber,
+    'countPerPage' => $countPerPage,
+    'sortColumn'   => $sortColumn ?? 'create_date',
+    'sortDirect'   => $sortDirect,
+  ];
 
   switch ($cmsAction) {
     // Tables
@@ -179,27 +186,33 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       }
       break;
     case 'loadOrders':
-      $sortColumn = $sortColumn ?? 'create_date';
-
-      $orderIds = json_decode($orderIds ?? '[]');
-      $dateRange = json_decode($dateRange ?? '[]');
-
       // Значит нужны все заказы (поиск)
-      if ($countPerPage > 999) $countPerPage = 1000000;
-      else $result['countRows'] = $db->getCountRows('orders');
+      if ($countPerPage > 999) $pagerParam['countPerPage'] = 1000000;
 
-      $result['orders'] = $db->loadOrder($pageNumber, $countPerPage, $sortColumn, $sortDirect, $dateRange, $orderIds);
-      !isset($search) && $result['statusOrders'] = $db->loadTable('order_status');
-      break;
-    case 'loadOrder': // Показать подробности
-      $orderIds = isset($orderId) ? [$orderId] : json_decode($orderIds ?? '[]');
-      if (count($orderIds) === 1) $result['order'] = $db->loadOrderById($orderIds[0]);
+      if (isset($orderIds)) {
+        $orderIds = json_decode($orderIds ?? '[]', true);
+        $result['orders'] = $db->loadOrdersById($orderIds);
+      }
+      else if (isset($ordersFilter)) { // Загрузка по менеджеру, клиенту или статусу
+        $ordersFilter = json_decode($ordersFilter, true);
+        $result['orders'] = $db->loadOrdersByRelatedKey($pagerParam, $ordersFilter);
+
+        if (isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', $ordersFilter['statusId']);
+
+        $result['countRows'] = $db->getCountRows('orders', $ordersFilter);
+      } //
+      else {
+        $dateRange = json_decode($dateRange ?? '[]', true);
+        $result['orders'] = $db->loadOrders($pagerParam, $dateRange);
+        $result['countRows'] = $db->getCountRows('orders');
+      }
+      !isset($search) && $result['statusOrders'] = $db->loadOrderStatus();
       break;
     case 'changeStatusOrder':
       if (isset($orderIds) && isset($statusId) && count($columns)) {
         if (!is_finite($statusId)) { $result['error'] = 'status_id_error'; break; }
 
-        $result['error'] = $db->changeOrders($columns, $dbTable, explode(',', $orderIds), $statusId);
+        $db->changeOrders($columns, $dbTable, explode(',', $orderIds), $statusId);
       }
       break;
     case 'delOrders':
