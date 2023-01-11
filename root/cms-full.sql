@@ -280,7 +280,7 @@ CREATE TABLE `orders` (
 CREATE TABLE `order_status` (
   `ID` int(2) UNSIGNED NOT NULL,
   `code` varchar(50) NULL DEFAULT NULL,
-  `name` varchar(50) CHARACTER SET utf8 NOT NULL
+  `name` varchar(50) CHARACTER SET utf8 NOT NULL,
   `sort` int(4) DEFAULT 50 NULL,
   `required` int(1) DEFAULT 0 NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

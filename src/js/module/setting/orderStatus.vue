@@ -12,7 +12,9 @@
       <div class="mb-3" style="max-height: 140px; overflow-y: auto">
         <template v-for="(item, index) of status" :key="item.ID">
           <div v-if="!item.delete" class="input-group mb-1">
-            <p-input-text v-tooltip.bottom="'код (необязательно)'" v-model="item.code" class="form-control"></p-input-text>
+            <p-input-text v-tooltip.bottom="'код (необязательно)'" class="form-control"
+                          :disabled="+item.required" v-model="item.code"
+            ></p-input-text>
             <p-input-text v-model="item.name" class="form-control w-50"></p-input-text>
             <p-input-text v-tooltip.bottom="'сортировка'" v-model="item.sort" class="form-control"></p-input-text>
             <div class="input-group-text">

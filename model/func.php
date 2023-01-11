@@ -471,27 +471,40 @@ function translit($value): string {
 
 /**
  * @param string $url
- * @param array $config - 'method', 'json', 'json_assoc'
+ * @param array $config - 'method', 'json', 'json_assoc', 'auth'
  * @param array<string, string> $params - assoc array
  * @return string
  */
 function httpRequest(string $url, array $config = [], array $params = []): string {
+  $myCurl = curl_init();
+
   $curlConfig = [
     CURLOPT_URL => $url,
     CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [],
   ];
+
+  if (isset($config['auth'])) {
+    $curlConfig[CURLOPT_HEADER] = 1;
+    $curlConfig[CURLOPT_HTTPHEADER][] = 'Authorization:' . $config['auth'];
+  }
 
   if (strtolower($config['method'] ?? 'get') === 'get') {
     $curlConfig[CURLOPT_HTTPGET] = true;
     $curlConfig[CURLOPT_URL] .= '?' . http_build_query($params);
   } else {
-    $curlConfig[CURLOPT_PORT] = true;
+    $curlConfig[CURLOPT_HTTPGET] = false;
+    $curlConfig[CURLOPT_POST] = true;
+    $curlConfig[CURLOPT_HEADER] = 1;
+    $curlConfig[CURLOPT_HTTPHEADER][] = "Content-Type: application/x-www-form-urlencoded";
     $curlConfig[CURLOPT_POSTFIELDS] = http_build_query($params);
   }
 
-  $myCurl = curl_init();
   curl_setopt_array($myCurl, $curlConfig);
   $response = curl_exec($myCurl);
+
+  if ($response === false) return curl_error($myCurl);
+
   curl_close($myCurl);
 
   if (($config['json'] ?? '') === 'json') {

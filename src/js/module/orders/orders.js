@@ -94,11 +94,10 @@ class Orders {
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
 
-    setTimeout(() => {
-      this.setTableTemplate('order');
-      this.query();
-      this.onEvent();
-    });
+    this.setTableTemplate('order');
+
+    this.query();
+    this.onEvent();
   }
   setParam() {
     this.M = new f.initModal();
@@ -217,7 +216,7 @@ class Orders {
 
     Object.entries(param).map(param => {
       this.form.set(param[0], param[1].toString());
-    })
+    });
 
     if (param.dbAction === this.mainAction) this.form.delete('orderIds');
 

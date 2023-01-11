@@ -168,7 +168,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $orderTotal = $orderTotal ?? 0;
 
         $param = [$orderId => [
-          'user_id'     => $main->getLogin('id'),
+          'user_id'     => $main->getLogin('id') ?? 1,
           'customer_id' => $customerId,
           'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
           'important_value' => $importantVal ?? '{}',

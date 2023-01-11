@@ -69,7 +69,7 @@ menu;
         <li>
           <a class="nav-item" href="<?= $siteLink ?>" aria-expanded="false">
             <i class="pi pi-globe"></i>
-            <span class="nav-text"><?= gTxt('calculator') ?></span>
+            <span class="nav-text"><?= gTxt(PUBLIC_PAGE) ?></span>
           </a>
         </li>
       <?php }

@@ -19,6 +19,8 @@
     "ext-iconv": "*",
     "ext-gettext": "*",
     "ext-simplexml": "*",
-    "ext-mysql_xdevapi": "*"
+    "ext-mysql_xdevapi": "*",
+    "ext-curl": "*",
+    "ext-apache": "*"
   }
 }

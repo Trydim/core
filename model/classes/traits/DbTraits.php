@@ -6,7 +6,7 @@ trait DbOrders {
             create_date AS 'createDate', last_edit_date AS 'lastEditDate', 
             start_shipping_date AS 'startShippingDate', end_shipping_date AS 'endShippingDate',
             U.name AS 'userName', C.name AS 'customerName', S.ID AS 'statusId', S.name AS 'status', total"
-      . ($includeValues ? ', ' : "\n") .
+      . ($includeValues ? ", important_value AS 'importantValue', save_value AS 'saveValue', report_value AS 'reportValue'" : "\n") .
       "FROM " . $this->pf('orders') . " O
       LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
       LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
@@ -62,7 +62,7 @@ trait DbOrders {
    * @return array rows
    */
   public function loadOrdersById($ids) {
-    $sql = $this->getBaseOrdersQuery(true) . "WHERE ";
+    $sql = $this->getBaseOrdersQuery(true) . "\n WHERE ";
 
     if (is_array($ids)) {
       $sql .= " O.ID = " . implode(' OR O.ID = ', $ids) . "\n";
@@ -75,6 +75,8 @@ trait DbOrders {
     return array_map(function ($row) {
       $row['reportValue'] = gzuncompress($row['reportValue']);
       if (!$row['reportValue']) $row['reportValue'] = false;
+
+      return $row;
     }, $res);
   }
 
@@ -166,8 +168,14 @@ trait DbOrders {
 
   // Status
 
-  public function loadOrderStatus() {
-    return self::getAll('SELECT * FROM ' . $this->pf('order_status') . " ORDER BY sort");
+  public function loadOrderStatus(string $filters = '') {
+    $sql = "SELECT * FROM " . $this->pf('order_status') . "\n ";
+
+    if (strlen($filters)) $sql .= 'WHERE ' . $filters . "\n ";
+
+    $sql .= "ORDER BY sort";
+
+    return self::getAll($sql);
   }
 }
 

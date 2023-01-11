@@ -159,7 +159,14 @@ trait Authorization {
    * @return bool
    */
   public function checkAction(string $action): bool {
-    return in_array($action, $this::$AVAILABLE_ACTION) || $this->checkAuth()->checkStatus();
+    $result = in_array($action, $this::$AVAILABLE_ACTION) || $this->checkAuth()->checkStatus();
+
+    if ($result === false) {
+      $headers = apache_request_headers();
+      $result = ($headers['Authorization'] ?? null) === $this->getCmsParam('TOKEN');
+    }
+
+    return $result;
   }
 
   /**

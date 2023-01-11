@@ -105,7 +105,7 @@ switch ($cmsAction) {
           $id = $status['ID'];
 
           if (isset($status['delete'])) {
-            $result['error']['statusDel'] = $db->deleteItem('order_status', [$id]);
+            $result['statusDel']['error'] = $db->deleteItem('order_status', [$id]);
             continue;
           }
 
@@ -126,8 +126,8 @@ switch ($cmsAction) {
         }
 
         $columns = $db->getColumnsTable('order_status');
-        $result['error']['statusAdd'] = $db->insert($columns, 'order_status', $param['new']);
-        $result['error']['statusChange'] = $db->insert($columns, 'order_status', $param['change'], true);
+        $result['statusAdd']['error'] = $db->insert($columns, 'order_status', $param['new']);
+        $result['statusChange']['error'] = $db->insert($columns, 'order_status', $param['change'], true);
       }
 
       // Rate

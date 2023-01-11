@@ -118,10 +118,10 @@ declare type CMSGlobalObject = {
   getDataAsSet(selector: string): Set<any>
   getDataAsArray(selector: string): any[]
 
-  show(collection: NodeList)
-  hide(collection: NodeList)
-  enable(collection: NodeList)
-  disable(collection: NodeList)
+  show(...collection: NodeList)
+  hide(...collection: NodeList)
+  enable(...collection: NodeList)
+  disable(...collection: NodeList)
 
   eraseNode(node: HTMLElement)
   /**
