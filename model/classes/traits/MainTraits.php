@@ -89,7 +89,7 @@ trait Authorization {
    * @return mixed
    */
   public function getLogin(string $field = 'login') {
-    return $this->user[$field];
+    return $this->user[$field] ?? null;
   }
 
   /**

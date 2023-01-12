@@ -31,6 +31,10 @@ $isAdmin = $main->getLogin('admin');
     <setting-other :prop-other-fields="otherFields" @update="updateOtherFields"></setting-other>
   <?php } ?>
 
+  <?php if ($isAdmin && $main->availablePage('orders') && false) { ?>
+    <setting-tokens @update="updateOrderStatus"></setting-tokens>
+  <?php } ?>
+
   <div class="col-12 text-center">
     <p-button v-tooltip.bottom="'Сохранить'" icon="pi pi-save" class="p-button-primary m-3"
               label="Сохранить" @click="saveSetting"
