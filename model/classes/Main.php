@@ -292,7 +292,11 @@ final class Main {
     if (isset($this->controllerField[$key])) {
       $field =& $this->controllerField[$key];
 
-      if (is_array($field)) {
+      if (is_string($field)) {
+        if ($position === 'before') $field = $value . $field;
+        else $field .= $value;
+      }
+      else if (is_array($field)) {
         if ($position === 'head') array_unshift($field, $value);
         else if ($position === 'before') array_unshift($field, $value);
         if ($position === 'last') $field[] = $value;

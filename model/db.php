@@ -158,11 +158,19 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
           $result = $db->insert($db->getColumnsTable('customers'), 'customers', $param, true);
         }
 
+        // Set Status Id
+        $statusId = $statusId ?? $main->getSettings(VC::STATUS_DEFAULT) ?? 1;
+        if (isset($statusCode)) {
+          $status = $db->loadOrderStatus(" code = '$statusCode'");
+          if (count($status) === 1) $statusId = $status[0]['ID'];
+        }
+
+        // Set order id, if have $orderId, then the order will be change.
         $orderId = intval($orderId ?? 0);
         $orderId = $orderId !== 0 ? $orderId
           : $db->getLastID('orders',
             [
-              'status_id' => $main->getSettings(VC::STATUS_DEFAULT) ?? 1,
+              'status_id'   => $statusId,
               'customer_id' => $customerId
             ]);
         $orderTotal = $orderTotal ?? 0;
@@ -170,6 +178,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $param = [$orderId => [
           'user_id'     => $main->getLogin('id') ?? 1,
           'customer_id' => $customerId,
+          'status_id'   => $statusId,
           'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
           'important_value' => $importantValue ?? '{}',
           'save_value'      => $saveValue ?? '{}',
@@ -183,6 +192,35 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $result['customerId'] = $customerId;
         $result['orderId']    = $orderId;
         $result['saveDate']   = date('Y-m-d H:i:s');
+      }
+      break;
+    case 'changeOrders':
+      $ordersIds = json_decode($ordersIds ?? '[]');
+      if (!is_array($ordersIds)) $ordersIds = [$ordersIds];
+
+      if (count($ordersIds)) {
+        $param = [];
+        $single = count($ordersIds) === 1;
+        $orders = json_decode($orders ?? '[]', true);
+
+        $statusId = $orders['statusId'] ?? false;
+        if (isset($orders['statusCode'])) {
+          $status = $db->loadOrderStatus(" code = '" . $orders['statusCode'] . "'");
+          if (count($status)) $statusId = $status[0]['ID'];
+        }
+
+        foreach ($ordersIds as $id) {
+          if (isset($orders['userId'])) $param[$id]['user_id'] = $orders['userId'];
+          if (isset($orders['customerId'])) $param[$id]['customer_id'] = $orders['customerId'];
+          if (isset($orders['orderTotal'])) $param[$id]['total'] = $orders['orderTotal'];
+          if ($statusId) $param[$id]['status_id'] = $statusId;
+        }
+
+        if (!empty($param)) {
+          $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
+        } else {
+          $result['error'] = 'Change orders: Empty param';
+        }
       }
       break;
     case 'loadOrders':

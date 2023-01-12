@@ -27,6 +27,20 @@ class VC {
         USER_ONLY_ONE   = 'onlyOne',
         USER_PERMISSION = 'permission';
 
+  /** Base views field */
+  const BASE_GLOBAL           = 'global',
+        BASE_PAGE_TITLE       = 'pageTitle',
+        BASE_HEAD_CONTENT     = 'headContent',
+        BASE_PAGE_HEADER      = 'pageHeader',
+        BASE_SIDE_LEFT        = 'sideLeft',
+        BASE_CONTENT          = 'content',
+        BASE_SIDE_RIGHT       = 'sideRight',
+        BASE_PAGE_FOOTER      = 'pageFooter',
+        BASE_FOOTER_CONTENT   = 'footerContent',
+        BASE_FOOTER_CONTENT_2 = 'footerContentBase',
+        BASE_CSS_LINKS        = 'cssLinks',
+        BASE_JS_LINKS         = 'jsLinks';
+
   /** Setting */
   const MAIL_TARGET      = 'mailTarget',
         MAIL_TARGET_COPY = 'mailTargetCopy',

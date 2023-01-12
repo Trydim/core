@@ -128,6 +128,7 @@ switch ($cmsAction) {
         $columns = $db->getColumnsTable('order_status');
         $result['statusAdd']['error'] = $db->insert($columns, 'order_status', $param['new']);
         $result['statusChange']['error'] = $db->insert($columns, 'order_status', $param['change'], true);
+        $result['statusList'] = $db->loadOrderStatus();
       }
 
       // Rate
