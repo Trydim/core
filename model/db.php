@@ -139,7 +139,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
 
     // Orders
     case 'saveOrder':
-      if (isset($reportVal)) {
+      if (isset($reportValue)) {
         $customerId = intval($customerId ?? 0);
         $customerChange = $customerId === 0 ? true : boolValue($customerChange ?? true);
         $customerId = $customerId !== 0 ? $customerId : $db->getLastID('customers');
@@ -171,9 +171,9 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
           'user_id'     => $main->getLogin('id') ?? 1,
           'customer_id' => $customerId,
           'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
-          'important_value' => $importantVal ?? '{}',
-          'save_value'      => $saveVal ?? '{}',
-          'report_value'    => addCpNumber($orderId, $reportVal),
+          'important_value' => $importantValue ?? '{}',
+          'save_value'      => $saveValue ?? '{}',
+          'report_value'    => addCpNumber($orderId, $reportValue),
           'start_shipping_date' => $db->getDbDateString($startShippingDate ?? ''),
           'end_shipping_date'   => $db->getDbDateString($endShippingDate ?? ''),
         ]];

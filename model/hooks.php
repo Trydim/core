@@ -6,11 +6,11 @@
 
 /**
  * @param $number
- * @param $reportVal
+ * @param $reportValue
  * @return false|string
  */
-function addCpNumber_DefaultFunc($number, $reportVal) {
-  $report = json_decode($reportVal, true);
+function addCpNumber_DefaultFunc($number, $reportValue) {
+  $report = json_decode($reportValue, true);
   $report['cpNumber'] = $report['cpNumber'] ?? $number;
   return json_encode($report);
 }

@@ -579,7 +579,7 @@ export default {
 
     data.set('mode', 'docs');
     data.set('cmsAction', 'pdf');
-    data.set('reportVal', JSON.stringify(report));
+    data.set('reportValue', JSON.stringify(report));
 
     report.fileTpl && data.set('fileTpl', report.fileTpl);
     report.pdfOrientation && data.set('pdfOrientation', report.pdfOrientation.toString().toUpperCase());
@@ -629,7 +629,7 @@ export default {
    * @param {?string|number} param.orderTotal - important param for show in order table (save as JSON)
    * @param {object} param.importantVal - important param for show in order table (save as JSON)
    * @param {object} param.saveVal - input or other values (save as JSON)
-   * @param {object} param.reportVal - require param report (save as JSON)
+   * @param {object} param.reportValue - require param report (save as JSON)
    *
    * @default param.orderTotal = 0
    *
@@ -652,9 +652,9 @@ export default {
     // Order
     data.set('orderId', (param.orderId || 0).toString());
     data.set('orderTotal', (param.orderTotal || 0).toString());
-    data.set('importantVal', JSON.stringify(param.importantVal || {}));
+    data.set('importantValue', JSON.stringify(param.importantValue || {}));
     data.set('saveVal', JSON.stringify(param.saveVal || {}));
-    data.set('reportVal', JSON.stringify(param.reportVal || {}));
+    data.set('reportValue', JSON.stringify(param.reportValue || {}));
     data.set('startShippingDate', (param['startShippingDate'] || '').toString());
     data.set('endShippingDate', (param['endShippingDate'] || '').toString());
 
@@ -686,7 +686,7 @@ export default {
    * @param {?boolean} param.orderChanged -
    * @param {?string} param.orderId - id of savedOrders
    * @param {object} param.saveVal - input or other values
-   * @param {object} param.reportVal - require param report
+   * @param {object} param.reportValue - require param report
    *
    * @return {object} - result {status}
    */
@@ -719,7 +719,7 @@ export default {
     if (f.AUTH_STATUS && p.orderId && !p.orderChanged) {
       !data.has('orderId') && data.set('orderId', p.orderId.toString()); // Отчет из сохранненого заказа
     } else {
-      !data.has('reportVal') && data.set('reportVal', JSON.stringify(p.reportVal || {}));
+      !data.has('reportValue') && data.set('reportValue', JSON.stringify(p.reportValue || {}));
     }
 
     return f.Post({data});

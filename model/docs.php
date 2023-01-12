@@ -9,17 +9,17 @@
 $data = [];
 
 // Если есть отчет
-$reportVal = isset($reportVal) ? json_decode($reportVal, true) : false;
+$reportValue = json_decode($reportValue ?? '[]', true);
 // Если есть номер заказа
-$orderId = empty($reportVal) ? ($orderId ?? false) : false;
+$orderId = empty($reportValue) ? ($orderId ?? false) : false;
 // Посмотреть номер заказа в отчете
-!$orderId && $orderId = isset($reportVal['orderId']) ? json_decode($reportVal['orderId']) : false;
+!$orderId && $orderId = isset($reportValue['orderId']) ? json_decode($reportValue['orderId']) : false;
 
 // Данные о менеджере
 // ---------------------------------------------------------------------------------------------------------------------
 if (isset($addManager)) {
-  if (isset($reportVal['name'])) { // Имя пользователя - неправильно
-    $userData = $main->db->getUser($reportVal['userId'] ?? $reportVal['name'], 'name, contacts');
+  if (isset($reportValue['name'])) { // Имя пользователя - неправильно
+    $userData = $main->db->getUser($reportValue['userId'] ?? $reportValue['name'], 'name, contacts');
   } else if ($orderId) { // Менеджер из сохраненного заказа
     $userData = $main->db->getUserByOrderId($orderId);
   } else { // Текущий пользователь
@@ -52,19 +52,19 @@ if (isset($addCustomer)) {
 // Отчет загрузить из БД по ИД
 // ---------------------------------------------------------------------------------------------------------------------
 if ($orderId) {
-  $reportVal = $main->db->loadOrdersById($orderId);
+  $reportValue = $main->db->loadOrdersById($orderId);
 
-  $reportVal['id']           = $reportVal['ID'];
+  $reportValue['id']           = $reportValue['ID'];
 
-  $reportVal['contacts']       = json_decode($reportVal['contacts'], true);
-  $reportVal['importantValue'] = json_decode($reportVal['importantValue'], true);
-  $reportVal['saveValue']      = json_decode($reportVal['saveValue'], true);
-  $reportVal['reportValue']    = json_decode($reportVal['reportValue'], true);
+  $reportValue['contacts']       = json_decode($reportValue['contacts'], true);
+  $reportValue['importantValue'] = json_decode($reportValue['importantValue'], true);
+  $reportValue['saveValue']      = json_decode($reportValue['saveValue'], true);
+  $reportValue['reportValue']    = json_decode($reportValue['reportValue'], true);
 
-  $data['order'] = $reportVal;
-  $data['reportValue'] = &$reportVal['reportValue'];
-} else if ($reportVal) {
-  $data['reportValue'] = $reportVal;
+  $data['order'] = $reportValue;
+  $data['reportValue'] = &$reportValue['reportValue'];
+} else if ($reportValue) {
+  $data['reportValue'] = $reportValue;
 }
 
 $cmsAction = $cmsAction ?? 'mail';

@@ -73,12 +73,10 @@ trait DbOrders {
     }
 
     return array_map(function ($row) {
-      $row = $this->parseJsonField($row);
-
       $row['reportValue'] = gzuncompress($row['reportValue']);
       if (!$row['reportValue']) $row['reportValue'] = false;
 
-      return $row;
+      return $this->jsonParseField($row);
     }, $res);
   }
 

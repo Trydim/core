@@ -11,13 +11,13 @@ function cmsAutoloader(string $class) {
 /**
  *
  * @param $number
- * @param $reportVal
+ * @param $reportValue
  * @return false|string
  */
-function addCpNumber($number, $reportVal) {
+function addCpNumber($number, $reportValue) {
   global $main;
-  $reportVal = $main->fireHook('addCpNumber', $number, $reportVal);
-  return gzcompress($reportVal, 9);
+  $reportValue = $main->fireHook('addCpNumber', $number, $reportValue);
+  return gzcompress($reportValue, 9);
 }
 
 /**
@@ -506,11 +506,9 @@ function httpRequest(string $url, array $config = [], array $params = []) {
   curl_close($myCurl);
 
   if (($config['json'] ?? true) === true) {
-    try {
-      return json_decode($response, $config['json_assoc'] ?? true);
-    } catch (Exception $e) {
-      return die('Json error: ' . $e->getMessage());
-    }
+    $res   = json_decode($response, $config['json_assoc'] ?? true);
+    $error = json_last_error();
+    return $error === 0 ? $res : 'Json error: ' . $response;
   }
 
   return $response;

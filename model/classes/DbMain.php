@@ -15,7 +15,8 @@ class DbMain extends R {
         DB_DATE_FROM   = '2000-01-01 00:00:00',
         DB_DATE_TO     = '2100-01-01 00:00:00';
 
-  const DB_JSON_FIELDS = ['inputValue', 'saveValue', 'importantValue', 'contacts', 'customization', 'settings', 'cmsParam', 'properties'];
+  const DB_JSON_FIELDS = ['inputValue', 'saveValue', 'importantValue', 'reportValue', 'contacts', 'customization', 'settings', 'cmsParam', 'properties'],
+        DB_BLOB_FIELDS = ['reportValue'];
 
   /**
    * @var Main
@@ -72,15 +73,34 @@ class DbMain extends R {
    * @param array $arr
    * @return array
    */
-  private function parseJsonField(array $arr): array {
+  private function jsonParseField(array $arr): array {
     $result = [];
     //$arr = array_flatten($arr);
 
     foreach ($arr as $key => $value) {
       if (is_array($value)) {
-        $result[$key] = $this->parseJsonField($value);
+        $result[$key] = $this->jsonParseField($value);
       } else if (in_array($key, self::DB_JSON_FIELDS)) {
         $result[$key] = json_decode($value, true);
+      } else {
+        $result[$key] = $value;
+      }
+    }
+
+    return $result;
+  }
+
+  /**
+   * @param array $arr
+   * @return array
+   */
+  public function jsonEncodeField(array $arr): array {
+    $result = [];
+    //$arr = array_flatten($arr);
+
+    foreach ($arr as $key => $value) {
+      if (in_array($key, self::DB_JSON_FIELDS) && is_string($value) === false) {
+        $result[$key] = json_encode($value, true);
       } else {
         $result[$key] = $value;
       }
@@ -1110,7 +1130,7 @@ class DbMain extends R {
     $sql = "SELECT ID AS 'id', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 
-    return $this->parseJsonField(self::getAll($sql));
+    return $this->jsonParseField(self::getAll($sql));
   }
 
   public function getDealerById(string $id): array {
@@ -1122,7 +1142,7 @@ class DbMain extends R {
             FROM dealers
             WHERE ID = :id";
 
-    $dealer = $this->parseJsonField(self::getRow($sql, [':id' => $id]));
+    $dealer = $this->jsonParseField(self::getRow($sql, [':id' => $id]));
     $dealer['settings'] = $dealer['settings'] ?? [];
     foreach ($dealer['settings'] as $prop => $value) {
       [$propName, $propValue] = $properties->getValue($prop, $value);
