@@ -36,4 +36,5 @@ if (DEBUG || in_array($mode, ['auth', 'docs']) || $main->checkAction($cmsAction)
   }
 } else $result['error'] = ['Auth no passing!'];
 
+header('Content-Type: application/json; charset=utf-8');
 echo json_encode($result);

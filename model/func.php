@@ -471,11 +471,11 @@ function translit($value): string {
 
 /**
  * @param string $url
- * @param array $config - 'method', 'json', 'json_assoc', 'auth'
+ * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'auth'
  * @param array<string, string> $params - assoc array
- * @return string
+ * @return string|array
  */
-function httpRequest(string $url, array $config = [], array $params = []): string {
+function httpRequest(string $url, array $config = [], array $params = []) {
   $myCurl = curl_init();
 
   $curlConfig = [
@@ -485,7 +485,6 @@ function httpRequest(string $url, array $config = [], array $params = []): strin
   ];
 
   if (isset($config['auth'])) {
-    $curlConfig[CURLOPT_HEADER] = 1;
     $curlConfig[CURLOPT_HTTPHEADER][] = 'Authorization:' . $config['auth'];
   }
 
@@ -495,7 +494,6 @@ function httpRequest(string $url, array $config = [], array $params = []): strin
   } else {
     $curlConfig[CURLOPT_HTTPGET] = false;
     $curlConfig[CURLOPT_POST] = true;
-    $curlConfig[CURLOPT_HEADER] = 1;
     $curlConfig[CURLOPT_HTTPHEADER][] = "Content-Type: application/x-www-form-urlencoded";
     $curlConfig[CURLOPT_POSTFIELDS] = http_build_query($params);
   }
@@ -507,7 +505,7 @@ function httpRequest(string $url, array $config = [], array $params = []): strin
 
   curl_close($myCurl);
 
-  if (($config['json'] ?? '') === 'json') {
+  if (($config['json'] ?? true) === true) {
     try {
       return json_decode($response, $config['json_assoc'] ?? true);
     } catch (Exception $e) {

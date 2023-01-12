@@ -436,11 +436,11 @@ class DbMain extends R {
     try {
       if (count($param) === 1) {
         foreach ($param as $id => $item) {
-
           $change && $beans->id = $id;
 
           foreach ($item as $k => $v) {
             if (isset($idColName) && $idColName === $k) continue;
+            if (in_array($k, self::DB_JSON_FIELDS) && is_string($v) === false) $v = json_encode($v);
             $beans->$k = $v;
           }
         }
@@ -450,10 +450,10 @@ class DbMain extends R {
 
         $i = 0;
         foreach ($param as $id => $item) {
-
           $change && $beans[$i]->id = $id;
 
           foreach ($item as $k => $v) {
+            if (in_array($k, self::DB_JSON_FIELDS) && is_string($v) === false) $v = json_encode($v);
             $beans[$i]->$k = $v;
           }
           $i++;
