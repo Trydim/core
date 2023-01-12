@@ -8,8 +8,8 @@ $field = [
   'pageTitle' => 'Администрирование',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/admindb.css?ver=3f0d36561c'];
-$field['jsLinks'] = [
+$field[VC::BASE_CSS_LINKS] = [CORE_CSS . 'module/admindb.css?ver=3f0d36561c'];
+$field[VC::BASE_JS_LINKS] = [
   CORE_JS . 'libs/handsontable.full.min.js?ver=f3bb2b6859',
   CORE_JS . 'module/admindb.js?ver=f3bb2b6859'
 ];
@@ -23,6 +23,6 @@ $pathLegend = $main->getCmsParam(VC::LEGEND_PATH);
 if ($pathLegend && file_exists($pathLegend)) require $pathLegend;
 unset($pathLegend);
 
-$main->setControllerField($field)->fireHook('admindbTemplate', $field);
+$main->setControllerField($field)->fireHook(VC::HOOKS_ADMIN_DB_TEMPLATE, $main);
 require $main->url->getRoutePath();
 $html = template('base', $field);

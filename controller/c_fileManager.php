@@ -52,7 +52,7 @@ $field = [
 $field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=fda1c25660'];
 $field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=45223fc11b'];
 
-$main->setControllerField($field)->fireHook('fileManagerTemplate', $field);
+$main->setControllerField($field)->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main);
 ob_start();
 include $main->url->getRoutePath();
 $field['content'] = ob_get_clean();

@@ -34,6 +34,6 @@ if (!isset($setting)) {
   }
 }
 
-$main->setControllerField($field)->fireHook('customersTemplate', $field);
+$main->setControllerField($field)->fireHook(VC::HOOKS_CUSTOMERS_TEMPLATE, $main);
 require $main->url->getRoutePath();
 $html = template('base', $field);

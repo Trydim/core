@@ -12,6 +12,7 @@ $field = [
   'jsLinks'   => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],
 ];
 
+$main->setControllerField($field)->fireHook(VC::HOOKS_DEALERS_TEMPLATE, $main);
 ob_start();
 include $main->url->getRoutePath();
 $field['content'] = ob_get_clean();

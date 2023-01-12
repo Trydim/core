@@ -282,13 +282,12 @@ final class Main {
   /**
    * @param string $key
    * @param mixed $value
-   * @param mixed $position [optional] <p>
-   * head - in head <p>
-   * before - before all script, after cms libs<p>
-   * last - before end body <p>
+   * @param mixed $position [optional] <br>
+   * before - if string - prepend to the beginning. if array - prepend elements to the beginning of an array<br>
+   * after - if string - append to the end. if array - append elements to the end of an array<br>
    * @return $this
    */
-  public function addControllerField(string $key, $value, string $position = 'last'): Main {
+  public function addControllerField(string $key, $value, string $position = 'after'): Main {
     if (isset($this->controllerField[$key])) {
       $field =& $this->controllerField[$key];
 
@@ -297,9 +296,8 @@ final class Main {
         else $field .= $value;
       }
       else if (is_array($field)) {
-        if ($position === 'head') array_unshift($field, $value);
-        else if ($position === 'before') array_unshift($field, $value);
-        if ($position === 'last') $field[] = $value;
+        if ($position === 'before') array_unshift($field, $value);
+        else if ($position === 'after') $field[] = $value;
       }
       else if (is_object($field)) $field->$key = $value;
 

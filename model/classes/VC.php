@@ -41,6 +41,9 @@ class VC {
         BASE_CSS_LINKS        = 'cssLinks',
         BASE_JS_LINKS         = 'jsLinks';
 
+  const CONTROLLER_FIELD_POSITION_BEFORE = 'before',
+        CONTROLLER_FIELD_POSITION_AFTER = 'after';
+
   /** Setting */
   const MAIL_TARGET      = 'mailTarget',
         MAIL_TARGET_COPY = 'mailTargetCopy',
@@ -61,5 +64,19 @@ class VC {
   /**
    * Setting action
    */
+
+
+  /**
+   * Hooks
+   */
+  const HOOKS_ADMIN_DB_TEMPLATE = 'admindbTemplate',
+        HOOKS_CALENDAR_TEMPLATE = 'calendarTemplate',
+        HOOKS_CATALOG_TEMPLATE  = 'catalogTemplate',
+        HOOKS_ORDER_TEMPLATE    = 'orderTemplate',
+        HOOKS_CUSTOMERS_TEMPLATE = 'customersTemplate',
+        HOOKS_DEALERS_TEMPLATE   = 'dealersTemplate',
+        HOOKS_FILE_MANAGER_TEMPLATE = 'fileManagerTemplate',
+        HOOKS_SETTING_TEMPLATE     = 'settingTemplate',
+        HOOKS_USERS_TEMPLATE       = 'usersTemplate';
 
 }

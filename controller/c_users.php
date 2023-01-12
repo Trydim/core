@@ -35,7 +35,7 @@ $param['permission'] = $permission = implode('', array_map(function ($item) {
 $managerField = $main->getSettings(VC::MANAGER_FIELDS);
 if (!$managerField) $managerField = [];
 
-$main->setControllerField($field)->fireHook('usersTemplate', $field);
+$main->setControllerField($field)->fireHook(VC::HOOKS_USERS_TEMPLATE, $main);
 $param['columns'] = $columns ?? '';
 require $main->url->getRoutePath();
 $html = template('base', $field);

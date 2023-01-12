@@ -78,7 +78,9 @@ class Orders {
   constructor() {
     this.setParam();
     this.setQueryParam();
-
+    setTimeout(() => this.init(), 500);
+  }
+  init() {
     this.p = new f.Pagination( '#paginator', {
       dbAction : this.mainAction,
       sortParam: this.queryParam,
@@ -94,32 +96,33 @@ class Orders {
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
 
-    this.setTableTemplate('order');
-
-    this.query();
+    this.ordersHeadRender();
     this.onEvent();
+    this.query();
   }
   setParam() {
     this.M = new f.initModal();
-    this.form = new FormData(); // Todo наверное не очень удобно
 
     this.needReload = false;
     this.confirmMsg = '';
     this.dealerId = 0;
 
-    this.table = f.qS('#commonTable');
+    this.filter = {};
+
+    this.table = f.qS('#orderTable');
     this.confirm = f.qS('#confirmField');
     this.btnMainOnly = f.qA('#actionBtnWrap input.mainOnly');
 
+    this.config = {
+      ordersColumns: f.getData('#dataOrdersColumn'),
+    }
+
     this.template = {
-      order    : f.gTNode('#orderTableTmp'),
-      impValue : f.gT('#tableImportantValue'),
+      tableHeader: f.gT('#tableHeaderCell'),
+      impValue : null, // f.gT('#tableImportantValue'),
       searchMsg: f.gT('#noFoundSearchMsg'),
       columns  : f.gT('#orderColumnsTableTmp'),
     }
-
-    let node = f.qS('#orderVisitorTableTmp');
-    node && (this.template.visit = node.content.children[0]);
   }
   setQueryParam() {
     this.mainAction = 'loadOrders';
@@ -135,23 +138,35 @@ class Orders {
       pageCount   : 0,
     };
   }
-  setTableTemplate(tmp) {
-    this.table.dataset.type = tmp;
-    this.table.innerHTML = this.template[tmp].innerHTML;
-    this.onSearchFocus();
-  }
 
-  fillTable(data, search = false) {
-    data = data.map(item => {
+  // Orders tables
+  ordersHeadRender() {
+    const html = this.config.ordersColumns.reduce((r, column) => {
+      return r += f.replaceTemplate(this.template.tableHeader, column);
+    }, '');
+
+    this.table.querySelector('thead tr').innerHTML = html;
+  }
+  ordersGetTableCellTemplate() {
+    let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${ID}"></td>';
+    tmp += this.config.ordersColumns.reduce((r, column) => {
+      if (column['dbName'] === 'ID') return r;
+      return r += '<td>${' + column['dbName'] + '}</td>';
+    }, '');
+
+    return this.template.tableCell = tmp + '</tr>';
+  }
+  ordersPrepare(data) {
+    return data.reduce((r, item) => {
       if (item.importantValue) {
         let value = '';
 
         /*if (false /!* TODO настройки вывода даты*!/) {
           for (let i in item) {
-            if (i.includes('date')) {
-              //let date = new Date(item[i]);
-              item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
-            }
+           if (i.includes('date')) {
+             //let date = new Date(item[i]);
+             item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
+           }
           }
         }*/
 
@@ -159,27 +174,41 @@ class Orders {
           value = JSON.parse(item.importantValue);
           !Array.isArray(value) && (value = Object.values(value).length && [value]);
           if (value.length) {
-            value = value.map(i => { i.key = _(i.key); return i; });
+            value = value.map(i => { i.key = window._(i.key); return i; });
             value = f.replaceTemplate(this.template.impValue, value);
           } else value = '-';
         }
         catch (e) { console.log(`Заказ ID:${item['ID']} имеет не правильное значение`); }
         item.importantValue = value;
       }
-
-      item.total = (+item.total).toFixed(2) || 0;
-      return item;
-    });
-
-    let html  = '',
-        tbody = this.template[this.table.dataset.type].querySelector('tbody tr').outerHTML;
-    data.length && (html += f.replaceTemplate(tbody, data));
-    !data.length && search && (html = this.template.searchMsg);
-    this.table.querySelector('tbody').innerHTML = html;
-
-    //data.length && this.selected[this.currentTable].onTableEvent();
-    data.length && this.selected.checkedRows();
+      r[item['ID']] = item
+      return r;
+    }, {});
   }
+  ordersFilter(search = false) {
+    return Object.values(this.orders).filter(row => {
+      if (search) return search === row;
+      return true;
+    });
+  }
+  ordersRender(search) {
+    let html  = '',
+        tbody = this.template.tableCell || this.ordersGetTableCellTemplate(),
+        data  = this.ordersFilter(search);
+
+    if (data.length) {
+      html += f.replaceTemplate(tbody, data);
+      setTimeout(() => this.selected.checkedRows());
+    } else if (search) {
+      html = this.template.searchMsg;
+    }
+    this.table.querySelector('tbody').innerHTML = html;
+  }
+  setOrders(data) {
+    this.orders = this.ordersPrepare(data);
+    this.ordersRender();
+  }
+
   // Заполнить статусы
   fillSelectStatus(data) {
     let tmp = f.gT('#changeStatus'), html = '';
@@ -210,18 +239,19 @@ class Orders {
   }
 
   query(action) {
-    const param = this.queryParam;
+    const data = new FormData(),
+          param = this.queryParam;
 
     if (action) param.dbAction = action;
 
     Object.entries(param).map(param => {
-      this.form.set(param[0], param[1].toString());
+      data.set(param[0], param[1].toString());
     });
 
-    if (param.dbAction === this.mainAction) this.form.delete('orderIds');
+    if (param.dbAction === this.mainAction) data.delete('orderIds');
 
     this.loaderTable.start();
-    f.Post({data: this.form}).then(data => {
+    f.Post({data}).then(data => {
       if(this.needReload) {
         this.needReload = false;
         this.selected.clear();
@@ -233,7 +263,7 @@ class Orders {
         this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
       }
 
-      if (data['orders']) this.fillTable(data['orders']);
+      if (data['orders']) this.setOrders(data['orders']);
       if (data['countRows']) this.p.setCountPageBtn(data['countRows']);
       if (data['statusOrders']) this.fillSelectStatus(data['statusOrders']);
 
@@ -259,9 +289,7 @@ class Orders {
 
     // Select
     f.qA('select[data-action]', 'change', e => this.actionSelect.call(this, e));
-  }
 
-  onSearchFocus() {
     // Focus Search Init
     let node = f.qS('#search');
     node.removeEventListener('focus', this.focusSearch);

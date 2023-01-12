@@ -111,7 +111,7 @@ declare type CMSGlobalObject = {
    * @param selector
    * @return string - json
    */
-  getData(selector: string): string
+  getData(selector: string): []
 
   getDataAsAssoc(selector: string): object
   getDataAsMap(selector: string): Map<any, any>
@@ -183,6 +183,7 @@ declare type CMSGlobalObject = {
 
   Modal<T = any>(options: SweetAlertOptions|string): SweetAlertResult<Awaited<T>>
   Modal<T = any>(title: string, html?: string, icon?: SweetAlertIcon): SweetAlertResult<Awaited<T>>
+  initModal(),
 }
 
 interface Window {

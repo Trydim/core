@@ -50,7 +50,7 @@ if (USE_DATABASE && $user['isAdmin']) {
   unset($permissions, $status);
 }
 
-$main->setControllerField($field)->fireHook('settingTemplate', $field);
+$main->setControllerField($field)->fireHook(VC::HOOKS_SETTING_TEMPLATE, $main);
 ob_start();
 require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();

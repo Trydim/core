@@ -23,12 +23,14 @@ if (!$setting) $setting = new stdClass();
 if (!isset($setting->ordersColumnsSort)) {
   $columns = ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
 
-  $param['ordersColumns'] = array_map(function ($item) {
+  $columns = array_map(function ($item) {
     return [
       'dbName' => $item,
       'name'   => gTxtDB('orders', $item),
     ];
   }, $columns);
+
+  $field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersColumn' value='". json_encode($columns) . "'>";
 }
 
 if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsSort)) {
@@ -46,6 +48,6 @@ if ($param['showFilter']) {
   $param['dealers'] = $main->db->selectQuery('dealers', ['id', 'name']);
 }
 
-$main->setControllerField($field)->fireHook('orderTemplate', $field);
+$main->setControllerField($field)->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);
 require $main->url->getRoutePath();
 $html = template('base', $field);

@@ -167,8 +167,7 @@ trait DbOrders {
   }
 
   // Status
-
-  public function loadOrderStatus(string $filters = '') {
+  public function loadOrderStatus(string $filters = ''): array {
     $sql = "SELECT * FROM " . $this->pf('order_status') . "\n ";
 
     if (strlen($filters)) $sql .= 'WHERE ' . $filters . "\n ";

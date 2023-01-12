@@ -12,8 +12,10 @@ $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>
 </template>
-<template id="tableImportantValue">
-  <div>\${key} - \${value}</div>
+<template id="tableHeaderCell">
+  <th>
+    <input type="button" class="btn btn-info btn-sm table-th" value="\${name}" data-column="\${dbName}">
+  </th>
 </template>
 <template id="sendMailTmp">
   <form class="content-center" action="#" id="authForm">
@@ -30,7 +32,7 @@ $field['footerContent'] .= <<<footerContent
   <div>
     <div>Дата создания - \${create_date}</div>
     <div>Дата редактирования - \${last_edit_date}</div>
-    <div>Закачик - \${customer}</div>
+    <div>Заказчик - \${customer}</div>
     <div>Менеджер - \${name}</div>
     <div>Статус - \${status}</div>
     <div>\${important_value}</div>

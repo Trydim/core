@@ -6,8 +6,6 @@
  * @var array $dealers - from controller
  */
 
-$ordersColumns = $ordersColumns ?? [];
-$ordersVisitorColumns = $ordersVisitorColumns ?? [];
 ?>
 <div class="d-flex justify-content-between pb-4" id="actionBtnWrap">
   <div class="">
@@ -64,56 +62,18 @@ $ordersVisitorColumns = $ordersVisitorColumns ?? [];
   </div>
 
   <div class="mt-1 position-relative">
-    <table id="commonTable" class="text-center table table-striped"></table>
-    <button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>
+    <table id="orderTable" class="text-center table table-striped">
+      <thead><tr></tr></thead>
+      <tbody></tbody>
+    </table>
+    <!--<button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>-->
   </div>
 
-  <template id="orderTableTmp">
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <?php foreach ($ordersColumns as $item) { ?>
-            <th>
-              <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
-            </th>
-          <?php } ?>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><input type="checkbox" class="" data-id="${ID}"></td>
-          <?php foreach ($ordersColumns as $item) { ?>
-            <td>${<?= $item['dbName']; ?>}</td>
-          <?php } ?>
-        </tr>
-      </tbody>
-    </table>
-  </template>
-
   <?php if (isset($param['ordersVisitorColumns'])) { ?>
-  <template id="orderVisitorTableTmp">
-    <table>
-      <thead>
-      <tr>
-        <th></th>
-        <?php foreach ($ordersVisitorColumns as $item) { ?>
-          <th>
-            <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
-          </th>
-        <?php } ?>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td><input type="checkbox" class="" data-id="${cp_number}"></td>
-        <?php foreach ($ordersVisitorColumns as $item) { ?>
-          <td>${<?= $item['dbName']; ?>}</td>
-        <?php } ?>
-      </tr>
-      </tbody>
+    <table id="orderVisitorTableTmp">
+      <thead><tr></tr></thead>
+      <tbody></tbody>
     </table>
-  </template>
   <?php } ?>
 
   <template id="orderColumnsTableTmp">

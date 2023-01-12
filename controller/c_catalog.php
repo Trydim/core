@@ -57,7 +57,7 @@ $field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . 
 
 unset($value, $propSetting, $mess);
 
-$main->setControllerField($field)->fireHook('catalogTemplate', $field);
+$main->setControllerField($field)->fireHook(VC::HOOKS_CATALOG_TEMPLATE, $main);
 ob_start();
 require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
