@@ -233,7 +233,7 @@ const customers = {
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
     let target = e.target, form,
-        action = target.getAttribute('data-action');
+        action = target.dataset.action;
 
     if (!action) return;
 

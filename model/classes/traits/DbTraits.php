@@ -12,15 +12,6 @@ trait DbOrders {
       LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
       JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID\n";
   }
-  private function getPaginatorQuery(array $pageParam) {
-    $pageNumber = $pageParam['pageNumber'] ?? 0;
-    $countPerPage = $pageParam['countPerPage'] ?? 100;
-    $sortColumn = $pageParam['sortColumn'] ?? 'last_edit_date';
-    $sortDirect = $pageParam['sortDirect'] ?? false;
-
-    $pageNumber *= $countPerPage;
-    return "ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
-  }
 
   /**
    * @param array $pageParam[int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
@@ -138,18 +129,13 @@ trait DbOrders {
   }
 
   /**
-   * @param int $pageNumber
-   * @param int $countPerPage
-   * @param string $sortColumn
-   * @param bool  $sortDirect
+   * @param array $pageParam[int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
    * @param array $dateRange
    * @param array $ids
    *
    * @return array|null
    */
-  public function loadVisitorOrder(int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'createDate', bool $sortDirect = false, array $dateRange = [], array $ids = []) {
-    $pageNumber *= $countPerPage;
-
+  public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []) {
     $sql = "SELECT cp_number AS 'cpNumber', create_date AS 'createDate', important_value AS 'importantValue', total
             FROM " . $this->pf('client_orders') . "\n";
 
@@ -160,8 +146,7 @@ trait DbOrders {
       else $sql .= implode(' OR ID = ', $ids) . " ";
     }
 
-    $sortColumn = AQueryWriter::camelsSnake($sortColumn);
-    $sql .= "ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
+    $sql .= $this->getPaginatorQuery($pageParam);
 
     return self::getAll($sql);
   }
@@ -175,6 +160,214 @@ trait DbOrders {
     $sql .= "ORDER BY sort";
 
     return self::getAll($sql);
+  }
+}
+
+trait DbUsers {
+  private function getUserDbColumns(string $field) {
+    switch ($field) {
+      default: return $field;
+      case 'id': case 'ID': return 'U.ID';
+      case 'name': return 'U.name';
+      case 'permissionName': return 'P.name';
+    }
+  }
+
+  /**
+   * @param string $login
+   * @param string $password
+   * @param bool   $status
+   * @return array|false
+   */
+  public function getUserFromFile(string $login = '', string $password = '', bool $status = false) {
+    if (file_exists(SYSTEM_PATH)) {
+      $value = file(SYSTEM_PATH)[0];
+      $value && $value = explode('|||', $value);
+      $this->login = [$value[0], $value[1]];
+
+      if (($value[0] === $login && $value[1] === $password) || $status) {
+        return [
+          'login' => $value[0],
+          'name'  => $value[0],
+          'ID'    => 1,
+        ];
+      } else return false;
+    } else {
+      file_put_contents(SYSTEM_PATH, '');
+      // Сделать регистрацию при первом разе
+    }
+  }
+
+  /**
+   * @param $login
+   * @param $column string
+   *
+   * @return array|null
+   */
+  public function getUser($login, string $column = 'ID') {
+    $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
+      [':login' => $login]
+    );
+
+    if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
+    return $result;
+  }
+
+  /**
+   * @param $userId
+   *
+   * @return array|null
+   */
+  public function getUserById($userId) {
+    return self::getRow("SELECT * FROM " . $this->pf('users') . " WHERE ID = :id",
+      [':id' => $userId]
+    );
+  }
+
+  /**
+   * @param $login
+   * @return array|null
+   */
+  public function getUserByLogin($login) {
+    $sql = "SELECT login, U.name AS 'name', hash, password, customization, 
+                   P.ID AS 'permId', P.name AS 'permName', properties AS 'permValue', activity
+            FROM " . $this->pf('users') . " U
+            LEFT JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
+            WHERE login = :login";
+
+    return self::getRow($sql, [':login' => $login]);
+  }
+
+  /**
+   * @param $id
+   *
+   * @return mixed
+   */
+  public function getUserByOrderId($id) {
+    return self::getRow("SELECT U.name AS 'name', U.contacts AS 'contacts'
+            FROM " . $this->pf('users') . " U 
+            JOIN " . $this->pf('orders') . " O ON U.ID = O.user_id
+            WHERE O.ID = :id", [':id' => $id]);
+  }
+
+  public function checkPassword($login, $password) {
+    if (USE_DATABASE) {
+      $user = $this->getUser($login, 'ID, name, login, password, activity');
+    } else {
+      return $this->getUserFromFile($login, $password);
+    }
+
+    return count($user) && boolValue($user['activity'])
+    && password_verify($password, $user['password']) ? $user : false;
+  }
+
+  public function changeUser($loginId, $param) {
+    $user = self::xdispense($this->pf('users'));
+    $user->ID = $loginId;
+    foreach ($param as $key => $value) {
+      $user->$key = $value;
+    }
+    self::store($user);
+  }
+
+  /**
+   * @param array $pageParam[int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
+   *
+   * @return array
+   */
+  public function loadUsers(array $pageParam): array {
+    $sql = "SELECT U.ID AS 'ID', login, U.name AS 'name', contacts, 
+                   permission_id AS 'permissionId', P.name AS 'permissionName', 
+                   register_date AS 'registerDate', activity
+        FROM " . $this->pf('users') . " U
+        LEFT JOIN " . $this->pf('permission') . " P ON U.permission_id = P.ID\n";
+
+    $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn']);
+
+    $sql .= $this->getPaginatorQuery($pageParam);
+
+    return self::getAll($sql);
+  }
+
+  public function setUserHash($loginId, $hash) {
+    if (USE_DATABASE) {
+      $user = self::xdispense($this->pf('users'));
+      $user->ID = $loginId;
+      $user->hash = $hash;
+      self::store($user);
+    } else {
+      !$this->login && $this->getUserFromFile();
+      $data = implode('|||', $this->login);
+      $data .= '|||' . $hash;
+      file_put_contents(SYSTEM_PATH, $data);
+    }
+  }
+
+  /**
+   * @param $session
+   * @return array|bool[]|false
+   */
+  public function checkUserHash($session) {
+    if (USE_DATABASE) {
+      $user = $this->getUserByLogin($session['login']);
+      if (!count($user) || !boolValue($user['activity'])) return false;
+
+      $customization = json_decode($user['customization'], true);
+
+      $userParam = [
+        'permissionId'  => intval($user['permId']),
+        'onlyOne'       => isset($customization['onlyOne']),
+        'customization' => $customization,
+        'permission'    => json_decode($user['permValue'], true),
+      ];
+    } else {
+      try {
+        if (!file_exists(SYSTEM_PATH)) throw new \ErrorException('error');
+        $value = file(SYSTEM_PATH);
+        $value && $value = explode('|||', $value[0]);
+        if (count($value) < 2) throw new \ErrorException('error');
+      } catch (\ErrorException $e) {
+        file_put_contents(SYSTEM_PATH, 'admin|||123|||');
+        return false;
+      }
+      $user = [
+        'password' => $value[1],
+        'hash'     => trim($value[2]),
+      ];
+      $userParam = [
+        'onlyOne' => true,
+        'admin'   => true,
+      ];
+    }
+
+    if ($userParam['onlyOne']) $ok = $session['hash'] === $user['hash'];
+    else {
+      $ok = USE_DATABASE ? password_verify($session['password'], $user['password'])
+        : $session['password'] === $user['password'];
+    }
+
+    return $ok ? $userParam : false;
+  }
+
+  /**
+   * get Setting for current user
+   *
+   * @param string $currentUser {string}
+   * @param string $columns {string}
+   *
+   * @return mixed
+   */
+  public function getUserSetting(string $currentUser = '', string $columns = 'customization') {
+    if (!$currentUser) {
+      $currentUser = $this->main->getLogin();
+    }
+    $result = self::getAssocRow("SELECT $columns from " . $this->pf('users') . " WHERE login = ?", [$currentUser]);
+
+    if (count($result) === 1) {
+      if ($columns === 'customization') return json_decode($result[0]['customization']);
+      if (count(explode(',', $columns)) === 1) return $result[$columns];
+    }
+    return json_decode('{}');
   }
 }
 

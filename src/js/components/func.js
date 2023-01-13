@@ -223,7 +223,7 @@ export default {
       let {relation, relationT} = member;
 
       relationT.forEach(t => {
-        !member.nodesT[t] && (member.nodesT[t] = [...f.qA(`input[data-target="${t}"], select [data-target="${t}"]`)]);
+        !member.nodesT[t] && (member.nodesT[t] = [...qs(`input[data-target="${t}"], select [data-target="${t}"]`)]);
 
         if (member.nodesT[t].length) {
           let checked = !!member.nodesT[t].find(item => item.checked || item.selected); // Находим в группе хоть 1 включенный (или противоположный выключенный)

@@ -111,7 +111,7 @@ const users = {
 
   query() {
     Object.entries(this.queryParam).map(param => {
-      this.form.set(param[0], param[1]);
+      this.form.set(param[0], param[1].toString());
     })
 
     f.Post({data: this.form}).then(data => {
@@ -189,7 +189,7 @@ const users = {
         form.querySelector('[name="password"]').parentNode.remove();
 
         // Contacts
-        Object.entries(users['contactsParse']).forEach(([k, v]) => {
+        users['contactsParse'] && Object.entries(users['contactsParse']).forEach(([k, v]) => {
           node = form.querySelector(`[name="${k}"]`);
           if (node) {
             if (oneElements) {

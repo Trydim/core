@@ -61,7 +61,7 @@ final class Main {
   }
   /**
    * @param string $value
-   * @return DbMain|Dealer|UrlGenerator
+   * @return DbMain|Dealer|UrlGenerator|Response
    */
   public function __get(string $value) {
     if ($value === 'url') {
@@ -74,6 +74,10 @@ final class Main {
     else if ($value === 'dealer') {
       $this->dealer = new Dealer($this);
       return $this->dealer;
+    }
+    else if ($value === 'response') {
+      $this->response = new Response($this);
+      return $this->response;
     }
 
     return $this->$value;

@@ -38,7 +38,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
   $pagerParam = [
     'pageNumber'   => $pageNumber,
     'countPerPage' => $countPerPage,
-    'sortColumn'   => $sortColumn ?? 'create_date',
+    'sortColumn'   => $sortColumn ?? 'ID',
     'sortDirect'   => $sortDirect,
   ];
 
@@ -241,6 +241,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       } //
       else {
         $dateRange = json_decode($dateRange ?? '[]', true);
+        $pagerParam['sortColumn'] = $sortColumn ?? 'create_date';
         $result['orders'] = $db->loadOrders($pagerParam, $dateRange);
         $result['countRows'] = $db->getCountRows('orders');
       }
@@ -604,13 +605,10 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       break;
     case 'loadCustomers':
       // Значит нужны все заказчики (поиск при сохранении)
-      if ($countPerPage > 999) $countPerPage = 1000000;
+      if ($countPerPage > 999) $pagerParam['countPerPage'] = 1000000;
       else $result['countRows'] = $db->getCountRows('customers');
 
-      $result['customers'] = $db->loadCustomers($pageNumber, $countPerPage,
-        $sortColumn ?? 'name', $sortDirect,
-        json_decode($customerIds ?? '[]')
-      );
+      $result['customers'] = $db->loadCustomers($pagerParam, json_decode($customerIds ?? '[]'));
       break;
     case 'addCustomer':
     case 'changeCustomer':
@@ -635,7 +633,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       break;
 
     // Permission
-    case 'loadPermission': break;
+    //case 'loadPermission': break;
 
     // Rate
     case 'loadRate':
@@ -645,7 +643,8 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
     // Users
     case 'loadUsers':
       $result['countRows'] = $db->getCountRows('users');
-      $result['users'] = $db->loadUsers($pageNumber, $countPerPage, $sortColumn ?? 'create_date', $sortDirect);
+
+      $result['users'] = $db->loadUsers($pagerParam);
       $result['permissionUsers'] = $db->loadTable('permission');
       break;
     case 'addUser':

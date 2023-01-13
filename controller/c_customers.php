@@ -15,23 +15,14 @@ $field = [
 //$setting = $main->db->getUserSetting(/*login user*/);
 
 if (!isset($setting)) {
-  $columns = $main->db->loadCustomers(0, 1);
+  $columns = ['ID', 'name', 'contacts',  'ITN', 'orders'];
 
-  if (count($columns)) {
-    $columns = array_keys($columns[0]) ?: [];
-    $columns = array_map(function ($item) {
-      $dbName = $item;
-
-      $item = [
-        'dbName' => $dbName,
-        'name' => gTxtDB('customers', $dbName),
-      ];
-
-      return $item;
-    }, $columns);
-
-    $param['columns'] = $columns;
-  }
+  $param['columns'] = array_map(function ($item) {
+    return [
+      'dbName' => $item,
+      'name' => gTxtDB('customers', $item),
+    ];
+  }, $columns);
 }
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_CUSTOMERS_TEMPLATE, $main);

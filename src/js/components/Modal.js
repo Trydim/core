@@ -44,7 +44,6 @@ const templatePopup = pr => {
 export const ModalOur = function (param = {}) {
   let modal = Object.create(null),
       data = Object.create(null),
-      destroy = !(this instanceof Modal),
       {
         prefix = 'vs_',
         modalId = 'adminPopup' + f.random(),
@@ -135,7 +134,6 @@ export const ModalOur = function (param = {}) {
       if (document.body.style.paddingRight === '16px')
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
 
-      if (destroy) this.destroy();
       else this.wrap.style.display = 'none';
     }, 300);
     //f.eraseNode(modal.content);

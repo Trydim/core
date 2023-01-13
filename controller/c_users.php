@@ -10,20 +10,14 @@ $field = [
 ];
 
 if (!isset($setting)) {
-  $columns = $main->db->loadUsers(0, 1);
+  $columns = ['ID', 'permissionName', 'login', 'name', 'contacts', 'registerDate', 'activity'];
 
-  if (count($columns) === 1) {
-    unset($columns[0]['permission_id']);
-    $columns = array_keys($columns[0]) ?: [];
-    $columns = array_map(function ($item) {
-      $dbName = $item;
-
-      return [
-        'dbName' => $dbName,
-        'name' => gTxtDB('users', $dbName),
-      ];
-    }, $columns);
-  }
+  $columns = array_map(function ($item) {
+    return [
+      'dbName' => $item,
+      'name' => gTxtDB('users', $item),
+    ];
+  }, $columns);
 }
 
 $permission = $main->db->selectQuery('permission', ['ID', 'name']);
