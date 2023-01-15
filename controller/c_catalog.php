@@ -61,4 +61,4 @@ $main->setControllerField($field)->fireHook(VC::HOOKS_CATALOG_TEMPLATE, $main);
 ob_start();
 require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
-$html = template('base', $field);
+$main->response->setContent(template('base', $field));

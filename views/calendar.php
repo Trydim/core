@@ -16,13 +16,13 @@ $field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath
 $field['footerContent'] .= <<<footerContent
 <template id="orderTemplate">
   <div>
-    <span>Статус заказа: \${S.name}</span><br>
+    <span>Статус заказа: \${status}</span><br>
     <span>Создан: \${createDate}</span><br>
     <span>Посл изменения: \${lastEditDate}</span><br>
     <span>Начало отгрузки: \${startShippingDate}</span><br>
     <span>Конец отгрузки: \${endShippingDate}</span><br>
-    <span>Менеджер: \${name}</span><br>
-    <span>Клиент: \${C.name}</span><br>
+    <span>Менеджер: \${userName}</span><br>
+    <span>Клиент: \${customerName}</span><br>
     <!--<span>\${importantValue}</span><br>-->
   </div>
 </template>

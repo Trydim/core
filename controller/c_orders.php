@@ -18,7 +18,7 @@ $field = [
 
 // получить конфиг текущего пользователя
 $setting = $main->getSettings('customization');
-if (!$setting) $setting = new stdClass();
+$setting = $setting ?? new stdClass();
 
 if (!isset($setting->ordersColumnsSort)) {
   $columns = ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
@@ -50,4 +50,4 @@ if ($param['showFilter']) {
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);
 require $main->url->getRoutePath();
-$html = template('base', $field);
+$main->response->setContent(template('base', $field));

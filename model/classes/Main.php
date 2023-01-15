@@ -69,15 +69,12 @@ final class Main {
     }
     else if ($value === 'db') {
       $this->db = new DbMain($this);
-      return $this->db;
     }
     else if ($value === 'dealer') {
       $this->dealer = new Dealer($this);
-      return $this->dealer;
     }
     else if ($value === 'response') {
       $this->response = new Response($this);
-      return $this->response;
     }
 
     return $this->$value;
@@ -249,7 +246,7 @@ final class Main {
   }
 
   /**
-   * Get one setting or array if have
+   * Get one setting or array if it has
    * @param string $key [
    * 'json' - return json, <p>
    * 'managerFields' - return managers custom fields, <p>
@@ -258,7 +255,7 @@ final class Main {
    * 'mailSubject' - <p>
    * 'mailFromName' - <p>
    * 'optionProperties' - <p>
-   * @param boolean $front if true - ready html input ]
+   * @param boolean $front if true - ready html input
    * @return mixed
    */
   public function getSettings(string $key = '', bool $front = false) {
@@ -339,7 +336,7 @@ final class Main {
     //return $this->controllerParam[$key] ?: false;
   }
 
-  public function initDefaultController(string &$html): Main {
+  public function initDefaultController(): Main {
     $target = $this->url->getRoute();
 
     $field = [
@@ -365,7 +362,7 @@ final class Main {
     $templateContent = ob_get_clean();
     $field['content'] = $field['content'] ?? (empty($templateContent) ? $target . ' default content.' : $templateContent);
     if ($target === '404') $field['global'] = $field['content'];
-    $html = template('base', $field);
+    $this->response->setContent(template('base', $field));
 
     return $this;
   }

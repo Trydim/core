@@ -70,12 +70,13 @@ class DbMain extends R {
     return $this->prefix . str_replace($this->prefix, '', $table);
   }
 
-  private function getPaginatorQuery(array $pageParam) {
+  private function getPaginatorQuery(array $pageParam): string {
     $pageNumber = $pageParam['pageNumber'] ?? 0;
     $countPerPage = $pageParam['countPerPage'] ?? 100;
-    $sortColumn = AQueryWriter::camelsSnake($pageParam['sortColumn'] ?? 'last_edit_date');
+    $sortColumn = AQueryWriter::camelsSnake($pageParam['sortColumn'] ?? 'id');
     $sortDirect = boolValue($pageParam['sortDirect'] ?? false) ? 'DESC' : '';
 
+    if ($sortColumn === 'id') $sortColumn = 'ID';// Todo у всех таблиц убрать верхний регистр ID
     $pageNumber *= $countPerPage;
     return "ORDER BY $sortColumn " . $sortDirect . " LIMIT $countPerPage OFFSET $pageNumber";
   }
@@ -863,7 +864,7 @@ class DbMain extends R {
    *
    * @return mixed
    */
-  public function loadCustomers(array $pageParam, $ids = []) {
+  public function loadCustomers(array $pageParam, array $ids = []) {
     $sql = "SELECT C.ID as 'id', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
       FROM " . $this->pf('customers') . " C
       LEFT JOIN " . $this->pf('orders') . " O on C.ID = O.customer_id\n";
@@ -881,7 +882,7 @@ class DbMain extends R {
     return self::getAll($sql);
   }
 
-  public function loadCustomerByOrderId($orderId) {
+  public function loadCustomerByOrderId($orderId): array {
     $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts
       FROM " . $this->pf('orders') . " O 
       LEFT JOIN " . $this->pf('customers') . " C ON C.ID = O.customer_id
@@ -893,7 +894,7 @@ class DbMain extends R {
   // Money
   //--------------------------------------------------------------------------------------------------------------------
 
-  public function getMoney() {
+  public function getMoney(): array {
     $queryRes = $this->selectQuery('money');
 
     $res = [];

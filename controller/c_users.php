@@ -1,4 +1,5 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
+
 /**
  * @var Main $main - global
  */
@@ -32,4 +33,4 @@ if (!$managerField) $managerField = [];
 $main->setControllerField($field)->fireHook(VC::HOOKS_USERS_TEMPLATE, $main);
 $param['columns'] = $columns ?? '';
 require $main->url->getRoutePath();
-$html = template('base', $field);
+$main->response->setContent(template('base', $field));

@@ -4,15 +4,15 @@
  * @var Main $main - global
  */
 
-$curYear = date('Y');
-$curMonth = date('m');
-$daysInMonth = date('t', mktime(0, 0, 0, $curMonth, 1, $curYear));
+$dateTo = date('Y-m-d');
+$dateFrom = (new DateTime($dateTo))->modify('-1 month')->format('Y-m-d');
+//$daysInMonth = date('t', mktime(0, 0, 0, $curMonth, 1, $curYear));
 $dateRange = [
-  'dateCreateFrom' => "$curYear-$curMonth-01 00:00:00",
-  'dateCreateTo' => "$curYear-$curMonth-$daysInMonth 23:59:59"
+  'dateEditedFrom' => "$dateFrom 00:00:00",
+  'dateEditedTo' => "$dateTo 23:59:59",
 ];
 $ordersStatus = $main->db->loadOrderStatus();
-$orders = $main->db->loadOrders([], $dateRange);
+$orders = $main->db->loadOrders(['countPerPage' => PHP_INT_MAX], $dateRange);
 
 $field = [
   'pageTitle'     => 'Календарь',
@@ -36,4 +36,4 @@ if (count($ordersStatus)) {
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_CALENDAR_TEMPLATE, $main);
 require $main->url->getRoutePath();
-$html = template('base', $field);
+$main->response->setContent(template('base', $field));

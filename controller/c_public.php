@@ -80,4 +80,4 @@ if ($isDealer) {
   unset($dealPublic, $dealCsvPath);
 }
 
-$html = template(OUTSIDE ? '_outside' : 'base', $field);
+$main->response->setContent(template(OUTSIDE ? '_outside' : 'base', $field));

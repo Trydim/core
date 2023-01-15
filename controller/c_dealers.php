@@ -16,4 +16,4 @@ $main->setControllerField($field)->fireHook(VC::HOOKS_DEALERS_TEMPLATE, $main);
 ob_start();
 include $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
-$html = template('base', $field);
+$main->response->setContent(template('base', $field));

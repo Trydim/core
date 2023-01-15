@@ -1,6 +1,17 @@
 <?php
 
 trait DbOrders {
+  private function getOrdersDbColumns(string $field) {
+    switch ($field) {
+      default: return $field;
+      case 'id': case 'ID': return 'O.ID';
+      case 'userName': return 'U.name';
+      case 'customerName': return 'C.name';
+      case 'statusId': return 'S.ID';
+      case 'status': return 'S.name';
+    }
+  }
+
   private function getBaseOrdersQuery(bool $includeValues = false) {
     return "SELECT O.ID AS 'ID', 
             create_date AS 'createDate', last_edit_date AS 'lastEditDate', 
@@ -41,6 +52,8 @@ trait DbOrders {
         $sql .= "O.last_edit_date BETWEEN '$from' AND '$to'\n";
       }
     }
+
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn']);
     $sql .= $this->getPaginatorQuery($pageParam);
 
     return self::getAll($sql);
@@ -98,6 +111,7 @@ trait DbOrders {
       $sql .= "O.status_id = " . implode(' OR O.status_id = ', $ids) . "\n";
     }
 
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn']);
     $sql .= $this->getPaginatorQuery($pageParam);
 
     return self::getAll($sql);

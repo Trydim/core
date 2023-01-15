@@ -151,7 +151,7 @@ const component = {
   },
 
   changeDateRange(e) {
-    let target = e.target, y, m, d, queryRange = [],
+    let target = e.target, y, m, d, queryRange = {},
         range = this.calendar.currentData.dateProfile.renderRange;
 
     if ((new Date()).getTime() < range.start.getTime()) return;
@@ -161,12 +161,12 @@ const component = {
     y = range.start.getFullYear();
     m = range.start.getMonth() + 1;
     d = range.start.getDate();
-    queryRange.push(`${y}-${m}-${d} 00:00:01`);
+    queryRange.dateEditedFrom = `${y}-${m}-${d} 00:00:01`;
 
     y = range.end.getFullYear();
     m = range.end.getMonth() + 1;
     d = range.end.getDate();
-    queryRange.push(`${y}-${m}-${d} 23:59:59`);
+    queryRange.dateEditedTo = `${y}-${m}-${d} 23:59:59`;
 
     this.form.set('dateRange', JSON.stringify(queryRange));
 
@@ -253,7 +253,8 @@ const orders = {
             createOrder = {
               color: '#0f9d58',
               allDay: true,
-              start: order['createDate']
+              start: order['createDate'],
+              end: order['lastEditDate'],
             },
             shippingOrder = {
               color: '#a52834', //так же заменять цвет в стилях! .fc-daygrid-dot-event

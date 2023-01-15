@@ -6,6 +6,7 @@
  * @var string $cmsAction - extract from query in main.php
  */
 
+$result = [];
 $db = $main->getDB();
 
 $dbTable = $dbTable ?? $tableName ?? '';
@@ -141,7 +142,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
     case 'saveOrder':
       if (isset($reportValue)) {
         $customerId = intval($customerId ?? 0);
-        $customerChange = $customerId === 0 ? true : boolValue($customerChange ?? true);
+        $customerChange = $customerId === 0 || boolValue($customerChange ?? true);
         $customerId = $customerId !== 0 ? $customerId : $db->getLastID('customers');
 
         if ($customerChange) {
@@ -241,7 +242,6 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       } //
       else {
         $dateRange = json_decode($dateRange ?? '[]', true);
-        $pagerParam['sortColumn'] = $sortColumn ?? 'create_date';
         $result['orders'] = $db->loadOrders($pagerParam, $dateRange);
         $result['countRows'] = $db->getCountRows('orders');
       }
@@ -790,4 +790,5 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
   }
 
   $db::close();
+  $main->response->setContent($result);
 }

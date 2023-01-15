@@ -64,7 +64,7 @@ export class LoaderIcon {
 
   templateWrap() {
     let node = this.big ? this.template() : this.templateSmall();
-    return this.customWrap || `<div style="display: flex;align-items: center;justify-content: center;position:fixed;">${node}</div>`;
+    return this.customWrap || `<div style="display: flex;align-items: center;justify-content: center;position:fixed;z-index: 100;background: #ffffff80">${node}</div>`;
   }
 
   template() {

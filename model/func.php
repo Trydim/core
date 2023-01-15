@@ -85,26 +85,6 @@ function boolValue($var): bool {
 }
 
 /**
- * Check if there is an error
- * Deep search for all error messages and return as an array
- * @param array $result
- */
-function checkError(array &$result): void {
-  $error = [];
-  if (!empty($result['error'])) {
-    if (is_array($result['error'])) {
-      array_walk_recursive($result['error'], function ($v, $k) use (&$error) {
-        if (empty($v)) return;
-        $error[] = [$k => $v];
-      });
-    } else $error = true;
-  }
-
-  if ($result['status'] = empty($error)) unset($result['error']);
-  else $result['error'] = $error;
-}
-
-/**
  * for param by load csv
  * @param $type
  * @param $value
@@ -152,14 +132,6 @@ function de($var, bool $die = true) {
 }
 
 /**
- * @return bool
- */
-function isSafari() {
-  global $main;
-  return $main->isSafari();
-}
-
-/**
  * @param string[]|string $hayStack
  * @param string $search
  * @return bool
@@ -188,7 +160,7 @@ function getLimitLevenshtein($word) {
   return ceil(iconv_strlen($word) / 2);
 }
 
-function getPageAsString($data) {
+function getPageAsString($data): string {
   $id = 'wrapCalcNode' . uniqid();
   $initJs = $data['initJs'];
   unset($data['initJs']);
@@ -291,9 +263,8 @@ function findKey($cell, $input) {
  *
  * @return boolean
  */
-function isJSON(string $value) {
+function isJSON(string $value): bool {
   return (
-    is_string($value) &&
     is_array(json_decode($value, true)) &&
     (json_last_error() == JSON_ERROR_NONE)
   );

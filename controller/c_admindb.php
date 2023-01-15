@@ -25,4 +25,4 @@ unset($pathLegend);
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_ADMIN_DB_TEMPLATE, $main);
 require $main->url->getRoutePath();
-$html = template('base', $field);
+$main->response->setContent(template('base', $field));

@@ -87,16 +87,10 @@ class Orders {
       query: this.query.bind(this),
     });
 
-    new f.SortColumns({
-      thead: this.table.querySelector('thead'),
-      query: this.query.bind(this),
-      dbAction : this.mainAction,
-      sortParam: this.queryParam,
-    });
+    this.ordersHeadRender();
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
 
-    this.ordersHeadRender();
     this.onEvent();
     this.query();
   }
@@ -107,6 +101,7 @@ class Orders {
     this.confirmMsg = '';
     this.dealerId = 0;
 
+    this.orders = {};
     this.filter = {};
 
     this.table = f.qS('#orderTable');
@@ -141,23 +136,30 @@ class Orders {
 
   // Orders tables
   ordersHeadRender() {
-    const html = this.config.ordersColumns.reduce((r, column) => {
+    const thead = this.table.querySelector('thead'),
+          html = this.config.ordersColumns.reduce((r, column) => {
       return r += f.replaceTemplate(this.template.tableHeader, column);
     }, '');
 
-    this.table.querySelector('thead tr').innerHTML = html;
+    thead.querySelector('tr').innerHTML = '<th></th>' + html;
+
+    new f.SortColumns({
+      thead,
+      query: this.query.bind(this),
+      dbAction : this.mainAction,
+      sortParam: this.queryParam,
+    });
   }
   ordersGetTableCellTemplate() {
     let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${ID}"></td>';
     tmp += this.config.ordersColumns.reduce((r, column) => {
-      if (column['dbName'] === 'ID') return r;
       return r += '<td>${' + column['dbName'] + '}</td>';
     }, '');
 
     return this.template.tableCell = tmp + '</tr>';
   }
   ordersPrepare(data) {
-    return data.reduce((r, item) => {
+    return data.map(item => {
       if (item.importantValue) {
         let value = '';
 
@@ -181,20 +183,22 @@ class Orders {
         catch (e) { console.log(`Заказ ID:${item['ID']} имеет не правильное значение`); }
         item.importantValue = value;
       }
-      r[item['ID']] = item
-      return r;
-    }, {});
+
+      this.orders[item['ID']] = item;
+      return item;
+    });
   }
-  ordersFilter(search = false) {
-    return Object.values(this.orders).filter(row => {
+  ordersFilter(data, search = false) {
+    return Object.values(data).filter(row => {
       if (search) return search === row;
       return true;
     });
   }
-  ordersRender(search) {
+  ordersRender(data, search) {
     let html  = '',
-        tbody = this.template.tableCell || this.ordersGetTableCellTemplate(),
-        data  = this.ordersFilter(search);
+        tbody = this.template.tableCell || this.ordersGetTableCellTemplate();
+
+    data = this.ordersFilter(data, search);
 
     if (data.length) {
       html += f.replaceTemplate(tbody, data);
@@ -205,8 +209,8 @@ class Orders {
     this.table.querySelector('tbody').innerHTML = html;
   }
   setOrders(data) {
-    this.orders = this.ordersPrepare(data);
-    this.ordersRender();
+    data = this.ordersPrepare(data);
+    this.ordersRender(data);
   }
 
   // Заполнить статусы

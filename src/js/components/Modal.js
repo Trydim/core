@@ -134,7 +134,7 @@ export const ModalOur = function (param = {}) {
       if (document.body.style.paddingRight === '16px')
         document.body.style.paddingRight = data.bodyPaddingRight || 'initial';
 
-      else this.wrap.style.display = 'none';
+      this.wrap.style.display = 'none';
     }, 300);
     //f.eraseNode(modal.content);
   }

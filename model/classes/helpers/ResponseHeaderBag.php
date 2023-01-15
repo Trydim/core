@@ -8,23 +8,19 @@ use DateTimeZone;
 
 /**
  * ResponseHeaderBag is a container for Response HTTP headers.
- *
- * @author Fabien Potencier <fabien@symfony.com>
  */
-class ResponseHeaderBag extends HeaderBag
-{
-  const COOKIES_FLAT = 'flat';
+class ResponseHeaderBag extends HeaderBag {
+  const COOKIES_FLAT  = 'flat';
   const COOKIES_ARRAY = 'array';
 
   const DISPOSITION_ATTACHMENT = 'attachment';
-  const DISPOSITION_INLINE = 'inline';
+  const DISPOSITION_INLINE     = 'inline';
 
   protected $computedCacheControl = [];
-  protected $cookies = [];
-  protected $headerNames = [];
+  protected $cookies              = [];
+  protected $headerNames          = [];
 
-  public function __construct(array $headers = [])
-  {
+  public function __construct(array $headers = []) {
     parent::__construct($headers);
 
     if (!isset($this->headers['cache-control'])) {
@@ -42,19 +38,18 @@ class ResponseHeaderBag extends HeaderBag
    *
    * @return array An array of headers
    */
-  public function allPreserveCase()
-  {
+  public function allPreserveCase(): array {
     $headers = [];
     foreach ($this->all() as $name => $value) {
-      $headers[isset($this->headerNames[$name]) ? $this->headerNames[$name] : $name] = $value;
+      $headers[$this->headerNames[$name] ?? $name] = $value;
     }
 
     return $headers;
   }
 
-  public function allPreserveCaseWithoutCookies()
-  {
+  public function allPreserveCaseWithoutCookies(): array {
     $headers = $this->allPreserveCase();
+
     if (isset($this->headerNames['set-cookie'])) {
       unset($headers[$this->headerNames['set-cookie']]);
     }
@@ -65,8 +60,7 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * {@inheritdoc}
    */
-  public function replace(array $headers = [])
-  {
+  public function replace(array $headers = []) {
     $this->headerNames = [];
 
     parent::replace($headers);
@@ -83,11 +77,10 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * {@inheritdoc}
    */
-  public function all(string $key = null)
-  {
+  public function all(string $key = null): array {
     $headers = parent::all($key);
     foreach ($this->getCookies() as $cookie) {
-      $headers['set-cookie'][] = (string) $cookie;
+      $headers['set-cookie'][] = (string)$cookie;
     }
 
     return $headers;
@@ -96,15 +89,14 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * {@inheritdoc}
    */
-  public function set($key, $values, $replace = true)
-  {
+  public function set($key, $values, $replace = true) {
     $uniqueKey = str_replace('_', '-', strtolower($key));
 
     if ('set-cookie' === $uniqueKey) {
       if ($replace) {
         $this->cookies = [];
       }
-      foreach ((array) $values as $cookie) {
+      foreach ((array)$values as $cookie) {
         $this->setCookie(Cookie::fromString($cookie));
       }
       $this->headerNames[$uniqueKey] = $key;
@@ -128,8 +120,7 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * {@inheritdoc}
    */
-  public function remove($key)
-  {
+  public function remove($key) {
     $uniqueKey = str_replace('_', '-', strtolower($key));
     unset($this->headerNames[$uniqueKey]);
 
@@ -153,21 +144,18 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * {@inheritdoc}
    */
-  public function hasCacheControlDirective($key)
-  {
+  public function hasCacheControlDirective($key): bool {
     return array_key_exists($key, $this->computedCacheControl);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheControlDirective($key)
-  {
+  public function getCacheControlDirective($key) {
     return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
   }
 
-  public function setCookie(Cookie $cookie)
-  {
+  public function setCookie(Cookie $cookie) {
     $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
     $this->headerNames['set-cookie'] = 'Set-Cookie';
   }
@@ -175,12 +163,11 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * Removes a cookie from the array, but does not unset it in the browser.
    *
-   * @param string $name
-   * @param string $path
-   * @param string $domain
+   * @param string      $name
+   * @param string      $path
+   * @param string|null $domain
    */
-  public function removeCookie($name, $path = '/', $domain = null)
-  {
+  public function removeCookie(string $name, string $path = '/', string $domain = null) {
     if (null === $path) {
       $path = '/';
     }
@@ -209,8 +196,7 @@ class ResponseHeaderBag extends HeaderBag
    *
    * @throws InvalidArgumentException When the $format is invalid
    */
-  public function getCookies($format = self::COOKIES_FLAT)
-  {
+  public function getCookies(string $format = self::COOKIES_FLAT): array {
     if (!in_array($format, [self::COOKIES_FLAT, self::COOKIES_ARRAY])) {
       throw new InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', [self::COOKIES_FLAT, self::COOKIES_ARRAY])));
     }
@@ -234,15 +220,14 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * Clears a cookie in the browser.
    *
-   * @param string $name
-   * @param string $path
-   * @param string $domain
-   * @param bool   $secure
-   * @param bool   $httpOnly
-   * @param string $sameSite
+   * @param string      $name
+   * @param string      $path
+   * @param string|null $domain
+   * @param bool        $secure
+   * @param bool        $httpOnly
+   //* @param string      $sameSite
    */
-  public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true/*, $sameSite = null*/)
-  {
+  public function clearCookie(string $name, string $path = '/', string $domain = null, $secure = false, bool $httpOnly = true/*, $sameSite = null*/) {
     $sameSite = func_num_args() > 5 ? func_get_arg(5) : null;
 
     $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite));
@@ -251,8 +236,8 @@ class ResponseHeaderBag extends HeaderBag
   /**
    * Generates a HTTP Content-Disposition field-value.
    *
-   * @param string $disposition      One of "inline" or "attachment"
-   * @param string $filename         A unicode string
+   * @param string $disposition One of "inline" or "attachment"
+   * @param string $filename A unicode string
    * @param string $filenameFallback A string containing only ASCII characters that
    *                                 is semantically equivalent to $filename. If the filename is already ASCII,
    *                                 it can be omitted, or just copied from $filename
@@ -263,8 +248,7 @@ class ResponseHeaderBag extends HeaderBag
    *
    * @see RFC 6266
    */
-  public function makeDisposition($disposition, $filename, $filenameFallback = '')
-  {
+  public function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string {
     if (!in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE])) {
       throw new InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
     }
@@ -305,8 +289,7 @@ class ResponseHeaderBag extends HeaderBag
    *
    * @return string
    */
-  protected function computeCacheControlValue()
-  {
+  protected function computeCacheControlValue(): string {
     if (!$this->cacheControl) {
       if ($this->has('Last-Modified') || $this->has('Expires')) {
         return 'private, must-revalidate'; // allows for heuristic expiration (RFC 7234 Section 4.2.2) in the case of "Last-Modified"
@@ -323,16 +306,15 @@ class ResponseHeaderBag extends HeaderBag
 
     // public if s-maxage is defined, private otherwise
     if (!isset($this->cacheControl['s-maxage'])) {
-      return $header.', private';
+      return $header . ', private';
     }
 
     return $header;
   }
 
-  private function initDate()
-  {
+  private function initDate() {
     $now = DateTime::createFromFormat('U', time());
     $now->setTimezone(new DateTimeZone('UTC'));
-    $this->set('Date', $now->format('D, d M Y H:i:s').' GMT');
+    $this->set('Date', $now->format('D, d M Y H:i:s') . ' GMT');
   }
 }

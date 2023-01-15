@@ -35,5 +35,4 @@ switch ($cmsAction) {
       $main->reDirect();
     }
     break;
-
 }

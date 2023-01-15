@@ -24,4 +24,4 @@ $field['sideRight']  = '';
 ob_start();
 include $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
-$html = template('base', $field);
+$main->response->setContent(template('base', $field));

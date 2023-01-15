@@ -89,7 +89,7 @@ switch ($cmsAction) {
   case 'excel':
   case 'pdf':
   case 'print':
-    $docType && $result = $docs->getDocs($mailTpl ?? 'mailTpl');
+    $docType && $main->response->setContent($docs->getDocs($mailTpl ?? 'mailTpl'));
     break;
   case 'mail':
     $docType && $docsPath = $docs->getDocs('save');
@@ -109,11 +109,11 @@ switch ($cmsAction) {
     $otherMail = $otherMail ?? [];
     isset($email) && !empty($email) && $otherMail[] = $email;
     $mail->addMail($otherMail);
-    $result['mail'] = $mail->send();
+    $main->response->setContent(['mail' => $mail->send()]);
     break;
   case 'getPrintStyle':
     $fileTpl = ABS_SITE_PATH . 'public/views/docs/' . ($fileTpl ?? 'printTpl.css');
 
-    if (file_exists($fileTpl)) $result['style'] = file_get_contents($fileTpl);
+    if (file_exists($fileTpl)) $main->response->setContent(['style' => file_get_contents($fileTpl)]);
     break;
 }
