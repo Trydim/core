@@ -3,7 +3,7 @@
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
 
 require __DIR__ . '/Rb.php';
-require __DIR__ . '/traits/DbTraits.php';
+require __DIR__ . '/Traits/DbTraits.php';
 
 class DbMain extends R {
   /** Save Load csv files */

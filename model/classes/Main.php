@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/traits/MainTraits.php';
+require __DIR__ . '/Traits/MainTraits.php';
 
 final class Main {
   use Authorization;
