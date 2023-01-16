@@ -22,7 +22,7 @@
   </div>
 </div>
 <div class="pb-4 d-none" id="confirmField">
-  <label><select id="selectStatus" class="d-none form-select" name="statusId"></select></label>
+  <label><select id="selectStatus" class="d-none form-select" data-action="statusOrders"></select></label>
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning ms-1" value="Отмена" data-action="confirmNo">
 </div>
@@ -46,12 +46,12 @@
   <div class="row">
     <div class="col input-group">
       <span class="input-group-text">Поиск:</span>
-      <input type="text" id="search" class="form-control" value="" autocomplete="off">
+      <input type="text" id="search" class="form-control" autocomplete="off">
     </div>
     <div class="col input-group">
       <?php if ($showFilter) { ?>
         <span class="input-group-text">Фильтр:</span>
-        <select class="form-select" data-action="filterChange">
+        <select class="form-select" data-action="filterDealer">
           <option value="0"><?= $main->getCmsParam('PROJECT_TITLE') ?></option>
           <?php foreach ($dealers as $dealer) { ?>
             <option value="<?= $dealer['id'] ?>"><?= $dealer['name'] ?></option>

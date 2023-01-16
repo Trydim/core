@@ -226,11 +226,12 @@ final class Main {
 
   /**
    * @param string $key
-   * @param $value
+   * @param mixed $value
    * @return $this
    */
   public function setSettings(string $key, $value): Main {
     $this->setting[$key] = $value;
+
     return $this;
   }
 
@@ -298,7 +299,7 @@ final class Main {
       }
       else if (is_array($field)) {
         if ($position === 'before') array_unshift($field, $value);
-        else if ($position === 'after') $field[] = $value;
+        else array_push($field, $value);
       }
       else if (is_object($field)) $field->$key = $value;
 

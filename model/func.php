@@ -31,7 +31,7 @@ function addCssLink(string $cssLink) {
 
   if ($main instanceof Main) {
     $cssLink = $main->url->getUri() . ltrim($cssLink, '/');
-    return $main->addControllerField('cssLinks', $cssLink);
+    return $main->addControllerField(VC::BASE_CSS_LINKS, $cssLink);
   }
 
   return false;
@@ -41,18 +41,17 @@ function addCssLink(string $cssLink) {
  * alias for $main->addControllerField('jsLinks')
  *
  * @param string $jsLink - from index.php directory
- * @param mixed $position [optional] <p>
- * head - in head <p>
- * before - before all script, after cms libs<p>
- * last - before end body <p>
+ * @param ?mixed $position [optional] <p>
+ * before - if string - prepend to the beginning. if array - prepend elements to the beginning of an array<br>
+ * after - if string - append to the end. if array - append elements to the end of an array<br>
  * @return Main|bool - false or Main object
  */
-function addJsLink(string $jsLink, string $position = 'last') {
+function addJsLink(string $jsLink, string $position = 'after') {
   global $main;
 
   if ($main instanceof Main) {
     $jsLink = $main->url->getUri() . ltrim($jsLink, '/');
-    return $main->addControllerField('jsLinks', $jsLink, $position);
+    return $main->addControllerField(VC::BASE_JS_LINKS, $jsLink, $position);
   }
 
   return false;
