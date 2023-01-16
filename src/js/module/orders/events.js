@@ -290,7 +290,7 @@ export default class extends Orders {
 
     let select = {
       'filterDealer': () => this.filterChange(target),
-      'statusOrders': () => this.changeSelectInput(target),
+      'statusOrders': () => this.changeSelectInput(target, action),
     };
 
     select[action] && select[action]();
@@ -308,7 +308,7 @@ export default class extends Orders {
 
     this.query(+id ? dealerPath : undefined);
   }
-  changeSelectInput(e) {
-    this.queryParam[e.target.name] = e.target.value;
+  changeSelectInput(target, action) {
+    this.queryParam[action] = target.value;
   }
 }
