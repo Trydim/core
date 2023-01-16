@@ -53,7 +53,7 @@ trait DbOrders {
       }
     }
 
-    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn']);
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
     $sql .= $this->getPaginatorQuery($pageParam);
 
     return self::getAll($sql);
