@@ -308,7 +308,7 @@ export default class extends Orders {
 
     this.query(+id ? dealerPath : undefined);
   }
-  changeSelectInput(target, action) {
-    this.queryParam[action] = target.value;
+  changeSelectInput(target) {
+    this.queryParam.statusId = target.value;
   }
 }
