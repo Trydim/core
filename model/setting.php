@@ -330,3 +330,5 @@ switch ($cmsAction) {
     }
     break;
 }
+
+if (isset($result)) $main->response->setContent($result);
