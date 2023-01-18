@@ -140,7 +140,7 @@ export class LoaderIcon {
     return this.customLoader || template;
   }
 
-  templateSmall () {
+  templateSmall() {
     let defSmallLoader = `
     <style>
       .load-3 .line {

@@ -1,17 +1,5 @@
+/// <reference lib="component.d.ts" />
 /// <reference lib="sweetalert2.d.ts" />
-
-declare class LoaderIcon {
-  constructor(
-    field: string | HTMLElement | any,
-    showNow?: boolean,
-    param?: {
-      wrap?: boolean | string,
-      loader?: boolean | string
-      loaderS?: boolean | string
-      big?: boolean | string
-    },
-  )
-}
 
 declare interface Hooks {
   beforeCreateApp: Function|null
@@ -179,7 +167,7 @@ declare type CMSGlobalObject = {
     type?: string | 'text' | 'json' | 'blob'
   }): Promise<Response>
 
-  LoaderIcon: LoaderIcon
+  LoaderIcon: typeof LoaderIcon
 
   Modal<T = any>(options: SweetAlertOptions|string): SweetAlertResult<Awaited<T>>
   Modal<T = any>(title: string, html?: string, icon?: SweetAlertIcon): SweetAlertResult<Awaited<T>>
