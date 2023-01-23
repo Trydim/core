@@ -51,12 +51,14 @@ const users = {
 
   setUsers(data) {
     this.usersList = new Map();
-    data.forEach(i => this.usersList.set(i['U.ID'], i));
+    data.forEach(i => this.usersList.set(i['ID'], i));
   },
   fillTable(data) {
+    debugger
     this.contValue || (this.contValue = f.gT('#tableContactsValue'));
     data = data.map(item => {
-      item['P.name'] && (item['P.name'] = _(item['P.name']));
+      item['permissionName'] = _(item['permissionName']);
+
       if (item.activity) {
         item.activityValue = !!+item.activity;
         item.activity = item.activityValue ? '+' : '-';
@@ -75,7 +77,7 @@ const users = {
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
         }
-        catch (e) { console.log(`Заказ ID:${item['U.ID']} имеет не правильное значение`); }
+        catch (e) { console.log(`Заказ ID: ${item['ID']} имеет не правильное значение`); }
         item['contacts'] = value;
       }
 
@@ -175,11 +177,11 @@ const users = {
         this.queryParam.usersId = JSON.stringify(id);
 
         node = form.querySelector('[name="name"]');
-        if (oneElements) node.value = users['U.name'];
+        if (oneElements) node.value = users['name'];
         else node.parentNode.remove();
 
         node = form.querySelector('[name="permissionId"]');
-        if (oneElements) node.value = users['permission_id'];
+        if (oneElements) node.value = users['permissionId'];
         else node.value = 1;
 
         node = form.querySelector('[name="login"]');
@@ -235,7 +237,7 @@ const users = {
         new f.Valid({form});
 
         this.confirmMsg = 'Новый пароль сохранен';
-        this.M.show('Изменить пароль пользователя ' + user['U.name'], form);
+        this.M.show('Изменить пароль пользователя ' + user['name'], form);
       },
       'delUser': () => {
         if (!this.id.getSelectedSize()) return;

@@ -339,7 +339,7 @@ class UrlGenerator {
     }
 
     if (isset($match[1])) {
-      if ($match[1] === PUBLIC_PAGE) $match[1] = 'public';
+      if (in_array($match[1], [PUBLIC_PAGE, 'public'])) $match[1] = 'public';
       else if (!$main->availablePage($match[1])) $match[1] = '404';
     }
     $route = $match[1] ?? ($this->main->availablePage(PUBLIC_PAGE) ? 'public' : $this->main->getSideMenu(true));
