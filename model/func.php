@@ -256,6 +256,26 @@ function findKey($cell, $input) {
 }
 
 /**
+ * Find csv file
+ * @param string $filename
+ * @return string
+ */
+function findCsvFile(string $filename): string {
+  global $main;
+
+  // Direct path
+  if (file_exists($filename)) return $filename;
+  // Dealer path
+  $path = $main->getCmsParam(VC::CSV_PATH) . $filename;
+  if (file_exists($path)) return $path;
+  // Main path
+  $path = $main->getCmsParam(VC::CSV_PATH) . $filename;
+  if (file_exists($path)) return $path;
+
+  return '';
+}
+
+/**
  * Determines whether a string can be considered JSON or not.
  *
  * @param string $value value to determine json of.
@@ -330,7 +350,7 @@ function loadCSV($dict, $filename, $one_rang = false) {
     }
     fclose($handle);
   } else {
-    return false; //файла нет
+    return 'File is not exist';
   }
 
   return $result;
@@ -343,8 +363,7 @@ function loadCSV($dict, $filename, $one_rang = false) {
  * @return array|bool
  */
 function loadFullCSV($path) {
-
-  if (file_exists($path) && ($handle = fopen($path, "rt")) !== false) {
+  if ($path !== '' && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
     $emptyRow = 0;
     while ($emptyRow < 5) { // Пять пустрых строк характеристик считаем что больше нету
@@ -359,7 +378,7 @@ function loadFullCSV($path) {
       } else $emptyRow++;
     }
     fclose($handle);
-  } else return false;
+  } else return 'File is not exist';
 
   return $result;
 }

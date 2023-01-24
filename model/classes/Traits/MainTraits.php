@@ -265,14 +265,18 @@ trait Cache {
    */
   private $cacheVars = ['all'];
 
+  /**
+   * Return path for cache, different for dealer and main.
+   * @return string
+   */
   private function cachePath() {
-    if ($this->url->getRoute() === 'public') {
-      $cachePath = $this->publicDealer ? $this->url->getPath(true) : ABS_SITE_PATH;
-    } else {
+    /*if ($this->publicDealer && $this->url->getRoute() === 'public') {
       $cachePath = $this->url->getPath(true);
-    }
+    } else {
+      $cachePath = $this->url->getBasePath(true);
+    }*/
 
-    return $cachePath . $this->CACHE['FILE_NAME'];
+    return $this->url->getPath(true) . $this->CACHE['FILE_NAME'];
   }
   private function cacheIsActual(string $cachePath) {
     return time() - filemtime($cachePath) < $this->CACHE['UPDATE_TIME'];
@@ -290,15 +294,13 @@ trait Cache {
   public function loadCsvCache(&...$vars): bool {
     $cachePath = $this->cachePath();
 
-    if (file_exists($cachePath)) {
-      if ($this->cacheIsActual($cachePath)) {
-        $data = json_decode(gzuncompress(file_get_contents($cachePath)), true);
-        $this->setCsvVariable(array_keys($data));
-        foreach (array_values($data) as $index => $var) {
-          $vars[$index] = $var;
-        }
-        return true;
+    if (file_exists($cachePath) && $this->cacheIsActual($cachePath)) {
+      $data = json_decode(gzuncompress(file_get_contents($cachePath)), true);
+      $this->setCsvVariable(array_keys($data));
+      foreach (array_values($data) as $index => $var) {
+        $vars[$index] = $var;
       }
+      return true;
     }
     return false;
   }
