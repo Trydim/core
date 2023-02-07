@@ -148,7 +148,6 @@ const onEvent = () => {
   f.qA('[data-action-cms]', 'click', cmsEvent);
 }
 
-// Entrance function
 (() => {
   if (f.gI('authForm')) return;
 
@@ -157,7 +156,7 @@ const onEvent = () => {
   f.getSetting();
   f.relatedOption();
   storageLoad();
-  setSideMenuStyle();
+  //setSideMenuStyle(); Ошибка высоты, зачем это было?
   onEvent();
   setLinkMenu(); // after bind events
 
