@@ -28,7 +28,7 @@ class Docs {
   /**
    * @var array
    */
-  private $data, $excelHeader = [], $pdfParam;
+  private $data, $pdfParam;
 
   /**
    * @var string
@@ -75,16 +75,20 @@ class Docs {
     $this->setDefaultParam();
     $this->getFileName();
     switch ($this->docsType) {
-      case 'pdf': $this->prepareTemplate(); break;
+      case 'pdf':
+        $this->prepareTemplate();
+        $this->initPdf();
+        break;
       case 'print':
         $this->pdfLibrary = 'print';
         $this->prepareTemplate();
+        $this->initPrint();
         break;
-      case 'excel': $this->setExcelData(); break;
+      case 'excel':
+        $this->initExcel();
+        $this->setExcelData();
+        break;
     }
-
-    $func = 'init' . $this->getFunc();
-    $this->$func();
   }
 
   private function getFileName() {
@@ -145,11 +149,8 @@ class Docs {
   }
 
   private function setExcelData() {
-    if ($this->useDefault) { $this->setExcelDefaultData(); return; }
-    $rows = [];
-    include $this->filePath;
-    $this->data = $rows;
-    isset($header) && $this->excelHeader = $header;
+    if ($this->useDefault) $this->setExcelDefaultData();
+    else include $this->filePath;
   }
 
   private function initPdf() {
@@ -222,10 +223,6 @@ class Docs {
   private function initExcel() {
     require_once __DIR__ . '/Xlsxwriter.php';
     $this->docs = new XLSXWriter();
-    count($this->excelHeader) && $this->docs->writeSheetHeader(gTxt('Sheet1'), $this->excelHeader);
-
-    foreach($this->data as $row)
-      $this->docs->writeSheetRow(gTxt('Sheet1'), $row);
   }
 
   /**
@@ -392,9 +389,35 @@ class Docs {
    * Example for Excel
    */
   private function setExcelDefaultData() {
-    $this->data = [['header', 'type', 'comment'], ['c1-text', 'string', 'text'], ['c2-text', '@', 'text'],
-                   ['c3-integer', 'integer', ''], ['c4-integer', '0', ''], ['c5-price', 'price', ''],
-                   ['c6-price', '#,##0.00', 'custom'], ['c7-date', 'date', ''], ['c8-date', 'YYYY-MM-DD', '']];
+    $data = [
+      // Sheet - 1
+      [
+        'sheetName' => 'sheetName',
+        'header' => [
+          'data' => ['header', 'type', 'comment'],
+          'style' => ['font-size'  => 12],
+        ],
+        'rows' => [
+          ['c1-text', 'string', 'text'], ['c2-text', '@', 'text'],
+          ['c3-integer', 'integer', ''], ['c4-integer', '0', ''], ['c5-price', 'price', ''],
+          ['c6-price', '#,##0.00', 'custom'], ['c7-date', 'date', ''],
+          ['c8-date', 'YYYY-MM-DD', ''],
+        ],
+      ]
+    ];
+
+    foreach($data as $sheet) {
+      $sheetName = gTxt( $sheet['sheetName']);
+
+      if (count($sheet['header'] ?? [])) {
+        $this->docs->writeSheetHeader($sheetName, $sheet['header']['data'], $sheet['header']['data']);
+        $this->docs->markMergedCell($sheetName, 0, 0, 0, 2);
+      }
+
+      foreach ($sheet['rows'] as $row) {
+        $this->docs->writeSheetRow($sheetName, $row);
+      }
+    }
   }
 
   /**
