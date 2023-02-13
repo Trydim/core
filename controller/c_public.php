@@ -17,7 +17,7 @@ $field = [
 $publicCss = $main->getCmsParam(VC::URI_CSS);
 $publicJs = $main->getCmsParam(VC::URI_JS);
 
-/** для совместимовсти */
+/** Для совместимости */
 define('PATH_CSS' , $publicCss);
 define('PATH_JS' , $publicJs);
 

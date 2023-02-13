@@ -43,10 +43,8 @@ $field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepa
 // Все свойства
 $value = $main->getSettings(VC::OPTION_PROPERTIES);
 foreach ($db->getTables('prop') as $table) {
-  $name = isset($value[$table['dbTable']]) ? $value[$table['dbTable']]['name'] : $table['name'];
-
   $value[$table['dbTable']] = [
-    'name' => $name,
+    'name'   => $value[$table['dbTable']]['name'] ?? $table['name'],
     'values' => array_map(function ($row) {
       $row['id'] = $row['ID'];
       return $row;

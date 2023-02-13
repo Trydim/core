@@ -260,7 +260,7 @@ switch ($cmsAction) {
     $dbProperties = array_keys($db->getTables('prop'));
 
     if (is_array($setting)) {
-      function getPropertyField($name, $type) {
+      function getPropertyField($name, $type): array {
         if (includes($name, '_ids')) $type = 'file';
 
         switch ($type) {

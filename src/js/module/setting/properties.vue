@@ -38,7 +38,7 @@
       </p-accordion-tab>
     </p-accordion>
 
-    <p-dialog v-model:visible="modal.display" :modal="true">
+    <p-dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
       <template #header>
         <h4>{{ modal.title }}</h4>
       </template>

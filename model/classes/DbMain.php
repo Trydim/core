@@ -30,6 +30,11 @@ class DbMain extends R {
   private $currentUserID = 2;
 
   /**
+   * @var boolean
+   */
+  private $usePrefix = true;
+
+  /**
    * @var string
    */
   private $prefix = '';
@@ -67,7 +72,7 @@ class DbMain extends R {
    * @return string
    */
   private function pf(string $table): string {
-    return $this->prefix . str_replace($this->prefix, '', $table);
+    return $this->usePrefix ? $this->prefix . str_replace($this->prefix, '', $table) : $table;
   }
 
   private function getPaginatorQuery(array $pageParam): string {
@@ -172,6 +177,14 @@ class DbMain extends R {
     }
     $date = date_create($date);
     return $date ? $date->format($this::DB_DATA_FORMAT) : null;
+  }
+
+  /**
+   * Use or not prefix
+   * @return boolean
+   */
+  public function togglePrefix(): bool {
+    return $this->usePrefix = !$this->usePrefix;
   }
 
   // MAIN query

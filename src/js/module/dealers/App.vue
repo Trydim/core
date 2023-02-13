@@ -49,7 +49,10 @@
           <p v-if="getPropertyType(key) === 'bool'" class="m-0">
             {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="{'pi-green pi-plus': value, 'pi-red pi-times': !value}"></i>
           </p>
-          <p v-else class="m-0">{{ getPropertyName(key) }}: {{ value }}</p>
+          <p v-else class="m-0">
+            {{ getPropertyName(key) }}:
+            {{ getPropertyType(key) ? value : getPropertyValue(key, value) }}
+          </p>
         </div>
       </template>
     </Column>
@@ -59,7 +62,7 @@
     <Button type="button" class="btn btn-warning" @click="changeDealer">Редактировать</Button>
   </div>
 
-  <Dialog v-model:visible="modal.display" :modal="true">
+  <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
     <template #header>
       <h4>{{ modal.title }}</h4>
     </template>
@@ -106,7 +109,7 @@
           <span class="p-inputgroup-addon col-5">{{ prop.name }}</span>
 
           <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]"></InputText>
-          <InputNumber v-else-if="prop.type === 'number'" :maxFractionDigits="10" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
+          <InputNumber v-else-if="prop.type === 'number'" :max-fraction-digits="10" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
           <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px"></Textarea>
           <ToggleButton v-else-if="prop.type === 'bool'" class="w-100"
                         on-icon="pi pi-check" off-icon="pi pi-times"
@@ -114,6 +117,10 @@
                         v-model="dealer.settings[key]"
           ></ToggleButton>
           <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"></Calendar>
+          <Dropdown v-else option-label="name" option-value="ID"
+                    :options="Object.values(prop.values)"
+                    v-model="dealer.settings[key]"
+          ></Dropdown>
         </div>
       </div>
     </div>
@@ -142,6 +149,7 @@ import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import InputNumber from 'primevue/inputnumber';
+import Dropdown from 'primevue/dropdown';
 import Calendar from 'primevue/calendar';
 
 import cloneDeep from 'lodash/clonedeep';
@@ -149,7 +157,7 @@ import cloneDeep from 'lodash/clonedeep';
 export default {
   name: 'dealer',
   components: {
-    Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar,
+    Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar, Dropdown,
     DataTable, Column,
     Dialog
   },
@@ -191,8 +199,8 @@ export default {
   }),
   computed: {
     properties() {
-      return this.dealersProperties.reduce((r, p) => {
-        r[p.code] = p; return r;
+      return Object.entries(this.dealersProperties).reduce((r, [code, p]) => {
+        p.code = code; r[code] = p; return r;
       }, Object.create(null));
     },
   },
@@ -230,7 +238,7 @@ export default {
     setData(dataKey, data) {
       if (dataKey === 'dealers') this.selected = {}
 
-      if (data[dataKey]) this[dataKey] = data[dataKey];
+      if (data[dataKey] || data) this[dataKey] = data[dataKey] || data;
       else f.showMsg('Query set data error' + dataKey, 'error');
     },
     setModal(title, confirmDisabled) {
@@ -246,6 +254,11 @@ export default {
     checkColumn() { return true; },
     getPropertyName(k) { return this.properties[k] ? this.properties[k].name : k; },
     getPropertyType(k) { return this.properties[k] ? this.properties[k].type : undefined; },
+    getPropertyValue(k, v) {
+      const res = this.properties[k] && this.properties[k].values && this.properties[k].values.find(i => i.id === v);
+
+      return res ? res.name : '';
+    },
     setProperty() {
       const de = this.dealer;
       de.settings = {};
@@ -333,17 +346,12 @@ export default {
     },
   },
   created() {
-    // Load dealers second
-    this.reloadFn = data => {
-      this.queryParam.mode     = 'DB';
-      this.queryParam.dbAction = 'loadDealers';
-      this.setData('dealersProperties', data);
-      this.query();
-    };
+    // Set properties
+    this.setData('dealersProperties', f.getData('#dataProperties'));
 
-    // Load properties first
-    this.queryParam.mode     = 'setting';
-    this.queryParam.dbAction = 'loadDealersProperties';
+    // Load dealers second
+    this.queryParam.mode     = 'DB';
+    this.queryParam.dbAction = 'loadDealers';
     this.query();
   },
   mounted() { },

@@ -197,7 +197,7 @@ final class Main {
       if (USE_DATABASE) {
         if (CHANGE_DATABASE) {
           $dbTables = array_merge($dbTables, $this->db->getTables());
-        } else if ($this->availablePage('catalog')) {
+        } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
           $props = array_merge([[
             'dbTable' => 'codes',
             'name'    => gTxtDB('codes', 'codes')

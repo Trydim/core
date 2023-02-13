@@ -58,8 +58,9 @@ trait Authorization {
   }
 
   private function setSideMenu() {
-    if ($this->checkStatus('no') && PUBLIC_PAGE) {
-      $this->sideMenu[] = PUBLIC_PAGE;
+    if ($this->checkStatus('no')) {
+      $this->sideMenu = $this->getCmsParam('ACCESS_MENU');
+      PUBLIC_PAGE && $this->sideMenu[] = PUBLIC_PAGE;
       return;
     }
 
