@@ -26,11 +26,9 @@ $theme-colors: () !default;
 @font-face {
   font-family: 'primeicons';
   font-display: block;
-  //src: url('./fonts/primeicons.eot');
   src: //url('./fonts/primeicons.eot?#iefix') format('embedded-opentype'),
-          url('icons/fonts/primeicons.ttf') format('truetype'),
-          url('icons/fonts/primeicons.woff') format('woff');
-  //url('./fonts/primeicons.svg?#primeicons') format('svg');
+       url(icons/fonts/primeicons.ttf) format('truetype'),
+       url(icons/fonts/primeicons.woff) format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -1158,7 +1156,7 @@ $theme-colors: () !default;
   background: url('icons/' + $key + '.svg') center no-repeat;
   background-size: contain;
 }
-
+/*
 .bi::before,
 [class^="bi-"]::before,
 [class*=" bi-"]::before {
@@ -1170,3 +1168,4 @@ $theme-colors: () !default;
 }
 
 .bi-123::before { @include getSVG('123');}
+*/
