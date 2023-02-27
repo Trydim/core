@@ -69,16 +69,9 @@
     <!--<button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>-->
   </div>
 
-  <?php if (isset($param['ordersVisitorColumns'])) { ?>
-    <table id="orderVisitorTableTmp">
-      <thead><tr></tr></thead>
-      <tbody></tbody>
-    </table>
-  <?php } ?>
-
   <template id="orderColumnsTableTmp">
     <div>
-      <?php foreach ($ordersColumns as $item) { ?>
+      <?php foreach ($param['ordersVisitorColumns'] ?? [] as $item) { ?>
         <div class="input-group mb-3">
           <div class="input-group-text">
             <input class="form-check-input mt-0" id="<?= $item['dbName'] ?>" type="checkbox" value="<?= $item['dbName'] ?>">

@@ -165,7 +165,7 @@ export default class extends Orders {
     if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
     let link = f.gI(f.ID.PUBLIC_PAGE),
-        query = this.table.dataset.type === 'order' ? 'orderId=' : 'orderVisitorId=';
+        query = 'orderId='; //this.table.dataset.type === 'order' ? 'orderId=' : 'orderVisitorId=';
     link.href += '?' + query + this.selected.getSelected()[0];
     link.click();
   }

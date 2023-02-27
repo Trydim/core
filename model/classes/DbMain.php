@@ -81,7 +81,8 @@ class DbMain extends R {
     $sortColumn = AQueryWriter::camelsSnake($pageParam['sortColumn'] ?? 'id');
     $sortDirect = boolValue($pageParam['sortDirect'] ?? false) ? 'DESC' : '';
 
-    if ($sortColumn === 'id') $sortColumn = 'ID';// Todo у всех таблиц убрать верхний регистр ID
+    if (includes($sortColumn, 'id')) $sortColumn = strtoupper($sortColumn);// Todo у всех таблиц убрать верхний регистр ID
+    if (includes($sortColumn, '.')) $sortColumn = ucfirst($sortColumn);
     $pageNumber *= $countPerPage;
     return "ORDER BY $sortColumn " . $sortDirect . " LIMIT $countPerPage OFFSET $pageNumber";
   }

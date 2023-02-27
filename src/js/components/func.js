@@ -627,8 +627,8 @@ export default {
    *
    * @param {?string|number} param.orderId - input or other values (save as JSON)
    * @param {?string|number} param.orderTotal - important param for show in order table (save as JSON)
-   * @param {object} param.importantVal - important param for show in order table (save as JSON)
-   * @param {object} param.saveVal - input or other values (save as JSON)
+   * @param {object} param.importantValue - important param for show in order table (save as JSON)
+   * @param {object} param.saveValue - input or other values (save as JSON)
    * @param {object} param.reportValue - require param report (save as JSON)
    *
    * @default param.orderTotal = 0
@@ -653,7 +653,7 @@ export default {
     data.set('orderId', (param.orderId || 0).toString());
     data.set('orderTotal', (param.orderTotal || 0).toString());
     data.set('importantValue', JSON.stringify(param.importantValue || {}));
-    data.set('saveVal', JSON.stringify(param.saveVal || {}));
+    data.set('saveValue', JSON.stringify(param.saveValue || {}));
     data.set('reportValue', JSON.stringify(param.reportValue || {}));
     data.set('startShippingDate', (param['startShippingDate'] || '').toString());
     data.set('endShippingDate', (param['endShippingDate'] || '').toString());

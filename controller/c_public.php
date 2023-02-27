@@ -28,10 +28,10 @@ if ($authStatus && isset($_GET['orderId'])) {
   if (is_numeric($orderId)) {
     $order = $main->db->loadOrdersById($orderId);
 
-    if ($order) {
-      $dbContent .= "<input type='hidden' id='dataOrder' value='" . json_encode($order) . "'>";
+    if (count($order) === 1) {
+      $dbContent .= "<input type='hidden' id='dataOrder' value='" . json_encode($order[0]) . "'>";
 
-      $customer = $main->db->loadCustomerByOrderId($order['ID']);
+      $customer = $main->db->loadCustomerByOrderId($order[0]['ID']);
       if ($customer) {
         $dbContent .= "<input type='hidden' id='dataCustomer' value='" . json_encode($customer) . "'>";
       }

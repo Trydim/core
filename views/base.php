@@ -73,7 +73,7 @@ $jsGlobalConst = json_encode([
       <?= $sideLeft ?>
 
       <section class="content-body">
-        <div class="px-xl-2 pb-5 h-100"><?= $content ?? '' ?></div>
+        <div class="px-xl-2 pt-2 pb-5 h-100"><?= $content ?? '' ?></div>
         <?= $pageFooter ?>
       </section>
       <?php if ($sideRight) { ?>
