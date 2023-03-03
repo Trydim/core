@@ -62,26 +62,31 @@ trait DbOrders {
   /**
    * load full information order
    * @param string|int|string[]|int[] $ids
+   * @param bool $oneOrder - if true, return one order and $ids must have one value.
    *
-   * @return array rows
+   * @return array|boolean rows
    */
-  public function loadOrdersById($ids) {
+  public function loadOrdersById($ids, $oneOrder = false) {
     $sql = $this->getBaseOrdersQuery(true) . "\n WHERE ";
 
     if (is_array($ids)) {
+      $one = false;
       $sql .= " O.ID = " . implode(' OR O.ID = ', $ids) . "\n";
       $res = self::getAll($sql);
     } else {
+      $one = true;
       $sql .= "O.ID = :id";
       $res = self::getAll($sql, [':id' => $ids]);
     }
 
-    return array_map(function ($row) {
+    $res = array_map(function ($row) {
       $row['reportValue'] = gzuncompress($row['reportValue']);
       if (!$row['reportValue']) $row['reportValue'] = false;
 
       return $this->jsonParseField($row);
     }, $res);
+
+    return $oneOrder ? ($one && count($res) === 1 ? $res[0] : false) : $res;
   }
 
   /**

@@ -52,14 +52,9 @@ if (isset($addCustomer)) {
 // Отчет загрузить из БД по ИД
 // ---------------------------------------------------------------------------------------------------------------------
 if ($orderId) {
-  $reportValue = $main->db->loadOrdersById($orderId);
+  $reportValue = $main->db->loadOrdersById($orderId, true);
 
-  $reportValue['id']           = $reportValue['ID'];
-
-  $reportValue['contacts']       = json_decode($reportValue['contacts'], true);
-  $reportValue['importantValue'] = json_decode($reportValue['importantValue'], true);
-  $reportValue['saveValue']      = json_decode($reportValue['saveValue'], true);
-  $reportValue['reportValue']    = json_decode($reportValue['reportValue'], true);
+  $reportValue['id'] = $reportValue['ID'];
 
   $data['order'] = $reportValue;
   $data['reportValue'] = &$reportValue['reportValue'];

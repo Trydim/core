@@ -26,12 +26,12 @@ if ($authStatus && isset($_GET['orderId'])) {
   $orderId = $_GET['orderId'];
 
   if (is_numeric($orderId)) {
-    $order = $main->db->loadOrdersById($orderId);
+    $order = $main->db->loadOrdersById($orderId, true);
 
-    if (count($order) === 1) {
-      $dbContent .= "<input type='hidden' id='dataOrder' value='" . json_encode($order[0]) . "'>";
+    if ($order) {
+      $dbContent .= "<input type='hidden' id='dataOrder' value='" . json_encode($order) . "'>";
 
-      $customer = $main->db->loadCustomerByOrderId($order[0]['ID']);
+      $customer = $main->db->loadCustomerByOrderId($order['ID']);
       if ($customer) {
         $dbContent .= "<input type='hidden' id='dataCustomer' value='" . json_encode($customer) . "'>";
       }
