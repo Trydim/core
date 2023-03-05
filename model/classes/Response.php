@@ -84,7 +84,7 @@ class Response {
           if (empty($v)) return;
           $error[] = [$k => $v];
         });
-      } else $error = true;
+      } else $error = $result['error'];
     }
 
     if ($result['status'] = empty($error)) unset($result['error']);

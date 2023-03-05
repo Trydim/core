@@ -57,7 +57,6 @@
 }
 
 .ab-dialog {
-  background: #F2F1EF;
   color: #444;
   display: none;
   height: 100%;
@@ -71,7 +70,6 @@
 }
 
 #ab-dialog-edit-category {
-  background: #F2F1EF;
   color: #444;
   display: none;
   height: 100%;
@@ -137,6 +135,7 @@ select {
   background: #203747;
   border-bottom: 1px solid #bdc3c7;
 }
+
 
 #ab-editor-toolbar button {
   background: #203747;
@@ -380,7 +379,6 @@ input#file {
 }
 
 #ab-panel button {
-  background-color: #f2f1ef;
   border: 0;
   border-radius: 2px;
   color: #333;
@@ -521,10 +519,6 @@ label {
   margin: 0;
 }
 
-#ab-content {
-  background: #F9f9f9;
-}
-
 .ab-badjes {
   background: #f44336;
   color: #fff;
@@ -556,11 +550,6 @@ label {
   #ab-content h2 {
     line-height: 32px;
     margin: 5px 0;
-  }
-
-  #ab-main {
-    background: #F2F1EF;
-    color: #333;
   }
 
   #ab-menu #ribbon-left {
@@ -618,17 +607,8 @@ label {
   padding: 10px 15px;
 }
 
-#ab-breadcrumb {
-  background: #eee;
-  border-bottom: 1px solid #bdc3c7;
-}
-
 #tree {
   margin-top: 10px;
-}
-
-#tree ul {
-  list-style-type: none;
 }
 
 #tree li {
@@ -638,12 +618,10 @@ label {
 }
 
 #tree ul {
-  padding-left: 15px;
-}
-
-#tree ul {
-  border-left: 1px solid #E0E0E0;
+  list-style-type: none;
   margin-left: 8px;
+  padding-left: 15px;
+  border-left: 1px solid #E0E0E0;
 }
 
 #tree div {
@@ -833,6 +811,17 @@ label {
 .ext-7z,
 .ext-rar {
   background: url(images/zip.png) left 50% no-repeat;
+}
+
+.ext-csv {
+  background: url(images/csv.png) left 50% no-repeat;
+  background-size: 19px;
+}
+
+.ext-xls,
+.ext-xlsx {
+  background: url(images/xls.png) left 50% no-repeat;
+  background-size: 19px;
 }
 
 .dropzone {

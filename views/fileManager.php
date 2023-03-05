@@ -11,7 +11,7 @@ $startPath = $main->url->getPath(true) . SHARE_PATH;
   <div class="row" id="ab-content">
 
     <!-- breadcrumb -->
-    <div class="col-12 row align-items-center" id="ab-breadcrumb">
+    <div class="col-12 row align-items-center border" id="ab-breadcrumb">
       <div class="col-6" id="breadcrumb-links">
         <span class="open">public</span>
       </div>

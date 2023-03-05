@@ -71,25 +71,30 @@ const fileManager = {
       $body.append('<div id="imgpreview" style="background-color:#ddd;width:120px;position:fixed;z-index:9999;left:' + parseInt(t.clientX - 140) + "px;top:" + parseInt(t.clientY - 40) + 'px"><img src="' + $(this).attr("href") + '" width="120" height="120"></div>')
     });
     $body.on("mouseleave", ".zoom", () => {$("#imgpreview").hide().remove()});
-    /*$body.on("click", "#a-create-folder", e => {
+    $body.on("click", "#createFolder", e => {
+      let path = $("#tree div.selected").data("fo"),
+          folder = prompt("Название директории:", ""), dir;
+
       e.preventDefault();
-      let u = $("#tree div.selected").data("fo"),
-          r = prompt("Name directory:", ""), f;
-      if (r)
-        return $body.append('<div id="alerts" class="btn blue">working..<\/div>'),
-          $("#alerts").fadeIn(1000),
-          f = u + r + "/",
-          this.query({cmsAction: 'createFolder', dir: f}, function () {
-            $("#tree div.selected").next("ul").append('<li><div id="' + r + '" data-fo="' + f + '" class="fo closed">' + r + '<\/div><ul style="display: none;"><\/ul><\/li>');
-            t(u)
-          }), $("#alerts").hide().remove(), !1
-    });*/
+      if (folder) {
+        dir = path + folder + "/";
+
+        $body.append('<div id="alerts" class="btn blue">working..<\/div>');
+
+        this.query({cmsAction: 'createFolder', dir}, () => {
+          $("#tree div.selected")
+            .next("ul")
+            .append(`<li><div id="${folder}" data-fo="${dir}" class="fo closed">${folder}</div><ul style="display: none;"></ul></li>`);
+          t(path)
+        });
+      }
+    });
     // Создать файл
     $body.on("click", "#createFile", function (i) {
-      i.preventDefault();
-
       const u = $("#tree div.selected").data("fo"),
             r = prompt("Name file:", "");
+
+      i.preventDefault();
 
       if (r) {
         fileManager.query({cmsAction: 'createFile', fileName: u + r}, function (data) {
@@ -235,7 +240,6 @@ const fileManager = {
 
     return this;
   },
-
 
   query(param, func) {
     let {type = ''} = param,

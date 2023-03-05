@@ -51,7 +51,7 @@ switch ($cmsAction) {
       natcasesort($files);
 
 
-      if (count($files) > 2) {
+      if (count($files)) {
         foreach ($files as $file) {
           if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) == 'dir') {
 
@@ -257,3 +257,4 @@ switch ($cmsAction) {
 }
 
 $result['html'] = $html ?? '';
+$main->response->setContent($result);
