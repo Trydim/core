@@ -46,43 +46,35 @@
     .nav-item {
       display: block;
       padding: 0.8125rem 1.25rem;
-      font-weight: 300;
       color: #bdbdc7;
       text-decoration: none;
+      white-space: nowrap;
+      transition: all 3s linear;
 
-      & + .nav-item {
-        padding-left: 1.25rem;
-      }
-
-      & > i {
-        position: relative;
+      > i {
         font-size: 1.125rem;
-        display: inline-block;
-        vertical-align: middle;
-        padding: 0 0.3rem;
         font-weight: 700;
-        top: -2px;
+        vertical-align: -2px;
       }
 
       &:hover,
       &:focus {
         background-color: lighten($color: $primary, $amount: 5%);
         color: $white;
-        // @include respond('desktop') {
-        //     background-color: $body-bg;
-        // }
-        // &::after {
-        //     border-color: blue;
-        // }
+        // @include respond('desktop') { background-color: $body-bg; }
       }
 
       &.active {
         color: $white;
       }
+
+      &.long:hover {
+        transform: translateX(-100%);
+      }
     }
 
     .nav-text {
-      padding: 0.8125rem 0.25rem;
+      padding-left: 0.25rem;
       outline-width: 0;
     }
 

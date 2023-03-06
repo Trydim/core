@@ -65,24 +65,29 @@ const setLinkMenu = () => {
   let target = menu.querySelector('.active');
   while (target) {
     let wrap = target.closest('[data-role="link"]');
-    if (!wrap) return;
+    if (!wrap) break;
     target = wrap.previousElementSibling;
     target.click();
   }
+
+  setSideMenuStyle(menu);
+}
+
+const setSideMenuStyle = (menu: HTMLElement) => {
+  menu.querySelectorAll('a.nav-item').forEach((liN: Element) => {
+    const textN = liN.querySelector('.nav-text'),
+          w = textN && textN.getBoundingClientRect().width;
+
+    if (liN.getBoundingClientRect().width < f.toNumber(w)) {
+      liN.classList.add('long');
+    }
+  })
 }
 
 const stopPreloader = () => {
   if (f.OUTSIDE) return;
   f.gI('preloader').remove();
   f.gI('mainWrapper').classList.add('show');
-}
-
-const setSideMenuStyle = () => {
-  const node = f.gI('DBTablesWrap');
-  if (!node) return;
-
-  const h = window.innerHeight - node.parentElement.getBoundingClientRect().top - 18;
-  node.style.maxHeight = h + 'px';
 }
 
 // Event function
@@ -156,7 +161,6 @@ const onEvent = () => {
   f.getSetting();
   f.relatedOption();
   storageLoad();
-  //setSideMenuStyle(); Ошибка высоты, зачем это было?
   onEvent();
   setLinkMenu(); // after bind events
 
