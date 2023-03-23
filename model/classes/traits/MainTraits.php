@@ -295,7 +295,7 @@ trait Cache {
   public function loadCsvCache(&...$vars): bool {
     $cachePath = $this->cachePath();
 
-    if (file_exists($cachePath) && $this->cacheIsActual($cachePath)) {
+    if (!DEBUG && file_exists($cachePath) && $this->cacheIsActual($cachePath)) {
       $data = json_decode(gzuncompress(file_get_contents($cachePath)), true);
       $this->setCsvVariable(array_keys($data));
       foreach (array_values($data) as $index => $var) {

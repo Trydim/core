@@ -14,8 +14,7 @@ const CORE          = __DIR__ . '/',
       DEALERS_PATH  = 'dealer',
       SYSTEM_PATH   = ABS_SITE_PATH . SHARE_PATH . 'system.php'; // TODO перенести в DB
 
-define('DEBUG', array_key_exists('DEBUG', $publicConfig));
-define('PUBLIC_PAGE', $publicConfig[VC::PUBLIC_PAGE] ?? false);
+define('DEBUG', boolval($publicConfig['DEBUG'] ?? false));
 define('USE_DATABASE', $publicConfig[VC::USE_DATABASE] ?? true);
 define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig[VC::CHANGE_DATABASE] ?? false) : false);
 
@@ -29,7 +28,6 @@ define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
 define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 
 $main->setCmsParam(VC::CSV_PATH, $url->getBasePath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
-     ->setCmsParam(VC::LEGEND_PATH, $url->getPath(true) . ($publicConfig['PATH_LEGEND'] ?? 'public/views/legend.php'))
      ->setCmsParam(VC::IMG_PATH, $url->getBasePath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam(VC::URI_IMG, $url->getBaseUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam(VC::URI_CSS, $url->getBaseUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
@@ -42,8 +40,8 @@ if ($main->isDealer()) {
        ->setCmsParam(VC::CSV_PATH, $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
   unset($publicConfig['PATH_CSV']);
 
-  $main->setCmsParam($publicConfig);
-  $main->setSettings(VC::DB_CONFIG, $dbConfig ?? []);
+  $main->setCmsParam($publicConfig)->setSettings(VC::DB_CONFIG, $dbConfig ?? []);
+
   if (isset($publicConfig['PATH_IMG'])) {
     $main->setCmsParam(VC::IMG_PATH, $url->getPath(true) . $publicConfig['PATH_IMG'])
          ->setCmsParam(VC::URI_IMG, $url->getUri() . $publicConfig['PATH_IMG']);
@@ -53,11 +51,16 @@ if ($main->isDealer()) {
        ->setCmsParam(VC::DEAL_URI_JS, $url->getUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 }
 
+$publicPage = $publicConfig[VC::PUBLIC_PAGE] ?? null;
+$main->setCmsParam(VC::ONLY_LOGIN, !boolValue($publicPage) || boolValue($publicConfig['ONLY_LOGIN'] ?? false))
+     ->setCmsParam(VC::LEGEND_PATH, $url->getPath(true) . ($publicConfig['PATH_LEGEND'] ?? 'public/views/legend.php'));
+
 define('URI_IMG', $main->getCmsParam(VC::URI_IMG));
+define('PUBLIC_PAGE', $publicPage);
 define('USE_CONTENT_EDITOR', $publicConfig['USE_CONTENT_EDITOR'] ?? false);
 
 !defined('OUTSIDE') && define('OUTSIDE', array_key_exists('outside', $_GET));
 
 $main->afterConstDefine();
 
-unset($url, $publicConfig, $dealConfig, $dbConfig);
+unset($url, $publicConfig, $publicPage, $dealConfig, $dbConfig);

@@ -56,7 +56,6 @@ final class Main {
    */
   public function __construct(array $cmsParam, array $dbConfig) {
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
-    $this->setCmsParam(VC::ONLY_LOGIN, $cmsParam['ONLY_LOGIN'] ?? !boolval(PUBLIC_PAGE));
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
   }
   /**

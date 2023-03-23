@@ -302,9 +302,7 @@ class UrlGenerator {
   public function getPath(bool $absolute = false): string {
     $absolutePath = $absolute ? $this->absolutePath : '';
 
-    if ($this->sitePath === null) {
-      $this->sitePath = $this->setSitePath();
-    }
+    if ($this->sitePath === null) $this->sitePath = $this->setSitePath();
 
     if ($absolute) {
       if ($this->baseSitePath !== '/') $absolutePath = str_replace($this->baseSitePath, '', $this->absolutePath);
@@ -320,9 +318,7 @@ class UrlGenerator {
    * @return string The raw URI (i.e. not URI decoded)
    */
   public function getRequestUri(): string {
-    if ($this->requestUri === null) {
-      $this->requestUri = $this->setRequestUri();
-    }
+    if ($this->requestUri === null) $this->requestUri = $this->setRequestUri();
 
     return $this->requestUri;
   }
@@ -348,15 +344,12 @@ class UrlGenerator {
     return $route;
   }
   public function getRoute(): string {
-    if ($this->route === null) {
-      $this->route = $this->setRoute();
-    }
+    if ($this->route === null) $this->route = $this->setRoute();
+
     return $this->route;
   }
   public function getRoutePath(): string {
-    if ($this->routePath === null) {
-      $this->routePath = $this->setRoutePath();
-    }
+    if ($this->routePath === null) $this->routePath = $this->setRoutePath();
 
     return $this->routePath;
   }
