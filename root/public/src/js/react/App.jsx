@@ -1,24 +1,18 @@
-import React, {Component} from "react";
+import React from "react";
 
 import {Test} from "./Test.jsx";
 
-export class App extends Component {
-  state = {
-    counter: 0
+export default function App() {
+  const [counter, setCounter] = setState(0);
+
+  const handleClick = () => {
+    setCounter(counter + 1);
   };
 
-  handleClick = () => {
-    this.setState(prevState => {
-      return { counter: prevState.counter + 1 };
-    });
-  };
+  return (<div className="App">
+    <Test />
 
-  render() {
-    return (<div className="App">
-      <Test />
-
-      <p>{`The count now is: ${this.state.counter}`}</p>
-      <button onClick={this.handleClick}>Click me</button>
-    </div>);
-  }
+    <p>{`The count now is: ${counter}`}</p>
+    <button onClick={handleClick}>Click me</button>
+  </div>);
 }

@@ -370,6 +370,7 @@ export default {
     const {name = 'download.file', blob} = data,
           link = f.createLink(name);
 
+    if (data.type === 'json') link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(blob.toString());
     if (data.type === 'base64') link.href = blob;
     else link.href = URL.createObjectURL(blob);
 
