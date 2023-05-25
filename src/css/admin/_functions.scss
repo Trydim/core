@@ -1,5 +1,8 @@
 @use "sass:math";
 
+@function div($div, $divider) {
+  @return math.div($div, $divider)
+}
 // Px to rem
 @function rem($px) {
   @if (type-of($px) != number) {

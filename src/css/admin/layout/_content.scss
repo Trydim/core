@@ -19,3 +19,11 @@
     width: 100%;
   }
 }
+
+[data-theme-version="dark"] {
+  background: $d-bg;
+
+  .container-content .content-body {
+    filter: invert(1);
+  }
+}

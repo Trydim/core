@@ -39,58 +39,6 @@
             }
         }
 
-        .quixnav {
-            overflow: visible;
-            position: absolute;
-            left: -12.8125rem;
-            // z-index: 1;
-
-            @include customMedia($min: 1200px, $max: 1350px) {
-                left: -10rem;
-            }
-
-            @at-root [direction="rtl"]#{&} {
-                left: auto;
-                right: -12.8125rem;
-            }
-
-            .nav-label {
-                display: none;
-            }
-
-            .metismenu {
-                &>li {
-                    &>a {
-                        display: flex;
-                        justify-content: space-between;
-
-                        &>i {
-                            order: 1;
-                        }
-                    }
-                }
-
-                ul {
-                    a {
-                        position: relative;
-
-                        &::before {
-                            position: absolute;
-                            content: "\f764";
-                            right: 1.75rem;
-                            font-size: 13px;
-                        }
-                    }
-                }
-
-                .has-arrow {
-                    &::after {
-                        right: 5rem;
-                    }
-                }
-            }
-        }
-
         .icon-hover-toggle {
 
             .nav-header {
@@ -118,14 +66,6 @@
                 }
             }
 
-            .quixnav {
-                left: 0;
-
-                @at-root [direction="rtl"]#{&} {
-                    left: auto;
-                    right: 0;
-                }
-            }
         }
 
         .content-body {

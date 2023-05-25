@@ -22,13 +22,16 @@ if ($main->checkStatus()) { ?>
   </a>
 
   <div class="nav-control" role="button" data-action-cms="menuToggle">
-    <div><i class="pi pi-caret-left"></i></div>
+    <i class="pi pi-caret-left"></i>
   </div>
 </div>
 
 <div class="header">
   <div class="header-content">
-    <div></div>
+    <div class="d-flex align-items-center form-check form-switch">
+      <input class="form-check-input" type="checkbox" data-action-cms="themeToggle">
+    </div>
+
     <nav class="navbar navbar-expand">
       <div class="collapse navbar-collapse">
 

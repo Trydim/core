@@ -1,6 +1,6 @@
 "use strict";
 
-const menuClass = 'menu-toggle';
+const MENU_CLASS = 'menu-toggle';
 const storage = new f.LocalStorage();
 
 const cancelFormSubmit = () => {
@@ -46,8 +46,15 @@ const storageLoad = () => {
   if (f.isMobile()) storage.set('menuToggle', 'true');
 
   // Set Menu Toggle
-  const node = f.gI('mainWrapper');
-  if (node && storage.get('menuToggle') === 'true') node.classList.add(menuClass);
+  let node = f.gI('mainWrapper');
+  if (node && storage.get('menuToggle') === 'true') node.classList.add(MENU_CLASS);
+
+  // set Theme
+  if (storage.get('themeToggle') === 'true') {
+    let node = f.qS('[data-action-cms="themeToggle"]');
+    node && (node.checked = true);
+    document.body.dataset.themeVersion = 'dark';
+  }
 }
 
 const setParentHeight = (target: HTMLElement, height: number) => {
@@ -95,16 +102,22 @@ const stopPreloader = () => {
 
 const menuToggle = () => {
   let node = f.gI('mainWrapper');
-  node.classList.toggle(menuClass);
-  storage.set('menuToggle', node.classList.contains(menuClass));
+  node.classList.toggle(MENU_CLASS);
+  storage.set('menuToggle', node.classList.contains(MENU_CLASS));
   setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
+}
+
+const themeToggle = () => {
+  const isLight = document.body.dataset.themeVersion === 'light';
+  document.body.dataset.themeVersion = isLight ? 'dark': 'light';
+  storage.set('themeToggle', isLight);
 }
 
 const cmsEvent = function() {
   let action = this.dataset.actionCms;
 
   let select = {
-    menuToggle: menuToggle,
+    menuToggle, themeToggle,
     exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };
   // @ts-ignore

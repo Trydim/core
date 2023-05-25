@@ -1,2 +1,18 @@
 @import './inheritance';
-@import './maps';
+
+$borders: (
+  "right", "left", "top", "bottom", ""
+);
+
+$theme_backgrounds: (
+  "color_1": $color_palate_1,
+  "color_2": $color_palate_2,
+  "color_3": $color_palate_3,
+  "color_4": $color_palate_4,
+  "color_5": $color_palate_5,
+  "color_6": $color_palate_6,
+  "color_7": $color_palate_7,
+  "color_8": $color_palate_8,
+  "color_9": $color_palate_9,
+  "color_10": $color_palate_10
+);
