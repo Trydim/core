@@ -4,19 +4,18 @@
 
     <div class="input-group my-3">
       <span class="input-group-text">Добавить тип доступа</span>
-      <p-input-text v-model="permission.name" class="form-control"
-      ></p-input-text>
+      <p-input-text class="form-control" v-model="permission.name"></p-input-text>
       <p-button v-tooltip.bottom="'Добавить тип доступа'" icon="pi pi-plus-circle" class="p-button-success"
                 @click="addPermission"></p-button>
     </div>
 
     <div class="input-group mb-3">
       <span class="input-group-text">Тип доступа</span>
-      <p-select option-label="name" option-value="id"
+      <p-select class="col"
+                option-label="name" option-value="id"
                 :editable="true"
                 :options="permissionsData"
                 v-model="permission.id"
-                class="col"
                 @input="changePermission"
       ></p-select>
       <p-button v-tooltip.bottom="isPermissionDelete ? 'Отменить удаление' : 'Удалить тип доступа'"
@@ -31,9 +30,8 @@
              v-tooltip.bottom="'Теги особых свойств (через пробел):\n\'защита/guard\' - защита от удаления\n'"
           ></i>
         </span>
-      <p-input-text v-model="permission.tags" class="form-control"
-                    :disabled="isPermissionDelete"
-                    @change="changePermissionTags"
+      <p-input-text class="form-control" :disabled="isPermissionDelete"
+                    v-model="propertyTags" @change="changePermissionTags"
       ></p-input-text>
     </div>
 
@@ -42,8 +40,9 @@
         Доступные меню
         <i class="pi pi-tag" v-tooltip.bottom="'Если в `Доступные` пусто, значит доступны все'"></i>
       </p>
-      <p-picklist v-model="permission.menu" data-key="id"
-                  list-style="height:220px" class="w-100"
+      <p-picklist class="w-100" data-key="id"
+                  list-style="height:220px"
+                  v-model="permission.menu"
                   @selection-change="pickedChange"
       >
         <template #source>
@@ -76,7 +75,6 @@ export default {
     permission: {
       id: 0,
       name: '',
-      tags: '',
       current: {
         id: 0,
         name: '',
@@ -107,6 +105,11 @@ export default {
       const sPer = this.permissionsData.find(i => i.id === this.permission.id);
       return !!(sPer && sPer.delete);
     },
+
+    propertyTags: {
+      get() { return this.permission.current.properties.tags },
+      set(v) { return this.permission.current.properties.tags = v },
+    }
   },
   methods: {
     loadData() {
@@ -127,12 +130,15 @@ export default {
     setPermission() {
       const menu = this.permission.menu,
             sPer = this.permissionsData.find(i => i.id === this.permission.id),
-            accessMenu = (sPer && sPer.properties['menu']) || '';
+            properties = {
+              tags: sPer.properties.tags || '',
+              menu: sPer.properties.menu || '',
+            };
 
-      menu[0] = this.permissionsMenu.filter(m => !accessMenu.includes(m.id));
-      menu[1] = this.permissionsMenu.filter(m => accessMenu.includes(m.id));
-      this.permission.tags = (sPer && sPer.properties['tags']) || '';
+      menu[0] = this.permissionsMenu.filter(m => !properties.menu.includes(m.id));
+      menu[1] = this.permissionsMenu.filter(m => properties.menu.includes(m.id));
 
+      sPer.properties = properties;
       this.permission.current = sPer;
     },
     setPermissionTags(id) {
