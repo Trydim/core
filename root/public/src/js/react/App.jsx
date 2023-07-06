@@ -1,9 +1,9 @@
-import React from "react";
+import React, {useState} from "react";
 
-import {Test} from "./Test.jsx";
+import Test from "./Test.jsx";
 
 export default function App() {
-  const [counter, setCounter] = setState(0);
+  const [counter, setCounter] = useState(0);
 
   const handleClick = () => {
     setCounter(counter + 1);
