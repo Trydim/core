@@ -12,7 +12,6 @@ export default class {
       query: this.query.bind(this),
     });
 
-    this.ordersHeadRender();
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
 
@@ -61,10 +60,14 @@ export default class {
     };
   }
 
+  getTypeConfig() {
+    return this['orderType'] === 'visit' ? 'ordersVisitColumns' : 'ordersColumns'
+  }
+
   // Orders tables
   ordersHeadRender() {
     const thead = this.table.querySelector('thead'),
-          html = this.config.ordersColumns.reduce((r, column) => {
+          html = this.config[this.getTypeConfig()].reduce((r, column) => {
             return r += f.replaceTemplate(this.template.tableHeader, column);
           }, '');
 
@@ -79,7 +82,8 @@ export default class {
   }
   ordersGetTableCellTemplate() {
     let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${ID}"></td>';
-    tmp += this.config.ordersColumns.reduce((r, column) => {
+
+    tmp += this.config[this.getTypeConfig()].reduce((r, column) => {
       return r += '<td>${' + column['dbName'] + '}</td>';
     }, '');
 
@@ -115,15 +119,17 @@ export default class {
       return item;
     });
   }
+
   ordersFilter(data, search = false) {
     return Object.values(data).filter(row => {
       if (search) return search === row;
       return true;
     });
   }
-  ordersRender(data, search) {
+
+  bodyRender(data, search) {
     let html  = '',
-        tbody = this.template.tableCell || this.ordersGetTableCellTemplate();
+        tbody = this.ordersGetTableCellTemplate();
 
     data = this.ordersFilter(data, search);
 
@@ -135,6 +141,12 @@ export default class {
     }
     this.table.querySelector('tbody').innerHTML = html;
   }
+
+  ordersRender(data, search) {
+    this.ordersHeadRender();
+    this.bodyRender(data, search)
+  }
+
   setOrders(data) {
     data = this.ordersPrepare(data);
     this.ordersRender(data);

@@ -45,7 +45,7 @@ if ($authStatus && isset($_GET['orderVisitorId'])) {
   $orderId = $_GET['orderVisitorId'];
 
   if (is_finite($orderId)) {
-    $order = $main->db->selectQuery('client_orders', ['*'], "cp_number = '$orderId'");
+    $order = $main->db->selectQuery('client_orders', ['*'], "ID = '$orderId'");
 
     if (count($order) === 1) {
       $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='" . json_encode($order[0]) . "'>";
