@@ -34,14 +34,16 @@ if (!isset($setting->ordersColumnsSort)) {
 }
 
 if ($main->getCmsParam('USERS_ORDERS') && !isset($setting->ordersVisitorColumnsSort)) {
-  $columns = ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
+  $columns = ['ID', 'cpNumber', 'createDate', 'importantValue', 'total'];
 
-  $param['ordersVisitorColumns'] = array_map(function ($item) {
+  $columns = array_map(function ($item) {
     return [
       'dbName' => $item,
       'name'   => gTxtDB('visitorOrders', $item),
     ];
   }, $columns);
+
+  $field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersVisitColumn' value='". json_encode($columns) . "'>";
 }
 
 if ($param['showFilter']) {

@@ -274,14 +274,14 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       }
       break;
     case 'loadVisitorOrders':
-      !isset($sortColumn) && $sortColumn = 'createDate';
+      !isset($sortColumn) && $pagerParam['sortColumn'] = 'createDate';
 
-      $search = isset($search);
+      //$searchValue = isset($searchValue);
       // Значит нужны все заказы (поиск)
-      if ($countPerPage > 999) $countPerPage = 1000000;
+      if ($countPerPage > 999) $pagerParam['countPerPage'] = 1000000;
       else $result['countRows'] = $db->getCountRows('client_orders');
 
-      $result['orders'] = $db->loadVisitorOrder($pageNumber, $countPerPage, $sortColumn, $sortDirect);
+      $result['orders'] = $db->loadVisitorOrder($pagerParam);
       break;
     case 'loadVisitorOrder': break;
     case 'delVisitorOrders':

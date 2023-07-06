@@ -26,7 +26,7 @@
   <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
   <input type="button" class="btn btn-warning ms-1" value="Отмена" data-action="confirmNo">
 </div>
-<?php if (isset($param['ordersVisitorColumns'])) { ?>
+<?php if ($main->getCmsParam('USERS_ORDERS')) { ?>
   <div class="d-flex pb-4" style="justify-content: left">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="orderType" value="order" id="orderTypeO" checked data-action="orderTypeChange">
@@ -69,20 +69,17 @@
     <!--<button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>-->
   </div>
 
-  <template id="orderColumnsTableTmp">
-    <div>
-      <?php foreach ($param['ordersVisitorColumns'] ?? [] as $item) { ?>
-        <div class="input-group mb-3">
-          <div class="input-group-text">
-            <input class="form-check-input mt-0" id="<?= $item['dbName'] ?>" type="checkbox" value="<?= $item['dbName'] ?>">
-          </div>
-          <label class="input-group-text flex-grow-1" for="<?= $item['dbName'] ?>">
-            <?= $item['name']; ?>
-          </label>
+  <!--<div id="orderColumnsTableTmp">
+    <?php /*foreach ($ordersVisitorColumns ?? [] as $item) { */?>
+      <div class="input-group mb-3">
+        <div class="input-group-text">
+          <input class="form-check-input mt-0" id="<?/*= $item['dbName'] */?>" type="checkbox" value="<?/*= $item['dbName'] */?>">
         </div>
-      <?php } ?>
-    </div>
-  </template>
-
+        <label class="input-group-text flex-grow-1" for="<?/*= $item['dbName'] */?>">
+          <?/*= $item['name']; */?>
+        </label>
+      </div>
+    <?php /*} */?>
+  </div>-->
 </div>
 <div id="paginator" class="w-100"></div>

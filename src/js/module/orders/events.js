@@ -121,7 +121,7 @@ export default class extends Orders {
         action         = target.dataset.action,
         selectedSize   = this.selected.getSelectedSize();
 
-    if (!selectedSize && !(['setupColumns', 'orderType']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
+    if (!selectedSize && !(['setupColumns', 'orderTypeChange']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
     this.queryParam.orderIds = this.selected.getSelected();
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
 
@@ -273,7 +273,7 @@ export default class extends Orders {
       f.show(f.qS('#orderBtn'));
     }
 
-    this.setTableTemplate(this.table.dataset.type);
+    //this.setTableTemplate(this.table.dataset.type);
     this.query();
   }
 

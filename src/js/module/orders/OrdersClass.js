@@ -36,7 +36,8 @@ export default class {
 
     this.config = {
       ordersColumns: f.getData('#dataOrdersColumn'),
-    }
+      ordersVisitColumns: f.getData('#dataOrdersVisitColumn'),
+    };
 
     this.template = {
       tableHeader: f.gT('#tableHeaderCell'),

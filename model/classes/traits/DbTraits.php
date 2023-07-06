@@ -155,7 +155,7 @@ trait DbOrders {
    * @return array|null
    */
   public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []) {
-    $sql = "SELECT cp_number AS 'cpNumber', create_date AS 'createDate', important_value AS 'importantValue', total
+    $sql = "SELECT ID, cp_number AS 'cpNumber', create_date AS 'createDate', important_value AS 'importantValue', total
             FROM " . $this->pf('client_orders') . "\n";
 
     if (count($dateRange)) $sql .= "WHERE create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
