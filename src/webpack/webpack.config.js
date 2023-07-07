@@ -61,6 +61,7 @@ module.exports = env => {
       parser: {
         javascript: {commonjsMagicComments: true},
       },
+      //noParse: /bootstrap5\.2/,
       rules: [
         getTypescriptRules(),
         getVueRules(),
@@ -116,7 +117,7 @@ const getVueRules = () => ({
 const getScssRules = dev => ({
   test: /\.s[ac]ss$/i,
   use : [
-    dev && false ? 'style-loader' : MiniCssExtractPlugin.loader,
+    dev ? 'style-loader' : MiniCssExtractPlugin.loader,
     'css-loader',
     'sass-loader',
   ],
