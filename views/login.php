@@ -19,7 +19,7 @@ $field['pageTitle'] = $this->getCmsParam('PROJECT_TITLE');
 $field['global'] = <<<global
 <main class="position-fixed h-100 w-100">
   <section class="content-center h-100">
-    <div class="authentication-content auth-form col-md-5">
+    <div class="authentication-content auth-form col-10 col-md-5">
       <h4 class="text-center mb-4"><i class="pi pi-user"></i> Авторизация</h4>
       $wrongString
       <form action="$actionLink" method="POST" id="authForm">
@@ -44,7 +44,7 @@ $field['global'] = <<<global
         </div>
 
         <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-block" onclick="this.classList.add('loading-st1')">Подтвердить</button>
+          <button type="submit" class="btn btn-primary btn-block w-100" onclick="this.classList.add('loading-st1')">Подтвердить</button>
         </div>
 
         <input name="mode" type="hidden" value="auth">

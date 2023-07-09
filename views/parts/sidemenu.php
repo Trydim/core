@@ -31,7 +31,6 @@ item;
 
     public function subSideMenu($title, $items, $root): string {
       $icon = $root ? 'pi-book' : 'pi-folder';
-      //$rootClass = $root ? 'overflow-scroll' : 'overflow-hidden';
       $idWrap = $root ? 'id="DBTablesWrap"' : '';
       return <<<menu
       <span class="nav-item has-arrow" role="button" aria-expanded="false">

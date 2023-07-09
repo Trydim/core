@@ -81,20 +81,24 @@ const setLinkMenu = () => {
 }
 
 const setSideMenuStyle = (menu: HTMLElement) => {
-  menu.querySelectorAll('a.nav-item').forEach((liN: Element) => {
-    const textN = liN.querySelector('.nav-text'),
-          w = textN && textN.getBoundingClientRect().width;
+  const sidebarN = f.gI('sideLeft'),
+        sidebarW = sidebarN && sidebarN.getBoundingClientRect().width;
 
-    if (liN.getBoundingClientRect().width < f.toNumber(w)) {
+  sidebarW && sidebarN.querySelectorAll('a.nav-item').forEach((liN: HTMLElement | any) => {
+    const textS = liN.querySelector('.nav-text').getBoundingClientRect(),
+          w = textS.left + textS.width;
+
+    if (w > sidebarW) {
+      liN.parentElement.style.width = w + 'px';
       liN.classList.add('long');
     }
-  })
+  });
 }
 
-const stopPreloader = () => {
+const stopPreloader = (short = true) => {
   if (f.OUTSIDE) return;
   f.gI('preloader').remove();
-  f.gI('mainWrapper').classList.add('show');
+  short && f.gI('mainWrapper').classList.add('show');
 }
 
 // Event function
@@ -167,7 +171,7 @@ const onEvent = () => {
 }
 
 (() => {
-  if (f.gI('authForm')) return;
+  if (f.gI('authForm')) { stopPreloader(false); return; }
 
   cancelFormSubmit();
   dictionaryInit();

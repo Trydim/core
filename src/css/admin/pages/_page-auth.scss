@@ -1,5 +1,4 @@
 .authentication-content {
-  background: $white;
   box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
   border-radius: 5px;
 
@@ -54,12 +53,13 @@
 */
 
 .auth-form {
-  padding: 50px 50px;
+  padding: rem(50);
+
+  @include respond(sm) { padding: 1rem; }
 
   .btn {
     height: 50px;
     font-weight: 700;
-    font-size: 0.875rem;
     letter-spacing: 0.5px;
   }
 

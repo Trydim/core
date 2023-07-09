@@ -398,7 +398,7 @@ export class Pagination {
       <div class="page-item me-2">
         <button type="button" class="page-link" data-action="prev">&laquo;</button>
       </div>
-      <div class="page-item pagination" data-btnwrap></div>
+      <div class="page-item d-flex px-2 pagination-scroll" data-btnwrap></div>
       <div class="page-item ms-2">
         <button type="button" class="page-link" data-action="next">&raquo;</button>
       </div>
