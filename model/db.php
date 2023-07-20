@@ -44,7 +44,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
   ];
 
   switch ($cmsAction) {
-    // Tables
+      // Tables
     case 'showTable':
       $result['columns'] = $columns;
       if (is_string($dbTable) && stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
@@ -60,7 +60,9 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       break;
     case 'saveTable':
       if (isset($dbData) && !empty($dbData)) {
-        $column = array_filter($columns, function ($col) { return $col['key'] === 'PRI'; });
+        $column = array_filter($columns, function ($col) {
+          return $col['key'] === 'PRI';
+        });
         $priColumn = count($column) ? $column[0]['columnName'] : false;
 
         $dbDataOld = $db->loadTable($dbTable);
@@ -97,8 +99,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         }
         count($added) && $result['insert'] = $db->insert($columns, $dbTable, $added);
         count($changed) && $result['change'] = $db->insert($columns, $dbTable, $changed, true);
-      }
-      else if (isset($csvData) && !empty($csvData)) {
+      } else if (isset($csvData) && !empty($csvData)) {
         $db->saveCsv(json_decode($csvData));
       } else if (isset($contentData) && !empty($contentData)) {
         $db->saveContentEditorData($contentData);
@@ -106,7 +107,9 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $result['error'] = 'Nothing to save!';
       }
       break;
-    case 'loadCSV': $db->fileForceDownload(); break;
+    case 'loadCSV':
+      $db->fileForceDownload();
+      break;
     case 'loadFormConfig':
       if (isset($dbTable)) {
         $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
@@ -138,7 +141,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       }
       break;
 
-    // Orders
+      // Orders
     case 'saveOrder':
       if (isset($reportValue)) {
         $customerId = intval($customerId ?? 0);
@@ -151,7 +154,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
             'ITN'  => $ITN ?? '',
             'contacts' => json_encode([
               'phone'   => $phone ?? '',
-              'email'   => $email ?? '',
+              // 'email'   => $email ?? '',
               'address' => $address ?? '',
             ]),
           ]];
@@ -169,11 +172,13 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         // Set order id, if have $orderId, then the order will be change.
         $orderId = intval($orderId ?? 0);
         $orderId = $orderId !== 0 ? $orderId
-          : $db->getLastID('orders',
+          : $db->getLastID(
+            'orders',
             [
               'status_id'   => $statusId,
               'customer_id' => $customerId
-            ]);
+            ]
+          );
         $orderTotal = $orderTotal ?? 0;
 
         $param = [$orderId => [
@@ -231,8 +236,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       if (isset($orderIds)) {
         $orderIds = json_decode($orderIds ?? '[]', true);
         $result['orders'] = $db->loadOrdersById($orderIds);
-      }
-      else if (isset($ordersFilter)) { // Загрузка по менеджеру, клиенту или статусу
+      } else if (isset($ordersFilter)) { // Загрузка по менеджеру, клиенту или статусу
         $ordersFilter = json_decode($ordersFilter, true);
         $result['orders'] = $db->loadOrdersByRelatedKey($pagerParam, $ordersFilter);
 
@@ -249,7 +253,10 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       break;
     case 'changeStatusOrder':
       if (isset($orderIds) && isset($statusId) && count($columns)) {
-        if (!is_finite($statusId)) { $result['error'] = 'status_id_error'; break; }
+        if (!is_finite($statusId)) {
+          $result['error'] = 'status_id_error';
+          break;
+        }
 
         $db->changeOrders($columns, $dbTable, explode(',', $orderIds), $statusId);
       }
@@ -259,7 +266,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       if (count($orderIds)) $db->deleteItem('orders', $orderIds);
       break;
 
-    // VisitorOrders
+      // VisitorOrders
     case 'saveVisitorOrder':
       if (isset($inputValue)) {
         $param = [
@@ -283,13 +290,14 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
 
       $result['orders'] = $db->loadVisitorOrder($pagerParam);
       break;
-    case 'loadVisitorOrder': break;
+    case 'loadVisitorOrder':
+      break;
     case 'delVisitorOrders':
       $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
       if (count($orderIds)) $db->deleteItem('client_orders', $orderIds);
       break;
 
-    // Section
+      // Section
     case 'createSection':
     case 'changeSection':
       $section = json_decode($section ?? '[]', true);
@@ -304,10 +312,12 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
           if ($cmsAction === 'changeSection') {
             $haveSection = $db->selectQuery('section', 'ID', " name = '$name'");
             if (count($haveSection) > 2 || $haveSection[0] !== $sectionId) {
-              $result['error'] = 'section_exist'; break;
+              $result['error'] = 'section_exist';
+              break;
             }
           } else {
-            $result['error'] = 'section_exist'; break;
+            $result['error'] = 'section_exist';
+            break;
           }
         }
 
@@ -344,10 +354,13 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       }
       break;
 
-    // Elements
+      // Elements
     case 'createElement':
     case 'copyElement':
-      if (!isset($sectionId)) { $result['error'] = 'section_id_error'; break; }
+      if (!isset($sectionId)) {
+        $result['error'] = 'section_id_error';
+        break;
+      }
 
       $element = json_decode($element ?? '[]', true);
       $fieldChange = json_decode($fieldChange ?? '[]', true);
@@ -355,7 +368,10 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
 
       if (!empty($name)) {
         $haveElements = $db->selectQuery('elements', 'name', " name = '$name' ");
-        if (count($haveElements)) { $result['error'] = 'element_name_exist'; break; }
+        if (count($haveElements)) {
+          $result['error'] = 'element_name_exist';
+          break;
+        }
 
         $param = [
           'section_parent_id' => $sectionId,
@@ -398,9 +414,12 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
 
         if ($single) {
           $elements = $db->selectQuery('elements', ['ID', 'name'], " name = '$name' ");
-          if (count($elements) > 1 || empty($name)
-              || (count($elements) === 1 && intval($elements[0]['ID']) !== intval($elementsId[0]))) {
-            $result['error'] = 'element_name_error'; break;
+          if (
+            count($elements) > 1 || empty($name)
+            || (count($elements) === 1 && intval($elements[0]['ID']) !== intval($elementsId[0]))
+          ) {
+            $result['error'] = 'element_name_error';
+            break;
           }
         }
 
@@ -425,11 +444,12 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       }
       break;
 
-    // Options
+      // Options
     case 'loadOptions':
       $result['options'] = $db->loadOptions(
         json_decode($filter ?? '[]', true),
-        $pageNumber ?? 0, $countPerPage
+        $pageNumber ?? 0,
+        $countPerPage
       );
       break;
     case 'copyOption':
@@ -442,10 +462,16 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $filesInfo = json_decode($filesInfo ?? '[]', true);
 
         $name = $option['name'];
-        if (empty($name)) { $result['error'] = 'option_name_error'; break; }
+        if (empty($name)) {
+          $result['error'] = 'option_name_error';
+          break;
+        }
 
         $haveOption = $db->selectQuery('options_elements', ['ID', 'name'], " ID = '$elementId' and name = '$name' ");
-        if (count($haveOption)) { $result['error'] = 'option_name_exist'; break; }
+        if (count($haveOption)) {
+          $result['error'] = 'option_name_exist';
+          break;
+        }
 
         $param['element_id'] = $elementId;
         $param['name'] = $name;
@@ -490,8 +516,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
               $saveResult = $db->setFiles($saveResult);
               $imageIds[] = $saveResult['id'];
               $result['files'][] = $saveResult;
-            }
-            else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
+            } else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
             else $result['error'] = $saveResult;
           }
 
@@ -518,7 +543,8 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
           $elementId = $elementsId[0];
           $options = $db->selectQuery('options_elements', ['ID', 'name'], " element_id = $elementId AND name = '$name' ");
           if (count($options) > 1 || empty($name) || (count($options) === 1 && $options[0]['ID'] !== $optionsId[0])) {
-            $result['error'] = 'option_name_error'; break;
+            $result['error'] = 'option_name_error';
+            break;
           }
         } elseif ($fieldChange['percent']) {
           $currentOptions = $db->openOptions($option['elementId']);
@@ -538,7 +564,9 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
           // Change percent
           if ($single) $param[$id]['output_percent'] = $option['percent'];
           else if ($fieldChange['percent']) {
-            $currentOption = array_filter($currentOptions, function ($option) use ($id) {return $option['id'] === $id;});
+            $currentOption = array_filter($currentOptions, function ($option) use ($id) {
+              return $option['id'] === $id;
+            });
             $currentOption = array_values($currentOption)[0];
 
             $param[$id]['output_percent'] = $option['percent'];
@@ -577,8 +605,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
                 $saveResult = $db->setFiles($saveResult);
                 $imageIds[] = $saveResult['id'];
                 $result['files'][] = $saveResult;
-              }
-              else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
+              } else if (is_numeric($saveResult)) $imageIds[] = $saveResult;
               else $result['error'] = $saveResult;
             }
 
@@ -596,7 +623,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       if (count($optionsId)) $db->deleteItem('options_elements', $optionsId);
       break;
 
-    // Customers
+      // Customers
     case 'loadCustomerByOrder':
       if (isset($orderId) && is_numeric($orderId)) {
         $result['customer'] = $db->loadCustomerByOrderId($orderId);
@@ -632,15 +659,15 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       if (count($usersId)) $result['customers'] = $db->deleteItem('customers', $usersId);
       break;
 
-    // Permission
-    //case 'loadPermission': break;
+      // Permission
+      //case 'loadPermission': break;
 
-    // Rate
+      // Rate
     case 'loadRate':
       $result['rate'] = $db->getMoney();
       break;
 
-    // Users
+      // Users
     case 'loadUsers':
       $result['countRows'] = $db->getCountRows('users');
 
@@ -652,7 +679,10 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       $user = json_decode($authForm ?? '[]', true);
 
       $haveName = $db->selectQuery('users', 'ID', ' login = "' . $user['login'] . '"');
-      if (count($haveName) > 1) { $result['error'] = 'login_exits'; break; }
+      if (count($haveName) > 1) {
+        $result['error'] = 'login_exits';
+        break;
+      }
 
       $contacts = [];
       foreach ($user as $k => $v) {
@@ -674,7 +704,10 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
 
         if (count($usersId) === 1) {
           $haveName = $db->selectQuery('users', ['ID', 'login'], ' login = "' . $authForm['login'] . '"');
-          if (count($haveName) && $haveName[0]['ID'] !== $usersId[0]) { $result['error'] = 'login_exits'; break; }
+          if (count($haveName) && $haveName[0]['ID'] !== $usersId[0]) {
+            $result['error'] = 'login_exits';
+            break;
+          }
         }
 
         foreach ($usersId as $id) {
@@ -708,7 +741,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       }
       break;
 
-    // Files
+      // Files
     case 'uploadFiles':
       $result = (new FS($main))->saveAllFromRequest();
       break;
@@ -754,7 +787,8 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
 
         if ($login === false) $login = 'dealer' . $id;
 
-        $main->dealer->create($id,
+        $main->dealer->create(
+          $id,
           [
             'dealerName' => $dealer['name'],
             'dbConfig' => $main->getSettings(VC::DB_CONFIG),
@@ -763,7 +797,8 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
             'prefix' => $prefix,
             'login' => $login,
             'pass'  => $pass,
-          ]);
+          ]
+        );
       }
       break;
     case 'loadDealers':
@@ -780,7 +815,6 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       break;
     case 'deleteDealer':
       if (isset($dealer)) {
-
       }
       break;
 

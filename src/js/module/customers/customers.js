@@ -320,9 +320,8 @@ const customers = {
 
         orders.ordersTmp || orders.initTemplate();
         div.innerHTML = orders.getOrders(id);
-
-        this.M.btnConfig('confirmYes', {value: 'Открыть'});
-        this.M.show('Заказы', div);
+        this.M.btnConfig('confirmYes', {value: _('Open')});
+        this.M.show(_('Orders'), div);
 
         this.delayFunc = () => {
           let checked = div.querySelector('input:checked');

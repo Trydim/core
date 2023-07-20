@@ -1,16 +1,16 @@
 <template>
   <div class="col-6 border" id="controlForm">
-    <h3 class="col text-center">Управление доступом</h3>
+    <h3 class="col text-center">{{ $t('Access control') }}</h3>
 
     <div class="input-group my-3">
-      <span class="input-group-text">Добавить тип доступа</span>
+      <span class="input-group-text">{{ $t('Add access type') }}</span>
       <p-input-text class="form-control" v-model="permission.name"></p-input-text>
-      <p-button v-tooltip.bottom="'Добавить тип доступа'" icon="pi pi-plus-circle" class="p-button-success"
+      <p-button v-tooltip.bottom="$t('Add access type')" icon="pi pi-plus-circle" class="p-button-success"
                 @click="addPermission"></p-button>
     </div>
 
     <div class="input-group mb-3">
-      <span class="input-group-text">Тип доступа</span>
+      <span class="input-group-text">{{ $t('Access type') }}</span>
       <p-select class="col"
                 option-label="name" option-value="id"
                 :editable="true"
@@ -18,14 +18,14 @@
                 v-model="permission.id"
                 @input="changePermission"
       ></p-select>
-      <p-button v-tooltip.bottom="isPermissionDelete ? 'Отменить удаление' : 'Удалить тип доступа'"
+      <p-button v-tooltip.bottom="isPermissionDelete ? $t('Cancel deletion') : $t('Delete access type')"
                 icon="pi pi-trash" class="p-button-danger"
                 @click="removePermission"></p-button>
     </div>
 
     <div class="input-group mb-3">
         <span class="input-group-text">
-          Теги
+          {{ $t('Tags') }}
           <i class="ms-1 pi pi-tag"
              v-tooltip.bottom="'Теги особых свойств (через пробел):\n\'защита/guard\' - защита от удаления\n'"
           ></i>
@@ -37,7 +37,7 @@
 
     <div class="col mb-3">
       <p class="col-12 mt-2 text-center">
-        Доступные меню
+        {{ $t('Available menus') }}
         <i class="pi pi-tag" v-tooltip.bottom="'Если в `Доступные` пусто, значит доступны все'"></i>
       </p>
       <p-picklist class="w-100" data-key="id"
@@ -46,10 +46,10 @@
                   @selection-change="pickedChange"
       >
         <template #source>
-          Возможные
+          {{ $t('Possible') }}
         </template>
         <template #target>
-          Доступные
+          {{ $t('Available') }}
         </template>
         <template #item="slotProps">
           <div class="product-item">

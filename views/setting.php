@@ -36,21 +36,15 @@ $isAdmin = $main->getLogin('admin');
   <?php } ?>
 
   <div class="col-12 text-center">
-    <p-button v-tooltip.bottom="'Сохранить'" icon="pi pi-save" class="p-button-primary m-3"
-              label="Сохранить" @click="saveSetting"
-    ></p-button>
+    <p-button v-tooltip.bottom="$t('Save')" icon="pi pi-save" class="p-button-primary m-3" :label="$t('Save')" @click="saveSetting"></p-button>
   </div>
   <hr>
 
   <?php if ($main->availablePage('catalog')) { ?>
-    <setting-properties type="catalog" :query="query" :query-param="queryParam"
-                        @update="updateProperties"
-    ></setting-properties>
+    <setting-properties type="catalog" :query="query" :query-param="queryParam" @update="updateProperties"></setting-properties>
   <?php } ?>
 
   <?php if ($main->availablePage('dealers')) { ?>
-    <setting-properties type="dealer" title="" :query="query" :query-param="queryParam"
-                        @update="updateDealersProperties"
-    ></setting-properties>
+    <setting-properties type="dealer" title="" :query="query" :query-param="queryParam" @update="updateDealersProperties"></setting-properties>
   <?php } ?>
 </div>

@@ -97,6 +97,8 @@ app.config.errorHandler = (err, vm, info) => {
   console.error(info, 'error', false);
 }
 
+app.config.globalProperties.$t = function (id) { return window._(id) }
+
 /**
  * Hook - beforeMounded
  */

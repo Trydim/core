@@ -1,13 +1,13 @@
 <template>
   <div class="col-6 border" id="rateForm">
-    <h3 class="col-12 text-center">Курсы валют</h3>
+    <h3 class="col-12 text-center">{{ $t('Exchange rates') }}</h3>
 
     <div class="col-12 row">
-      <p class="col-8">Автоматически обновлять курсы</p>
+      <p class="col-8">{{ $t('Automatically update rates') }}</p>
       <div class="col-4 d-inline-flex">
-        <p class="col mt-0 text-center">Нет</p>
+        <p class="col mt-0 text-center">{{ $t('No') }}</p>
         <p-switch v-model="autoRefresh"></p-switch>
-        <p class="col mt-0 text-center">Да</p>
+        <p class="col mt-0 text-center">{{ $t('Yes') }}</p>
       </div>
     </div>
 
@@ -19,8 +19,8 @@
     </div>
 
     <div v-if="!autoRefresh" class="col-12 text-center mb-3">
-      <p-button v-tooltip.bottom="'Редактировать курсы'" icon="pi pi-sliders-h" class="p-button-success"
-                label="Редактировать курсы"
+      <p-button v-tooltip.bottom="$t('Edit rates')" icon="pi pi-sliders-h" class="p-button-success"
+                :label="$t('Edit rates')"
                 @click="editRate"
       ></p-button>
     </div>

@@ -1,9 +1,9 @@
 <template>
   <div class="col-6 border" id="statsForm">
-    <h3 class="w-100 text-center">Статусы</h3>
+    <h3 class="w-100 text-center">{{ $t('Statuses') }}</h3>
     <div id="ordersStatusForm" class="col">
       <div class="input-group my-3">
-        <span class="input-group-text flex-grow-1">Настройка статусов заказов</span>
+        <span class="input-group-text flex-grow-1">{{ $t('Setting order statuses') }}</span>
         <button type="button" class="btn btn-outline-secondary" @click="addStatus()">
           <i class="pi pi-plus-circle align-text-bottom pi-green"></i>
         </button>
@@ -12,15 +12,15 @@
       <div class="mb-3" style="max-height: 140px; overflow-y: auto">
         <template v-for="(item, index) of status" :key="item.ID">
           <div v-if="!item.delete" class="input-group mb-1">
-            <p-input-text v-tooltip.bottom="'код (необязательно)'" class="form-control"
+            <p-input-text v-tooltip.bottom="$t('code (optional)')" class="form-control"
                           :disabled="+item.required" v-model="item.code"
             ></p-input-text>
             <p-input-text v-model="item.name" class="form-control w-50"></p-input-text>
-            <p-input-text v-tooltip.bottom="'сортировка'" v-model="item.sort" class="form-control"></p-input-text>
+            <p-input-text v-tooltip.bottom="$t('Sorting')" v-model="item.sort" class="form-control"></p-input-text>
             <div class="input-group-text">
-              <p-radiobutton v-tooltip.bottom="'По умолчанию'" v-model="statusDef" :value="item.ID"></p-radiobutton>
+              <p-radiobutton v-tooltip.bottom="$t('Default')" v-model="statusDef" :value="item.ID"></p-radiobutton>
             </div>
-            <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-times" class="p-button-danger"
+            <p-button v-tooltip.bottom="$t('Delete')" icon="pi pi-times" class="p-button-danger"
                       :disabled="+item.required"
                       @click="removeStatus(index)"></p-button>
           </div>

@@ -9,22 +9,22 @@
 ?>
 <div class="d-flex justify-content-between pb-4" id="actionBtnWrap">
   <div class="">
-    <input type="button" class="btn btn-success oneOrderOnly mainOnly" value="Редактировать" data-action="openOrder">
+    <input type="button" class="btn btn-success oneOrderOnly mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
     <span id="orderBtn">
-      <input type="button" class="btn btn-warning mainOnly" value="Изменить Статус" data-action="changeStatusOrder">
+      <input type="button" class="btn btn-warning mainOnly" value="<?= gTxt('Change status') ?>" data-action="changeStatusOrder">
       <input type="button" class="btn btn-primary oneOrderOnly" value="Pdf" data-action="savePdf">
-      <input type="button" class="btn btn-primary oneOrderOnly" value="Печать" data-action="printOrder">
-      <input type="button" class="btn btn-primary oneOrderOnly" value="Отправить на почту" data-action="sendOrder">
+      <input type="button" class="btn btn-primary oneOrderOnly" value="<?= gTxt('Print') ?>" data-action="printOrder">
+      <input type="button" class="btn btn-primary oneOrderOnly" value="<?= gTxt('Send mail') ?>" data-action="sendOrder">
     </span>
   </div>
   <div>
-    <input type="button" class="btn btn-danger mainOnly" value="Удалить" data-action="delOrders">
+    <input type="button" class="btn btn-danger mainOnly" value="<?= gTxt('Delete') ?>" data-action="delOrders">
   </div>
 </div>
 <div class="pb-4 d-none" id="confirmField">
   <label><select id="selectStatus" class="d-none form-select" data-action="statusOrders"></select></label>
-  <input type="button" class="btn btn-success" value="Подтвердить" data-action="confirmYes">
-  <input type="button" class="btn btn-warning ms-1" value="Отмена" data-action="confirmNo">
+  <input type="button" class="btn btn-success" value="<?= gTxt('Confirm') ?>" data-action="confirmYes">
+  <input type="button" class="btn btn-warning ms-1" value="<?= gTxt('Cancel') ?>" data-action="confirmNo">
 </div>
 <?php if ($main->getCmsParam('USERS_ORDERS')) { ?>
   <div class="d-flex pb-4" style="justify-content: left">
@@ -45,7 +45,7 @@
 <div class="res-table">
   <div class="row">
     <div class="col input-group">
-      <span class="input-group-text">Поиск:</span>
+      <span class="input-group-text"><?= gTxt('Search') ?>:</span>
       <input type="text" id="search" class="form-control" autocomplete="off">
     </div>
     <div class="col input-group">
@@ -63,7 +63,9 @@
 
   <div class="mt-1 position-relative">
     <table id="orderTable" class="text-center table table-striped">
-      <thead><tr></tr></thead>
+      <thead>
+        <tr></tr>
+      </thead>
       <tbody></tbody>
     </table>
     <!--<button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>-->

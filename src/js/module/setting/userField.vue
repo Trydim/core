@@ -1,41 +1,41 @@
 <template>
   <div class="col-6 border" id="userForm">
-    <h3 class="col text-center">Пользователь</h3>
+    <h3 class="col text-center">{{ $t('User') }}</h3>
     <div class="form-floating my-3">
       <p-input-text v-model="user.login" class="form-control" placeholder="_"
       ></p-input-text>
-      <label>Логин</label>
+      <label>{{ $t('Login') }}</label>
     </div>
     <div class="form-floating mb-3">
       <p-input-text type="password" v-model="user.password" class="form-control" placeholder="_"
       ></p-input-text>
-      <label>Новый Пароль</label>
+      <label>{{ $t('New password') }}</label>
     </div>
     <div class="form-floating mb-3">
       <p-input-text type="password" v-model="user.passwordRepeat" class="form-control" placeholder="_"
       ></p-input-text>
-      <label>Повторите Пароль</label>
+      <label>{{ $t('Repeat password') }}</label>
     </div>
 
     <div class="input-group mb-3">
       <div class="input-group-text col-1">
         <p-checkbox id="showAllField" v-model="showAllField" :binary="true"></p-checkbox>
       </div>
-      <label class="input-group-text col" for="showAllField">Показать все параметры</label>
+      <label class="input-group-text col" for="showAllField">{{ $t('Show all options') }}</label>
     </div>
 
     <template v-if="showAllField">
       <div class="form-floating my-3">
         <p-input-text v-model="user.name" class="form-control" placeholder="_"></p-input-text>
-        <label>ФИО</label>
+        <label>{{ $t('Full name') }}</label>
       </div>
       <div class="form-floating mb-3">
         <p-input-text v-model="user.fields.phone" class="form-control" placeholder="_"></p-input-text>
-        <label>Телефон</label>
+        <label>{{ $t('Phone') }}</label>
       </div>
       <div class="form-floating mb-3">
         <p-input-text v-model="user.fields.email" class="form-control" placeholder="_"></p-input-text>
-        <label>Почта</label>
+        <label>{{ $t('Mail') }}</label>
       </div>
 
       <div v-for="(item, key) of userFields" class="mb-3"
@@ -74,7 +74,7 @@
         <div class="input-group-text col-1">
           <p-checkbox id="onlyOne" v-model="user.onlyOne" :binary="true"></p-checkbox>
         </div>
-        <label class="input-group-text col" for="onlyOne">Запретить одновременный вход</label>
+        <label class="input-group-text col" for="onlyOne">{{ $t('Prevent simultaneous login') }}</label>
       </div>
 
     </template>

@@ -17,10 +17,10 @@ $user = [
   'login'        => $user['login'],
   'isAdmin'      => $main->getLogin('admin'),
   'contacts'     => $user['contacts'],
-  'customization'=> $user['customization'],
+  'customization' => $user['customization'],
 ];
-$field['footerContent'] .= "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>"
-                         . $main->getSettings('json', true);
+$field['footerContent'] .= "<input type='hidden' id='dataUser' value='" . json_encode($user) . "'>"
+  . $main->getSettings('json', true);
 
 if (USE_DATABASE && $user['isAdmin']) {
   $permissions['permissions'] = $main->db->loadTable('permission');
@@ -50,6 +50,7 @@ if (USE_DATABASE && $user['isAdmin']) {
   unset($permissions, $status);
 }
 
+$field['footerContent'] .= $main->initDictionary();
 $main->setControllerField($field)->fireHook(VC::HOOKS_SETTING_TEMPLATE, $main);
 ob_start();
 require $main->url->getRoutePath();
