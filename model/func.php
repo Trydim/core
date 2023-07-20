@@ -116,7 +116,7 @@ function convertToArray($value): array {
  */
 function compareFiles(string $file1, string $file2): bool {
   return file_exists($file1) && file_exists($file2)
-         && md5_file($file1) === md5_file($file2);
+    && md5_file($file1) === md5_file($file2);
 }
 
 /**
@@ -461,10 +461,10 @@ function translit($value): string {
 /**
  * @param string $url
  * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'auth'
- * @param array<string, string> $params - assoc array
+ * @param string|array<string, string> $params - assoc array
  * @return string|array
  */
-function httpRequest(string $url, array $config = [], array $params = []) {
+function httpRequest(string $url, array $config = [], $params = []) {
   $myCurl = curl_init();
 
   $curlConfig = [
@@ -483,8 +483,8 @@ function httpRequest(string $url, array $config = [], array $params = []) {
   } else {
     $curlConfig[CURLOPT_HTTPGET] = false;
     $curlConfig[CURLOPT_POST] = true;
-    $curlConfig[CURLOPT_HTTPHEADER][] = "Content-Type: application/x-www-form-urlencoded";
-    $curlConfig[CURLOPT_POSTFIELDS] = http_build_query($params);
+    $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json; charset=utf-8';
+    $curlConfig[CURLOPT_POSTFIELDS]   = $params;
   }
 
   curl_setopt_array($myCurl, $curlConfig);

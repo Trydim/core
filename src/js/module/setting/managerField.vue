@@ -4,7 +4,7 @@
 
     <div class="input-group my-3">
       <span class="input-group-text flex-grow-1">{{ $t('Additional fields for managers') }}</span>
-      <p-button v-tooltip.bottom="$t('Add new field')" icon="pi pi-plus-circle" class="p-button-success"
+      <p-button v-tooltip.bottom="this.$t('Add new field')" icon="pi pi-plus-circle" class="p-button-success"
                 @click="addField"></p-button>
     </div>
 
@@ -17,7 +17,7 @@
                   v-model="item.type"
                   class="col-5"
         ></p-select>
-        <p-button v-tooltip.bottom="$t('Delete field')" icon="pi pi-times" class="p-button-danger"
+        <p-button v-tooltip.bottom="this.$t('Delete field')" icon="pi pi-times" class="p-button-danger"
                   @click="removeField(key)"></p-button>
       </div>
     </template>

@@ -260,7 +260,7 @@ const customers = {
         form.querySelector('#cTypeI').checked = true;
 
         this.confirmMsg = 'Клиент добавлен';
-        this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
+        this.M.btnConfig('confirmYes', {value: _('Confirm')});
         this.M.show('Добавление пользователя', form);
         f.relatedOption(form);
       },
@@ -298,7 +298,7 @@ const customers = {
         node.value = customer['ITN'];
 
         this.confirmMsg = 'Изменения сохранены';
-        this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
+        this.M.btnConfig('confirmYes', {value: _('Confirm')});
         this.M.show('Изменение клиента', form);
         f.relatedOption(form);
       },
@@ -309,7 +309,7 @@ const customers = {
         this.queryParam.customerId = JSON.stringify(this.selected.getSelected());
 
         this.confirmMsg = 'Успешно удалено';
-        this.M.btnConfig('confirmYes', {value: 'Подтвердить'});
+        this.M.btnConfig('confirmYes', {value: _('Confirm')});
         this.M.show('Удалить', 'Удалить выбранных клиентов?');
 
         this.delayFunc = () => this.selected.clear();
@@ -320,7 +320,7 @@ const customers = {
 
         orders.ordersTmp || orders.initTemplate();
         div.innerHTML = orders.getOrders(id);
-        this.M.btnConfig('confirmYes', {value: _('Open')});
+        this.M.btnConfig('confirmYes', {value: _('Confirm')});
         this.M.show(_('Orders'), div);
 
         this.delayFunc = () => {

@@ -1,1 +1,0 @@
-c:\OSPanel\modules\php\PHP_7.4\php.exe "%~dp0composer.phar" %*

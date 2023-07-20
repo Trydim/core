@@ -9,7 +9,7 @@ $field['content'] = template('parts/customersContent', $param);
 
 $field['footerContent'] .= <<<footerContent
 <template id="tableOrderBtn">
-  <input type="button" class="btn btn-info btn-sm table-th" value="Zobacz zamówienia" data-id="\${id}" data-action="openOrders">
+  <input type="button" class="btn btn-info btn-sm table-th" value="Посмотреть заказы" data-id="\${id}" data-action="openOrders">
 </template>
 <template id="tableOrdersNumbers">
   <div class="form-check mb-1">

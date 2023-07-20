@@ -1,4 +1,10 @@
-<?php if (!defined('MAIN_ACCESS')) die('access denied!'); ?>
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
+
+/**
+ * @var $columns array - from controller
+ */
+
+?>
 
 <div class="d-flex justify-content-between pb-3" id="actionBtnWrap">
   <div>
@@ -24,25 +30,19 @@
     <thead>
       <tr>
         <th></th>
-        <?php if (isset($columns)) {
-          foreach ($columns as $item) {
-            if ($item['dbName'] === 'ITN') continue ?>
-            <th>
-              <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
-            </th>
-        <?php }
-        } ?>
+        <?php foreach ($columns as $item) { ?>
+          <th>
+            <input type="button" class="btn btn-info btn-sm table-th" value="<?= $item['name']; ?>" data-column="<?= $item['dbName']; ?>">
+          </th>
+        <?php } ?>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><input type="checkbox" class="" data-id="${id}"></td>
-        <?php if (isset($columns)) {
-          foreach ($columns as $item) {
-            if ($item['dbName'] === 'ITN') continue ?>
-            <td>${<?= $item['dbName']; ?>}</td>
-        <?php }
-        } ?>
+        <?php foreach ($columns as $item) { ?>
+          <td>${<?= $item['dbName']; ?>}</td>
+        <?php } ?>
       </tr>
     </tbody>
     <tfoot>

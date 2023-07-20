@@ -27,7 +27,7 @@ const templatePopup = pr => {
         </div>
         <div class="${pr}modal-content" data-role="content"></div>
         <div class="${pr}modal-footer" data-role="bottomFieldBtn">
-          <input type="button" class="confirmYes btn btn-success" value="Подтвердить" data-action="confirmYes">
+          <input type="button" class="confirmYes btn btn-success" value="${_('Confirm')}" data-action="confirmYes">
           <input type="button" class="closeBtn btn btn-warning" value="${_('Cancel')}" data-action="confirmNo">
         </div>
       </div>

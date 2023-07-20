@@ -1,10 +1,9 @@
 <template>
   <div class="col-6 border" id="otherForm">
     <h3 class="col text-center">{{ $t('Other') }}</h3>
-    <div class="form-floating mb-3" v-tooltip.bottom="$t('For the mask, use _. Leave blank to disable')">
+    <div class="form-floating mb-3" v-tooltip.bottom="this.$t('For the mask, use _. Leave blank to disable')">
       <p-input-text v-model="phoneMask.global" class="form-control" placeholder="_"></p-input-text>
-      <label>{{ $t('Phone template generic') }}</label>
-      <!--<label>Шаблон телефона для менеджеров</label>-->
+      <label>{{ $t('Phone mask') }}</label>
     </div>
     <!--<div class="form-floating mb-3">
       <p-input-text v-model="phoneMask.Customers" class="form-control" placeholder="_"

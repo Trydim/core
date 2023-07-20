@@ -3,9 +3,9 @@
     <h3 class="col text-center">{{ $t('Access control') }}</h3>
 
     <div class="input-group my-3">
-      <span class="input-group-text">{{ $t('Add access type') }}</span>
+      <span class="input-group-text">{{ $t('Add type') }}</span>
       <p-input-text class="form-control" v-model="permission.name"></p-input-text>
-      <p-button v-tooltip.bottom="$t('Add access type')" icon="pi pi-plus-circle" class="p-button-success"
+      <p-button v-tooltip.bottom="this.$t('Add access type')" icon="pi pi-plus-circle" class="p-button-success"
                 @click="addPermission"></p-button>
     </div>
 
@@ -18,7 +18,7 @@
                 v-model="permission.id"
                 @input="changePermission"
       ></p-select>
-      <p-button v-tooltip.bottom="isPermissionDelete ? $t('Cancel deletion') : $t('Delete access type')"
+      <p-button v-tooltip.bottom="this.$t(isPermissionDelete ? 'Cancel deletion' : 'Delete access type')"
                 icon="pi pi-trash" class="p-button-danger"
                 @click="removePermission"></p-button>
     </div>

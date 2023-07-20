@@ -4,23 +4,23 @@
     <div class="form-floating my-3">
       <p-input-text v-model="mail.target" ref="mailTarget" :class="'form-control'" placeholder="_"
       ></p-input-text>
-      <label>{{ $t('Mail for orders') }}</label>
+      <label>{{ $t('Mail to') }}</label>
     </div>
 
     <div class="form-floating mb-3">
       <p-input-text v-model="mail.targetCopy" ref="mailTargetCopy" :class="'form-control'" placeholder="_"
       ></p-input-text>
-      <label>{{ $t('Letter copy') }}</label>
+      <label>{{ $t('Copy') }}</label>
     </div>
     <div class="form-floating mb-3">
       <p-input-text v-model="mail.subject" :class="'form-control'" placeholder="_"
       ></p-input-text>
-      <label>{{ $t('Letter subject') }}</label>
+      <label>{{ $t('Subject') }}</label>
     </div>
     <div class="form-floating mb-3">
       <p-input-text v-model="mail.fromName" :class="'form-control'" placeholder="_"
       ></p-input-text>
-      <label>{{ $t('Sender name') }}</label>
+      <label>{{ $t('From name') }}</label>
     </div>
   </div>
 </template>

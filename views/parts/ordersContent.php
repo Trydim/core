@@ -30,14 +30,14 @@
   <div class="d-flex pb-4" style="justify-content: left">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="orderType" value="order" id="orderTypeO" checked data-action="orderTypeChange">
-      <label class="form-check-label" for="orderTypeO" title="Заказы сохраненные Менеджерами">
-        Сохраненные заказы
+      <label class="form-check-label" for="orderTypeO" title="<?= gTxt('Orders saved by manager') ?>">
+        <?= gTxt('Manager orders') ?>
       </label>
     </div>
     <div class="form-check ms-1">
       <input class="form-check-input" type="radio" name="orderType" value="visit" id="orderTypeV" data-action="orderTypeChange">
-      <label class="form-check-label" for="orderTypeV" title="Уникальные расчеты посетителей">
-        Пользовательские заказы
+      <label class="form-check-label" for="orderTypeV" title="<?= gTxt('Results saved by customers') ?>">
+        <?= gTxt('Customer orders') ?>
       </label>
     </div>
   </div>
@@ -50,7 +50,7 @@
     </div>
     <div class="col input-group">
       <?php if ($showFilter) { ?>
-        <span class="input-group-text">Фильтр:</span>
+        <span class="input-group-text"><?= gTxt('Filter') ?>:</span>
         <select class="form-select" data-action="filterDealer">
           <option value="0"><?= $main->getCmsParam('PROJECT_TITLE') ?></option>
           <?php foreach ($dealers as $dealer) { ?>

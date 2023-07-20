@@ -154,7 +154,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
             'ITN'  => $ITN ?? '',
             'contacts' => json_encode([
               'phone'   => $phone ?? '',
-              // 'email'   => $email ?? '',
+              'email'   => $email ?? '',
               'address' => $address ?? '',
             ]),
           ]];

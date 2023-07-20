@@ -14,7 +14,9 @@ $field = [
 // получить конфиг текущего пользователя
 //$setting = $main->db->getUserSetting(/*login user*/);
 
-if (!isset($setting)) {
+$param['columns'] = $setting['customersColumns'] ?? [];
+
+if (count($param['columns']) < 1) {
   $columns = ['ID', 'name', 'contacts',  'ITN', 'orders'];
 
   $param['columns'] = array_map(function ($item) {

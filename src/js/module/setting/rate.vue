@@ -19,8 +19,8 @@
     </div>
 
     <div v-if="!autoRefresh" class="col-12 text-center mb-3">
-      <p-button v-tooltip.bottom="$t('Edit rates')" icon="pi pi-sliders-h" class="p-button-success"
-                :label="$t('Edit rates')"
+      <p-button v-tooltip.bottom="this.$t('Edit rates')" icon="pi pi-sliders-h" class="p-button-success"
+                :label="this.$t('Edit')"
                 @click="editRate"
       ></p-button>
     </div>

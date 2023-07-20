@@ -393,25 +393,6 @@ export class Pagination {
     this.query(this.dbAction);
   }
 
-  // template() {
-  //   return `<div class="pagination justify-content-center">
-  //     <div class="page-item me-2">
-  //       <button type="button" class="page-link" data-action="prev">&laquo;</button>
-  //     </div>
-  //     <div class="page-item d-flex px-2 pagination-scroll" data-btnwrap></div>
-  //     <div class="page-item ms-2">
-  //       <button type="button" class="page-link" data-action="next">&raquo;</button>
-  //     </div>
-
-  //     <div class="page-item ms-5">
-  //       <select class="form-select d-inline-block" data-action="count">
-  //         <option value="5">5 запись</option>
-  //         <option value="10">10 записей</option>
-  //         <option value="20" selected>20 записей</option>
-  //       </select>
-  //     </div>
-  //   </div>`;
-  // }
   template() {
     return `<div class="pagination justify-content-center">
       <div class="page-item me-2">
@@ -424,9 +405,9 @@ export class Pagination {
 
       <div class="page-item ms-5">
         <select class="form-select d-inline-block" data-action="count">
-          <option value="5">5 wpisów</option>
-          <option value="10">10 wpisów</option>
-          <option value="20" selected>20 wpisów</option>
+          <option value="5">5 запись</option>
+          <option value="10">10 записей</option>
+          <option value="20" selected>20 записей</option>
         </select>
       </div>
     </div>`;

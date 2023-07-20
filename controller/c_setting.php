@@ -6,7 +6,7 @@
 
 $field = [
   'pageTitle' => 'Настройки',
-  'footerContent' => '',
+  'footerContent' => $main->initDictionary(),
   'cssLinks'   => [CORE_CSS . 'module/setting.css?ver=096616aa6f'],
   'jsLinks'    => [CORE_JS . 'module/setting.js?ver=2239ad0927'],
 ];
@@ -50,7 +50,6 @@ if (USE_DATABASE && $user['isAdmin']) {
   unset($permissions, $status);
 }
 
-$field['footerContent'] .= $main->initDictionary();
 $main->setControllerField($field)->fireHook(VC::HOOKS_SETTING_TEMPLATE, $main);
 ob_start();
 require $main->url->getRoutePath();
