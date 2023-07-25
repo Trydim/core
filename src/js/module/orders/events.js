@@ -25,6 +25,7 @@ class AllOrdersList {
   }
 
   getFormData(param) {
+    debugger
     const fd = new FormData();
     fd.set('mode', 'DB');
     fd.set('dbAction', param.dbAction);
@@ -58,10 +59,15 @@ class AllOrdersList {
     }
   }
 
+  /**
+   *
+   * @param node
+   * @param {[]} resultIds
+   */
   showResult(node, resultIds) {
-    let array = [];
-    resultIds.forEach(i => array.push(this.data[i]));
-    orders.fillTable(array, true);
+    let array = resultIds.reduce((r, i) => {r.push(this.data[i]); return r}, []);
+
+    if (array.length) OrdersInstance.setOrders(array, true);
     /* Todo что бы учитывать настройки пагинации нужен запрос
      if (resultIds.length) {
      f.setLoading(this.node);
@@ -95,9 +101,7 @@ export default class extends Orders {
     f.qA('select[data-action]', 'change', e => this.actionSelect.call(this, e));
 
     // Focus Search Init
-    let node = f.qS('#search');
-    node.removeEventListener('focus', this.focusSearch);
-    node.addEventListener('focus', this.focusSearch, {once: true});
+    f.qS('#search').addEventListener('focus', e => this.focusSearch(e), {once: true});
   }
 
   // Добавить проверку почты
@@ -110,9 +114,10 @@ export default class extends Orders {
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
   focusSearch(e) {
-    const dbAction = orders.table.dataset.type === 'order' ? this.mainAction : 'loadVisitorOrders';
+    const dbAction = this.orderType === 'visit' ? 'loadVisitorOrders' : this.mainAction,
+          tableType = this.orderType === 'visit' ? 'visitOrder' : 'order';
 
-    new AllOrdersList({dbAction, node: e.target, tableType: orders.table.dataset.type});
+    new AllOrdersList({dbAction, node: e.target, tableType});
   }
 
   actionBtn(e) {
@@ -223,31 +228,35 @@ export default class extends Orders {
     fd.set('mode', 'DB');
     fd.set('dbAction', 'loadCustomerByOrder');
     fd.set('orderId', this.queryParam.orderIds);
-    f.Post({data: fd})
-     .then(data => {
-       if (data['customer'] && data['customer']['contacts']) {
-         let contacts = JSON.parse(data['customer']['contacts']),
-             user = data['users'],
-             node = form.querySelector('[name="email"]');
+    f.Post({data: fd}).then(data => {
+      if (!data['customer']) {
+        f.showMsg('Customer for order ' + this.queryParam.orderIds + ' not found', 'error');
+        return;
+      }
 
-         this.queryParam.mode = 'docs';
-         this.queryParam.cmsAction = 'mail';
-         this.queryParam.docType = 'pdf';
-         this.queryParam.orderId = this.queryParam.orderIds;
-         this.queryParam.name = user.name || user['login'];
-         this.queryParam.phone = contacts.phone || '';
-         this.queryParam.email = contacts['email'];
+      if (data['customer']['contacts']) {
+        let contacts = JSON.parse(data['customer']['contacts']),
+            user     = data['users'],
+            node     = form.querySelector('[name="email"]');
 
-         this.onEventNode(node, this.changeSelectInput, {}, 'change');
-         contacts['email'] && (node.value = contacts['email']);
+        this.queryParam.mode      = 'docs';
+        this.queryParam.cmsAction = 'mail';
+        this.queryParam.docType   = 'pdf';
+        this.queryParam.orderId   = this.queryParam.orderIds;
+        this.queryParam.name      = user.name || user['login'];
+        this.queryParam.phone     = contacts.phone || '';
+        this.queryParam.email     = contacts['email'];
 
-         this.M.btnConfig('confirmYes', {value: 'Отправить'});
-         this.M.show('Отправить на почту', form);
+        this.onEventNode(node, this.changeSelectInput, {}, 'change');
+        contacts['email'] && (node.value = contacts['email']);
 
-         this.confirmMsg = 'Отправлено';
-         // TODO Добавить проверку почты
-         //f.initValid(() => {}, );
-       }
+        this.M.btnConfig('confirmYes', {value: 'Отправить'});
+        this.M.show('Отправить на почту', form);
+
+        this.confirmMsg = 'Отправлено';
+        // TODO Добавить проверку почты
+        //f.initValid(() => {}, );
+      }
      });
   }
   orderTypeChange(selectedSize, target) {

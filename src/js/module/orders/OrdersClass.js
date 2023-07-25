@@ -23,7 +23,8 @@ export default class {
 
     this.needReload = false;
     this.confirmMsg = '';
-    this.dealerId = 0;
+    this.dealerId   = 0;
+    this.orderType  = 'main';
 
     this.orders = {};
     this.filter = {};
@@ -43,7 +44,7 @@ export default class {
       impValue : null, // f.gT('#tableImportantValue'),
       searchMsg: f.gT('#noFoundSearchMsg'),
       columns  : f.gT('#orderColumnsTableTmp'),
-    }
+    };
   }
   setQueryParam() {
     this.mainAction = 'loadOrders';
@@ -61,7 +62,7 @@ export default class {
   }
 
   getTypeConfig() {
-    return this['orderType'] === 'visit' ? 'ordersVisitColumns' : 'ordersColumns'
+    return this.orderType === 'visit' ? 'ordersVisitColumns' : 'ordersColumns';
   }
 
   // Orders tables
@@ -188,8 +189,8 @@ export default class {
 
     if (action) param.dbAction = action;
 
-    Object.entries(param).map(param => {
-      data.set(param[0], param[1].toString());
+    Object.entries(param).map(([k, v]) => {
+      data.set(k, v.toString());
     });
 
     if (param.dbAction === this.mainAction) data.delete('orderIds');
