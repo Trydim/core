@@ -775,11 +775,11 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $param = [
           'name' => $dealer['name'],
           'cms_param' => json_encode(['prefix' => $prefix]),
-          'activity' => intval(boolValue($dealer['activity'] ?? true)),
-          'contacts' => json_encode([
+          'activity'  => intval(boolValue($dealer['activity'] ?? true)),
+          'contacts'  => json_encode([
             'address' => $dealer['address'] ?? '',
-            'email' => $dealer['email'] ?? '',
-            'phone' => $dealer['phone'] ?? '',
+            'email'   => $dealer['email'] ?? '',
+            'phone'   => $dealer['phone'] ?? '',
           ]),
         ];
 
@@ -807,8 +807,18 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
     case 'changeDealer':
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
+        $name = $dealer['name'];
+        if (strlen($name) < 2) {
+          $result['error'] = 'Name must be 2 or more chars!';
+          break;
+        }
 
-        $param['settings'] = json_encode($dealer['settings']);
+        $param = [
+          'name'     => $name,
+          'contacts' => json_encode($dealer['contacts']),
+          'activity' => intval(boolValue($dealer['activity'] ?? true)),
+          'settings' => json_encode($dealer['settings'])
+        ];
 
         $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);
       }

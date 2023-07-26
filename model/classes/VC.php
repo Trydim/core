@@ -4,8 +4,7 @@ class VC {
   /** Cms Const */
   const PUBLIC_PAGE     = 'PUBLIC_PAGE',
         USE_DATABASE    = 'USE_DATABASE',
-        CHANGE_DATABASE = 'CHANGE_DATABASE',
-        URI_IMG_CONST   = 'URI_IMG';
+        CHANGE_DATABASE = 'CHANGE_DATABASE';
 
   /** cmsParams */
   const DB_CONFIG   = 'dbConfig',
@@ -16,8 +15,10 @@ class VC {
         URI_IMG     = 'uriImg',
         URI_CSS     = 'uriCss',
         URI_JS      = 'uriJs',
-        DEAL_URI_CSS = 'dealUriCss',
-        DEAL_URI_JS  = 'dealUriJs';
+        DEAL_IMG_PATH = 'dealImgPath',
+        DEAL_URI_IMG  = 'dealUriImg',
+        DEAL_URI_CSS  = 'dealUriCss',
+        DEAL_URI_JS   = 'dealUriJs';
 
   /** userField */
   const USER_ID = 'id',

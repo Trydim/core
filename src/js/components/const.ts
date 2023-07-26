@@ -20,6 +20,8 @@ export default {
   PATH_IMG     : (cms['URI_IMG'] || 'public/images/'), // для обратной совместимости
   URI_IMG      : (cms['URI_IMG'] || 'public/images/'),
 
+  DEAL_URI_IMG : cms['DEAL_URI_IMG'],
+
   AUTH_STATUS  : cms['AUTH_STATUS'] || false,
   IS_DEAL      : cms['IS_DEAL'] || false,
   INIT_SETTING : cms['INIT_SETTING'] || false,

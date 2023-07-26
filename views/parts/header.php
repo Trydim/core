@@ -5,19 +5,24 @@
  */
 
 $siteLink = $main->url->getUri();
-$imgSrc = $main->getCmsParam(VC::IMG_PATH);
 
-if ($main->checkStatus()) { ?>
+if ($main->checkStatus()) {
+  $imgSrc = '';
+  $getLogoString = function (string $pathK, string $uriK) use ($main) {
+    $path = $main->getCmsParam($pathK);
+    $link = $main->getCmsParam($uriK);
+
+    if (file_exists($path . 'logo.webp')) return '<source srcset="' . $link . 'logo.webp" type="image/webp">';
+    else if (file_exists($path . 'logo.jpg')) return '<img src="' . $link . 'logo.jpg" alt="logo">';
+    return false;
+  };
+
+  if ($main->isDealer()) $imgSrc = $getLogoString(VC::DEAL_IMG_PATH, VC::DEAL_URI_IMG);
+  if ($imgSrc === '') $imgSrc = $getLogoString(VC::IMG_PATH, VC::URI_IMG);
+?>
 <div class="nav-header">
   <a href="<?= $siteLink ?>" class="brand-logo">
-    <picture class="logo-abbr">
-      <?php if (file_exists($imgSrc . 'logo.webp')) { ?>
-        <source srcset="<?= URI_IMG . 'logo.webp' ?>" type="image/webp">
-      <? } ?>
-      <?php if (file_exists($imgSrc . 'logo.jpg')) { ?>
-        <img src="<?= URI_IMG . 'logo.jpg' ?>" alt="logo">
-      <? } ?>
-    </picture>
+    <picture class="logo-abbr"><?= $imgSrc ?></picture>
     <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
   </a>
 

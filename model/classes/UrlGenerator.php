@@ -261,12 +261,15 @@ class UrlGenerator {
     $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
     if ($isDealer) {
-      preg_match('/' . DEALERS_PATH . '\/(\d+)\//', $requestUri, $match); // получить ID дилера
+      preg_match('/' . DEALERS_PATH . '\/(.+?)\//', $requestUri, $match); // получить ID дилера
 
       if (!isset($match[1])) die('Dealer id not found!');
-      if (!is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
-
-      else $this->main->setCmsParam('dealerId', $match[1]);
+      if (is_numeric($match[1])) {
+        if (!is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
+        else $this->main->setCmsParam('dealerId', $match[1]);
+      } else {
+        $this->main->setCmsParam('dealerLink', $match[1]);
+      }
     }
 
     $this->main->setCmsParam('isDealer', $isDealer);

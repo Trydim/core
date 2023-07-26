@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
-    <Button v-if="false" type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
+    <Button v-if="!false" type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
     <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="deleteDealer">Удалить</Button>
   </div>
 
@@ -45,15 +45,15 @@
     </Column>
     <Column field="settings" :sortable="false" :header="translate('setting')">
       <template #body="slotProps">
-        <div v-for="(value, key) of slotProps.data.settings" :key="key">
+        <template v-for="(value, key) of slotProps.data.settings" :key="key">
           <p v-if="getPropertyType(key) === 'bool'" class="m-0">
             {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="{'pi-green pi-plus': value, 'pi-red pi-times': !value}"></i>
           </p>
-          <p v-else class="m-0">
+          <p v-else class="m-0 text-nowrap">
             {{ getPropertyName(key) }}:
             {{ getPropertyType(key) ? value : getPropertyValue(key, value) }}
           </p>
-        </div>
+        </template>
       </template>
     </Column>
   </DataTable>

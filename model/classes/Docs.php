@@ -33,7 +33,7 @@ class Docs {
   /**
    * @var string
    */
-  private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $fileName;
+  private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $dealImgPath, $fileName;
 
   /**
    * @var object
@@ -133,6 +133,9 @@ class Docs {
     ];
 
     $this->imgPath = $this->main->getCmsParam(VC::URI_IMG);
+    if ($this->main->isDealer()) {
+      $this->dealImgPath = $this->main->getCmsParam(VC::DEAL_URI_IMG);
+    }
   }
 
   private function prepareTemplate() {

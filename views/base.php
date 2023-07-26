@@ -18,12 +18,13 @@ $footerContentBase = $footerContentBase ?? template('parts/footerBase');
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
   'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
-  'SITE_PATH'     => $main->url->getPath(),
-  'MAIN_PHP_PATH' => $main->url->getPath() . 'index.php',
+  'SITE_PATH'     => $main->url->getBasePath(),
+  'MAIN_PHP_PATH' => $main->url->getBasePath() . 'index.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
-  'URI_IMG'       => URI_IMG,
+  'URI_IMG'       => $main->getCmsParam(VC::URI_IMG),
   'AUTH_STATUS'   => $isAuth,
   'IS_DEAL'       => $main->isDealer(),
+  'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 
