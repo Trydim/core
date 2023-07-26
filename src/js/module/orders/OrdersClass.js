@@ -190,7 +190,7 @@ export default class {
     if (action) param.dbAction = action;
 
     Object.entries(param).map(([k, v]) => {
-      data.set(k, v.toString());
+      v !== undefined && data.set(k, v.toString());
     });
 
     if (param.dbAction === this.mainAction) data.delete('orderIds');

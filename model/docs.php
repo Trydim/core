@@ -1,12 +1,14 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var array $main - global
+ * @var Main $main - global
  * @var string $cmsAction - extract from query in main.php
  * @var string $docType - from query
  */
 
 $data = [];
+$cmsAction = $cmsAction ?? 'mail';
+$docType   = $docType ?? $cmsAction;
 
 // Если есть отчет
 $reportValue = json_decode($reportValue ?? '[]', true);
@@ -61,9 +63,6 @@ if ($orderId) {
 } else if ($reportValue) {
   $data['reportValue'] = $reportValue;
 }
-
-$cmsAction = $cmsAction ?? 'mail';
-$docType = $docType ?? $cmsAction;
 
 // Создание документа
 // ---------------------------------------------------------------------------------------------------------------------

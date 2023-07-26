@@ -32,7 +32,7 @@ export class Main {
     //let input = f.qS('input[name="tablesList"]:checked');
     //input && (this.tableName = input.value);
 
-    this.action = typeof e === "string" ? e.toString() : e.target.dataset.dbaction;
+    this.action = typeof e === "string" ? e : e.target.dataset.dbaction;
 
     this.loaderTable.start();
 

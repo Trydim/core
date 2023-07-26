@@ -17,21 +17,14 @@ global $main;
 // MailSetting
 define('MAIL_TARGET_DEBUG', $main->getCmsParam('MAIL_TARGET_DEBUG') ?? 'trydim@mail.ru');
 define('MAIL_SMTP', $main->getCmsParam('MAIL_SMTP') ?? true);
-
 define('MAIL_PORT', $main->getCmsParam('MAIL_PORT') ?? 465);
 
-define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.yandex.ru');
-define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'noreplycalcby@yandex.ru');
-define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? '638ch1');
-
-
-/*
 define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.mail.ru');
 define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'mail.common@list.ru');
-define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'RAE^ysPypo22');
-*/
+define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'Ea4uUCnzBBN269wDJWUx');
 
 /*
+define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.yandex.ru');
 define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'commonserver@yandex.ru');
 define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'xmbxqxulvhwcqyta');
 */
@@ -190,7 +183,7 @@ class Mail {
 
       return true;
     } catch (Exception $e) {
-      return 'Сообщение не было отправлено. Причина ошибки: {$mail->ErrorInfo}';
+      return "The email has not been sent. Error: $mail->ErrorInfo";
     }
   }
 

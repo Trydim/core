@@ -239,13 +239,13 @@ export default class extends Orders {
             user     = data['users'],
             node     = form.querySelector('[name="email"]');
 
-        this.queryParam.mode      = 'docs';
-        this.queryParam.cmsAction = 'mail';
-        this.queryParam.docType   = 'pdf';
-        this.queryParam.orderId   = this.queryParam.orderIds;
-        this.queryParam.name      = user.name || user['login'];
-        this.queryParam.phone     = contacts.phone || '';
-        this.queryParam.email     = contacts['email'];
+        this.queryParam.mode     = 'docs';
+        this.queryParam.dbAction = 'mail';
+        this.queryParam.docType  = 'pdf';
+        this.queryParam.orderId  = this.queryParam.orderIds;
+        this.queryParam.name     = user.name || user['login'];
+        this.queryParam.phone    = contacts.phone || '';
+        this.queryParam.email    = contacts['email'];
 
         this.onEventNode(node, this.changeSelectInput, {}, 'change');
         contacts['email'] && (node.value = contacts['email']);

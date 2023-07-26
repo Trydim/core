@@ -8,7 +8,7 @@
 
 ?>
 <div class="d-flex justify-content-between pb-4" id="actionBtnWrap">
-  <div class="">
+  <div>
     <input type="button" class="btn btn-success oneOrderOnly mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
     <span id="orderBtn">
       <input type="button" class="btn btn-warning mainOnly" value="<?= gTxt('Change status') ?>" data-action="changeStatusOrder">
