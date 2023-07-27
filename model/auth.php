@@ -14,14 +14,21 @@ switch ($cmsAction) {
   case 'login':
     $main->fireHook('authLoginBefore', $main);
     if ($user = $main->db->checkPassword($login, $password)) {
+      $_SESSION['id']       = $user['id'];
+      $_SESSION['name']     = $user['name'];
       $_SESSION['login']    = $login;
       $_SESSION['password'] = $password;
-      $_SESSION['name']     = $user['name'];
-      $_SESSION['id']       = $user['ID'];
       $_SESSION['PHPSESSID'] = $_COOKIE['PHPSESSID'];
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
-      $main->db->setUserHash($user['ID'], $_SESSION['hash']);
+      $main->db->setUserHash($user['id'], $_SESSION['hash']);
+
+      if ($main->isDealer()) {
+        $id = $main->getCmsParam('dealerId');
+
+        $_SESSION['dealerId'] = $id;
+        setcookie('dealerLink', $id);
+      }
 
       $main->reDirect();
     } else $main->reDirect("login?status=error&login=$login");
@@ -29,10 +36,14 @@ switch ($cmsAction) {
   case 'exit':
     if (isset($_SESSION['id'])) {
       $hash = password_hash(uniqid(), PASSWORD_BCRYPT);
-      $main->db->setUserHash($_SESSION['id'], $hash);
+      $target = $_COOKIE['dealerLink'] ?? '';
       $_SESSION['password'] = uniqid();
-      $_SESSION['target'] = '';
-      $main->reDirect();
+
+      $main->db->setUserHash($_SESSION['id'], $hash);
+      setcookie('dealerLink', '');
+
+      array_map(function ($key) { unset($_SESSION[$key]); }, ['target', 'dealerLink', 'dealerId']);
+      $main->reDirect($target);
     }
     break;
 }

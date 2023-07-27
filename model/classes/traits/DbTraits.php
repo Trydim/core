@@ -206,9 +206,9 @@ trait DbUsers {
 
       if (($value[0] === $login && $value[1] === $password) || $status) {
         return [
+          'id'    => 1,
           'login' => $value[0],
           'name'  => $value[0],
-          'ID'    => 1,
         ];
       } else return false;
     } else {
@@ -218,12 +218,12 @@ trait DbUsers {
   }
 
   /**
-   * @param $login
-   * @param $column string
+   * @param string $login
+   * @param string $column
    *
    * @return array|null
    */
-  public function getUser($login, string $column = 'ID') {
+  public function getUser(string $login, string $column = 'ID') {
     $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
       [':login' => $login]
     );
@@ -269,15 +269,21 @@ trait DbUsers {
             WHERE O.ID = :id", [':id' => $id]);
   }
 
-  public function checkPassword($login, $password) {
+  /**
+   * @param string $login
+   * @param string $password
+   * @return array|false
+   */
+  public function checkPassword(string $login, string $password) {
     if (USE_DATABASE) {
-      $user = $this->getUser($login, 'ID, name, login, password, activity');
+      $sql = "SELECT ID as 'id', name, login, password 
+              FROM " . $this->pf('users') . " WHERE login = :login and activity = 1";
+      $user = self::getRow($sql, [':login' => $login]);
     } else {
       return $this->getUserFromFile($login, $password);
     }
 
-    return count($user) && boolValue($user['activity'])
-    && password_verify($password, $user['password']) ? $user : false;
+    return count($user) && password_verify($password, $user['password']) ? $user : false;
   }
 
   public function changeUser($loginId, $param) {

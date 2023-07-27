@@ -180,8 +180,6 @@ class DbMain extends R {
     return $date ? $date->format($this::DB_DATA_FORMAT) : null;
   }
 
-
-
   /**
    * Use or not prefix
    * @return boolean
@@ -948,14 +946,18 @@ class DbMain extends R {
    * @return bool true if it was set
    */
   public function setDealerLink(): bool {
-    if ($this->main->getCmsParam('dealerId')) return true;
+    $sql = "SELECT ID as 'id', JSON_VALUE(cms_param, '$.prefix') AS 'prefix' FROM dealers";
 
-    $sql = "SELECT ID as 'id', JSON_VALUE(cms_param, '$.prefix') AS 'prefix'
-            FROM dealers 
-            WHERE JSON_VALUE(cms_param, '$.link') = :link AND activity = 1 LIMIT 1";
-    $link = $this->main->getCmsParam('dealerLink');
+    $sqlValue = $this->main->getCmsParam('dealerId');
+    if ($sqlValue) {
+      $sql .= " WHERE ID = :value";
+    } else {
+      $sqlValue = $this->main->getCmsParam('dealerLink');
+      $sql = " WHERE JSON_VALUE(cms_param, '$.link') = :value";
+    }
 
-    $row = self::getRow($sql, [':link' => $link]);
+    $sql .= ' AND activity = 1 LIMIT 1';
+    $row = self::getRow($sql, [':value' => $sqlValue]);
 
     if ($row['id'] && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
       $this->main->setCmsParam('dealerId', $row['id']);

@@ -37,9 +37,9 @@ trait Authorization {
    * @return $this|Main
    */
   public function setLogin(array $user): Main {
+    $this->user['id']    = $_SESSION['id'];
     $this->user['login'] = $_SESSION['login'];
     $this->user['name']  = $_SESSION['name'];
-    $this->user['id']    = $_SESSION['id'];
     $this->user['onlyOne'] = $user['onlyOne'] ?? false;
     $this->user['permission'] = $user['permission'] ?? [];
 
@@ -119,8 +119,7 @@ trait Authorization {
   private function checkAuth(): Main {
     session_start();
 
-    if (isset($_SESSION['hash']) && isset($_SESSION['PHPSESSID'])
-      && $_SESSION['PHPSESSID'] === $_COOKIE['PHPSESSID']) {
+    if (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID']) {
       $user = $this->db->checkUserHash($_SESSION);
       $user && $this->setLogin($user);
     }

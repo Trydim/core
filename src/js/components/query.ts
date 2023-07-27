@@ -46,7 +46,7 @@ const downloadBody = async (data: any) => {
 
 const query = (url: string, body: BodyInit | null, type = 'json') => {
   type === 'file' && (type = 'body');
-  return fetch(url, {method: 'post', body})
+  return fetch(url, {method: 'post', headers: {'Cookie': document.cookie}, credentials: "same-origin", body})
     .then((res: Response | Promise<string> | any) => type === 'json' ? res.text() : res).then(
       data => {
         if (type === 'json') return checkJSON(data);

@@ -260,6 +260,11 @@ class UrlGenerator {
     $requestUri = $this->getRequestUri();
     $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
+    if (!$isDealer) {
+      $requestUri = str_replace($this->server->get('HTTP_ORIGIN'), '', $this->server->get('HTTP_REFERER'));
+      $isDealer = includes($requestUri, DEALERS_PATH . '/');
+    }
+
     if ($isDealer) {
       preg_match('/' . DEALERS_PATH . '\/(.+?)\//', $requestUri, $match); // получить ID дилера
 
