@@ -25,7 +25,6 @@ class AllOrdersList {
   }
 
   getFormData(param) {
-    debugger
     const fd = new FormData();
     fd.set('mode', 'DB');
     fd.set('dbAction', param.dbAction);
@@ -46,8 +45,14 @@ class AllOrdersList {
   prepareSearchData(data) {
     if (this.type === 'order') {
       this.data = data.reduce((r, i) => {
-        this.searchData[i['ID']] = i['ID'] + i['customerName'];
-        r[i['ID']] = i;
+        const id = i['ID'];
+
+        let phone;
+        try { phone = JSON.parse(i['customerContacts'])['phone'].replace(/ |-|_|\(|\)|@/g, ''); }
+        catch { phone = ''; }
+
+        this.searchData[id] = id + i['customerName'] + phone;
+        r[id] = i;
         return r;
       }, Object.create(null));
     } else {
@@ -67,7 +72,7 @@ class AllOrdersList {
   showResult(node, resultIds) {
     let array = resultIds.reduce((r, i) => {r.push(this.data[i]); return r}, []);
 
-    if (array.length) OrdersInstance.setOrders(array, true);
+    OrdersInstance.setOrders(array, true);
     /* Todo что бы учитывать настройки пагинации нужен запрос
      if (resultIds.length) {
      f.setLoading(this.node);
@@ -126,9 +131,9 @@ export default class extends Orders {
         action         = target.dataset.action,
         selectedSize   = this.selected.getSelectedSize();
 
-    if (!selectedSize && !(['setupColumns', 'orderTypeChange']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
-    this.queryParam.orderIds = this.selected.getSelected();
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
+    if (!selectedSize && !(['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
+    this.queryParam.orderIds = this.selected.getSelected();
 
     if (action.includes('confirm')) { // Закрыть подтверждение
       f.hide(this.confirm, f.qS('#selectStatus'), f.qS('#printTypeField'));
@@ -288,7 +293,23 @@ export default class extends Orders {
   }
 
   setupColumns() {
-    this.M.show('Настройка колонок', this.template.columns);
+    const form = f.gTNode('#orderColumnsTableTmp');
+
+    this.queryParam.mode      = 'setting';
+    this.queryParam.dbAction  = 'saveColumns';
+    this.queryParam.tableType = this.orderType === 'visit' ? 'ordersShowVisitorColumns' : 'ordersShowColumns';
+
+    this.config.ordersColumns.forEach(key => {
+      form.querySelector(`[name="${key['dbName']}"]`).checked = true;
+    });
+
+    form.oninput = () => {
+      this.queryParam.columns = JSON.stringify([...new FormData(form).keys()]);
+      console.log(this.queryParam.columns);
+    };
+
+    form.dispatchEvent(new Event('input'));
+    this.M.show('Настройка колонок', form);
   }
 
   actionSelect(e) {

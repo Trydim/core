@@ -1,31 +1,29 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var Main $this - global
+ * @var Main $main - global
  */
 
-$siteLink   = $this->url->getUri();
-$actionLink = $this->url->getUri() . 'index.php';
-$login      = $_REQUEST['login'] ?? '';
-$pass       = $_REQUEST['password'] ?? '';
-$wrongString = $this->checkStatus('error') ? '<div class="alert alert-danger text-center" role="alert"><i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль</div><br>' : '';
-
-$publicLink = !$this->getCmsParam(VC::ONLY_LOGIN) && PUBLIC_PAGE
-  ? '<a class="text-primary" href="' . $siteLink . '">Открытая страница</a>' : '';
-
-$field['pageTitle'] = $this->getCmsParam('PROJECT_TITLE');
-
-/* Исользовать global что бы в базовом шаблоне не использовать структуру (надо будет инструкцию потом написать) */
-$field['global'] = <<<global
+$isGlobal = true;
+$sitePath = $main->url->getUri();
+$login    = $_REQUEST['login'] ?? '';
+$dealers  = $dealers ?? [];
+?>
 <main class="position-fixed h-100 w-100">
   <section class="content-center h-100">
     <div class="authentication-content auth-form col-10 col-md-5">
       <h4 class="text-center mb-4"><i class="pi pi-user"></i> Авторизация</h4>
-      $wrongString
-      <form action="$actionLink" method="POST" id="authForm">
-        <div class="form-group">
+      <?php if ($main->checkStatus('error')) { ?>
+        <div class="alert alert-danger text-center" role="alert">
+          <i class="pi pi-info-circle pi-red me-1"></i>Неправильный логин или пароль
+        </div><br>
+      <?php } ?>
+
+      <form action="<?= $sitePath ?>index.php" method="POST" id="authForm">
+
+        <div class="form-group mt-1 mb-2">
           <label><strong>Логин</strong></label>
-          <input name="login" type="text" class="form-control" value="$login">
+          <input name="login" type="text" class="form-control" value="<?= $login ?>">
         </div>
         <div class="form-group mt-1 mb-2">
           <label><strong>Пароль</strong></label>
@@ -50,11 +48,11 @@ $field['global'] = <<<global
         <input name="mode" type="hidden" value="auth">
         <input name="cmsAction" type="hidden" value="login">
       </form>
-      <div class="new-account mt-3">
-        <p>$publicLink</p>
-      </div>
-
+      <?php if (!$main->getCmsParam(VC::ONLY_LOGIN) && PUBLIC_PAGE) { ?>
+        <div class="new-account mt-3">
+          <a class="text-primary" href="<?= $sitePath ?>">Открытая страница</a>
+        </div>
+      <?php } ?>
     </div>
   </section>
 </main>
-global;

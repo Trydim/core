@@ -42,33 +42,31 @@
     </div>
   </div>
 <?php } ?>
-<div class="res-table">
-  <div class="row">
-    <div class="col input-group">
-      <span class="input-group-text"><?= gTxt('Search') ?>:</span>
-      <input type="text" id="search" class="form-control" autocomplete="off">
-    </div>
-    <div class="col input-group">
-      <?php if ($showFilter) { ?>
-        <span class="input-group-text"><?= gTxt('Filter') ?>:</span>
-        <select class="form-select" data-action="filterDealer">
-          <option value="0"><?= $main->getCmsParam('PROJECT_TITLE') ?></option>
-          <?php foreach ($dealers as $dealer) { ?>
-            <option value="<?= $dealer['id'] ?>"><?= $dealer['name'] ?></option>
-          <?php } ?>
-        </select>
-      <?php } ?>
-    </div>
+<div class="d-flex">
+  <div class="col input-group">
+    <span class="input-group-text"><?= gTxt('Search') ?>:</span>
+    <input type="text" id="search" class="form-control" autocomplete="off">
   </div>
+  <?php if ($showFilter) { ?>
+    <div class="col input-group ms-3">
+      <span class="input-group-text"><?= gTxt('Filter') ?>:</span>
+      <select class="form-select" data-action="filterDealer">
+        <option value="0"><?= $main->getCmsParam('PROJECT_TITLE') ?></option>
+        <?php foreach ($dealers as $dealer) { ?>
+          <option value="<?= $dealer['id'] ?>"><?= $dealer['name'] ?></option>
+        <?php } ?>
+      </select>
+    </div>
+  <?php } ?>
+</div>
 
-  <div class="mt-1 position-relative">
-    <table id="orderTable" class="text-center table table-striped">
-      <thead>
-        <tr></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <!--<button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>-->
-  </div>
+<div class="mt-1 position-relative">
+  <table id="orderTable" class="text-center table table-striped">
+    <thead>
+      <tr></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>
 </div>
 <div id="paginator" class="w-100"></div>

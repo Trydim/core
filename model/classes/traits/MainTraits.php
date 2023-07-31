@@ -42,6 +42,7 @@ trait Authorization {
     $this->user['name']  = $_SESSION['name'];
     $this->user['onlyOne'] = $user['onlyOne'] ?? false;
     $this->user['permission'] = $user['permission'] ?? [];
+    $this->user['customization'] = $user['customization'] ?? [];
 
     $this->user['admin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
     $this->setLoginStatus('ok');

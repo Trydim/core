@@ -16,12 +16,24 @@ trait DbOrders {
     return "SELECT O.ID AS 'ID', 
             create_date AS 'createDate', last_edit_date AS 'lastEditDate', 
             start_shipping_date AS 'startShippingDate', end_shipping_date AS 'endShippingDate',
-            U.name AS 'userName', C.name AS 'customerName', S.ID AS 'statusId', S.name AS 'status', total"
+            U.name AS 'userName',
+            C.ID AS 'customerId', C.name AS 'customerName', C.contacts AS 'customerContacts',
+            S.ID AS 'statusId', S.name AS 'status', total"
       . ($includeValues ? ", important_value AS 'importantValue', save_value AS 'saveValue', report_value AS 'reportValue'" : "\n") .
       "FROM " . $this->pf('orders') . " O
       LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
       LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
       JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID\n";
+  }
+
+  public function getBaseOrdersQueryColumns(): array {
+    return [
+      'ID', 'createDate', 'lastEditDate', 'startShippingDate', 'endShippingDate',
+      'userName',
+      'customerId', 'customerName', 'customerContacts',
+      'statusId', 'status',
+      'importantValue', 'total'
+    ];
   }
 
   /**

@@ -14,22 +14,26 @@
   ],
 
   'orders' => [ // Перевод шапки заказов
-    'O.ID'            => 'Номер',
-    'create_date'     => 'Дата создания',
-    'last_edit_date'  => 'Дата редактирования',
-    'name'            => 'Менеджер',
-    'C.name'          => 'Клиент',
+    'ID'                => 'Номер',
+    'createDate'        => 'Дата создания',
+    'lastEditDate'      => 'Дата редактирования',
+    'startShippingDate' => 'Начало Отгрузки',
+    'endShippingDate'   => 'Конце Отгрузки',
+    'userName'          => 'Менеджер',
+    'customerId'        => 'Номер клиент',
+    'customerName'      => 'Клиент',
+    'customerContacts'  => 'Контакты',
     'total'           => 'Сумма',
-    'important_value' => 'Подробности',
-    'S.name'          => 'Статус',
+    'importantValue'    => 'Подробности',
+    'status'            => 'Статус',
   ],
 
   'visitorOrders' => [ // Перевод шапки заказов
-    'ID'              => 'Номер',
-    'cp_number'       => 'Номер КП',
-    'create_date'     => 'Дата создания',
-    'total'           => 'Сумма',
-    'important_value' => 'Подробности',
+    'ID'             => 'Номер',
+    'cpNumber'       => 'Номер КП',
+    'createDate'     => 'Дата создания',
+    'total'          => 'Сумма',
+    'importantValue' => 'Подробности',
   ],
 
   'users' => [

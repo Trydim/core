@@ -1,11 +1,13 @@
-<?php
+<?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
-$main = $main ?? $this;
-$field['cssLinks'][] = CORE_CSS . 'admin.css';
+/**
+ * @var Main $main - global
+ */
 
+$isGlobal = true;
 $dbError = isset($_REQUEST['dbError']);
 ?>
-<div class="authincation" style="height: 100vh">
+<div class="authentication" style="height: 100vh">
   <div class="container-fluid h-100">
     <div class="row justify-content-center h-100 align-items-center">
       <div class="col-md-5">

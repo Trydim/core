@@ -110,12 +110,12 @@ class Docs {
     $path = "public/views/docs/$this->fileTpl.php";
     $fullPath = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $path;
 
-    if (file_exists($path)) $this->filePath = $fullPath;
+    if (file_exists($fullPath)) $this->filePath = $fullPath;
     else {
       $fullPath = $this->main->url->getBasePath(true) . $path;
 
-      if (file_exists($path)) $this->filePath = $fullPath;
-      $this->useDefault = true;
+      if (file_exists($fullPath)) $this->filePath = $fullPath;
+      else $this->useDefault = true;
     }
   }
 
@@ -396,10 +396,8 @@ class Docs {
       // Sheet - 1
       [
         'sheetName' => 'sheetName',
-        'header' => [
-          'data' => ['header', 'type', 'comment'],
-          'style' => ['font-size'  => 12],
-        ],
+        'headerData' => ['header' => 'string', 'type' => 'string', 'comment' => 'string'],
+        'headerStyle' => [['font-size' => 12]],
         'rows' => [
           ['c1-text', 'string', 'text'], ['c2-text', '@', 'text'],
           ['c3-integer', 'integer', ''], ['c4-integer', '0', ''], ['c5-price', 'price', ''],
@@ -413,8 +411,8 @@ class Docs {
       $sheetName = gTxt( $sheet['sheetName']);
 
       if (count($sheet['header'] ?? [])) {
-        $this->docs->writeSheetHeader($sheetName, $sheet['header']['data'], $sheet['header']['data']);
-        $this->docs->markMergedCell($sheetName, 0, 0, 0, 2);
+        $this->docs->writeSheetHeader($sheetName, $sheet['headerData'], $sheet['headerStyle']);
+        //$this->docs->markMergedCell($sheetName, 0, 0, 0, 2);
       }
 
       foreach ($sheet['rows'] as $row) {

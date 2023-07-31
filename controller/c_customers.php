@@ -12,20 +12,17 @@ $field = [
 ];
 
 // получить конфиг текущего пользователя
-//$setting = $main->db->getUserSetting(/*login user*/);
+$setting = $main->getLogin('customization');
+$setting = $setting ?: [];;
 
-$param['columns'] = $setting['customersColumns'] ?? [];
 
-if (count($param['columns']) < 1) {
-  $columns = ['ID', 'name', 'contacts',  'ITN', 'orders'];
-
-  $param['columns'] = array_map(function ($item) {
-    return [
-      'dbName' => $item,
-      'name' => gTxtDB('customers', $item),
-    ];
-  }, $columns);
-}
+$columns = $setting['customersShowColumns'] ?? ['ID', 'name', 'contacts',  'ITN', 'orders'];
+$param['columns'] = array_map(function ($item) {
+  return [
+    'dbName' => $item,
+    'name' => gTxtDB('customers', $item),
+  ];
+}, $columns);
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_CUSTOMERS_TEMPLATE, $main);
 require $main->url->getRoutePath();

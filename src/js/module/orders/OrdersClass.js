@@ -43,7 +43,6 @@ export default class {
       tableHeader: f.gT('#tableHeaderCell'),
       impValue : null, // f.gT('#tableImportantValue'),
       searchMsg: f.gT('#noFoundSearchMsg'),
-      columns  : f.gT('#orderColumnsTableTmp'),
     };
   }
   setQueryParam() {
@@ -91,7 +90,26 @@ export default class {
     return this.template.tableCell = tmp + '</tr>';
   }
   ordersPrepare(data) {
+    this.contValue || (this.contValue = f.gT('#tableContactsValue'));
+
     return data.map(item => {
+      if (item['customerContacts']) {
+        let value = '';
+
+        try {
+          value = JSON.parse(item['customerContacts']);
+          item['contactsParse'] = value;
+          if (Object.values(value).length) {
+            let arr = Object.entries(value).map(n => ({key: _(n[0]), value: n[1]}));
+            value = f.replaceTemplate(this.contValue, arr);
+          } else value = '';
+        } catch (e) {
+          value = item['customerContacts'];
+          //console.log(`Клиент ID: ${item.id} имеет не правильное значение`);
+        }
+        item['customerContacts'] = value;
+      }
+
       if (item.importantValue) {
         let value = '';
 

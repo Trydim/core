@@ -54,7 +54,6 @@ const users = {
     data.forEach(i => this.usersList.set(i['ID'], i));
   },
   fillTable(data) {
-    debugger
     this.contValue || (this.contValue = f.gT('#tableContactsValue'));
     data = data.map(item => {
       item['permissionName'] = _(item['permissionName']);

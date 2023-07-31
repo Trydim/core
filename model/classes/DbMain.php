@@ -946,22 +946,23 @@ class DbMain extends R {
    * @return bool true if it was set
    */
   public function setDealerLink(): bool {
-    $sql = "SELECT ID as 'id', JSON_VALUE(cms_param, '$.prefix') AS 'prefix' FROM dealers";
+    $sql = "SELECT ID as 'id', cms_param AS 'cmsParam' FROM dealers";
 
     $sqlValue = $this->main->getCmsParam('dealerId');
     if ($sqlValue) {
       $sql .= " WHERE ID = :value";
     } else {
       $sqlValue = $this->main->getCmsParam('dealerLink');
-      $sql = " WHERE JSON_VALUE(cms_param, '$.link') = :value";
+      $sqlValue = "%$sqlValue%";
+      $sql = " WHERE cms_param LIKE :value";
     }
 
     $sql .= ' AND activity = 1 LIMIT 1';
-    $row = self::getRow($sql, [':value' => $sqlValue]);
+    $row = $this->jsonParseField(self::getRow($sql, [':value' => $sqlValue]));
 
     if ($row['id'] && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
       $this->main->setCmsParam('dealerId', $row['id']);
-      $this->prefix = $row['prefix'];
+      $this->prefix = $row['cmsParam']['prefix'];
       return true;
     }
     $this->main->setCmsParam('isDealer', false);

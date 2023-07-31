@@ -8,6 +8,18 @@
 $field['content'] = template('parts/ordersContent', $param);
 
 $field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>';
+
+$orderColumnsTableTmp = '';
+foreach ($param['orderColumns'] as $column) {
+  $orderColumnsTableTmp .= '
+    <div class="input-group">
+      <label for="col' . $column . '" class="input-group-text flex-grow-1">' . gTxtDB('orders', $column) . ':</label>
+      <div class="input-group-text">
+        <input type="checkbox" id="col' . $column . '" class="form-check-input mt-0" value="true" name="' . $column . '">
+      </div>
+    </div>';
+}
+
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>
@@ -28,6 +40,9 @@ $field['footerContent'] .= <<<footerContent
 <template id="noFoundSearchMsg">
   <tr><td colspan="15">не найдено</td></tr>
 </template>
+<template id="tableContactsValue">
+  <div>\${key}: \${value}</div>
+</template>
 <!--template id="orderOpenForm">
   <div>
     <div>Дата создания - \${create_date}</div>
@@ -40,6 +55,9 @@ $field['footerContent'] .= <<<footerContent
     <div>\${total}</div>
   </div>
 </template-->
+<template id="orderColumnsTableTmp">
+  <form class="" action="#" id="columnsSetting">$orderColumnsTableTmp</form>
+</template>
 footerContent;
 
 $field['footerContent'] .= template('docs/printTpl');

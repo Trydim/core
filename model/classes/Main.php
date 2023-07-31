@@ -337,12 +337,14 @@ final class Main {
   }
 
   public function initDefaultController(): Main {
+    $main = $this;
+    $isGlobal = false;
     $target = $this->url->getRoute();
 
     $field = [
       'main'        => $this,
-      'headContent' => '',
       'pageTitle'   => gTxt($target),
+      'headContent' => '',
       'cssLinks'    => [],
       'jsLinks'     => [],
 
@@ -361,7 +363,7 @@ final class Main {
     include $this->url->getRoutePath();
     $templateContent = ob_get_clean();
     $field['content'] = $field['content'] ?? (empty($templateContent) ? $target . ' default content.' : $templateContent);
-    if ($target === '404') $field['global'] = $field['content'];
+    if ($isGlobal) $field['global'] = $field['content'];
     $this->response->setContent(template('base', $field));
 
     return $this;
