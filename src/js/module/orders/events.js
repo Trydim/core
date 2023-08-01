@@ -158,7 +158,7 @@ export default class extends Orders {
   }
   delOrders() {
     this.needReload = true;
-    this.confirmMsg = 'Удаление выполнено';
+    this.confirmMsg = _('Deleted');
     f.show(this.confirm);
     return true;
   }
@@ -317,7 +317,7 @@ export default class extends Orders {
         action = target.dataset.action,
         selectedSize   = this.selected.getSelectedSize();
 
-    if (!selectedSize && !(['setupColumns', 'orderType']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
+    if (!selectedSize && !(['setupColumns', 'orderType']).includes(action)) { f.showMsg(_('Choose an order!'), 'warning'); return; }
 
     let select = {
       'filterDealer': () => this.filterChange(target),

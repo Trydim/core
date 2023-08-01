@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
-    <Button v-if="!false" type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
+    <Button v-if="false" type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
     <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="deleteDealer">Удалить</Button>
   </div>
 
@@ -129,8 +129,8 @@
     </div>
 
     <template #footer>
-      <Button label="Подтвердить" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm()"></Button>
-      <Button label="Отмена" icon="pi pi-times" class="p-button-text" @click="modalCancel()"></Button>
+      <Button :label="translate('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm()"></Button>
+      <Button :label="translate('Cancel')" icon="pi pi-times" class="p-button-text" @click="modalCancel()"></Button>
     </template>
   </Dialog>
 </template>

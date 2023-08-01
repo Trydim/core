@@ -228,7 +228,7 @@ switch ($cmsAction) {
   case 'createProperty': case 'createDealersProperty':
   case 'changeProperty': case 'changeDealersProperty':
     $propKey   = in_array($cmsAction, ['createProperty', 'changeProperty']) ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
-    $cmsAction = stripos($cmsAction, 'create') ? 'create' : 'change';
+    $cmsAction = includes($cmsAction, 'create') ? 'create' : 'change';
     $property  = json_decode($property ?? '[]', true);
 
     $tableName = $property['newName'];
@@ -241,7 +241,7 @@ switch ($cmsAction) {
       foreach ($property['fields'] as $field) {
         if ($cmsAction === 'change') $param[translit($field['name'])] = $field['type'];
         else {
-          $param[$field['name']] = [
+          $param[] = [
             'newName' => $field['newName'],
             'type'    => $field['type'],
           ];
@@ -333,7 +333,7 @@ switch ($cmsAction) {
     }
     break;
   case 'deleteProperty':  case 'deleteDealersProperty':
-    $propKey = $cmsAction === 'deleteProperties' ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
+    $propKey = $cmsAction === 'deleteProperty' ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
     $property = json_decode($property ?? '[]', true);
     $setting = $main->getSettings($propKey);
 

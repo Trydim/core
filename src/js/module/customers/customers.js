@@ -197,7 +197,7 @@ const customers = {
   checkCustomers() {
     for (const id of this.selected.getSelected()) {
       if (this.usersList.get(id).orders) {
-        f.showMsg(`У Клиента ${id} имеются заказы!`, 'error');
+        f.showMsg(_(`The client %1 has orders!`, id), 'error');
         return true;
       }
     }
@@ -259,13 +259,13 @@ const customers = {
 
         form.querySelector('#cTypeI').checked = true;
 
-        this.confirmMsg = 'Клиент добавлен';
+        this.confirmMsg = _('Client added');
         this.M.btnConfig('confirmYes', {value: _('Confirm')});
-        this.M.show('Добавление пользователя', form);
+        this.M.show(_('Adding a client'), form);
         f.relatedOption(form);
       },
       'changeCustomer': () => {
-        if (this.selected.getSelectedSize() !== 1) { f.showMsg('Выберите одного клиента!'); return; }
+        if (this.selected.getSelectedSize() !== 1) { f.showMsg(_('Choose one client!')); return; }
 
         let node,
             id = this.selected.getSelected(),
@@ -297,20 +297,20 @@ const customers = {
         f.initMask(node, '_________');
         node.value = customer['ITN'];
 
-        this.confirmMsg = 'Изменения сохранены';
+        this.confirmMsg = _('Changes saved');
         this.M.btnConfig('confirmYes', {value: _('Confirm')});
-        this.M.show('Изменение клиента', form);
+        this.M.show(_('Changing a client'), form);
         f.relatedOption(form);
       },
       'delCustomer': () => {
-        if (!this.selected.getSelectedSize()) { f.showMsg('Выберите клиента!', 'error'); return; }
+        if (!this.selected.getSelectedSize()) { f.showMsg(_('Choose a client!'), 'error'); return; }
         if (this.checkCustomers()) return;
 
         this.queryParam.customerId = JSON.stringify(this.selected.getSelected());
 
-        this.confirmMsg = 'Успешно удалено';
+        this.confirmMsg = _('Deleted');
         this.M.btnConfig('confirmYes', {value: _('Confirm')});
-        this.M.show('Удалить', 'Удалить выбранных клиентов?');
+        this.M.show(_('Delete'), _('Delete selected clients?'));
 
         this.delayFunc = () => this.selected.clear();
       },

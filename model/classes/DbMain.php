@@ -744,12 +744,12 @@ class DbMain extends R {
       case 'bool': return boolval($value);
     }
   }
-  private function parseDbProperty($prop, $type) {
+  private function parseDbProperty(string $prop, string $type): string {
     $str = " `$prop` ";
 
     switch ($type) {
-      case 'file': return " `$prop". "_ids` varchar(255)";
-      case 'string': return $str . "varchar(255)";
+      case 'file': return " `$prop" . "_ids` varchar(255)";
+      case 'text': case 'string': return $str . "varchar(255)";
       case 'textarea': return $str . "varchar(1000)";
       case 'int': return $str . "int(20) NOT NULL DEFAULT 1";
       case 'float': return $str . "float NOT NULL DEFAULT 1";
@@ -800,16 +800,16 @@ class DbMain extends R {
     return ['name' => "Prop item: $propValue in $propName - not found!"];
   }
 
-  public function createPropertyTable(string $dbTable, array $param) {
+  public function createPropertyTable(string $dbTable, array $params) {
     $dbTable = $this->pf($dbTable);
 
     $sql = "CREATE TABLE $dbTable (
             `ID` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
 
-    if (count($param)) {
-      foreach ($param as $prop => $type) {
-        $sql .= ', ' . $this->parseDbProperty($prop, $type);
+    if (count($params)) {
+      foreach ($params as $prop) {
+        $sql .= ', ' . $this->parseDbProperty($prop['newName'], $prop['type']);
       }
     }
 

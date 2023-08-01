@@ -43,7 +43,7 @@
         <h4>{{ modal.title }}</h4>
       </template>
 
-      <div v-if="queryParam.cmsAction !== 'deleteProperties'" style="width: 600px">
+      <div v-if="queryParam.cmsAction !== deleteAction" style="width: 600px">
         <!-- Имя -->
         <div class="col-12 row my-1">
           <div class="col">Название свойства:</div>

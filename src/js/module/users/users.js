@@ -162,11 +162,11 @@ const users = {
 
         new f.Valid({form});
 
-        this.confirmMsg = 'Новый пользователь добавлен';
-        this.M.show('Добавление пользователя', form);
+        this.confirmMsg = _('New user added');
+        this.M.show(_('Add new user'), form);
       },
       'changeUser': () => {
-        if (!this.id.getSelectedSize()) { f.showMsg('Выберите минимум 1 пользователя', 'error'); return; }
+        if (!this.id.getSelectedSize()) { f.showMsg(_('Please select at least 1 user'), 'error'); return; }
 
         let oneElements = this.id.getSelectedSize() === 1, node,
             id = this.id.getSelected(),
@@ -215,11 +215,11 @@ const users = {
 
         new f.Valid({form});
 
-        this.confirmMsg = 'Изменения сохранены';
-        this.M.show('Изменение пользователей', form);
+        this.confirmMsg = _('Changes saved');
+        this.M.show(_('Changing Users'), form);
       },
       'changeUserPassword': () => { // TODO доработать изменение пароля
-        if (this.id.getSelectedSize() !== 1) { f.showMsg('Выберите только одного пользователя', 'error'); return; }
+        if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Select only one user'), 'error'); return; }
 
         let id   = this.id.getSelected(),
             user = this.usersList.get(id[0]),
@@ -235,8 +235,8 @@ const users = {
 
         new f.Valid({form});
 
-        this.confirmMsg = 'Новый пароль сохранен';
-        this.M.show('Изменить пароль пользователя ' + user['name'], form);
+        this.confirmMsg = _('New password saved');
+        this.M.show(_('Change user password') + ' ' + user['name'], form);
       },
       'delUser': () => {
         if (!this.id.getSelectedSize()) return;
@@ -244,8 +244,8 @@ const users = {
         this.queryParam.usersId = JSON.stringify(this.id.getSelected());
         this.delayFunc = () => this.id.clear();
 
-        this.confirmMsg = 'Удаление успешно';
-        this.M.show('Удалить', 'Удалить выбранных пользователя?');
+        this.confirmMsg = _('Deleted');
+        this.M.show(_('Delete'), _('Delete selected users?'));
         this.M.btnConfirm.classList.remove('cl-confirm-disabled');
         this.M.btnConfirm.removeAttribute('disabled');
       },
@@ -271,7 +271,7 @@ const users = {
   changePassword(e, newPass) {
     if (e.target.value !== newPass.value) {
       e.target.value = newPass.value = '';
-      f.showMsg('Пароли не совпадают', 'error');
+      f.showMsg(_('Password not same'), 'error');
       return;
     }
     this.queryParam.validPass = e.target.value;
