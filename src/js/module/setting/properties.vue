@@ -74,7 +74,7 @@
           </div>
         </div>
         <!-- Составной тип-->
-        <template v-if="property.type === 'select'">
+        <template v-if="property.type.includes('select')">
           <div class="col-12 row mb-1">
             <div class="col">Дополнительные поля свойства (имя есть):</div>
             <div class="col">
@@ -163,6 +163,7 @@ export default {
         label: 'Составные',
         items: [
           {id: 'select', name: 'Справочник'},
+          {id: 'multiSelect', name: 'Справочник множественный'},
         ]
       }
     ],
