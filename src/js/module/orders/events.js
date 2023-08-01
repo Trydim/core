@@ -252,17 +252,18 @@ export default class extends Orders {
         this.queryParam.phone    = contacts.phone || '';
         this.queryParam.email    = contacts['email'];
 
-        this.onEventNode(node, this.changeSelectInput, {}, 'change');
+        this.onEventNode(node, this.changeEmailInput, {}, 'change');
         contacts['email'] && (node.value = contacts['email']);
+        new f.Valid({form,
+          sendFunc: () => {},
+        });
 
         this.M.btnConfig('confirmYes', {value: 'Отправить'});
         this.M.show('Отправить на почту', form);
 
         this.confirmMsg = 'Отправлено';
-        // TODO Добавить проверку почты
-        //f.initValid(() => {}, );
       }
-     });
+    });
   }
   orderTypeChange(selectedSize, target) {
     if (this.orderType === target.value) return;
@@ -321,7 +322,7 @@ export default class extends Orders {
 
     let select = {
       'filterDealer': () => this.filterChange(target),
-      'statusOrders': () => this.changeSelectInput(target, action),
+      'statusOrders': () => this.changeSelectInput(target),
     };
 
     select[action] && select[action]();
@@ -341,5 +342,8 @@ export default class extends Orders {
   }
   changeSelectInput(target) {
     this.queryParam.statusId = target.value;
+  }
+  changeEmailInput(e) {
+    this.queryParam.email = e.target.value;
   }
 }
