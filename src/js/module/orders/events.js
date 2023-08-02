@@ -132,7 +132,7 @@ export default class extends Orders {
         selectedSize   = this.selected.getSelectedSize();
 
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
-    if (!selectedSize && !(['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
+    if (!selectedSize && !(['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo']).includes(action)) { f.showMsg(_('Choose an order!'), 'warning'); return; }
     this.queryParam.orderIds = this.selected.getSelected();
 
     if (action.includes('confirm')) { // Закрыть подтверждение
@@ -163,7 +163,7 @@ export default class extends Orders {
     return true;
   }
   loadOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+    if (selectedSize !== 1) { f.showMsg(_('Choose 1 order'), 'warning'); return; }
 
     this.form.set('dbAction', 'loadOrderById');
     this.form.set( 'orderId', this.queryParam.orderIds);
@@ -172,7 +172,7 @@ export default class extends Orders {
      .then(data => this.showOrder(data));
   }
   openOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+    if (selectedSize !== 1) { f.showMsg(_('Choose 1 order'), 'warning'); return; }
 
     let link = f.gI(f.ID.PUBLIC_PAGE),
       /* нужно это делать от дефолтного типа */
@@ -181,7 +181,7 @@ export default class extends Orders {
     link.click();
   }
   printOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+    if (selectedSize !== 1) { f.showMsg(_('Choose 1 order'), 'warning'); return; }
     let P    = f.initPrint(),
         data = new FormData();
 
@@ -197,7 +197,7 @@ export default class extends Orders {
     });
   }
   savePdf(selectedSize, target) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+    if (selectedSize !== 1) { f.showMsg(_('Choose 1 order'), 'warning'); return; }
 
     let data = new FormData(),
         url = this.dealerId ? 'dealer/' + this.dealerId + '/' : '';
@@ -225,7 +225,7 @@ export default class extends Orders {
     });
   }
   sendOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+    if (selectedSize !== 1) { f.showMsg(_('Choose 1 order'), 'warning'); return; }
 
     let form = f.gTNode('#sendMailTmp');
 
@@ -255,10 +255,10 @@ export default class extends Orders {
         this.onEventNode(node, this.changeSelectInput, {}, 'change');
         contacts['email'] && (node.value = contacts['email']);
 
-        this.M.btnConfig('confirmYes', {value: 'Отправить'});
-        this.M.show('Отправить на почту', form);
+        this.M.btnConfig('confirmYes', {value: _('Send')});
+        this.M.show(_('Send mail'), form);
 
-        this.confirmMsg = 'Отправлено';
+        this.confirmMsg = _('Sent');
         // TODO Добавить проверку почты
         //f.initValid(() => {}, );
       }
@@ -309,7 +309,7 @@ export default class extends Orders {
     };
 
     form.dispatchEvent(new Event('input'));
-    this.M.show('Настройка колонок', form);
+    this.M.show(_('Columns setting'), form);
   }
 
   actionSelect(e) {

@@ -9,12 +9,12 @@ $field['content'] = template('parts/customersContent', $param);
 
 $field['footerContent'] .= '
 <template id="tableOrderBtn">
-  <input type="button" class="btn btn-info btn-sm table-th" value="' . gTxt('View orders') . '" data-id="\${id}" data-action="openOrders">
+  <input type="button" class="btn btn-info btn-sm table-th" value="' . gTxt('View orders') . '" data-id="${id}" data-action="openOrders">
 </template>
 <template id="tableOrdersNumbers">
   <div class="form-check mb-1">
-    <input class="form-check-input" type="radio" name="orders" id="orders-\${value}" value="\${value}">
-    <label class="form-check-label" for="orders-\${value}">' . gTxt('Order') . ' №\${value}</label>
+    <input class="form-check-input" type="radio" name="orders" id="orders-${value}" value="${value}">
+    <label class="form-check-label" for="orders-${value}">' . gTxt('Order') . ' №${value}</label>
   </div>
 </template>
 <template id="tableContactsValue">

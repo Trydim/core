@@ -151,10 +151,10 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         if ($customerChange) {
           $param = [$customerId => [
             'name' => $name ?? 'No name',
-            'ITN'  => $ITN ?? '',
+            // 'ITN'  => $ITN ?? '',
             'contacts' => json_encode([
               'phone'   => $phone ?? '',
-              'email'   => $email ?? '',
+              // 'email'   => $email ?? '',
               'address' => $address ?? '',
             ]),
           ]];
