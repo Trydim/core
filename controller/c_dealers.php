@@ -15,8 +15,12 @@ $field = [
 // all Properties
 $value = $main->getSettings(VC::DEALER_PROPERTIES);
 foreach ($main->db->getTables('prop') as $table) {
+  // Param saved in json
+  $prop = $value[$table['dbTable']] ?? [];
+
   $value[$table['dbTable']] = [
-    'name'   => $value[$table['dbTable']]['name'] ?? $table['name'],
+    'name'   => $prop['name'] ?? $table['name'],
+    'type'   => $prop['type'] ?? 'select',
     'values' => array_map(function ($row) {
       $row['id'] = $row['ID'];
       return $row;

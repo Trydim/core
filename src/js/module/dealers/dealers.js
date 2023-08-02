@@ -16,5 +16,8 @@ vue.config.errorHandler = (err, vm, info) => {
   console.error(info, 'error', false);
 }
 
+// Перевод
+vue.config.globalProperties.$t = function (str) { return window._(str); };
+
 vue.mount('#dealerApp');
 window.DealersInstance = vue;

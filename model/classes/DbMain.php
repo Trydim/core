@@ -731,7 +731,7 @@ class DbMain extends R {
     }, $options);
   }
 
-  // Property
+  // Property only main cms
   //------------------------------------------------------------------------------------------------------------------
 
   private function parseSimpleProperty($type, $value) {
@@ -801,7 +801,7 @@ class DbMain extends R {
   }
 
   public function createPropertyTable(string $dbTable, array $params) {
-    $dbTable = $this->pf($dbTable);
+    //$dbTable = $this->pf($dbTable);
 
     $sql = "CREATE TABLE $dbTable (
             `ID` int(10) UNSIGNED NOT NULL,
@@ -855,6 +855,15 @@ class DbMain extends R {
     }
 
     return $error;
+  }
+
+  /**
+   * @param string $dbTable
+   * @param array $ids
+   * @return array
+   */
+  public function loadPropertyTable(string $dbTable, array $ids): array {
+    return self::getAll("SELECT * FROM $dbTable WHERE ID IN (" . self::genSlots($ids) . ' )', $ids);
   }
 
   public function delPropertyTable($dbTables) {

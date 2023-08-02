@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
-    <Button v-if="false" type="button" class="btn btn-success" @click="addDealer">Добавить</Button>
-    <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="deleteDealer">Удалить</Button>
+    <Button v-if="false" type="button" class="btn btn-success" @click="addDealer">{{ $t('Add') }}</Button>
+    <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="deleteDealer">{{ $t('Delete') }}</Button>
   </div>
 
   <DataTable v-if="dealers.length"
@@ -23,35 +23,34 @@
                       placeholder="Настроить колонки" style="width: 20em"
       ></p-multi-select>
     </template>-->
-    <Column v-if="checkColumn('id')" field="id" :sortable="true" :header="translate('id')" class="text-center">
+    <Column v-if="checkColumn('id')" field="id" :sortable="true" :header="this.$t('id')" class="text-center">
       <template #body="slotProps">
         <span :data-id="slotProps.data.id">{{ slotProps.data.id }}</span>
       </template>
     </Column>
-    <Column field="name" :sortable="true" :header="translate('name')"></Column>
-    <Column field="contacts" :sortable="false" :header="translate('contacts')">
+    <Column field="name" :sortable="true" :header="this.$t('Name')"></Column>
+    <Column field="contacts" :sortable="false" :header="this.$t('Contacts')">
       <template #body="slotProps">
         <div v-if="slotProps.data.contacts.phone">{{ slotProps.data.contacts.phone }}</div>
         <div v-if="slotProps.data.contacts.email">{{ slotProps.data.contacts.email }}</div>
         <div v-if="slotProps.data.contacts.address">{{ slotProps.data.contacts.address }}</div>
       </template>
     </Column>
-    <Column field="registerDate" :sortable="false" :header="translate('Register date')"></Column>
-    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" header="Activity" class="text-center">
+    <Column field="registerDate" :sortable="false" :header="this.$t('Register date')"></Column>
+    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" :header="this.$t('Activity')" class="text-center">
       <template #body="slotProps">
         <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
         <span v-else class="pi pi-times pi-red"></span>
       </template>
     </Column>
-    <Column field="settings" :sortable="false" :header="translate('setting')">
+    <Column field="settings" :sortable="false" :header="this.$t('Setting')">
       <template #body="slotProps">
         <template v-for="(value, key) of slotProps.data.settings" :key="key">
           <p v-if="getPropertyType(key) === 'bool'" class="m-0">
             {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="{'pi-green pi-plus': value, 'pi-red pi-times': !value}"></i>
           </p>
           <p v-else class="m-0 text-nowrap">
-            {{ getPropertyName(key) }}:
-            {{ getPropertyType(key) ? value : getPropertyValue(key, value) }}
+            {{ getPropertyName(key) }}: {{ getPropertyValue(key, value) }}
           </p>
         </template>
       </template>
@@ -117,10 +116,15 @@
                         v-model="dealer.settings[key]"
           ></ToggleButton>
           <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"></Calendar>
-          <Dropdown v-else option-label="name" option-value="ID"
+          <Dropdown v-else-if="prop.type === 'select'" option-label="name" option-value="ID"
                     :options="Object.values(prop.values)"
                     v-model="dealer.settings[key]"
           ></Dropdown>
+          <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="ID"
+                       :options="Object.values(prop.values)"
+                       v-model="dealer.settings[key]"
+          ></MultiSelect>
+
         </div>
       </div>
     </div>
@@ -129,8 +133,8 @@
     </div>
 
     <template #footer>
-      <Button :label="translate('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm()"></Button>
-      <Button :label="translate('Cancel')" icon="pi pi-times" class="p-button-text" @click="modalCancel()"></Button>
+      <Button :label="this.$t('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm()"></Button>
+      <Button :label="this.$t('Cancel')" icon="pi pi-times" class="p-button-text" @click="modalCancel()"></Button>
     </template>
   </Dialog>
 </template>
@@ -150,6 +154,7 @@ import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import InputNumber from 'primevue/inputnumber';
 import Dropdown from 'primevue/dropdown';
+import MultiSelect from 'primevue/multiselect';
 import Calendar from 'primevue/calendar';
 
 import cloneDeep from 'lodash/clonedeep';
@@ -157,7 +162,7 @@ import cloneDeep from 'lodash/clonedeep';
 export default {
   name: 'dealer',
   components: {
-    Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar, Dropdown,
+    Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar, Dropdown, MultiSelect,
     DataTable, Column,
     Dialog
   },
@@ -213,7 +218,6 @@ export default {
     },
   },
   methods: {
-    translate(str) { return window._(str); },
     query() {
       const data = new FormData();
       this.dealerLoading = true;
@@ -253,11 +257,11 @@ export default {
 
     checkColumn() { return true; },
     getPropertyName(k) { return this.properties[k] ? this.properties[k].name : k; },
-    getPropertyType(k) { return this.properties[k] ? this.properties[k].type : undefined; },
+    getPropertyType(k) { return this.properties[k] ? this.properties[k].type : k; },
     getPropertyValue(k, v) {
-      const res = this.properties[k] && this.properties[k].values && this.properties[k].values.find(i => i.id === v);
+      const res = this.properties[k] && this.properties[k].values && this.properties[k].values.filter(i => v.includes(i.id));
 
-      return res ? res.name : '';
+      return res ? res.map(i => i.name).join(', ') : v;
     },
     setProperty() {
       const de = this.dealer;

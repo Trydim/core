@@ -58,7 +58,7 @@ menu;
     }
   }
 
-  $adminMenu = (new CreateMenu($siteLink))->create('AdminDB', $dbTables);
+  $adminMenu = (new CreateMenu($siteLink))->create('adminDB', $dbTables);
 } ?>
 <aside id="sideLeft" class="sidebar"> <!-- data-background-color="white"-->
   <div class="position-sticky top-0">

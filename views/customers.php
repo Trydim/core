@@ -23,18 +23,18 @@ $field['footerContent'] .= '
 <template id="customerForm">
   <form class="was-validated" action="#">
     <div class="form-floating my-3">
-      <input type="text" class="form-control" id="cName" placeholder="' . gTxt('Name') . '" name="name" value="">
-      <label for="cName">Имя</label>
+      <input type="text" class="form-control" id="cName" placeholder="' . gTxt('Name') . '" name="name">
+      <label for="cName">' . gTxt('Name') . '</label>
     </div>
     
     <div class="form-floating mb-3">
-      <input type="tel" class="form-control" id="cPhone" placeholder="' . gTxt('Phone') . '" name="phone" value="">
-      <label for="cPhone">Телефон</label>
+      <input type="tel" class="form-control" id="cPhone" placeholder="' . gTxt('Phone') . '" name="phone">
+      <label for="cPhone">' . gTxt('Phone') . '</label>
     </div>
  
     <div class="form-floating mb-3">
-      <input type="email" class="form-control" id="cMail" placeholder="' . gTxt('Mail') . '" name="email" value="">
-      <label for="cMail">Почта</label>
+      <input type="email" class="form-control" id="cMail" placeholder="' . gTxt('Mail') . '" name="email">
+      <label for="cMail">' . gTxt('Mail') . '</label>
     </div>
     
     <div class="row mb-3">

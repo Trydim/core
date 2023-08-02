@@ -292,13 +292,13 @@ function isJSON(string $value): bool {
 /**
  * Load csv to array$_FILES['pictureHead']['error']
  *
- * @param array - dictionary for search on the key. example: ['name' => 'Имя'].
- * @param string - csv filename with path
- * @param bool - if true that return one rang array
+ * @param array  $dict     - dictionary for search on the key. example: ['name' => 'Имя'].
+ * @param string $filename - csv filename with path
+ * @param bool   $oneRang  - if true that return one rang array
  *
- * @return mixed array or bool
+ * @return array|bool
  */
-function loadCSV($dict, $filename, $one_rang = false) {
+function loadCSV(array $dict, string $filename, bool $oneRang = false) {
   global $main;
   $filename = file_exists($filename) ? $filename : $main->getCmsParam(VC::CSV_PATH) . $filename;
   $result = [];
@@ -320,7 +320,7 @@ function loadCSV($dict, $filename, $one_rang = false) {
           else $keyIndex[$key] = $i;
         }
       }
-      if ($one_rang) {
+      if ($oneRang) {
 
         foreach ($keyIndex as $item) {
           $addpos = function ($data) use ($item) { return $data[$item]; };
@@ -359,10 +359,10 @@ function loadCSV($dict, $filename, $one_rang = false) {
 /**
  * Поиск в первых пяти строках начала таблиц
  *
- * @param $path
+ * @param string $path
  * @return array|bool
  */
-function loadFullCSV($path) {
+function loadFullCSV(string $path) {
   if ($path !== '' && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
     $emptyRow = 0;
