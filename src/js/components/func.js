@@ -289,7 +289,7 @@ export default {
 
   /**
    * Активировать элементы
-   * @param {NodeList} collection
+   * @param {Node} collection
    */
   enable: (...collection) => {
     collection.map(nodes => {
@@ -303,7 +303,7 @@ export default {
 
   /**
    * Деактивировать элементы
-   * @param {NodeList} collection
+   * @param {Node} collection
    */
   disable: (...collection) => {
     collection.map(nodes => {
@@ -368,7 +368,7 @@ export default {
    */
   saveFile: data => {
     const {name = 'download.file', blob} = data,
-          link = f.createLink(name);
+          link  = f.createLink(name);
 
     if (data.type === 'json') link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(blob.toString());
     if (data.type === 'base64') link.href = blob;
@@ -387,13 +387,13 @@ export default {
   replaceLetter: value => {
     let cyrillic = 'УКЕНХВАРОСМТ',
         latin    = 'YKEHXBAPOCMT',
-        replacer = (match) => cyrillic.charAt(latin.indexOf(match)),
+        replacer = match => cyrillic.charAt(latin.indexOf(match)),
         letters  = new RegExp(`(${latin.split('').join('|')})`, 'gi');
-    return value.replace(letters, replacer).replace(/(&nbsp| | )/g, '').toLowerCase(); // какой-то пробел
+    return value.replace(letters, replacer).replace(/(&nbsp| | )/g, '').toLowerCase();
   },
 
   /**
-   * replace ${key from obj} from template to value from obj
+   * replace ${key_from_obj} from template to value from obj
    * @param {string} tmpString html string template
    * @param {array|object} arrayObjects - array of object
    * @return {string}
@@ -540,25 +540,6 @@ export default {
     } else {
       node.classList.remove('loading-st1', 'loading-st1-sm', 'loading-st1-big', 'loading-st1-light');
     }
-  },
-
-  /**
-   * Функция печати по умолчанию
-   * @param {object} report
-   * @returns {Node}
-   */
-  printReport: (report) => {
-    let html = '';
-
-    if (report.number)  html += `<span>Orders №${report.number}</span>${html}`;
-
-    html += '<table>';
-    Object.values(report).map(i => {
-      html += '<tr><td>' + Object.values(i).join('</td><td>') + '</td></tr>';
-    });
-    html += '</table>';
-
-    return f.createElement(html);
   },
 
   /**

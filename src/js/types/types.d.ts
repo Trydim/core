@@ -25,6 +25,8 @@ declare type CMSGlobalObject = {
   PATH_IMG: string
   /** Uri to images folder */
   URI_IMG: string
+  /** Uri to dealer images folder */
+  DEAL_URI_IMG : string,
   /** User is authorized */
   AUTH_STATUS: boolean
   /** app starting as dealer module */
@@ -35,13 +37,17 @@ declare type CMSGlobalObject = {
     PUBLIC_PAGE: string
   }
 
-  INIT_SETTING: object|false
+  INIT_SETTING: Object | false
   /** global mask for function initMask */
   PHONE_MASK_DEFAULT: string
   /** Global hooks for cms module on vue */
   HOOKS: Hooks
   /** same INIT_SETTING */
-  CMS_SETTING: object
+  CMS_SETTING: Object
+
+  CLASS_NAME: {
+    SORT_BTN_CLASS: string,
+  }
 
   /**
    * @param {string} msg
@@ -68,13 +74,13 @@ declare type CMSGlobalObject = {
    * @param {string} id String that specifies the ID value.
    * @return {HTMLElement} HtmlElement
    */
-  gI(id: string): HTMLElement | any
+  gI(id: string): HTMLElement | Node | any
 
   /**
    * @param {string} selector
    * @param {HTMLElement} node
    */
-  qS(selector: string, node?: HTMLElement): HTMLElement | any
+  qS(selector: string, node?: HTMLElement): HTMLElement | Node | any
 
   /**
    *
@@ -82,7 +88,7 @@ declare type CMSGlobalObject = {
    * @param nodeKey - param/key
    * @param value - value or function (this, Node list, current selector)
    */
-  qA(selector: string, nodeKey?: string, value?: string | Function): NodeList | Iterable<any>
+  qA(selector: string, nodeKey?: string, value?: string | Function): NodeList | Iterable<Node>
 
   /**
    * получить html шаблона
@@ -96,7 +102,7 @@ declare type CMSGlobalObject = {
    * Получить Node шаблона
    * @param {string} selector
    */
-  gTNode(selector: string): HTMLElement
+  gTNode(selector: string): HTMLTemplateElement
 
   /**
    * @param selector
@@ -109,10 +115,10 @@ declare type CMSGlobalObject = {
   getDataAsSet(selector: string): Set<any>
   getDataAsArray(selector: string): any[]
 
-  show(...collection: NodeList)
-  hide(...collection: NodeList)
-  enable(...collection: NodeList)
-  disable(...collection: NodeList)
+  show(...collection: NodeList | Iterable<Node>)
+  hide(...collection: NodeList | Iterable<Node>)
+  enable(...collection: NodeList | Iterable<Node>)
+  disable(...collection: NodeList | Iterable<Node>)
 
   eraseNode(node: HTMLElement)
   /**
@@ -132,7 +138,8 @@ declare type CMSGlobalObject = {
   parseNumber(v: any): number
 
   /**
-   * return random number
+   * Generate random number from min to max
+   * @default 1-99999
    */
   random(min?: number, max?: number): number,
 
@@ -148,8 +155,53 @@ declare type CMSGlobalObject = {
           type?: 'tip' | 'info' | 'success' | 'ok' | 'warning' | 'error' | 'alert',
           options?: boolean | object
   ): void
+  /**
+   * flatten object
+   * @param obj
+   */
+  objectFlat(obj: Object): [string, any][]
 
-  getSetting()
+  /**
+   * Save file from browser
+   *
+   * @example for PDF:
+   * {name: 'file.pdf',
+   * type: 'base64',
+   * blob: 'data:application/pdf;base64,' + data['pdfBody']}
+   */
+  saveFile(data: {name: string, type: undefined | string  | 'json' | 'base64', lob: string}): void
+  /**
+   * Replace latin to cyrillic symbol
+   */
+  replaceLetter(value: string): string
+  /**
+   * replace ${key_from_obj} from template to value from obj
+   */
+  replaceTemplate(tmpString: string, arrayObjects: {[key: string]: string}): string
+  /**
+   * Mask for input
+   */
+  initMask(node: HTMLElement, phoneMask: string): void
+  /**
+   * Set loading spinner icon
+   */
+  setLoading(node: HTMLElement, isLight?: false): void
+  /**
+   * Remove loading spinner icon
+   */
+  removeLoading(node: HTMLElement): void
+  /**
+   * Create and download Pdf document
+   * Will be use template in views/docs/pdfTpl.php as default
+   *
+   * A global function "pdfResources" will be created, which can help to get an html+css template
+   */
+  downloadPdf(
+    target: HTMLElement,
+    report: {reportValue: Object | any, fileName?: string, fileTpl?: string, pdfOrientation?: 'P' | 'L'},
+    data: FormData,
+    finishOk: Function
+  )
 
   /**
    * LocalStorage
@@ -175,9 +227,21 @@ declare type CMSGlobalObject = {
   Modal<T = any>(options: SweetAlertOptions|string): SweetAlertResult<Awaited<T>>
   Modal<T = any>(title: string, html?: string, icon?: SweetAlertIcon): SweetAlertResult<Awaited<T>>
   initModal(),
+
+  searchInit(): Searching
+
+  Pagination: typeof Pagination
+  SelectedRow: typeof SelectedRow
+  SortColumns: typeof SortColumns
+
+
+  /* Without description */
+  createLink(fileName: string): HTMLAnchorElement
+
+  getSetting()
 }
 
-interface Window {
+interface Window extends Window {
   f: CMSGlobalObject
 }
 

@@ -88,6 +88,10 @@ class AllOrdersList {
 }
 
 export default class extends Orders {
+  constructor() {
+    super();
+    this.onEvent();
+  }
   /**
    * @param node
    * @param func
@@ -158,18 +162,18 @@ export default class extends Orders {
   }
   delOrders() {
     this.needReload = true;
-    this.confirmMsg = _('Deleted');
+    this.confirmMsg = window._('Deleted');
     f.show(this.confirm);
     return true;
   }
   loadOrder(selectedSize) {
     if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
-    this.form.set('dbAction', 'loadOrderById');
-    this.form.set( 'orderId', this.queryParam.orderIds);
+    const data = new FormData();
+    data.set('dbAction', 'loadOrderById');
+    data.set( 'orderId', this.queryParam.orderIds);
 
-    f.Post({data: this.form})
-     .then(data => this.showOrder(data));
+    f.Post({data}).then(data => this.showOrder(data));
   }
   openOrder(selectedSize) {
     if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }

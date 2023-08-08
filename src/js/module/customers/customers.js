@@ -48,12 +48,12 @@ const CustomersList = {
 
   showResult(node, resultIds) {
     if (resultIds.length) {
-      f.setLoading(this.node);
+      //f.setLoading(this.node);
       //this.FD.set('search', '1');
       this.FD.set('customerIds', JSON.stringify(resultIds));
 
       f.Post({data: this.FD}).then(data => {
-        f.removeLoading(this.node);
+        //f.removeLoading(this.node);
         if (data['customers']) customers.fillTable(data['customers'], true);
       });
     } else customers.fillTable([], true);
@@ -181,7 +181,7 @@ const customers = {
       }*/
 
       if (item['orders']) {
-        orders.setData(item.id, item['orders'])
+        orders.setData(item.id, item['orders']);
         item['orders'] = f.replaceTemplate(this.orderBtn, {id: item.id});
       }
 
