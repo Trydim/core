@@ -64,6 +64,13 @@ class Dealer {
       die("Folder for $this->dealerDir dealer not created");
     }
   }
+  private function checkFolder(): bool {
+    if (!is_dir($this->dealerDir)) {
+      die("Folder $this->dealerDir is not exist!");
+      //return false;
+    }
+    return true;
+  }
   private function copy(string $src, string $dst) {
     $sep = DIRECTORY_SEPARATOR;
     $dir = opendir($src);
@@ -80,13 +87,11 @@ class Dealer {
     }
     closedir($dir);
   }
-  private function copyFiles() {
+  private function copyFiles(array $folders = ['lang', 'public', 'shared']) {
     try {
-
-      foreach (['lang', 'public', 'shared'] as $dir) {
+      foreach ($folders as $dir) {
         $this->copy($this::RESOURCES . $dir, $this->dealerPath . $dir);
       }
-
     } catch (\Exception $e) {
       die("Copy resources error");
     }
@@ -126,7 +131,7 @@ class Dealer {
   }
 
   /**
-   * @param number $id
+   * @param int|string $id
    * @param array $configParam
    * @param array $dbParam
    */
@@ -138,6 +143,14 @@ class Dealer {
     $this->createConfig($configParam);
 
     $this->updateDb($dbParam);
+  }
+
+  public function update($id) {
+    $this->setParam($id, '');
+    if ($this->checkFolder() === false) return false;
+    $this->copyFiles(['public']);
+
+    return $id;
   }
 
   public function drop(string $id, string $prefix) {

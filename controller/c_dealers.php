@@ -4,6 +4,19 @@
  * @var object $main - global
  */
 
+if (includes($main->url->getRequestUri(), 'update')) {
+  $start = time();
+
+  $pathResource = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR .
+  $dealers = $main->db->loadDealers();
+  foreach ($dealers as $dealer) {
+    $main->dealer->update($dealer['id']);
+  }
+
+  $main->response->setContent('Dealers updated! by ' . time() - $start . ' sec');
+  return;
+}
+
 $field = [
   'pageTitle'     => 'Дилеры',
   'sideRight'     => '',

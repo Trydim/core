@@ -19,6 +19,7 @@
     "ext-iconv": "*",
     "ext-gettext": "*",
     "ext-simplexml": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ext-gd": "*"
   }
 }
