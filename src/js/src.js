@@ -11,7 +11,7 @@ import {Debugger} from "./components/Debugger";
 import {Modal, ModalOur} from './components/Modal.js';
 import {CustomSelect} from './components/CustomSelect.js';
 import LocalStorage from "./components/LocalStorage.js";
-import {shadowNode} from './components/shadownode.js';
+import {ShadowNode} from './components/ShadowNode.js';
 import {SelectedRow} from "./components/SelectedRow.js";
 import {ToastClass, toast} from "./components/toast";
 import {Valid} from "./components/Valid";
@@ -26,7 +26,7 @@ const m = {
   /** Our dev modal */
   initModal : ModalOur,
   initPrint : module.Print,
-  initShadow: param => new shadowNode(param),
+  initShadow: param => new ShadowNode(param),
 
   observer: new module.Observer(),
 
@@ -140,4 +140,4 @@ const m = {
   User,
 };
 
-window.f = Object.assign(c, f, q, m);
+window.f = Object.assign({}, c, f, q, m);

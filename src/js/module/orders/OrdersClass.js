@@ -1,9 +1,32 @@
 "use strict";
 
 export default class {
+  selected = null;
+
+  mainAction = 'loadOrders';
+  needReload = false;
+  queryParam = {
+    mode        : 'DB',
+    dbAction    : '',
+    tableName   : 'orders',
+    sortColumn  : 'createDate',
+    sortDirect  : false, // true = DESC, false
+    currPage    : 0,
+    countPerPage: 20,
+    pageCount   : 0,
+  };
+  confirm = null;
+  selectStatus = null;
+
+  confirmMsg = '';
+  dealerId   = 0;
+
+  orders = {};
+  filter = {};
+
   constructor() {
     this.setParam();
-    this.setQueryParam();
+    this.queryParam.dbAction = this.mainAction;
   }
   init() {
     this.p = new f.Pagination( '#paginator', {
@@ -15,19 +38,12 @@ export default class {
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
 
-    this.onEvent();
     this.query();
   }
   setParam() {
     this.M = new f.initModal();
 
-    this.needReload = false;
-    this.confirmMsg = '';
-    this.dealerId   = 0;
     this.orderType  = 'main';
-
-    this.orders = {};
-    this.filter = {};
 
     this.table        = f.qS('#orderTable');
     this.confirm      = f.qS('#confirmField');
@@ -43,20 +59,6 @@ export default class {
       tableHeader: f.gT('#tableHeaderCell'),
       impValue : null, // f.gT('#tableImportantValue'),
       searchMsg: f.gT('#noFoundSearchMsg'),
-    };
-  }
-  setQueryParam() {
-    this.mainAction = 'loadOrders';
-
-    this.queryParam = {
-      mode        : 'DB',
-      dbAction    : this.mainAction,
-      tableName   : 'orders',
-      sortColumn  : 'createDate',
-      sortDirect  : false, // true = DESC, false
-      currPage    : 0,
-      countPerPage: 20,
-      pageCount   : 0,
     };
   }
 
@@ -100,7 +102,7 @@ export default class {
           value = JSON.parse(item['customerContacts']);
           item['contactsParse'] = value;
           if (Object.values(value).length) {
-            let arr = Object.entries(value).map(n => ({key: _(n[0]), value: n[1]}));
+            let arr = Object.entries(value).map(n => ({key: window._(n[0]), value: n[1]}));
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
         } catch (e) {
@@ -114,13 +116,13 @@ export default class {
         let value = '';
 
         /*if (false /!* TODO настройки вывода даты*!/) {
-         for (let i in item) {
-         if (i.includes('date')) {
-         //let date = new Date(item[i]);
-         item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
-         }
-         }
-         }*/
+          for (let i in item) {
+            if (i.includes('date')) {
+              //let date = new Date(item[i]);
+              item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
+            }
+          }
+        }*/
 
         try {
           value = JSON.parse(item.importantValue);
@@ -182,7 +184,7 @@ export default class {
   }
   // Открыть заказ TODO кнопка скрыта
   showOrder(data) {
-    if(!data['order']) console.log('error');
+    if (!data['order']) console.log('error');
 
     let tmp = f.gT('#orderOpenForm'),
         html = document.createElement('div');

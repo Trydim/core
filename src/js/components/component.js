@@ -188,10 +188,31 @@ export class LoaderIcon {
 
 // Печать
 export const Print = () => {
-  let p   = Object.create(null);
+  const p = Object.create(null);
   p.frame = document.createElement("iframe");
   p.data  = 'no content'; // html
   p.href  = location.pathname;
+
+  /**
+   * Функция печати по умолчанию
+   * @param {string} type
+   * @param {Object} report
+   * @param {string|number}  report.number
+   * @returns {Node}
+   */
+  const printReport = (type, report) => {
+    let html = '';
+
+    if (report.number) html += `<span>Orders №${report.number}</span>${html}`;
+
+    html += '<table>';
+    Object.values(report).map(i => {
+      html += '<tr><td>' + Object.values(i).join('</td><td>') + '</td></tr>';
+    });
+    html += '</table>';
+
+    return f.createElement(html);
+  };
 
   p.frame.onload = function () {
     history.pushState({print: 'ok'}, '', '/');
@@ -258,13 +279,13 @@ export const Print = () => {
   }
 
   /**
-   * Печатать используя фукнцию
+   * Печатать используя функцию
    * @param printFunc
    * @param data
    * @param type
    * @return {Promise<void>}
    */
-  p.orderPrint = async function (printFunc, data, type) {
+  p.orderPrint = async function (printFunc = printReport, data, type) {
     let report = JSON.parse(data.order['reportValue']);
     this.print(await printFunc(type, report));
   }

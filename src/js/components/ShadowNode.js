@@ -1,7 +1,6 @@
 'use strict'
 
-export class shadowNode {
-
+export class ShadowNode {
   constructor() {
     this.customElements = false;
     this.customElements && this.init();
@@ -25,5 +24,4 @@ export class shadowNode {
      const style = this.shadowRoot.querySelector('slot').assignedNodes();
      this.shadowRoot.append(style[0]);*/
   }
-
 }

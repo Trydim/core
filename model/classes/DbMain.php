@@ -963,13 +963,13 @@ class DbMain extends R {
     } else {
       $sqlValue = $this->main->getCmsParam('dealerLink');
       $sqlValue = "%$sqlValue%";
-      $sql = " WHERE cms_param LIKE :value";
+      $sql .= " WHERE cms_param LIKE :value";
     }
 
     $sql .= ' AND activity = 1 LIMIT 1';
     $row = $this->jsonParseField(self::getRow($sql, [':value' => $sqlValue]));
 
-    if ($row['id'] && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
+    if (isset($row['id']) && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
       $this->main->setCmsParam('dealerId', $row['id']);
       $this->prefix = $row['cmsParam']['prefix'];
       return true;
