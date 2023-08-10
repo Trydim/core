@@ -260,8 +260,6 @@ CREATE TABLE `orders` (
   `ID` int(10) UNSIGNED NOT NULL,
   `create_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_edit_date` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `start_shipping_date` timestamp NULL DEFAULT NULL,
-  `end_shipping_date` timestamp NULL DEFAULT NULL,
   `user_id` int(10) UNSIGNED DEFAULT NULL,
   `customer_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
   `total` float DEFAULT 0,

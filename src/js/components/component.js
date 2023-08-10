@@ -426,9 +426,10 @@ export class Pagination {
 
       <div class="page-item ms-5">
         <select class="form-select d-inline-block" data-action="count">
-          <option value="5">5 запись</option>
           <option value="10">10 записей</option>
-          <option value="20" selected>20 записей</option>
+          <option value="20">20 записей</option>
+          <option value="50" selected>50 записей</option>
+          <option value="100">100 записей</option>
         </select>
       </div>
     </div>`;

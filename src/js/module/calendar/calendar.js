@@ -255,17 +255,17 @@ const orders = {
               allDay: true,
               start: order['createDate'],
               end: order['lastEditDate'],
-            },
-            shippingOrder = {
+            };
+            /*shippingOrder = {
               color: '#a52834', //так же заменять цвет в стилях! .fc-daygrid-dot-event
               allDay: false,
               start: order['startShippingDate'],
               end: order['endShippingDate']
-            };
+            }*/
       //событие даты заказа
       component.filter !== 'shipping' && component.addOrder(Object.assign(general, createOrder));
       //событие даты отгрузки
-      component.filter !== 'create' && component.addOrder(Object.assign(general, shippingOrder));
+      //component.filter !== 'create' && component.addOrder(Object.assign(general, shippingOrder));
     });
   },
 

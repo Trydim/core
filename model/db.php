@@ -189,8 +189,6 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
           'important_value' => $importantValue ?? '{}',
           'save_value'      => $saveValue ?? '{}',
           'report_value'    => addCpNumber($orderId, $reportValue),
-          'start_shipping_date' => $db->getDbDateString($startShippingDate ?? ''),
-          'end_shipping_date'   => $db->getDbDateString($endShippingDate ?? ''),
         ]];
 
         $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);

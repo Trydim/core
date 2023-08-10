@@ -19,8 +19,6 @@ $field['footerContent'] .= <<<footerContent
     <span>Статус заказа: \${status}</span><br>
     <span>Создан: \${createDate}</span><br>
     <span>Посл изменения: \${lastEditDate}</span><br>
-    <span>Начало отгрузки: \${startShippingDate}</span><br>
-    <span>Конец отгрузки: \${endShippingDate}</span><br>
     <span>Менеджер: \${userName}</span><br>
     <span>Клиент: \${customerName}</span><br>
     <!--<span>\${importantValue}</span><br>-->

@@ -69,4 +69,4 @@
   </table>
   <button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>
 </div>
-<div id="paginator" class="w-100"></div>
+<div id="paginator"></div>

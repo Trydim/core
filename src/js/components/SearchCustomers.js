@@ -104,7 +104,7 @@ export const searching = () => {
     return this;
   }
 
-  // Переделать когда нить. в вордпрессе очень крутой поисковик
+  // Переделать когда нить. в Wordpress очень крутой поисковик
   obj.search = function (need) {
     let pattern     = /(-|_|\(|\)|@)/gm,
         cyrillic    = 'УКЕНХВАРОСМТукенхваросмт',
@@ -172,7 +172,7 @@ export const searching = () => {
       wrap.append(this.resultTmp);
     }
 
-    target.dispatchEvent(new Event('keyup'));
+    //target.dispatchEvent(new Event('keyup'));
   }
 
   obj.clickResult = function (e, inputNode) {

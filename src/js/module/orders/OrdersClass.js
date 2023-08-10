@@ -10,7 +10,7 @@ export default class {
     dbAction    : '',
     tableName   : 'orders',
     sortColumn  : 'createDate',
-    sortDirect  : false, // true = DESC, false
+    sortDirect  : true, // true = DESC, false
     currPage    : 0,
     countPerPage: 20,
     pageCount   : 0,
@@ -60,6 +60,8 @@ export default class {
       impValue : null, // f.gT('#tableImportantValue'),
       searchMsg: f.gT('#noFoundSearchMsg'),
     };
+
+    f.oneTimeFunction.add('ordersHeadRender', this.ordersHeadRender.bind(this));
   }
 
   getTypeConfig() {
@@ -95,45 +97,20 @@ export default class {
     this.contValue || (this.contValue = f.gT('#tableContactsValue'));
 
     return data.map(item => {
-      if (item['customerContacts']) {
-        let value = '';
+      /* TODO настройки вывода даты */
+      ['createDate', 'lastEditDate'].forEach(k => {
+        const d = new Date(item[k])
+        item[k] = d.toLocaleTimeString().slice(0, 5) + ' ' + d.toLocaleDateString();
+      });
 
-        try {
-          value = JSON.parse(item['customerContacts']);
-          item['contactsParse'] = value;
-          if (Object.values(value).length) {
-            let arr = Object.entries(value).map(n => ({key: window._(n[0]), value: n[1]}));
-            value = f.replaceTemplate(this.contValue, arr);
-          } else value = '';
-        } catch (e) {
-          value = item['customerContacts'];
-          //console.log(`Клиент ID: ${item.id} имеет не правильное значение`);
-        }
-        item['customerContacts'] = value;
+      if (item['customerContacts']) {
+        let value = Object.entries(item['customerContacts']).map(n => ({key: window._(n[0]), value: n[1]}));
+        item['customerContacts'] = f.replaceTemplate(this.contValue, value);
       }
 
-      if (item.importantValue) {
-        let value = '';
-
-        /*if (false /!* TODO настройки вывода даты*!/) {
-          for (let i in item) {
-            if (i.includes('date')) {
-              //let date = new Date(item[i]);
-              item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
-            }
-          }
-        }*/
-
-        try {
-          value = JSON.parse(item.importantValue);
-          !Array.isArray(value) && (value = Object.values(value).length && [value]);
-          if (value.length) {
-            value = value.map(i => { i.key = window._(i.key); return i; });
-            value = f.replaceTemplate(this.template.impValue, value);
-          } else value = '-';
-        }
-        catch (e) { console.log(`Заказ ID:${item['ID']} имеет не правильное значение`); }
-        item.importantValue = value;
+      if (item['importantValue']) {
+        let value = Object.entries(item['importantValue']).map(n => ({key: window._(n[0]), value: n[1]}));
+        item['importantValue'] = f.replaceTemplate(this.contValue, value);
       }
 
       this.orders[item['ID']] = item;
@@ -164,8 +141,8 @@ export default class {
   }
 
   ordersRender(data, search) {
-    this.ordersHeadRender();
-    this.bodyRender(data, search)
+    f.oneTimeFunction.exec('ordersHeadRender');
+    this.bodyRender(data, search);
   }
 
   setOrders(data) {

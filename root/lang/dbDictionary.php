@@ -17,8 +17,6 @@
     'ID'                => 'Номер',
     'createDate'        => 'Дата создания',
     'lastEditDate'      => 'Дата редактирования',
-    'startShippingDate' => 'Начало Отгрузки',
-    'endShippingDate'   => 'Конце Отгрузки',
     'userName'          => 'Менеджер',
     'customerId'        => 'Номер клиент',
     'customerName'      => 'Клиент',

@@ -637,8 +637,6 @@ export default {
     data.set('importantValue', JSON.stringify(param.importantValue || {}));
     data.set('saveValue', JSON.stringify(param.saveValue || {}));
     data.set('reportValue', JSON.stringify(param.reportValue || {}));
-    data.set('startShippingDate', (param['startShippingDate'] || '').toString());
-    data.set('endShippingDate', (param['endShippingDate'] || '').toString());
 
     return f.Post({data});
   },

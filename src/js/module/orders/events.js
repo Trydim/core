@@ -45,13 +45,10 @@ class AllOrdersList {
   prepareSearchData(data) {
     if (this.type === 'order') {
       this.data = data.reduce((r, i) => {
-        const id = i['ID'];
+        const id = i['ID'],
+              phone = i['customerContacts'].phone.replace(/ |-|_|\(|\)|@/g, '');
 
-        let phone;
-        try { phone = JSON.parse(i['customerContacts'])['phone'].replace(/ |-|_|\(|\)|@/g, ''); }
-        catch { phone = ''; }
-
-        this.searchData[id] = id + i['customerName'] + phone;
+        this.searchData[id] = id + i['customerName'] + phone + i['customerContacts'];
         r[id] = i;
         return r;
       }, Object.create(null));
@@ -70,7 +67,7 @@ class AllOrdersList {
    * @param {[]} resultIds
    */
   showResult(node, resultIds) {
-    let array = resultIds.reduce((r, i) => {r.push(this.data[i]); return r}, []);
+    let array = resultIds.reduce((r, i) => {r.push({...this.data[i]}); return r}, []);
 
     OrdersInstance.setOrders(array, true);
     /* Todo что бы учитывать настройки пагинации нужен запрос
@@ -136,7 +133,9 @@ export default class extends Orders {
         selectedSize   = this.selected.getSelectedSize();
 
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
-    if (!selectedSize && !(['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo']).includes(action)) { f.showMsg('Выберите заказ!', 'warning'); return; }
+    if (!selectedSize && !(['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo']).includes(action)) {
+      f.showMsg('Выберите заказ!', 'warning'); return;
+    }
     this.queryParam.orderIds = this.selected.getSelected();
 
     if (action.includes('confirm')) { // Закрыть подтверждение

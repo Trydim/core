@@ -234,6 +234,11 @@ declare type CMSGlobalObject = {
   SelectedRow: typeof SelectedRow
   SortColumns: typeof SortColumns
 
+  oneTimeFunction: {
+    add(name: string, func: Function)
+    exec(name: string, ...arg: any)
+    del(name: string)
+  }
 
   /* Without description */
   createLink(fileName: string): HTMLAnchorElement

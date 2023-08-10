@@ -12,12 +12,22 @@ class DbMain extends R {
   use DbOrders;
   use DbUsers;
 
-  const DB_DATA_FORMAT = 'Y-m-d H:i:s',
+  const DB_DATE_FORMAT = 'Y-m-d H:i:s',
         DB_DATE_FROM   = '2000-01-01 00:00:00',
-        DB_DATE_TO     = '2100-01-01 00:00:00';
+        DB_DATE_TO     = '2100-01-01 00:00:00',
+        SHOW_DATE_FORMAT = 'H:i d-m-Y';
 
-  const DB_JSON_FIELDS = ['inputValue', 'saveValue', 'importantValue', 'reportValue', 'contacts', 'customization', 'settings', 'cmsParam', 'properties'],
-        DB_BLOB_FIELDS = ['reportValue'];
+  const DB_JSON_FIELDS = [
+    'inputValue', 'saveValue', 'importantValue', 'reportValue',
+    'contacts', 'customerContacts', 'customization',
+    'settings', 'cmsParam', 'properties'
+  ];
+
+  const DB_DATE_FIELDS = [
+    'createDate', 'lastEditDate', 'registerDate'
+  ];
+
+  const DB_BLOB_FIELDS = ['reportValue'];
 
   /**
    * @var Main
@@ -108,6 +118,16 @@ class DbMain extends R {
     return $result;
   }
 
+  private function convertDateFormatField(array $arr): array {
+    foreach ($arr as &$value) {
+      foreach (self::DB_DATE_FIELDS as $dateF) {
+        if (isset($value[$dateF])) $value[$dateF] = date_format(date_create($value[$dateF]), self::SHOW_DATE_FORMAT);
+      }
+    }
+
+    return $arr;
+  }
+
   /**
    * @param array $arr
    * @return array
@@ -174,10 +194,10 @@ class DbMain extends R {
 
     if (empty($date)) return null;
     if (is_numeric($date) && strlen($date) >= 10) {
-      return date($this::DB_DATA_FORMAT, intval(substr($date, 0, 10)));
+      return date($this::DB_DATE_FORMAT, intval(substr($date, 0, 10)));
     }
     $date = date_create($date);
-    return $date ? $date->format($this::DB_DATA_FORMAT) : null;
+    return $date ? $date->format($this::DB_DATE_FORMAT) : null;
   }
 
   /**
@@ -937,7 +957,7 @@ class DbMain extends R {
 
   public function setMoney($rate) {
     $beans = self::xdispense($this->pf('money'), 1);
-    $date = date($this::DB_DATA_FORMAT);
+    $date = date($this::DB_DATE_FORMAT);
 
     foreach ($rate as $currency) {
       $beans->id = $currency['ID'];

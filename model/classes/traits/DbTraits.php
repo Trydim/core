@@ -1,7 +1,7 @@
 <?php
 
 trait DbOrders {
-  private function getOrdersDbColumns(string $field) {
+  private function getOrdersDbColumns(string $field): string {
     switch ($field) {
       default: return $field;
       case 'id': case 'ID': return 'O.ID';
@@ -12,14 +12,14 @@ trait DbOrders {
     }
   }
 
-  private function getBaseOrdersQuery(bool $includeValues = false) {
+  private function getBaseOrdersQuery(bool $includeValues = false): string {
     return "SELECT O.ID AS 'ID', 
-            create_date AS 'createDate', last_edit_date AS 'lastEditDate', 
-            start_shipping_date AS 'startShippingDate', end_shipping_date AS 'endShippingDate',
+            create_date AS 'createDate', last_edit_date AS 'lastEditDate',
             U.name AS 'userName',
             C.ID AS 'customerId', C.name AS 'customerName', C.contacts AS 'customerContacts',
-            S.ID AS 'statusId', S.name AS 'status', total"
-      . ($includeValues ? ", important_value AS 'importantValue', save_value AS 'saveValue', report_value AS 'reportValue'" : "\n") .
+            S.ID AS 'statusId', S.name AS 'status', total,
+            important_value AS 'importantValue'"
+      . ($includeValues ? ", save_value AS 'saveValue', report_value AS 'reportValue'" : "\n") .
       "FROM " . $this->pf('orders') . " O
       LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
       LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
@@ -28,7 +28,7 @@ trait DbOrders {
 
   public function getBaseOrdersQueryColumns(): array {
     return [
-      'ID', 'createDate', 'lastEditDate', 'startShippingDate', 'endShippingDate',
+      'ID', 'createDate', 'lastEditDate',
       'userName',
       'customerId', 'customerName', 'customerContacts',
       'statusId', 'status',
@@ -68,7 +68,7 @@ trait DbOrders {
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
     $sql .= $this->getPaginatorQuery($pageParam);
 
-    return self::getAll($sql);
+    return $this->jsonParseField(self::getAll($sql));
   }
 
   /**
@@ -78,7 +78,7 @@ trait DbOrders {
    *
    * @return array|boolean rows
    */
-  public function loadOrdersById($ids, $oneOrder = false) {
+  public function loadOrdersById($ids, bool $oneOrder = false) {
     $sql = $this->getBaseOrdersQuery(true) . "\n WHERE ";
 
     if (is_array($ids)) {
@@ -152,7 +152,7 @@ trait DbOrders {
   public function saveVisitorOrder($param) {
     $bean = self::xdispense($this->pf('client_orders'));
 
-    $bean->create_date = date($this::DB_DATA_FORMAT);
+    $bean->create_date = date($this::DB_DATE_FORMAT);
     foreach ($param as $key => $value) {
       $bean->$key = $value;
     }
@@ -166,7 +166,7 @@ trait DbOrders {
    *
    * @return array|null
    */
-  public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []) {
+  public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []): ?array {
     $sql = "SELECT ID, cp_number AS 'cpNumber', create_date AS 'createDate', important_value AS 'importantValue', total
             FROM " . $this->pf('client_orders') . "\n";
 
@@ -195,7 +195,7 @@ trait DbOrders {
 }
 
 trait DbUsers {
-  private function getUserDbColumns(string $field) {
+  private function getUserDbColumns(string $field): string {
     switch ($field) {
       default: return $field;
       case 'id': case 'ID': return 'U.ID';
@@ -226,6 +226,7 @@ trait DbUsers {
     } else {
       file_put_contents(SYSTEM_PATH, '');
       // Сделать регистрацию при первом разе
+      return false;
     }
   }
 
@@ -235,7 +236,7 @@ trait DbUsers {
    *
    * @return array|null
    */
-  public function getUser(string $login, string $column = 'ID') {
+  public function getUser(string $login, string $column = 'ID'): ?array {
     $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
       [':login' => $login]
     );
@@ -249,7 +250,7 @@ trait DbUsers {
    *
    * @return array|null
    */
-  public function getUserById($userId) {
+  public function getUserById($userId): ?array {
     return self::getRow("SELECT * FROM " . $this->pf('users') . " WHERE ID = :id",
       [':id' => $userId]
     );
@@ -259,7 +260,7 @@ trait DbUsers {
    * @param $login
    * @return array|null
    */
-  public function getUserByLogin($login) {
+  public function getUserByLogin($login): ?array {
     $sql = "SELECT login, U.name AS 'name', hash, password, customization, 
                    P.ID AS 'permId', P.name AS 'permName', properties AS 'permValue', activity
             FROM " . $this->pf('users') . " U
@@ -270,11 +271,10 @@ trait DbUsers {
   }
 
   /**
-   * @param $id
-   *
-   * @return mixed
+   * @param string|int $id
+   * @return array|null
    */
-  public function getUserByOrderId($id) {
+  public function getUserByOrderId($id): ?array {
     return self::getRow("SELECT U.name AS 'name', U.contacts AS 'contacts'
             FROM " . $this->pf('users') . " U 
             JOIN " . $this->pf('orders') . " O ON U.ID = O.user_id
@@ -313,11 +313,11 @@ trait DbUsers {
    * @return array
    */
   public function loadUsers(array $pageParam): array {
-    $sql = "SELECT U.ID AS 'ID', login, U.name AS 'name', contacts, 
-                   permission_id AS 'permissionId', P.name AS 'permissionName', 
+    $sql = "SELECT U.ID AS 'ID', login, U.name AS 'name', contacts,
+                   permission_id AS 'permissionId', P.name AS 'permissionName',
                    register_date AS 'registerDate', activity
-        FROM " . $this->pf('users') . " U
-        LEFT JOIN " . $this->pf('permission') . " P ON U.permission_id = P.ID\n";
+            FROM " . $this->pf('users') . " U
+            LEFT JOIN " . $this->pf('permission') . " P ON U.permission_id = P.ID\n";
 
     $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn']);
 
