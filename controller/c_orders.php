@@ -24,7 +24,7 @@ $setting = $setting ?: [];
 $columns = $main->db->getBaseOrdersQueryColumns();
 $param['orderColumns'] = $columns;
 $field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersAllColumn' value='" . json_encode($columns) . "'>";
-// Колонки которые отображаются.
+// Колонки, которые отображаются.
 $columns = $setting['ordersShowColumns'] ?? ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
 $columns = array_map(function ($item) {
   return [

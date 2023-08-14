@@ -12,7 +12,8 @@ $field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath
 $orderColumnsTableTmp = '';
 foreach ($param['orderColumns'] as $column) {
   $orderColumnsTableTmp .= '
-    <div class="input-group">
+    <div class="input-group my-1 droppable">
+      <div class="input-group-text dragItem"><i class="pi pi-list"></i></div>
       <label for="col' . $column . '" class="input-group-text flex-grow-1">' . gTxtDB('orders', $column) . ':</label>
       <div class="input-group-text">
         <input type="checkbox" id="col' . $column . '" class="form-check-input mt-0" value="true" name="' . $column . '">
@@ -56,7 +57,7 @@ $field['footerContent'] .= <<<footerContent
   </div>
 </template-->
 <template id="orderColumnsTableTmp">
-  <form class="" action="#" id="columnsSetting">$orderColumnsTableTmp</form>
+  <form action="#" id="columnsSetting">$orderColumnsTableTmp</form>
 </template>
 footerContent;
 

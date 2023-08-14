@@ -408,7 +408,7 @@ class Docs {
     ];
 
     foreach($data as $sheet) {
-      $sheetName = gTxt( $sheet['sheetName']);
+      $sheetName = gTxt($sheet['sheetName']);
 
       if (count($sheet['header'] ?? [])) {
         $this->docs->writeSheetHeader($sheetName, $sheet['headerData'], $sheet['headerStyle']);

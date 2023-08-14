@@ -303,9 +303,75 @@ export default class extends Orders {
     this.queryParam.dbAction  = 'saveColumns';
     this.queryParam.tableType = this.orderType === 'visit' ? 'ordersShowVisitorColumns' : 'ordersShowColumns';
 
-    this.config.ordersColumns.forEach(key => {
-      form.querySelector(`[name="${key['dbName']}"]`).checked = true;
+    this.config.ordersColumns.forEach((key) => {
+      const inputN = form.querySelector(`[name="${key['dbName']}"]`),
+            wrap   = inputN.parentNode.parentNode;
+
+      inputN.checked = true;
+      form.append(wrap);
     });
+
+    form.querySelectorAll('.droppable').forEach((wrap) => {
+      const dragN  = wrap.querySelector('.dragItem');
+
+      let currentDroppable = null;
+
+      dragN.onmousedown = function(event) {
+        let s = wrap.getBoundingClientRect(),
+            shiftX = event.clientX - s.left,
+            shiftY = event.clientY - s.top;
+
+        function enterDroppable(elem) { elem.style.outline = '1px solid red'; }
+        function leaveDroppable(elem) { elem.style.outline = ''; }
+        function moveAt(pageX, pageY) {
+          wrap.style.left = pageX - shiftX + 'px';
+          wrap.style.top = pageY - shiftY + 'px';
+        }
+        function onMouseMove(event) {
+          moveAt(event.pageX, event.pageY);
+
+          wrap.hidden = true;
+          let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+          wrap.hidden = false;
+
+          if (!elemBelow) return;
+
+          let droppableBelow = elemBelow.closest('.droppable');
+          if (currentDroppable !== droppableBelow) {
+            if (currentDroppable) { // null если мы были не над droppable до этого события
+              leaveDroppable(currentDroppable); // (например, над пустым пространством)
+            }
+            currentDroppable = droppableBelow;
+            if (currentDroppable) { // null если мы не над droppable сейчас, во время этого события
+              enterDroppable(currentDroppable); // (например, только что покинули droppable)
+            }
+          }
+        }
+
+        wrap.style.position = 'absolute';
+        wrap.style.width = s.width + 'px';
+        wrap.style.zIndex = 1000;
+        document.body.append(wrap);
+
+        moveAt(event.pageX, event.pageY);
+
+        document.addEventListener('mousemove', onMouseMove);
+
+        dragN.onmouseup = function() {
+          if (currentDroppable) currentDroppable.after(wrap);
+          else form.prepend(wrap);
+
+          wrap.style.position = 'initial';
+          wrap.style.width = 'auto';
+
+          document.removeEventListener('mousemove', onMouseMove);
+          dragN.onmouseup = null;
+          form.dispatchEvent(new Event('input'));
+        };
+      };
+
+      dragN.ondragstart = function() { return false; };
+    })
 
     form.oninput = () => {
       this.queryParam.columns = JSON.stringify([...new FormData(form).keys()]);

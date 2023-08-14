@@ -61,12 +61,12 @@
 </div>
 
 <div class="mt-1 position-relative">
+  <button type="button" class="position-absolute top-0 btn btn-light pi pi-cog mt-2 p-2" style="z-index: +1" data-action="setupColumns"></button>
   <table id="orderTable" class="text-center table table-striped">
     <thead>
-      <tr></tr>
+      <tr style="max-width: "></tr>
     </thead>
     <tbody></tbody>
   </table>
-  <button type="button" class="position-absolute end-0 top-0 btn btn-light pi pi-cog m-2" style="z-index: +1" data-action="setupColumns"></button>
 </div>
 <div id="paginator"></div>

@@ -51,7 +51,8 @@ export default class {
     this.btnMainOnly  = f.qA('#actionBtnWrap input.mainOnly');
 
     this.config = {
-      ordersColumns: f.getData('#dataOrdersColumn'),
+      ordersAllColumns: f.getData('#dataOrdersAllColumn'),
+      ordersColumns   : f.getData('#dataOrdersColumn'),
       ordersVisitColumns: f.getData('#dataOrdersVisitColumn'),
     };
 
@@ -88,7 +89,8 @@ export default class {
     let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${ID}"></td>';
 
     tmp += this.config[this.getTypeConfig()].reduce((r, column) => {
-      return r += '<td>${' + column['dbName'] + '}</td>';
+      r += '<td>${' + column['dbName'] + '}</td>';
+      return r;
     }, '');
 
     return this.template.tableCell = tmp + '</tr>';
@@ -100,7 +102,7 @@ export default class {
       /* TODO настройки вывода даты */
       ['createDate', 'lastEditDate'].forEach(k => {
         const d = new Date(item[k])
-        item[k] = d.toLocaleTimeString().slice(0, 5) + ' ' + d.toLocaleDateString();
+        item[k] = d.toLocaleDateString() + ' ' + d.toLocaleTimeString().slice(0, 5);
       });
 
       if (item['customerContacts']) {

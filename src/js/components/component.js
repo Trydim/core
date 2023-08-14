@@ -2,6 +2,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 // Загрузчик / preLoader
+import LocalStorage from "./LocalStorage";
+
 export class LoaderIcon {
   /**
    *
@@ -305,6 +307,9 @@ export class Pagination {
 
     if (!(field && param.query)) return;
 
+    this.storage = new f.LocalStorage();
+    this.storageKey = param.storageKey || 'countPerPage';
+
     this.node           = field;
     this.node.innerHTML = this.template();
     this.node.onclick   = this.onclick.bind(this);
@@ -318,14 +323,20 @@ export class Pagination {
     this.dbAction    = dbAction;
     this.sortParam   = sortParam;
     this.activeClass = f.CLASS_NAME.ACTIVE;
+
     this.setParam();
   }
 
   setParam() {
-    const pageCounts = Array.from(this.pageCounter.node.options).map(o => f.toNumber(o.value));
+    const counterNode = this.pageCounter.node,
+          pageCounts = Array.from(counterNode.options).map(o => f.toNumber(o.value));
 
     this.pageCounter.min = Math.min(...pageCounts);
     this.pageCounter.max = Math.max(...pageCounts);
+
+    if (this.storage.has(this.storageKey)) {
+      this.sortParam.countPerPage = counterNode.value = this.storage.get(this.storageKey);
+    } else this.sortParam.countPerPage = counterNode.value;
   }
 
   setQueryAction(action) {
@@ -404,6 +415,7 @@ export class Pagination {
       case 'page': this.sortParam.currPage = btn.dataset.page; break;
       case 'count':
         if (this.sortParam.countPerPage === +e.target.value) return;
+        this.storage.set(this.storageKey, e.target.value);
         this.sortParam.countPerPage = +e.target.value;
         this.sortParam.currPage = 0;
         break;
