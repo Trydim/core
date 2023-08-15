@@ -34,7 +34,7 @@ $field['footerContent'] .= <<<footerContent
   <form class="content-center" action="#" id="authForm">
     <div class="input-group">
       <span class="input-group-text">Почта:</span>
-      <input type="text" id="email" class="form-control" value="" name="email">
+      <input type="text" id="email" class="form-control" required name="email">
     </div>
   </form>
 </template>

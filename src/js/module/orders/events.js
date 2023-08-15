@@ -379,6 +379,9 @@ export default class extends Orders {
     };
 
     form.dispatchEvent(new Event('input'));
+
+    this.M.btnConfirm.classList.remove('cl-confirm-disabled'); // Валидация
+    this.M.btnConfig('confirmYes', {value: _('Confirm'), disabled: false});
     this.M.show('Настройка колонок', form);
   }
 

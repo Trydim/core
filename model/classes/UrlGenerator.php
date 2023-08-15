@@ -146,7 +146,9 @@ class UrlGenerator {
     $dealLink = '';
 
     if ($this->main->isDealer()) {
-      $dealLink = 'dealer/' . $this->main->getCmsParam('dealerId') . '/';
+      $id = $this->main->getCmsParam('dealerId');
+      if ($this->isLocalDealer($id)) $id = 'resource';
+      $dealLink = 'dealer/' . $id . '/';
     }
 
     return $this->getBasePath() . $dealLink;
@@ -270,7 +272,7 @@ class UrlGenerator {
 
       if (!isset($match[1])) die('Dealer id not found!');
       if (is_numeric($match[1])) {
-        if (!is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
+        if (!$this->isLocalDealer($match[1]) && !is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
         else $this->main->setCmsParam('dealerId', $match[1]);
       } else {
         $this->main->setCmsParam('dealerLink', $match[1]);
@@ -278,6 +280,10 @@ class UrlGenerator {
     }
 
     $this->main->setCmsParam('isDealer', $isDealer);
+  }
+  // Попытка сделать одну папку ресурсов для разработки дилеров
+  public function isLocalDealer(string $id): bool {
+    return $this->server->get('REMOTE_ADDR') === '127.0.0.1' && $id === '1';
   }
 
   public function getScheme(): string {
