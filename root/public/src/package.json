@@ -12,6 +12,8 @@
     "localCypressTest": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=false",
     "cypressDeployProd": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=true",
 
+    "publicDevServe": "webpack serve --config ./webpack/webpack.config.js",
+
     "createDealerDev": "node ./webpack/createDealerDev.js"
   }
 }

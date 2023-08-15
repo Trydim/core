@@ -415,4 +415,8 @@ export default class extends Orders {
   changeEmailInput(e) {
     this.queryParam.email = e.target.value;
   }
+
+  resetSelected() {
+    this.selected.clear();
+  }
 }

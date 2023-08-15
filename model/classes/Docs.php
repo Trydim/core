@@ -14,7 +14,7 @@ class Docs {
   /**
    * What library use
    *
-   * @var string [mpdf/html2pdf]
+   * @var string [dompdf/mpdf/html2pdf]
    */
   private $pdfLibrary;
 

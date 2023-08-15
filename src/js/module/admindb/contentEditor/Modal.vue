@@ -13,7 +13,7 @@ export default {
   },
   emits: ['confirm', 'cancel'],
   data: () => ({
-    M: new f.Modal(),
+    M: f.initModal(),
   }),
   mounted() {
     const m = this.M;

@@ -9,7 +9,7 @@
       <i class="ms-3 mt-1 pi pi-cog float-end" @click.stop="toggleField(key)"></i>
 
       <template v-if="showFieldEditor(key)">
-        <label class="d-flex align-items-center justify-content-between">
+        <label class="d-flex align-items-center">
           <span class="col-4">Ключ</span>
           <input type="text" class="ms-1 col-6" :value="key"
                  :disabled="item.locked"
@@ -20,10 +20,10 @@
           ></i>
         </label>
 
-        <label class="d-flex align-items-center justify-content-between">
+        <label class="d-flex align-items-center">
           <span class="col-4">Название</span>
           <input type="text" class="ms-1 col-6" v-model="item.name" @blur="changeField($event.target, key)">
-          <i v-if="count > 1" class="ms-3 pi pi-trash pointer" @click.stop="deleteField(key, item)"></i>
+          <i v-if="count > 1" class="ms-auto pi pi-trash pointer" @click.stop="deleteField(key, item)"></i>
         </label>
       </template>
     </span>

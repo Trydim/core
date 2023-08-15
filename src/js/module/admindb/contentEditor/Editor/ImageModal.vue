@@ -4,17 +4,17 @@
     @confirm="confirmImage"
     @cancel="$emit('close')"
   >
-    <div class="form-floating">
+    <div class="row form-floating">
       <input type="text" id="imgSrc" class="form-control" placeholder="Путь" v-model="src">
       <label for="imgSrc">Путь</label>
     </div>
-    <div class="row">
+    <div class="row gap-2 mt-2">
       <input ref="file" hidden type="file" @change="addFile">
       <button type="button" class="col btn btn-light" @click="uploadImage">
         <i class="pi pi-upload"></i>
         Загрузить
       </button>
-      <button type="button" class="col btn btn-light">
+      <button v-if="false" type="button" class="col btn btn-light" @click="selectImage">
         <i class="pi pi-folder"></i>
         Выбрать
       </button>
@@ -52,7 +52,11 @@ export default {
       else data.set('files' + fl.id, fl.toString());
 
       return f.Post({data}).then(async data => {
-        if (data.status && data['files']) return data['files'][0]['path'];
+        if (data.status) {
+          delete data.status;
+          return Object.values(data)[0]['uri'];
+        }
+        return 'save file error';
       });
     },
     clearFiles() {
@@ -61,9 +65,6 @@ export default {
       this.$refs.file.files = input.files;
     },
 
-    uploadImage() {
-      this.$refs.file.click();
-    },
     addFile() {
       Object.values(this.$refs.file.files).forEach(file => {
         let error = file.size > 1024*1024,
@@ -77,6 +78,13 @@ export default {
         };
       });
       this.clearFiles();
+    },
+
+    uploadImage() {
+      this.$refs.file.click();
+    },
+    selectImage() {
+
     },
 
     async confirmImage() {

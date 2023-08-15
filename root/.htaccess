@@ -17,12 +17,17 @@ RewriteRule ^(.*)$ /index.php?targetPage=$1 [L,QSA]
 #php_value session.gc_maxlifetime 86400
 #php_value session.cookie_lifetime 0
 
-#запрет ко всем файлам
+# Запрет ко всем файлам
 <FilesMatch "\.(php)$">
 	Deny from all
 </FilesMatch>
 
-#разрешить 1 файл
+# Разрешить 1 файл
 <FilesMatch "^index.(php)$">
 	Allow from all
 </FilesMatch>
+
+# Для dev servera
+#<IfModule mod_headers.c>
+#    Header set Access-Control-Allow-Origin "*"
+#</IfModule>

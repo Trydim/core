@@ -3,6 +3,8 @@
 export default class {
   selected = null;
 
+  selectedArea = undefined;
+
   mainAction = 'loadOrders';
   needReload = false;
   queryParam = {
@@ -37,6 +39,7 @@ export default class {
 
     this.loaderTable = new f.LoaderIcon(this.table);
     this.selected = new f.SelectedRow({table: this.table});
+    this.selected.subscribe(this.selectedRender.bind(this));
 
     this.query();
   }
@@ -45,9 +48,10 @@ export default class {
 
     this.orderType  = 'main';
 
-    this.table        = f.qS('#orderTable');
-    this.confirm      = f.qS('#confirmField');
-    this.selectStatus = f.qS('#selectStatus');
+    this.table        = f.gI('orderTable');
+    this.confirm      = f.gI('confirmField');
+    this.selectedArea = f.gI('selectedArea');
+    this.selectStatus = f.gI('selectStatus');
     this.btnMainOnly  = f.qA('#actionBtnWrap input.mainOnly');
 
     this.config = {
@@ -61,6 +65,7 @@ export default class {
       impValue : null, // f.gT('#tableImportantValue'),
       searchMsg: f.gT('#noFoundSearchMsg'),
     };
+
 
     f.oneTimeFunction.add('ordersHeadRender', this.ordersHeadRender.bind(this));
   }
@@ -141,10 +146,20 @@ export default class {
     }
     this.table.querySelector('tbody').innerHTML = html;
   }
-
   ordersRender(data, search) {
     f.oneTimeFunction.exec('ordersHeadRender');
     this.bodyRender(data, search);
+  }
+  // Show selected orders
+  selectedRender() {
+    const selected = this.selected.getSelected();
+
+    if (selected.length) {
+      f.show(this.selectedArea);
+      this.selectedArea.firstElementChild.innerHTML = '<span>' + selected.join('</span><span>, ') + '</span>';
+    } else {
+      f.hide(this.selectedArea);
+    }
   }
 
   setOrders(data) {

@@ -3,7 +3,7 @@
 /**
  * @var object $main
  * @var array $param
- * @var array $permission
+ * @var string $permission
  * @var array $managerField
  */
 
@@ -41,7 +41,7 @@ $field['footerContent'] .= '
     </div>
 
     <div class="form-floating mb-3">
-      <select class="form-select" id="permissionId" name="permissionId">$permission</select>
+      <select class="form-select" id="permissionId" name="permissionId">' . $permission . '</select>
       <label for="permissionId">' . gTxt('Permission') . '</label>
     </div>
 

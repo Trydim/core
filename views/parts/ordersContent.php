@@ -63,10 +63,13 @@
 <div class="mt-1 position-relative">
   <button type="button" class="position-absolute top-0 btn btn-light pi pi-cog mt-2 p-2" style="z-index: +1" data-action="setupColumns"></button>
   <table id="orderTable" class="text-center table table-striped">
-    <thead>
-      <tr style="max-width: "></tr>
-    </thead>
+    <thead><tr></tr></thead>
     <tbody></tbody>
   </table>
 </div>
 <div id="paginator"></div>
+
+<div class="position-fixed bottom-0 end-0 mb-5 d-none" id="selectedArea">
+  <div class="d-inline bg-light p-1 me-1" title="<?= gTxt('Selected orders') ?>"></div>
+  <button class="btn btn-danger pi pi-times" data-action="resetSelected"></button>
+</div>
