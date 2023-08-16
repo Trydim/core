@@ -998,7 +998,7 @@ class DbMain extends R {
     return false;
   }
 
-  public function loadDealers(): ?array {
+  public function loadDealers(): array {
     $sql = "SELECT ID AS 'id', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 

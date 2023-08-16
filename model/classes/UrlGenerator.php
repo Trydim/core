@@ -1,5 +1,6 @@
 <?php
 
+use Helpers\InputBag;
 use Helpers\ServerBag;
 use Helpers\HeaderBag;
 
@@ -8,6 +9,10 @@ class UrlGenerator {
    * @var Main
    */
   private $main;
+  /**
+   * @var InputBag
+   */
+  public $request;
   /**
    * @var ServerBag
    */
@@ -81,7 +86,8 @@ class UrlGenerator {
    */
   public function __construct(Main $main, string $corePath) {
     $this->main = $main;
-    $this->server = new ServerBag($_SERVER);
+    $this->request = new InputBag($_REQUEST);
+    $this->server  = new ServerBag($_SERVER);
     $this->headers = new HeaderBag($this->server->getHeaders());
 
     $this->absolutePath = str_replace('\\', '/', ABS_SITE_PATH);
@@ -283,7 +289,7 @@ class UrlGenerator {
   }
   // Попытка сделать одну папку ресурсов для разработки дилеров
   public function isLocalDealer(string $id): bool {
-    return $this->server->get('REMOTE_ADDR') === '127.0.0.1' && $id === '1';
+    return false && $this->server->get('REMOTE_ADDR') === '127.0.0.1' && $id === '1';
   }
 
   public function getScheme(): string {

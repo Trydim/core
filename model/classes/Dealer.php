@@ -75,7 +75,7 @@ class Dealer {
     $sep = DIRECTORY_SEPARATOR;
     $dir = opendir($src);
 
-    mkdir($dst);
+    if (!is_dir($dst)) mkdir($dst);
     while ($file = readdir($dir)) {
       if (in_array($file, ['.', '..'])) continue;
 
@@ -147,7 +147,7 @@ class Dealer {
 
   public function update($id) {
     $this->setParam($id, '');
-    if ($this->checkFolder() === false) return false;
+    if (!is_dir($this->dealerDir)) $this->createFolder();
     $this->copyFiles(['public']);
 
     return $id;

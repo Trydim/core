@@ -15,14 +15,13 @@ declare class LoaderIcon {
   stop(): void
 }
 
-
 declare class Observer {
   constructor()
 
   addArgument(): void
   remove(): void
   getListPublisher(): void
-  subscribe()
+  subscribe(): void
   fire()
 }
 
@@ -49,6 +48,19 @@ declare class SelectedRow {
   constructor(param: {
     table: HTMLTableElement
   })
+
+  clear(): void
+  add(id: string | number): SelectedRow
+  getSelected(): string | number[]
+  getSelectedSize(): number
+  remove(id: string | number): SelectedRow
+
+  getObserverKey(): string
+
+  subscribe(func: Function, ...arg: any): void
+
+  checkedById(id: string | number, check = true): SelectedRow
+  checkedAll()
 }
 
 declare class SortColumns {

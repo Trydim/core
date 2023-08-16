@@ -43,24 +43,32 @@ const templatePopup = pr => {
  */
 export const ModalOur = function (param = {}) {
   let modal = Object.create(null),
-      data = Object.create(null),
+      data  = Object.create(null),
       {
-        prefix = 'vs_',
-        modalId = 'adminPopup' + f.random(),
-        template = '',
-        showDefaultButton = true,
+        prefix    = 'vs_',
+        modalId   = 'adminPopup' + f.random(),
+        template  = '',
         btnConfig = false,
+        showDefaultButton = true,
       } = param;
 
   modal.setParam = function (param) {
-    this.wrap.id = param.modalId || '';
-    //this.window   =
-    //this.title    =
-    //this.content  =
-    //this.btnField =
+    const once = {once: true};
 
-    if (this.btnConfirm && typeof param.beforeConfirm === 'function') this.btnConfirm.addEventListener('mousedown', param.beforeConfirm);
-    if (this.btnCancel && typeof param.beforeCancel === 'function') this.btnCancel.addEventListener('mousedown', param.beforeCancel);
+    this.param = param;
+    this.wrap.id = param.modalId || '';
+
+    if (this.btnConfirm) {
+      if (typeof param.beforeConfirm === 'function') this.btnConfirm.addEventListener('mousedown', param.beforeConfirm, once);
+      if (typeof param.afterConfirm === 'function') this.btnConfirm.addEventListener('mousedown', param.afterConfirm, once);
+    }
+    if (this.btnCancel) {
+      ['beforeCancel', 'afterCancel'].forEach(hook => {
+        if (typeof param[hook] === 'function') {
+          this.btnCancel.forEach(n => n.addEventListener('mousedown', param[hook], once));
+        }
+      })
+    }
   }
   modal.bindBtn = function () {
     this.wrap.querySelectorAll(`.${prefix}modal-close, .confirmYes, .closeBtn`)
@@ -88,8 +96,10 @@ export const ModalOur = function (param = {}) {
    * @param {string|HTMLElement} content
    * @param {object} param
    * @param {string} param.modalId - add wrap id
-   * @param {function} param.beforeConfirm - add wrap id
-   * @param {function} param.beforeCancel - add wrap id
+   * @param {function} param.beforeConfirm
+   * @param {function} param.afterConfirm
+   * @param {function} param.beforeCancel
+   * @param {function} param.afterCancel
    */
   modal.show = function (title, content = '', param= {}) {
     if (this.title && title) {
@@ -121,7 +131,6 @@ export const ModalOur = function (param = {}) {
 
     this.onEvent();
   }
-
   modal.hide = function () {
     const scrollY = Math.max(window.scrollY, window.pageYOffset, document.body.scrollTop);
 

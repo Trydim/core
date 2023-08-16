@@ -45,8 +45,23 @@ const downloadBody = async (data: any) => {
 }
 
 const query = (url: string, body: BodyInit | null, type = 'json') => {
+  const headers = {'Cookie': document.cookie} as any;
+
+  if (body && ['object', 'string'].includes(typeof body) && !(body instanceof FormData)) {
+    let data = new FormData();
+
+    if (typeof body === 'object') {
+      Object.entries(body).forEach(([k, v]) => {
+        data.set(k, typeof v === 'object' ? JSON.stringify(v) : v.toString());
+      });
+    }
+    else data.set('content', body);
+
+    body = data;
+  }
+
   type === 'file' && (type = 'body');
-  return fetch(url, {method: 'post', headers: {'Cookie': document.cookie}, credentials: "same-origin", body})
+  return fetch(url, {method: 'post', headers, credentials: "same-origin", body})
     .then((res: Response | Promise<string> | any) => type === 'json' ? res.text() : res).then(
       data => {
         if (type === 'json') return checkJSON(data);

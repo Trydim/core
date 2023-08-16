@@ -218,7 +218,7 @@ declare type CMSGlobalObject = {
 
   Post(obj: {
     url?: string,
-    data: BodyInit,
+    data: BodyInit | {},
     type?: string | 'text' | 'json' | 'blob'
   }): Promise<Response>
 

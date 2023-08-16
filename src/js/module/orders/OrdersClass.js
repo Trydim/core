@@ -198,7 +198,7 @@ export default class {
   }
 
   query(action) {
-    const data = new FormData(),
+    const data  = new FormData(),
           param = this.queryParam;
 
     if (action) param.dbAction = action;
@@ -211,13 +211,12 @@ export default class {
 
     this.loaderTable.start();
     f.Post({data}).then(data => {
-      if(this.needReload) {
+      if (this.needReload) {
         this.needReload = false;
         this.selected.clear();
         this.queryParam.dbAction = this.mainAction;
         this.queryParam.orderIds = '[]';
-        this.query();
-        return;
+        return this.query();
       } else {
         this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
       }

@@ -127,11 +127,12 @@ export default class extends Orders {
   }
 
   actionBtn(e) {
-    let hideActionWrap = false,
-        target         = e.target,
-        action         = target.dataset.action,
+    let target = e.target,
+        action = target.dataset.action,
+        hideActionWrap = false,
         selectedSize   = this.selected.getSelectedSize();
 
+    if (!['setupColumns'].includes(action)) return;
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
     if (!selectedSize && !(['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo']).includes(action)) {
       f.showMsg('Выберите заказ!', 'warning'); return;
@@ -169,6 +170,7 @@ export default class extends Orders {
     if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
 
     const data = new FormData();
+    data.set('mode', 'DB');
     data.set('dbAction', 'loadOrderById');
     data.set( 'orderId', this.queryParam.orderIds);
 
@@ -297,11 +299,11 @@ export default class extends Orders {
   }
 
   setupColumns() {
-    const form = f.gTNode('#orderColumnsTableTmp');
+    const modal = new f.initModal(),
+          form  = f.gTNode('#orderColumnsTableTmp'),
+          queryParam = {mode: 'setting', dbAction: 'saveColumns'};
 
-    this.queryParam.mode      = 'setting';
-    this.queryParam.dbAction  = 'saveColumns';
-    this.queryParam.tableType = this.orderType === 'visit' ? 'ordersShowVisitorColumns' : 'ordersShowColumns';
+    queryParam.tableType = this.orderType === 'visit' ? 'ordersShowVisitorColumns' : 'ordersShowColumns';
 
     this.config.ordersColumns.forEach((key) => {
       const inputN = form.querySelector(`[name="${key['dbName']}"]`),
@@ -373,16 +375,17 @@ export default class extends Orders {
       dragN.ondragstart = function() { return false; };
     })
 
-    form.oninput = () => {
-      this.queryParam.columns = JSON.stringify([...new FormData(form).keys()]);
-      console.log(this.queryParam.columns);
-    };
-
+    form.oninput = () => queryParam.columns = JSON.stringify([...new FormData(form).keys()]);
     form.dispatchEvent(new Event('input'));
 
-    this.M.btnConfirm.classList.remove('cl-confirm-disabled'); // Валидация
-    this.M.btnConfig('confirmYes', {value: _('Confirm'), disabled: false});
-    this.M.show('Настройка колонок', form);
+    modal.btnConfig('confirmYes', {value: _('Confirm')});
+    modal.show('Настройка колонок', form, {
+      afterConfirm: () => {
+        f.Post({data: queryParam}).then(data => {
+          if (data.status) f.showMsg(_('Saved! Change will be visible after reload page'), 'warning');
+        });
+      }
+    });
   }
 
   actionSelect(e) {

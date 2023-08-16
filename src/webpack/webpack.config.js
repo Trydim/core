@@ -13,7 +13,7 @@ module.exports = env => {
     watchOptions: {aggregateTimeout: 300}, // задержка оценки изменений в мс
     entry       : {
       main: './js/main.ts',
-      src: './js/src.js',
+      src : './js/src.js',
     },
 
     experiments: {
@@ -21,10 +21,11 @@ module.exports = env => {
     },
 
     output : {
-      path         : path.resolve(__dirname, '../../assets/'),
-      filename     : 'js/[name].js',
-      scriptType   : 'module',
-      module       : true,
+      clean: !dev,
+      path      : path.resolve(__dirname, '../../assets/'),
+      filename  : 'js/[name].js',
+      scriptType: 'module',
+      module    : true,
       libraryTarget: 'module',
     },
     resolve: {

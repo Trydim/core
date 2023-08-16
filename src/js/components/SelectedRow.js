@@ -1,5 +1,3 @@
-// TODO сохранять в сессии потом, что бы можно было перезагрузить страницу
-
 class SelectedId {
   constructor(key) {
     this.key = key;
@@ -63,15 +61,12 @@ export class SelectedRow {
     if (!table) return;
     this.table = table;
     this.observerKey = 'selected' + (Math.random() * 10000 | 0);
-    this.setSelectedId();
+    this.selectedId  = new SelectedId(this.observerKey);
     this.onTableMutator();
     this.onTableEvent();
     f.observer.addArgument(this.observerKey, this);
   }
 
-  setSelectedId() {
-    this.selectedId = new SelectedId(this.observerKey);
-  }
   clear() {
     this.checkedRows(false);
     this.selectedId.clear();

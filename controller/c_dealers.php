@@ -13,7 +13,7 @@ if (includes($main->url->getRequestUri(), 'update')) {
     $main->dealer->update($dealer['id']);
   }
 
-  $main->response->setContent('Dealers updated! by ' . time() - $start . ' sec');
+  $main->response->setContent('Dealers updated! by ' . (time() - $start) . ' sec');
   return;
 }
 
