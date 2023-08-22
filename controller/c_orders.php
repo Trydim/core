@@ -6,14 +6,18 @@
 $param = [
   'showFilter' => $main->availablePage('dealers') && $main->getCmsParam('DEALERS_ORDERS_SHOW'),
 ];
+
+$user = $main->db->getUserById($main->getLogin('id'));
 $user = [
+  'name'       => $main->getLogin(VC::USER_NAME),
   'permission' => $main->getLogin(VC::USER_PERMISSION),
   'isAdmin'    => $main->getLogin(VC::USER_IS_ADMIN),
+  'fields'     => $user['contacts'],
 ];
 $field = [
   'pageTitle' => 'Заказы',
   'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
-  'footerContent' => "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>",
+  'footerContent' => "<input type='hidden' id='dataUser' value='" . json_encode($user) . "'>",
 ];
 
 // получить конфиг текущего пользователя
@@ -32,7 +36,7 @@ $columns = array_map(function ($item) {
     'name'   => gTxtDB('orders', $item),
   ];
 }, $columns);
-$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersColumn' value='". json_encode($columns) . "'>";
+$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersColumn' value='" . json_encode($columns) . "'>";
 
 
 // Пользовательские заказы
@@ -43,7 +47,7 @@ $columns = array_map(function ($item) {
     'name'   => gTxtDB('visitorOrders', $item),
   ];
 }, $columns);
-$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersVisitColumn' value='". json_encode($columns) . "'>";
+$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersVisitColumn' value='" . json_encode($columns) . "'>";
 
 if ($param['showFilter']) {
   $param['dealers'] = $main->db->selectQuery('dealers', ['id', 'name']);

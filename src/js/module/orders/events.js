@@ -219,12 +219,38 @@ export default class extends Orders {
       f.removeLoading(target);
       target.removeAttribute('disabled');
       if (data['pdfBody']) {
-        f.saveFile({
-          name: data['name'],
-          type: 'base64',
-          blob: 'data:application/pdf;base64,' + data['pdfBody']
-        });
-        target.blur();
+        const manager = new f.User().data
+        const formData = new FormData()
+        const queryParam = {
+          mode        : 'DB',
+          dbAction    : 'loadOrders',
+          orderIds    : this.queryParam.orderIds[0],
+          sortColumn  : 'createDate',
+        }
+        Object.entries(queryParam).map(([key, value]) => formData.set(key, value.toString()))
+        // запрос на заказ, из которого беру данные для нужного pdf
+        f.Post({data: formData}).then(({ orders }) => {
+          const order = orders[0], reportValue = order.reportValue
+          // будет нужно мб
+          // const pureLength = reportValue.basketItems.items.reduce((acc, item) => acc += item.pureLength, 0)
+          // const workDays = reportValue.basketItems.items.reduce((acc, item) => acc += +item.workDays, 0)
+          let fileName = order
+            ? `${manager?.fields.company || 'centura'}_${order.ID || 0}_${order.lastEditDate.slice(0, 10) || 0}` : ''
+
+          try {
+            f.downloadPdf(
+              target, {
+                ...reportValue,
+                fileName,
+                company: manager?.fields.company || 'centura',
+                // info: { ...reportValue.info, pureLength, workDays }
+              }
+            )
+          } catch (error) {
+            f.showMsg(_('Order loading error'), 'error')
+            console.error(error)
+          }
+        })
       }
     });
   }

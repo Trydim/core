@@ -14,16 +14,26 @@ $managerFieldHtml = '';
 foreach ($managerField as $k => $item) {
   $rndId = uniqid();
   switch ($item['type']) {
+    case 'company':
+      $input =
+        '<select name="' . $k . '" class="form-control form-select">
+          <option value="centura">Centura</option>
+          <option value="lunfix">Lunfix</option>
+        </select>';
+      break;
     case 'textarea':
       $input = '<textarea name="' . $k . '" class="form-control"></textarea>';
       break;
-    case 'string': case 'number': case 'date': default:
+    case 'string':
+    case 'number':
+    case 'date':
+    default:
       $input = '<input id="' . $rndId . '" type="' . $item['type'] . '" class="form-control" name="' . $k . '">';
       break;
   }
 
   $managerFieldHtml .= '<div class="form-floating managerField mb-3">' . $input .
-                       '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
+    '<label id="' . $rndId . '">' . $item['name'] . '</label></div>';
 }
 
 $field['footerContent'] .= '
@@ -41,7 +51,7 @@ $field['footerContent'] .= '
     </div>
 
     <div class="form-floating mb-3">
-      <select class="form-select" id="permissionId" name="permissionId">$permission</select>
+      <select class="form-select" id="permissionId" name="permissionId">' . $permission . '</select>
       <label for="permissionId">' . gTxt('Permission') . '</label>
     </div>
 
@@ -64,8 +74,8 @@ $field['footerContent'] .= '
       <input type="email" class="form-control" id="pEmail" placeholder="' . gTxt('Email') . '" name="email" required>
       <label for="pEmail">' . gTxt('Email') . '</label>
     </div>' .
-    $managerFieldHtml
-    . '<div id="changeField" class="row">
+  $managerFieldHtml
+  . '<div id="changeField" class="row">
       <div class="col-6 ps-4">
         <label class="w-100" for="pActivity" role="button">' . gTxt('Activity') . ':</label>
       </div>

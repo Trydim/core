@@ -42,6 +42,7 @@ export default {
       {id: 'textarea', name: _('Text (many)')},
       {id: 'number', name: _('Number')},
       {id: 'date', name: _('Date')},
+      {id: 'company', name: _('Company')},
     ],
   }),
   methods: {
