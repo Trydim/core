@@ -213,11 +213,19 @@ export default class {
       v !== undefined && data.set(k, v.toString());
     });
 
-    if (param.dbAction === this.mainAction) data.delete('orderIds');
+    if (param.dbAction === this.mainAction) {
+      data.delete('orderIds');
+
+      // тут проверить если пользователь менеджер (не админ)
+      // то добавить это
+      if (true) {
+        data.set('ordersFilter', JSON.stringify({userId: 1})); // номер текущего пользователя в массиве (для другого случая)
+      }
+    }
 
     this.loaderTable.start();
     f.Post({data}).then(data => {
-      if(this.needReload) {
+      if (this.needReload) {
         this.needReload = false;
         this.selected.clear();
         this.queryParam.dbAction = this.mainAction;
