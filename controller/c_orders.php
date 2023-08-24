@@ -13,6 +13,7 @@ $user = [
   'permission' => $main->getLogin(VC::USER_PERMISSION),
   'isAdmin'    => $main->getLogin(VC::USER_IS_ADMIN),
   'fields'     => $user['contacts'],
+  'id'         => $main->getLogin(VC::USER_ID),
 ];
 $field = [
   'pageTitle' => 'Заказы',

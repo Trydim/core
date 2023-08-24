@@ -5,12 +5,13 @@ export default class {
 
   mainAction = 'loadOrders';
   needReload = false;
+  user = new f.User().data
   queryParam = {
     mode        : 'DB',
     dbAction    : '',
     tableName   : 'orders',
     sortColumn  : 'createDate',
-    sortDirect  : false, // true = DESC, false
+    sortDirect  : true, // true = DESC, false
     currPage    : 0,
     countPerPage: 20,
     pageCount   : 0,
@@ -213,7 +214,11 @@ export default class {
       v !== undefined && data.set(k, v.toString());
     });
 
-    if (param.dbAction === this.mainAction) data.delete('orderIds');
+    if (param.dbAction === this.mainAction) {
+      data.delete('orderIds')
+
+      if(!this.user.isAdmin) data.set('ordersFilter', JSON.stringify({ userId: this.user.id }))
+    };
 
     this.loaderTable.start();
     f.Post({data}).then(data => {
