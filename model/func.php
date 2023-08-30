@@ -460,7 +460,7 @@ function translit($value): string {
 
 /**
  * @param string $url
- * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'auth'
+ * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'auth', 'contentType'
  * @param string|array<string, string> $params - assoc array
  * @return string|array
  */
@@ -483,7 +483,7 @@ function httpRequest(string $url, array $config = [], $params = []) {
   } else {
     $curlConfig[CURLOPT_HTTPGET] = false;
     $curlConfig[CURLOPT_POST] = true;
-    $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json; charset=utf-8';
+    $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Type: ' . ($config['contentType'] ?? 'application/json; charset=utf-8');
     $curlConfig[CURLOPT_POSTFIELDS]   = $params;
   }
 

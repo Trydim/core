@@ -116,7 +116,8 @@ export default class {
       }
 
       if (item['importantValue']) {
-        let value = Object.entries(item['importantValue']).map(n => ({key: window._(n[0]), value: n[1]}));
+        // Производитель добавляет свои поля, сохраняя текущие в baseVal
+        let value = Object.entries(item['importantValue']['baseVal'] || item['importantValue']).map(n => ({key: window._(n[0]), value: n[1]}));
         item['importantValue'] = f.replaceTemplate(this.contValue, value);
       }
 
