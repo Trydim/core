@@ -37,14 +37,15 @@ trait Authorization {
    * @return $this|Main
    */
   public function setLogin(array $user): Main {
-    $this->user['id']    = $_SESSION['id'];
-    $this->user['login'] = $_SESSION['login'];
-    $this->user['name']  = $_SESSION['name'];
-    $this->user['onlyOne'] = $user['onlyOne'] ?? false;
-    $this->user['permission'] = $user['permission'] ?? [];
+    $this->user['id']    = $user['id'];
+    $this->user['login'] = $user['login'];
+    $this->user['name']  = $user['name'];
+    $this->user['contacts'] = $user['contacts'] ?? [];
+    $this->user['onlyOne']  = $user['onlyOne'];
+    $this->user['permission']    = $user['permissionValue'] ?? [];
     $this->user['customization'] = $user['customization'] ?? [];
 
-    $this->user['admin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
+    $this->user['isAdmin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
     $this->setLoginStatus('ok');
     return $this;
   }
@@ -91,6 +92,7 @@ trait Authorization {
    * @return mixed
    */
   public function getLogin(string $field = 'login') {
+    if ($field === 'all') return $this->user;
     return $this->user[$field] ?? null;
   }
 

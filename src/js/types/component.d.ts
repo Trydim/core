@@ -85,3 +85,5 @@ declare interface Searching {
     showResult(template: string, resultIds: number[] | string[])
   })
 }
+
+declare interface User {}

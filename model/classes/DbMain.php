@@ -20,7 +20,7 @@ class DbMain extends R {
   const DB_JSON_FIELDS = [
     'inputValue', 'saveValue', 'importantValue', 'reportValue',
     'contacts', 'customerContacts', 'customization',
-    'settings', 'cmsParam', 'properties'
+    'settings', 'cmsParam', 'properties', 'permissionValue'
   ];
 
   const DB_DATE_FIELDS = [

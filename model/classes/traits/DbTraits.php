@@ -114,11 +114,11 @@ trait DbOrders {
     $sql = $this->getBaseOrdersQuery() . 'WHERE ';
 
     if (isset($filters['userId'])) {
-      $sql = "O.user_id = '" . $filters['userId'] . "'";
+      $sql .= "O.user_id = '" . $filters['userId'] . "'";
     }
 
     else if (isset($filters['customerId'])) {
-      $sql = "O.customer_id = '" . $filters['customerId'] . "'";
+      $sql .= "O.customer_id = '" . $filters['customerId'] . "'";
     }
 
     else if (isset($filters['statusId'])) {
@@ -131,7 +131,7 @@ trait DbOrders {
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn']);
     $sql .= $this->getPaginatorQuery($pageParam);
 
-    return self::getAll($sql);
+    return $this->jsonParseField(self::getAll($sql));
   }
 
   public function changeOrders($columns, $dbTable, $commonValues, $status_id) {
@@ -261,13 +261,14 @@ trait DbUsers {
    * @return array|null
    */
   public function getUserByLogin($login): ?array {
-    $sql = "SELECT login, U.name AS 'name', hash, password, customization, 
-                   P.ID AS 'permId', P.name AS 'permName', properties AS 'permValue', activity
+    $sql = "SELECT U.ID AS 'id', login,  password, hash, 
+                   U.name AS 'name', contacts, customization, activity,
+                   P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
             FROM " . $this->pf('users') . " U
             LEFT JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
             WHERE login = :login";
 
-    return self::getRow($sql, [':login' => $login]);
+    return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
   }
 
   /**
@@ -349,14 +350,8 @@ trait DbUsers {
       $user = $this->getUserByLogin($session['login']);
       if (!count($user) || !boolValue($user['activity'])) return false;
 
-      $customization = json_decode($user['customization'], true);
-
-      $userParam = [
-        'permissionId'  => intval($user['permId']),
-        'onlyOne'       => isset($customization['onlyOne']),
-        'customization' => $customization,
-        'permission'    => json_decode($user['permValue'], true),
-      ];
+      $user['permissionId'] = intval($user['permissionId']);
+      $user['onlyOne'] = $user['customization']['onlyOne'] ?? false;
     } else {
       try {
         if (!file_exists(SYSTEM_PATH)) throw new \ErrorException('error');
@@ -368,22 +363,17 @@ trait DbUsers {
         return false;
       }
       $user = [
+        'onlyOne'  => true,
+        'admin'    => true,
         'password' => $value[1],
         'hash'     => trim($value[2]),
       ];
-      $userParam = [
-        'onlyOne' => true,
-        'admin'   => true,
-      ];
     }
 
-    if ($userParam['onlyOne']) $ok = $session['hash'] === $user['hash'];
-    else {
-      $ok = USE_DATABASE ? password_verify($session['password'], $user['password'])
-        : $session['password'] === $user['password'];
-    }
+    $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
+                           : password_verify($session['password'], $user['password']);
 
-    return $ok ? $userParam : false;
+    return $ok ? $user : false;
   }
 
   /**

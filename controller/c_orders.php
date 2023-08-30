@@ -1,4 +1,5 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
+
 /**
  * @var Main $main - global
  */
@@ -6,14 +7,11 @@
 $param = [
   'showFilter' => $main->availablePage('dealers') && $main->getCmsParam('DEALERS_ORDERS_SHOW'),
 ];
-$user = [
-  'permission' => $main->getLogin(VC::USER_PERMISSION),
-  'isAdmin'    => $main->getLogin(VC::USER_IS_ADMIN),
-];
+
 $field = [
   'pageTitle' => 'Заказы',
   'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
-  'footerContent' => "<input type='hidden' id='dataUser' value='". json_encode($user) . "'>",
+  'footerContent' => "<input type='hidden' id='dataUser' value='". json_encode($main->getLogin('all')) . "'>",
 ];
 
 // получить конфиг текущего пользователя

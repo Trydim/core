@@ -66,7 +66,6 @@ export default class {
       searchMsg: f.gT('#noFoundSearchMsg'),
     };
 
-
     f.oneTimeFunction.add('ordersHeadRender', this.ordersHeadRender.bind(this));
   }
 

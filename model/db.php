@@ -238,7 +238,9 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $ordersFilter = json_decode($ordersFilter, true);
         $result['orders'] = $db->loadOrdersByRelatedKey($pagerParam, $ordersFilter);
 
-        if (isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', $ordersFilter['statusId']);
+        if (isset($ordersFilter['userId'])) $ordersFilter = 'user_id = ' . $ordersFilter['userId'];
+        else if (isset($filters['customerId'])) $ordersFilter = 'customer_id = ' . implode(' or customer_id = ', $ordersFilter['customerId']);
+        else if (isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', $ordersFilter['statusId']);
 
         $result['countRows'] = $db->getCountRows('orders', $ordersFilter);
       } //

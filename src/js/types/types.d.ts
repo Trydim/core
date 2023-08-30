@@ -233,6 +233,7 @@ declare type CMSGlobalObject = {
   Pagination: typeof Pagination
   SelectedRow: typeof SelectedRow
   SortColumns: typeof SortColumns
+  User: typeof User
 
   oneTimeFunction: {
     add(name: string, func: Function)
