@@ -29,6 +29,7 @@ class AllOrdersList {
     fd.set('mode', 'DB');
     fd.set('dbAction', param.dbAction);
     fd.set('countPerPage', '1000');
+    if(!param.user.isAdmin) fd.set('ordersFilter', JSON.stringify({ userId: param.user.id }))
     return fd;
   }
 
@@ -126,7 +127,7 @@ export default class extends Orders {
     const dbAction = this.orderType === 'visit' ? 'loadVisitorOrders' : this.mainAction,
           tableType = this.orderType === 'visit' ? 'visitOrder' : 'order';
 
-    new AllOrdersList({dbAction, node: e.target, tableType});
+    new AllOrdersList({dbAction, node: e.target, tableType, user: this.user});
   }
 
   actionBtn(e) {

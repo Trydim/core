@@ -1,19 +1,29 @@
 <?php
 
-trait DbOrders {
-  private function getOrdersDbColumns(string $field) {
+trait DbOrders
+{
+  private function getOrdersDbColumns(string $field)
+  {
     switch ($field) {
-      default: return $field;
-      case 'id': case 'ID': return 'O.ID';
-      case 'userName': return 'U.name';
-      case 'customerName': return 'C.name';
-      case 'statusId': return 'S.ID';
-      case 'status': return 'S.name';
+      default:
+        return $field;
+      case 'id':
+      case 'ID':
+        return 'O.ID';
+      case 'userName':
+        return 'U.name';
+      case 'customerName':
+        return 'C.name';
+      case 'statusId':
+        return 'S.ID';
+      case 'status':
+        return 'S.name';
     }
   }
 
-  private function getBaseOrdersQuery(bool $includeValues = false) {
-    return "SELECT O.ID AS 'ID', 
+  private function getBaseOrdersQuery(bool $includeValues = false)
+  {
+    return "SELECT comment AS 'comment', O.ID AS 'ID', 
             create_date AS 'createDate', last_edit_date AS 'lastEditDate', 
             start_shipping_date AS 'startShippingDate', end_shipping_date AS 'endShippingDate',
             U.name AS 'userName',
@@ -26,9 +36,10 @@ trait DbOrders {
       JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID\n";
   }
 
-  public function getBaseOrdersQueryColumns(): array {
+  public function getBaseOrdersQueryColumns(): array
+  {
     return [
-      'ID', 'createDate', 'lastEditDate', 'startShippingDate', 'endShippingDate',
+      'comment', 'ID', 'createDate', 'lastEditDate', 'startShippingDate', 'endShippingDate',
       'userName',
       'customerId', 'customerName', 'customerContacts',
       'statusId', 'status',
@@ -46,7 +57,8 @@ trait DbOrders {
    *
    * @return array
    */
-  public function loadOrders(array $pageParam, array $filters = []): array {
+  public function loadOrders(array $pageParam, array $filters = []): array
+  {
     $sql = $this->getBaseOrdersQuery();
 
     if (count($filters)) {
@@ -57,8 +69,7 @@ trait DbOrders {
         $from = $this->getDbDateString($filters['dateCreateFrom'] ?? self::DB_DATE_FROM);
         $to   = $this->getDbDateString($filters['dateCreateTo'] ?? self::DB_DATE_TO);
         $sql .= "O.create_date BETWEEN '$from' AND '$to'\n";
-      }
-      else if (isset($filters['dateEditedFrom']) || isset($filters['dateEditedTo'])) {
+      } else if (isset($filters['dateEditedFrom']) || isset($filters['dateEditedTo'])) {
         $from = $this->getDbDateString($filters['dateEditedFrom'] ?? self::DB_DATE_FROM);
         $to   = $this->getDbDateString($filters['dateEditedTo'] ?? self::DB_DATE_TO);
         $sql .= "O.last_edit_date BETWEEN '$from' AND '$to'\n";
@@ -78,7 +89,8 @@ trait DbOrders {
    *
    * @return array|boolean rows
    */
-  public function loadOrdersById($ids, $oneOrder = false) {
+  public function loadOrdersById($ids, $oneOrder = false)
+  {
     $sql = $this->getBaseOrdersQuery(true) . "\n WHERE ";
 
     if (is_array($ids)) {
@@ -110,18 +122,15 @@ trait DbOrders {
    *
    * @return array
    */
-  public function loadOrdersByRelatedKey(array $pageParam, array $filters = []): array {
+  public function loadOrdersByRelatedKey(array $pageParam, array $filters = []): array
+  {
     $sql = $this->getBaseOrdersQuery() . 'WHERE ';
 
     if (isset($filters['userId'])) {
       $sql .= "O.user_id = '" . $filters['userId'] . "'";
-    }
-
-    else if (isset($filters['customerId'])) {
+    } else if (isset($filters['customerId'])) {
       $sql .= "O.customer_id = '" . $filters['customerId'] . "'";
-    }
-
-    else if (isset($filters['statusId'])) {
+    } else if (isset($filters['statusId'])) {
       $ids = $filters['statusId'];
       if (!is_array($ids)) $ids = [$ids];
 
@@ -134,7 +143,8 @@ trait DbOrders {
     return self::getAll($sql);
   }
 
-  public function changeOrders($columns, $dbTable, $commonValues, $status_id) {
+  public function changeOrders($columns, $dbTable, $commonValues, $status_id)
+  {
     $param = [];
 
     array_map(function ($id) use (&$param, $status_id) {
@@ -149,7 +159,8 @@ trait DbOrders {
   // Visitors
   //------------------------------------------------------------------------------------------------------------------
 
-  public function saveVisitorOrder($param) {
+  public function saveVisitorOrder($param)
+  {
     $bean = self::xdispense($this->pf('client_orders'));
 
     $bean->create_date = date($this::DB_DATA_FORMAT);
@@ -166,7 +177,8 @@ trait DbOrders {
    *
    * @return array|null
    */
-  public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []) {
+  public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = [])
+  {
     $sql = "SELECT ID, cp_number AS 'cpNumber', create_date AS 'createDate', important_value AS 'importantValue', total
             FROM " . $this->pf('client_orders') . "\n";
 
@@ -183,7 +195,8 @@ trait DbOrders {
   }
 
   // Status
-  public function loadOrderStatus(string $filters = ''): array {
+  public function loadOrderStatus(string $filters = ''): array
+  {
     $sql = "SELECT * FROM " . $this->pf('order_status') . "\n ";
 
     if (strlen($filters)) $sql .= 'WHERE ' . $filters . "\n ";
@@ -194,13 +207,20 @@ trait DbOrders {
   }
 }
 
-trait DbUsers {
-  private function getUserDbColumns(string $field) {
+trait DbUsers
+{
+  private function getUserDbColumns(string $field)
+  {
     switch ($field) {
-      default: return $field;
-      case 'id': case 'ID': return 'U.ID';
-      case 'name': return 'U.name';
-      case 'permissionName': return 'P.name';
+      default:
+        return $field;
+      case 'id':
+      case 'ID':
+        return 'U.ID';
+      case 'name':
+        return 'U.name';
+      case 'permissionName':
+        return 'P.name';
     }
   }
 
@@ -210,7 +230,8 @@ trait DbUsers {
    * @param bool   $status
    * @return array|false
    */
-  public function getUserFromFile(string $login = '', string $password = '', bool $status = false) {
+  public function getUserFromFile(string $login = '', string $password = '', bool $status = false)
+  {
     if (file_exists(SYSTEM_PATH)) {
       $value = file(SYSTEM_PATH)[0];
       $value && $value = explode('|||', $value);
@@ -235,8 +256,10 @@ trait DbUsers {
    *
    * @return array|null
    */
-  public function getUser(string $login, string $column = 'ID') {
-    $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
+  public function getUser(string $login, string $column = 'ID')
+  {
+    $result = self::getRow(
+      "SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
       [':login' => $login]
     );
 
@@ -249,8 +272,10 @@ trait DbUsers {
    *
    * @return array|null
    */
-  public function getUserById($userId) {
-    return self::getRow("SELECT * FROM " . $this->pf('users') . " WHERE ID = :id",
+  public function getUserById($userId)
+  {
+    return self::getRow(
+      "SELECT * FROM " . $this->pf('users') . " WHERE ID = :id",
       [':id' => $userId]
     );
   }
@@ -259,7 +284,8 @@ trait DbUsers {
    * @param $login
    * @return array|null
    */
-  public function getUserByLogin($login) {
+  public function getUserByLogin($login)
+  {
     $sql = "SELECT login, U.name AS 'name', hash, password, customization, 
                    P.ID AS 'permId', P.name AS 'permName', properties AS 'permValue', activity
             FROM " . $this->pf('users') . " U
@@ -274,7 +300,8 @@ trait DbUsers {
    *
    * @return mixed
    */
-  public function getUserByOrderId($id) {
+  public function getUserByOrderId($id)
+  {
     return self::getRow("SELECT U.name AS 'name', U.contacts AS 'contacts'
             FROM " . $this->pf('users') . " U 
             JOIN " . $this->pf('orders') . " O ON U.ID = O.user_id
@@ -286,7 +313,8 @@ trait DbUsers {
    * @param string $password
    * @return array|false
    */
-  public function checkPassword(string $login, string $password) {
+  public function checkPassword(string $login, string $password)
+  {
     if (USE_DATABASE) {
       $sql = "SELECT ID as 'id', name, login, password 
               FROM " . $this->pf('users') . " WHERE login = :login and activity = 1";
@@ -298,7 +326,8 @@ trait DbUsers {
     return count($user) && password_verify($password, $user['password']) ? $user : false;
   }
 
-  public function changeUser($loginId, $param) {
+  public function changeUser($loginId, $param)
+  {
     $user = self::xdispense($this->pf('users'));
     $user->ID = $loginId;
     foreach ($param as $key => $value) {
@@ -312,7 +341,8 @@ trait DbUsers {
    *
    * @return array
    */
-  public function loadUsers(array $pageParam): array {
+  public function loadUsers(array $pageParam): array
+  {
     $sql = "SELECT U.ID AS 'ID', login, U.name AS 'name', contacts, 
                    permission_id AS 'permissionId', P.name AS 'permissionName', 
                    register_date AS 'registerDate', activity
@@ -326,7 +356,8 @@ trait DbUsers {
     return self::getAll($sql);
   }
 
-  public function setUserHash($loginId, $hash) {
+  public function setUserHash($loginId, $hash)
+  {
     if (USE_DATABASE) {
       $user = self::xdispense($this->pf('users'));
       $user->ID = $loginId;
@@ -344,7 +375,8 @@ trait DbUsers {
    * @param $session
    * @return array|bool[]|false
    */
-  public function checkUserHash($session) {
+  public function checkUserHash($session)
+  {
     if (USE_DATABASE) {
       $user = $this->getUserByLogin($session['login']);
       if (!count($user) || !boolValue($user['activity'])) return false;
@@ -394,7 +426,8 @@ trait DbUsers {
    *
    * @return mixed
    */
-  public function getUserSetting(string $currentUser = '', string $columns = 'customization') {
+  public function getUserSetting(string $currentUser = '', string $columns = 'customization')
+  {
     if (!$currentUser) {
       $currentUser = $this->main->getLogin();
     }
@@ -408,13 +441,15 @@ trait DbUsers {
   }
 }
 
-trait DbCsv {
+trait DbCsv
+{
   private $csvTable;
 
   /**
    * @param mixed $csvTable
    */
-  public function setCsvTable($csvTable) {
+  public function setCsvTable($csvTable)
+  {
     $this->csvTable = $csvTable;
   }
 
@@ -424,7 +459,8 @@ trait DbCsv {
    * @param $link {string}
    * @return mixed|null
    */
-  static function scanDirCsv(string $path, string $link = '') {
+  static function scanDirCsv(string $path, string $link = '')
+  {
     return array_reduce(is_dir($path) ? scandir($path) : [], function ($r, $item) use ($link) {
       if (!($item === '.' || $item === '..')) {
         if (stripos($item, '.csv')) {
@@ -446,7 +482,8 @@ trait DbCsv {
     }, []);
   }
 
-  public function openCsv() {
+  public function openCsv()
+  {
     $csvPath = $this->main->getCmsParam(VC::CSV_PATH) . $this->csvTable;
 
     if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
@@ -464,7 +501,8 @@ trait DbCsv {
     return false;
   }
 
-  public function fileForceDownload() {
+  public function fileForceDownload()
+  {
     $file = $this->main->getCmsParam(VC::CSV_PATH) . $this->csvTable;
 
     if (file_exists($file)) {
@@ -493,7 +531,8 @@ trait DbCsv {
    *
    * @return DbMain
    */
-  public function saveCsv($csvData): DbMain {
+  public function saveCsv($csvData): DbMain
+  {
     $csvPath = $this->main->getCmsParam(VC::CSV_PATH);
 
     if (file_exists($csvPath . $this->csvTable)) {
@@ -512,12 +551,14 @@ trait DbCsv {
   }
 }
 
-trait ContentEditor {
+trait ContentEditor
+{
   private $CONTENT_PATH = SHARE_PATH . 'content.json';
   private $contentData = '{}';
   private $contentLoaded;
 
-  private function contentPath(): string {
+  private function contentPath(): string
+  {
     if ($this->main->publicDealer && $this->main->url->getRoute() === 'public') {
       $path = $this->main->url->getPath(true);
     } else {
@@ -527,7 +568,8 @@ trait ContentEditor {
     return $path . $this->CONTENT_PATH;
   }
 
-  private function checkContentFile(): void {
+  private function checkContentFile(): void
+  {
     $path = $this->contentPath();
 
     if (!file_exists($path)) {
@@ -540,7 +582,8 @@ trait ContentEditor {
    * @param bool $assoc
    * @return mixed
    */
-  public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false) {
+  public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false)
+  {
     $this->checkContentFile();
 
     $data = file_get_contents($this->contentPath());
@@ -548,7 +591,8 @@ trait ContentEditor {
     return $jsonDecode ? json_decode($data, $assoc) : $data;
   }
 
-  public function saveContentEditorData($data) {
+  public function saveContentEditorData($data)
+  {
     $this->checkContentFile();
 
     if (!is_string($data)) $data = json_encode($data);
@@ -556,7 +600,8 @@ trait ContentEditor {
     return file_put_contents($this->contentPath(), $data);
   }
 
-  public function mergeContentData() {
+  public function mergeContentData()
+  {
     $this->contentLoaded = $this->getContentData(false);
   }
 
@@ -566,7 +611,8 @@ trait ContentEditor {
    *
    * @return array
    */
-  public function getContentData(bool $flatten = true, bool $assoc = false): array {
+  public function getContentData(bool $flatten = true, bool $assoc = false): array
+  {
     $data = $this->loadContentEditorData(true, true);
 
     if (is_array($this->contentLoaded)) {
@@ -574,7 +620,7 @@ trait ContentEditor {
     }
 
     if ($flatten) {
-      $data = array_reduce($data, function($r, $section) use ($assoc) {
+      $data = array_reduce($data, function ($r, $section) use ($assoc) {
         foreach ($section['fields'] as $key => $value) {
           if ($assoc) $r[$key] = $value['value'];
           else $r[] = [

@@ -71,6 +71,7 @@ export default class {
   ordersHeadRender() {
     const thead = this.table.querySelector('thead'),
           html = this.config[this.getTypeConfig()].reduce((r, column) => {
+            if(column.dbName === 'comment') column.name = ''
             return r += f.replaceTemplate(this.template.tableHeader, column);
           }, '');
 
@@ -87,9 +88,9 @@ export default class {
     let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${ID}"></td>';
 
     tmp += this.config[this.getTypeConfig()].reduce((r, column) => {
-      return r += '<td>${' + column['dbName'] + '}</td>';
+      if(column['dbName'] === 'comment') return r += '<td><div class="comment"><div class="comment__icon"></div><div class="content-wrapper"><div class="comment__content tooltip">${' + column['dbName'] + '}</div></div></div></td>';
+      else return r += '<td>${' + column['dbName'] + '}</td>';
     }, '');
-
     return this.template.tableCell = tmp + '</tr>';
   }
   ordersPrepare(data) {
@@ -162,6 +163,12 @@ export default class {
       html = this.template.searchMsg;
     }
     this.table.querySelector('tbody').innerHTML = html;
+
+    // скрытие тултипов без контента
+    [...this.table.querySelectorAll('.tooltip')].forEach(item => {
+      if(!item.innerHTML) item.closest('.comment').style.display = 'none'
+    })
+
   }
 
   ordersRender(data, search) {
@@ -216,7 +223,6 @@ export default class {
 
     if (param.dbAction === this.mainAction) {
       data.delete('orderIds')
-
       if(!this.user.isAdmin) data.set('ordersFilter', JSON.stringify({ userId: this.user.id }))
     };
 

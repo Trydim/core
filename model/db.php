@@ -191,6 +191,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
           'report_value'    => addCpNumber($orderId, $reportValue),
           'start_shipping_date' => $db->getDbDateString($startShippingDate ?? ''),
           'end_shipping_date'   => $db->getDbDateString($endShippingDate ?? ''),
+          'comment' => json_decode($reportValue, true)['comment'],
         ]];
 
         $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
