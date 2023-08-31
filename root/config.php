@@ -66,9 +66,12 @@ $publicConfig = [
   'ACCESS_MENU' => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'users', 'customPage'],
 
   /**
-   * Просмотр заказов дилеров
+   * Фильтр заказов
+   * @type string - dealers - фильтрация по дилерам
+   *  users - фильтрация по пользователям
+   *  customers - по клиентам
    */
-  'DEALERS_ORDERS_SHOW' => true,
+  'FILTER_ORDERS' => false,
 
   /** Папка по умолчанию для файлового менеджера */
   // 'SHARE_PATH' => 'public/images/',

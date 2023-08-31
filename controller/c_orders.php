@@ -5,7 +5,7 @@
  */
 
 $param = [
-  'showFilter' => $main->availablePage('dealers') && $main->getCmsParam('DEALERS_ORDERS_SHOW'),
+  'showFilter' => $main->getCmsParam('FILTER_ORDERS') ?? '',
 ];
 
 $field = [
@@ -44,7 +44,7 @@ $columns = array_map(function ($item) {
 $field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersVisitColumn' value='". json_encode($columns) . "'>";
 
 if ($param['showFilter']) {
-  $param['dealers'] = $main->db->selectQuery('dealers', ['id', 'name']);
+  $param['filterOptions'] = $main->db->selectQuery($param['showFilter'], ['id', 'name']);
 }
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);

@@ -3,7 +3,7 @@
 /**
  * @var Main $main - global
  * @var bool $showFilter - from controller
- * @var array $dealers - from controller
+ * @var array $filterOptions - from controller
  */
 
 ?>
@@ -50,10 +50,10 @@
   <?php if ($showFilter) { ?>
     <div class="col input-group ms-3">
       <span class="input-group-text"><?= gTxt('Filter') ?>:</span>
-      <select class="form-select" data-action="filterDealer">
+      <select class="form-select" data-action="filter<?= ucfirst($showFilter) ?>">
         <option value="0"><?= $main->getCmsParam('PROJECT_TITLE') ?></option>
-        <?php foreach ($dealers as $dealer) { ?>
-          <option value="<?= $dealer['id'] ?>"><?= $dealer['name'] ?></option>
+        <?php foreach ($filterOptions as $option) { ?>
+          <option value="<?= $option['id'] ?>"><?= $option['name'] ?></option>
         <?php } ?>
       </select>
     </div>

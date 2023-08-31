@@ -239,7 +239,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
         $result['orders'] = $db->loadOrdersByRelatedKey($pagerParam, $ordersFilter);
 
         if (isset($ordersFilter['userId'])) $ordersFilter = 'user_id = ' . $ordersFilter['userId'];
-        else if (isset($filters['customerId'])) $ordersFilter = 'customer_id = ' . implode(' or customer_id = ', $ordersFilter['customerId']);
+        else if (isset($ordersFilter['customerId'])) $ordersFilter = 'customer_id = ' . $ordersFilter['customerId'];
         else if (isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', $ordersFilter['statusId']);
 
         $result['countRows'] = $db->getCountRows('orders', $ordersFilter);

@@ -389,14 +389,13 @@ export default class extends Orders {
   }
 
   actionSelect(e) {
-    let target = e.target,
-        action = target.dataset.action,
-        selectedSize   = this.selected.getSelectedSize();
+    const target = e.target,
+          action = target.dataset.action;
 
-    if (!selectedSize && !(['setupColumns', 'orderType']).includes(action)) { f.showMsg(_('Choose an order!'), 'warning'); return; }
-
-    let select = {
+    const select = {
       'filterDealer': () => this.filterChange(target),
+      'filterUsers': () => this.filterChange(target),
+      'filterCustomers': () => this.filterCustomers(target),
       'statusOrders': () => this.changeSelectInput(target),
     };
 
@@ -406,7 +405,6 @@ export default class extends Orders {
     const id = target.value,
           dealerPath = f.SITE_PATH + 'dealer/' + id + '/';
 
-    this.selected.clear();
     this.queryParam.mode = 'DB';
     this.queryParam.dbAction = this.mainAction;
     this.queryParam.orderIds = '[]';
@@ -415,6 +413,17 @@ export default class extends Orders {
 
     this.query(+id ? dealerPath : undefined);
   }
+  filterCustomers(target) {
+    this.queryParam.mode = 'DB';
+    this.queryParam.dbAction = this.mainAction;
+    this.queryParam.currPage = 0;
+
+    if (+target.value) this.queryParam.ordersFilter = JSON.stringify({customerId: target.value});
+    else delete this.queryParam.ordersFilter;
+
+    this.query();
+  }
+
   changeSelectInput(target) {
     this.queryParam.statusId = target.value;
   }
