@@ -114,11 +114,11 @@ trait DbOrders {
     $sql = $this->getBaseOrdersQuery() . 'WHERE ';
 
     if (isset($filters['userId'])) {
-      $sql = "O.user_id = '" . $filters['userId'] . "'";
+      $sql .= "O.user_id = '" . $filters['userId'] . "'";
     }
 
     else if (isset($filters['customerId'])) {
-      $sql = "O.customer_id = '" . $filters['customerId'] . "'";
+      $sql .= "O.customer_id = '" . $filters['customerId'] . "'";
     }
 
     else if (isset($filters['statusId'])) {

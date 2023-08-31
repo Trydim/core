@@ -222,7 +222,7 @@ export default class {
 
     this.loaderTable.start();
     f.Post({data}).then(data => {
-      if(this.needReload) {
+      if (this.needReload) {
         this.needReload = false;
         this.selected.clear();
         this.queryParam.dbAction = this.mainAction;
