@@ -269,7 +269,8 @@ class UrlGenerator {
     $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
     if (!$isDealer) {
-      $requestUri = str_replace($this->server->get('HTTP_ORIGIN'), '', $this->server->get('HTTP_REFERER'));
+      $httpOrigin = $this->server->get('HTTP_ORIGIN'); // ver 8 null, HTTP_REFERER too
+      if ($httpOrigin) $requestUri = str_replace($httpOrigin, '', $this->server->get('HTTP_REFERER'));
       $isDealer = includes($requestUri, DEALERS_PATH . '/');
     }
 

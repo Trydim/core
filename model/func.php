@@ -119,15 +119,17 @@ function compareFiles(string $file1, string $file2): bool {
     && md5_file($file1) === md5_file($file2);
 }
 
-/**
- * @param $var
- * @param bool $die
- */
-function de($var, bool $die = true) {
-  echo '<pre>';
-  var_dump($var);
-  echo '</pre>';
-  if ($die) die();
+if (!function_exists('de')) {
+  /**
+   * @param $var
+   * @param bool $die
+   */
+  function de($var, bool $die = true) {
+    echo '<pre>';
+    var_dump($var);
+    echo '</pre>';
+    if ($die) die();
+  }
 }
 
 /**
