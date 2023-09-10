@@ -11,14 +11,8 @@ $field = [
   'jsLinks'    => [CORE_JS . 'module/setting.js?ver=2239ad0927'],
 ];
 
-$user = $main->db->getUserById($main->getLogin('id'));
-$user = [
-  'name'         => $user['name'],
-  'login'        => $user['login'],
-  'isAdmin'      => $main->getLogin('admin'),
-  'contacts'     => $user['contacts'],
-  'customization' => $user['customization'],
-];
+$user = $main->getLogin('all');
+
 $field['footerContent'] .= "<input type='hidden' id='dataUser' value='" . json_encode($user) . "'>"
   . $main->getSettings('json', true);
 

@@ -117,9 +117,6 @@ export default {
       const node = f.gI('dataUser'),
             data = node && node.value ? JSON.parse(node.value) : false;
 
-      data.contacts = JSON.parse(data.contacts || '{}');
-      data.customization = JSON.parse(data.customization || '{}');
-
       this.setData(data);
     },
 

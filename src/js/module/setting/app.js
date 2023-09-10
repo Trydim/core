@@ -1,7 +1,5 @@
 'use strict';
 
-const conArrToObject = (arr, key) => arr.reduce((r, i) => {r[i[key]] = i; return r;}, Object.create(null));
-
 const loadData = d => {
   const data = f['CMS_SETTING'];
 

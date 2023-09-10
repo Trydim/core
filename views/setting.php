@@ -4,7 +4,7 @@
  * @var Main $main - global
  */
 
-$isAdmin = $main->getLogin('admin');
+$isAdmin = $main->getLogin('isAdmin');
 ?>
 <div class="row container m-auto" id="settingForm">
   <?php if ($isAdmin) { ?>
@@ -32,7 +32,7 @@ $isAdmin = $main->getLogin('admin');
   <?php } ?>
 
   <?php if ($isAdmin && $main->availablePage('orders') && false) { ?>
-    <setting-tokens @update="updateOrderStatus"></setting-tokens>
+    <setting-tokens @update=""></setting-tokens>
   <?php } ?>
 
   <div class="col-12 text-center">
