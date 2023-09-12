@@ -132,9 +132,11 @@ export default class extends Orders {
         hideActionWrap = false,
         selectedSize   = this.selected.getSelectedSize();
 
-    if (!['setupColumns'].includes(action)) return;
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
-    if (!selectedSize && !(['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo']).includes(action)) {
+    if (['loadOrder', 'openOrder', 'printOrder', 'savePdf', 'saveBasePdf', 'sendOrder'].includes(action) && selectedSize !== 1) {
+      f.showMsg('Выберите 1 заказ!', 'warning'); return;
+    }
+    if (!selectedSize && !['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo'].includes(action)) {
       f.showMsg('Выберите заказ!', 'warning'); return;
     }
     this.queryParam.orderIds = this.selected.getSelected();
@@ -166,27 +168,22 @@ export default class extends Orders {
     f.show(this.confirm);
     return true;
   }
-  loadOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
-
+  /*loadOrder() {
     const data = new FormData();
     data.set('mode', 'DB');
     data.set('dbAction', 'loadOrderById');
-    data.set( 'orderId', this.queryParam.orderIds);
+    data.set('orderId', this.queryParam.orderIds);
 
     f.Post({data}).then(data => this.showOrder(data));
-  }
-  openOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
-
+  }*/
+  openOrder() {
     let link = f.gI(f.ID.PUBLIC_PAGE),
-      /* нужно это делать от дефолтного типа */
+        // нужно это делать от дефолтного типа
         query = this.orderType === 'visit' ? 'orderVisitorId=' : 'orderId=';
     link.href += '?' + query + this.selected.getSelected()[0];
     link.click();
   }
-  printOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
+  printOrder() {
     let P    = f.initPrint(),
         data = new FormData();
 
@@ -202,8 +199,6 @@ export default class extends Orders {
     });
   }
   savePdf(selectedSize, target) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
-
     let data = new FormData(),
         url = this.dealerId ? 'dealer/' + this.dealerId + '/' : '';
 
@@ -229,9 +224,7 @@ export default class extends Orders {
       }
     });
   }
-  sendOrder(selectedSize) {
-    if (selectedSize !== 1) { f.showMsg('Выберите 1 заказ!', 'warning'); return; }
-
+  sendOrder() {
     let form = f.gTNode('#sendMailTmp');
 
     let fd = new FormData();

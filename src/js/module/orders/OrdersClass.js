@@ -106,18 +106,18 @@ export default class {
       /* TODO настройки вывода даты */
       ['createDate', 'lastEditDate'].forEach(k => {
         const d = new Date(item[k])
-        item[k] = d.toLocaleDateString() + ' ' + d.toLocaleTimeString().slice(0, 5);
+        item[k] = d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU').slice(0, 5);
       });
 
-      if (item['customerContacts']) {
-        let value = Object.entries(item['customerContacts']).map(n => ({key: window._(n[0]), value: n[1]}));
-        item['customerContacts'] = f.replaceTemplate(this.contValue, value);
+      if (item.customerContacts) {
+        let value = Object.entries(item.customerContacts).map(n => ({key: window._(n[0]), value: n[1]}));
+        item.customerContacts = f.replaceTemplate(this.contValue, value);
       }
 
-      if (item['importantValue']) {
+      if (item.importantValue) {
         // Производитель добавляет свои поля, сохраняя текущие в baseVal
-        let value = Object.entries(item['importantValue']['baseVal'] || item['importantValue']).map(n => ({key: window._(n[0]), value: n[1]}));
-        item['importantValue'] = f.replaceTemplate(this.contValue, value);
+        let value = Object.entries(item.importantValue).map(n => ({key: window._(n[0]), value: n[1]}));
+        item.importantValue = f.replaceTemplate(this.contValue, value);
       }
 
       this.orders[item['ID']] = item;

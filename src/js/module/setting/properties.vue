@@ -74,7 +74,7 @@
           </div>
         </div>
         <!-- Составной тип-->
-        <template v-if="property.type.includes('select')">
+        <template v-if="property.type.toLowerCase().includes('select')">
           <div class="col-12 row mb-1">
             <div class="col">Дополнительные поля свойства (имя есть):</div>
             <div class="col">
@@ -257,6 +257,7 @@ export default {
       }
     },
     changeProperty() {
+      debugger
       if (!this.propertiesSelected) return;
       this.queryParam.cmsAction = this.changeAction;
 
