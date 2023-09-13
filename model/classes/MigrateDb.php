@@ -71,8 +71,8 @@ class MigrateDb {
   public function createCodes() {
     $table = $this->pf('codes');
     $sql = "CREATE TABLE $table (
-      `symbol_code` varchar(255) CHARACTER SET utf8 NOT NULL,
-      `name` varchar(255) CHARACTER SET utf8 NOT NULL
+      `symbol_code` varchar(255) NOT NULL,
+      `name` varchar(255) NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
     $error = $this->db->exec($sql);
@@ -85,8 +85,8 @@ class MigrateDb {
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
       `parent_ID` int(10) UNSIGNED NOT NULL DEFAULT 0,
-      `code` varchar(255) CHARACTER SET utf8 NOT NULL,
-      `name` varchar(255) CHARACTER SET utf8 NOT NULL,
+      `code` varchar(255) NOT NULL,
+      `name` varchar(255) NOT NULL,
       `active` int(1) NOT NULL DEFAULT 1
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
@@ -100,9 +100,9 @@ class MigrateDb {
     $table = $this->pf('elements');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
-      `element_type_code` varchar(255) CHARACTER SET utf8 NOT NULL,
+      `element_type_code` varchar(255) NOT NULL,
       `section_parent_id` int(10) UNSIGNED NOT NULL,
-      `name` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT 'noname',
+      `name` varchar(255) NOT NULL DEFAULT 'noname',
       `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
       `activity` int(1) NOT NULL DEFAULT 1,
       `sort` int(11) NOT NULL DEFAULT 100
@@ -128,9 +128,9 @@ class MigrateDb {
     $table = $this->pf('money');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
-      `code` varchar(10) CHARACTER SET utf8 NOT NULL,
-      `name` varchar(100) CHARACTER SET utf8 NOT NULL,
-      `short_name` varchar(5) CHARACTER SET utf8 NOT NULL,
+      `code` varchar(10) NOT NULL,
+      `name` varchar(100) NOT NULL,
+      `short_name` varchar(5) NOT NULL,
       `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
       `scale` int(11) NOT NULL DEFAULT 1,
       `rate` decimal(10,4) NOT NULL DEFAULT 1.0000,
@@ -146,8 +146,8 @@ class MigrateDb {
     $table = $this->pf('units');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
-      `name` varchar(255) CHARACTER SET utf8 NOT NULL,
-      `short_name` varchar(10) CHARACTER SET utf8 NOT NULL,
+      `name` varchar(255) NOT NULL,
+      `short_name` varchar(10) NOT NULL,
       `activity` int(1) NOT NULL DEFAULT 1
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
@@ -164,9 +164,9 @@ class MigrateDb {
       `money_input_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
       `money_output_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
       `unit_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
-      `images_ids` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-      `name` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT 'not name option',
-      `properties` varchar(1000) CHARACTER SET utf8 DEFAULT NULL,
+      `images_ids` varchar(255) DEFAULT NULL,
+      `name` varchar(255) NOT NULL DEFAULT 'not name option',
+      `properties` varchar(1000) DEFAULT NULL,
       `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
       `activity` int(1) NOT NULL DEFAULT 1,
       `sort` int(10) NOT NULL DEFAULT 100,
@@ -204,8 +204,8 @@ class MigrateDb {
     $table = $this->pf('permission');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
-      `name` varchar(50) CHARACTER SET utf8 NOT NULL,
-      `properties` varchar(255) CHARACTER SET utf8 NOT NULL
+      `name` varchar(50) NOT NULL,
+      `properties` varchar(255) NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
     $error = $this->db->exec($sql);
@@ -219,14 +219,14 @@ class MigrateDb {
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
       `permission_id` int(10) UNSIGNED NOT NULL,
-      `login` varchar(100) CHARACTER SET utf8 NOT NULL,
-      `password` varchar(60) CHARACTER SET utf8 NOT NULL,
-      `name` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-      `contacts` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+      `login` varchar(100) NOT NULL,
+      `password` varchar(60) NOT NULL,
+      `name` varchar(255) DEFAULT NULL,
+      `contacts` varchar(255) DEFAULT NULL,
       `register_date` timestamp NOT NULL DEFAULT current_timestamp(),
       `activity` int(1) NOT NULL DEFAULT 1,
-      `customization` varchar(1000) CHARACTER SET utf8 DEFAULT '{}',
-      `hash` varchar(60) CHARACTER SET utf8 DEFAULT NULL
+      `customization` varchar(1000) DEFAULT '{}',
+      `hash` varchar(60) DEFAULT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
     $error = $this->db->exec($sql);
@@ -263,7 +263,7 @@ class MigrateDb {
     $sql = "CREATE TABLE $table (
       `ID` int(2) UNSIGNED NOT NULL,
       `code` varchar(50) NULL DEFAULT NULL,
-      `name` varchar(50) CHARACTER SET utf8 NOT NULL,
+      `name` varchar(50) NOT NULL,
       `sort` int(4) DEFAULT 50 NULL,
       `required` int(1) DEFAULT 0 NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
@@ -282,9 +282,9 @@ class MigrateDb {
       `user_id` int(10) UNSIGNED DEFAULT NULL,
       `customer_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
       `total` float DEFAULT 0,
-      `important_value` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '{}',
+      `important_value` varchar(255) NOT NULL DEFAULT '{}',
       `status_id` int(2) UNSIGNED NOT NULL DEFAULT 1,
-      `save_value` varchar(500) CHARACTER SET utf8 NOT NULL DEFAULT '{}',
+      `save_value` varchar(500) NOT NULL DEFAULT '{}',
       `report_value` mediumblob DEFAULT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
@@ -350,7 +350,7 @@ class MigrateDb {
     SIDES
   --------------------------------------------------------------------------------------------------------------------*/
 
-  public function createAdmin(string $login, string $pass) {
+  public function addAdmin(string $login, string $pass) {
     $bean = $this->db::xdispense($this->pf('permission'));
     $bean->name = 'Администратор';
     $bean->properties = '{"menu":"","tags":"guard admin"}';
@@ -365,19 +365,36 @@ class MigrateDb {
     $bean->name = $login ?? $this::DEAL_LOGIN;
     $this->db->store($bean);
   }
-  public function createStatus() {
+  public function addStatus(array $rows) {
     $bean = $this->db::xdispense($this->pf('order_status'));
+
+    if (count($rows)) {
+      foreach ($rows AS $row) {
+        foreach ($row AS $column => $value) {
+          $bean->$column = $value;
+        }
+        $this->db->store($bean);
+      }
+    }
+
     $bean->name = $this::ORDER_STATUS;
     $this->db->store($bean);
   }
-  public function createMoneyRate() {
+  public function addMoneyRate(array $rows) {
     $bean = $this->db::xdispense($this->pf('money'));
     $bean->code = 'USD';
     $bean->name = 'United State Dollar';
     $bean->short_name = '$';
     $bean->scale = 1;
-    $bean->rate = 2.5;
+    $bean->rate = 1;
     $bean->main = 1;
+    $this->db->store($bean);
+
+    $bean->code = 'EUR';
+    $bean->name = 'Euro';
+    $bean->short_name = '€';
+    $bean->scale = 1;
+    $bean->rate = 1;
     $this->db->store($bean);
 
     $bean->code = 'RUB';

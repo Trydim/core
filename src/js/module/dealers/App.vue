@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
-    <Button v-if="false" type="button" class="btn btn-success" @click="addDealer">{{ $t('Add') }}</Button>
+    <Button v-if="!false" type="button" class="btn btn-success" @click="addDealer">{{ $t('Add') }}</Button>
     <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="deleteDealer">{{ $t('Delete') }}</Button>
   </div>
 
@@ -66,13 +66,23 @@
       <h4>{{ modal.title }}</h4>
     </template>
 
-    <div v-if="queryParam.dbAction === 'changeDealer'" class="row" style="min-width: 500px">
+    <div v-if="queryParam.dbAction !== 'deleteDealer'" class="row" style="min-width: 500px">
       <div class="col-6">
         <!-- Наименование -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Название:</span>
           <InputText class="p-inputtext-sm" v-model="dealer.name" autofocus></InputText>
         </div>
+        <template v-if="queryParam.dbAction === 'addDealer'">
+          <div class="p-inputgroup my-2">
+            <span class="p-inputgroup-addon col-5">Логин:</span>
+            <InputText class="p-inputtext-sm" v-model="dealer.login" autofocus></InputText>
+          </div>
+          <div class="p-inputgroup my-2">
+            <span class="p-inputgroup-addon col-5">Пароль:</span>
+            <InputText class="p-inputtext-sm" v-model="dealer.password" autofocus></InputText>
+          </div>
+        </template>
         <!-- Контакты номер -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Телефон:</span>
@@ -196,10 +206,10 @@ export default {
     },
 
     modal: {
-      display        : false,
+      display: false,
+      title  : '',
+      loading: false,
       confirmDisabled: true,
-      title          : '',
-      loading        : false,
     },
   }),
   computed: {
@@ -330,7 +340,8 @@ export default {
       this.setProperty();
     },
     deleteDealer() {
-      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return;
+      }
     },
 
     dblClick(e) {

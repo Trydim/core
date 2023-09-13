@@ -98,14 +98,16 @@ class Dealer {
   }
   private function createConfig(array $params) {
     $config = file_get_contents($this::RESOURCES . 'config.php');
+    if (!$config) die('Config file for dealer not exist!');
+
     $setParam = function ($paramName, $params) use (&$config) {
       $value = is_array($params) ? $params[$paramName] : $params;
       $config = str_replace('$' . $paramName, $value, $config);
     };
 
     $setParam('dealerName', $params);
-
     $setParam('prefix', $this->prefix);
+
     foreach (['dbHost', 'dbName', 'dbUsername', 'dbPass'] as $key) {
       $setParam($key, $params[VC::DB_CONFIG]);
     }
@@ -125,9 +127,9 @@ class Dealer {
     $this->migrateDb->createOrderStatus();
     $this->migrateDb->createOrders();
 
-    $this->migrateDb->createAdmin($param['login'], $param['pass']);
-    $this->migrateDb->createStatus();
-    $this->migrateDb->createMoneyRate();
+    $this->migrateDb->addAdmin($param['login'], $param['pass']);
+    $this->migrateDb->addStatus($param['status'] ?? []);
+    $this->migrateDb->addMoneyRate($param['money'] ?? []);
   }
 
   /**
@@ -136,6 +138,8 @@ class Dealer {
    * @param array $dbParam
    */
   public function create($id, array $configParam, array $dbParam) {
+    $this->main->fireHook(VC::HOOKS_DEALERS_BEFORE_CREATE, $this, $configParam, $dbParam);
+
     $this->setParam($id, $dbParam['prefix']);
     $this->createFolderDealers();
     $this->createFolder();
@@ -143,6 +147,8 @@ class Dealer {
     $this->createConfig($configParam);
 
     $this->updateDb($dbParam);
+
+    $this->main->fireHook(VC::HOOKS_DEALERS_AFTER_CREATE, $this);
   }
 
   public function update($id) {

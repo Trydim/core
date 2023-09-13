@@ -756,24 +756,29 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
 
-        $login = $dealer['login'] ?? false;
-        $pass = password_hash($dealer['pass'] ?? 123, PASSWORD_BCRYPT);
-        $prefix = strtolower(substr(translit($dealer['name']), 0, 3));
+        $dealerName = trim($dealer['name']);
+        $login = trim($dealer['login'] ?? '');
+        $pass = password_hash($dealer['password'] ?? 123, PASSWORD_BCRYPT);
+
+        $prefix = preg_replace('/[^a-zA-Z]/i', '', translit($dealerName));
+        $prefix = strtolower(substr($prefix, 0, 3)) . '_';
 
         $haveDealers = $db->selectQuery('dealers', 'cms_param');
         if (count($haveDealers)) {
           $haveDealers = array_filter($haveDealers, function ($param) use ($prefix) {
             $param = json_decode($param);
-            return ($param->prefix ?? false) === $prefix . '_';
+            return ($param->prefix ?? false) === $prefix;
           });
-          if (count($haveDealers)) $prefix .= substr(uniqid(), -3, 3);
+          if (count($haveDealers)) {
+            $prefix = str_replace('_', '', $prefix) . substr(uniqid(), -3, 3) . '_';
+          }
           unset($haveDealers);
         }
 
         $id = $db->getLastID('dealers', ['name' => 'tmp']);
 
         $param = [
-          'name' => $dealer['name'],
+          'name' => $dealerName,
           'cms_param' => json_encode(['prefix' => $prefix]),
           'activity'  => intval(boolValue($dealer['activity'] ?? true)),
           'contacts'  => json_encode([
@@ -781,11 +786,12 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
             'email'   => $dealer['email'] ?? '',
             'phone'   => $dealer['phone'] ?? '',
           ]),
+          'settings' => json_encode($dealer['settings'] ?? []),
         ];
 
         $result = $db->insert($columns, 'dealers', [$id => $param], true);
 
-        if ($login === false) $login = 'dealer' . $id;
+        if ($login === '') $login = 'dealer' . $id;
 
         $main->dealer->create(
           $id,
@@ -824,8 +830,7 @@ if ($cmsAction === 'tables') { // todo добавить фильтрацию т�
       }
       break;
     case 'deleteDealer':
-      if (isset($dealer)) {
-      }
+      if (isset($dealer)) { }
       break;
 
     default:

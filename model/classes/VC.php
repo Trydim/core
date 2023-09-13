@@ -75,9 +75,10 @@ class VC {
         HOOKS_CATALOG_TEMPLATE  = 'catalogTemplate',
         HOOKS_ORDER_TEMPLATE    = 'orderTemplate',
         HOOKS_CUSTOMERS_TEMPLATE = 'customersTemplate',
-        HOOKS_DEALERS_TEMPLATE   = 'dealersTemplate',
         HOOKS_FILE_MANAGER_TEMPLATE = 'fileManagerTemplate',
-        HOOKS_SETTING_TEMPLATE     = 'settingTemplate',
-        HOOKS_USERS_TEMPLATE       = 'usersTemplate';
-
+        HOOKS_SETTING_TEMPLATE      = 'settingTemplate',
+        HOOKS_USERS_TEMPLATE        = 'usersTemplate',
+        HOOKS_DEALERS_TEMPLATE      = 'dealersTemplate',
+        HOOKS_DEALERS_BEFORE_CREATE = 'beforeCreateDealer',
+        HOOKS_DEALERS_AFTER_CREATE  = 'afterCreateDealer';
 }
