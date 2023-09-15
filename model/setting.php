@@ -227,19 +227,27 @@ switch ($cmsAction) {
   // Options property
   case 'createProperty': case 'createDealersProperty':
   case 'changeProperty': case 'changeDealersProperty':
-    $propKey   = in_array($cmsAction, ['createProperty', 'changeProperty']) ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
-    $cmsAction = includes($cmsAction, 'create') ? 'create' : 'change';
-    $property  = json_decode($property ?? '[]', true);
+    $propKey  = in_array($cmsAction, ['createProperty', 'changeProperty']) ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
+    $isChange = includes($cmsAction, 'change');
+    $property = json_decode($property ?? '[]', true);
 
     $tableName = $property['newName'];
     $tableCode = strtolower(translit($property['newCode'] ?? $tableName));
-    $propName = 'prop_' . str_replace('prop_', '', $tableCode);
-    $setting = $main->getSettings($propKey);
+    $propName  = 'prop_' . str_replace('prop_', '', $tableCode);
+    $setting   = $main->getSettings($propKey);
 
-    if ($property['type'] === 'select') { // Справочник
+    // Удалить сущности свойства, если есть (пока только таблица)
+    if ($isChange) {
+      // Если теперь не справочник удалить таблицу.
+      if (!includes($property['type'], 'select')) $db->delPropertyTable([$propName]);
+    }
+
+    if (includes($property['type'], 'select')) { // Справочник
+      $haveTable = count($db->getTables($propName));
+
       $param = [];
       foreach ($property['fields'] as $field) {
-        if ($cmsAction === 'change') $param[translit($field['name'])] = $field['type'];
+        if ($haveTable && $isChange) $param[translit($field['newName'])] = $field['type'];
         else {
           $param[] = [
             'newName' => $field['newName'],
@@ -248,28 +256,53 @@ switch ($cmsAction) {
         }
       }
 
-      if (!isset($setting[$propName])) {
+      if (!isset($setting[$propName]) || !$haveTable) {
         $result['error'] = $db->createPropertyTable($propName, $param);
-      } else if ($cmsAction === 'change') {
+      } else if ($isChange) {
         $result['error'] = $db->changePropertyTable($propName, $param);
       } else $result['error'] = 'Property exist';
 
-      $setting[$propName]['name'] = $tableName;
+      $setting[$propName] = [
+        'name' => $tableName,
+        'type' => $property['type'],
+      ];
+      $main->setSettings($propKey, $setting)->saveSettings();
+    } else if (includes($property['type'], 'table')) {
+      $setting[$propName] = [
+        'name' => $tableName,
+        'type' => 'table',
+        'columns' => $property['fields'],
+      ];
       $main->setSettings($propKey, $setting)->saveSettings();
     } else { // остальные
-      $dataType = $property['type'];
-
       // If changed, else remove old value.
-      if ($cmsAction === 'change') unset($setting[$property['code']]);
+      if ($isChange) unset($setting[$property['code']]);
 
       if (!isset($setting[$propName])) {
         $setting[$propName] = [
           'name' => $tableName,
-          'type' => $dataType,
+          'type' => $property['type'],
         ];
         $main->setSettings($propKey, $setting)->saveSettings();
       } else $result['error'] = 'Property exist';
     }
+    break;
+  case 'changePropertyOrder': case 'changeDealersPropertyOrder':
+    $propKey  = includes($cmsAction, 'Dealer') ? VC::DEALER_PROPERTIES : VC::OPTION_PROPERTIES;
+    $property = json_decode($property ?? '[]', true);
+
+    if (!count($property)) { $result['error'] = $cmsAction . ' error: Property is empty'; break; }
+
+    $setting = [];
+    foreach ($property as $prop) {
+      $setting[$prop['code']] = [
+        'name' => $prop['name'],
+        'type' => $prop['type'],
+      ];
+    }
+
+    $main->setSettings($propKey, $setting)->saveSettings();
+    $result = ['ok'];
     break;
   case 'loadProperties': case 'loadDealersProperties':
     $propKey = $cmsAction === 'loadProperties' ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;

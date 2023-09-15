@@ -66,7 +66,7 @@
       <h4>{{ modal.title }}</h4>
     </template>
 
-    <div v-if="queryParam.dbAction !== 'deleteDealer'" class="row" style="min-width: 500px">
+    <div v-if="queryParam.dbAction !== 'deleteDealer'" class="row" style="min-width: 500px; max-width: 80vw">
       <div class="col-6">
         <!-- Наименование -->
         <div class="p-inputgroup my-2">
@@ -134,8 +134,15 @@
                        :options="Object.values(prop.values)"
                        v-model="dealer.settings[key]"
           ></MultiSelect>
-
         </div>
+      </div>
+
+      <div class="col-12">
+        <template v-for="(prop, key) of properties" :key="key">
+          <property-table v-if="prop.type === 'table'" :prop="prop" :dealer="dealer"
+                          @changed="changedTableProperty"
+          ></property-table>
+        </template>
       </div>
     </div>
     <div v-else>
@@ -168,13 +175,15 @@ import MultiSelect from 'primevue/multiselect';
 import Calendar from 'primevue/calendar';
 
 import cloneDeep from 'lodash/clonedeep';
+import PropertyTable from "./propertyTable.vue";
 
 export default {
   name: 'dealer',
   components: {
     Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar, Dropdown, MultiSelect,
     DataTable, Column,
-    Dialog
+    PropertyTable,
+    Dialog,
   },
   data: () => ({
     dealers: [],
@@ -250,7 +259,7 @@ export default {
       });
     },
     setData(dataKey, data) {
-      if (dataKey === 'dealers') this.selected = {}
+      if (dataKey === 'dealers') this.selected = {};
 
       if (data[dataKey] || data) this[dataKey] = data[dataKey] || data;
       else f.showMsg('Query set data error' + dataKey, 'error');
@@ -265,10 +274,13 @@ export default {
       this.query();
     },
 
+    changedTableProperty() { this.modal.confirmDisabled = !this.dealer.name; },
+
     checkColumn() { return true; },
     getPropertyName(k) { return this.properties[k] ? this.properties[k].name : k; },
     getPropertyType(k) { return this.properties[k] ? this.properties[k].type : k; },
     getPropertyValue(k, v) {
+      v = v.toString();
       const res = this.properties[k] && this.properties[k].values && this.properties[k].values.filter(i => v.includes(i.id));
 
       return res ? res.map(i => i.name).join(', ') : v;

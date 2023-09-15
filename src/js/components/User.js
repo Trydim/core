@@ -57,6 +57,6 @@ export default class {
    * @return {boolean}
    */
   haveTags(tag) {
-    return this.data.tags.includes(tag.toLowerCase())
+    return (this.data.tags || '').includes(tag.toLowerCase());
   }
 }

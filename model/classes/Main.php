@@ -388,7 +388,7 @@ final class Main {
       $target = $_SESSION['target'] ?? '';
       isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
     }
-    header('location: ' . $this->url->getUri() . $target);
+    header('Location: ' . $this->url->getUri() . $target, true, 303);
     die;
   }
 

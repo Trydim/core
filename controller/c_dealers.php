@@ -26,12 +26,12 @@ $field = [
 ];
 
 // all Properties
-$value = $main->getSettings(VC::DEALER_PROPERTIES);
+$setting = $main->getSettings(VC::DEALER_PROPERTIES);
 foreach ($main->db->getTables('prop') as $table) {
   // Param saved in json
-  $prop = $value[$table['dbTable']] ?? [];
+  $prop = $setting[$table['dbTable']] ?? [];
 
-  $value[$table['dbTable']] = [
+  $setting[$table['dbTable']] = [
     'name'   => $prop['name'] ?? $table['name'],
     'type'   => $prop['type'] ?? 'select',
     'values' => array_map(function ($row) {
@@ -40,7 +40,14 @@ foreach ($main->db->getTables('prop') as $table) {
     }, $main->db->loadTable($table['dbTable'])),
   ];
 }
-$field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . json_encode($value) . "'>";
+$field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . json_encode($setting) . "'>";
+
+// if have table property, add libs
+$haveTable = array_filter($setting, function ($prop) { return $prop['type'] === 'table'; });
+if (count($haveTable)) {
+  array_unshift($field['jsLinks'], CORE_JS . 'libs/handsontable.full.min.js?ver=f3bb2b6859');
+}
+unset($setting, $haveTable);
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_DEALERS_TEMPLATE, $main);
 ob_start();

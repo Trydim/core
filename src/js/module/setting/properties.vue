@@ -73,8 +73,8 @@
             </p-select>
           </div>
         </div>
-        <!-- Составной тип-->
-        <template v-if="property.type.toLowerCase().includes('select')">
+        <!-- Составной тип (справочники) -->
+        <template v-if="typeIsSelect">
           <div class="col-12 row mb-1">
             <div class="col">Дополнительные поля свойства (имя есть):</div>
             <div class="col">
@@ -101,14 +101,34 @@
             </div>
           </div>
         </template>
+        <template v-if="typeIsTable">
+          <div class="col-12 row mb-1">
+            <div class="col">Колонки:</div>
+            <div class="col">
+              <p-button v-tooltip.bottom="'Добавить колонку в таблицу'" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+                        label="Добавить колонку"
+                        @click="addTableColumn"></p-button>
+            </div>
+          </div>
+
+          <div v-for="(field, index) of property.fields" class="row  mb-1 border" :key="index">
+            <div class="col flex-grow-1 p-0 text-center">
+              <p-input-text class="w-100" v-model="property.fields[index]"></p-input-text>
+            </div>
+            <div v-if="property.fields.length > 1" class="col-1 m-0 text-center">
+              <p-button v-tooltip.bottom="'Удалить колонку'" icon="pi pi-times" class="p-button-danger"
+                        @click="removeTableColumn(index)"></p-button>
+            </div>
+          </div>
+        </template>
       </div>
       <div v-else style="min-width: 300px">
         Удалить свойство
       </div>
 
       <template #footer>
-        <p-button label="Yes" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="propertiesConfirm"></p-button>
-        <p-button label="No" icon="pi pi-times" class="p-button-text" @click="propertiesCancel"></p-button>
+        <p-button :label="this.$t('Yes')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="propertiesConfirm"></p-button>
+        <p-button :label="this.$t('No')" icon="pi pi-times" class="p-button-text" @click="propertiesCancel"></p-button>
       </template>
     </p-dialog>
   </div>
@@ -164,6 +184,7 @@ export default {
         items: [
           {id: 'select', name: 'Справочник'},
           {id: 'multiSelect', name: 'Справочник множественный'},
+          {id: 'table', name: 'Таблица'},
         ]
       }
     ],
@@ -177,11 +198,6 @@ export default {
       {id: 'bool', name: 'Флаг (да/нет)'},
     ],
   }),
-  watch: {
-    'property.newName'() {
-      this.property.newCode = f.transLit(this.property.newName).toLowerCase().replace(/\s/g, '');
-    },
-  },
   computed: {
     accordionHeader() {
       return this.type === 'catalog' ? 'Редактировать параметры каталога'
@@ -203,6 +219,10 @@ export default {
       return this.type === 'catalog' ? 'changeProperty'
                                      : 'changeDealersProperty';
     },
+    changeRowOrder() {
+      return this.type === 'catalog' ? 'changePropertyOrder'
+                                     : 'changeDealersPropertyOrder';
+    },
     deleteAction() {
       return this.type === 'catalog' ? 'deleteProperty'
                                      : 'deleteDealersProperty';
@@ -210,7 +230,23 @@ export default {
 
     allTypes() {
       return this.propertiesTypes[0].items.concat(this.propertiesTypes[1].items);
-    }
+    },
+    typeIsSelect() { return this.property.type.toLowerCase().includes('select'); },
+    typeIsTable() { return this.property.type === 'table'; },
+  },
+  watch: {
+    'property.newName'() {
+      const name = this.property.newName;
+      if (!name) return;
+
+      this.property.newCode = f.transLit(name).toLowerCase().replace(/\s/g, '');
+    },
+    typeIsSelect() {
+      if (this.typeIsSelect) this.property.fields = {};
+    },
+    typeIsTable() {
+      if (this.typeIsTable) this.property.fields = ['column_1'];
+    },
   },
   methods: {
     loadProperties() {
@@ -231,6 +267,13 @@ export default {
 
     onRowReorder(event) {
       this.propertiesData = event.value;
+
+      this.$nextTick(() => {
+        this.loading = true;
+        this.queryParam.cmsAction = this.changeRowOrder;
+        this.queryParam.property = JSON.stringify(this.propertiesData);
+        this.query().then(() => this.loading = false);
+      });
     },
 
     openAccordion() {
@@ -242,7 +285,6 @@ export default {
       this.property.name = '';
       this.property.code = '';
       this.property.type = 'text';
-      this.property.fields = {};
 
       this.modal.title = 'Создать свойство';
       this.modal.display = true;
@@ -257,7 +299,6 @@ export default {
       }
     },
     changeProperty() {
-      debugger
       if (!this.propertiesSelected) return;
       this.queryParam.cmsAction = this.changeAction;
 
@@ -265,7 +306,7 @@ export default {
       this.property.newName = this.property.name;
       this.property.newCode = this.property.code;
 
-      if (this.property.type === 'select') {
+      if (this.typeIsSelect) {
         Object.values(this.property.fields).forEach(f => {
           f.newName = f.name;
           f.newCode = f.code;
@@ -294,7 +335,16 @@ export default {
       }
     },
     removePropertyField(id) {
-      delete this.property.fields.splice(id, 1);
+      delete this.property.fields[id];
+    },
+
+    addTableColumn() {
+      let index = this.property.fields.length;
+
+      this.property.fields.push('column_' + (index + 1));
+    },
+    removeTableColumn(id) {
+      this.property.fields.splice(id, 1);
     },
 
     propertiesConfirm() {

@@ -40,8 +40,6 @@ window.Handsontable.cellTypes.registerCellType('color-picker', {
   editor: Handsontable.editors.TextEditor,
 })*/
 
-
-
 export const handson = {
   optionCommon: {
     rowHeaders        : true,

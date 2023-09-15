@@ -3,7 +3,7 @@
 import '../../../css/module/admindb/handsontable.min.css';
 import mustache from 'mustache';
 
-import "./handsontable.full.min";
+import "../../libs/handsontable.full.min";
 import {handson} from "./handsontable.option";
 
 export class Main {
