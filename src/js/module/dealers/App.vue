@@ -49,6 +49,11 @@
           <p v-if="getPropertyType(key) === 'bool'" class="m-0">
             {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="{'pi-green pi-plus': value, 'pi-red pi-times': !value}"></i>
           </p>
+          <template v-else-if="getPropertyType(key) === 'table'">
+            <p v-if="value.length" class="m-0 text-nowrap">
+              {{ getPropertyName(key) }}: <i class="pi pi-table" v-tooltip.left="getTablePropertyValue(value)"></i>
+            </p>
+          </template>
           <p v-else class="m-0 text-nowrap">
             {{ getPropertyName(key) }}: {{ getPropertyValue(key, value) }}
           </p>
@@ -113,28 +118,29 @@
           v-tooltip.bottom="'Обновить свойства'"
           @click="refreshProperties"
         ></Button>-->
-        <div v-for="(prop, key) of properties" :key="key"
-             class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">{{ prop.name }}</span>
+        <template v-for="(prop, key) of properties" :key="key">
+          <div v-if="prop.type !== 'table'" class="p-inputgroup my-2">
+            <span class="p-inputgroup-addon col-5">{{ prop.name }}</span>
 
-          <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]"></InputText>
-          <InputNumber v-else-if="prop.type === 'number'" :max-fraction-digits="10" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
-          <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px"></Textarea>
-          <ToggleButton v-else-if="prop.type === 'bool'" class="w-100"
-                        on-icon="pi pi-check" off-icon="pi pi-times"
-                        on-label="Да" off-label="Нет"
-                        v-model="dealer.settings[key]"
-          ></ToggleButton>
-          <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"></Calendar>
-          <Dropdown v-else-if="prop.type === 'select'" option-label="name" option-value="ID"
-                    :options="Object.values(prop.values)"
-                    v-model="dealer.settings[key]"
-          ></Dropdown>
-          <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="ID"
-                       :options="Object.values(prop.values)"
-                       v-model="dealer.settings[key]"
-          ></MultiSelect>
-        </div>
+            <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]"></InputText>
+            <InputNumber v-else-if="prop.type === 'number'" :max-fraction-digits="10" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
+            <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px"></Textarea>
+            <ToggleButton v-else-if="prop.type === 'bool'" class="w-100"
+                          on-icon="pi pi-check" off-icon="pi pi-times"
+                          on-label="Да" off-label="Нет"
+                          v-model="dealer.settings[key]"
+            ></ToggleButton>
+            <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"></Calendar>
+            <Dropdown v-else-if="prop.type === 'select'" option-label="name" option-value="ID"
+                      :options="Object.values(prop.values)"
+                      v-model="dealer.settings[key]"
+            ></Dropdown>
+            <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="ID"
+                         :options="Object.values(prop.values)"
+                         v-model="dealer.settings[key]"
+            ></MultiSelect>
+          </div>
+        </template>
       </div>
 
       <div class="col-12">
@@ -284,6 +290,15 @@ export default {
       const res = this.properties[k] && this.properties[k].values && this.properties[k].values.filter(i => v.includes(i.id));
 
       return res ? res.map(i => i.name).join(', ') : v;
+    },
+    getTablePropertyValue(v) {
+      let html = `<div class="grid" style="--bs-columns: ${v[0].length}; grid-gap: 0.1rem;">`;
+
+      v.forEach(r => r.forEach(c => {
+        html += '<div class="border text-center text-nowrap overflow-hidden" style="max-width: 200px">' + c + '</div>';
+      }));
+
+      return {escape: true, value: html + '</div>', /*hideDelay: 30000*/};
     },
     setProperty() {
       const de = this.dealer;

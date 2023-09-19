@@ -33,7 +33,7 @@ export default {
       handsontable: undefined,
 
       config: {
-        data: prop && prop.data || [new Array(this.prop.columns.length).fill('')],
+        data: prop && prop.length ? prop : [new Array(this.prop.columns.length).fill('')],
 
         rowHeaders   : true,
         dropdownMenu : true,

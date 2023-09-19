@@ -28,7 +28,7 @@ trait Authorization {
   private $sideMenu = [];
 
   /**
-   * @var object [admin, login, id, name]
+   * @var object []
    */
   private $user = [];
 
@@ -88,7 +88,7 @@ trait Authorization {
   }
 
   /**
-   * @param string $field
+   * @param string $field - id, login, name, contacts, onlyOne, isAdmin, contacts, permission, customization
    * @return mixed
    */
   public function getLogin(string $field = 'login') {
@@ -113,7 +113,7 @@ trait Authorization {
       $this->reDirect('404');
     }
 
-    $this->setCmsParam('dealer', $dealer);
+    $this->user['dealer'] = $dealer;
   }
   /**
    * Проверка пароля

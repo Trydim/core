@@ -1007,7 +1007,7 @@ class DbMain extends R {
 
   public function getDealerById(string $id): array {
     $settings = [];
-    $properties = new Properties($this->main);
+    $properties = new Properties($this->main, 'dealer');
 
     $sql = "SELECT ID AS 'id', name, contacts,
                    register_date AS 'registerDate', activity, settings
@@ -1015,13 +1015,16 @@ class DbMain extends R {
             WHERE ID = :id";
 
     $dealer = $this->jsonParseField(self::getRow($sql, [':id' => $id]));
+
+    $this->togglePrefix();
     $dealer['settings'] = $dealer['settings'] ?? [];
     foreach ($dealer['settings'] as $prop => $value) {
       [$propName, $propValue] = $properties->getValue($prop, $value);
       $settings[$propName] = $propValue;
     }
-
     $dealer['settings'] = $settings;
+    $this->togglePrefix();
+
     return $dealer;
   }
 }

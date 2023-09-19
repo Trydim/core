@@ -98,8 +98,8 @@ export class Main {
 
         if (['bit', 'int(1)'].includes(colParam.type)) {
           res.type = 'checkbox';
-          res.checkedTemplate = '+';
-          res.uncheckedTemplate = '-';
+          res.checkedTemplate = '1';
+          res.uncheckedTemplate = '0';
         }
         else res.type = colParam.type.includes('varchar') ? 'text' : 'numeric';
 

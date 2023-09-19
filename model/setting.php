@@ -339,7 +339,7 @@ switch ($cmsAction) {
             'type' => $type,
           ];
 
-          if ($type === 'select') {
+          if (includes($type, 'select')) {
             $columns = $db->getColumnsTable($code);
 
             if (count($columns) > 2) {
