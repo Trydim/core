@@ -143,6 +143,7 @@ export default class extends Orders {
 
     if (action.includes('confirm')) { // Закрыть подтверждение
       f.hide(this.confirm, f.qS('#selectStatus'), f.qS('#printTypeField'));
+      this.selected.unBlock();
       f.show(f.qS('#actionBtnWrap'));
 
       if (action === 'confirmYes') {
@@ -160,6 +161,7 @@ export default class extends Orders {
 
     this.confirmMsg = 'Статусы Сохранены';
     f.show(this.confirm, this.selectStatus);
+    this.selected.block();
     return true;
   }
   delOrders() {

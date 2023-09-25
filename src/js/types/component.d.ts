@@ -55,6 +55,9 @@ declare class SelectedRow {
   getSelectedSize(): number
   remove(id: string | number): SelectedRow
 
+  block(): SelectedRow
+  unBlock(): SelectedRow
+
   getObserverKey(): string
 
   subscribe(func: Function, ...arg: any): void

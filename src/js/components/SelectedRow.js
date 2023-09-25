@@ -60,6 +60,7 @@ export class SelectedRow {
 
     if (!table) return;
     this.table = table;
+    this.blocked = false;
     this.observerKey = 'selected' + (Math.random() * 10000 | 0);
     this.selectedId  = new SelectedId(this.observerKey);
     this.onTableMutator();
@@ -72,13 +73,16 @@ export class SelectedRow {
     this.selectedId.clear();
   }
   add(id) {
-    this.selectedId.add(id);
+    !this.blocked && this.selectedId.add(id);
     return this;
   }
   remove(id) {
-    this.selectedId.delete(id);
+    !this.blocked && this.selectedId.delete(id);
     return this;
   }
+
+  block() { this.blocked = true; return this; }
+  unBlock() { this.blocked = false; return this; }
 
   // Observer func
   /**
@@ -149,6 +153,7 @@ export class SelectedRow {
   // Event function
   mouseOver(e) {
     let tr = e.target.closest('tr');
+    if (!tr) return;
     if (e.buttons) tr.classList.add('mouseSelected');
     else if (tr.classList.contains('mouseSelected')) tr.classList.remove('mouseSelected')
   }
@@ -158,7 +163,7 @@ export class SelectedRow {
   }
   mouseUp(e) {
     let tr = e.target.closest('tr');
-    if (!tr) return;
+    if (!tr || this.blocked) return;
     let finishClick = tr.rowIndex,
         start = Math.min(this.startClick, finishClick),
         finish = Math.max(this.startClick, finishClick);

@@ -7,7 +7,7 @@
  */
 
 ?>
-<div class="d-flex justify-content-between pb-4" id="actionBtnWrap">
+<div class="d-flex justify-content-between mb-4 pt-1 position-sticky top-0 bg-white" id="actionBtnWrap" style="z-index: +2">
   <div>
     <input type="button" class="btn btn-success oneOrderOnly mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
     <span id="orderBtn">
@@ -21,13 +21,13 @@
     <input type="button" class="btn btn-danger mainOnly" value="<?= gTxt('Delete') ?>" data-action="delOrders">
   </div>
 </div>
-<div class="pb-4 d-none" id="confirmField">
+<div class="position-sticky mb-4 pt-1 top-0 bg-white d-none" id="confirmField" style="z-index: +2">
   <label><select id="selectStatus" class="d-none form-select" data-action="statusOrders"></select></label>
   <input type="button" class="btn btn-success" value="<?= gTxt('Confirm') ?>" data-action="confirmYes">
   <input type="button" class="btn btn-warning ms-1" value="<?= gTxt('Cancel') ?>" data-action="confirmNo">
 </div>
 <?php if ($main->getCmsParam('USERS_ORDERS')) { ?>
-  <div class="d-flex pb-4" style="justify-content: left">
+  <div class="d-flex mb-4" style="justify-content: left">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="orderType" value="order" id="orderTypeO" checked data-action="orderTypeChange">
       <label class="form-check-label" for="orderTypeO" title="<?= gTxt('Orders saved by manager') ?>">
@@ -62,12 +62,12 @@
 
 <div class="mt-1 position-relative">
   <button type="button" class="position-absolute top-0 btn btn-light pi pi-cog mt-2 p-2" style="z-index: +1" data-action="setupColumns"></button>
-  <table id="orderTable" class="text-center table table-striped">
+  <table id="orderTable" class="text-center table table-striped mb-0">
     <thead><tr></tr></thead>
     <tbody></tbody>
   </table>
 </div>
-<div id="paginator"></div>
+<div class="mt-3" id="paginator"></div>
 
 <div class="position-fixed bottom-0 end-0 mb-5 d-none" id="selectedArea">
   <div class="d-inline bg-light p-1 me-1" title="<?= gTxt('Selected orders') ?>"></div>

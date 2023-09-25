@@ -34,7 +34,7 @@ class Properties {
    */
   public function getValue($prop, $value): array {
     $propParam = $this->propSetting[$prop] ?? null;
-    $propType = $propParam ? $propParam['type'] : null;
+    $propType = $propParam['type'] ?? '';
     $haveValue = boolValue($value);
 
     if ($propParam === null) {
