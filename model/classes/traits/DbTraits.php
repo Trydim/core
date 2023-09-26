@@ -15,7 +15,7 @@ trait DbOrders {
   private function getBaseOrdersQuery(bool $includeValues = false): string {
     return "SELECT O.ID AS 'ID', 
             create_date AS 'createDate', last_edit_date AS 'lastEditDate',
-            U.name AS 'userName',
+            U.ID AS 'userId', U.name AS 'userName',
             C.ID AS 'customerId', C.name AS 'customerName', C.contacts AS 'customerContacts',
             S.ID AS 'statusId', S.name AS 'status', total,
             important_value AS 'importantValue'"
