@@ -34,8 +34,9 @@ if ($mode = $main->getCmsParam('mode')) {
 } else {
   $main->beforeController();
 
-  $pathController = CORE . 'controller/c_' . $main->url->getRoute() . '.php';
-  if (file_exists($pathController)) require $pathController;
+  $pathController = 'controller/c_' . $main->url->getRoute() . '.php';
+  if (file_exists(ABS_SITE_PATH . "public/" . $pathController)) require ABS_SITE_PATH . "public/" . $pathController;
+  else if (file_exists(CORE . $pathController)) require CORE . $pathController;
   else $main->initDefaultController();
 
   unset($pathController, $field);
