@@ -7,8 +7,8 @@ const checkJSON = (data: string) => {
     return response;
   }
   catch (e) {
-    e['xdebug_message'] && f.showMsg(e['xdebug_message'], 'error', false);
-    e.message && f.showMsg(e.message, 'error', false);
+    const msg = e['xdebug_message'] || e.message || e;
+    msg && f.showMsg(msg, 'error', false);
     data && f.showMsg(data, 'error', false);
     return {status: false};
   }

@@ -7,9 +7,7 @@
 if (includes($main->url->getRequestUri(), 'update')) {
   $start = time();
 
-  $pathResource = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR .
-  $dealers = $main->db->loadDealers();
-  foreach ($dealers as $dealer) {
+  foreach ($main->db->loadDealers() as $dealer) {
     if (boolValue($dealer['activity'] ?? false)) $main->dealer->update($dealer['id']);
   }
 
