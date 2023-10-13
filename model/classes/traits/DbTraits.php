@@ -414,7 +414,7 @@ trait DbCsv {
    * @param $link {string}
    * @return mixed|null
    */
-  static function scanDirCsv(string $path, string $link = '') {
+  public function scanDirCsv(string $path, string $link = '') {
     return array_reduce(is_dir($path) ? scandir($path) : [], function ($r, $item) use ($link) {
       if (!($item === '.' || $item === '..')) {
         if (stripos($item, '.csv')) {
@@ -423,11 +423,10 @@ trait DbCsv {
             'name'     => gTxt(str_replace('.csv', '', $item)),
           ];
         } else {
-          global $main;
-          $csvPath = $main->getCmsParam(VC::CSV_PATH);
+          $csvPath = $this->main->getCmsParam(VC::CSV_PATH);
           $link && $link .= '/';
           if (filetype($csvPath . $link . $item) === 'dir') {
-            $r[$item] = self::scanDirCsv($csvPath . $link . $item, $link . $item);
+            $r[$item] = $this->scanDirCsv($csvPath . $link . $item, $link . $item);
           }
         }
       }

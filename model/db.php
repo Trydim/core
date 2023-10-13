@@ -13,7 +13,7 @@ $dbTable = $dbTable ?? $tableName ?? '';
 
 stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
 
-if ($cmsAction === 'tables') { // todo добавить фильтрацию таблиц
+if ($cmsAction === 'tables') { // todo Никогда не используется, добавить фильтрацию таблиц
   CHANGE_DATABASE && $result[$cmsAction] = $db->getTables();
   $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam(VC::CSV_PATH));
 } else {

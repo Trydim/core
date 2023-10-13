@@ -85,6 +85,37 @@ trait Authorization {
 
     // Setting allowed for all
     $this->sideMenu[] = 'setting';
+
+    // Set AdminDb tree menu
+    if ($this->availablePage('admindb')) {
+      $dbTables = [];
+      if (USE_DATABASE) {
+        if (CHANGE_DATABASE) {
+          $dbTables = array_merge($dbTables, $this->db->getTables());
+        } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
+          $props = array_merge([[
+                                  'dbTable' => 'codes',
+                                  'name'    => gTxtDB('codes', 'codes')
+                                ]], $this->db->getTables('prop'));
+
+          $props = array_map(function ($prop) {
+            $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
+            $setting && $setting['name'] && $prop['name'] = $setting['name'];
+            return $prop;
+          }, $props);
+          $dbTables = array_merge($dbTables, ['z_prop' => $props]);
+        }
+      }
+      $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
+      // TODO $this->checkXml();
+
+      if (USE_CONTENT_EDITOR) {
+        $this->dbTables[] = [
+          'fileName' => 'content-js',
+          'name'     => gTxt('Content editor'),
+        ];
+      }
+    }
   }
 
   /**
@@ -254,48 +285,64 @@ trait Cache {
    * @var array - const
    */
   private $CACHE = [
-    'FILE_NAME' => SHARE_PATH . 'csvCache.bin',
-    'UPDATE_TIME' => 1209600, // 2 Недели.
+    'KEY_FILE_NAME' => 'csvCache.key',
+    'FILE_NAME' => 'csvCache.bin',
   ];
 
   /**
    * @var string
    */
-  private $cachePath;
+  private $cacheKey;
 
   /**
    * @var array
    */
   private $cacheVars = ['all'];
 
-  /**
-   * Return path for cache, different for dealer and main.
-   * @return string
-   */
-  private function cachePath() {
+  private function getCacheDir(): string {
     /*if ($this->publicDealer && $this->url->getRoute() === 'public') {
       $cachePath = $this->url->getPath(true);
     } else {
       $cachePath = $this->url->getBasePath(true);
     }*/
 
-    return $this->url->getPath(true) . $this->CACHE['FILE_NAME'];
-  }
-  private function cacheIsActual(string $cachePath) {
-    return time() - filemtime($cachePath) < $this->CACHE['UPDATE_TIME'];
+    return $this->url->getPath(true) . SHARE_PATH;
   }
 
-  public function setCsvVariable(array $vars) {
+  /**
+   * Return path for cache, different for dealer and main.
+   * @return string
+   */
+  private function getCachePath(): string {
+    return $this->getCacheDir() . $this->cacheKey . $this->CACHE['FILE_NAME'];
+  }
+
+  private function getCacheKeyPath(): string {
+    return $this->getCmsParam(VC::CSV_PATH) . $this->cacheKey . $this->CACHE['KEY_FILE_NAME'];
+  }
+
+  private function cacheIsActual(string $cachePath): bool {
+    return abs(filemtime($this->getCacheKeyPath()) - filemtime($cachePath)) < 10;
+  }
+
+  public function setCsvVariable(array $vars): Main {
     $this->cacheVars = $vars;
     return $this;
   }
 
+  public function setCacheKey(string $key): Main {
+    $this->cacheKey = $key;
+    return $this;
+  }
+
   /**
-   * @param mixed ...$vars
+   * @param string $cacheKey
+   * @param mixed  ...$vars
    * @return bool
    */
-  public function loadCsvCache(&...$vars): bool {
-    $cachePath = $this->cachePath();
+  public function loadCsvCache(string $cacheKey, &...$vars): bool {
+    $this->setCacheKey($cacheKey);
+    $cachePath = $this->getCachePath();
 
     if (!DEBUG && file_exists($cachePath) && $this->cacheIsActual($cachePath)) {
       $data = json_decode(gzuncompress(file_get_contents($cachePath)), true);
@@ -308,15 +355,25 @@ trait Cache {
     return false;
   }
 
-  public function saveCsvCache(...$vars) {
+  /**
+   * @param string $cacheKey
+   * @param        ...$vars
+   */
+  public function saveCsvCache(string $cacheKey, ...$vars) {
     $data = [];
+    $this->setCacheKey($cacheKey);
+
     foreach ($this->cacheVars as $index => $key) $data[$key] = $vars[$index];
-    file_put_contents($this->cachePath(), gzcompress(json_encode($data), 1));
+    file_put_contents($this->getCachePath(), gzcompress(json_encode($data), 1));
+    //file_put_contents($this->getCacheKeyPath(), uniqid());
   }
 
   public function deleteCsvCache() {
-    $cachePath = $this->cachePath();
-    file_exists($cachePath) && unlink($cachePath);
+    $cacheDir = scandir($this->getCacheDir());
+
+    foreach ($cacheDir as $path) {
+      if (includes($path, $this->CACHE['FILE_NAME'])) unlink($path);
+    }
   }
 
   public function loadPageCache() {
