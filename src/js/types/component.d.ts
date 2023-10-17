@@ -16,13 +16,12 @@ declare class LoaderIcon {
 }
 
 declare class Observer {
-  constructor()
-
   addArgument(): void
   remove(): void
-  getListPublisher(): void
-  subscribe(): void
-  fire()
+  getListPublisher(): {}
+  searchPublisherKey(searchKey: string): string
+  subscribe(name: string, func: Function): void
+  fire(name: string, ...arg)
 }
 
 declare class Pagination {
@@ -47,6 +46,7 @@ declare class Pagination {
 declare class SelectedRow {
   constructor(param: {
     table: HTMLTableElement
+    observerKey?: string,
   })
 
   clear(): void

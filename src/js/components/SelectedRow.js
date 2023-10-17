@@ -50,6 +50,7 @@ export class SelectedRow {
   /**
    * @param {object} param
    * @param {HTMLElement} param.table
+   * @param {string?} param.observerKey
    */
   constructor(param) {
     let {
@@ -61,7 +62,7 @@ export class SelectedRow {
     if (!table) return;
     this.table = table;
     this.blocked = false;
-    this.observerKey = 'selected' + (Math.random() * 10000 | 0);
+    this.observerKey = param.observerKey || 'selected' + (Math.random() * 10000 | 0);
     this.selectedId  = new SelectedId(this.observerKey);
     this.onTableMutator();
     this.onTableEvent();

@@ -610,11 +610,27 @@ export class Observer {
     delete this.publisher[name];
     delete this.listeners[name];
   }
-  getListPublisher() {
+
+  getListPublisher(searchKey) {
+    if (searchKey) {
+      const publisher = Object.keys(this.publisher).filter(i => i.includes(searchKey));
+      return publisher ? this.publisher[publisher[0]]
+                       : f.showMsg('Publisher not found: ' + key, 'error');
+    }
+
     return {
       publisher: Object.keys(this.publisher),
       listeners: Object.keys(this.listeners),
     };
+  }
+
+  /**
+   * @param {string} searchKey
+   * @returns {string|undefined}
+   */
+  searchPublisherKey(searchKey) {
+    const publisher = Object.keys(this.publisher).filter(i => i.includes(searchKey));
+    return publisher ? publisher[0] : f.showMsg('Publisher not found: ' + key, 'error');
   }
 
   /**

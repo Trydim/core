@@ -171,6 +171,7 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
 
         // Set order id, if have $orderId, then the order will be change.
         $orderId = intval($orderId ?? 0);
+        $orderChange = $orderId !== 0;
         $orderId = $orderId !== 0 ? $orderId
           : $db->getLastID(
             'orders',
@@ -181,17 +182,30 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
           );
         $orderTotal = $orderTotal ?? 0;
 
-        $param = [$orderId => [
-          'user_id'     => $main->getLogin('id') ?? 1,
-          'customer_id' => $customerId,
-          'status_id'   => $statusId,
-          'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
-          'important_value' => $importantValue ?? '{}',
-          'save_value'      => $saveValue ?? '{}',
-          'report_value'    => addCpNumber($orderId, $reportValue),
-        ]];
+        if ($orderChange) {
+          $param = [
+            'customer_id'  => $customerId,
+            'report_value' => $reportValue,
+          ];
 
-        $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
+          isset($userId) && $param['user_id'] = $userId;
+          isset($statusId) && $param['status_id'] = $statusId;
+          $orderTotal !== 0 && $param['total'] = floatval(is_finite($orderTotal) ? $orderTotal : 0);
+          isset($importantValue) && $param['important_value'] = $importantValue;
+          isset($saveValue) && $param['save_value'] = $saveValue;
+        } else {
+          $param = [
+            'user_id'     => $main->getLogin('id') ?? 1,
+            'customer_id' => $customerId,
+            'status_id'   => $statusId,
+            'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
+            'important_value' => $importantValue ?? '{}',
+            'save_value'      => $saveValue ?? '{}',
+            'report_value'    => addCpNumber($orderId, $reportValue),
+          ];
+        }
+
+        $result = $db->insert($db->getColumnsTable('orders'), 'orders', [$orderId => $param], true);
 
         $result['customerId'] = $customerId;
         $result['orderId']    = $orderId;

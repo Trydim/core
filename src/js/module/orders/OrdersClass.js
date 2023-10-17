@@ -38,7 +38,7 @@ export default class {
     });
 
     this.loaderTable = new f.LoaderIcon(this.table);
-    this.selected = new f.SelectedRow({table: this.table});
+    this.selected = new f.SelectedRow({table: this.table, observerKey: 'selectedOrders'});
     this.selected.subscribe(this.selectedRender.bind(this));
 
     this.query();
