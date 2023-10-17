@@ -20,6 +20,7 @@
     "ext-gettext": "*",
     "ext-simplexml": "*",
     "ext-curl": "*",
-    "ext-gd": "*"
+    "ext-gd": "*",
+    "ext-zip": "*"
   }
 }

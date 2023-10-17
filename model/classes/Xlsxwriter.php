@@ -1,5 +1,72 @@
 <?php
 
+class XLSXWriter_BuffererWriter {
+  protected $fd         = null;
+  protected $buffer     = '';
+  protected $check_utf8 = false;
+
+  public function __construct($filename, $fd_fopen_flags = 'w', $check_utf8 = false) {
+    $this->check_utf8 = $check_utf8;
+    $this->fd = fopen($filename, $fd_fopen_flags);
+    if ($this->fd === false) {
+      XLSXWriter::log("Unable to open $filename for writing.");
+    }
+  }
+
+  public function write($string) {
+    $this->buffer .= $string;
+    if (isset($this->buffer[8191])) {
+      $this->purge();
+    }
+  }
+
+  protected function purge() {
+    if ($this->fd) {
+      if ($this->check_utf8 && !self::isValidUTF8($this->buffer)) {
+        XLSXWriter::log("Error, invalid UTF8 encoding detected.");
+        $this->check_utf8 = false;
+      }
+      fwrite($this->fd, $this->buffer);
+      $this->buffer = '';
+    }
+  }
+
+  public function close() {
+    $this->purge();
+    if ($this->fd) {
+      fclose($this->fd);
+      $this->fd = null;
+    }
+  }
+
+  public function __destruct() {
+    $this->close();
+  }
+
+  public function ftell() {
+    if ($this->fd) {
+      $this->purge();
+      return ftell($this->fd);
+    }
+    return -1;
+  }
+
+  public function fseek($pos) {
+    if ($this->fd) {
+      $this->purge();
+      return fseek($this->fd, $pos);
+    }
+    return -1;
+  }
+
+  protected static function isValidUTF8($string) {
+    if (function_exists('mb_check_encoding')) {
+      return mb_check_encoding($string, 'UTF-8') ? true : false;
+    }
+    return preg_match("//u", $string) ? true : false;
+  }
+}
+
 class XLSXWriter {
   const EXCEL_2007_MAX_ROW = 1048576;
   const EXCEL_2007_MAX_COL = 16384;
@@ -11,6 +78,10 @@ class XLSXWriter {
   protected $company;
   protected $description;
   protected $keywords = array();
+  protected $tempdir;
+
+  private $images = [];
+  private $imageOptions = [];
 
   protected $current_sheet;
   protected $sheets         = array();
@@ -107,12 +178,37 @@ class XLSXWriter {
     $zip->addEmptyDir("_rels/");
     $zip->addFromString("_rels/.rels", self::buildRelationshipsXML());
 
+    if (count($this->images) > 0) {
+      $zip->addEmptyDir("xl/media/");
+
+      $zip->addEmptyDir("xl/drawings");
+      $zip->addEmptyDir("xl/drawings/_rels");
+
+      foreach ($this->images as $imageId => $imagePath) {
+        $imageName = explode('/', $imagePath);
+        $imageName = end($imageName);
+
+        $zip->addFile($imagePath, 'xl/media/' . $imageName);
+
+        $i = 1;
+        foreach ($this->sheets as $sheet) {
+          $zip->addFromString("xl/drawings/drawing" . $i . ".xml", $this->buildDrawingXML($imagePath, $imageId));
+          $zip->addFromString("xl/drawings/_rels/drawing" . $i . ".xml.rels", $this->buildDrawingRelationshipXML());
+          $i++;
+        }
+      }
+    }
+
     $zip->addEmptyDir("xl/worksheets/");
+    $zip->addEmptyDir("xl/worksheets/_rels/");
+
+    $i = 1;
     foreach ($this->sheets as $sheet) {
       $zip->addFile($sheet->filename, "xl/worksheets/" . $sheet->xmlname);
+      $zip->addFromString("xl/worksheets/_rels/" . $sheet->xmlname . '.rels', $this->buildSheetRelationshipXML($i++));
     }
     $zip->addFromString("xl/workbook.xml", self::buildWorkbookXML());
-    $zip->addFile($this->writeStylesXML(), "xl/styles.xml");  //$zip->addFromString("xl/styles.xml"           , self::buildStylesXML() );
+    $zip->addFile($this->writeStylesXML(), "xl/styles.xml");  // $zip->addFromString("xl/styles.xml", self::buildStylesXML());
     $zip->addFromString("[Content_Types].xml", self::buildContentTypesXML());
 
     $zip->addEmptyDir("xl/_rels/");
@@ -227,10 +323,10 @@ class XLSXWriter {
     if (!$suppress_row) {
       $header_row = array_keys($header_types);
 
-      $sheet->file_writer->write('<row collapsed="false" customFormat="false" customHeight="false" hidden="false" ht="12.1" outlineLevel="0" r="' . (1) . '">');
+      $sheet->file_writer->write('<row collapsed="false" customFormat="false" customHeight="false" hidden="false" ht="12.1" outlineLevel="0" r="' . ($sheet->row_count + 1) . '">');
       foreach ($header_row as $c => $v) {
         $cell_style_idx = empty($style) ? $sheet->columns[$c]['default_cell_style'] : $this->addCellStyle('GENERAL', json_encode(isset($style[0]) ? $style[$c] : $style));
-        $this->writeCell($sheet->file_writer, 0, $c, $v, $number_format_type = 'n_string', $cell_style_idx);
+        $this->writeCell($sheet->file_writer, $sheet->row_count, $c, $v, 'n_string', $cell_style_idx);
       }
       $sheet->file_writer->write('</row>');
       $sheet->row_count++;
@@ -254,7 +350,7 @@ class XLSXWriter {
       $customHt = isset($row_options['height']) ? true : false;
       $hidden = isset($row_options['hidden']) ? (bool)($row_options['hidden']) : false;
       $collapsed = isset($row_options['collapsed']) ? (bool)($row_options['collapsed']) : false;
-      $sheet->file_writer->write('<row collapsed="' . ($collapsed) . '" customFormat="false" customHeight="' . ($customHt) . '" hidden="' . ($hidden) . '" ht="' . ($ht) . '" outlineLevel="0" r="' . ($sheet->row_count + 1) . '">');
+      $sheet->file_writer->write('<row collapsed="' . ($collapsed ? 'true' : 'false') . '" customFormat="false" customHeight="' . ($customHt ? 'true' : 'false') . '" hidden="' . ($hidden ? 'true' : 'false') . '" ht="' . ($ht) . '" outlineLevel="0" r="' . ($sheet->row_count + 1) . '">');
     } else {
       $sheet->file_writer->write('<row collapsed="false" customFormat="false" customHeight="false" hidden="false" ht="12.1" outlineLevel="0" r="' . ($sheet->row_count + 1) . '">');
     }
@@ -307,6 +403,11 @@ class XLSXWriter {
     $sheet->file_writer->write('<oddHeader>&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12&amp;A</oddHeader>');
     $sheet->file_writer->write('<oddFooter>&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12Page &amp;P</oddFooter>');
     $sheet->file_writer->write('</headerFooter>');
+    if (count($this->images) > 0) {
+      foreach ($this->images as $imageId => $imagePath) {
+        $sheet->file_writer->write('<drawing r:id="rId' . $imageId . '" />');
+      }
+    }
     $sheet->file_writer->write('</worksheet>');
 
     $max_cell_tag = '<dimension ref="A1:' . $max_cell . '"/>';
@@ -347,7 +448,7 @@ class XLSXWriter {
     if (!is_scalar($value) || $value === '') { //objects, array, empty
       $file->write('<c r="' . $cell_name . '" s="' . $cell_style_idx . '"/>');
     } elseif (is_string($value) && $value[0] == '=') {
-      $file->write('<c r="' . $cell_name . '" s="' . $cell_style_idx . '" t="s"><f>' . self::xmlspecialchars($value) . '</f></c>');
+      $file->write('<c r="' . $cell_name . '" s="' . $cell_style_idx . '" t="s"><f>' . self::xmlspecialchars(ltrim($value, '=')) . '</f></c>');
     } elseif ($num_format_type == 'n_date') {
       $file->write('<c r="' . $cell_name . '" s="' . $cell_style_idx . '" t="n"><v>' . intval(self::convert_date_time($value)) . '</v></c>');
     } elseif ($num_format_type == 'n_datetime') {
@@ -651,10 +752,11 @@ class XLSXWriter {
     }
     $workbook_xml .= '</sheets>';
     $workbook_xml .= '<definedNames>';
+    $i = 0;
     foreach ($this->sheets as $sheet_name => $sheet) {
       if ($sheet->auto_filter) {
         $sheetname = self::sanitize_sheetname($sheet->sheetname);
-        $workbook_xml .= '<definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">\'' . self::xmlspecialchars($sheetname) . '\'!$A$1:' . self::xlsCell($sheet->row_count - 1, count($sheet->columns) - 1, true) . '</definedName>';
+        $workbook_xml .= '<definedName name="_xlnm._FilterDatabase" localSheetId="' . $i . '" hidden="1">\'' . self::xmlspecialchars($sheetname) . '\'!$A$1:' . self::xlsCell($sheet->row_count - 1, count($sheet->columns) - 1, true) . '</definedName>';
         $i++;
       }
     }
@@ -665,11 +767,10 @@ class XLSXWriter {
 
   protected function buildWorkbookRelsXML() {
     $i = 0;
-    $wkbkrels_xml = "";
-    $wkbkrels_xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $wkbkrels_xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $wkbkrels_xml .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
     $wkbkrels_xml .= '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>';
-    foreach ($this->sheets as $sheet_name => $sheet) {
+    foreach ($this->sheets as $sheet) {
       $wkbkrels_xml .= '<Relationship Id="rId' . ($i + 2) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/' . ($sheet->xmlname) . '"/>';
       $i++;
     }
@@ -678,22 +779,136 @@ class XLSXWriter {
     return $wkbkrels_xml;
   }
 
-  protected function buildContentTypesXML() {
-    $content_types_xml = "";
-    $content_types_xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+  /**
+   * @param int $sheetId
+   * @return string
+   */
+  public function buildSheetRelationshipXML(int $sheetId) {
+    $lastRelationshipId = 0;
+
+    $rels_xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $rels_xml .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
+
+    if (count($this->images) > 0) {
+      foreach ($this->images as $imageId => $imagePath) {
+        $rels_xml .= '<Relationship Id="rId' . (++$lastRelationshipId) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing' . $sheetId . '.xml"/>';
+      }
+    }
+
+    $rels_xml .= "\n";
+    $rels_xml .= '</Relationships>';
+
+    return $rels_xml;
+  }
+
+  protected function buildContentTypesXML(): string {
+    $content_types_xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $content_types_xml .= '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">';
+    $content_types_xml .= '<Default ContentType="application/xml" Extension="xml"/>';
+    $content_types_xml .= '<Default ContentType="image/png" Extension="png"/>';
+    $content_types_xml .= '<Default Extension="jpeg" ContentType="image/jpeg"/>';
+    $content_types_xml .= '<Default ContentType="application/vnd.openxmlformats-package.relationships+xml" Extension="rels"/>';
     $content_types_xml .= '<Override PartName="/_rels/.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>';
     $content_types_xml .= '<Override PartName="/xl/_rels/workbook.xml.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>';
-    foreach ($this->sheets as $sheet_name => $sheet) {
+    foreach ($this->sheets as $sheet) {
       $content_types_xml .= '<Override PartName="/xl/worksheets/' . ($sheet->xmlname) . '" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
     }
     $content_types_xml .= '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>';
     $content_types_xml .= '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>';
+    if (count($this->images) > 0) {
+      $i = 1;
+      foreach ($this->sheets as $sheet) {
+        $content_types_xml .= '<Override PartName="/xl/drawings/drawing' . ($i++) . '.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml" />';
+      }
+    }
     $content_types_xml .= '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>';
     $content_types_xml .= '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>';
     $content_types_xml .= "\n";
     $content_types_xml .= '</Types>';
     return $content_types_xml;
+  }
+
+  /**
+   * @param string $imagePath
+   * @param int    $imageId
+   * @return string
+   */
+  public function buildDrawingXML(string $imagePath, int $imageId): string {
+    $imageOptions = $this->imageOptions[$imageId];
+    list($width, $height) = getimagesize($imagePath);
+
+    if ($imageOptions['endColNum'] == 0) $imageOptions['endColNum'] = $imageOptions['startColNum'] + round($width / 96);
+    if ($imageOptions['endRowNum'] == 0) $imageOptions['endRowNum'] = $imageOptions['startRowNum'] + round($height / 28);
+
+    $endColOffset = round($width * 431.8);
+    $endRowOffset = round($height * 86.358);
+
+    return '
+    <xdr:wsDr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing">
+      <xdr:twoCellAnchor editAs="oneCell">
+        <xdr:from>
+          <xdr:col>' . $imageOptions['startColNum'] . '</xdr:col>
+          <xdr:colOff>0</xdr:colOff>
+          <xdr:row>' . $imageOptions['startRowNum'] . '</xdr:row>
+          <xdr:rowOff>0</xdr:rowOff>
+        </xdr:from>
+        <xdr:to>
+          <xdr:col>' . $imageOptions['endColNum'] . '</xdr:col>
+          <xdr:colOff>' . $endColOffset . '</xdr:colOff>
+          <xdr:row>' . $imageOptions['endRowNum'] . '</xdr:row>
+          <xdr:rowOff>' . $endRowOffset . '</xdr:rowOff>
+        </xdr:to>
+        <xdr:pic>
+          <xdr:nvPicPr>
+            <xdr:cNvPr id="' . $imageId . '" name="Picture ' . $imageId . '">
+              <a:extLst>
+                <a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}">
+                  <a16:creationId xmlns:a16="http://schemas.microsoft.com/office/drawing/2014/main" id="{00000000-0008-0000-0000-000002000000}"/>
+                </a:ext>
+              </a:extLst>
+            </xdr:cNvPr>
+            <xdr:cNvPicPr>
+              <a:picLocks noChangeAspect="0"/>
+            </xdr:cNvPicPr>
+          </xdr:nvPicPr>
+          <xdr:blipFill>
+            <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId' . $imageId . '" cstate="print"/>
+            <a:stretch>
+                <a:fillRect/>
+            </a:stretch>
+          </xdr:blipFill>
+          <xdr:spPr>
+            <a:xfrm>
+              <a:off x="' . $imageOptions['startColNum'] . '" y="' . $imageOptions['startRowNum'] . '"/>
+              <a:ext cx="' . $endColOffset . '" cy="' . $endRowOffset . '"/>
+            </a:xfrm>
+            <a:prstGeom prst="rect">
+              <a:avLst/>
+            </a:prstGeom>
+          </xdr:spPr>
+        </xdr:pic>
+        <xdr:clientData/>
+      </xdr:twoCellAnchor>
+    </xdr:wsDr>';
+  }
+
+  /**
+   * @return string
+   */
+  public function buildDrawingRelationshipXML(): string {
+    $drawingXML = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $drawingXML .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
+
+    foreach ($this->images as $imageId => $imagePath) {
+      $imageName = explode('/', $imagePath);
+      $imageName = end($imageName);
+
+      $drawingXML .= '<Relationship Id="rId' . $imageId . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/' . $imageName . '"/>';
+    }
+
+    $drawingXML .= "\n" . '</Relationships>';
+
+    return $drawingXML;
   }
 
   //------------------------------------------------------------------
@@ -744,7 +959,7 @@ class XLSXWriter {
     //note, badchars does not include \t\n\r (\x09\x0a\x0d)
     static $badchars = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x7f";
     static $goodchars = "                              ";
-    return strtr(htmlspecialchars($val, ENT_QUOTES | ENT_XML1), $badchars, $goodchars);//strtr appears to be faster than str_replace
+    return strtr(htmlspecialchars((string)$val, ENT_QUOTES | ENT_XML1 | ENT_SUBSTITUTE), $badchars, $goodchars);//strtr appears to be faster than str_replace
   }
 
   //------------------------------------------------------------------
@@ -877,71 +1092,25 @@ class XLSXWriter {
     return $days + $seconds;
   }
   //------------------------------------------------------------------
-}
 
-class XLSXWriter_BuffererWriter {
-  protected $fd         = null;
-  protected $buffer     = '';
-  protected $check_utf8 = false;
-
-  public function __construct($filename, $fd_fopen_flags = 'w', $check_utf8 = false) {
-    $this->check_utf8 = $check_utf8;
-    $this->fd = fopen($filename, $fd_fopen_flags);
-    if ($this->fd === false) {
-      XLSXWriter::log("Unable to open $filename for writing.");
+  /**
+   * @param string $imagePath
+   * @param array  $imageOptions
+   * @param int    $imageId
+   * @throws Exception
+   */
+  public function addImage($imagePath, $imageId, $imageOptions = []) {
+    if (!file_exists($imagePath)) {
+      XLSXWriter::log("Unable to open $imagePath for writing.");
     }
-  }
 
-  public function write($string) {
-    $this->buffer .= $string;
-    if (isset($this->buffer[8191])) {
-      $this->purge();
-    }
-  }
+    $this->images[$imageId] = $imagePath;
 
-  protected function purge() {
-    if ($this->fd) {
-      if ($this->check_utf8 && !self::isValidUTF8($this->buffer)) {
-        XLSXWriter::log("Error, invalid UTF8 encoding detected.");
-        $this->check_utf8 = false;
-      }
-      fwrite($this->fd, $this->buffer);
-      $this->buffer = '';
-    }
-  }
-
-  public function close() {
-    $this->purge();
-    if ($this->fd) {
-      fclose($this->fd);
-      $this->fd = null;
-    }
-  }
-
-  public function __destruct() {
-    $this->close();
-  }
-
-  public function ftell() {
-    if ($this->fd) {
-      $this->purge();
-      return ftell($this->fd);
-    }
-    return -1;
-  }
-
-  public function fseek($pos) {
-    if ($this->fd) {
-      $this->purge();
-      return fseek($this->fd, $pos);
-    }
-    return -1;
-  }
-
-  protected static function isValidUTF8($string) {
-    if (function_exists('mb_check_encoding')) {
-      return mb_check_encoding($string, 'UTF-8') ? true : false;
-    }
-    return preg_match("//u", $string) ? true : false;
+    $this->imageOptions[$imageId] = array_merge([
+      'startColNum' => 0,
+      'endColNum'   => 0,
+      'startRowNum' => 0,
+      'endRowNum'   => 0,
+    ], $imageOptions);
   }
 }
