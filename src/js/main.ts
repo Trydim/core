@@ -31,7 +31,7 @@ const dictionaryInit = () => {
     if (key.length === 1) return d.getTitle(key[0]);
 
     let str = d.getTitle(key[0]);
-    for (let i = 1; i< key.length; i++) {
+    for (let i = 1; i < key.length; i++) {
       key[i] && (str = str.replace(`%${i}`, key[i]));
     }
     return str;

@@ -185,7 +185,7 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
         if ($orderChange) {
           $param = [
             'customer_id'  => $customerId,
-            'report_value' => $reportValue,
+            'report_value' => addCpNumber($orderId, $reportValue),
           ];
 
           isset($userId) && $param['user_id'] = $userId;
