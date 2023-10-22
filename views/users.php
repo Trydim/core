@@ -20,7 +20,28 @@ foreach ($managerField as $k => $item) {
     case 'string': case 'number': case 'date': default:
       $input = '<input id="' . $rndId . '" type="' . $item['type'] . '" class="form-control" name="' . $k . '">';
       break;
+    case 'checkbox':
+      $managerFieldHtml .= '<div class="row">
+        <div class="col-6 ps-4">
+          <label class="w-100" for="' . $rndId . '" role="button">' . $item['name'] .':</label>
+        </div>
+        <div class="col-6">
+          <div class="form-check form-switch mb-3 text-center">
+            <input class="form-check-input float-none" type="checkbox" name="' . $k . '" id="' . $rndId . '">
+          </div>
+        </div>
+      </div>';
+      break;
+    case 'list':
+      $input = '<select name="' . $k . '" class="form-select">';
+      foreach ($item['options'] as $option) {
+        $input .= '<option value="' . $option . '">' . $option . '</option>';
+      }
+      $input .= '</select>';
+      break;
   }
+
+  if ($item['type'] === 'checkbox') continue;
 
   $managerFieldHtml .= '<div class="form-floating managerField mb-3">' . $input .
                        '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
@@ -70,7 +91,7 @@ $field['footerContent'] .= '
         <label class="w-100" for="pActivity" role="button">' . gTxt('Activity') . ':</label>
       </div>
       <div class="col-6">
-        <div class="form-check form-switch mb-3 formRow text-center">
+        <div class="form-check form-switch mb-3 text-center">
           <input class="form-check-input float-none" type="checkbox" role="switch" name="activity" id="pActivity">
         </div>
       </div>

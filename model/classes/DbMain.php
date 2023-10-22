@@ -20,14 +20,14 @@ class DbMain extends R {
   const DB_JSON_FIELDS = [
     'inputValue', 'saveValue', 'importantValue', 'reportValue',
     'contacts', 'customerContacts', 'customization',
-    'settings', 'cmsParam', 'properties', 'permissionValue'
+    'cmsParam', 'properties', 'permissionValue'
   ];
 
   const DB_DATE_FIELDS = [
     'createDate', 'lastEditDate', 'registerDate'
   ];
 
-  const DB_BLOB_FIELDS = ['reportValue'];
+  const DB_BLOB_FIELDS = ['reportValue', 'settings'];
 
   /**
    * @var Main
@@ -110,6 +110,8 @@ class DbMain extends R {
         $result[$key] = $this->jsonParseField($value);
       } else if (in_array($key, self::DB_JSON_FIELDS)) {
         $result[$key] = json_decode($value, true);
+      } else if (in_array($key, self::DB_BLOB_FIELDS)) {
+        $result[$key] = empty($value) ? [] : json_decode(gzuncompress($value), true);
       } else {
         $result[$key] = $value;
       }

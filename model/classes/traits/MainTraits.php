@@ -123,6 +123,7 @@ trait Authorization {
    * @return mixed
    */
   public function getLogin(string $field = 'login') {
+    if ($field === 'id' && !isset($this->user[$field])) $this->checkAuth();
     if ($field === 'all') return $this->user;
     return $this->user[$field] ?? null;
   }

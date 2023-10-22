@@ -800,7 +800,7 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
             'email'   => $dealer['email'] ?? '',
             'phone'   => $dealer['phone'] ?? '',
           ]),
-          'settings' => json_encode($dealer['settings'] ?? []),
+          'settings' => gzcompress(json_encode($dealer['settings'] ?? []), 9),
         ];
 
         $result = $db->insert($columns, 'dealers', [$id => $param], true);
@@ -837,7 +837,7 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
           'name'     => $name,
           'contacts' => json_encode($dealer['contacts']),
           'activity' => intval(boolValue($dealer['activity'] ?? true)),
-          'settings' => json_encode($dealer['settings'])
+          'settings' => gzcompress(json_encode($dealer['settings']), 9),
         ];
 
         $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);

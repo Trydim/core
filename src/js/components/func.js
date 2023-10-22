@@ -549,6 +549,8 @@ export default {
    * @param {string?} report.fileName - result file name without extension
    * @param {string?} report.fileTpl - pdf template file without extension
    * @param {string?} report.pdfOrientation ['P', 'L'] - pdf orientation
+   * @param {boolean?} report.addManager - manager information will be loaded
+   * @param {boolean?} report.addCustomer - customer information will be loaded
    * @param {FormData?} data - object of formData to send in query Body
    * @param {function?} finishOk
    * @param {function?} err
@@ -565,6 +567,8 @@ export default {
 
     report.fileTpl && data.set('fileTpl', report.fileTpl);
     report.pdfOrientation && data.set('pdfOrientation', report.pdfOrientation.toString().toUpperCase());
+    report.addManager && data.set('addManager', '1');
+    report.addCustomer && data.set('addCustomer', '1');
 
     f.Post({data, type: f.isSafari() ? 'file' : 'json'}).then(data => {
       f.removeLoading(target);

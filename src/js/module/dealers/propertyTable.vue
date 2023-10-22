@@ -71,9 +71,9 @@ export default {
             res.uncheckedTemplate = '-';
           }
           /*else if (/#([a-fA-F]|\d){3,6}/.test(cell)) {
-           res.type = 'color-picker';
-           }*/
-          else res.type = isFinite(cell.replace(',', '.')) ? 'numeric' : 'text';
+            res.type = 'color-picker';
+          }*/
+          else res.type = isFinite(+(cell.toString().replace(',', '.'))) ? 'numeric' : 'text';
 
           return res;
         },

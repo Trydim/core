@@ -46,7 +46,7 @@ if (isset($addCustomer)) {
 
   if (count($customerData)) {
     $userData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);
-    $data['customerData'] = $userData;
+    $data['customerData'] = $customerData;
   }
   unset($customerData);
 }

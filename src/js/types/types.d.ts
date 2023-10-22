@@ -198,7 +198,13 @@ declare type CMSGlobalObject = {
    */
   downloadPdf(
     target: HTMLElement,
-    report: {reportValue: Object | any, fileName?: string, fileTpl?: string, pdfOrientation?: 'P' | 'L'},
+    report: {
+      reportValue: Object | any,
+      fileName?: string, fileTpl?: string,
+      pdfOrientation?: 'P' | 'L',
+      addManager?: boolean,
+      addCustomer?: boolean,
+    },
     data: FormData,
     finishOk: Function
   )

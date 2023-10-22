@@ -203,7 +203,7 @@ const users = {
         node = form.querySelectorAll('.managerField');
         if (oneElements) {
           node.forEach(n => {
-            let input = n.querySelector('input[name], textarea[name]'),
+            let input = n.querySelector('input[name], textarea[name], select[name]'),
                 name = input.name;
 
             users[name] && (input.value = users[name]);
