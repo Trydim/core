@@ -1,13 +1,13 @@
 <?php
 
-class XLSXWriter_BuffererWriter {
+class XLSXWriter_BufferWriter {
   protected $fd         = null;
   protected $buffer     = '';
   protected $check_utf8 = false;
 
-  public function __construct($filename, $fd_fopen_flags = 'w', $check_utf8 = false) {
+  public function __construct($filename, $fd_open_flags = 'w', $check_utf8 = false) {
     $this->check_utf8 = $check_utf8;
-    $this->fd = fopen($filename, $fd_fopen_flags);
+    $this->fd = fopen($filename, $fd_open_flags);
     if ($this->fd === false) {
       XLSXWriter::log("Unable to open $filename for writing.");
     }
@@ -43,10 +43,10 @@ class XLSXWriter_BuffererWriter {
     $this->close();
   }
 
-  public function ftell() {
+  public function fTell() {
     if ($this->fd) {
       $this->purge();
-      return ftell($this->fd);
+      return fTell($this->fd);
     }
     return -1;
   }
@@ -61,7 +61,7 @@ class XLSXWriter_BuffererWriter {
 
   protected static function isValidUTF8($string) {
     if (function_exists('mb_check_encoding')) {
-      return mb_check_encoding($string, 'UTF-8') ? true : false;
+      return mb_check_encoding($string, 'UTF-8');
     }
     return preg_match("//u", $string) ? true : false;
   }
@@ -144,8 +144,7 @@ class XLSXWriter {
   public function writeToString() {
     $temp_file = $this->tempFilename();
     self::writeToFile($temp_file);
-    $string = file_get_contents($temp_file);
-    return $string;
+    return file_get_contents($temp_file);
   }
 
   public function writeToFile($filename) {
@@ -228,7 +227,7 @@ class XLSXWriter {
       'sheetname'          => $sheet_name,
       'xmlname'            => $sheet_xmlname,
       'row_count'          => 0,
-      'file_writer'        => new XLSXWriter_BuffererWriter($sheet_filename),
+      'file_writer'        => new XLSXWriter_BufferWriter($sheet_filename),
       'columns'            => array(),
       'merge_cells'        => array(),
       'max_cell_tag_start' => 0,
@@ -247,9 +246,9 @@ class XLSXWriter {
     $sheet->file_writer->write('<sheetPr filterMode="false">');
     $sheet->file_writer->write('<pageSetUpPr fitToPage="false"/>');
     $sheet->file_writer->write('</sheetPr>');
-    $sheet->max_cell_tag_start = $sheet->file_writer->ftell();
+    $sheet->max_cell_tag_start = $sheet->file_writer->fTell();
     $sheet->file_writer->write('<dimension ref="A1:' . $max_cell . '"/>');
-    $sheet->max_cell_tag_end = $sheet->file_writer->ftell();
+    $sheet->max_cell_tag_end = $sheet->file_writer->fTell();
     $sheet->file_writer->write('<sheetViews>');
     $sheet->file_writer->write('<sheetView colorId="64" defaultGridColor="true" rightToLeft="' . $rightToLeftValue . '" showFormulas="false" showGridLines="true" showOutlineSymbols="true" showRowColHeaders="true" showZeros="true" tabSelected="' . $tabselected . '" topLeftCell="A1" view="normal" windowProtection="false" workbookViewId="0" zoomScale="100" zoomScaleNormal="100" zoomScalePageLayoutView="100">');
     if ($sheet->freeze_rows && $sheet->freeze_columns) {
@@ -284,8 +283,7 @@ class XLSXWriter {
   private function addCellStyle($number_format, $cell_style_string) {
     $number_format_idx = self::add_to_list_get_index($this->number_formats, $number_format);
     $lookup_string = $number_format_idx . ";" . $cell_style_string;
-    $cell_style_idx = self::add_to_list_get_index($this->cell_styles, $lookup_string);
-    return $cell_style_idx;
+    return self::add_to_list_get_index($this->cell_styles, $lookup_string);
   }
 
   private function initializeColumnTypes($header_types) {
@@ -347,7 +345,7 @@ class XLSXWriter {
 
     if (!empty($row_options)) {
       $ht = isset($row_options['height']) ? floatval($row_options['height']) : 12.1;
-      $customHt = isset($row_options['height']) ? true : false;
+      $customHt = isset($row_options['height']);
       $hidden = isset($row_options['hidden']) ? (bool)($row_options['hidden']) : false;
       $collapsed = isset($row_options['collapsed']) ? (bool)($row_options['collapsed']) : false;
       $sheet->file_writer->write('<row collapsed="' . ($collapsed ? 'true' : 'false') . '" customFormat="false" customHeight="' . ($customHt ? 'true' : 'false') . '" hidden="' . ($hidden ? 'true' : 'false') . '" ht="' . ($ht) . '" outlineLevel="0" r="' . ($sheet->row_count + 1) . '">');
@@ -442,7 +440,7 @@ class XLSXWriter {
     $this->finalizeSheet($sheet_name);
   }
 
-  protected function writeCell(XLSXWriter_BuffererWriter &$file, $row_number, $column_number, $value, $num_format_type, $cell_style_idx) {
+  protected function writeCell(XLSXWriter_BufferWriter &$file, $row_number, $column_number, $value, $num_format_type, $cell_style_idx) {
     $cell_name = self::xlsCell($row_number, $column_number);
 
     if (!is_scalar($value) || $value === '') { //objects, array, empty
@@ -564,7 +562,7 @@ class XLSXWriter {
     $style_indexes = $r['styles'];
 
     $temporary_filename = $this->tempFilename();
-    $file = new XLSXWriter_BuffererWriter($temporary_filename);
+    $file = new XLSXWriter_BufferWriter($temporary_filename);
     $file->write('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n");
     $file->write('<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">');
     $file->write('<numFmts count="' . count($this->number_formats) . '">');
@@ -628,7 +626,7 @@ class XLSXWriter {
         $border_color = !empty($pieces['color']) ? '<color rgb="' . strval($pieces['color']) . '"/>' : '';
         $file->write('<border diagonalDown="false" diagonalUp="false">');
         foreach (array('left', 'right', 'top', 'bottom') as $side) {
-          $show_side = in_array($side, $pieces['side']) ? true : false;
+          $show_side = in_array($side, $pieces['side']);
           $file->write($show_side ? "<$side style=\"$border_style\">$border_color</$side>" : "<$side/>");
         }
         $file->write('<diagonal/>');
@@ -956,17 +954,16 @@ class XLSXWriter {
 
   //------------------------------------------------------------------
   public static function xmlspecialchars($val) {
-    //note, badchars does not include \t\n\r (\x09\x0a\x0d)
-    static $badchars = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x7f";
-    static $goodchars = "                              ";
-    return strtr(htmlspecialchars((string)$val, ENT_QUOTES | ENT_XML1 | ENT_SUBSTITUTE), $badchars, $goodchars);//strtr appears to be faster than str_replace
+    //note, badChars does not include \t\n\r (\x09\x0a\x0d)
+    static $badChars = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x7f";
+    static $goodChars = "                              ";
+    return strtr(htmlspecialchars((string)$val, ENT_QUOTES | ENT_XML1 | ENT_SUBSTITUTE), $badChars, $goodChars);//str appears to be faster than str_replace
   }
 
   //------------------------------------------------------------------
   public static function array_first_key(array $arr) {
     reset($arr);
-    $first_key = key($arr);
-    return $first_key;
+    return key($arr);
   }
 
   //------------------------------------------------------------------
@@ -1034,10 +1031,10 @@ class XLSXWriter {
   //------------------------------------------------------------------
   public static function convert_date_time($date_input) //thanks to Excel::Writer::XLSX::Worksheet.pm (perl)
   {
-    $days = 0;                                                        # Number of days since epoch
+    //$days = 0;                                                        # Number of days since epoch
     $seconds = 0;                                                     # Time expressed as fraction of 24h hours in seconds
     $year = $month = $day = 0;
-    $hour = $min = $sec = 0;
+    //$hour = $min = $sec = 0;
 
     $date_time = $date_input;
     if (preg_match("/(\d{4})\-(\d{2})\-(\d{2})/", $date_time, $matches)) {
@@ -1095,11 +1092,11 @@ class XLSXWriter {
 
   /**
    * @param string $imagePath
-   * @param array  $imageOptions
-   * @param int    $imageId
+   * @param int $imageId
+   * @param array $imageOptions
    * @throws Exception
    */
-  public function addImage($imagePath, $imageId, $imageOptions = []) {
+  public function addImage(string $imagePath, int $imageId, $imageOptions = []) {
     if (!file_exists($imagePath)) {
       XLSXWriter::log("Unable to open $imagePath for writing.");
     }

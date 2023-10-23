@@ -357,7 +357,7 @@ export default {
       this.dealer = cloneDeep(this.selected);
       this.dealer.activity = !!+this.dealer.activity;
 
-      if (!this.dealer.settings) this.setProperty();
+      if (Object.keys(this.dealer.settings).length === 0) this.setProperty();
       else this.updateProperty();
 
       this.setModal('Настройка для дилера', true);

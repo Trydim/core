@@ -21,6 +21,7 @@
     "ext-simplexml": "*",
     "ext-curl": "*",
     "ext-gd": "*",
-    "ext-zip": "*"
+    "ext-zip": "*",
+    "ext-ctype": "*"
   }
 }
