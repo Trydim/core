@@ -16,6 +16,9 @@ export default {
     newValue: Number,
   },
   emits: ['update:modelValue'],
+  watch: {
+    newValue() { this.editor.setValue(this.modelValue) },
+  },
   methods: {
     init() {
       if (this.editor) {

@@ -4,8 +4,21 @@
  * @var Main $main - global
  */
 
+const DEFAULT_ICON = [
+  'admindb'     => 'pi-book',
+  'calendar'    => 'pi-table',
+  'catalog'     => 'pi-user',
+  'customers'   => 'pi-dollar',
+  'dealers'     => 'pi-money-bill',
+  'fileManager' => 'pi-folder-open',
+  'orders'      => 'pi-inbox',
+  'statistic'   => 'pi-chart-line',
+  'users'       => 'pi-users',
+];
+
 $adminMenu = '';
 $dbTables = $main->getBaseTable();
+$route    = $main->url->getRoute();
 $siteLink = $main->url->getUri();
 
 if (is_array($dbTables)) {
@@ -66,7 +79,7 @@ menu;
       <li class="nav-label"><?= gTxt('Main Menu') ?></li>
       <?php if ($main->availablePage(PUBLIC_PAGE)) { ?>
         <li>
-          <a class="nav-item" href="<?= $siteLink ?>" aria-expanded="false">
+          <a class="nav-item <?= $route === 'public' ? 'active' : '' ?>" href="<?= $siteLink ?>" aria-expanded="false">
             <i class="pi pi-globe"></i>
             <span class="nav-text"><?= gTxt(PUBLIC_PAGE) ?></span>
           </a>
@@ -76,104 +89,46 @@ menu;
       foreach ($main->getSideMenu() as $item) {
         if (in_array($item, [PUBLIC_PAGE, 'setting'])) continue;
 
-        if (is_array($item) && isset($item['label'])) { ?>
-          <li class="nav-label"><?= gTxt($item['label']) ?></li>
+        if (is_array($item)) {
+          if (isset($item['label'])) { ?>
+            <li class="nav-label"><?= gTxt($item['label']) ?></li>
+          <?php continue; }
+
+          $link = $item['link'];
+          $icon = $item['icon'] ?? DEFAULT_ICON[$link] ?? 'pi-circle';
+        } else {
+          $link = $item;
+          $icon = DEFAULT_ICON[$link] ?? 'pi-circle';
+        }
+
+        if ($link === 'hr') { ?>
+          <li><hr></li>
         <?php continue; }
 
-        switch ($item) {
-          case 'orders': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>orders">
-                <i class="pi pi-inbox"></i>
-                <span class="nav-text"><?= gTxt('orders') ?></span>
+        if ($link === 'admindb') { ?>
+          <li>
+            <?php if ($adminMenu) echo $adminMenu; else { ?>
+              <a class="nav-item <?= $active ?>" href="<?= $siteLink . $link ?>">
+                <i class="pi <?= $icon ?>"></i>
+                <span class="nav-text"><?= gTxt($link) ?></span>
               </a>
-            </li>
-          <?php break;
-          case 'calendar': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>calendar">
-                <i class="pi pi-table"></i>
-                <span class="nav-text"><?= gTxt('calendar') ?></span>
-              </a>
-            </li>
-          <?php break;
-          case 'customers': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>customers">
-                <i class="pi pi-dollar"></i>
-                <span class="nav-text"><?= gTxt('customers') ?></span>
-              </a>
-            </li>
-          <?php break;
-          case 'users': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>users">
-                <i class="pi pi-users"></i>
-                <span class="nav-text"><?= gTxt('users') ?></span>
-              </a>
-            </li>
-          <?php break;
-          case 'statistic': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>statistic">
-                <i class="pi pi-chart-line"></i>
-                <span class="nav-text"><?= gTxt('statistic') ?></span>
-              </a>
-            </li>
-          <?php break;
-          case 'admindb': ?>
-            <li>
-              <?php if ($adminMenu) echo $adminMenu; else { ?>
-                <a class="nav-item" href="<?= $siteLink ?>admindb">
-                  <i class="pi pi-user"></i>
-                  <span class="nav-text"><?= gTxt('admindb') ?></span>
-                </a>
-              <?php } ?>
-            </li>
-          <?php break;
-          case 'catalog': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>catalog">
-                <i class="pi pi-user"></i>
-                <span class="nav-text"><?= gTxt('catalog') ?></span>
-              </a>
-            </li>
-          <?php break;
-          case 'fileManager': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>fileManager">
-                <i class="pi pi-folder-open"></i>
-                <span class="nav-text"><?= gTxt('fileManager') ?></span>
-              </a>
-            </li>
-          <?php break;
-          case 'dealers': ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink ?>dealers" aria-expanded="false">
-                <i class="pi pi-money-bill"></i>
-                <span class="nav-text"><?= gTxt('dealers') ?></span>
-              </a>
-            </li>
-          <?php break;
-          case 'hr': ?>
-            <li>
-              <hr>
-            </li>
-            <?php break;
-          default: ?>
-            <li>
-              <a class="nav-item" href="<?= $siteLink . $item?>">
-                <i class="pi pi-circle"></i>
-                <span class="nav-text"><?= gTxt($item) ?></span>
-              </a>
-            </li>
-          <?php break;
-          }
+            <?php } ?>
+          </li>
+        <?php continue; }
+
+        ?>
+        <li>
+          <a class="nav-item <?= $route === $link ? 'active' : '' ?>" href="<?= $siteLink . $link ?>">
+            <i class="pi <?= $icon ?>"></i>
+            <span class="nav-text"><?= gTxt($link) ?></span>
+          </a>
+        </li>
+        <?php
         }
 
       if (in_array('setting', $main->getSideMenu()) || $main->getLogin('admin')) { ?>
         <li>
-          <a class="nav-item" href="<?= $siteLink ?>setting">
+          <a class="nav-item <?= $route === 'setting' ? 'active' : '' ?>" href="<?= $siteLink ?>setting">
             <i class="pi pi-sliders-h"></i>
             <span class="nav-text"><?= gTxt('setting') ?></span>
           </a>

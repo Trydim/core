@@ -507,11 +507,7 @@ trait ContentEditor {
   private $contentLoaded;
 
   private function contentPath(): string {
-    if ($this->main->url->getRoute() === 'public') {
-      $path = $this->main->publicDealer ? $this->main->url->getPath(true) : $this->main->url->getBasePath(true);
-    } else {
-      $path = $this->main->url->getPath(true);
-    }
+    $path = $this->main->publicDealer ? $this->main->url->getPath(true) : $this->main->url->getBasePath(true);
 
     return $path . $this->CONTENT_PATH;
   }

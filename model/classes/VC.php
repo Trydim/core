@@ -70,7 +70,8 @@ class VC {
   /**
    * Hooks
    */
-  const HOOKS_ADMIN_DB_TEMPLATE = 'admindbTemplate',
+  const HOOKS_PUBLIC_TEMPLATE   = 'publicTemplate',
+        HOOKS_ADMIN_DB_TEMPLATE = 'admindbTemplate',
         HOOKS_CALENDAR_TEMPLATE = 'calendarTemplate',
         HOOKS_CATALOG_TEMPLATE  = 'catalogTemplate',
         HOOKS_ORDER_TEMPLATE    = 'orderTemplate',
@@ -80,5 +81,6 @@ class VC {
         HOOKS_USERS_TEMPLATE        = 'usersTemplate',
         HOOKS_DEALERS_TEMPLATE      = 'dealersTemplate',
         HOOKS_DEALERS_BEFORE_CREATE = 'beforeCreateDealer',
-        HOOKS_DEALERS_AFTER_CREATE  = 'afterCreateDealer';
+        HOOKS_DEALERS_AFTER_CREATE  = 'afterCreateDealer',
+        HOOKS_AUTH_LOGIN_BEFORE     = 'authLoginBefore';
 }

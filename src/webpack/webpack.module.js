@@ -34,13 +34,14 @@ module.exports = env => {
     },
 
     output: {
-      path         : path.resolve(__dirname, '../../assets/'),
-      filename     : 'js/module/[name].js',
-      library      : {
+      clean   : !dev,
+      path    : path.resolve(__dirname, '../../assets/'),
+      filename: 'js/module/[name].js',
+      library : {
         type: 'module',
       },
-      scriptType   : 'module',
-      module       : true,
+      scriptType: 'module',
+      module    : true,
       libraryTarget: 'module',
     },
 

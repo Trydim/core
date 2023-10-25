@@ -12,7 +12,7 @@ $password = $password ?? '';
 
 switch ($cmsAction) {
   case 'login':
-    $main->fireHook('authLoginBefore', $main);
+    $main->fireHook(VC::HOOKS_AUTH_LOGIN_BEFORE, $main);
     if ($user = $main->db->checkPassword($login, $password)) {
       $_SESSION['id']       = $user['id'];
       $_SESSION['name']     = $user['name'];

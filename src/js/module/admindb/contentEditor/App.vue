@@ -29,7 +29,7 @@
         </h5>
         <Editor v-if="editorTypeHtml === false && value" v-model="value" :newValue="newValue"></Editor>
         <keep-alive v-if="editorTypeHtml">
-          <CodeMirror v-if="value" v-model="value"></CodeMirror>
+          <CodeMirror v-if="value" :newValue="newValue" v-model="value"></CodeMirror>
         </keep-alive>
       </div>
       <div class="d-flex flex-column align-items-center mt-1">

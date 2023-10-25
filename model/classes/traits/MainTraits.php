@@ -373,7 +373,7 @@ trait Cache {
     $cacheDir = scandir($this->getCacheDir());
 
     foreach ($cacheDir as $path) {
-      if (includes($path, $this->CACHE['FILE_NAME'])) unlink($path);
+      if (includes($path, $this->CACHE['FILE_NAME']) && file_exists($path)) unlink($path);
     }
   }
 

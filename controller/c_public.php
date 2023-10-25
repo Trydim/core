@@ -80,4 +80,5 @@ if ($isDealer) {
   unset($dealPublic, $dealCsvPath);
 }
 
+$main->setControllerField($field)->fireHook(VC::HOOKS_PUBLIC_TEMPLATE, $main);
 $main->response->setContent(template(OUTSIDE ? '_outside' : 'base', $field));

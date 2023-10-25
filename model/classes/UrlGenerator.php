@@ -241,17 +241,20 @@ class UrlGenerator {
   private function setRoutePath(): string {
     $route = $this->route === 'public' ? PUBLIC_PAGE : $this->route;
     $view = CORE . 'views/';
-    $routePath = $this->getPath(true) . "public/views/$route.php";
 
-    if (file_exists($routePath)) {
-      return $routePath;
-    } else if (file_exists($view . "$route.php")) {
+    if ($this->main->isDealer() && file_exists($this->getPath(true) . "public/views/$route.php"))
+      return $this->getPath(true) . "public/views/$route.php";
+
+    if (file_exists($this->getBasePath(true) . "public/views/$route.php"))
+      return $this->getBasePath(true) . "public/views/$route.php";
+
+    if (file_exists($view . "$route.php"))
       return $view . "$route.php";
-    } else if (file_exists($view . $route . "/$route.php")) {
+
+    if (file_exists($view . $route . "/$route.php"))
       return $view . $route . "/$route.php";
-    } else {
-      return $view . '404.php';
-    }
+
+    return $view . '404.php';
   }
   private function setCoreUri() {
     // Определять автоматом.
