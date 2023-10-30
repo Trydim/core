@@ -11,13 +11,12 @@ function cmsAutoloader(string $class) {
 /**
  *
  * @param $number
- * @param $reportValue
+ * @param string $importantValue - as json
  * @return false|string
  */
-function addCpNumber($number, $reportValue) {
+function addCpNumber($number, string $importantValue) {
   global $main;
-  $reportValue = $main->fireHook('addCpNumber', $number, $reportValue);
-  return gzcompress($reportValue, 9);
+  return $main->fireHook('addCpNumber', $number, $importantValue);
 }
 
 /**

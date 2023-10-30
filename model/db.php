@@ -185,13 +185,13 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
         if ($orderChange) {
           $param = [
             'customer_id'  => $customerId,
-            'report_value' => addCpNumber($orderId, $reportValue),
+            'report_value' => gzcompress($reportValue, 9),
           ];
 
           isset($userId) && $param['user_id'] = $userId;
           isset($statusId) && $param['status_id'] = $statusId;
           $orderTotal !== 0 && $param['total'] = floatval(is_finite($orderTotal) ? $orderTotal : 0);
-          isset($importantValue) && $param['important_value'] = $importantValue;
+          isset($importantValue) && $param['important_value'] = addCpNumber($orderId, $importantValue);
           isset($saveValue) && $param['save_value'] = $saveValue;
         } else {
           $param = [
@@ -199,9 +199,9 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
             'customer_id' => $customerId,
             'status_id'   => $statusId,
             'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
-            'important_value' => $importantValue ?? '{}',
+            'important_value' => addCpNumber($orderId, $importantValue ?? '{}'),
             'save_value'      => $saveValue ?? '{}',
-            'report_value'    => addCpNumber($orderId, $reportValue),
+            'report_value'    => gzcompress($reportValue, 9),
           ];
         }
 

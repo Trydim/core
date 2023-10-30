@@ -34,7 +34,7 @@ module.exports = env => {
     },
 
     output: {
-      clean   : !dev,
+      //clean   : !dev,
       path    : path.resolve(__dirname, '../../assets/'),
       filename: 'js/module/[name].js',
       library : {

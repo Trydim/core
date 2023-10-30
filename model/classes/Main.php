@@ -384,7 +384,7 @@ final class Main {
   /**
    * @var bool
    */
-  public $publicDealer = false;
+  public $publicDealer = true;
   /**
    * @var string
    */
