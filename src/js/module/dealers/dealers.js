@@ -10,8 +10,6 @@ import PrimeVue from 'primevue/config';
 import Tooltip from 'primevue/tooltip';
 
 const vue = createApp(App);
-vue.use(PrimeVue);
-vue.directive('tooltip', Tooltip);
 
 vue.config.errorHandler = (err, vm, info) => {
   debugger
@@ -22,5 +20,11 @@ vue.config.errorHandler = (err, vm, info) => {
 // Перевод
 vue.config.globalProperties.$t = function (str) { return window._(str); };
 
-vue.mount('#dealerApp');
-window.DealersInstance = vue;
+document.addEventListener("DOMContentLoaded", () => {
+  vue.use(PrimeVue);
+  vue.directive('tooltip', Tooltip);
+
+  window.DealersInstance = vue;
+  // Delay for hooks
+  setTimeout(() => vue.mount('#dealerApp'), 0);
+});

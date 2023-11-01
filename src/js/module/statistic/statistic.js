@@ -99,4 +99,8 @@ const orders = {
   },
 }
 
-window.StatisticInstance = statistic.init();
+document.addEventListener("DOMContentLoaded", () => {
+  window.StatisticInstance = statistic;
+  // Delay for hooks
+  setTimeout(() => statistic.init(), 0);
+});

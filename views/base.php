@@ -52,6 +52,13 @@ $jsGlobalConst = json_encode([
   <script>
     window.CMS_CONST = '<?= $jsGlobalConst ?>'
   </script>
+
+  <link rel="preload" href="<?= CORE_JS ?>src.js?ver=1353431" as="script" crossorigin>
+  <link rel="preload" href="<?= CORE_JS ?>main.js?ver=16844b1b6f1" as="script" crossorigin>
+
+  <?php array_map(function ($item) { ?>
+    <link rel="preload" href="<?= $item ?>" as="script" crossorigin>
+  <?php }, $jsLinks ?? []); ?>
 </head>
 
 <!-- dark -->

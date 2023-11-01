@@ -203,11 +203,6 @@ const orders = {
   data: Object.create(null),
   orderIds: new Set(),
 
-  template: {
-    orderContentBody: f.gTNode('#orderTemplate'),
-    orderContentBtn: f.gTNode('#orderBtnTemplate'),
-  },
-
   init() {
     let node = f.qS('#ordersStatusValue');
     node && node.innerText && this.setStatus(JSON.parse(node.innerText));
@@ -216,6 +211,11 @@ const orders = {
     node = f.qS('#ordersValue');
     node && node.innerText && this.setOrders(JSON.parse(node.innerText));
     node && node.remove();
+
+    this.template = {
+      orderContentBody: f.gTNode('#orderTemplate'),
+      orderContentBtn: f.gTNode('#orderBtnTemplate'),
+    };
 
     this.onEvent();
   },
@@ -286,15 +286,22 @@ const orders = {
 }
 
 const calendar = {
-  M: new f.initModal({showDefaultButton: false}),
+  orders,
+  component,
 
   init() {
-    orders.init();
-    component.init();
-    orders.showOrders();
+    this.M = new f.initModal({showDefaultButton: false});
+
+    this.orders.init();
+    this.component.init();
+    this.orders.showOrders();
 
     return this;
   }
 }
 
-window.CalendarInstance = calendar.init();
+document.addEventListener("DOMContentLoaded", () => {
+  window.CalendarInstance = calendar;
+  // Delay for hooks
+  setTimeout(() => calendar.init(), 0);
+});

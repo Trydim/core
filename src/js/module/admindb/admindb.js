@@ -1,8 +1,8 @@
 "use strict";
 
 import {TableValues} from "./TableValues";
-import {FormViews} from "./FormViews";
-import {XMLTable} from "./XMLTable";
+//import {FormViews} from "./FormViews";
+//import {XMLTable} from "./XMLTable";
 import ContentEditor from './contentEditor/ContentEditor';
 
 /**
@@ -10,17 +10,15 @@ import ContentEditor from './contentEditor/ContentEditor';
  * @param tmpString
  * @return string
  */
-const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
+//const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
 
 /* Проверка файла перед добавлением (не знаю что хотел проверить)
- const checkAddedFile = function (e) {
- let input = e.target;
- if (!input.value.includes('csv')) {
- //return;
- }
- }*/
+const checkAddedFile = function (e) {
+  let input = e.target;
+  if (!input.value.includes('csv')) return;
+}*/
 
-const admindb = {
+const adminDb = {
   init() {
     this.onEvent();
     if (this.checkLoadContentEditor()) this.switchAdminType('content');
@@ -78,4 +76,8 @@ const admindb = {
   },
 }
 
-window.AdminDbInstance = admindb.init();
+document.addEventListener("DOMContentLoaded", () => {
+  window.AdminDbInstance = adminDb;
+  // Delay for hooks
+  setTimeout(() => adminDb.init(), 0);
+});

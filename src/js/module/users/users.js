@@ -4,10 +4,9 @@ const users = {
   form: new FormData(),
 
   needReload: false,
-  table: f.qS('#usersTable'),
   tbody: '',
   impValue: '',
-  confirm: f.qS('#confirmField'),
+
   confirmMsg: false,
 
   tmp: {
@@ -31,6 +30,9 @@ const users = {
   usersList: new Map(),
 
   init() {
+    this.table   = f.qS('#usersTable');
+    this.confirm = f.qS('#confirmField');
+
     this.p = new f.Pagination( '#paginator',{
       dbAction : 'loadUsers',
       sortParam: this.queryParam,
@@ -296,4 +298,8 @@ const users = {
   },
 }
 
-window.UsersInstance = users.init();
+document.addEventListener("DOMContentLoaded", () => {
+  window.UsersInstance = users;
+  // Delay for hooks
+  setTimeout(() => users.init(), 0);
+});

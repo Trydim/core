@@ -104,10 +104,8 @@ const customers = {
   form: new FormData(),
 
   needReload: false,
-  table: f.gI('customersTable'),
-  tbody: '',
+  tbody   : '',
   impValue: '',
-  confirm: f.gI('confirmField'),
 
   queryParam: {
     mode        : 'DB',
@@ -128,6 +126,9 @@ const customers = {
   usersList: new Map(),
 
   init() {
+    this.table   = f.gI('customersTable');
+    this.confirm = f.gI('confirmField');
+
     this.M = new f.initModal();
     this.p = new f.Pagination( '#paginator',{
       dbAction : 'loadCustomers',
@@ -373,4 +374,8 @@ const customers = {
   },
 }
 
-window.CustomersInstance = customers.init();
+document.addEventListener("DOMContentLoaded", () => {
+  window.CustomersInstance = customers;
+  // Delay for hooks
+  setTimeout(() => customers.init(), 0);
+});

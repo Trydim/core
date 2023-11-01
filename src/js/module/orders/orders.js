@@ -7,8 +7,10 @@ class Orders extends Events {
     super();
 
     // Delay for hooks
-    setTimeout(() => this.init(), 500);
+    setTimeout(() => this.init(), 0);
   }
 }
 
-window.OrdersInstance = new Orders();
+document.addEventListener("DOMContentLoaded", () => {
+  window.OrdersInstance = new Orders();
+});

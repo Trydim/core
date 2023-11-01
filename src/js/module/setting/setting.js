@@ -49,47 +49,7 @@ import Tooltip from 'primevue/tooltip';
 // Import Modules
 import App from './app';
 
-/**
- * Hook - beforeCreateApp
- */
-f.HOOKS.beforeCreateApp({App});
-
-const app  = createApp(App),
-      node = f.gI('settingForm');
-
-app.use(PrimeVue);
-app.component('p-accordion', Accordion);
-app.component('p-accordion-tab', AccordionTab);
-app.component('p-button', Button);
-app.component('p-calendar', Calendar);
-app.component('p-checkbox', Checkbox);
-app.component('p-dialog', Dialog);
-app.component('p-image', Image);
-app.component('p-input-text', InputText);
-app.component('p-input-number', InputNumber);
-app.component('p-picklist', PickList);
-app.component('p-radiobutton', RadioButton);
-app.component('p-select', Dropdown);
-app.component('p-switch', InputSwitch);
-app.component('p-t-column', Column);
-app.component('p-table', DataTable);
-app.component('p-textarea', Textarea);
-//app.component('p-toggle-button', ToggleButton);
-//app.component('p-multi-select', MultiSelect);
-//app.component('p-tree-select', TreeSelect);
-//app.component('p-file', FileUpload);
-
-// Custom component
-app.component('setting-mail', Mail);
-app.component('setting-user', UserFields);
-app.component('setting-permission', Permission);
-app.component('setting-manager-field', ManagerFields);
-app.component('setting-rate', Rate);
-app.component('setting-order-status', OrderStatus);
-app.component('setting-properties', Properties);
-app.component('setting-other', Other);
-
-app.directive('tooltip', Tooltip);
+const app = createApp(App);
 
 app.config.errorHandler = (err, vm, info) => {
   debugger
@@ -99,12 +59,56 @@ app.config.errorHandler = (err, vm, info) => {
 
 app.config.globalProperties.$t = function (id) { return window._(id) }
 
-/**
- * Hook - beforeMounded
- */
-f.HOOKS.beforeMoundedApp({vueApp: app, App, template: node});
+document.addEventListener("DOMContentLoaded", () => {
+  // Hook - beforeCreateApp
+  f.HOOKS.beforeCreateApp({App});
 
-const that = app.mount(node);
-window.SettingsInstance = app;
+  const node = f.gI('settingForm');
 
-f.HOOKS.afterMoundedApp({vueApp: app, App, that});
+  app.use(PrimeVue);
+  app.component('p-accordion', Accordion);
+  app.component('p-accordion-tab', AccordionTab);
+  app.component('p-button', Button);
+  app.component('p-calendar', Calendar);
+  app.component('p-checkbox', Checkbox);
+  app.component('p-dialog', Dialog);
+  app.component('p-image', Image);
+  app.component('p-input-text', InputText);
+  app.component('p-input-number', InputNumber);
+  app.component('p-picklist', PickList);
+  app.component('p-radiobutton', RadioButton);
+  app.component('p-select', Dropdown);
+  app.component('p-switch', InputSwitch);
+  app.component('p-t-column', Column);
+  app.component('p-table', DataTable);
+  app.component('p-textarea', Textarea);
+  //app.component('p-toggle-button', ToggleButton);
+  //app.component('p-multi-select', MultiSelect);
+  //app.component('p-tree-select', TreeSelect);
+  //app.component('p-file', FileUpload);
+
+  // Custom component
+  app.component('setting-mail', Mail);
+  app.component('setting-user', UserFields);
+  app.component('setting-permission', Permission);
+  app.component('setting-manager-field', ManagerFields);
+  app.component('setting-rate', Rate);
+  app.component('setting-order-status', OrderStatus);
+  app.component('setting-properties', Properties);
+  app.component('setting-other', Other);
+
+  app.directive('tooltip', Tooltip);
+
+  // Hook - beforeMounded
+  f.HOOKS.beforeMoundedApp({vueApp: app, App, template: node});
+
+  window.SettingsInstance = app;
+
+  // Delay for hooks
+  setTimeout(() => {
+    const that = app.mount(node);
+    // Hook - afterMounded
+    f.HOOKS.afterMoundedApp({vueApp: app, App, that});
+    customers.init()
+  }, 0);
+});

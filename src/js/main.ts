@@ -170,7 +170,7 @@ const onEvent = () => {
   f.qA('[data-action-cms]', 'click', cmsEvent);
 }
 
-(() => {
+document.addEventListener("DOMContentLoaded", () => {
   if (f.gI('authForm')) { stopPreloader(false); return; }
 
   cancelFormSubmit();
@@ -182,4 +182,4 @@ const onEvent = () => {
   setLinkMenu(); // after bind events
 
   stopPreloader();
-})();
+});

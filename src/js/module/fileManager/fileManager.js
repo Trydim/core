@@ -11,8 +11,6 @@ const t = dir => {
   });
 }
 
-window.$ = window.$ || window['jQuery'];
-
 const fileManager = {
   form: new FormData(),
 
@@ -97,7 +95,7 @@ const fileManager = {
       i.preventDefault();
 
       if (r) {
-        fileManager.query({cmsAction: 'createFile', fileName: u + r}, function (data) {
+        fileManager.query({cmsAction: 'createFile', fileName: u + r}, function () {
           t(u);
           let ext = r.substr(r.lastIndexOf(".") + 1);
           $("#tree div.selected").next("ul")
@@ -112,14 +110,15 @@ const fileManager = {
       var f = $(this).parents("tr").find("a.delete-directory").attr("href"),
           r = f.match(/([^\/]*)\/*$/)[1],
           i = prompt("New name:", r);
-      if (i != null && i != "") {
+
+      if (i != null && i !== "") {
         //$body.append('<div id="alerts" class="btn blue">working..<\/div>');
         var u = f.replace(r, i),
             e = $("#ab-list-pages td.ab-tdfolder").find("a:contains(" + r + "):last"),
             o = $(".selected").next("ul").find("li div:contains(" + r + "):last"),
             s = $(this).parents("tr").find("a.delete-directory");
 
-        fileManager.query({cmsAction: 'renameFolder', oldName: f, newName: u}, function (t) {
+        fileManager.query({cmsAction: 'renameFolder', oldName: f, newName: u}, function () {
           //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
           e.attr("href", u).text(i);
           s.attr("href", u);
@@ -134,14 +133,15 @@ const fileManager = {
           i = prompt("New name:", r),
           e = $(this).parents("tr").find("a.delete-file"),
           o = $(this).parents("tr").find("a.ab-edit-file");
-      if (i != null && i != "") {
+
+      if (i != null && i !== "") {
         //$body.append('<div id="alerts" class="btn blue">working..<\/div>');
         $("#alerts").fadeIn(1e3);
         var f = u.replace(r, i),
             s = $("#ab-list-pages td.ab-tdfile:contains(" + r + "):last"),
             h = $(".selected").next("ul").find("li:contains(" + r + "):last");
 
-        return fileManager.query({cmsAction: 'renameFolder', oldName: u, newName: f}, function (t) {
+        return fileManager.query({cmsAction: 'renameFolder', oldName: u, newName: f}, function () {
           //$("#alerts").hide().remove();
           //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
           //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
@@ -160,7 +160,7 @@ const fileManager = {
 
       let tr = $(this).parents("tr");
       confirm('Delete folder "' + r + '" ?') &&
-      fileManager.query({cmsAction: 'deleteFolder', dir: i},  function (t) {
+      fileManager.query({cmsAction: 'deleteFolder', dir: i},  function () {
           //$("#alerts").hide().remove();
           //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
           //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
@@ -177,12 +177,13 @@ const fileManager = {
 
       let tr = $(this).parents("tr");
 
-      confirm('Удалить файл "' + r + '" ?')
-           && fileManager.query({cmsAction: 'deleteFile', dir: i},  function (t) {
+      if (confirm('Удалить файл "' + r + '" ?')) {
+        fileManager.query({cmsAction: 'deleteFile', dir: i},  function () {
           tr.hide(100).remove();
           u.remove();
           f.showMsg('Удалено');
-        })
+        });
+      }
     });
 
     $body.on("mousedown", "#zipsite, a.downloadfolder, a.downloadfile", function () {
@@ -202,7 +203,7 @@ const fileManager = {
     });*/
 
     $("#frm-uploadfile #file").on('drop', changeInput)
-    $("#frm-uploadfile #file").on('change', changeInput);
+                              .on('change', changeInput);
 
     function changeInput (e) {
       e.preventDefault();
@@ -261,4 +262,9 @@ const fileManager = {
   },
 }
 
-window.FileManagerInstance = fileManager.init();
+document.addEventListener("DOMContentLoaded", () => {
+  window.$ = window.$ || window['jQuery'];
+  window.FileManagerInstance = fileManager;
+  // Delay for hooks
+  setTimeout(() => fileManager.init(), 0);
+});
