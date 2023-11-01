@@ -147,6 +147,18 @@ trait Authorization {
 
     $this->user['dealer'] = $dealer;
   }
+
+  private function haveHeaderAuthorization(): bool {
+    $login    = $this->url->server->get('PHP_AUTH_USER');
+    $password = $this->url->server->get('PHP_AUTH_PW');
+
+    if (!empty($login) && !empty($password)) {
+      $_SESSION['login']     = $login;
+      $_SESSION['password']  = $password;
+      return true;
+    }
+    return false;
+  }
   /**
    * Проверка пароля
    * @return $this|Main
@@ -154,7 +166,10 @@ trait Authorization {
   private function checkAuth(): Main {
     session_start();
 
-    if (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID']) {
+    if ( (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
+         ||
+         $this->haveHeaderAuthorization() )
+    {
       $user = $this->db->checkUserHash($_SESSION);
       $user && $this->setLogin($user);
     }

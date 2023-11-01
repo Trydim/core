@@ -16,7 +16,7 @@ class UrlGenerator {
   /**
    * @var ServerBag
    */
-  private $server;
+  public $server;
   /**
    * @var HeaderBag
    */
