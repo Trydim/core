@@ -160,8 +160,8 @@ class DbMain extends R {
         if (!count($dbConfig)) exit('Configs error');
       }
 
-      $this->prefix = $dbConfig['dbPrefix'] ?? $this->prefix;
       $this->dbName = $dbConfig['dbName'];
+      $this->setPrefix($dbConfig['dbPrefix'] ?? $this->prefix);
 
       self::setup(
         'mysql:host=' . $dbConfig['dbHost'] . ';dbname=' . $dbConfig['dbName'],
@@ -200,6 +200,10 @@ class DbMain extends R {
     }
     $date = date_create($date);
     return $date ? $date->format($this::DB_DATE_FORMAT) : null;
+  }
+
+  public function setPrefix(string $prefix) {
+    $this->prefix = $prefix ?? $this->prefix;
   }
 
   /**
@@ -1001,7 +1005,7 @@ class DbMain extends R {
   }
 
   public function loadDealers(): array {
-    $sql = "SELECT ID AS 'id', name, contacts, register_date AS 'registerDate', activity, settings
+    $sql = "SELECT ID AS 'id', cms_param AS 'cmsParam', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 
     return $this->jsonParseField(self::getAll($sql));

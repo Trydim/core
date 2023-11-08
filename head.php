@@ -17,7 +17,7 @@ if ($mode = $main->getCmsParam('mode')) {
   extract($_REQUEST);
   $cmsAction = $dbAction ?? $cmsAction ?? 'noAction';
 
-  if (DEBUG || in_array($mode, ['auth', 'docs']) || $main->checkAction($cmsAction)) {
+  if (DEBUG || in_array($mode, ['auth', 'tBot', 'docs']) || $main->checkAction($cmsAction)) {
     try {
       switch ($mode) {
         case 'auth': require $componentPath . 'auth.php'; break;
@@ -26,6 +26,7 @@ if ($mode = $main->getCmsParam('mode')) {
         case 'docs':    require $componentPath . 'docs.php'; break;
         case 'FM':      require $componentPath . 'fileManager.php'; break;
         case 'setting': require $componentPath . 'setting.php'; break;
+        case 'tBot': require  __DIR__ . '/modelBot.php';
       }
     } catch (Exception $e) {
       $main->response->setContent($e->getMessage());

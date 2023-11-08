@@ -131,6 +131,18 @@ if (!function_exists('de')) {
   }
 }
 
+if (!function_exists('def')) {
+  /**
+   * @param $var
+   * @param bool $die
+   */
+  function def($var, bool $die = true) {
+    if (is_array($var) || is_object($var)) $var = json_encode($var);
+    file_put_contents(ABS_SITE_PATH . 'shared/debug.json', $var);
+    if ($die) die();
+  }
+}
+
 /**
  * @param string[]|string $hayStack
  * @param string $search
