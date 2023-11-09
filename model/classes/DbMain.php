@@ -179,6 +179,36 @@ class DbMain extends R {
   }
 
   /**
+   * Multiple databases
+   * @param string $key
+   * @param array  $dbConfig
+   * @param bool   $freeze
+   * @return $this
+   */
+  public function addDb(string $key, array $dbConfig, bool $freeze = true): DbMain {
+    self::addDatabase(
+      $key,
+      'mysql:host=' . $dbConfig['dbHost'] . ';dbname=' . $dbConfig['dbName'],
+      $dbConfig['dbUsername'],
+      $dbConfig['dbPass'],
+      $freeze
+    );
+
+    return $this;
+  }
+
+  /**
+   * Select a database,
+   * @param string $key
+   * @return $this
+   */
+  public function selectDb(string $key): DbMain {
+    self::selectDatabase($key);
+
+    return $this;
+  }
+
+  /**
    * What does this function do?
    * @param $varName
    * @return string
@@ -775,7 +805,7 @@ class DbMain extends R {
 
     switch ($type) {
       case 'file': return " `$prop" . "_ids` varchar(255)";
-      case 'text': case 'string': return $str . "varchar(255)";
+      default: case 'text': case 'string': return $str . "varchar(255)";
       case 'textarea': return $str . "varchar(1000)";
       case 'int': return $str . "int(20) NOT NULL DEFAULT 1";
       case 'float': return $str . "float NOT NULL DEFAULT 1";

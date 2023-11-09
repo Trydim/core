@@ -9,12 +9,12 @@
 ?>
 <div class="d-flex justify-content-between mb-4 pt-1 position-sticky top-0 bg-white" id="actionBtnWrap" style="z-index: +2">
   <div>
-    <input type="button" class="btn btn-success oneOrderOnly mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
+    <input type="button" class="btn btn-success mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
     <span id="orderBtn">
       <input type="button" class="btn btn-warning mainOnly" value="<?= gTxt('Change status') ?>" data-action="changeStatusOrder">
-      <input type="button" class="btn btn-primary oneOrderOnly" value="Pdf" data-action="savePdf">
-      <input type="button" class="btn btn-primary oneOrderOnly" value="<?= gTxt('Print') ?>" data-action="printOrder">
-      <input type="button" class="btn btn-primary oneOrderOnly" value="<?= gTxt('Send mail') ?>" data-action="sendOrder">
+      <input type="button" class="btn btn-primary" value="Pdf" data-action="savePdf">
+      <input type="button" class="btn btn-primary" value="<?= gTxt('Print') ?>" data-action="printOrder">
+      <input type="button" class="btn btn-primary" value="<?= gTxt('Send mail') ?>" data-action="sendOrder">
     </span>
   </div>
   <div>

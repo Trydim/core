@@ -7,14 +7,15 @@ class VC {
         CHANGE_DATABASE = 'CHANGE_DATABASE';
 
   /** cmsParams */
-  const DB_CONFIG   = 'dbConfig',
-        ONLY_LOGIN  = 'onlyLogin',
-        CSV_PATH    = 'csvPath',
-        LEGEND_PATH = 'legendPath',
-        IMG_PATH    = 'imgPath',
-        URI_IMG     = 'uriImg',
-        URI_CSS     = 'uriCss',
-        URI_JS      = 'uriJs',
+  const PROJECT_TITLE = 'PROJECT_TITLE',
+        DB_CONFIG     = 'dbConfig',
+        ONLY_LOGIN    = 'onlyLogin',
+        CSV_PATH      = 'csvPath',
+        LEGEND_PATH   = 'legendPath',
+        IMG_PATH      = 'imgPath',
+        URI_IMG       = 'uriImg',
+        URI_CSS       = 'uriCss',
+        URI_JS        = 'uriJs',
         DEAL_IMG_PATH = 'dealImgPath',
         DEAL_URI_IMG  = 'dealUriImg',
         DEAL_URI_CSS  = 'dealUriCss',

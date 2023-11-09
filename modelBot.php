@@ -15,15 +15,15 @@ $action = $data['text'] ?? 'noText';
 $chatId = $data['chat']['id'];
 $username = $data['chat']['username'];
 
-function toggleUser($chatId, $username = false) {
+function toggleUser(string $chatId, $user = false): bool {
   $botList = file_get_contents(SUBSCRIBE);
 
-  if (!$botList && $username) $botList = '{}';
+  if (!$botList && $user) $botList = '{}';
 
   if ($botList) {
     $botList = json_decode($botList, true);
 
-    if ($username) $botList[$chatId] = $username;
+    if ($user) $botList[$chatId] = $user;
     else unset($botList[$chatId]);
 
     file_put_contents(SUBSCRIBE, json_encode($botList));
@@ -32,11 +32,21 @@ function toggleUser($chatId, $username = false) {
 
   return false;
 }
+function haveUser(string $chatId): bool {
+  $botList = file_get_contents(SUBSCRIBE);
+
+  if ($botList) {
+    $botList = json_decode($botList, true);
+
+    return isset($botList[$chatId]);
+  }
+  return false;
+}
 
 $result = ['chat_id' => $chatId];
 switch ($action) {
   case '/start':
-    // Найти пользователя у всех дилеров
+    $db = $main->getDB();
     $pagerParam = [
       'pageNumber'   => 0,
       'countPerPage' => 10000,
@@ -44,17 +54,28 @@ switch ($action) {
       'sortDirect'   => false,
     ];
 
-    foreach ($main->db->loadDealers() as $dealer) {
+    // Проверить есть ли такой пользователь
+    if (haveUser($chatId)) {
+      $result['text'] = 'Пользователь ' . $username . ' уже подписан.';
+      break;
+    }
+
+    // Найти пользователя у всех дилеров
+    foreach ($db->loadDealers() as $dealer) {
       $prefix = $dealer['cmsParam']['prefix'] ?? false;
       if (!$prefix) def($dealer['ID'] . ' not have prefix');
 
-      $main->db->setPrefix($prefix);
-      foreach ($main->db->loadUsers($pagerParam) as $user) {
+      $db->setPrefix($prefix);
+      foreach ($db->loadUsers($pagerParam) as $user) {
         $contacts = json_decode($user['contacts'] ?? '[]', true);
-        $telegramUsername = trim($contacts['telegramUsername'] ?? '');
+        $tgUsername = trim($contacts['telegramUsername'] ?? '');
 
-        if ($telegramUsername === $username) {
-          $r = toggleUser($chatId, $username);
+        if ($tgUsername === $username) {
+          $r = toggleUser($chatId, [
+            'type' => 'dealer',
+            'username' => $username,
+            'permission' => $db->selectQuery('permission', ['ID', 'properties'], 'ID = ' . $user['permissionId'])[0]
+          ]);
           $result['text'] = $r ? 'Подписан пользователь: ' . $username : 'Ошибка';
           break 3; // Остановить switch
         }
@@ -62,11 +83,29 @@ switch ($action) {
     }
 
     // Найти пользователя в производстве
+    $dbMakerConfig = [
+      'dbHost'     => 'localhost',
+      'dbName'     => 'graddoor_maker_prod',
+      'dbUsername' => 'dbUser',
+      'dbPass'     => 'WHZM4JpunONGycm'
+    ];
+    $db->addDb('maker', $dbMakerConfig)->selectDb('maker')->setPrefix('');
+    foreach ($db->loadUsers($pagerParam) as $user) {
+      $contacts = json_decode($user['contacts'] ?? '[]', true);
+      $tgUsername = str_replace('@', '', trim($contacts['telegramUsername'] ?? ''));
 
-    //$main->setCmsParam($publicConfig);
-    //$db = new DbMain();
+      if ($tgUsername === $username) {
+        $r = toggleUser($chatId, [
+          'type' => 'maker',
+          'username' => $username,
+          'permission' => $db->selectQuery('permission', ['ID', 'properties'], 'ID = ' . $user['permissionId'])[0]
+        ]);
+        $result['text'] = $r ? 'Подписан пользователь: ' . $username : 'Ошибка';
+        break 2;
+      }
+    }
 
-
+    $result['text'] = 'Пользователь ' . $username . ' не найден.';
     break;
   case '/stop':
     // Удалить из списка
