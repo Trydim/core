@@ -207,12 +207,10 @@ switch ($cmsAction) {
 
     $usersId = $main->getLogin('id');
     $tableType = $tableType ?? 'order';
+    $customization = $main->getLogin('customization');
+    $customization[$tableType] = json_decode($columns, true);
 
-    $param[$usersId] = [
-      'customization' => [
-        $tableType => json_decode($columns, true),
-      ]
-    ];
+    $param[$usersId] = ['customization' => $customization];
 
     // Save user
     $result = $db->insert($db->getColumnsTable('users'), 'users', $param, true);

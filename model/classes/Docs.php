@@ -33,7 +33,7 @@ class Docs {
   /**
    * @var string
    */
-  private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $dealImgPath, $fileName;
+  private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $dealImgPath;
 
   /**
    * @var object
@@ -55,6 +55,10 @@ class Docs {
    * @var Main|null
    */
   private $main;
+  /**
+   * @var string
+   */
+  public $fileName;
 
   /**
    * Docs constructor.
