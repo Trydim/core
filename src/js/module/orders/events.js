@@ -347,7 +347,7 @@ export default class extends Orders {
 
         wrap.style.position = 'absolute';
         wrap.style.width = s.width + 'px';
-        wrap.style.zIndex = 1000;
+        wrap.style.zIndex = 1250;
         document.body.append(wrap);
 
         moveAt(event.pageX, event.pageY);

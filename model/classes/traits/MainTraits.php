@@ -164,7 +164,7 @@ trait Authorization {
    * @return $this|Main
    */
   private function checkAuth(): Main {
-    session_start();
+    !isset($_SESSION) && session_start();
 
     if ( (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
          ||

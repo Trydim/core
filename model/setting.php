@@ -200,19 +200,14 @@ switch ($cmsAction) {
     $main->saveSettings();
     break;
   case 'saveColumns':
-    if (!isset($tableType) || !isset($columns)) {
-      $result['error'] = 'saveColumns error';
-      break;
-    }
+    if (!isset($tableType) || !isset($columns)) { $result['error'] = 'saveColumns error'; break; }
 
     $usersId = $main->getLogin('id');
     $tableType = $tableType ?? 'order';
+    $customization = $main->getLogin('customization');
+    $customization[$tableType] = json_decode($columns, true);
 
-    $param[$usersId] = [
-      'customization' => [
-        $tableType => json_decode($columns, true),
-      ]
-    ];
+    $param[$usersId] = ['customization' => $customization];
 
     // Save user
     $result = $db->insert($db->getColumnsTable('users'), 'users', $param, true);

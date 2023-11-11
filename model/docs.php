@@ -10,14 +10,13 @@ $data = [];
 $cmsAction = $cmsAction ?? 'mail';
 $docType   = $docType ?? $cmsAction;
 
-// Если есть отчет
 $reportValue = json_decode($reportValue ?? '[]', true);
-// Если есть номер заказа
+// Sent order id if report is empty
 $orderId = empty($reportValue) ? ($orderId ?? false) : false;
-// Посмотреть номер заказа в отчете
+// Get order id from report value
 !$orderId && $orderId = isset($reportValue['orderId']) ? json_decode($reportValue['orderId']) : false;
 
-// Данные о менеджере
+// Manager data from data base
 // ---------------------------------------------------------------------------------------------------------------------
 if (isset($addManager)) {
   if (isset($reportValue['name'])) { // Имя пользователя - неправильно
@@ -35,11 +34,11 @@ if (isset($addManager)) {
   unset($userData);
 }
 
-// Данные о клиенте
+// Customer data from data base
 // ---------------------------------------------------------------------------------------------------------------------
 if (isset($addCustomer)) {
   if (isset($customerId)) {
-    $customerData = $main->db->selectQuery('customer', '*', " ID = $customerId");
+    $customerData = $main->db->selectQuery('customers', '*', " ID = $customerId");
   } else if ($orderId) { // Заказчик из сохраненного заказа
     $customerData = $main->db->loadCustomerByOrderId($orderId);
   } else $customerData = $customer ?? [];
@@ -51,20 +50,20 @@ if (isset($addCustomer)) {
   unset($customerData);
 }
 
-// Отчет загрузить из БД по ИД
+// If the report is empty, then the order is loaded by order id
 // ---------------------------------------------------------------------------------------------------------------------
-if ($orderId) {
+if ($orderId && count($reportValue) === 0) {
   $reportValue = $main->db->loadOrdersById($orderId, true);
 
   $reportValue['id'] = $reportValue['ID'];
 
   $data['order'] = $reportValue;
   $data['reportValue'] = &$reportValue['reportValue'];
-} else if ($reportValue) {
+} else if (count($reportValue)) {
   $data['reportValue'] = $reportValue;
 }
 
-// Создание документа
+// Create docs
 // ---------------------------------------------------------------------------------------------------------------------
 if (in_array($docType, ['excel', 'pdf', 'print'])) {
   $docs = new Docs(
@@ -108,6 +107,6 @@ switch ($cmsAction) {
   case 'getPrintStyle':
     $fileTpl = ABS_SITE_PATH . 'public/views/docs/' . ($fileTpl ?? 'printTpl.css');
 
-    if (file_exists($fileTpl)) $main->response->setContent(['style' => file_get_contents($fileTpl)]);
+    $main->response->setContent(['style' => file_exists($fileTpl) ? file_get_contents($fileTpl) : '']);
     break;
 }

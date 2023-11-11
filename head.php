@@ -34,22 +34,6 @@ if ($mode = $main->getCmsParam('mode')) {
   } else $main->response->setContent(['error' => 'Auth no passing!']);
 } else {
   $main->beforeController();
-/*
-  $pagerParam = [
-    'pageNumber'   => 0,
-    'countPerPage' => 10000,
-    'sortColumn'   => 'ID',
-    'sortDirect'   => false,
-  ];
-  $dbMakerConfig = [
-    'dbHost'     => 'localhost',
-    'dbName'     => 'graddoor_maker',
-    'dbUsername' => 'root',
-    'dbPass'     => ''
-  ];
-
-  $main->db->addDb('maker', $dbMakerConfig)->selectDb('maker');
-  $t = $main->db->loadUsers($pagerParam);*/
 
   $pathController = 'controller/c_' . $main->url->getRoute() . '.php';
   if (file_exists(ABS_SITE_PATH . "public/" . $pathController)) require ABS_SITE_PATH . "public/" . $pathController;

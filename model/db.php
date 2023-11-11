@@ -148,6 +148,10 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
         $customerChange = $customerId === 0 || boolValue($customerChange ?? true);
         $customerId = $customerId !== 0 ? $customerId : $db->getLastID('customers');
 
+        // If customer id is missing
+        $result = $db->selectQuery('customers', '*', " ID = $customerId");
+        if (!count($result)) { $customerChange = true; $customerId = 0; }
+
         if ($customerChange) {
           $param = [$customerId => [
             'name' => $name ?? 'No name',

@@ -119,6 +119,7 @@ declare type CMSGlobalObject = {
   hide(...collection: NodeList | Iterable<Node>)
   enable(...collection: NodeList | Iterable<Node>)
   disable(...collection: NodeList | Iterable<Node>)
+  flashNode(...collection: NodeList | Iterable<Node>)
 
   eraseNode(node: HTMLElement)
   /**
@@ -205,8 +206,9 @@ declare type CMSGlobalObject = {
       addManager?: boolean,
       addCustomer?: boolean,
     },
-    data: FormData,
-    finishOk: Function
+    data?: FormData,
+    finishOk?: Function,
+    errorFn?: Function,
   )
 
   /**
