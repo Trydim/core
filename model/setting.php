@@ -3,7 +3,7 @@
 /**
  * @var Main $main - global main object
  *
- * @var string $cmsAction - extract from query in main.php
+ * @var string $cmsAction - extract from query in head.php
  * @var array $user - extract from query
  */
 

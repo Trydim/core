@@ -26,6 +26,7 @@ if ($mode = $main->getCmsParam('mode')) {
         case 'docs':    require $componentPath . 'docs.php'; break;
         case 'FM':      require $componentPath . 'fileManager.php'; break;
         case 'setting': require $componentPath . 'setting.php'; break;
+        case 'socket':  require $componentPath . 'socket.php'; break;
         case 'tBot': require  __DIR__ . '/modelBot.php';
       }
     } catch (Exception $e) {

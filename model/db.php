@@ -3,7 +3,7 @@
 /**
  * @var Main $main
  * @var array $dbConfig - config from public
- * @var string $cmsAction - extract from query in main.php
+ * @var string $cmsAction - extract from query in head.php
  */
 
 $result = [];
