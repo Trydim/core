@@ -41,6 +41,7 @@ export default class {
     this.selected = new f.SelectedRow({table: this.table, observerKey: 'selectedOrders'});
     this.selected.subscribe(this.selectedRender.bind(this));
 
+    this.initSocket();
     this.query();
   }
   setParam() {
@@ -197,6 +198,49 @@ export default class {
     else f.enable(this.btnMainOnly);
   }
 
+  initSocket() {
+    const connectIcon = f.gI('wsConnectIcon');
+    const wsUri  = 'ws://' + location.host + ':9000/demo/server.php';
+
+    let ws;
+
+    try {
+      ws = this.websocket = new WebSocket(wsUri);
+    } catch (e) {
+      debugger
+    }
+
+    ws.onopen = () => {f.show(connectIcon)};
+    ws.onclose = () => {f.hide(connectIcon)};
+
+    ws.onmessage = (e) => {
+      let response = JSON.parse(e.data);
+
+      switch (response.mode) {
+        case 'load':
+          this.queryParam.dbAction = this.mainAction;
+          this.query();
+          break;
+        default: case 'system':
+          break;
+      }
+    };
+    ws.onerror = () => {
+      if (this.startSended) return;
+      this.startSended = true;
+
+      fetch(f.MAIN_PHP_PATH + '?mode=socket&cmsAction=startWS')
+
+      setTimeout(() => this.initSocket(), 1000);
+      console.error('connect error');
+    };
+
+    window.sendMessage = function () {
+      let data = {name: 'name', message: 'msdf'};
+      ws.send(JSON.stringify(data));
+    }
+  }
+
   query(action) {
     const data  = new FormData(),
           param = this.queryParam;
@@ -211,6 +255,10 @@ export default class {
 
     this.loaderTable.start();
     f.Post({data}).then(data => {
+      if (param.dbAction === 'changeStatusOrder') {
+        this.websocket.send(JSON.stringify({cmsAction: param.dbAction}))
+      }
+
       if (this.needReload) {
         this.needReload = false;
         this.selected.clear();

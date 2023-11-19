@@ -1,7 +1,7 @@
 <?php
 
-/* Папка для временных файлов */
-  const RESULT_PATH = 'shared/';
+//const RESULT_PATH = 'shared/'; // Папка для временных файлов
+
 !defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
