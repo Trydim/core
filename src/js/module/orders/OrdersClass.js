@@ -67,6 +67,7 @@ export default class {
     };
 
     f.oneTimeFunction.add('ordersHeadRender', this.ordersHeadRender.bind(this));
+    f.oneTimeFunction.add('fillSelectStatus', this.fillSelectStatus.bind(this));
   }
 
   getTypeConfig() {
@@ -223,7 +224,7 @@ export default class {
 
       if (data['orders']) this.setOrders(data['orders']);
       if (data['countRows']) this.p.setCountPageBtn(data['countRows']);
-      if (data['statusOrders']) this.fillSelectStatus(data['statusOrders']);
+      if (data['statusOrders']) f.oneTimeFunction.exec('fillSelectStatus');
 
       this.loaderTable.stop();
     });

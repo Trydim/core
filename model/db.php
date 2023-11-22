@@ -258,7 +258,7 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
 
         if (isset($ordersFilter['userId'])) $ordersFilter = 'user_id = ' . $ordersFilter['userId'];
         else if (isset($ordersFilter['customerId'])) $ordersFilter = 'customer_id = ' . $ordersFilter['customerId'];
-        else if (isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', $ordersFilter['statusId']);
+        else if ($statusId = isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
 
         $result['countRows'] = $db->getCountRows('orders', $ordersFilter);
       } //
