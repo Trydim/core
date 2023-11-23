@@ -112,20 +112,23 @@ trait DbOrders {
    */
   public function loadOrdersByRelatedKey(array $pageParam, array $filters = []): array {
     $sql = $this->getBaseOrdersQuery() . 'WHERE ';
+    $connect = '';
 
     if (isset($filters['userId'])) {
       $sql .= "O.user_id = '" . $filters['userId'] . "'";
+      $connect = ' AND ';
     }
 
-    else if (isset($filters['customerId'])) {
-      $sql .= "O.customer_id = '" . $filters['customerId'] . "'";
+    if (isset($filters['customerId'])) {
+      $sql .= $connect . "O.customer_id = '" . $filters['customerId'] . "'";
+      $connect = ' AND ';
     }
 
-    else if (isset($filters['statusId'])) {
+    if (isset($filters['statusId'])) {
       $ids = $filters['statusId'];
       if (!is_array($ids)) $ids = [$ids];
 
-      $sql .= "O.status_id = " . implode(' OR O.status_id = ', $ids) . "\n";
+      $sql .= $connect . "O.status_id = " . implode(' OR O.status_id = ', $ids) . "\n";
     }
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn']);

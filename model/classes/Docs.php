@@ -176,14 +176,10 @@ class Docs {
           $this->docs->setPaper('A4', $this->pdfParam['orientation'] === 'P' ? 'portrait' : 'landscape');
 
           //$this->docs->getOptions()->setDebugLayout(true);
+          //$this->docs->getOptions()->setDebugLayoutBlocks(true);
           //$this->docs->getOptions()->setDebugPng(true);
           $this->docs->getOptions()->setIsRemoteEnabled(true);
           $this->docs->getOptions()->setIsPhpEnabled(true);
-
-          foreach ($this->domFooter as $t) {
-            $font = $this->docs->getFontMetrics()->getFont($t['font'], "normal");
-            $this->docs->getCanvas()->page_text($t['x'], $t['y'], $t['text'], $font, $t['size'], $t['color'], $t['word_space'], $t['char_space'] ,$t['angle']);
-          }
 
           $this->docs->loadHtml('<html><head><style>' . ($this->styleContent ?? '') . '</style></head><body>' . $this->content . '</body></html>');
         } catch (\Mpdf\MpdfException $e) {
@@ -288,6 +284,11 @@ class Docs {
     switch ($this->pdfLibrary) {
       case 'dompdf':
         $this->docs->render();
+
+        foreach ($this->domFooter as $t) {
+          $font = $this->docs->getFontMetrics()->getFont($t['font'], "normal");
+          $this->docs->getCanvas()->page_text($t['x'], $t['y'], $t['text'], $font, $t['size'], $t['color'], $t['word_space'], $t['char_space'] ,$t['angle']);
+        }
 
         if ($dest === 'save') {
           file_put_contents($path . $this->fileName, $this->docs->output());
@@ -452,7 +453,7 @@ class Docs {
    * @param float  $char_space Char spacing adjustment
    * @param float  $angle      Angle to write the text at, measured clockwise starting from the x-axis
    * */
-  public function setFooter(float $x, float $y, string $text, $font = 'DejaVu Sans', $size = 16.0, $color = [0, 0, 0], $word_space = 0.0, $char_space = 0.0, $angle = 0.0) {
+  public function setFooter(float $x, float $y, string $text, $font = 'Helvetica', $size = 16.0, $color = [0, 0, 0], $word_space = 0.0, $char_space = 0.0, $angle = 0.0) {
     $this->domFooter[] = [
       'x'     => $x,
       'y'     => $y,
@@ -469,15 +470,24 @@ class Docs {
   /**
    * Add bottom page counter
    * @param string $position
-   * @param string $template
+   * @param string $template -
+   * @param float  $size       The font size, in points
    */
-  public function addPageCounter($position = 'right', $template = '{PAGE_NUM} из {PAGE_COUNT}') {
+  public function addPageCounter($position = 'right', $template = '{PAGE_NUM} / {PAGE_COUNT}', $size = 12.0) {
+    $isPortrait = $this->pdfOrientation === 'P';
+    $getX = function ($x) use ($isPortrait) { return round($x / 100 * ($isPortrait ? 612 : 792)); };
+    $getY = function ($y) use ($isPortrait) { return round($y / 100 * ($isPortrait ? 792 : 612)); };
+
     switch ($position) {
-      default: case 'left': $x = 32; $y = 768; break;
-      case 'right'        : $x = 232; $y = 768; break;
+      default: case 'left':
+        $x = $getX(3);  $y = $getY(90);
+        break;
+      case 'right':
+        $x = $getX(97); $y = $getY(90);
+        break;
     }
 
-    $this->setFooter($x, $y, $template);
+    $this->setFooter($x, $y, $template, 'Helvetica', $size);
   }
 
   /**

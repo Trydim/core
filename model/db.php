@@ -222,19 +222,20 @@ if ($cmsAction === 'tables') { // todo Никогда не использует�
 
       if (count($ordersIds)) {
         $param = [];
-        $single = count($ordersIds) === 1;
-        $orders = json_decode($orders ?? '[]', true);
+        //$single = count($ordersIds) === 1;
 
-        $statusId = $orders['statusId'] ?? false;
-        if (isset($orders['statusCode'])) {
-          $status = $db->loadOrderStatus(" code = '" . $orders['statusCode'] . "'");
+        $statusId = $statusId ?? false;
+        if (isset($statusCode)) {
+          $status = $db->loadOrderStatus(" code = '" . $statusCode . "'");
           if (count($status)) $statusId = $status[0]['ID'];
         }
 
         foreach ($ordersIds as $id) {
-          if (isset($orders['userId'])) $param[$id]['user_id'] = $orders['userId'];
-          if (isset($orders['customerId'])) $param[$id]['customer_id'] = $orders['customerId'];
-          if (isset($orders['orderTotal'])) $param[$id]['total'] = $orders['orderTotal'];
+          isset($userId)         && $param[$id]['user_id']     = $userId;
+          isset($customerId)     && $param[$id]['customer_id'] = $customerId;
+          isset($orderTotal)     && $param[$id]['total']       = $orderTotal;
+          isset($importantValue) && $param[$id]['important_value'] = $importantValue;
+          isset($saveValue)      && $param[$id]['save_value']      = $saveValue;
           if ($statusId) $param[$id]['status_id'] = $statusId;
         }
 

@@ -224,7 +224,7 @@ export default class {
 
       if (data['orders']) this.setOrders(data['orders']);
       if (data['countRows']) this.p.setCountPageBtn(data['countRows']);
-      if (data['statusOrders']) f.oneTimeFunction.exec('fillSelectStatus');
+      if (data['statusOrders']) f.oneTimeFunction.exec('fillSelectStatus', data['statusOrders']);
 
       this.loaderTable.stop();
     });
