@@ -36,6 +36,7 @@ class SocketControl {
 
 switch ($cmsAction) {
   case 'startWS':
+    break;
     $address = $_SERVER['HTTP_HOST'];
     $port = '9000';
     $null = null;

@@ -62,7 +62,8 @@ const users = {
 
       if (item.activity) {
         item.activityValue = !!+item.activity;
-        item.activity = item.activityValue ? '+' : '-';
+        item.activity = item.activityValue ? 'check' : 'times';
+        item.activity = `<i class="pi pi-${item.activity}"></i>`;
       }
 
       if (item['contacts']) {
@@ -157,102 +158,6 @@ const users = {
       };
     }
 
-    let select = {
-      'addUser': () => {
-        form = this.tmp.form.cloneNode(true);
-        form.querySelector('#changeField').remove();
-
-        new f.Valid({form});
-
-        this.confirmMsg = _('New user added');
-        this.M.show(_('Add new user'), form);
-      },
-      'changeUser': () => {
-        if (!this.id.getSelectedSize()) { f.showMsg(_('Please select at least 1 user'), 'error'); return; }
-
-        let oneElements = this.id.getSelectedSize() === 1, node,
-            id = this.id.getSelected(),
-            users = this.usersList.get(id[0]);
-        form = this.tmp.form.cloneNode(true);
-
-        this.queryParam.usersId = JSON.stringify(id);
-
-        node = form.querySelector('[name="name"]');
-        if (oneElements) node.value = users['name'];
-        else node.parentNode.remove();
-
-        node = form.querySelector('[name="permissionId"]');
-        if (oneElements) node.value = users['permissionId'];
-        else node.value = 1;
-
-        node = form.querySelector('[name="login"]');
-        if (oneElements) node.value = users['login'];
-        else node.parentNode.remove();
-
-        form.querySelector('[name="password"]').parentNode.remove();
-
-        // Contacts
-        users['contactsParse'] && Object.entries(users['contactsParse']).forEach(([k, v]) => {
-          node = form.querySelector(`[name="${k}"]`);
-          if (node) {
-            if (oneElements) {
-              node.value = v;
-              node.type === 'tel' && f.initMask(node);
-            } else node.parentNode.remove();
-          }
-        });
-
-        node = form.querySelectorAll('.managerField');
-        if (oneElements) {
-          node.forEach(n => {
-            let input = n.querySelector('input[name], textarea[name], select[name]'),
-                name = input.name;
-
-            users[name] && (input.value = users[name]);
-          });
-        } else node.forEach(n => n.remove());
-
-        node = form.querySelector('[name="activity"]');
-        node.checked = oneElements ? users.activityValue : true;
-
-        new f.Valid({form});
-
-        this.confirmMsg = _('Changes saved');
-        this.M.show(_('Changing Users'), form);
-      },
-      'changeUserPassword': () => { // TODO доработать изменение пароля
-        if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Select only one user'), 'error'); return; }
-
-        let id   = this.id.getSelected(),
-            user = this.usersList.get(id[0]),
-            form = f.gTNode('#userChangePassForm');
-
-        this.queryParam.usersId = JSON.stringify(id);
-
-        let newPass = form.querySelector('[name="newPass"]'),
-            repeatPass = form.querySelector('[name="repeatPass"]');
-
-        this.onEventNode(newPass, e => this.changeTextInput(e, repeatPass), {}, 'change');
-        this.onEventNode(repeatPass, e => this.changePassword(e, newPass), {}, 'change');
-
-        new f.Valid({form});
-
-        this.confirmMsg = _('New password saved');
-        this.M.show(_('Change user password') + ' ' + user['name'], form);
-      },
-      'delUser': () => {
-        if (!this.id.getSelectedSize()) return;
-
-        this.queryParam.usersId = JSON.stringify(this.id.getSelected());
-        this.delayFunc = () => this.id.clear();
-
-        this.confirmMsg = _('Deleted');
-        this.M.show(_('Delete'), _('Delete selected users?'));
-        this.M.btnConfirm.classList.remove('cl-confirm-disabled');
-        this.M.btnConfirm.removeAttribute('disabled');
-      },
-    }
-
     if (action === 'confirmYes') { // Закрыть подтверждением
       this.delayFunc();
       this.delayFunc = () => {};
@@ -262,8 +167,105 @@ const users = {
       this.reloadAction = false;
     } else {
       this.queryParam.dbAction = action;
-      select[action] && select[action]();
+      form = this[action] && this[action]();
     }
+  },
+
+  addUser() {
+    const form = this.tmp.form.cloneNode(true);
+    form.querySelector('#changeField').remove();
+
+    new f.Valid({form});
+
+    this.confirmMsg = _('New user added');
+    this.M.show(_('Add new user'), form);
+    return form;
+  },
+  changeUser() {
+    if (!this.id.getSelectedSize()) { f.showMsg(_('Please select at least 1 user'), 'error'); return; }
+
+    let oneElements = this.id.getSelectedSize() === 1, node,
+        id = this.id.getSelected(),
+        users = this.usersList.get(id[0]),
+        form = this.tmp.form.cloneNode(true);
+
+    this.queryParam.usersId = JSON.stringify(id);
+
+    node = form.querySelector('[name="name"]');
+    if (oneElements) node.value = users['name'];
+    else node.parentNode.remove();
+
+    node = form.querySelector('[name="permissionId"]');
+    if (oneElements) node.value = users['permissionId'];
+    else node.value = 1;
+
+    node = form.querySelector('[name="login"]');
+    if (oneElements) node.value = users['login'];
+    else node.parentNode.remove();
+
+    form.querySelector('[name="password"]').parentNode.remove();
+
+    // Contacts
+    users['contactsParse'] && Object.entries(users['contactsParse']).forEach(([k, v]) => {
+      node = form.querySelector(`[name="${k}"]`);
+      if (node) {
+        if (oneElements) {
+          node.value = v;
+          node.type === 'tel' && f.initMask(node);
+        } else node.parentNode.remove();
+      }
+    });
+
+    node = form.querySelectorAll('.managerField');
+    if (oneElements) {
+      node.forEach(n => {
+        let input = n.querySelector('input[name], textarea[name], select[name]'),
+            name = input.name;
+
+        users[name] && (input.value = users[name]);
+      });
+    } else node.forEach(n => n.remove());
+
+    node = form.querySelector('[name="activity"]');
+    node.checked = oneElements ? users.activityValue : true;
+
+    new f.Valid({form});
+
+    this.confirmMsg = _('Changes saved');
+    this.M.show(_('Changing Users'), form);
+    return form;
+  },
+  changeUserPassword() { // TODO доработать изменение пароля
+    if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Select only one user'), 'error'); return; }
+
+    let id   = this.id.getSelected(),
+        user = this.usersList.get(id[0]),
+        form = f.gTNode('#userChangePassForm');
+
+    this.queryParam.usersId = JSON.stringify(id);
+
+    let newPass = form.querySelector('[name="newPass"]'),
+        repeatPass = form.querySelector('[name="repeatPass"]');
+
+    this.onEventNode(newPass, e => this.changeTextInput(e, repeatPass), {}, 'change');
+    this.onEventNode(repeatPass, e => this.changePassword(e, newPass), {}, 'change');
+
+    new f.Valid({form});
+
+    this.confirmMsg = _('New password saved');
+    this.M.show(_('Change user password') + ' ' + user['name'], form);
+    return form;
+  },
+  delUser() {
+    if (!this.id.getSelectedSize()) return;
+
+    this.queryParam.usersId = JSON.stringify(this.id.getSelected());
+    this.delayFunc = () => this.id.clear();
+
+    this.confirmMsg = _('Deleted');
+    this.M.show(_('Delete'), _('Delete selected users?'));
+    this.M.btnConfirm.classList.remove('cl-confirm-disabled');
+    this.M.btnConfirm.removeAttribute('disabled');
   },
 
   changeTextInput(e, repeatPass) {

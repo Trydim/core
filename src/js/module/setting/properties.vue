@@ -172,11 +172,11 @@ export default {
       {
         label: 'Простые',
         items: [
-          {id: 'text', name: 'Текст (~200 символов)'},
-          {id: 'textarea', name: 'Текст (много)'},
-          {id: 'number', name: 'Число'},
-          {id: 'date', name: 'Дата'},
-          {id: 'bool', name: 'Флаг (да/нет)'},
+          {id: 'text',     name: _('Text (~200 characters)')},
+          {id: 'textarea', name: _('Text (many)')},
+          {id: 'number',   name: _('Number')},
+          {id: 'bool',     name: _('Checkbox')},
+          {id: 'date',     name: _('Date')},
         ]
       },
       {

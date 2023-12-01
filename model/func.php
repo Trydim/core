@@ -190,9 +190,16 @@ function getPageAsString($data): string {
  * @return string
  */
 function gTxt(string $str): string {
+  global $main;
   static $txt;
   if (!$txt) {
     $txt = include ABS_SITE_PATH . 'lang/dictionary.php';
+
+    if ($main->isDealer()) {
+      $path = $main->url->getPath(true) . 'lang/dictionary.php';
+      $dTxt = file_exists($path) ? include $path : [];
+      $txt = array_replace($txt, $dTxt);
+    }
   }
   return $txt[$str] ?? $str;
 }
@@ -204,9 +211,16 @@ function gTxt(string $str): string {
  * @return string
  */
 function gTxtDB(string $db, string $str): string {
+  global $main;
   static $txt;
   if (!$txt) {
     $txt = include ABS_SITE_PATH . 'lang/dbDictionary.php';
+
+    if ($main->isDealer()) {
+      $path = $main->url->getPath(true) . 'lang/dbDictionary.php';
+      $dTxt = file_exists($path) ? include $path : [];
+      $txt = array_replace($txt, $dTxt);
+    }
   }
   return $txt[$db][$str] ?? $str;
 }

@@ -5,7 +5,6 @@
  */
 
 const URL_TELEGRAM = 'https://api.telegram.org/bot',
-      TOKEN = '6923935821:AAEzxdER-PujGKw2MO4BXDFkJxITVqrZcWc',
       SUBSCRIBE = ABS_SITE_PATH . SHARE_PATH . 'subscribeList.json';
 
 $data = $_REQUEST['botData']['message'];
@@ -119,5 +118,5 @@ switch ($action) {
 
 }
 
-$result = httpRequest(URL_TELEGRAM . TOKEN . '/' . $method, ['method' => 'post'], json_encode($result));
+$result = httpRequest(URL_TELEGRAM . TOKEN_TELEGRAM . '/' . $method, ['method' => 'post'], json_encode($result));
 def($result);

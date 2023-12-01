@@ -41,7 +41,7 @@ export default class {
     this.selected = new f.SelectedRow({table: this.table, observerKey: 'selectedOrders'});
     this.selected.subscribe(this.selectedRender.bind(this));
 
-    this.initSocket();
+    //this.initSocket();
     this.query();
   }
   setParam() {

@@ -107,8 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Delay for hooks
   setTimeout(() => {
     const that = app.mount(node);
-    // Hook - afterMounded
-    f.HOOKS.afterMoundedApp({vueApp: app, App, that});
-    customers.init()
+
+    f.HOOKS.afterMoundedApp({vueApp: app, App, that}); // Hook - afterMounded
   }, 0);
 });

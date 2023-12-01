@@ -26,8 +26,10 @@ class VC {
         USER_IS_ADMIN   = 'admin',
         USER_LOGIN      = 'login',
         USER_NAME       = 'name',
+        USER_CONTACTS   = 'contacts',
         USER_ONLY_ONE   = 'onlyOne',
-        USER_PERMISSION = 'permission';
+        USER_PERMISSION = 'permission',
+        USER_DEALER     = 'dealer';
 
   /** Base views field */
   const BASE_GLOBAL           = 'global',

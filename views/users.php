@@ -1,17 +1,15 @@
 <?php if (!defined('MAIN_ACCESS')) die('access denied!');
 
 /**
- * @var object $main
- * @var array $param
- * @var string $permission
- * @var array $managerField
+ * @var Main $main
+ * @var array $param - ['columns', 'permission', 'managerField']
  */
 
 $field['content'] = template('parts/usersContent', $param);
 
 // Users/Manager custom field
 $managerFieldHtml = '';
-foreach ($managerField as $k => $item) {
+foreach ($param['managerField'] as $k => $item) {
   $rndId = uniqid();
   switch ($item['type']) {
     case 'textarea':
@@ -39,6 +37,17 @@ foreach ($managerField as $k => $item) {
       }
       $input .= '</select>';
       break;
+    case 'csvTable':
+      $o = $item['options'];
+      $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $item['options']['table']);
+
+      $input = '<select name="' . $k . '" class="form-select">';
+      foreach ($data as $row) {
+        $input .= '<option value="' . $row[$o['saveKey']] . '">' . $row[$o['showKey']] . '</option>';
+      }
+      $input .= '</select>';
+
+      break;
   }
 
   if ($item['type'] === 'checkbox') continue;
@@ -46,6 +55,7 @@ foreach ($managerField as $k => $item) {
   $managerFieldHtml .= '<div class="form-floating managerField mb-3">' . $input .
                        '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
 }
+unset($managerField, $k, $item, $rndId, $data, $o, $row, $input);
 
 $field['footerContent'] .= '
 <template id="permission">
@@ -62,7 +72,7 @@ $field['footerContent'] .= '
     </div>
 
     <div class="form-floating mb-3">
-      <select class="form-select" id="permissionId" name="permissionId">' . $permission . '</select>
+      <select class="form-select" id="permissionId" name="permissionId">' . $param['permission'] . '</select>
       <label for="permissionId">' . gTxt('Permission') . '</label>
     </div>
 

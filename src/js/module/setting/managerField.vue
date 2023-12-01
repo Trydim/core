@@ -12,10 +12,10 @@
       <div class="input-group mb-1">
         <p-input-text v-model="item.code" class="form-control"></p-input-text>
         <p-input-text v-model="item.name" class="form-control"></p-input-text>
-        <p-select option-label="name" option-value="id"
+        <p-select class="col-5"
                   :options="managerFieldTypes"
+                  option-value="id" option-label="name"
                   v-model="item.type"
-                  class="col-5"
         ></p-select>
         <p-button v-tooltip.bottom="this.$t('Delete field')" icon="pi pi-times" class="p-button-danger"
                   @click="removeField(key)"></p-button>
@@ -29,11 +29,31 @@
                     @click="removeOption(item, index)"></p-button>
         </div>
       </div>
+      <div v-if="item.type === 'csvTable'" class="px-3">
+        <div class="input-group mb-1">
+          <p-select class="col-4"
+                    :loading="loadingTable"
+                    :options="csvTable"
+                    option-value="fileName" option-label="name"
+                    v-model="item.options.table"
+          ></p-select>
+          <p-input-text class="col-4 form-control" v-tooltip.bottom="this.$t('Column for save')" v-model="item.options.saveKey"></p-input-text>
+          <p-input-text class="col-4 form-control" v-tooltip.bottom="this.$t('Column for show')" v-model="item.options.showKey"></p-input-text>
+        </div>
+      </div>
     </template>
   </div>
 </template>
 
 <script>
+
+const prepareCsvList = (data, path = '') => {
+  return Object.entries(data).reduce((r, [k, v]) => {
+    if (isFinite(+k)) r.push({ fileName: path + v.fileName, name: v.name });
+    else r = r.concat(prepareCsvList(v, k + '/' + path));
+    return r;
+  }, []);
+};
 
 export default {
   props: {
@@ -47,14 +67,28 @@ export default {
     managerFields: {},
 
     managerFieldTypes: [
-      {id: 'text', name: _('Text (~200 characters)')},
+      {id: 'text',     name: _('Text (~200 characters)')},
       {id: 'textarea', name: _('Text (many)')},
-      {id: 'number', name: _('Number')},
+      {id: 'number',   name: _('Number')},
       {id: 'checkbox', name: _('Checkbox')},
-      {id: 'date', name: _('Date')},
-      {id: 'list', name: _('List')},
+      {id: 'date',     name: _('Date')},
+      {id: 'list',     name: _('List')},
+      {id: 'csvTable', name: _('Table')},
+      //{id: 'select',   name: _('Directory')},
     ],
+
+    loadingTable: true,
+    csvTable: [],
   }),
+  watch: {
+    managerFields: {
+      deep: true,
+      handler() {
+        this.checkListType();
+        this['$emit']('update', this.getFields());
+      },
+    },
+  },
   methods: {
     getFields() {
       return Object.values(this.managerFields).reduce((r, field) => {
@@ -63,9 +97,25 @@ export default {
       }, {});
     },
 
+    loadCsv(field) {
+      return f.Get({data: 'mode=DB&cmsAction=tables'}).then(d => {
+        if (d.status) {
+          this.csvTable = prepareCsvList(d['csvFiles']);
+          if (!field.options.table) field.options.table = this.csvTable[0].fileName;
+        }
+
+        this.loadingTable = false;
+      });
+    },
     checkListType() {
       Object.values(this.managerFields).forEach(field => {
-        if (field.type === 'list' && !field.options) field.options = ['Option1'];
+        if (field.type === 'list' && field.options.length === 0) field.options = ['Option1'];
+        else if (field.type === 'csvTable') {
+          if (!field.options.saveKey) field.options = {saveKey: 'id', showKey: 'name'};
+
+          if (this.csvTable.length === 0) this.loadCsv(field);
+          if (!field.options.table) field.options.table = this.csvTable[0].fileName;
+        }
       });
     },
 
@@ -82,14 +132,6 @@ export default {
   },
   created() {
     this.managerFields = this.propFields;
-
-    this.$watch('managerFields', {
-      deep: true,
-      handler() {
-        this.checkListType();
-        this['$emit']('update', this.getFields());
-      },
-    });
   },
 }
 </script>
