@@ -41,7 +41,7 @@ export default class {
     this.selected = new f.SelectedRow({table: this.table, observerKey: 'selectedOrders'});
     this.selected.subscribe(this.selectedRender.bind(this));
 
-    //this.initSocket();
+    this.initSocket();
     this.query();
   }
   setParam() {
@@ -199,25 +199,20 @@ export default class {
   }
 
   initSocket() {
-    const connectIcon = f.gI('wsConnectIcon');
-    const wsUri  = 'ws://' + location.host + ':9000/demo/server.php';
+    const connectIcon = f.gI('wsConnectIcon'),
+          wsUri  = 'ws://dev.vistegra.by:2346',
+          socketKey = 'orders' + f.random(10000, 100000);
 
-    let ws;
+    let ws = this.websocket = new WebSocket(wsUri + '?key=' + socketKey);
 
-    try {
-      ws = this.websocket = new WebSocket(wsUri);
-    } catch (e) {
-      debugger
-    }
-
-    ws.onopen = () => {f.show(connectIcon)};
-    ws.onclose = () => {f.hide(connectIcon)};
+    ws.onopen = () => f.show(connectIcon);
+    ws.onclose = () => f.hide(connectIcon);
 
     ws.onmessage = (e) => {
       let response = JSON.parse(e.data);
 
       switch (response.mode) {
-        case 'load':
+        case 'changeStatusOrder':
           this.queryParam.dbAction = this.mainAction;
           this.query();
           break;
@@ -225,20 +220,7 @@ export default class {
           break;
       }
     };
-    ws.onerror = () => {
-      if (this.startSended) return;
-      this.startSended = true;
-
-      fetch(f.MAIN_PHP_PATH + '?mode=socket&cmsAction=startWS')
-
-      setTimeout(() => this.initSocket(), 1000);
-      console.error('connect error');
-    };
-
-    window.sendMessage = function () {
-      let data = {name: 'name', message: 'msdf'};
-      ws.send(JSON.stringify(data));
-    }
+    ws.onerror = () => console.error('Socket connect error');
   }
 
   query(action) {
@@ -256,7 +238,7 @@ export default class {
     this.loaderTable.start();
     f.Post({data}).then(data => {
       if (param.dbAction === 'changeStatusOrder') {
-        this.websocket.send(JSON.stringify({cmsAction: param.dbAction}))
+        this.websocket.send(JSON.stringify({mode: param.dbAction}));
       }
 
       if (this.needReload) {

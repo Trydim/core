@@ -28,22 +28,22 @@
         <span :data-id="slotProps.data.id">{{ slotProps.data.id }}</span>
       </template>
     </Column>
-    <Column field="name" :sortable="true" :header="this.$t('Name')"></Column>
-    <Column field="contacts" :sortable="false" :header="this.$t('Contacts')">
+    <Column field="name" :sortable="true" :header="this.$t('name')"></Column>
+    <Column field="contacts" :sortable="false" :header="this.$t('contacts')">
       <template #body="slotProps">
         <div v-if="slotProps.data.contacts.phone">{{ slotProps.data.contacts.phone }}</div>
         <div v-if="slotProps.data.contacts.email">{{ slotProps.data.contacts.email }}</div>
         <div v-if="slotProps.data.contacts.address">{{ slotProps.data.contacts.address }}</div>
       </template>
     </Column>
-    <Column field="registerDate" :sortable="false" :header="this.$t('Register date')"></Column>
-    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" :header="this.$t('Activity')" class="text-center">
+    <Column field="registerDate" :sortable="false" :header="this.$t('register date')"></Column>
+    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" :header="this.$t('activity')" class="text-center">
       <template #body="slotProps">
         <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
         <span v-else class="pi pi-times pi-red"></span>
       </template>
     </Column>
-    <Column field="settings" :sortable="false" :header="this.$t('Setting')">
+    <Column field="settings" :sortable="false" :header="this.$t('setting')">
       <template #body="slotProps">
         <template v-for="(value, key) of slotProps.data.settings" :key="key">
           <p v-if="getPropertyType(key) === 'bool'" class="m-0">

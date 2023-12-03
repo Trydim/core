@@ -1,13 +1,13 @@
 <?php return [
   // Menus
   'calculator'  => 'Калькулятор',
-  'Administration' => 'Администрирование',
   'maker'       => 'Производство',
   'calendar'    => 'Календарь',
   'statistic'   => 'Статистика',
   'orders'      => 'Заказы',
   'catalog'     => 'Каталог',
   'fileManager' => 'Файловый менеджер',
+  'adminDB'     => 'Администрирование',
   'customers'   => 'Клиенты',
   'users'       => 'Менеджеры',
   'setting'     => 'Настройки',
@@ -16,7 +16,9 @@
   'content-js'     => 'Редактор контента',
 
   // CMS
-  'Login'   => 'Вход',
+  'Authorization' => 'Авторизация',
+  'Login'   => 'Логин',
+  'Password'=> 'Пароль',
   'Logout'  => 'Выход',
   'Add'     => 'Добавить',
   'Change'  => 'Изменить',
@@ -72,9 +74,16 @@
   'code (optional)' => 'Код (необязательно)',
   'Sorting'         => 'Сортировка',
   'Default'         => 'По умолчанию',
+  // Orders
+  'Orders' => 'Заказы',
+  'Order' => 'Заказ',
+  'View orders' => 'Посмотреть заказы',
+  'Saved! Change will be visible after reload page' => 'Сохранено! Изменения будут видны после перезагрузки страницы',
   // Other
   'Other'      => 'Прочее',
   'Phone mask' => 'Шаблон номера телефона',
+  'register date' => 'Дата регистрации',
+  'activity' => 'Активен',
 
   'z_prop' => 'Справочник',
   'config' => 'Конфигурация',
