@@ -73,3 +73,7 @@
   <div class="d-inline bg-light p-1 me-1" title="<?= gTxt('Selected orders') ?>"></div>
   <button class="btn btn-danger pi pi-times" data-action="resetSelected"></button>
 </div>
+
+<div class="position-fixed bottom-0 end-0 m-2 d-none" id="wsConnectIcon">
+  <i class="pi pi-circle-fill pi-green"></i>
+</div>
