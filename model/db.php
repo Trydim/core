@@ -222,26 +222,27 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
       if (count($ordersIds)) {
         $param = [];
-        $single = count($ordersIds) === 1;
-        $orders = json_decode($orders ?? '[]', true);
+        //$single = count($ordersIds) === 1;
 
-        $statusId = $orders['statusId'] ?? false;
-        if (isset($orders['statusCode'])) {
-          $status = $db->loadOrderStatus(" code = '" . $orders['statusCode'] . "'");
+        $statusId = $statusId ?? false;
+        if (isset($statusCode)) {
+          $status = $db->loadOrderStatus(" code = '" . $statusCode . "'");
           if (count($status)) $statusId = $status[0]['ID'];
         }
 
         foreach ($ordersIds as $id) {
-          if (isset($orders['userId'])) $param[$id]['user_id'] = $orders['userId'];
-          if (isset($orders['customerId'])) $param[$id]['customer_id'] = $orders['customerId'];
-          if (isset($orders['orderTotal'])) $param[$id]['total'] = $orders['orderTotal'];
+          isset($userId) && $param[$id]['user_id'] = $userId;
+          isset($customerId) && $param[$id]['customer_id'] = $customerId;
+          isset($orderTotal) && $param[$id]['total'] = $orderTotal;
+          isset($total) && $param[$id]['total'] = $total;
+          isset($importantValue) && $param[$id]['important_value'] = isset($orderId) ? addCpNumber($orderId, $importantValue) : $importantValue;
           if ($statusId) $param[$id]['status_id'] = $statusId;
         }
 
-        if (!empty($param)) {
+        if (count($param)) {
           $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
         } else {
-          $result['error'] = 'Change orders: Empty param';
+          $result['error'] = 'Error change orders: empty param';
         }
       }
       break;
