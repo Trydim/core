@@ -231,11 +231,12 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         }
 
         foreach ($ordersIds as $id) {
-          isset($userId) && $param[$id]['user_id'] = $userId;
-          isset($customerId) && $param[$id]['customer_id'] = $customerId;
-          isset($orderTotal) && $param[$id]['total'] = $orderTotal;
-          isset($total) && $param[$id]['total'] = $total;
+          isset($userId)         && $param[$id]['user_id']     = $userId;
+          isset($customerId)     && $param[$id]['customer_id'] = $customerId;
+          isset($orderTotal)     && $param[$id]['total']       = $orderTotal;
+          isset($total)          && $param[$id]['total']       = $total;
           isset($importantValue) && $param[$id]['important_value'] = isset($orderId) ? addCpNumber($orderId, $importantValue) : $importantValue;
+          isset($saveValue)      && $param[$id]['save_value']  = $saveValue;
           if ($statusId) $param[$id]['status_id'] = $statusId;
         }
 
@@ -259,7 +260,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
         if (isset($ordersFilter['userId'])) $ordersFilter = 'user_id = ' . $ordersFilter['userId'];
         else if (isset($ordersFilter['customerId'])) $ordersFilter = 'customer_id = ' . $ordersFilter['customerId'];
-        else if (isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', $ordersFilter['statusId']);
+        else if ($statusId = isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
 
         $result['countRows'] = $db->getCountRows('orders', $ordersFilter);
       } //

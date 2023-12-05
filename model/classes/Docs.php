@@ -36,6 +36,11 @@ class Docs {
   private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $dealImgPath;
 
   /**
+   * @var array
+   */
+  private $domFooter = [];
+
+  /**
    * @var object
    */
   private $docs;
@@ -171,11 +176,12 @@ class Docs {
           $this->docs->setPaper('A4', $this->pdfParam['orientation'] === 'P' ? 'portrait' : 'landscape');
 
           //$this->docs->getOptions()->setDebugLayout(true);
+          //$this->docs->getOptions()->setDebugLayoutBlocks(true);
           //$this->docs->getOptions()->setDebugPng(true);
           $this->docs->getOptions()->setIsRemoteEnabled(true);
           $this->docs->getOptions()->setIsPhpEnabled(true);
 
-          $this->docs->loadHtml('<style>' . ($this->styleContent ?? '') . '</style>' . $this->content);
+          $this->docs->loadHtml('<html><head><style>' . ($this->styleContent ?? '') . '</style></head><body>' . $this->content . '</body></html>');
         } catch (\Mpdf\MpdfException $e) {
           echo $e->getMessage();
         }
@@ -278,6 +284,11 @@ class Docs {
     switch ($this->pdfLibrary) {
       case 'dompdf':
         $this->docs->render();
+
+        foreach ($this->domFooter as $t) {
+          $font = $this->docs->getFontMetrics()->getFont($t['font'], "normal");
+          $this->docs->getCanvas()->page_text($t['x'], $t['y'], $t['text'], $font, $t['size'], $t['color'], $t['word_space'], $t['char_space'] ,$t['angle']);
+        }
 
         if ($dest === 'save') {
           file_put_contents($path . $this->fileName, $this->docs->output());
@@ -423,6 +434,60 @@ class Docs {
         $this->docs->writeSheetRow($sheetName, $row);
       }
     }
+  }
+
+  /**
+   * Writes text at the specified x and y coordinates on every page.
+   *
+   * The strings '{PAGE_NUM}' and '{PAGE_COUNT}' are automatically replaced
+   * with their current values.
+   *
+   * @param float  $x
+   * @param float  $y
+   * @param string $text       The text to write
+   * @param string $font       The font file to use
+   * @param float  $size       The font size, in points
+   * @param array  $color      Color array in the format `[r, g, b, "alpha" => alpha]`
+   *                           where r, g, b, and alpha are float values between 0 and 1
+   * @param float  $word_space Word spacing adjustment
+   * @param float  $char_space Char spacing adjustment
+   * @param float  $angle      Angle to write the text at, measured clockwise starting from the x-axis
+   * */
+  public function setFooter(float $x, float $y, string $text, $font = 'Helvetica', $size = 16.0, $color = [0, 0, 0], $word_space = 0.0, $char_space = 0.0, $angle = 0.0) {
+    $this->domFooter[] = [
+      'x'     => $x,
+      'y'     => $y,
+      'text'  => $text,
+      'font'  => $font,
+      'size'  => $size,
+      'color' => $color,
+      'word_space' => $word_space,
+      'char_space' => $char_space,
+      'angle'      => $angle,
+    ];
+  }
+
+  /**
+   * Add bottom page counter
+   * @param string $position
+   * @param string $template -
+   * @param float  $size       The font size, in points
+   */
+  public function addPageCounter($position = 'right', $template = '{PAGE_NUM} / {PAGE_COUNT}', $size = 12.0) {
+    $isPortrait = $this->pdfOrientation === 'P';
+    $getX = function ($x) use ($isPortrait) { return round($x / 100 * ($isPortrait ? 612 : 792)); };
+    $getY = function ($y) use ($isPortrait) { return round($y / 100 * ($isPortrait ? 792 : 612)); };
+
+    switch ($position) {
+      default: case 'left':
+        $x = $getX(3);  $y = $getY(90);
+        break;
+      case 'right':
+        $x = $getX(97); $y = $getY(90);
+        break;
+    }
+
+    $this->setFooter($x, $y, $template, 'Helvetica', $size);
   }
 
   /**

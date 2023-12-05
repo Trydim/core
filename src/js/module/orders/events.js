@@ -387,16 +387,9 @@ export default class extends Orders {
     const target = e.target,
           action = target.dataset.action;
 
-    const select = {
-      'filterDealer': () => this.filterChange(target),
-      'filterUsers': () => this.filterChange(target),
-      'filterCustomers': () => this.filterCustomers(target),
-      'statusOrders': () => this.changeSelectInput(target),
-    };
-
-    select[action] && select[action]();
+    this[action] && this[action](target);
   }
-  filterChange(target) {
+  /*filterChange(target) {
     const id = target.value,
           dealerPath = f.SITE_PATH + 'dealer/' + id + '/';
 
@@ -407,7 +400,7 @@ export default class extends Orders {
     this.toggleDisableBtn(+id);
 
     this.query(+id ? dealerPath : undefined);
-  }
+  }*/
   filterCustomers(target) {
     this.queryParam.mode = 'DB';
     this.queryParam.dbAction = this.mainAction;
@@ -419,7 +412,7 @@ export default class extends Orders {
     this.query();
   }
 
-  changeSelectInput(target) {
+  statusOrders(target) {
     this.queryParam.statusId = target.value;
   }
   changeEmailInput(e) {
