@@ -16,6 +16,8 @@ const getCustomElements = () => new Promise(resolve => {
 });
 
 const templatePopup = pr => {
+  if (typeof window._ !== 'function') window._ = v => v;
+
   return `
     <div class="${pr}modal-overlay">
       <div class="${pr}modal" data-role="window">

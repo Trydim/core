@@ -200,10 +200,9 @@ export default class {
 
   initSocket() {
     const connectIcon = f.gI('wsConnectIcon'),
-          wsUri  = 'ws://dev.vistegra.by:2346',
-          socketKey = 'orders' + f.random(10000, 100000);
-
-    let ws = this.websocket = new WebSocket(wsUri + '?key=' + socketKey);
+          wsUri       = 'ws://' + location.host + ':2346',
+          socketKey   = 'orders' + f.random(10000, 100000),
+          ws = this.websocket = new WebSocket(wsUri + '?key=' + socketKey);
 
     ws.onopen = () => f.show(connectIcon);
     ws.onclose = () => f.hide(connectIcon);
@@ -220,7 +219,7 @@ export default class {
           break;
       }
     };
-    ws.onerror = () => console.error('Socket connect error');
+    ws.onerror = () => console.warn('Socket connect error');
   }
 
   query(action) {
@@ -238,7 +237,8 @@ export default class {
     this.loaderTable.start();
     f.Post({data}).then(data => {
       if (param.dbAction === 'changeStatusOrder') {
-        this.websocket.send(JSON.stringify({mode: param.dbAction}));
+        const ws = this.websocket;
+        ws.readyState === ws.OPEN && ws.send(JSON.stringify({mode: param.dbAction}));
       }
 
       if (this.needReload) {
