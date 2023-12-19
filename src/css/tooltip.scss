@@ -2,7 +2,6 @@
   position: relative;
   display: flex;
   justify-content: center;
-  cursor: pointer;
 
   .content-wrapper {
     position: absolute;
@@ -32,14 +31,15 @@
     opacity: .5;
     transition: opacity .3s ease-in-out;
   }
+}
+
+td:has(.comment) {
+  cursor: pointer;
 
   &:hover {
-    & .content-wrapper {
-      visibility: visible;
-      opacity: 1;
-    }
-
+    & .content-wrapper,
     & .comment__icon {
+      visibility: visible;
       opacity: 1;
     }
   }

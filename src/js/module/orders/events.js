@@ -328,6 +328,7 @@ export default class extends Orders {
 
   setupColumns() {
     const form = f.gTNode('#orderColumnsTableTmp');
+    const toRemove = ['startShippingDate', 'endShippingDate', 'importantValue', 'customerId', 'statusId']
 
     this.queryParam.mode      = 'setting';
     this.queryParam.dbAction  = 'saveColumns';
@@ -336,6 +337,9 @@ export default class extends Orders {
     this.config.ordersColumns.forEach(key => {
       form.querySelector(`[name="${key['dbName']}"]`).checked = true;
     });
+
+    // удаление эл-тов из заказов, так себе
+    toRemove.forEach(item => form.querySelector(`[name="${item}"]`).closest('.input-group').style.display = 'none')
 
     form.oninput = () => {
       this.queryParam.columns = JSON.stringify([...new FormData(form).keys()]);
