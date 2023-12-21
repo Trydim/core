@@ -487,7 +487,7 @@ function translit($value): string {
 
 /**
  * @param string $url
- * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'auth', 'contentType'
+ * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'auth', 'contentType', 'timeout'
  * @param string|array<string, string> $params - assoc array
  * @return string|array
  */
@@ -498,6 +498,7 @@ function httpRequest(string $url, array $config = [], $params = []) {
     CURLOPT_URL => $url,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER => [],
+    CURLOPT_TIMEOUT => $config['timeout'] ?? 45,
   ];
 
   if (isset($config['auth'])) {
@@ -517,14 +518,19 @@ function httpRequest(string $url, array $config = [], $params = []) {
   curl_setopt_array($myCurl, $curlConfig);
   $response = curl_exec($myCurl);
 
-  if ($response === false) return curl_error($myCurl);
+  if ($error = $response === false) {
+    $response = [
+      'code' => curl_getinfo($myCurl, CURLINFO_HTTP_CODE),
+      'error' => curl_error($myCurl),
+    ];
+  }
 
   curl_close($myCurl);
 
-  if (($config['json'] ?? true) === true) {
-    $res   = json_decode($response, $config['json_assoc'] ?? true);
-    $error = json_last_error();
-    return $error === 0 ? $res : 'Json error: ' . $response;
+  if ($error === false && ($config['json'] ?? true) === true) {
+    $res = json_decode($response, $config['json_assoc'] ?? true);
+
+    return json_last_error() === JSON_ERROR_NONE ? $res : 'Json error: ' . $response;
   }
 
   return $response;

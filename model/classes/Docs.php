@@ -246,12 +246,12 @@ class Docs {
     $fullPath = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $path;
 
     if (file_exists($fullPath)) {
-      $this->styleContent = file_get_contents($path);
+      $this->styleContent = file_get_contents($fullPath);
     } else {
       $fullPath = $this->main->url->getBasePath(true) . $path;
 
       if (file_exists($fullPath)) {
-        $this->styleContent = file_get_contents($path);
+        $this->styleContent = file_get_contents($fullPath);
       }
     }
   }

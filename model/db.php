@@ -699,8 +699,8 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $user = json_decode($authForm ?? '[]', true);
 
       $haveName = $db->selectQuery('users', 'ID', ' login = "' . $user['login'] . '"');
-      if (count($haveName) > 1) {
-        $result['error'] = 'login_exits';
+      if (count($haveName) > 0) {
+        $result['error'] = 'login_exist';
         break;
       }
 
@@ -725,7 +725,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if (count($usersId) === 1) {
           $haveName = $db->selectQuery('users', ['ID', 'login'], ' login = "' . $authForm['login'] . '"');
           if (count($haveName) && $haveName[0]['ID'] !== $usersId[0]) {
-            $result['error'] = 'login_exits';
+            $result['error'] = 'login_exist';
             break;
           }
         }
