@@ -35,7 +35,7 @@ class Mail {
    */
   private $main;
 
-  private $mailTpl, $body = '', $docPath = '', $pdfFileName = '';
+  private $mailTpl, $body = '', $docPath = [], $pdfFileName = [];
   private $mailTarget;
   private $subject, $fromName;
   private $otherMail       = [];
@@ -70,18 +70,25 @@ class Mail {
    * @param array $array
    */
   public function prepareMail(array $array = []): void {
+    $path = "public/views/docs/$this->mailTpl.php";
+
     extract($array);
     ob_start();
 
-    // Шаблон в public
-    if (file_exists(ABS_SITE_PATH . "public/views/docs/$this->mailTpl.php"))
-      include ABS_SITE_PATH . "public/views/docs/$this->mailTpl.php";
-    else if (file_exists($this->mailTpl)) include $this->mailTpl;
-    else {
+    do {
+      // dealer template
+      $prefPath = $this->main->url->getPath(true) . $path;
+      if (file_exists($prefPath)) {include $prefPath; break;}
+      // public template
+      $prefPath = $this->main->url->getBasePath(true) . $path;
+      if (file_exists($prefPath)) {include $prefPath; break;}
+      // absolute path
+      if (file_exists($this->mailTpl)) {include $this->mailTpl; break;}
+      // default template
       ob_clean();
       $this->body = $this->getDefaultTemplate();
-      return;
-    }
+    } while (false);
+
     $this->body = ob_get_clean();
   }
 
@@ -93,10 +100,11 @@ class Mail {
   }
 
   /**
-   * @param array $emails
+   * @param string|array $emails
    */
-  public function addMail(array $emails): void {
-    if (!empty($emails)) $this->otherMail = array_merge($this->otherMail, $emails);
+  public function addMail($emails): void {
+    if (is_string($emails)) $this->otherMail[] = $emails;
+    else if (!empty($emails)) $this->otherMail = array_merge($this->otherMail, $emails);
   }
 
   /**
@@ -105,8 +113,8 @@ class Mail {
    */
   public function addFile(string $docPath, string $fileName = '') {
     $fileName = !empty($fileName) ? $fileName : basename($docPath);
-    $this->docPath = $docPath;
-    $this->pdfFileName = empty($fileName) ? uniqid() . '.pdf' : $fileName;
+    $this->docPath[] = $docPath;
+    $this->pdfFileName[] = empty($fileName) ? uniqid() . '.pdf' : $fileName;
   }
 
   public function addOtherFile($files) {
@@ -167,9 +175,12 @@ class Mail {
       $mail->AltBody = 'Тестовое сообщение.';
 
       // Attachment files
-      if (is_file($this->docPath)) {
-        $mail->addAttachment($this->docPath, $this->pdfFileName);
-        $resource = [$this->docPath];
+      $resource = [];
+      foreach ($this->docPath as $index => $filePath) {
+        if (is_file($filePath)) {
+          $mail->addAttachment($filePath, $this->pdfFileName[$index]);
+          $resource[] = $filePath;
+        }
       }
 
       // Other Files
