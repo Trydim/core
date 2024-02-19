@@ -294,11 +294,11 @@ export default {
     getTablePropertyValue(v) {
       let html = `<div class="grid" style="--bs-columns: ${v[0].length}; grid-gap: 0.1rem;">`;
 
-      v.forEach(r => r.forEach(c => {
-        html += '<div class="border text-center text-nowrap overflow-hidden" style="max-width: 200px">' + c + '</div>';
+      Array.isArray(v) && v.forEach(r => r.forEach(c => {
+        html += '<div class="border text-center text-nowrap overflow-hidden" style="max-width: 200px">' + (c || '') + '</div>';
       }));
 
-      return {escape: true, value: html + '</div>', /*hideDelay: 30000*/};
+      return {escape: false, value: html + '</div>', /*hideDelay: 30000*/};
     },
     setProperty() {
       const de = this.dealer;

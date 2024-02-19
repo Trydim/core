@@ -21,7 +21,7 @@ define('MAIL_PORT', $main->getCmsParam('MAIL_PORT') ?? 465);
 
 define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.mail.ru');
 define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'mail.common@list.ru');
-define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'Ea4uUCnzBBN269wDJWUx');
+define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'eTp1Mh13HrsET3qatEdg');
 
 /*
 define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.yandex.ru');

@@ -1,11 +1,13 @@
 'use strict';
 
-export default class {
+export default class User {
   constructor(selector = '#dataUser') {
     if (!selector) return {};
 
     let node = typeof selector === 'string' ? f.qS(selector) : selector,
         data;
+
+    if (typeof User.instance === 'object') return User.instance;
     if (!node || !node.value) {
       console.warn('class User node or value not found!');
       return {};
@@ -22,6 +24,7 @@ export default class {
     this.data = data;
     this.setSettings();
 
+    User.instance = this;
     node.remove();
   }
 
@@ -34,6 +37,7 @@ export default class {
             this.data.fields[id] = {value: this.data.fields[id], ...setting};
           }
         });
+
         clearInterval(interval);
       }
 

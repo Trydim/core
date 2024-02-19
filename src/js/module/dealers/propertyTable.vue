@@ -33,7 +33,7 @@ export default {
       handsontable: undefined,
 
       config: {
-        data: prop && prop.length ? prop : [new Array(this.prop.columns.length).fill('')],
+        data: Array.isArray(prop) && prop.length ? prop : [new Array(this.prop.columns.length).fill('')],
 
         rowHeaders   : true,
         dropdownMenu : true,
@@ -73,7 +73,7 @@ export default {
           /*else if (/#([a-fA-F]|\d){3,6}/.test(cell)) {
             res.type = 'color-picker';
           }*/
-          else res.type = isFinite(+(cell.toString().replace(',', '.'))) ? 'numeric' : 'text';
+          //else res.type = isFinite(+(cell.toString().replace(',', '.'))) ? 'numeric' : 'text';
 
           return res;
         },

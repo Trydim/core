@@ -487,7 +487,7 @@ class Docs {
         break;
     }
 
-    $this->setFooter($x, $y, $template, 'Helvetica', $size);
+    $this->setFooter($x, $y, $template, 'DejaVu Sans', $size);
   }
 
   /**

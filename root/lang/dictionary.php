@@ -35,6 +35,7 @@
   'Change status'   => 'Сменить статус',
   'Print'           => 'Печать',
   'Send mail'       => 'Отправить на почту',
+  'Activity'        => 'Активен',
 
   // CMS - settings
   // Mail
@@ -53,6 +54,7 @@
   'Phone'            => 'Телефон',
   'Prevent simultaneous login' => 'Запретить одновременный вход',
   // Permission
+  'Permission'     => 'Права',
   'Access control' => 'Доступ',
   'Add type'       => 'Добавить',
   'Access type'    => 'Тип доступа',
@@ -68,6 +70,15 @@
   // Rate
   'Exchange rates' => 'Курсы',
   'Automatically update rates' => 'Автообновлнение',
+  // Customers
+  'Changing a client' => 'Редактирование клиента',
+  'Individual' => 'Физ. лицо',
+  'Corporate'  => 'Юр. лицо',
+  'Address'    => 'Адрес',
+  'ITN'        => 'ИНН',
+  // Users
+  'Changing Users' => 'Редактирование пользователя',
+
   // Orders status
   'Statuses' => 'Статусы',
   'Setting order statuses' => 'Установка статусов заказов',
@@ -106,5 +117,6 @@
   'email'   => 'почта',
   'address' => 'адрес',
 
-  'printType1' => 'Печать',
+  'Deleted' => 'Удалено',
+  'Delete selected clients?' => 'Удалить выбранных?'
 ];
