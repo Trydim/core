@@ -2,22 +2,24 @@
 
 // Core Bootstrap
 //@import "bootstrap/bootstrap";
-@import "./bootstrap/bootstrap5.2.css";
+@import "./bootstrap/bootstrap5.2.css" layer(base);
 
-// Icons (prime)
-@import "icons/icons";
+@layer base {
+  // Icons (prime)
+  @import "icons/icons";
 
-// Theme
-@import './variable';
-@import "./admin/functions";
-@import "./admin/mixin";
-@import "./admin/abstracts/abstracts";
-@import "admin/utilities/utilities";
+  // Theme
+  @import './variable';
+  @import "./admin/functions";
+  @import "./admin/mixin";
+  @import "./admin/abstracts/abstracts";
+  @import "admin/utilities/utilities";
 
-@import "admin/preloader";
+  @import "admin/preloader";
 
-@import "admin/base/common";
+  @import "admin/base/common";
 
-@import "admin/layout/layout";
+  @import "admin/layout/layout";
 
-@import "admin/pages";
+  @import "admin/pages";
+}

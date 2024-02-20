@@ -1,7 +1,7 @@
 'use strict';
 
 import '../../../css/module/admindb/handsontable.min.css';
-import "../../libs/handsontable.full.min";
+import '../../libs/handsontable.full.min';
 
 import { createApp } from 'vue';
 import App from "./App.vue";

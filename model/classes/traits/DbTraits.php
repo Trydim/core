@@ -327,7 +327,7 @@ trait DbUsers {
 
     $sql .= $this->getPaginatorQuery($pageParam);
 
-    return self::getAll($sql);
+    return $this->jsonParseField(self::getAll($sql));
   }
 
   public function setUserHash($loginId, $hash) {

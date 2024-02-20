@@ -9,6 +9,7 @@ $field['content'] = template('parts/usersContent', $param);
 
 // Users/Manager custom field
 $managerFieldHtml = '';
+$managerField = [];
 foreach ($param['managerField'] as $k => $item) {
   $rndId = uniqid();
   switch ($item['type']) {
@@ -39,11 +40,16 @@ foreach ($param['managerField'] as $k => $item) {
       break;
     case 'csvTable':
       $o = $item['options'];
-      $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $item['options']['table']);
+      $managerField[$k] = [];
+      $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $o['table']);
 
       $input = '<select name="' . $k . '" class="form-select">';
       foreach ($data as $row) {
-        $input .= '<option value="' . $row[$o['saveKey']] . '">' . $row[$o['showKey']] . '</option>';
+        $dK = $row[$o['saveKey']];
+        $dV = $row[$o['showKey']];
+
+        $managerField[$k][$dK] = $dV;
+        $input .= '<option value="' . $dK . '">' . $dV . '</option>';
       }
       $input .= '</select>';
 
@@ -55,9 +61,11 @@ foreach ($param['managerField'] as $k => $item) {
   $managerFieldHtml .= '<div class="form-floating managerField mb-3">' . $input .
                        '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
 }
-unset($managerField, $k, $item, $rndId, $data, $o, $row, $input);
+unset($k, $dK, $dV, $item, $rndId, $data, $o, $row, $input);
 
-$field['footerContent'] .= '
+$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataManagerField' value='" . json_encode($managerField) . "'>";
+
+$field[VC::BASE_FOOTER_CONTENT] .= '
 <template id="permission">
   <option value="${ID}">${name}</option>
 </template>
@@ -123,4 +131,5 @@ $field['footerContent'] .= '
   </form>
 </template>';
 
-$field['footerContent'] .= $main->initDictionary();
+$field[VC::BASE_FOOTER_CONTENT] .= $main->initDictionary();
+

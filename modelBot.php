@@ -66,7 +66,6 @@ switch ($action) {
 
       $db->setPrefix($prefix);
       foreach ($db->loadUsers($pagerParam) as $user) {
-        $contacts = json_decode($user['contacts'] ?? '[]', true);
         $tgUsername = trim($contacts['telegramUsername'] ?? '');
 
         if ($tgUsername === $username) {
@@ -89,8 +88,8 @@ switch ($action) {
       'dbPass'     => 'WHZM4JpunONGycm'
     ];
     $db->addDb('maker', $dbMakerConfig)->selectDb('maker')->setPrefix('');
+
     foreach ($db->loadUsers($pagerParam) as $user) {
-      $contacts = json_decode($user['contacts'] ?? '[]', true);
       $tgUsername = str_replace('@', '', trim($contacts['telegramUsername'] ?? ''));
 
       if ($tgUsername === $username) {

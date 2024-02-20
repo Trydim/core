@@ -33,6 +33,8 @@ const users = {
     this.table   = f.qS('#usersTable');
     this.confirm = f.qS('#confirmField');
 
+    this.managerField = f.getData('#dataManagerField');
+
     this.p = new f.Pagination( '#paginator',{
       dbAction : 'loadUsers',
       sortParam: this.queryParam,
@@ -67,29 +69,21 @@ const users = {
       }
 
       if (item['contacts']) {
-        let value = '';
+        let arr = Object.entries(item['contacts']).map(([key, value]) => {
+          return {
+            key  : _(key),
+            value: this.managerField[key] ? this.managerField[key][value] : value
+          };
+        });
 
-        try {
-          value = JSON.parse(item['contacts']);
-          item['contactsParse'] = value;
-          if(Object.values(value).length) {
-            let arr = Object.entries(value).map(([key, value]) => {
-              return {key: _(key), value};
-            });
-            value = f.replaceTemplate(this.contValue, arr);
-          } else value = '';
-        }
-        catch (e) { console.log(`Заказ ID: ${item['ID']} имеет не правильное значение`); }
-        item['contacts'] = value;
+        item['contacts'] = f.replaceTemplate(this.contValue, arr);
       }
 
-      if(true /* TODO настройки вывода даты*/) {
-        for (let i in item) {
-          if(i.includes('date')) {
-            item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
-          }
-        }
+      //if (true /* TODO настройки вывода даты */) {
+      for (let i in item) {
+        if (i.includes('date')) item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
       }
+      //}
 
       return item;
     })
@@ -120,7 +114,7 @@ const users = {
 
     f.Post({data: this.form}).then(data => {
 
-      if(this.needReload) {
+      if (this.needReload) {
         this.needReload = false;
         this.selectedId = new Set();
         this.queryParam.dbAction = 'loadUsers';
@@ -128,12 +122,12 @@ const users = {
         this.query();
         return;
       } else {
-        this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
+        this.confirmMsg && f.showMsg(this.confirmMsg, data.status ? 'success' : 'error') && (this.confirmMsg = false);
       }
 
-      if(data['permissionUsers']) { this.setPermission(data['permissionUsers']); this.fillPermission(data['permissionUsers']); }
-      if(data['users']) { this.setUsers(data['users']); this.fillTable(data['users']); }
-      if(data['countRows']) this.p.setCountPageBtn(data['countRows']);
+      if (data['permissionUsers']) { this.setPermission(data['permissionUsers']); this.fillPermission(data['permissionUsers']); }
+      if (data['users']) { this.setUsers(data['users']); this.fillTable(data['users']); }
+      if (data['countRows']) this.p.setCountPageBtn(data['countRows']);
     });
   },
 

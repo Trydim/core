@@ -41,6 +41,7 @@ f.qS() | function | querySelector + поиск в shadowDom
 f.qA() | function | querySelectorAll + поиск в shadowDom. Быстрая установка свойств
 f.gT() | function | Получить шаблон как string
 f.gTNode() | function | Получить шаблон как node
+f.getData() | function | Дата из input[hidden] как есть
 f.getDataAsAssoc() | function | Дата из input[hidden] как объект
 f.getDataAsMap() | function | Дата из input[hidden] как Map
 f.getDataAsSet() | function | Дата из input[hidden] как Set

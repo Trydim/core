@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
-    <Button v-if="!false" type="button" class="btn btn-success" @click="addDealer">{{ $t('Add') }}</Button>
-    <Button v-if="false" type="button" class="ms-auto btn btn-danger" @click="deleteDealer">{{ $t('Delete') }}</Button>
+    <Button v-if="!false" type="button" @click="addDealer">{{ $t('Add') }}</Button>
+    <Button v-if="false" type="button" @click="deleteDealer">{{ $t('Delete') }}</Button>
   </div>
 
   <DataTable v-if="dealers.length"
@@ -63,7 +63,7 @@
   </DataTable>
 
   <div class="d-flex my-3">
-    <Button type="button" class="btn btn-warning" @click="changeDealer">Редактировать</Button>
+    <Button type="button" class="btn-warning" @click="changeDealer">Редактировать</Button>
   </div>
 
   <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
@@ -73,7 +73,7 @@
 
     <div v-if="queryParam.dbAction !== 'deleteDealer'" class="row" style="min-width: 500px; max-width: 80vw">
       <div class="col-6">
-        <!-- Наименование -->
+        <!-- Название -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Название:</span>
           <InputText class="p-inputtext-sm" v-model="dealer.name" autofocus></InputText>
@@ -165,7 +165,6 @@
 <script>
 
 import 'primevue/resources/themes/saga-blue/theme.css';
-import 'primevue/resources/primevue.css';
 
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
