@@ -1034,11 +1034,36 @@ class DbMain extends R {
     return false;
   }
 
-  public function loadDealers(): array {
+  public function loadDealers(bool $activity = false): array {
     $sql = "SELECT ID AS 'id', cms_param AS 'cmsParam', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 
+    if ($activity) $sql .= " WHERE activity <> 0";
+
     return $this->jsonParseField(self::getAll($sql));
+  }
+
+  public function loadDealersUsers(string $filter = ''): array {
+    $sql = '';
+
+    $dealers = $this->loadDealers(true);
+    $dealers = array_map(function ($dealer) {
+      return [
+        'id'     => $dealer['id'],
+        'prefix' => $dealer['cmsParam']['prefix'],
+      ];
+    }, $dealers);
+
+    foreach ($dealers as $dealer) {
+      $sql .= "UNION SELECT ID as 'id', name, login, password, "
+            . "'" . $dealer['id'] . "' as dealerId, "
+            . "'" . $dealer['prefix'] . "' as prefix "
+            . 'FROM ' . $dealer['prefix'] . 'users';
+    }
+
+    $sql .= ' WHERE ' . $filter;
+
+    return self::getAll(substr($sql, 6));
   }
 
   public function getDealerById(string $id): array {

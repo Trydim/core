@@ -299,7 +299,21 @@ trait DbUsers {
       return $this->getUserFromFile($login, $password);
     }
 
-    return count($user) && password_verify($password, $user['password']) ? $user : false;
+    if (count($user) && password_verify($password, $user['password'])) return $user;
+    if ($this->main->isDealer()) return false;
+
+    // User search by dealers
+    $dealersUsers = $this->loadDealersUsers("login = '$login'");
+    if (count($dealersUsers)) {
+      foreach ($dealersUsers as $user) {
+        if (password_verify($password, $user['password'])) {
+          $this->setPrefix($user['prefix']);
+          return $user;
+        }
+      }
+    }
+
+    return false;
   }
 
   public function changeUser($loginId, $param) {
