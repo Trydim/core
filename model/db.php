@@ -760,6 +760,21 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $db->deleteItem('users', $usersId);
       }
       break;
+    case 'loadUsersLogin':
+      $users = [];
+
+      $dealersUsers = $main->db->loadDealersUsers();
+      if (count($dealersUsers)) {
+        $users = array_map(function ($user) { return $user['login']; }, $dealersUsers);
+
+        if ($main->isDealer()) {
+          $main->db->togglePrefix();
+          $users = array_merge($users, $main->db->selectQuery('users', 'login'));
+        }
+      }
+
+      $result['users'] = $users;
+      break;
 
       // Files
     case 'uploadFiles':

@@ -28,16 +28,16 @@
         <span :data-id="slotProps.data.id">{{ slotProps.data.id }}</span>
       </template>
     </Column>
-    <Column field="name" :sortable="true" :header="this.$t('name')"></Column>
-    <Column field="contacts" :sortable="false" :header="this.$t('contacts')">
+    <Column field="name" :sortable="true" :header="this.$t('Name')"></Column>
+    <Column field="contacts" :sortable="false" :header="this.$t('Contacts')">
       <template #body="slotProps">
         <div v-if="slotProps.data.contacts.phone">{{ slotProps.data.contacts.phone }}</div>
         <div v-if="slotProps.data.contacts.email">{{ slotProps.data.contacts.email }}</div>
         <div v-if="slotProps.data.contacts.address">{{ slotProps.data.contacts.address }}</div>
       </template>
     </Column>
-    <Column field="registerDate" :sortable="false" :header="this.$t('register date')"></Column>
-    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" :header="this.$t('activity')" class="text-center">
+    <Column field="registerDate" :sortable="false" :header="this.$t('Register date')"></Column>
+    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" :header="this.$t('Activity')" class="text-center">
       <template #body="slotProps">
         <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
         <span v-else class="pi pi-times pi-red"></span>
@@ -47,13 +47,11 @@
       <template #body="slotProps">
         <template v-for="(value, key) of slotProps.data.settings" :key="key">
           <p v-if="getPropertyType(key) === 'bool'" class="m-0">
-            {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="{'pi-green pi-plus': value, 'pi-red pi-times': !value}"></i>
+            {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="value ? 'pi-green pi-plus' : 'pi-red pi-times'"></i>
           </p>
-          <template v-else-if="getPropertyType(key) === 'table'">
-            <p v-if="value.length" class="m-0 text-nowrap">
-              {{ getPropertyName(key) }}: <i class="pi pi-table" v-tooltip.left="getTablePropertyValue(value)"></i>
-            </p>
-          </template>
+          <TablePropertyValue v-else-if="getPropertyType(key) === 'table'"
+                              :name="getPropertyName(key)" :value="value"
+          ></TablePropertyValue>
           <p v-else class="m-0 text-nowrap">
             {{ getPropertyName(key) }}: {{ getPropertyValue(key, value) }}
           </p>
@@ -145,9 +143,8 @@
 
       <div class="col-12">
         <template v-for="(prop, key) of properties" :key="key">
-          <property-table v-if="prop.type === 'table'" :prop="prop" :dealer="dealer"
-                          @changed="changedTableProperty"
-          ></property-table>
+          <PropertyTable v-if="prop.type === 'table'" :prop="prop" :dealer="dealer" @changed="changedTableProperty"
+          ></PropertyTable>
         </template>
       </div>
     </div>
@@ -180,14 +177,16 @@ import MultiSelect from 'primevue/multiselect';
 import Calendar from 'primevue/calendar';
 
 import cloneDeep from 'lodash/clonedeep';
-import PropertyTable from "./propertyTable.vue";
+
+import TablePropertyValue from './TablePropertyValue.vue';
+import PropertyTable from "./PropertyTable.vue";
 
 export default {
   name: 'dealer',
   components: {
     Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar, Dropdown, MultiSelect,
     DataTable, Column,
-    PropertyTable,
+    TablePropertyValue, PropertyTable,
     Dialog,
   },
   data: () => ({
@@ -229,6 +228,7 @@ export default {
   computed: {
     properties() {
       return Object.entries(this.dealersProperties).reduce((r, [code, p]) => {
+        code = code.replace('prop_', '');
         p.code = code; r[code] = p; return r;
       }, Object.create(null));
     },
@@ -270,9 +270,7 @@ export default {
       else f.showMsg('Query set data error' + dataKey, 'error');
     },
     setModal(title, confirmDisabled) {
-      this.$nextTick(() => {
-        this.modal = {display: true, title, confirmDisabled};
-      });
+      this.$nextTick(() => this.modal = {display: true, title, confirmDisabled});
     },
     reload() {
       this.queryParam.dbAction = 'loadDealers';
@@ -289,15 +287,6 @@ export default {
       const res = this.properties[k] && this.properties[k].values && this.properties[k].values.filter(i => v.includes(i.id));
 
       return res ? res.map(i => i.name).join(', ') : v;
-    },
-    getTablePropertyValue(v) {
-      let html = `<div class="grid" style="--bs-columns: ${v[0].length}; grid-gap: 0.1rem;">`;
-
-      Array.isArray(v) && v.forEach(r => r.forEach(c => {
-        html += '<div class="border text-center text-nowrap overflow-hidden" style="max-width: 200px">' + (c || '') + '</div>';
-      }));
-
-      return {escape: false, value: html + '</div>', /*hideDelay: 30000*/};
     },
     setProperty() {
       const de = this.dealer;

@@ -106,6 +106,34 @@ const users = {
 
     f.gI('selectPermission').innerHTML = html;
   },
+  // Check unique login
+  loadAllLogins() {
+    f.Get({data: {mode: 'DB', cmsAction: 'loadUsersLogin'}})
+     .then(d => this.usersLogin = d.status ? d['users'] : []);
+  },
+  validLogin(form) {
+    const loginNode = form.querySelector('[name="login"]'),
+          btn = this.M.btnConfig;
+
+    if (!this.usersLogin) this.loadAllLogins();
+
+    loginNode.addEventListener('input', () => {
+      const isValid = !this.usersLogin.includes(loginNode.value),
+            cL = loginNode.parentElement.classList;
+
+      setTimeout(() => {
+        if (isValid) {
+          cL.add('cl-input-valid');
+          cL.remove('cl-input-error');
+          loginNode.title = '';
+        } else {
+          cL.add('cl-input-error');
+          cL.remove('cl-input-valid');
+          loginNode.title = 'Пользователь с таким логином существует';
+        }
+      }, 100);
+    })
+  },
 
   query() {
     Object.entries(this.queryParam).map(param => {
@@ -171,6 +199,7 @@ const users = {
 
     new f.Valid({form});
 
+    this.validLogin(form);
     this.confirmMsg = _('New user added');
     this.M.show(_('Add new user'), form);
     return form;
@@ -194,7 +223,7 @@ const users = {
     else node.value = 1;
 
     node = form.querySelector('[name="login"]');
-    if (oneElements) node.value = users['login'];
+    if (oneElements) this.currentUserLogin = node.value = users['login'];
     else node.parentNode.remove();
 
     form.querySelector('[name="password"]').parentNode.remove();
@@ -225,6 +254,7 @@ const users = {
 
     new f.Valid({form});
 
+    this.validLogin(form);
     this.confirmMsg = _('Changes saved');
     this.M.show(_('Changing Users'), form);
     return form;

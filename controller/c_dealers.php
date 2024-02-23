@@ -8,11 +8,9 @@ if (includes($main->url->getRequestUri(), 'update')) {
   $start = time();
   $msg = gTxt('dealers') . ':<br>';
 
-  foreach ($main->db->loadDealers() as $dealer) {
-    if (boolValue($dealer['activity'] ?? false)) {
-      $main->dealer->update($dealer['id']);
-      $msg .= $dealer['name'] . '<br>';
-    }
+  foreach ($main->db->loadDealers(true) as $dealer) {
+    $main->dealer->update($dealer['id']);
+    $msg .= $dealer['name'] . '<br>';
   }
 
   $main->response->setContent($msg . '<br>The Updated is completed in ' . (time() - $start) . ' sec!');

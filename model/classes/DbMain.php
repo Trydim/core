@@ -1007,6 +1007,27 @@ class DbMain extends R {
   // Dealers
   //--------------------------------------------------------------------------------------------------------------------
 
+  private function parseDealerSettings(array $dealers) {
+    $properties = new Properties($this->main, 'dealer');
+
+    $this->togglePrefix();
+    foreach ($dealers as &$dealer) {
+      $settings = [];
+      $dealer['settings'] = $dealer['settings'] ?? [];
+
+      foreach ($dealer['settings'] as $prop => $value) {
+        [$propName, $propValue] = $properties->getValue($prop, $value);
+        $settings[$propName] = $propValue;
+      }
+
+      $dealer['settings'] = $settings;
+    }
+    $this->togglePrefix();
+
+    return $dealers;
+  }
+
+
   /**
    * @return bool true if it was set
    */
@@ -1040,10 +1061,16 @@ class DbMain extends R {
 
     if ($activity) $sql .= " WHERE activity <> 0";
 
-    return $this->jsonParseField(self::getAll($sql));
+    $dealers = $this->jsonParseField(self::getAll($sql));
+    return $this->parseDealerSettings($dealers);
   }
 
-  public function loadDealersUsers(string $filter = ''): array {
+  /**
+   * Load all users by all dealers
+   * @param string $login
+   * @return array
+   */
+  public function loadDealersUsers(string $login = ''): array {
     $sql = '';
 
     $dealers = $this->loadDealers(true);
@@ -1061,14 +1088,15 @@ class DbMain extends R {
             . 'FROM ' . $dealer['prefix'] . 'users';
     }
 
-    $sql .= ' WHERE ' . $filter;
+    $sql = substr($sql, 6) . ' WHERE activity = 1';
 
-    return self::getAll(substr($sql, 6));
+    if ($login) $sql .= ' AND login = :login';
+
+    return self::getAll($sql, [':login' => $login]);
   }
 
-  public function getDealerById(string $id): array {
-    $settings = [];
-    $properties = new Properties($this->main, 'dealer');
+  public function getDealerById(string $id = null): array {
+    $id = $id ?? $this->main->getCmsParam('dealerId');
 
     $sql = "SELECT ID AS 'id', name, contacts,
                    register_date AS 'registerDate', activity, settings
@@ -1077,15 +1105,6 @@ class DbMain extends R {
 
     $dealer = $this->jsonParseField(self::getRow($sql, [':id' => $id]));
 
-    $this->togglePrefix();
-    $dealer['settings'] = $dealer['settings'] ?? [];
-    foreach ($dealer['settings'] as $prop => $value) {
-      [$propName, $propValue] = $properties->getValue($prop, $value);
-      $settings[$propName] = $propValue;
-    }
-    $dealer['settings'] = $settings;
-    $this->togglePrefix();
-
-    return $dealer;
+    return $this->parseDealerSettings([$dealer])[0];
   }
 }

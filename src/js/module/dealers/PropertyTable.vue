@@ -12,7 +12,7 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 
 export default {
-  name: 'property-table',
+  name: 'PropertyTable',
   components: {Accordion, AccordionTab},
   props: {
     prop: {

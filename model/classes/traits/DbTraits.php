@@ -303,7 +303,7 @@ trait DbUsers {
     if ($this->main->isDealer()) return false;
 
     // User search by dealers
-    $dealersUsers = $this->loadDealersUsers("login = '$login'");
+    $dealersUsers = $this->loadDealersUsers($login);
     if (count($dealersUsers)) {
       foreach ($dealersUsers as $user) {
         if (password_verify($password, $user['password'])) {

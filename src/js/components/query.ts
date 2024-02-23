@@ -89,7 +89,8 @@ export default {
    * @return {Promise<Response>}
    * @constructor
    */
-  Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}: {url: string, data?: string, type?: string}) => query(url + '?' + data, null, type),
+  Get: ({url = f.MAIN_PHP_PATH, data, type = 'json'}: {url: string, data?: string, type?: string}) =>
+    query(url + '?' + (typeof data === 'string' ? data : (new URLSearchParams(data)).toString()), null, type),
 
   /**
    * Fetch Post

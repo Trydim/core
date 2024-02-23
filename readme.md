@@ -88,3 +88,5 @@ f.SelectedRow() | class | Выделение строк (например для
 f.showMsg() | function | Показать сообщение
 f.Valid() | class | Валидация форм + загрузка файлов
 f.User() | class | Вся информация о текущем пользователе.
+f.Get() | function | Запрос
+f.Post() | function | Запрос

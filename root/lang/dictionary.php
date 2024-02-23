@@ -64,6 +64,8 @@
   'Available'       => 'Доступные',
   'Cancel deletion'    => 'Отменить удаление',
   'Delete access type' => 'Удалить тип доступа',
+  // Dealer
+  'Value is not valid' => 'Значение не верное',
   // Manager settings
   'Manager settings' => 'Менеджеры',
   'Additional fields for managers' => 'Дополнительные поля',
