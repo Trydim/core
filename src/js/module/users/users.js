@@ -1,17 +1,29 @@
 'use strict';
 
+const node = {
+  table  : undefined,
+  tRow   : undefined,
+  confirm: undefined,
+};
+const tmp = {
+  form    : undefined,
+  contacts: undefined,
+}
+
+const data = {
+  usersList: new Map(),
+  managerField: {},
+  usersLogin: [], // Не безопастно
+  currentLogin: '',
+}
+
 const users = {
   form: new FormData(),
 
   needReload: false,
-  tbody: '',
   impValue: '',
 
   confirmMsg: false,
-
-  tmp: {
-    form: f.gTNode('#userForm'),
-  },
 
   queryParam: {
     mode        : 'DB',
@@ -25,24 +37,22 @@ const users = {
   },
 
   delayFunc: () => {},
-  //statusList: Object.create(null), // Типы доступов
-
-  usersList: new Map(),
 
   init() {
-    this.table   = f.qS('#usersTable');
-    this.confirm = f.qS('#confirmField');
+    const table = node.table = f.qS('#usersTable');
 
-    this.managerField = f.getData('#dataManagerField');
+    tmp.form = f.gTNode('#userForm');
+
+    data.managerField = f.getData('#dataManagerField');
 
     this.p = new f.Pagination( '#paginator',{
       dbAction : 'loadUsers',
       sortParam: this.queryParam,
       query: this.query.bind(this),
     });
-    this.id = new f.SelectedRow({table: this.table});
+    this.id = new f.SelectedRow({table});
     new f.SortColumns({
-      thead: this.table.querySelector('thead'),
+      thead: table.querySelector('thead'),
       query: this.query.bind(this),
       dbAction : 'loadUsers',
       sortParam: this.queryParam,
@@ -53,15 +63,11 @@ const users = {
     this.onEvent();
   },
 
-  setUsers(data) {
-    this.usersList = new Map();
-    data.forEach(i => this.usersList.set(i['ID'], i));
-  },
-  fillTable(data) {
-    this.contValue || (this.contValue = f.gT('#tableContactsValue'));
-    data = data.map(item => {
-      item['permissionName'] = _(item['permissionName']);
+  setUsers(users) { users.forEach(i => data.usersList.set(i['ID'], i)); },
+  fillTable(users) {
+    const contactsTmp = tmp.contacts || (tmp.contacts = f.gT('#tableContactsValue'));
 
+    users = users.map(item => {
       if (item.activity) {
         item.activityValue = !!+item.activity;
         item.activity = item.activityValue ? 'check' : 'times';
@@ -72,11 +78,12 @@ const users = {
         let arr = Object.entries(item['contacts']).map(([key, value]) => {
           return {
             key  : _(key),
-            value: this.managerField[key] ? this.managerField[key][value] : value
+            value: data.managerField[key] ? data.managerField[key][value] : value
           };
         });
 
-        item['contacts'] = f.replaceTemplate(this.contValue, arr);
+        item['contactsParse'] = item['contacts'];
+        item['contacts'] = f.replaceTemplate(contactsTmp, arr);
       }
 
       //if (true /* TODO настройки вывода даты */) {
@@ -88,51 +95,32 @@ const users = {
       return item;
     })
 
-    let html  = '';
-    this.tbody || (this.tbody = this.table.querySelector('tbody tr').outerHTML);
-    html += f.replaceTemplate(this.tbody, data);
-    this.table.querySelector('tbody').innerHTML = html;
+    const tRow = node.tRow || (node.tRow = node.table.querySelector('tbody tr').outerHTML);
+    node.table.querySelector('tbody').innerHTML = f.replaceTemplate(tRow, users);
   },
 
   setPermission(data) {
     this.permissionList = new Map();
     data.forEach(i => this.permissionList.set(i['ID'], i));
   },
-  // Заполнить статусы
+
   fillPermission(data) {
-    let tmp = f.gT('#permission'), html  = '';
-
-    html += f.replaceTemplate(tmp, data);
-
-    f.gI('selectPermission').innerHTML = html;
+    f.gI('selectPermission').innerHTML = f.replaceTemplate(f.gT('#permission'), data);
   },
   // Check unique login
   loadAllLogins() {
     f.Get({data: {mode: 'DB', cmsAction: 'loadUsersLogin'}})
-     .then(d => this.usersLogin = d.status ? d['users'] : []);
+     .then(d => data.usersLogin = d.status ? d['users'] : []);
   },
-  validLogin(form) {
-    const loginNode = form.querySelector('[name="login"]'),
-          btn = this.M.btnConfig;
+  validLogin(form, validator) {
+    const loginNode = form.querySelector('[name="login"]');
 
-    if (!this.usersLogin) this.loadAllLogins();
+    if (!data.usersLogin.length) this.loadAllLogins();
 
-    loginNode.addEventListener('input', () => {
-      const isValid = !this.usersLogin.includes(loginNode.value),
-            cL = loginNode.parentElement.classList;
+    validator.countNodes += 1;
+    if (data.currentLogin) validator.setValidated(loginNode);
 
-      setTimeout(() => {
-        if (isValid) {
-          cL.add('cl-input-valid');
-          cL.remove('cl-input-error');
-          loginNode.title = '';
-        } else {
-          cL.add('cl-input-error');
-          cL.remove('cl-input-valid');
-          loginNode.title = 'Пользователь с таким логином существует';
-        }
-      }, 100);
-    })
+    loginNode.addEventListener('input', () => this.inputLogin(loginNode, validator));
   },
 
   query() {
@@ -141,10 +129,8 @@ const users = {
     })
 
     f.Post({data: this.form}).then(data => {
-
       if (this.needReload) {
         this.needReload = false;
-        this.selectedId = new Set();
         this.queryParam.dbAction = 'loadUsers';
         this.queryParam.usersId = '[]';
         this.query();
@@ -161,6 +147,22 @@ const users = {
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
+  inputLogin: (loginNode, validator) => {
+    let login = loginNode.value,
+        haveLogin = data.usersLogin.includes(login),
+        sameLogin = data.currentLogin && login === data.currentLogin,
+        toShort   = login.length < 3;
+
+    if ((haveLogin && !sameLogin) || toShort) {
+      validator.setErrorValidate(loginNode);
+      loginNode.title = haveLogin ? 'Пользователь с таким логином существует' : 'Логин слишком короткий';
+    } else {
+      validator.setValidated(loginNode);
+      loginNode.title = '';
+    }
+
+    validator.checkConfirmBtn();
+  },
 
   // кнопки открыть закрыть и т.д.
   actionBtn(e) {
@@ -194,12 +196,12 @@ const users = {
   },
 
   addUser() {
-    const form = this.tmp.form.cloneNode(true);
+    const form = tmp.form.cloneNode(true);
     form.querySelector('#changeField').remove();
 
-    new f.Valid({form});
+    data.currentLogin = '';
+    this.validLogin(form, new f.Valid({form}));
 
-    this.validLogin(form);
     this.confirmMsg = _('New user added');
     this.M.show(_('Add new user'), form);
     return form;
@@ -208,9 +210,9 @@ const users = {
     if (!this.id.getSelectedSize()) { f.showMsg(_('Please select at least 1 user'), 'error'); return; }
 
     let oneElements = this.id.getSelectedSize() === 1, node,
-        id = this.id.getSelected(),
-        users = this.usersList.get(id[0]),
-        form = this.tmp.form.cloneNode(true);
+        id    = this.id.getSelected(),
+        users = data.usersList.get(id[0]),
+        form  = tmp.form.cloneNode(true);
 
     this.queryParam.usersId = JSON.stringify(id);
 
@@ -223,7 +225,7 @@ const users = {
     else node.value = 1;
 
     node = form.querySelector('[name="login"]');
-    if (oneElements) this.currentUserLogin = node.value = users['login'];
+    if (oneElements) data.currentLogin = node.value = users['login'];
     else node.parentNode.remove();
 
     form.querySelector('[name="password"]').parentNode.remove();
@@ -252,9 +254,8 @@ const users = {
     node = form.querySelector('[name="activity"]');
     node.checked = oneElements ? users.activityValue : true;
 
-    new f.Valid({form});
+    if (oneElements) this.validLogin(form, new f.Valid({form}));
 
-    this.validLogin(form);
     this.confirmMsg = _('Changes saved');
     this.M.show(_('Changing Users'), form);
     return form;
@@ -263,7 +264,7 @@ const users = {
     if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Select only one user'), 'error'); return; }
 
     let id   = this.id.getSelected(),
-        user = this.usersList.get(id[0]),
+        user = data.usersList.get(id[0]),
         form = f.gTNode('#userChangePassForm');
 
     this.queryParam.usersId = JSON.stringify(id);
@@ -299,7 +300,7 @@ const users = {
   changePassword(e, newPass) {
     if (e.target.value !== newPass.value) {
       e.target.value = newPass.value = '';
-      f.showMsg(_('Password not same'), 'error');
+      f.showMsg(_('Password mismatch'), 'error');
       return;
     }
     this.queryParam.validPass = e.target.value;

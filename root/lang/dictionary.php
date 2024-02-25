@@ -1,7 +1,6 @@
 <?php return [
   // Menus
   'calculator'  => 'Калькулятор',
-  'maker'       => 'Производство',
   'calendar'    => 'Календарь',
   'statistic'   => 'Статистика',
   'orders'      => 'Заказы',
@@ -17,6 +16,7 @@
 
   // CMS
   'Authorization' => 'Авторизация',
+  'Log in'  => 'Вход',
   'Login'   => 'Логин',
   'Password'=> 'Пароль',
   'Logout'  => 'Выход',
@@ -72,14 +72,25 @@
   // Rate
   'Exchange rates' => 'Курсы',
   'Automatically update rates' => 'Автообновлнение',
-  // Customers
+  // Customers page
   'Changing a client' => 'Редактирование клиента',
   'Individual' => 'Физ. лицо',
   'Corporate'  => 'Юр. лицо',
   'Address'    => 'Адрес',
   'ITN'        => 'ИНН',
-  // Users
+
+  // Users page
+  'New user added' => 'Пользователь добавлен',
+  'Add new user'   => 'Добавить пользователя',
   'Changing Users' => 'Редактирование пользователя',
+  'Select only one user' => 'Пожалуйста выберете только одного пользователя',
+  'Please select at least 1 user' => 'Пожалуйста выберете не менее одного пользователя',
+  'Changes saved' => 'Изменения сохранены',
+  'New password saved' => 'Пароль изменен',
+  'Change user password' => 'Изменить пароль',
+  'Delete selected users?' => 'Удалить выбранных пользователей',
+  'Password mismatch' => 'Пароли не совпадают',
+  'User name' => 'ФИО',
 
   // Orders status
   'Statuses' => 'Статусы',

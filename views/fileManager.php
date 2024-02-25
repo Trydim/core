@@ -4,7 +4,7 @@
  * @var Main $main - global
  */
 
-$startPath = $main->url->getPath(true) . SHARE_PATH;
+$startPath = $main->url->getPath(true) . $main->getCmsParam('SHARE_PATH');
 
 ?>
 <div class="container-fluid ab-filemanager" id="ab-main">

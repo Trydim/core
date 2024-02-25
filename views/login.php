@@ -22,7 +22,7 @@ $dealers  = $dealers ?? [];
       <form action="<?= $sitePath ?>index.php" method="POST" id="authForm">
 
         <div class="form-group mt-1 mb-2">
-          <label><strong><?= gTxt('Login') ?></strong></label>
+          <label><strong><?= gTxt('Log in') ?></strong></label>
           <input name="login" type="text" class="form-control" value="<?= $login ?>">
         </div>
         <div class="form-group mt-1 mb-2">

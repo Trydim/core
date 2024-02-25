@@ -108,7 +108,7 @@ declare type CMSGlobalObject = {
    * @param selector
    * @return string - json
    */
-  getData(selector: string): []
+  getData(selector: string): object
 
   getDataAsAssoc(selector: string): object
   getDataAsMap(selector: string): Map<any, any>
@@ -182,7 +182,7 @@ declare type CMSGlobalObject = {
   /**
    * Mask for input
    */
-  initMask(node: HTMLElement, phoneMask: string): void
+  initMask(node: HTMLElement, phoneMask?: string): void
   /**
    * Set loading spinner icon
    */
@@ -253,6 +253,8 @@ declare type CMSGlobalObject = {
   createLink(fileName: string): HTMLAnchorElement
 
   getSetting()
+
+  Valid()
 }
 
 interface Window extends Window {

@@ -75,8 +75,8 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
 <template id="userForm">
   <form action="#">
     <div class="form-floating my-3">
-      <input type="text" class="form-control" id="pName" placeholder="' . gTxt('Name') . '" name="name" required>
-      <label for="pName">' . gTxt('Name') . '</label>
+      <input type="text" class="form-control" id="pName" placeholder="' . gTxt('User name') . '" name="name" required>
+      <label for="pName">' . gTxt('User name') . '</label>
     </div>
 
     <div class="form-floating mb-3">
@@ -85,7 +85,7 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
     </div>
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" id="pLogin" placeholder="' . gTxt('Login') . '" name="login" required>
+      <input type="text" class="form-control" id="pLogin" placeholder="' . gTxt('Login') . '" name="login">
       <label for="pLogin">' . gTxt('Login') . '</label>
     </div>
 
@@ -118,7 +118,6 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
 </template>
 <template id="userChangePassForm">
   <form action="#">
-    <!--label>Старый пароль: <input type="password" name="oldPass"></label-->
     <div class="form-floating mb-3">
       <input type="password" class="form-control" id="changePassword" placeholder="' . gTxt('New password') . '" name="newPass" required>
       <label for="changePassword">' . gTxt('New password') . '</label>

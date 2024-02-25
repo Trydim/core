@@ -1082,17 +1082,16 @@ class DbMain extends R {
     }, $dealers);
 
     foreach ($dealers as $dealer) {
-      $sql .= "UNION SELECT ID as 'id', name, login, password, "
+      $sql .= " UNION SELECT ID as 'id', name, login, password, "
             . "'" . $dealer['id'] . "' as dealerId, "
             . "'" . $dealer['prefix'] . "' as prefix "
-            . 'FROM ' . $dealer['prefix'] . 'users';
+            . 'FROM ' . $dealer['prefix'] . 'users '
+            . ' WHERE activity = 1';
+
+      if ($login) $sql .= ' AND login = "' . $login . '"';
     }
 
-    $sql = substr($sql, 6) . ' WHERE activity = 1';
-
-    if ($login) $sql .= ' AND login = :login';
-
-    return self::getAll($sql, [':login' => $login]);
+    return self::getAll(substr($sql, 7), [':login' => $login]);
   }
 
   public function getDealerById(string $id = null): array {

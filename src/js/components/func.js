@@ -109,9 +109,8 @@ export default {
 
   getData: selector => {
     const node = f.qS(selector),
-          json = node && (JSON.parse(node.value));
-    if (!node) return false;
-    else node.remove();
+          json = node ? JSON.parse(node.value) : {};
+    node && node.remove();
     return json;
   },
 
@@ -121,7 +120,7 @@ export default {
    * @return {object}
    */
   getDataAsAssoc: selector => {
-    const arr   = Object.values(f.getData(selector) || []),
+    const arr   = Object.values(f.getData(selector)),
           fItem = arr[0],
           fKeys = Object.keys(fItem);
 
@@ -139,9 +138,9 @@ export default {
       return r;
     }, Object.create(null));
   },
-  getDataAsMap: selector => new Map(Object.entries(f.getDataAsAssoc(selector) || {})),
-  getDataAsSet: selector => new Set(Object.values(f.getData(selector) || [])),
-  getDataAsArray : selector => Object.values(f.getData(selector) || []),
+  getDataAsMap: selector => new Map(Object.entries(f.getDataAsAssoc(selector))),
+  getDataAsSet: selector => new Set(Object.values(f.getData(selector))),
+  getDataAsArray : selector => Object.values(f.getData(selector)),
 
   /** Показать элементы, аргументы коллекции NodeList */
   show: (...collection) => { collection.map(nodes => {
