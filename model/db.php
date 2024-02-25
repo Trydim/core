@@ -783,6 +783,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'openOrders': /* TODO когда это отправляется */
       break;
 
+
     case 'addDealer':
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
@@ -808,6 +809,9 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
         $id = $db->getLastID('dealers', ['name' => 'tmp']);
 
+        $settings = [];
+        foreach ($dealer['settings'] as $k => $v) $settings['prop_' . $k] = $v;
+
         $param = [
           'name' => $dealerName,
           'cms_param' => json_encode(['prefix' => $prefix]),
@@ -817,7 +821,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
             'email'   => $dealer['email'] ?? '',
             'phone'   => $dealer['phone'] ?? '',
           ]),
-          'settings' => gzcompress(json_encode($dealer['settings'] ?? []), 9),
+          'settings' => gzcompress(json_encode($settings), 9),
         ];
 
         $result = $db->insert($columns, 'dealers', [$id => $param], true);
@@ -845,16 +849,16 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
         $name = $dealer['name'];
-        if (strlen($name) < 2) {
-          $result['error'] = 'Name must be 2 or more chars!';
-          break;
-        }
+        if (strlen($name) < 2) { $result['error'] = 'Name must be 2 or more chars!'; break; }
+
+        $settings = [];
+        foreach ($dealer['settings'] as $k => $v) $settings['prop_' . $k] = $v;
 
         $param = [
           'name'     => $name,
           'contacts' => json_encode($dealer['contacts']),
           'activity' => intval(boolValue($dealer['activity'] ?? true)),
-          'settings' => gzcompress(json_encode($dealer['settings']), 9),
+          'settings' => gzcompress(json_encode($settings), 9),
         ];
 
         $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);

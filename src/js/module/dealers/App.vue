@@ -153,8 +153,8 @@
     </div>
 
     <template #footer>
-      <Button :label="this.$t('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm()"></Button>
-      <Button :label="this.$t('Cancel')" icon="pi pi-times" class="p-button-text" @click="modalCancel()"></Button>
+      <Button :label="this.$t('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm"></Button>
+      <Button :label="this.$t('Cancel')" icon="pi pi-times" class="p-button-text" @click="modalCancel"></Button>
     </template>
   </Dialog>
 </template>
@@ -351,12 +351,9 @@ export default {
       this.setModal('Настройка для дилера', true);
       this.reloadFn = this.reload;
     },
-    refreshProperties() {
-      this.setProperty();
-    },
+    refreshProperties() { this.setProperty() },
     deleteDealer() {
-      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return;
-      }
+      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
     },
 
     dblClick(e) {
