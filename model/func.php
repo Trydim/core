@@ -16,7 +16,7 @@ function cmsAutoloader(string $class) {
  */
 function addCpNumber($number, string $importantValue) {
   global $main;
-  return $main->fireHook('addCpNumber', $number, $importantValue);
+  return $main->fireHook(VC::HOOKS_SAVE_ORDER, $number, $importantValue);
 }
 
 /**

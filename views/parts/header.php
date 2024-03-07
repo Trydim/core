@@ -23,7 +23,7 @@ if ($main->checkStatus()) {
 <div class="nav-header">
   <a href="<?= $siteLink ?>" class="brand-logo">
     <picture class="logo-abbr"><?= $imgSrc ?></picture>
-    <span class="brand-title"><?= $main->getCmsParam('PROJECT_TITLE') ?></span>
+    <span class="brand-title"><?= $main->getCmsParam(VC::PROJECT_TITLE) ?></span>
   </a>
 
   <div class="nav-control" role="button" data-action-cms="menuToggle">

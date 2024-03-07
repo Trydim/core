@@ -78,6 +78,7 @@ class VC {
         HOOKS_CALENDAR_TEMPLATE = 'calendarTemplate',
         HOOKS_CATALOG_TEMPLATE  = 'catalogTemplate',
         HOOKS_ORDER_TEMPLATE    = 'orderTemplate',
+        HOOKS_SAVE_ORDER        = 'saveOrder',
         HOOKS_CUSTOMERS_TEMPLATE = 'customersTemplate',
         HOOKS_FILE_MANAGER_TEMPLATE = 'fileManagerTemplate',
         HOOKS_SETTING_TEMPLATE      = 'settingTemplate',

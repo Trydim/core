@@ -213,7 +213,7 @@ trait Authorization {
 
     if ($result === false) {
       $headers = apache_request_headers();
-      $result = ($headers['Authorization'] ?? null) === $this->getCmsParam('TOKEN');
+      $result = ($headers['Authorization'] ?? false) === $this->getCmsParam('TOKEN');
     }
 
     return $result;

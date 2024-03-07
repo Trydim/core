@@ -32,7 +32,7 @@ if ($mode = $main->getCmsParam('mode')) {
     } catch (Exception $e) {
       $main->response->setContent($e->getMessage());
     }
-  } else $main->response->setContent(['error' => 'Auth no passing!']);
+  } else $main->response->setContent(['error' => gTxt('Auth no passing!')]);
 } else {
   $main->beforeController();
 

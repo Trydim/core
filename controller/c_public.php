@@ -8,7 +8,7 @@ $authStatus = $main->checkStatus();
 $isDealer = $main->isDealer();
 $dbContent = "";
 $field = [
-  'pageTitle' => $main->getCmsParam('PROJECT_TITLE'),
+  'pageTitle' => $main->getCmsParam(VC::PROJECT_TITLE),
   'headContent' => '<meta name="Public"><meta name="description" content="Public">',
   'cssLinks' => [],
   'jsLinks'  => [],

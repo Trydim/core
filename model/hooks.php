@@ -14,4 +14,4 @@ function addCpNumber_DefaultFunc($number, string $importantValue): string {
   $report['cpNumber'] = $report['cpNumber'] ?? $number;
   return json_encode($report);
 }
-addHook('addCpNumber', 'addCpNumber_DefaultFunc');
+addHook(VC::HOOKS_SAVE_ORDER, 'addCpNumber_DefaultFunc');

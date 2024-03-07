@@ -44,9 +44,13 @@ class Properties {
       $value = $this->main->db->loadPropertyTable($prop, $value);
     } else if ($haveValue && $propType === 'table') {
       $res = [];
-      foreach ($value as $row) {
-        $res[] = array_combine($propParam['columns'], $row);
+
+      if (is_array($value)) {
+        foreach ($value as $row) {
+          $res[] = array_combine($propParam['columns'], $row);
+        }
       }
+
       $value = $res;
     }
 

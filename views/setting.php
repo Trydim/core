@@ -6,6 +6,14 @@
 
 $isAdmin = $main->getLogin('isAdmin');
 ?>
+<style>
+  .form-floating>.form-control:focus,
+  .form-floating>.form-control:not(:placeholder-shown),
+  .form-floating>.form-control-plaintext:focus,
+  .form-floating>.form-control-plaintext:not(:placeholder-shown) {
+    padding: 1.625rem 0.675rem 0.625rem !important;
+  }
+</style>
 <div class="row container m-auto" id="settingForm">
   <?php if ($isAdmin) { ?>
     <setting-mail :prop-mail="mail" @update="updateMail"></setting-mail>

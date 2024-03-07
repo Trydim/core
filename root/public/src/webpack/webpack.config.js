@@ -72,8 +72,10 @@ module.exports = env => {
         template: 'template/index.html',
       }),
 
-      /** Глобальные для Vue */
       new webpack.DefinePlugin({
+        BUILD_TIME: new Date().toLocaleString().replace(', ', '-'),
+
+        /** Глобальные для Vue */
         // Drop Options API from bundle
         __VUE_OPTIONS_API__  : 'true',
         __VUE_PROD_DEVTOOLS__: 'false',

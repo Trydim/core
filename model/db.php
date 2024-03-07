@@ -783,7 +783,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'openOrders': /* TODO когда это отправляется */
       break;
 
-
+      // Dealers
     case 'addDealer':
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);

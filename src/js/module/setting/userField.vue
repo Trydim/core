@@ -2,39 +2,36 @@
   <div class="col-6 border" id="userForm">
     <h3 class="col text-center">{{ $t('User') }}</h3>
     <div class="form-floating my-3">
-      <p-input-text v-model="user.login" class="form-control" placeholder="_"
-      ></p-input-text>
+      <p-input-text class="form-control" placeholder="" v-model="user.login"></p-input-text>
       <label>{{ $t('Login') }}</label>
     </div>
     <div class="form-floating mb-3">
-      <p-input-text type="password" v-model="user.password" class="form-control" placeholder="_"
-      ></p-input-text>
+      <p-input-text type="password" class="form-control" placeholder="" v-model="user.password"></p-input-text>
       <label>{{ $t('New password') }}</label>
     </div>
     <div class="form-floating mb-3">
-      <p-input-text type="password" v-model="user.passwordRepeat" class="form-control" placeholder="_"
-      ></p-input-text>
+      <p-input-text type="password" class="form-control" placeholder="" v-model="user.passwordRepeat"></p-input-text>
       <label>{{ $t('Repeat password') }}</label>
     </div>
 
     <div class="input-group mb-3">
       <div class="input-group-text col-1">
-        <p-checkbox id="showAllField" v-model="showAllField" :binary="true"></p-checkbox>
+        <p-checkbox id="showAllField" :binary="true" v-model="showAllField"></p-checkbox>
       </div>
-      <label class="input-group-text col" for="showAllField">{{ $t('Show all options') }}</label>
+      <label class="input-group-text col" :for="'showAllField'">{{ $t('Show all options') }}</label>
     </div>
 
     <template v-if="showAllField">
       <div class="form-floating my-3">
-        <p-input-text v-model="user.name" class="form-control" placeholder="_"></p-input-text>
+        <p-input-text class="form-control" placeholder="" v-model="user.name"></p-input-text>
         <label>{{ $t('Full name') }}</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="user.fields.phone" class="form-control" placeholder="_"></p-input-text>
+        <p-input-text class="form-control" placeholder="" v-model="user.fields.phone"></p-input-text>
         <label>{{ $t('Phone') }}</label>
       </div>
       <div class="form-floating mb-3">
-        <p-input-text v-model="user.fields.email" class="form-control" placeholder="_"></p-input-text>
+        <p-input-text class="form-control" placeholder="" v-model="user.fields.email"></p-input-text>
         <label>{{ $t('Mail') }}</label>
       </div>
 
@@ -43,12 +40,12 @@
                     'input-group': item.type !== 'text' && item.type !== 'textarea'}"
       >
         <p-input-text v-if="item.type === 'text'"
-                      class="form-control" :id="item.type + key"
-                      v-model="user.fields[key]" placeholder="_"
+                      class="form-control" :id="item.type + key" placeholder=""
+                      v-model="user.fields[key]"
         ></p-input-text>
 
         <p-textarea v-if="item.type === 'textarea'"
-                    class="form-control" :id="item.type + key" placeholder="_"
+                    class="form-control" :id="item.type + key" placeholder=""
                     v-model="user.fields[key]"
         ></p-textarea>
 
@@ -57,8 +54,8 @@
         >{{ item.name }}</label>
 
         <p-input-number v-if="item.type === 'number'"
-                        :id="item.type + key" class="col-6" show-buttons
-                        v-model="user.fields[key]" placeholder="0"
+                        :id="item.type + key" class="col-6" placeholder="0"
+                        show-buttons v-model="user.fields[key]"
         ></p-input-number>
 
         <p-calendar v-if="item.type === 'date'"
@@ -66,15 +63,13 @@
                     date-format="mm-dd-yy"
                     v-model="user.fields[key]"
         ></p-calendar>
-
-
       </div>
 
       <div class="input-group mb-3">
         <div class="input-group-text col-1">
-          <p-checkbox id="onlyOne" v-model="user.onlyOne" :binary="true"></p-checkbox>
+          <p-checkbox id="onlyOne" :binary="true" v-model="user.onlyOne"></p-checkbox>
         </div>
-        <label class="input-group-text col" for="onlyOne">{{ $t('Prevent simultaneous login') }}</label>
+        <label class="input-group-text col" :for="'onlyOne'">{{ $t('Prevent simultaneous login') }}</label>
       </div>
 
     </template>

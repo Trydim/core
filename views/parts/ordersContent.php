@@ -51,7 +51,7 @@
     <div class="col input-group ms-3">
       <span class="input-group-text"><?= gTxt('Filter') ?>:</span>
       <select class="form-select" data-action="filter<?= ucfirst($showFilter) ?>">
-        <option value="0"><?= $main->getCmsParam('PROJECT_TITLE') ?></option>
+        <option value="0"><?= $main->getCmsParam(VC::PROJECT_TITLE) ?></option>
         <?php foreach ($filterOptions as $option) { ?>
           <option value="<?= $option['id'] ?>"><?= $option['name'] ?></option>
         <?php } ?>
