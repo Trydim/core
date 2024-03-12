@@ -288,11 +288,14 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
       // VisitorOrders
     case 'saveVisitorOrder':
-      if (isset($inputValue)) {
+      if (isset($reportValue)) {
+        $orderTotal = $orderTotal ?? 0;
+
         $param = [
-          'cp_number'   => $cpNumber ?? time(),
-          'input_value' => $inputValue,
-          'total'       => $total ?? 0,
+          'save_value'     => $saveValue ?? '{}',
+          'important_value' => addCpNumber(0, $importantValue ?? '{}'),
+          'report_value'    => gzcompress($reportValue, 9),
+          'total'           => floatval(is_finite($orderTotal) ? $orderTotal : 0),
         ];
 
         isset($importantValue) && $importantValue !== 'false' && $param['importantValue'] = $importantValue;
@@ -309,8 +312,6 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       else $result['countRows'] = $db->getCountRows('client_orders');
 
       $result['orders'] = $db->loadVisitorOrder($pagerParam);
-      break;
-    case 'loadVisitorOrder':
       break;
     case 'delVisitorOrders':
       $orderIds = isset($orderIds) ? json_decode($orderIds) : [];

@@ -41,14 +41,14 @@ if ($authStatus && isset($_GET['orderId'])) {
   unset($orderId, $order, $customer);
 }
 
-if ($authStatus && isset($_GET['orderVisitorId'])) {
+else if ($authStatus && isset($_GET['orderVisitorId'])) {
   $orderId = $_GET['orderVisitorId'];
 
   if (is_finite($orderId)) {
-    $order = $main->db->selectQuery('client_orders', ['*'], "ID = '$orderId'");
+    $order = $main->db->loadVisitorOrderById($orderId);
 
-    if (count($order) === 1) {
-      $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='" . json_encode($order[0]) . "'>";
+    if (count($order)) {
+      $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='" . json_encode($order) . "'>";
     }
   }
 

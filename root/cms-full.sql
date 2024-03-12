@@ -29,10 +29,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `client_orders` (
   `ID` int(10) UNSIGNED NOT NULL,
-  `cp_number` varchar(30) DEFAULT NULL,
   `create_date` timestamp NULL DEFAULT current_timestamp(),
-  `input_value` varchar(500) DEFAULT '{}',
+  `save_value` varchar(500) DEFAULT '{}',
   `important_value` varchar(255) DEFAULT '{}',
+  `report_value` mediumblob DEFAULT NULL,
   `total` float DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

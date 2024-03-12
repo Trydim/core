@@ -34,7 +34,7 @@ $field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersColumn' v
 
 
 // Пользовательские заказы
-$columns = $setting['ordersShowVisitorColumns'] ?? ['ID', 'cpNumber', 'createDate', 'importantValue', 'total'];
+$columns = $setting['ordersShowVisitorColumns'] ?? ['ID', 'createDate', 'importantValue', 'total'];
 $columns = array_map(function ($item) {
   return [
     'dbName' => $item,

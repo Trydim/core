@@ -18,7 +18,7 @@ class DbMain extends R {
         SHOW_DATE_FORMAT = 'H:i d-m-Y';
 
   const DB_JSON_FIELDS = [
-    'inputValue', 'saveValue', 'importantValue', 'reportValue',
+    'inputValue', 'saveValue', 'importantValue',
     'contacts', 'customerContacts', 'customization',
     'cmsParam', 'properties', 'permissionValue'
   ];

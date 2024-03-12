@@ -7,6 +7,7 @@ export default class {
 
   mainAction = 'loadOrders';
   needReload = false;
+  headRendered = false; // Шапка отрисована
   queryParam = {
     mode        : 'DB',
     dbAction    : '',
@@ -90,6 +91,8 @@ export default class {
       dbAction : this.mainAction,
       sortParam: this.queryParam,
     });
+
+    this.headRendered = true;
   }
   ordersGetTableCellTemplate() {
     let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${ID}"></td>';
@@ -149,7 +152,7 @@ export default class {
     this.table.querySelector('tbody').innerHTML = html;
   }
   ordersRender(data, search) {
-    f.oneTimeFunction.exec('ordersHeadRender');
+    if (!this.headRendered) this.ordersHeadRender();
     this.bodyRender(data, search);
   }
   // Show selected orders

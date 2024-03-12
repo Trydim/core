@@ -91,12 +91,7 @@ trait DbOrders {
       $res = self::getAll($sql, [':id' => $ids]);
     }
 
-    $res = array_map(function ($row) {
-      $row['reportValue'] = gzuncompress($row['reportValue']);
-      if (!$row['reportValue']) $row['reportValue'] = false;
-
-      return $this->jsonParseField($row);
-    }, $res);
+    $res = array_map(function ($row) { return $this->jsonParseField($row); }, $res);
 
     return $oneOrder ? ($one && count($res) === 1 ? $res[0] : false) : $res;
   }
@@ -150,7 +145,7 @@ trait DbOrders {
   }
 
   // Visitors
-  //------------------------------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
 
   public function saveVisitorOrder($param) {
     $bean = self::xdispense($this->pf('client_orders'));
@@ -170,7 +165,10 @@ trait DbOrders {
    * @return array|null
    */
   public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []): ?array {
-    $sql = "SELECT ID, cp_number AS 'cpNumber', create_date AS 'createDate', important_value AS 'importantValue', total
+    $sql = "SELECT ID, create_date AS 'createDate',
+            save_value AS 'saveValue', 
+            important_value AS 'importantValue',
+            total
             FROM " . $this->pf('client_orders') . "\n";
 
     if (count($dateRange)) $sql .= "WHERE create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
@@ -182,10 +180,24 @@ trait DbOrders {
 
     $sql .= $this->getPaginatorQuery($pageParam);
 
-    return self::getAll($sql);
+    return $this->jsonParseField(self::getAll($sql));
+  }
+
+  public function loadVisitorOrderById(string $id) {
+    $sql = "SELECT ID, create_date AS 'createDate',
+            save_value AS 'saveValue', 
+            important_value AS 'importantValue',
+            report_value AS 'reportValue',
+            total
+            FROM " . $this->pf('client_orders') . "\n
+            WHERE ID = :id";
+
+    return $this->jsonParseField(self::getRow($sql, [':id' => $id]));
   }
 
   // Status
+  //--------------------------------------------------------------------------------------------------------------------
+
   public function loadOrderStatus(string $filters = ''): array {
     $sql = "SELECT * FROM " . $this->pf('order_status') . "\n ";
 

@@ -267,7 +267,9 @@ export default class extends Orders {
   }
   orderTypeChange(selectedSize, target) {
     if (this.orderType === target.value) return;
+    this.headRendered = false;
     this.orderType = target.value;
+    this.selected.clear();
 
     this.queryParam.sortColumn = 'createDate';
     this.queryParam.sortDirect = false;
