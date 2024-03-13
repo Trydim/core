@@ -4,6 +4,11 @@
     <Button v-if="false" type="button" @click="deleteDealer">{{ $t('Delete') }}</Button>
   </div>
 
+  <!--<div class="flex justify-content-between">
+    <InputText v-model="filters" placeholder="Keyword Search"></InputText>
+    <i class="pi pi-search"></i>
+  </div>-->
+
   <DataTable v-if="dealers.length"
              :value="dealers" datakey="id"
              :loading="dealerLoading"

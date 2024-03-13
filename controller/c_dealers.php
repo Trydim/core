@@ -17,6 +17,18 @@ if (includes($main->url->getRequestUri(), 'update')) {
   return;
 }
 
+else if (includes($main->url->getRequestUri(), 'database')) {
+  $param['isDBEditor'] = true;
+  $param['dealerList'] = [];
+
+  foreach ($main->db->loadDealers() as $dealer) {
+    $param['dealerList'][] = [
+      'id'   => $dealer['id'],
+      'name' => $dealer['name'],
+    ];
+  }
+}
+
 $field = [
   'pageTitle'     => 'Дилеры',
   'sideRight'     => '',

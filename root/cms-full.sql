@@ -406,8 +406,7 @@ CREATE TABLE `dealers` (
 -- Индексы таблицы `client_orders`
 --
 ALTER TABLE `client_orders`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `client_orders_cp_number_uindex` (`cp_number`);
+  ADD PRIMARY KEY (`ID`);
 
 --
 -- Индексы таблицы `codes`

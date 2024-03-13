@@ -21,10 +21,31 @@ vue.config.errorHandler = (err, vm, info) => {
 vue.config.globalProperties.$t = function (str) { return window._(str); };
 
 document.addEventListener("DOMContentLoaded", () => {
-  vue.use(PrimeVue);
-  vue.directive('tooltip', Tooltip);
+  const app = f.gI('dealerApp');
 
-  window.DealersInstance = vue;
-  // Delay for hooks
-  setTimeout(() => vue.mount('#dealerApp'), 0);
+  if (app) {
+    vue.use(PrimeVue);
+    vue.directive('tooltip', Tooltip);
+
+    window.DealersInstance = vue;
+    // Delay for hooks
+    setTimeout(() => vue.mount(app), 0);
+  } else {
+    const form = f.gI('editDb'),
+          report = f.gI('reportArea');
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+
+      f.Post({data: new FormData(form)}).then(d => {
+        if (d.status) {
+          const r = d['report'];
+
+          report.innerHTML =
+            r['error'].join('<br>') + '<br>' + r['error'].length + '<br><br>'
+            + r['complete'].join('<br>') + '<br>' + r['complete'].length;
+        }
+      });
+    }
+  }
 });

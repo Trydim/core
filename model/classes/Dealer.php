@@ -165,4 +165,32 @@ class Dealer {
     // удалить все таблица с префиксом
     $this->migrateDb->drop($prefix);
   }
+
+  //
+  //--------------------------------------------------------------------------------------------------------------------
+
+  public function updateDatabase(array $selectedDealer, string $sqlText): array {
+    $report = [
+      'error' => [],
+      'complete' => [],
+    ];
+    $sqlQueryList = explode('###', $sqlText);
+
+    foreach ($this->main->db->loadDealers() as $dealer) {
+      if (count($selectedDealer) && !in_array($selectedDealer, $dealer['id'])) continue;
+
+      $prefix = $dealer['cmsParam']['prefix'];
+
+      if (empty($prefix)) { $report['error'][] = "Error: prefix doesn't exist - " . $dealer['id']; continue; }
+
+      foreach ($sqlQueryList as $sql) {
+        $sql = str_replace('$prefix', $prefix, $sql);
+        $result = $this->main->db->execQuery($sql);
+      }
+
+      if (is_finite($result)) $report['complete'][] = "Complete for dealer " . $dealer['id'] . ": " . $prefix;
+    }
+
+    return $report;
+  }
 }

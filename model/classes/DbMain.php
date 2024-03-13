@@ -576,6 +576,10 @@ class DbMain extends R {
     return $result;
   }
 
+  public function execQuery(string $sql): int {
+    return self::exec($sql);
+  }
+
   // Files
   //------------------------------------------------------------------------------------------------------------------
 
@@ -1026,7 +1030,6 @@ class DbMain extends R {
 
     return $dealers;
   }
-
 
   /**
    * @return bool true if it was set

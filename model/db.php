@@ -866,7 +866,12 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'deleteDealer':
-      if (isset($dealer)) { }
+      //if (isset($dealer)) { }
+      break;
+    case 'dealersDatabaseEdit':
+      //if (password_verify($safeKey ?? '', '')) return;
+
+      $result['report'] = $main->dealer->updateDatabase($selectedDealer ?? [], $sqlText ?? '');
       break;
 
     default:
