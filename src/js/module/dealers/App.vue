@@ -1,20 +1,20 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
-    <Button v-if="!false" type="button" @click="addDealer">{{ $t('Add') }}</Button>
-    <Button v-if="false" type="button" @click="deleteDealer">{{ $t('Delete') }}</Button>
+    <Button @click="addDealer">{{ $t('Add') }}</Button>
+    <Button v-if="false" @click="deleteDealer">{{ $t('Delete') }}</Button>
   </div>
 
-  <!--<div class="flex justify-content-between">
-    <InputText v-model="filters" placeholder="Keyword Search"></InputText>
-    <i class="pi pi-search"></i>
-  </div>-->
+  <div class="col-4 flex justify-content-between mb-3 position-relative">
+    <InputText class="w-100" :placeholder="this.$t('Keyword Search')" v-model="search"></InputText>
+    <i class="position-absolute h-100 end-0 pi pi-search" style="padding: 16px"></i>
+  </div>
 
-  <DataTable v-if="dealers.length"
-             :value="dealers" datakey="id"
+  <DataTable v-if="filteredDealers.length"
+             :value="filteredDealers" datakey="id"
              :loading="dealerLoading"
              show-gridlines
              selection-mode="single" :meta-key-selection="false"
-             :paginator="dealers.length > 10" :rows="10" :rows-per-page-options="[10,20,50]"
+             :paginator="filteredDealers.length > 10" :rows="10" :rows-per-page-options="[10,20,50]"
              paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
              current-page-report-template="Showing {first} to {last} of {totalRecords}"
              responsive-layout="scroll"
@@ -30,7 +30,7 @@
     </template>-->
     <Column v-if="checkColumn('id')" field="id" :sortable="true" :header="this.$t('id')" class="text-center">
       <template #body="slotProps">
-        <span :data-id="slotProps.data.id">{{ slotProps.data.id }}</span>
+        <a target="_blank" :href="'../dealer/' + slotProps.data.id" :data-id="slotProps.data.id">{{ slotProps.data.id }}</a>
       </template>
     </Column>
     <Column field="name" :sortable="true" :header="this.$t('Name')"></Column>
@@ -66,7 +66,7 @@
   </DataTable>
 
   <div class="d-flex my-3">
-    <Button type="button" class="btn-warning" @click="changeDealer">Редактировать</Button>
+    <Button class="btn-warning" @click="changeDealer">Редактировать</Button>
   </div>
 
   <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
@@ -195,6 +195,8 @@ export default {
     Dialog,
   },
   data: () => ({
+    search: '',
+
     dealers: [],
     selected: {},
 
@@ -236,6 +238,14 @@ export default {
         code = code.replace('prop_', '');
         p.code = code; r[code] = p; return r;
       }, Object.create(null));
+    },
+
+    filteredDealers() {
+      if (this.search.length < 3) return this.dealers;
+
+      let reg = new RegExp(this.search, 'i');
+
+      return this.dealers.filter(dealer => reg.test(dealer.id + dealer.name));
     },
   },
   watch: {

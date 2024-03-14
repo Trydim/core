@@ -300,7 +300,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
         isset($importantValue) && $importantValue !== 'false' && $param['importantValue'] = $importantValue;
 
-        $db->saveVisitorOrder($param);
+        $result['orderId'] = $db->saveVisitorOrder($param);
       }
       break;
     case 'loadVisitorOrders':

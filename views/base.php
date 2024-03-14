@@ -89,6 +89,9 @@ $jsGlobalConst = json_encode([
       <?php } ?>
     </div>
 
+    <?php if ($main->isDealer()) { ?>
+      <a href="<?= $main->url->getBaseUri() ?>" class="d-block position-fixed start-0 bottom-0 m-3" style="width: 2rem; height: 2rem; z-index: 11"></a>
+    <?php } ?>
   </main>
 <?php } else echo $global; ?>
 

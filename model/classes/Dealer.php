@@ -105,6 +105,7 @@ class Dealer {
       $config = str_replace('$' . $paramName, $value, $config);
     };
 
+    $setParam('dealerName', $params);
     $setParam('prefix', $this->prefix);
 
     foreach (['dbHost', 'dbName', 'dbUsername', 'dbPass'] as $key) {

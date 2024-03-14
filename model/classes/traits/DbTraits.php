@@ -155,6 +155,8 @@ trait DbOrders {
       $bean->$key = $value;
     }
     self::store($bean);
+
+    return $bean->getID();
   }
 
   /**
