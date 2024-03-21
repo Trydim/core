@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
     <Button @click="addDealer">{{ $t('Add') }}</Button>
-    <Button v-if="false" @click="deleteDealer">{{ $t('Delete') }}</Button>
+    <Button v-if="!false" @click="deleteDealer" class="p-button-danger">{{ $t('Delete') }}</Button>
   </div>
 
   <div class="col-4 flex justify-content-between mb-3 position-relative">
@@ -153,9 +153,7 @@
         </template>
       </div>
     </div>
-    <div v-else>
-      Удалить Дилера
-    </div>
+    <div v-else class="bold">Продолжить?</div>
 
     <template #footer>
       <Button :label="this.$t('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm"></Button>
@@ -369,6 +367,12 @@ export default {
     refreshProperties() { this.setProperty() },
     deleteDealer() {
       if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+
+      this.queryParam.dbAction = 'deleteDealer';
+      this.dealer = cloneDeep(this.selected);
+
+      this.setModal('Удалить выбранных дилеров', false);
+      this.reloadFn = this.reload;
     },
 
     dblClick(e) {

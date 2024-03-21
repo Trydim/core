@@ -138,7 +138,7 @@ trait Authorization {
   }
 
   private function checkDealer() {
-    $dealer = $this->db->getDealerById();
+    $dealer = $this->db->loadDealerById();
 
     // Activity
     if (boolValue($dealer['activity']) === false) {

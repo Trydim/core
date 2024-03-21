@@ -1098,7 +1098,7 @@ class DbMain extends R {
     return self::getAll(substr($sql, 7), [':login' => $login]);
   }
 
-  public function getDealerById(string $id = null): array {
+  public function loadDealerById(string $id = null): array {
     $id = $id ?? $this->main->getCmsParam('dealerId');
 
     $sql = "SELECT ID AS 'id', name, contacts,

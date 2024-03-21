@@ -866,7 +866,17 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'deleteDealer':
-      //if (isset($dealer)) { }
+      if (isset($dealer)) {
+        $dealer = json_decode($dealer, true);
+        $id = $dealer['id'];
+
+        $dealer = $db->selectQuery('dealers', ['cms_param'], ' ID = ' . $id);
+        $dealerPrefix = json_decode($dealer[0]['cms_param'], true)['prefix'] ?? '';
+
+        if (empty($id) || empty($dealerPrefix)) { $result['error'] = 'Dealers id or prefix is empty!'; break; }
+
+        $main->dealer->drop($id, $dealerPrefix);
+      }
       break;
     case 'dealersDatabaseEdit':
       //if (password_verify($safeKey ?? '', '')) return;

@@ -413,11 +413,18 @@ class MigrateDb {
   }
 
   public function drop($prefix) {
+    $error = [];
     $tables = $this->db->getTables($prefix);
 
     foreach ($tables as $prop) {
       $table = $prop['dbTable'];
-      $this->db->exec("DROP TABLE `$table`");
+      try {
+        $this->db->exec("DROP TABLE `$table`");
+      } catch (Exception $e) {
+        $error[] = $e->getMessage();
+      }
     }
+
+    if (count($error)) $this->drop($prefix);
   }
 }
