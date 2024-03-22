@@ -49,26 +49,22 @@ class Dealer {
       try {
         mkdir($this::FOLDER);
       } catch (\ErrorException $e) {
-        die('Folder for dealers not created.');
+        die('Dealer folder not created!');
       }
     }
   }
   private function createFolder() {
-    if (is_dir($this->dealerDir)) {
-      die('Folder for dealer exist!');
-    }
+    if (is_dir($this->dealerDir)) die('Dealer folder exist!');
 
     try {
       mkdir($this->dealerDir);
     } catch (\Exception $e) {
-      die("Folder for $this->dealerDir dealer not created");
+      die("$this->dealerDir folder not created");
     }
   }
   private function checkFolder(): bool {
-    if (!is_dir($this->dealerDir)) {
-      die("Folder $this->dealerDir is not exist!");
-      //return false;
-    }
+    if (!is_dir($this->dealerDir)) die("$this->dealerDir folder does not exist!");
+
     return true;
   }
   private function copy(string $src, string $dst) {
@@ -93,12 +89,12 @@ class Dealer {
         $this->copy($this::RESOURCES . $dir, $this->dealerPath . $dir);
       }
     } catch (\Exception $e) {
-      die("Copy resources error");
+      die('Error copying resources');
     }
   }
   private function createConfig(array $params) {
     $config = file_get_contents($this::RESOURCES . 'config.php');
-    if (!$config) die('Config file for dealer not exist!');
+    if (!$config) die('Dealer configuration file does not exist!');
 
     $setParam = function ($paramName, $params) use (&$config) {
       $value = is_array($params) ? $params[$paramName] : $params;
@@ -160,11 +156,13 @@ class Dealer {
   }
 
   public function drop(string $id, string $prefix) {
-    unlink($this::FOLDER . '/' . $id);
+    removeFolder($this::FOLDER . $id);
 
     $this->migrateDb = new MigrateDb($this->main, $prefix);
-    // удалить все таблица с префиксом
+    // Drop all tables with prefix
     $this->migrateDb->drop($prefix);
+    // Remove dealer
+    return $this->main->db->deleteItem('dealers', [$id]);
   }
 
   //

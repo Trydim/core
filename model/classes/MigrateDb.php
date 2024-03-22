@@ -412,7 +412,9 @@ class MigrateDb {
     $this->db->store($bean);
   }
 
-  public function drop($prefix) {
+  public function drop($prefix, int $deep = 0) {
+    if ($deep === 3) return;
+
     $error = [];
     $tables = $this->db->getTables($prefix);
 
@@ -425,6 +427,6 @@ class MigrateDb {
       }
     }
 
-    if (count($error)) $this->drop($prefix);
+    if (count($error)) $this->drop($prefix, $deep + 1);
   }
 }

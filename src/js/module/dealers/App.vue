@@ -153,7 +153,12 @@
         </template>
       </div>
     </div>
-    <div v-else class="bold">Продолжить?</div>
+    <div v-else class="fw-bold">
+      Последствия не обратимы!<br>Для продолжения наберите <span class="pi-red">{{ secureCode }}</span>!
+      <div class="p-inputgroup my-2">
+        <InputText class="p-inputtext-sm" v-model="inputSecureCode"></InputText>
+      </div>
+    </div>
 
     <template #footer>
       <Button :label="this.$t('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm"></Button>
@@ -194,6 +199,9 @@ export default {
   },
   data: () => ({
     search: '',
+
+    secureCode: '0',
+    inputSecureCode: '',
 
     dealers: [],
     selected: {},
@@ -247,6 +255,8 @@ export default {
     },
   },
   watch: {
+    inputSecureCode() { this.modal.confirmDisabled = this.secureCode !== this.inputSecureCode },
+
     dealer: {
       deep: true,
       handler() {
@@ -269,10 +279,9 @@ export default {
         }
 
         this.setData('dealers', data);
-        if (this.msg.text) {
-          f.showMsg(this.msg.text, this.msg.type);
-          this.msg.text = '';
-        }
+
+        if (data.status && this.msg.text) f.showMsg(this.msg.text, this.msg.type);
+        this.msg.text = '';
         this.dealerLoading = false;
       });
     },
@@ -371,8 +380,12 @@ export default {
       this.queryParam.dbAction = 'deleteDealer';
       this.dealer = cloneDeep(this.selected);
 
-      this.setModal('Удалить выбранных дилеров', false);
+      this.secureCode = f.random(1000, 9999).toString();
+      this.inputSecureCode = '';
+
+      this.setModal('Удалить выбранных дилеров', true);
       this.reloadFn = this.reload;
+      this.msg.text = `Дилер №${this.selected.id} - ${this.selected.name} удален!`;
     },
 
     dblClick(e) {
@@ -387,9 +400,7 @@ export default {
       this.query();
       this.modalCancel();
     },
-    modalCancel() {
-      this.modal.display = false;
-    },
+    modalCancel() { this.modal.display = false },
   },
   created() {
     // Set properties
