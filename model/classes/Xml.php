@@ -17,6 +17,8 @@ class Array2XML {
 }
 
 class Xml {
+  //private static $main;
+
   static $xml;
 
   static function getXMLTemplate() {
@@ -27,25 +29,39 @@ XML;
   }
 
   static function setChown() {
-    //exec ("find /path/to/folder -type f -exec chmod 0777 {} +");  - папки
+    //exec ("find /path/to/folder -type f -exec chmod 0777 {} +"); - папки
     //exec ("find /path/to/folder -type d -exec chmod 0777 {} +"); - файлы
     //chown()
   }
 
-  static function checkXml($cvs, $link = '') {
-    global $main;
+  /**
+   * @param string $csvPath
+   */
+  static function checkXml(string $csvPath) {
+    $rootDir = ABS_SITE_PATH . SHARE_PATH;
+    $xmlDir  = $rootDir . 'xml';
+    $xmlPath = str_replace('.csv', '.xml', $csvPath);
+
+    if (!file_exists($xmlDir)) mkdir($xmlDir);
+
+    $link = $xmlDir;
+    foreach (explode(str_replace($rootDir, '', $csvPath), '/') as $dir) {
+      $link .= '/' . $dir;
+      if (!file_exists($xmlDir)) mkdir($link);
+    }
+
+    if (!file_exists($csvPath . $file)) file_put_contents($csvPath . $file, self::getXMLTemplate());
+    /*
     $csvPath = $main->getCmsParam(VC::CSV_PATH);
-    $link !== '' && $link .= '/';
-    $xmlDir = ABS_SITE_PATH . SHARE_PATH . 'xml';
+
 
     foreach ($cvs as $key => $file) {
       if (!is_numeric($key)) { self::checkXml($file, $link . $key); continue; }
 
       $file = '../xml/' . $link . pathinfo($file['fileName'], PATHINFO_FILENAME) . '.xml';
-      if (!file_exists($xmlDir)) mkdir($xmlDir);
-      if (!file_exists($xmlDir . '/' . $link)) mkdir($xmlDir . '/' . $link);
-      if (!file_exists($csvPath . $file)) file_put_contents($csvPath . $file, self::getXMLTemplate());
-    }
+
+
+    }*/
   }
 
   // Поиск столбца ключей и описания

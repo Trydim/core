@@ -186,9 +186,7 @@ final class Main {
     $this->setting = array_merge($this->setting, $setting);
     return $this;
   }
-  private function checkXml() {
-    Xml::checkXml($this->dbTables);
-  }
+
   /**
    * Установка всех параметров для аккаунта
    * @return $this

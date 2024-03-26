@@ -204,7 +204,7 @@ export default class {
 
   initSocket() {
     const connectIcon = f.gI('wsConnectIcon'),
-          wsUri       = 'ws://' + location.host + ':2346',
+          wsUri       = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + ':2346',
           socketKey   = 'orders' + f.random(10000, 100000),
           ws = this.websocket = new WebSocket(wsUri + '?key=' + socketKey);
 

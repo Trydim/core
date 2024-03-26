@@ -108,7 +108,7 @@ menu;
         if ($link === 'admindb') { ?>
           <li>
             <?php if ($adminMenu) echo $adminMenu; else { ?>
-              <a class="nav-item <?= $active ?>" href="<?= $siteLink . $link ?>">
+              <a class="nav-item <?= $active ?? '' ?>" href="<?= $siteLink . $link ?>">
                 <i class="pi <?= $icon ?>"></i>
                 <span class="nav-text"><?= gTxt($link) ?></span>
               </a>

@@ -27,7 +27,6 @@ export class TableValues extends Main {
     this.loaderTable.stop();
   }
 
-
   checkInputValue(columnName, value) {
     let key = false, match = /(\D+)\((\d+)/g.exec(this.columns[columnName].type);
     if (match) {

@@ -21,7 +21,7 @@ define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig[VC::CHANGE_DATABASE] ?? 
 define('CSV_DELIMITER', $publicConfig['CSV_DELIMITER'] ?? ';');
 define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);
 
-$main = new Main($publicConfig, $dbConfig ?? []);
+$GLOBALS['main'] = $main = new Main($publicConfig, $dbConfig ?? []);
 $url = $main->url;
 
 //define('IS_LOCAL', $main->isDealer() && $url->isLocalDealer('1')); // Only for first

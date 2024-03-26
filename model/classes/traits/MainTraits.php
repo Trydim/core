@@ -107,7 +107,6 @@ trait Authorization {
         }
       }
       $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
-      // TODO $this->checkXml();
 
       if (USE_CONTENT_EDITOR) {
         $this->dbTables[] = [

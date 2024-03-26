@@ -433,16 +433,17 @@ trait DbCsv {
   private $csvTable;
 
   /**
-   * @param mixed $csvTable
+   * @param string $path
    */
-  public function setCsvTable($csvTable) {
-    $this->csvTable = $csvTable;
+  public function setCsvTable(string $path) {
+    $this->csvTable = substr($path, 1);
   }
 
   /**
    * сделать поиск всех файлов, наверное. (хотя если их много переходить на БД, наверное)
    * @param $path {string}
    * @param $link {string}
+   *
    * @return mixed|null
    */
   public function scanDirCsv(string $path, string $link = '') {
@@ -466,22 +467,20 @@ trait DbCsv {
     }, []);
   }
 
-  public function openCsv() {
+  public function openCsv(): array {
+    $result = [];
     $csvPath = $this->main->getCmsParam(VC::CSV_PATH) . $this->csvTable;
 
-    if (file_exists($csvPath) && ($file = fopen($csvPath, 'rt'))) {
-      $result = [];
-      while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) {
-        /* Это не работает
-        $cells = array_map(function ($cell) {
-          return mb_detect_encoding($cell, 'UTF-8', true) === 'UTF-8' ? $cell
-                 : iconv('cp1251', 'UTF-8', $cell);
-        }, $cells);*/
-        $result[] = $cells;
+    if (file_exists($csvPath)) {
+      if ($file = fopen($csvPath, 'rt')) {
+        while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) $result[] = $cells;
+        fclose($file);
       }
-      return $result;
+
+      Xml::checkXml($csvPath);
     }
-    return false;
+
+    return $result;
   }
 
   public function fileForceDownload() {
@@ -509,11 +508,11 @@ trait DbCsv {
   }
 
   /**
-   * @param $csvData
+   * @param array $csvData
    *
-   * @return DbMain
+   * @return DbCsv
    */
-  public function saveCsv($csvData): DbMain {
+  public function saveCsv(array $csvData): DbCsv {
     $csvPath = $this->main->getCmsParam(VC::CSV_PATH);
 
     if (file_exists($csvPath . $this->csvTable)) {
@@ -528,6 +527,7 @@ trait DbCsv {
       file_put_contents($csvPath . $this->csvTable, $fileStrings);
       $this->main->deleteCsvCache();
     }
+
     return $this;
   }
 }

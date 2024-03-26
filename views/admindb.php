@@ -20,7 +20,7 @@ $field['content'] = <<<main
     <button type="button" class="btn btn-primary d-none" id="btnRefresh">Обновить Конфиг</button>
   </div>
   <div></div>
-  <div id="viewField" class="gap-1" hidden>
+  <div id="viewField" class="gap-1">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" disabled data-action="adminType">
       <label class="form-check-label" for="formMode">Режим форм</label>
