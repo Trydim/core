@@ -13,7 +13,7 @@ if (!isset($global)) {
   $sideLeft = $sideLeft ?? ($isAuth ? template('parts/sidemenu') : '');
   $sideRight = $sideRight ?? '';
 }
-$footerContentBase = $footerContentBase ?? template('parts/footerBase');
+$footerContentBase = $footerContentBase ?? '';
 
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,

@@ -5,8 +5,7 @@
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Cookie
-{
+class Cookie {
     const SAMESITE_NONE = 'none';
     const SAMESITE_LAX = 'lax';
     const SAMESITE_STRICT = 'strict';

@@ -222,7 +222,7 @@ class MigrateDb {
       `login` varchar(100) NOT NULL,
       `password` varchar(60) NOT NULL,
       `name` varchar(255) DEFAULT NULL,
-      `contacts` varchar(255) DEFAULT NULL,
+      `contacts` varchar(1000) DEFAULT NULL,
       `register_date` timestamp NOT NULL DEFAULT current_timestamp(),
       `activity` int(1) NOT NULL DEFAULT 1,
       `customization` varchar(1000) DEFAULT '{}',
