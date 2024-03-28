@@ -2,7 +2,7 @@
 
 import {TableValues} from "./TableValues";
 //import {FormViews} from "./FormViews";
-//import {XMLTable} from "./XMLTable";
+import TableEditor from "./tableEditor/TableEditor.js";
 import ContentEditor from './contentEditor/ContentEditor';
 
 /**
@@ -61,9 +61,8 @@ const adminDb = {
         //}
         break;
       case 'config':
-        /*f.show(this.btnRefresh);
-        this.dbAction('loadXmlConfig');
-         this.adminType = new XMLTable();*/
+        //this.dbAction('loadXmlConfig');
+         this.adminType = new TableEditor();
         break;
       case 'content':
         this.adminType = new ContentEditor();

@@ -477,7 +477,7 @@ trait DbCsv {
         fclose($file);
       }
 
-      Xml::checkXml($csvPath);
+      Xml::checkXml($this->csvTable);
     }
 
     return $result;

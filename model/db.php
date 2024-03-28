@@ -126,9 +126,9 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
-        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
+        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('.csv', '.xml', $dbTable);
         if (file_exists($filePath)) {
-          if (filesize($filePath) < 60) Xml::createXmlDefault($filePath, substr($dbTable, 1));
+          if (filesize($filePath) < 60) $result = Xml::createXmlDefault($filePath, substr($dbTable, 1));
           $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
         }
       }
@@ -681,7 +681,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
 
       // Permission
-      //case 'loadPermission': break;
+    //case 'loadPermission': break;
 
       // Rate
     case 'loadRate':

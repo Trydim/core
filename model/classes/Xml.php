@@ -39,32 +39,23 @@ XML;
    */
   static function checkXml(string $csvPath) {
     $rootDir = ABS_SITE_PATH . SHARE_PATH;
-    $xmlDir  = $rootDir . 'xml';
+    $xmlDir  = $rootDir . 'xml/';
     $xmlPath = str_replace('.csv', '.xml', $csvPath);
 
-    if (!file_exists($xmlDir)) mkdir($xmlDir);
-
-    $link = $xmlDir;
-    foreach (explode(str_replace($rootDir, '', $csvPath), '/') as $dir) {
-      $link .= '/' . $dir;
-      if (!file_exists($xmlDir)) mkdir($link);
+    $link = $rootDir;
+    foreach (explode('/', dirname('xml/' . $csvPath)) as $dir) {
+      $link .= $dir . '/';
+      if (!file_exists($link)) mkdir($link);
     }
 
-    if (!file_exists($csvPath . $file)) file_put_contents($csvPath . $file, self::getXMLTemplate());
-    /*
-    $csvPath = $main->getCmsParam(VC::CSV_PATH);
-
-
-    foreach ($cvs as $key => $file) {
-      if (!is_numeric($key)) { self::checkXml($file, $link . $key); continue; }
-
-      $file = '../xml/' . $link . pathinfo($file['fileName'], PATHINFO_FILENAME) . '.xml';
-
-
-    }*/
+    if (!file_exists($xmlDir . $xmlPath)) file_put_contents($xmlDir . $xmlPath, self::getXMLTemplate());
   }
 
-  // Поиск столбца ключей и описания
+  /**
+   * Поиск столбца ключей и описания
+   * @param $csv
+   * @return array
+   */
   static function findKeyCell($csv) {
     $res = [];
     for ($i = 0; $i < 3; $i++) {
@@ -82,37 +73,41 @@ XML;
 
   static function createXmlDefault($xmlFileName, $fileName) {
     $csv = loadCSV([], $fileName);
-    if (count($csv)) {
-      $xml = new SimpleXMLElement(self::getXMLTemplate());
-      $param = [];
 
-      $keyColumn = self::findKeyCell($csv);
-      if (!$keyColumn) $xml->row = 'Конфигурация таблицы не доступна';
-      $key = $keyColumn['index'];
-      $desc = isset($keyColumn['desc']) ? $keyColumn['desc'] : false;
+    if (count($csv) === 0) return ['error' => 'Csv table is empty!'];
 
-      foreach ($csv[$keyColumn['row']] as $c => $cell) $param[$c] = $cell;//str_replace(' ', '-', $cell);
-      for (; $keyColumn['row'] > -1; $keyColumn['row']--) array_shift($csv);
-      $csv = array_values(array_filter($csv, function ($item) use ($key) { return !empty($item[$key]); }));
+    $xml = new SimpleXMLElement(self::getXMLTemplate());
+    $param = [];
 
-      foreach ($csv as $r => $row) {
-        $xml->addChild('row');
-        $xml->row[$r]->addAttribute('id', $row[$key]);
-        if ($desc) $xml->row[$r]->addChild('description', $row[$desc]);
-        $xml->row[$r]->addChild('params');
-        $params = &$xml->row[$r]->params;
-        foreach ($row as $c => $cell) {
-          if ($c === $key || $c === $desc || $param[$c] === '') continue;
-          $params->addChild('param');
-          $y = count($params->param) - 1;
-          $params->param[$y]->addAttribute('type', 'string');
-          $params->param[$y]->addAttribute('currentValue', $cell);
-          $params->param[$y]->addChild('key', $param[$c]);
-        }
+    $keyColumn = self::findKeyCell($csv);
+    if (!$keyColumn) $xml->row = 'Конфигурация таблицы не доступна';
+    $key  = $keyColumn['index'];
+    $desc = $keyColumn['desc'] ?? false;
+
+    foreach ($csv[$keyColumn['row']] as $c => $cell) $param[$c] = $cell;//str_replace(' ', '-', $cell);
+    for (; $keyColumn['row'] > -1; $keyColumn['row']--) array_shift($csv);
+    $csv = array_values(array_filter($csv, function ($item) use ($key) { return !empty($item[$key]); }));
+
+    foreach ($csv as $r => $row) {
+      $xml->addChild('rows');
+      $xml->rows[$r]->addAttribute('id', $row[$key]);
+      if ($desc) $xml->rows[$r]->addAttribute('description', $row[$desc]);
+      $xml->rows[$r]->addChild('params');
+      $params = &$xml->rows[$r]->params;
+
+      foreach ($row as $c => $cell) {
+        if ($c === $key || $c === $desc) continue;
+
+        $params->addChild('param');
+        $y = count($params->param) - 1;
+        $params->param[$y]->addChild('key', $param[$c]);
+        $params->param[$y]->addAttribute('type', 'string');
+        //$params->param[$y]->addAttribute('currentValue', $cell); // Зачем?
       }
-
-      file_put_contents($xmlFileName, $xml->asXML());
     }
+
+    file_put_contents($xmlFileName, $xml->asXML());
+    return [];
   }
 
   static function saveXml($dbTable, $data) {

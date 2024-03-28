@@ -3,54 +3,13 @@
 class Rows {
   constructor(row, rowNode, paramNode) {
     this.row = row;
-    this.rowNode = rowNode;
-    this.paramNode = paramNode;
 
-    this.setParam();
     this.setTemplate();
     this.onEvent();
 
     return this;
   }
-
-  setParam() {
-    this.attr = this.row['@attributes'];
-    this.rowParam = this.row.params.param.length ? this.row.params.param : [this.row.params.param];
-  }
-
-  setTemplate() {
-    this.rowNode.querySelector('[data-field="desc"]').innerHTML = this.row.description;
-    this.rowNode.querySelector('[data-field="id"]').innerHTML = `(${this.row['@attributes'].id})`;
-
-    this.params = [];
-    this.rowParam.forEach((param, index) => {
-      const paramItem = this.paramNode.cloneNode(true);
-      paramItem.querySelector('[data-field="key"]').innerHTML = param.key;
-      paramItem.querySelector('[data-field="type"]').innerHTML = _(param['@attributes'].type);
-      paramItem.dataset.index = index.toString();
-      this.params.push(paramItem);
-      //Object.entries(param['@attributes']).forEach(([k, v]) => { param.dataset[k] = v });
-    })
-
-    f.eraseNode(this.rowNode.querySelector('[data-field="params"]')).append(...this.params);
-  }
-
   // Event function
-
-  onEvent() {
-    this.rowNode.onclick = (e) => this.commonClick(e);
-  }
-
-  commonClick(e) {
-    let target = e.target,
-        action = target.dataset.field || target.dataset.action;
-
-    const select = {
-      'editField': () => this.clickEditField(target),
-    }
-
-    select[action] && select[action]();
-  }
 
   clickEditField(target) {
     const index = target.closest('[data-index]').dataset.index,
@@ -134,9 +93,9 @@ class Rows {
   }
 }
 
-export const XMLTable = {
-  init() {
-    this.setStyle();
+export class XMLTable {
+  constructor() {
+
     this.M = f.initModal();
 
     !this.rowTmp && (this.rowTmp = f.gTNode('#rowTemplate'));
@@ -144,18 +103,13 @@ export const XMLTable = {
     if (!this.editParamNode) {
       this.editParamNode = f.gTNode('#editParamModal');
       f.relatedOption(this.editParamNode);
-      this.onEventEdit();
     }
 
     this.rows = this.queryResult['XMLValues'].row;
     this.XMLInit();
 
-    this.onceFunc = new f.OneTimeFunction('loadTables', this.loaderTables.bind(this));
     this.onEvent();
-  },
-  setStyle() {
-    document.body.style.overflow = 'auto';
-  },
+  }
 
   XMLInit() {
     const div = document.createElement('div');
@@ -165,33 +119,8 @@ export const XMLTable = {
     this.rows.forEach(row => div.append(row.getRowNode()))
 
     f.eraseNode(this.mainNode).append(div);
-  },
+  }
 
-  loaderTables() {
-    let data = new FormData();
-
-    data.set('mode', 'DB');
-    data.set('dbAction', 'tables');
-
-    f.Post({data}).then(data => {
-      data['csvFiles'] && this.setLoadedTablesList(data['csvFiles'])
-    });
-  },
-  setLoadedTablesList(data) {
-    const flat = (d, link = '') => {
-      link && (link = '/' + link);
-      return Object.entries(d).reduce((r, [i, item]) => {
-        r += isFinite(+i) ? `<option value="${link + '/' + item.fileName}">${item.name}</option>`
-                          : flat(item, i + link);
-        return r;
-      }, '');
-    }
-
-    let html = flat(data),
-        node = this.editParamNode.querySelector('[data-field="dbTables"]');
-    node.innerHTML = html;
-    node.click();
-  },
   setLoadedTable(data) {
     let html = '',
         col = data[0].length;
@@ -203,7 +132,7 @@ export const XMLTable = {
     }
 
     this.editParamNode.querySelector('[data-field="tableCol"]').innerHTML = html;
-  },
+  }
 
 
   // Event function
@@ -223,7 +152,7 @@ export const XMLTable = {
       f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
       this.disableBtnSave();
     });
-  },
+  }
   refresh() {
     const data = new FormData();
 
@@ -238,23 +167,8 @@ export const XMLTable = {
       }
       this.disableBtnSave();
     });
-  },
+  }
 
-  commonEditClick(e) {
-    let target = e.target,
-        action = target.dataset.action;
-
-    const select = {
-      'selectChange': () => this.changeSelectType(target),
-      'selectDbTables': () => this.changeSelectTables(target),
-    }
-
-    select[action] && select[action]();
-  },
-  changeSelectType(target) {
-    if (target.value !== 'relationTable') return;
-    this.onceFunc.exec('loadTables');
-  },
   changeSelectTables(target) {
     const data = new FormData();
     data.set('mode', 'DB');
@@ -264,7 +178,7 @@ export const XMLTable = {
     f.Post({data}).then(data => {
       data['csvValues'] && this.setLoadedTable(data['csvValues']);
     });
-  },
+  }
 
   // Event bind
   //--------------------------------------------------------------------------------------------------------------------
@@ -272,9 +186,5 @@ export const XMLTable = {
   onEvent() {
     this.btnSave.onclick = (e) => this.save(e);
     this.btnRefresh.onclick = (e) => this.refresh(e);
-  },
-
-  onEventEdit() {
-    this.editParamNode.onclick = (e) => this.commonEditClick(e);
-  },
+  }
 }

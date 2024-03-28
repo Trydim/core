@@ -4,11 +4,17 @@ import {handson} from "./handsontable.option";
 import {Main} from "./Main";
 
 export class TableValues extends Main {
-  constructor(tableType) {
+  constructor() {
     super();
     this.columns = Object.create(null);
     this.data = Object.create(null);
+
+    this.setPageStyle();
     this.showTable();
+  }
+
+  setPageStyle() {
+    document.body.style.overflow = 'hidden';
   }
 
   async showTable() {

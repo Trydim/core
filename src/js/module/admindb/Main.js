@@ -19,19 +19,11 @@ export class Main {
     this.tableName = new URLSearchParams(location.search).get('tableName') || '';
     this.loaderTable = new f.LoaderIcon(this.mainNode, false, true, {small: false});
 
-    this.setPageStyle();
     this.onBtnEvent();
     this.disableBtnSave();
   }
 
-  setPageStyle() {
-    document.body.style.overflow = 'hidden';
-  }
   dbAction(e) {
-    // Если список таблица не в меню (не используется)
-    //let input = f.qS('input[name="tablesList"]:checked');
-    //input && (this.tableName = input.value);
-
     this.action = typeof e === "string" ? e : e.target.dataset.dbaction;
 
     this.loaderTable.start();
@@ -155,7 +147,7 @@ export class Main {
   }
 
   query(data = new FormData()) {
-    if (!this.action || !this.tableName) return false;
+    if (!this.action || !this.tableName) throw new Error('Error query');
 
     data.set('mode', 'DB');
     data.set('dbAction', this.action);
@@ -167,7 +159,6 @@ export class Main {
   // Event function
   //--------------------------------------------------------------------------------------------------------------------
   tableNameClick(e) {
-    //e.preventDefault();
     let node = e.target, name = node.value || node.innerText;
     if(name.includes('.csv')) f.qS('#btnLoadCSV').classList.remove('fade');
     else f.qS('#btnLoadCSV').classList.add('fade');
@@ -188,9 +179,6 @@ export class Main {
   // DB event bind
   //--------------------------------------------------------------------------------------------------------------------
   onBtnEvent() {
-    // Остальные кнопки
-    f.qA('input[data-dbaction]').forEach(n => n.addEventListener('click', e => this.dbAction(e)));
-
     // Загрузить файл
     //node = f.qS('#DBTables');
     //node && node.addEventListener('click', e => admindb.tableNameClick(e), {passive: true});
