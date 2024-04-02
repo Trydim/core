@@ -1,8 +1,8 @@
 "use strict";
 
-import {TableValues} from "./TableValues";
-//import {FormViews} from "./FormViews";
-import TableEditor from "./tableEditor/TableEditor.js";
+import {FormsTable} from "./formEditor/FormsTable";
+import {CsvValues} from "./CsvValues";
+import {TableEditor} from "./tableEditor/TableEditor.js";
 import ContentEditor from './contentEditor/ContentEditor';
 
 /**
@@ -45,28 +45,17 @@ const adminDb = {
     select[action] && select[action]();
   },
   switchAdminType(value) {
+    this.adminType && this.adminType.destroy();
+
     switch (value) {
-      case 'form':
-        //f.hide(this.btnRefresh);
-        //this.dbAction('loadFormConfig');
-        //this.adminType = new FormViews();
-        break;
-      case 'table':
-        //f.hide(this.btnRefresh);
-        /*if (this.tableName === '') {
+      case 'form':    this.adminType = new FormsTable();    break;
+      case 'table':   this.adminType = new CsvValues();     break;
+        /*
          f.Get({data: 'mode=load&dbAction=tables'})
          .then(data => this.showTablesName(data));
-         } else {*/
-        this.adminType = new TableValues();
-        //}
-        break;
-      case 'config':
-        //this.dbAction('loadXmlConfig');
-         this.adminType = new TableEditor();
-        break;
-      case 'content':
-        this.adminType = new ContentEditor();
-        break;
+        */
+      case 'config':  this.adminType = new TableEditor();   break;
+      case 'content': this.adminType = new ContentEditor(); break;
     }
   },
 

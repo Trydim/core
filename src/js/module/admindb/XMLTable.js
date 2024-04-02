@@ -56,14 +56,6 @@ class Rows {
 
     attr.type = form.get('type');
     switch (attr.type) {
-      default:
-      case 'color':
-      case 'string': break;
-      case 'number':
-        attr.min = form.get('min');
-        attr.max = form.get('max');
-        attr.step = form.get('step');
-        break;
       case 'simpleList':
         attr.values = JSON.stringify(form.get('listItems').replaceAll('\r', '').split('\n'));
         break;
@@ -81,25 +73,11 @@ class Rows {
 
     this.rowParam[index]['@attributes'] = attr;
     this.render();
-    XMLTable.enableBtnSave();
-  }
-
-  render() {
-    this.setTemplate();
-  }
-
-  getRowNode() {
-    return this.rowNode;
   }
 }
 
 export class XMLTable {
   constructor() {
-
-    this.M = f.initModal();
-
-    !this.rowTmp && (this.rowTmp = f.gTNode('#rowTemplate'));
-    !this.paramTmp && (this.paramTmp = f.gTNode('#rowParamTemplate'));
     if (!this.editParamNode) {
       this.editParamNode = f.gTNode('#editParamModal');
       f.relatedOption(this.editParamNode);
@@ -107,8 +85,6 @@ export class XMLTable {
 
     this.rows = this.queryResult['XMLValues'].row;
     this.XMLInit();
-
-    this.onEvent();
   }
 
   XMLInit() {
@@ -153,21 +129,6 @@ export class XMLTable {
       this.disableBtnSave();
     });
   }
-  refresh() {
-    const data = new FormData();
-
-    data.set('mode', 'DB');
-    data.set('dbAction', 'refreshXMLConfig');
-    data.set('tableName', this.tableName);
-
-    f.Post({data}).then(data => {
-      if (data['XMLValues']) {
-        this.queryResult = data;
-        this.init();
-      }
-      this.disableBtnSave();
-    });
-  }
 
   changeSelectTables(target) {
     const data = new FormData();
@@ -178,13 +139,5 @@ export class XMLTable {
     f.Post({data}).then(data => {
       data['csvValues'] && this.setLoadedTable(data['csvValues']);
     });
-  }
-
-  // Event bind
-  //--------------------------------------------------------------------------------------------------------------------
-
-  onEvent() {
-    this.btnSave.onclick = (e) => this.save(e);
-    this.btnRefresh.onclick = (e) => this.refresh(e);
   }
 }

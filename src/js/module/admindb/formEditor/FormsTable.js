@@ -6,21 +6,17 @@ import {Main} from '../Main.js';
 
 import App from './App.vue';
 
-export class TableEditor extends Main {
+export class FormsTable extends Main {
   constructor() {
     super();
-    this.setPageStyle();
     this.showData();
     this.onEvent();
   }
 
-  setPageStyle() {
-    document.body.style.overflow = 'auto';
-  }
-
   async showData() {
-    await this.dbAction('loadXmlConfig');
-    this.contentData       = this.queryResult['XMLValues'];
+    await this.dbAction('loadFormsTable');
+    this.contentData       = this.queryResult['csvValues'];
+    this.contentConfig     = this.queryResult['XMLValues'];
     this.contentProperties = this.queryResult['XMLProperties'];
 
     this.setVueConfig();
@@ -70,9 +66,9 @@ export class TableEditor extends Main {
     const data = new FormData();
 
     data.set('mode', 'DB');
-    data.set('dbAction', 'saveXMLConfig');
+    data.set('dbAction', 'saveTable');
     data.set('tableName', this.tableName);
-    data.set('XMLConfig', JSON.stringify(this.contentData));
+    data.set('csvData', JSON.stringify(this.contentData));
 
     f.Post({data}).then(data => {
       f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');

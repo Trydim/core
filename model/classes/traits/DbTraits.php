@@ -476,8 +476,6 @@ trait DbCsv {
         while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) $result[] = $cells;
         fclose($file);
       }
-
-      Xml::checkXml($this->csvTable);
     }
 
     return $result;
@@ -510,9 +508,9 @@ trait DbCsv {
   /**
    * @param array $csvData
    *
-   * @return DbCsv
+   * @return $this
    */
-  public function saveCsv(array $csvData): DbCsv {
+  public function saveCsv(array $csvData) {
     $csvPath = $this->main->getCmsParam(VC::CSV_PATH);
 
     if (file_exists($csvPath . $this->csvTable)) {

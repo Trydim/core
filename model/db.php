@@ -110,13 +110,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'loadCSV':
       $db->fileForceDownload();
       break;
-    case 'loadFormConfig':
+    case 'loadFormsTable':
       if (isset($dbTable)) {
-        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
-        if (file_exists($filePath) && filesize($filePath) > 60) {
-          $result['csvValues'] = $db->openCsv();
-          $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
-        } else $result['error'] = 'File error';
+        $result['csvValues'] = $db->openCsv();
+        $result['XMLValues'] = Xml::syncXmlFile($dbTable);
+        $result['XMLProperties'] = $main->getSettings(VC::TABLE_XML_PROPERTIES);
       }
       break;
     case 'saveXMLConfig':
@@ -126,18 +124,9 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
-        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('.csv', '.xml', $dbTable);
-        if (file_exists($filePath)) {
-          if (filesize($filePath) < 60) $result = Xml::createXmlDefault($filePath, substr($dbTable, 1));
-          $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
-        }
-      }
-      break;
-    case 'refreshXMLConfig':
-      if (isset($dbTable)) {
-        $filePath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('csv', 'xml', $dbTable);
-        Xml::createXmlDefault($filePath, substr($dbTable, 1));
-        $result['XMLValues'] = new SimpleXMLElement(file_get_contents($filePath));
+        $result['XMLValues'] = Xml::syncXmlFile($dbTable);
+
+        $result['XMLProperties'] = $main->getSettings(VC::TABLE_XML_PROPERTIES);
       }
       break;
 

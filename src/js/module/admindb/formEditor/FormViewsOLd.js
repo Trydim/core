@@ -29,7 +29,7 @@ const inputBlur = function () {
   this.value = checkInputValue(this, +this.value);
 };
 
-export const FormViews = {
+export const FormViewsOLd = {
   init() {
     this.relTarget = Object.create(null);
 

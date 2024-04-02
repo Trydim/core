@@ -3,7 +3,7 @@
 import {handson} from "./handsontable.option";
 import {Main} from "./Main";
 
-export class TableValues extends Main {
+export class CsvValues extends Main {
   constructor() {
     super();
     this.columns = Object.create(null);
@@ -82,6 +82,10 @@ export class TableValues extends Main {
       html += '<br>';
     });
     f.gI('errors').innerHTML = html;
+  }
+
+  destroy() {
+    this.btnSave.onclick = undefined;
   }
 
   // Events function

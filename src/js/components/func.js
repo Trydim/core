@@ -121,7 +121,7 @@ export default {
    */
   getDataAsAssoc: selector => {
     const arr   = Object.values(f.getData(selector)),
-          fItem = arr[0],
+          fItem = arr[0] || {},
           fKeys = Object.keys(fItem);
 
     let oneValue = false;

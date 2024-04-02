@@ -9,7 +9,7 @@ import {handson} from "./handsontable.option";
 export class Main {
   constructor() {
     this.action = '';
-    this.btnSaveEnable = false;
+    this.btnSaveEnable = true;
     this.queryResult = {};
     this.mainNode   = f.qS('#insertToDB');
     this.btnSave    = f.qS('#btnSave');

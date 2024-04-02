@@ -21,11 +21,8 @@ class Xml {
 
   static $xml;
 
-  static function getXMLTemplate() {
-    return <<<XML
-<?xml version="1.0" encoding="UTF-8" ?>
-<root></root>
-XML;
+  static function getXMLTemplate(): string {
+    return '<?xml version="1.0" encoding="UTF-8" ?><root></root>';
   }
 
   static function setChown() {
@@ -37,7 +34,7 @@ XML;
   /**
    * @param string $csvPath
    */
-  static function checkXml(string $csvPath) {
+  static function createStartXml(string $csvPath) {
     $rootDir = ABS_SITE_PATH . SHARE_PATH;
     $xmlDir  = $rootDir . 'xml/';
     $xmlPath = str_replace('.csv', '.xml', $csvPath);
@@ -52,72 +49,98 @@ XML;
   }
 
   /**
-   * Поиск столбца ключей и описания
-   * @param $csv
-   * @return array
+   * Поиск столбца ключей
+   * @param array $csv
+   * @return int
    */
   static function findKeyCell($csv) {
-    $res = [];
-    for ($i = 0; $i < 3; $i++) {
-      foreach ($csv[$i] as $index => $cell) {
-        if (preg_match('/(id)|(key)/i', $cell)) $res['index'] = $index;
-        else if (preg_match('/(опис)|(desc)/ui', $cell)) $res['desc'] = $index;
-      }
-      if (count($res)) {
-        $res['row'] = $i;
-        break;
-      }
+    foreach ($csv[0] as $index => $cell) {
+      if (preg_match('/(id)|(key)/i', $cell)) return $index;
     }
-    return $res;
+
+    return 0;
   }
 
-  static function createXmlDefault($xmlFileName, $fileName) {
-    $csv = loadCSV([], $fileName);
-
+  static function updateXmlDefault(string $xmlPath, string $csvPath) {
+    $csv = loadCSV([], $csvPath);
     if (count($csv) === 0) return ['error' => 'Csv table is empty!'];
 
-    $xml = new SimpleXMLElement(self::getXMLTemplate());
-    $param = [];
-
-    $keyColumn = self::findKeyCell($csv);
-    if (!$keyColumn) $xml->row = 'Конфигурация таблицы не доступна';
-    $key  = $keyColumn['index'];
-    $desc = $keyColumn['desc'] ?? false;
-
-    foreach ($csv[$keyColumn['row']] as $c => $cell) $param[$c] = $cell;//str_replace(' ', '-', $cell);
-    for (; $keyColumn['row'] > -1; $keyColumn['row']--) array_shift($csv);
-    $csv = array_values(array_filter($csv, function ($item) use ($key) { return !empty($item[$key]); }));
-
-    foreach ($csv as $r => $row) {
-      $xml->addChild('rows');
-      $xml->rows[$r]->addAttribute('id', $row[$key]);
-      if ($desc) $xml->rows[$r]->addAttribute('description', $row[$desc]);
-      $xml->rows[$r]->addChild('params');
-      $params = &$xml->rows[$r]->params;
-
-      foreach ($row as $c => $cell) {
-        if ($c === $key || $c === $desc) continue;
-
-        $params->addChild('param');
-        $y = count($params->param) - 1;
-        $params->param[$y]->addChild('key', $param[$c]);
-        $params->param[$y]->addAttribute('type', 'string');
-        //$params->param[$y]->addAttribute('currentValue', $cell); // Зачем?
-      }
+    $xml = new SimpleXMLElement(file_get_contents($xmlPath));
+    $currentXml = $xml->asXML();
+    // Check rows, columns count
+    //$rowsCount    = count($csv);
+    //$columnsCount = count($csv[0]);
+    /*if ((int) $xml->attributes()->rows === $rowsCount
+      && (int) $xml->attributes()->columns === $columnsCount) {
+      return $xml;
     }
 
-    file_put_contents($xmlFileName, $xml->asXML());
-    return [];
+    $xml->addAttribute('rows', $rowsCount);
+    $xml->addAttribute('columns', $columnsCount);
+    */
+
+    $param = [];
+    foreach ($csv[0] as $c => $cell) $param[$c] = $cell;
+
+    $csv = array_values(array_filter($csv, function ($item) { return !empty(implode('', $item)); }));
+
+    foreach ($csv as $r => $row) {
+      // В нулевой строке общие параметры
+      //if ($r === 0 && !isset())
+
+      //
+      if (!isset($xml->children()->rows) || !isset($xml->children()->rows[$r])) {
+        $xml->addChild('rows');
+        //$xml->rows[$r]->addAttribute('index', $r);
+      }
+
+      $xRow = &$xml->rows[$r];
+
+      // Если ид не совпадает значит новая строка
+      // Искать такой ид в других строках (кроме первой)
+      // переместить все параметры
+      // Если новая строка, раздать параметры из шапки по умолчанию а не строки.
+      if ((string) $xRow->attributes()->id !== $row[0/*$index*/]) {
+        $xml->rows[$r]->addAttribute('id', $row[0/*$index*/]);
+      }
+
+      if (!isset($xRow->children()->params)) $xRow->addChild('params');
+      $xParams = &$xRow->params;
+
+      foreach ($row as $c => $cell) {
+        if (!isset($xParams->children()->param)) $xParams->addChild('param');
+        $xParam = &$xParams->param[$c];
+
+        if (!isset($xParam->attributes()->key) || (string) $xParam->attributes()->key !== $param[$c]) $xParam->addAttribute('key', $param[$c]);
+        // Для всех строк "по умолчанию" наследование от шапки
+        if (!isset($xParam->attributes()->type)) $xParam->addAttribute('type', $r === 0 ? 'string' : 'inherit');
+      }
+
+      // Удалить лишние параметры/колонки
+
+    }
+
+    // Если нет измений не сохранять
+    if ($currentXml !== $xml->asXML()) file_put_contents($xmlPath, $xml->asXML());
+    return $xml;
   }
 
-  static function saveXml($dbTable, $data) {
-    global $main;
+  static function syncXmlFile(string $csvPath) {
+    $xmlPath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('.csv', '.xml', $csvPath);
+
+    // Check file
+    if (!file_exists($xmlPath)) self::createStartXml(substr($csvPath, 1));
+
+    return self::updateXmlDefault($xmlPath, $csvPath);
+  }
+
+  static function saveXml(string $csvPath, array $data) {
+    $xmlPath = ABS_SITE_PATH . SHARE_PATH . 'xml' . str_replace('.csv', '.xml', $csvPath);
 
     $xml = new SimpleXMLElement(self::getXMLTemplate());
     try {
       self::arrayToXml($data, $xml);
-      $filePath = $main->getCmsParam(VC::CSV_PATH) . '../xml' . str_replace('csv', 'xml', $dbTable);
-      file_put_contents($filePath, $xml->asXML());
+      file_put_contents($xmlPath, $xml->asXML());
     } catch (Exception $e) {
       return $e->getMessage();
     }
@@ -137,11 +160,10 @@ XML;
     return $v;
   }
 
-  static function arrayToXml($data, &$xml) {
+  static function arrayToXml($data, $xml) {
     foreach ($data as $key => $value) {
       if (is_array($value)) {
-
-        if ($key === '@attributes'/*|| $key === '@value' || $key === '@cdata'*/) {
+        if ($key === '@attributes') {
           foreach ($value as $attrKey => $attrValue) {
             $xml->addAttribute($attrKey, self::bool2str($attrValue));
           }
@@ -157,5 +179,4 @@ XML;
       }
     }
   }
-
 }

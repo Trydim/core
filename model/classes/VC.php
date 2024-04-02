@@ -63,7 +63,8 @@ class VC {
         SERVER_REFRESH = 'serverRefresh',
 
         OPTION_PROPERTIES = 'optionProperties',
-        DEALER_PROPERTIES = 'dealersProperties';
+        DEALER_PROPERTIES = 'dealersProperties',
+        TABLE_XML_PROPERTIES = 'xmlProperties';
 
   /**
    * Setting action
