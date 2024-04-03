@@ -43,7 +43,7 @@ foreach ($param['managerField'] as $k => $item) {
       $managerField[$k] = [];
       $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $o['table']);
 
-      $input = '<select name="' . $k . '" class="form-select">';
+      $input = '<select class="form-select" name="' . $k . '" ' . ($o['multiselect'] ?? false ? 'multiple style="resize: vertical"' : '') . '>';
       foreach ($data as $row) {
         $dK = $row[$o['saveKey']];
         $dV = $row[$o['showKey']];
@@ -131,4 +131,3 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
 </template>';
 
 $field[VC::BASE_FOOTER_CONTENT] .= $main->initDictionary();
-
