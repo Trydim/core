@@ -18,7 +18,7 @@
     </span>
   </div>
   <div>
-    <input type="button" class="btn btn-danger mainOnly" value="<?= gTxt('Delete') ?>" data-action="delOrders">
+    <input type="button" id="deleteOrderBtn" class="btn btn-danger mainOnly" value="<?= gTxt('Delete') ?>" data-action="delOrders">
   </div>
 </div>
 <div class="position-sticky mb-4 pt-1 top-0 bg-white d-none" id="confirmField" style="z-index: +2">

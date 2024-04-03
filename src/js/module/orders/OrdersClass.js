@@ -248,7 +248,7 @@ export default class {
       if (this.needReload) {
         this.needReload = false;
         this.selected.clear();
-        this.queryParam.dbAction = this.mainAction;
+        this.queryParam.dbAction = this.orderType.toString() === 'visit' ? 'loadVisitorOrders' : this.mainAction;
         this.queryParam.orderIds = '[]';
         return this.query();
       } else {

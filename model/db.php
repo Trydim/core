@@ -314,7 +314,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $result['orders'] = $db->loadVisitorOrder($pagerParam);
       break;
     case 'delVisitorOrders':
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
+      $orderIds = explode(',', $orderIds ?? '');
       if (count($orderIds)) $db->deleteItem('client_orders', $orderIds);
       break;
 
