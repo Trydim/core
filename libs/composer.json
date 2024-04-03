@@ -24,6 +24,7 @@
     "ext-gd": "*",
     "ext-zip": "*",
     "ext-ctype": "*",
-    "ext-sockets": "*"
+    "ext-sockets": "*",
+    "ext-dom": "*"
   }
 }

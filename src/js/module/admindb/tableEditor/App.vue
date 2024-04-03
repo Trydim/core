@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <div v-for="(row, i) of contentData" :key="i" class="row">
-      <div class="col-4 border">
+  <div class="overflow-auto">
+    <div v-for="(row, i) of contentData" :key="i" class="row flex-nowrap">
+      <div class="col-2 border">
         <small v-if="row['@attributes']">{{ row['@attributes'].id }}</small>
       </div>
 
@@ -24,7 +24,8 @@
         </label>
       </div>
       <div v-if="param.type === 'string'" class="d-flex">
-        Ограничения для строк
+        <p>Нельзя редактировать</p>
+        <input type="checkbox" v-model="param.disabled">
         <!--<p>ключ=значение.</p>
         <textarea name="listItems" cols="30" rows="5"></textarea>-->
       </div>

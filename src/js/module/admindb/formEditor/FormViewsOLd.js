@@ -164,8 +164,6 @@ export const FormViewsOLd = {
       for (let item of data[i]) {
         if (item === paramAttr.tableCol) {
           col.id = data[i].indexOf(item);
-        } else if (/(desc|опис|name|наимен)/i.test(item)) {
-          col.desc = data[i].indexOf(item);
         }
       }
 
@@ -240,25 +238,4 @@ export const FormViewsOLd = {
         ? [...target.options].filter(i => i.selected).map(n => n.value).join(' ')
         : target.value;
   },
-
-  save() {
-    const data = new FormData();
-
-    data.set('mode', 'DB');
-    data.set('dbAction', 'saveTable');
-    data.set('tableName', this.tableName);
-    data.set('csvData', JSON.stringify(this.csv));
-
-    f.Post({data}).then(data => {
-      f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
-      this.disableBtnSave();
-    });
-  },
-
-  // DB event bind
-  //--------------------------------------------------------------------------------------------------------------------
-
-  onEvent() {
-    this.btnSave.addEventListener('click', () => this.save());
-  }
 }
