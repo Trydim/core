@@ -122,6 +122,7 @@ class Dealer {
     $this->migrateDb->createUsers();
     $this->migrateDb->createOrderStatus();
     $this->migrateDb->createOrders();
+    $this->migrateDb->createClientOrders();
 
     $this->migrateDb->addAdmin($param['login'], $param['pass']);
     $this->migrateDb->addStatus($param['status'] ?? []);

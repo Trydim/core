@@ -1075,8 +1075,7 @@ class DbMain extends R {
    * @return array
    */
   public function loadDealersUsers(string $login = ''): array {
-    $sql = '';
-
+    $result = [];
     $dealers = $this->loadDealers(true);
     $dealers = array_map(function ($dealer) {
       return [
@@ -1085,7 +1084,19 @@ class DbMain extends R {
       ];
     }, $dealers);
 
-    foreach ($dealers as $dealer) {
+    $countPerPart = 20;
+    $countDealers = count($dealers);
+    $countPart = ceil($countDealers / $countPerPart);
+
+    for ($i = 0; $i < $countPart; $i++) {
+      $sql = '';
+      if ($login) $result = [];
+
+      for ($j = 0; $j < $countPerPart; $j++) {
+        $index = $i * $countPerPart + $j;
+        if ($index >= $countDealers) break;
+
+        $dealer = $dealers[$index];
       $sql .= " UNION SELECT ID as 'id', name, login, password, "
             . "'" . $dealer['id'] . "' as dealerId, "
             . "'" . $dealer['prefix'] . "' as prefix "
@@ -1095,7 +1106,11 @@ class DbMain extends R {
       if ($login) $sql .= ' AND login = "' . $login . '"';
     }
 
-    return self::getAll(substr($sql, 7), [':login' => $login]);
+      $result = array_merge($result, self::getAll(substr($sql, 7), [':login' => $login]));
+      if ($login && count($result)) return $result;
+    }
+
+    return $result;
   }
 
   public function loadDealerById(string $id = null): array {

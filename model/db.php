@@ -764,11 +764,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'loadUsersLogin':
       $users = [];
 
-      $dealersUsers = $main->db->loadDealersUsers();
+      $dealersUsers = $db->loadDealersUsers();
       if (count($dealersUsers)) $users = array_map(function ($user) { return $user['login']; }, $dealersUsers);
 
-      $main->db->togglePrefix();
-      $users = array_merge($users, $main->db->selectQuery('users', 'login'));
+      $db->togglePrefix();
+      $users = array_merge($users, $db->selectQuery('users', 'login'));
 
       $result['users'] = $users;
       break;
