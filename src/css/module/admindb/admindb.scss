@@ -1,0 +1,19 @@
+
+@import "./handsontable.min.css";
+
+.form-editor {
+
+  input {
+    border: none;
+
+    input.selected {
+      border: 1px red solid;
+    }
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid row">
+  <div class="form-editor container-fluid row">
     <div class="col-10">
       <!-- Спойлеры -->
       <template v-for="(spoiler, s) of mergedData" :key="s">
@@ -14,23 +14,16 @@
             </div>
             <!-- Содержимое -->
             <template v-for="(row, i) of spoiler" :key="i">
-              <template v-for="(cell, j) of row" :key="j">
-                <div v-if="cell.param.type === 'string' || i === 0">
-                  <input type="text" class="w-100"
-                         :disabled="cell.param.disabled || i === 0"
-                         :value="cell.value"
-                         @change="stringChange($event.target, i, j)">
-                </div>
-                <div v-else-if="cell.param.type === 'number'">
-                  <input type="number" class="text-end"
+              <div v-for="(cell, j) of row" :key="j" class="cell">
+                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]"></InputText>
+                <input v-else-if="cell.param.type === 'number'" type="number" class="w-100 text-end"
                          :min="cell.param.min || 0"
                          :max="cell.param.max || 1e12"
                          :step="cell.param.step || 1"
                          :disabled="cell.param.disabled"
                          :value="cell.value"
-                         @change="numberChange($event.target, i, j)">
-                </div>
-              </template>
+                       @change="numberChange($event.target, i, j)">
+              </div>
             </template>
           </div>
         </details>
@@ -46,9 +39,11 @@
 
 //import Modal from "../contentEditor/Modal";
 
+import InputText from "./form/text.vue";
+
 export default {
   name: "FormsTable",
-  components: {},
+  components: {InputText},
   data() {
     return {
       showModal: false,
@@ -125,9 +120,6 @@ export default {
       this.mergedData = res;
     },
 
-    stringChange(t, i, j) {
-      this.contentData[i][j] = t.value;
-    },
     numberChange(t, i, j) {
       this.contentData[i][j] = t.value;
     },

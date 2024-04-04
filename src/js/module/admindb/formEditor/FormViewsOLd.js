@@ -109,20 +109,6 @@ export const FormViewsOLd = {
       switch (paramAttr.type) {
         default:
         case 'string': break;
-        case 'number':
-          input.name += Math.random() * 1000 | 0;
-          input.min = paramAttr.min || 0;
-          input.max = paramAttr.max || 1000000000;
-
-          let step = paramAttr.step || 1;
-          node = paramItem.querySelector('.actionMinus');
-          node.dataset.change = (step * -1).toString();
-          node.dataset.input = input.name;
-
-          node = paramItem.querySelector('.actionPlus');
-          node.dataset.change = step;
-          node.dataset.input = input.name;
-          break;
         case 'simpleList':
           let value = JSON.parse(paramAttr.values);
           input.innerHTML = value.map(i => {

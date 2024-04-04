@@ -57,9 +57,11 @@ export class TableEditor extends Main {
 
     vue.use(this.self);
     vue.mount(this.mainNode);
+    this.vueApp = vue;
   }
 
   destroy() {
+    this.vueApp.unmount();
     this.btnSave.onclick = undefined;
   }
 

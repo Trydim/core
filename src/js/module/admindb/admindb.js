@@ -1,5 +1,7 @@
 "use strict";
 
+import '../../../css/module/admindb/admindb.scss';
+
 import {FormsTable} from "./formEditor/FormsTable";
 import {CsvValues} from "./CsvValues";
 import {TableEditor} from "./tableEditor/TableEditor.js";

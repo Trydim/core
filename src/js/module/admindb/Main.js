@@ -1,6 +1,5 @@
 "use strict";
 
-import '../../../css/module/admindb/handsontable.min.css';
 import mustache from 'mustache';
 
 import "../../libs/handsontable.full.min";

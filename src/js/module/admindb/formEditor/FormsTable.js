@@ -25,9 +25,6 @@ export class FormsTable extends Main {
   }
 
   setVueConfig() {
-    this.directives = {};
-    this.component = {};
-
     this.self = {
       install: app => app.config.globalProperties.$db = this,
     };
@@ -35,27 +32,19 @@ export class FormsTable extends Main {
   vueInit() {
     const vue = Vue.createApp(App);
 
-    Object.entries(this.directives).forEach(([dName, param]) => {
-      vue.directive(dName, param);
-    });
-    Object.entries(this.component).forEach(([component, param]) => {
-      vue.component(component, param);
-    });
-
-    vue.config.errorHandler = (err, vm, info) => {
+    vue.config.errorHandler = (err) => {
       debugger
       console.log(err);
       f.showMsg(err, 'error', false);
-      // обработка ошибки
-      // `info` — специфическая для Vue информация об ошибке,
-      // например, в каком хуке жизненного цикла была найдена ошибка
     }
 
     vue.use(this.self);
     vue.mount(this.mainNode);
+    this.vueApp = vue;
   }
 
   destroy() {
+    this.vueApp.unmount();
     this.btnSave.onclick = undefined;
   }
 
