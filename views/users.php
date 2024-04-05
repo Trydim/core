@@ -20,17 +20,17 @@ foreach ($param['managerField'] as $k => $item) {
       $input = '<input id="' . $rndId . '" type="' . $item['type'] . '" class="form-control" name="' . $k . '">';
       break;
     case 'checkbox':
-      $managerFieldHtml .= '<div class="row">
+      $managerFieldHtml .= '<div class="row managerField">
         <div class="col-6 ps-4">
-          <label class="w-100" for="' . $rndId . '" role="button">' . $item['name'] .':</label>
+          <label class="w-100" for="' . $rndId . '">' . $item['name'] .':</label>
         </div>
         <div class="col-6">
           <div class="form-check form-switch mb-3 text-center">
-            <input class="form-check-input float-none" type="checkbox" name="' . $k . '" id="' . $rndId . '">
+            <input type="checkbox" id="' . $rndId . '" class="form-check-input float-none" name="' . $k . '">
           </div>
         </div>
       </div>';
-      break;
+      continue 2;
     case 'list':
       $input = '<select name="' . $k . '" class="form-select">';
       foreach ($item['options'] as $option) {
@@ -43,20 +43,36 @@ foreach ($param['managerField'] as $k => $item) {
       $managerField[$k] = [];
       $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $o['table']);
 
-      $input = '<select class="form-select" name="' . $k . '" ' . ($o['multiselect'] ?? false ? 'multiple style="resize: vertical"' : '') . '>';
-      foreach ($data as $row) {
-        $dK = $row[$o['saveKey']];
-        $dV = $row[$o['showKey']];
+      if ($o['multiselect']) {
+        $managerFieldHtml = '<div class="form-control managerField" style="height: 60px; overflow: hidden auto; resize: vertical">'; //  ' . ($o['multiselect'] ?? false ? 'multiple style="resize: vertical"' : '') . '>'
+        foreach ($data as $row) {
+          $rndId = uniqid();
+          $dK = $row[$o['saveKey']];
+          $dV = $row[$o['showKey']];
 
-        $managerField[$k][$dK] = $dV;
-        $input .= '<option value="' . $dK . '">' . $dV . '</option>';
+          $managerField[$k][$dK] = $dV;
+          $managerFieldHtml .= '
+          <div class="form-check">
+            <input type="checkbox" id="' . $rndId . '" class="form-check-input"  name="' . $k . '" value="' . $dK . '">
+            <label class="form-check-label" for="' . $rndId . '">' . $dV .'</label>
+          </div>';
+        }
+        $managerFieldHtml .= '</div>';
+        continue 2;
+      } else {
+        $input = '<select class="form-select" name="' . $k . '">';
+        foreach ($data as $row) {
+          $dK = $row[$o['saveKey']];
+          $dV = $row[$o['showKey']];
+
+          $managerField[$k][$dK] = $dV;
+          $input .= '<option value="' . $dK . '">' . $dV . '</option>';
+        }
+        $input .= '</select>';
       }
-      $input .= '</select>';
 
       break;
   }
-
-  if ($item['type'] === 'checkbox') continue;
 
   $managerFieldHtml .= '<div class="form-floating managerField mb-3">' . $input .
                        '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
@@ -70,7 +86,7 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
   <option value="${ID}">${name}</option>
 </template>
 <template id="tableContactsValue">
-  <div>${key}: ${value}</div>
+  <div class="d-flex align-items-center justify-content-center gap-2"><div>${key}:</div><div>${value}</div></div>
 </template>
 <template id="userForm">
   <form action="#">

@@ -1051,7 +1051,7 @@ class DbMain extends R {
 
     if (isset($row['id']) && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
       $this->main->setCmsParam('dealerId', $row['id']);
-      $this->main->setCmsParam('PROJECT_TITLE', $row['name']);
+      $this->main->setCmsParam(VC::PROJECT_TITLE, $row['name']);
       $this->prefix = $row['cmsParam']['prefix'];
       return true;
     }
