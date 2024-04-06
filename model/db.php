@@ -844,7 +844,14 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'loadDealers':
-      $result['dealers'] = $main->db->loadDealers();
+      $result['dealers'] = $db->loadDealers();
+      break;
+    case 'loadDealerUsers':
+      $dealer = $db->getDealerById($main->url->request->get('dealerId'));
+
+      $db->setPrefix($dealer['cmsParam']['prefix']);
+
+      $result['dealerUsers'] = $db->selectQuery('users');
       break;
     case 'changeDealer':
       if (isset($dealer)) {
