@@ -65,8 +65,9 @@
     </Column>
   </DataTable>
 
-  <div class="d-flex my-3">
-    <Button class="btn-warning" @click="changeDealer">Редактировать</Button>
+  <div class="d-flex gap-3 my-3">
+    <Button class="btn-warning" @click="changeDealer">{{ $t('Edit dealer') }}</Button>
+    <Button class="btn-warning" @click="changeDealerUser">{{ $t('Edit dealer users') }}</Button>
   </div>
 
   <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
@@ -81,16 +82,15 @@
           <span class="p-inputgroup-addon col-5">Название:</span>
           <InputText class="p-inputtext-sm" v-model="dealer.name" autofocus></InputText>
         </div>
-        <template v-if="queryParam.dbAction === 'addDealer'">
-          <div class="p-inputgroup my-2">
-            <span class="p-inputgroup-addon col-5">Логин:</span>
-            <InputText class="p-inputtext-sm" v-model="dealer.login" autofocus></InputText>
-          </div>
-          <div class="p-inputgroup my-2">
-            <span class="p-inputgroup-addon col-5">Пароль:</span>
-            <InputText class="p-inputtext-sm" v-model="dealer.password" autofocus></InputText>
-          </div>
-        </template>
+
+        <div class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">Логин:</span>
+          <InputText class="p-inputtext-sm" v-model="dealer.login"></InputText>
+        </div>
+        <div class="p-inputgroup my-2">
+          <span class="p-inputgroup-addon col-5">Пароль:</span>
+          <InputText class="p-inputtext-sm" v-model="dealer.password"></InputText>
+        </div>
         <!-- Контакты номер -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Телефон:</span>
@@ -372,6 +372,26 @@ export default {
 
       this.setModal('Настройка для дилера', true);
       this.reloadFn = this.reload;
+    },
+    changeDealerUser() {
+      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+
+      f.Get({data: {
+        mode: 'DB',
+        cmsAction: 'loadDealerUsers',
+        dealerId: this.selected.id,
+      }}).then(d => {
+        if (d.status && d['dealerUsers']) {
+          this.dealerUsers = d['dealerUsers'];
+        }
+
+        this.modal.loading = false;
+      })
+      this.queryParam.dbAction = 'update';
+      this.queryParam.dealerId = this.selected.id;
+
+      this.modal.loading = true;
+      this.setModal('Пользователи дилера', true);
     },
     refreshProperties() { this.setProperty() },
     deleteDealer() {

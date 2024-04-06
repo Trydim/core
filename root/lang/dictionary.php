@@ -36,6 +36,7 @@
   'Print'           => 'Печать',
   'Send mail'       => 'Отправить на почту',
   'Activity'        => 'Активен',
+  'Auth no passing!' => 'Ошибка авторизации!',
 
   // CMS - settings
   // Mail
@@ -66,6 +67,8 @@
   'Delete access type' => 'Удалить тип доступа',
   // Dealer
   'Value is not valid' => 'Значение не верное',
+  'Edit dealer'        => 'Редактировать дилера',
+  'Edit dealer users'  => 'Редактировать пользователей',
   // Manager settings
   'Manager settings' => 'Менеджеры',
   'Additional fields for managers' => 'Дополнительные поля',
@@ -98,10 +101,14 @@
   'code (optional)' => 'Код (необязательно)',
   'Sorting'         => 'Сортировка',
   'Default'         => 'По умолчанию',
+  'order created'   => 'Заказ создан',
   // Orders
   'Orders' => 'Заказы',
   'Order' => 'Заказ',
-  'View orders' => 'Посмотреть заказы',
+  'View orders'     => 'Показать заказы',
+  'Manager orders'  => 'Заказы',
+  'Customer orders' => 'Предварительные расчеты',
+  'Selected orders' => 'Выбранные заказы',
   'Saved! Change will be visible after reload page' => 'Сохранено! Изменения будут видны после перезагрузки страницы',
   // Other
   'Other'      => 'Прочее',

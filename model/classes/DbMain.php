@@ -1117,6 +1117,7 @@ class DbMain extends R {
     $id = $id ?? $this->main->getCmsParam('dealerId');
 
     $sql = "SELECT ID AS 'id', name, contacts,
+                   cms_param AS 'cmsParam',
                    register_date AS 'registerDate', activity, settings
             FROM dealers
             WHERE ID = :id";
