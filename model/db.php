@@ -303,7 +303,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $result['orders'] = $db->loadVisitorOrder($pagerParam);
       break;
     case 'delVisitorOrders':
-      $orderIds = isset($orderIds) ? json_decode($orderIds) : [];
+      $orderIds = explode(',', $orderIds ?? '');
       if (count($orderIds)) $db->deleteItem('client_orders', $orderIds);
       break;
 
@@ -753,11 +753,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'loadUsersLogin':
       $users = [];
 
-      $dealersUsers = $main->db->loadDealersUsers();
+      $dealersUsers = $db->loadDealersUsers();
       if (count($dealersUsers)) $users = array_map(function ($user) { return $user['login']; }, $dealersUsers);
 
-      $main->db->togglePrefix();
-      $users = array_merge($users, $main->db->selectQuery('users', 'login'));
+      $db->togglePrefix();
+      $users = array_merge($users, $db->selectQuery('users', 'login'));
 
       $result['users'] = $users;
       break;
@@ -833,7 +833,14 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'loadDealers':
-      $result['dealers'] = $main->db->loadDealers();
+      $result['dealers'] = $db->loadDealers();
+      break;
+    case 'loadDealerUsers':
+      $dealer = $db->getDealerById($main->url->request->get('dealerId'));
+
+      $db->setPrefix($dealer['cmsParam']['prefix']);
+
+      $result['dealerUsers'] = $db->selectQuery('users');
       break;
     case 'changeDealer':
       if (isset($dealer)) {

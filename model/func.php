@@ -108,14 +108,16 @@ function convertToArray($value): array {
   return [];
 }
 
-/**
- * @param string $file1
- * @param string $file2
- * @return bool
- */
-function compareFiles(string $file1, string $file2): bool {
-  return file_exists($file1) && file_exists($file2)
-    && md5_file($file1) === md5_file($file2);
+if (!function_exists('compareFiles')) {
+  /**
+   * @param string $file1
+   * @param string $file2
+   * @return bool
+   */
+  function compareFiles(string $file1, string $file2): bool {
+    return file_exists($file1) && file_exists($file2)
+      && md5_file($file1) === md5_file($file2);
+  }
 }
 
 if (!function_exists('de')) {

@@ -318,16 +318,15 @@ class MigrateDb {
     $table = $this->pf('client_orders');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
-      `cp_number` varchar(30) DEFAULT NULL,
-      `'create_date` timestamp NULL DEFAULT current_timestamp(),
-      `input_value` varchar(500) DEFAULT '{}',
+      `create_date` timestamp NULL DEFAULT current_timestamp(),
+      `save_value` varchar(500) DEFAULT '{}',
       `important_value` varchar(255) DEFAULT '{}',
+      `report_value` mediumblob DEFAULT NULL,
       `total` float DEFAULT 0
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
     $error = $this->db->exec($sql);
     !$error && $error = $this->alterPrimaryKey($table);
-    !$error && $error = $this->alterUnique($table, 'cp_number');
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }

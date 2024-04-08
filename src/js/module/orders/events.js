@@ -170,6 +170,12 @@ export default class extends Orders {
     f.show(this.confirm);
     return true;
   }
+  delVisitorOrders() {
+    this.needReload = true;
+    this.confirmMsg = window._('Deleted');
+    f.show(this.confirm);
+    return true;
+  }
   /*loadOrder() {
     const data = new FormData();
     data.set('mode', 'DB');
@@ -282,12 +288,14 @@ export default class extends Orders {
       this.queryParam.tableName = 'client_orders';
       this.table.dataset.type   = 'visit';
 
+      f.gI('deleteOrderBtn').dataset.action = 'delVisitorOrders';
       f.hide(f.qS('#orderBtn'));
     } else {
       this.queryParam.dbAction  = this.mainAction;
       this.queryParam.tableName = 'orders';
       this.table.dataset.type   = 'order';
 
+      f.gI('deleteOrderBtn').dataset.action = 'delOrders';
       f.show(f.qS('#orderBtn'));
     }
 

@@ -31,14 +31,18 @@
       </div>
       <div v-if="item.type === 'csvTable'" class="px-3">
         <div class="input-group mb-1">
-          <p-select class="col-4"
+          <p-select class="col-3"
                     :loading="loadingTable"
                     :options="csvTable"
                     option-value="fileName" option-label="name"
                     v-model="item.options.table"
           ></p-select>
-          <p-input-text class="col-4 form-control" v-tooltip.bottom="this.$t('Column for save')" v-model="item.options.saveKey"></p-input-text>
-          <p-input-text class="col-4 form-control" v-tooltip.bottom="this.$t('Column for show')" v-model="item.options.showKey"></p-input-text>
+          <p-input-text class="col-3 form-control" v-tooltip.bottom="this.$t('Column for save')" v-model="item.options.saveKey"></p-input-text>
+          <p-input-text class="col-3 form-control" v-tooltip.bottom="this.$t('Column for show')" v-model="item.options.showKey"></p-input-text>
+          <div class="col-3 d-flex justify-content-center align-items-center gap-1">
+            <label :for="'multiselect'">{{ $t('Multiselect') }}</label>
+            <p-checkbox input-id="multiselect" binary v-model="item.options.multiselect"></p-checkbox>
+          </div>
         </div>
       </div>
     </template>
@@ -115,6 +119,7 @@ export default {
 
           if (this.csvTable.length === 0) this.loadCsv(field);
           if (!field.options.table) field.options.table = this.csvTable[0].fileName;
+          if (field.options.multiselect === undefined) field.options.multiselect = false;
         }
       });
     },

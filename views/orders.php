@@ -21,6 +21,8 @@ foreach ($param['orderColumns'] as $column) {
     </div>';
 }
 
+$mail = gTxt('Mail');
+
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">
   <option value="\${ID}">\${name}</option>
@@ -33,7 +35,7 @@ $field['footerContent'] .= <<<footerContent
 <template id="sendMailTmp">
   <form class="content-center" action="#" id="authForm">
     <div class="input-group">
-      <span class="input-group-text">Почта:</span>
+      <span class="input-group-text">$mail:</span>
       <input type="text" id="email" class="form-control" required name="email">
     </div>
   </form>

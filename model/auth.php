@@ -17,7 +17,7 @@ switch ($cmsAction) {
 
       $_SESSION['id']       = $user['id'];
       $_SESSION['name']     = $user['name'];
-      $_SESSION['login']    = $login;
+      $_SESSION['login']    = $user['login'];
       $_SESSION['password'] = $password;
       $_SESSION['PHPSESSID'] = $_COOKIE['PHPSESSID'];
 
@@ -33,11 +33,13 @@ switch ($cmsAction) {
     break;
   case 'exit':
     if (isset($_SESSION['id'])) {
-      $_SESSION['password'] = uniqid();
-      $hash = password_hash(uniqid(), PASSWORD_BCRYPT);
+      $userId = $_SESSION['id'];
+      $dealerId = $_SESSION['dealerId'] ?? false;
+      session_destroy();
+      session_abort();
 
-      $main->db->setUserHash($_SESSION['id'], $hash);
-      $main->reDirect(isset($user['dealerId']) ? 'dealer/' . $user['dealerId'] : '');
+      $main->db->setUserHash($userId, password_hash(uniqid(), PASSWORD_BCRYPT));
+      $main->reDirect($dealerId ? 'dealer/' . $dealerId : '');
     }
     break;
 }

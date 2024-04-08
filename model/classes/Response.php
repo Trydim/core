@@ -312,7 +312,8 @@ class Response {
     if (function_exists('fastcgi_finish_request')) {
       fastcgi_finish_request();
     } elseif (!in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
-      static::closeOutputBuffers(0, true);
+      // Bitrix errors
+      //static::closeOutputBuffers(0, true);
     }
 
     return $this;
@@ -940,58 +941,50 @@ class Response {
    * @return $this
    *!/
   public function prepare(Request $request) {
-  $headers = $this->headers;
+    $headers = $this->headers;
 
-  if ($this->isInformational() || $this->isEmpty()) {
-  $this->setContent(null);
-  $headers->remove('Content-Type');
-  $headers->remove('Content-Length');
-  } else {
-  // Content-type based on the Request
-  if (!$headers->has('Content-Type')) {
-  $format = $request->getRequestFormat();
-  if (null !== $format && $mimeType = $request->getMimeType($format)) {
-  $headers->set('Content-Type', $mimeType);
-  }
-  }
+    if ($this->isInformational() || $this->isEmpty()) {
+      $this->setContent(null);
+      $headers->remove('Content-Type');
+      $headers->remove('Content-Length');
+    } else {
+    // Content-type based on the Request
+      if (!$headers->has('Content-Type')) {
+      $format = $request->getRequestFormat();
+      if (null !== $format && $mimeType = $request->getMimeType($format)) {
+        $headers->set('Content-Type', $mimeType);
+      }
+    }
 
-  // Fix Content-Type
-  $charset = $this->charset ?: 'UTF-8';
-  if (!$headers->has('Content-Type')) {
-  $headers->set('Content-Type', 'text/html; charset=' . $charset);
-  } elseif (0 === stripos($headers->get('Content-Type'), 'text/') && false === stripos($headers->get('Content-Type'), 'charset')) {
-  // add the charset
-  $headers->set('Content-Type', $headers->get('Content-Type') . '; charset=' . $charset);
-  }
+    // Fix Content-Type
+    $charset = $this->charset ?: 'UTF-8';
+    if (!$headers->has('Content-Type')) {
+      $headers->set('Content-Type', 'text/html; charset=' . $charset);
+    } elseif (0 === stripos($headers->get('Content-Type'), 'text/') && false === stripos($headers->get('Content-Type'), 'charset')) {
+      // add the charset
+      $headers->set('Content-Type', $headers->get('Content-Type') . '; charset=' . $charset);
+    }
 
-  // Fix Content-Length
-  if ($headers->has('Transfer-Encoding')) {
-  $headers->remove('Content-Length');
-  }
+    // Fix Content-Length
+    if ($headers->has('Transfer-Encoding')) {
+      $headers->remove('Content-Length');
+    }
 
-  if ($request->isMethod('HEAD')) {
-  // cf. RFC2616 14.13
-  $length = $headers->get('Content-Length');
-  $this->setContent(null);
-  if ($length) {
-  $headers->set('Content-Length', $length);
-  }
-  }
-  }
+    if ($request->isMethod('HEAD')) {
+    // cf. RFC2616 14.13
+      $length = $headers->get('Content-Length');
+      $this->setContent(null);
+      if ($length) {
+        $headers->set('Content-Length', $length);
+      }
+    }
 
-  // Fix protocol
-  if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
-  $this->setProtocolVersion('1.1');
-  }
+    // Check if we need to send extra expire info headers
+    if ('1.0' == $this->getProtocolVersion() && false !== strpos($headers->get('Cache-Control'), 'no-cache')) {
+      $headers->set('pragma', 'no-cache');
+      $headers->set('expires', -1);
+    }
 
-  // Check if we need to send extra expire info headers
-  if ('1.0' == $this->getProtocolVersion() && false !== strpos($headers->get('Cache-Control'), 'no-cache')) {
-  $headers->set('pragma', 'no-cache');
-  $headers->set('expires', -1);
-  }
-
-  $this->ensureIEOverSSLCompatibility($request);
-
-  return $this;
+    return $this;
   }*/
 }

@@ -54,7 +54,7 @@ foreach ($main->db->getTables('prop') as $table) {
 }
 $field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . json_encode($setting) . "'>";
 
-// if have table property, add libs
+// if user have table property, add libs
 $haveTable = array_filter($setting, function ($prop) { return $prop['type'] === 'table'; });
 if (count($haveTable)) {
   array_unshift($field['jsLinks'], CORE_JS . 'libs/handsontable.full.min.js?ver=f3bb2b6859');

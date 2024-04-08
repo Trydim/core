@@ -76,10 +76,12 @@ const users = {
 
       if (item['contacts']) {
         let arr = Object.entries(item['contacts']).map(([key, value]) => {
-          return {
-            key  : _(key),
-            value: data.managerField[key] ? data.managerField[key][value] : value
-          };
+          if (data.managerField[key]) {
+            if (!Array.isArray(value)) value = [value];
+            value = value.map(v => data.managerField[key][v]).join('<br>');
+          }
+
+          return {key: _(key), value};
         });
 
         item['contactsParse'] = item['contacts'];
@@ -176,7 +178,12 @@ const users = {
       this.delayFunc = () => {
         const f = new FormData(form), res = {};
         for (const [k, v] of f.entries()) {
-          res[k] = v;
+          if (res[k]) {
+            if (!Array.isArray(res[k])) res[k] = [res[k]];
+
+            res[k].push(v);
+          }
+          else res[k] = v;
         }
         this.queryParam.authForm = JSON.stringify(res);
       };
@@ -212,6 +219,7 @@ const users = {
     let oneElements = this.id.getSelectedSize() === 1, node,
         id    = this.id.getSelected(),
         users = data.usersList.get(id[0]),
+        contacts = users['contactsParse'],
         form  = tmp.form.cloneNode(true);
 
     this.queryParam.usersId = JSON.stringify(id);
@@ -231,23 +239,33 @@ const users = {
     form.querySelector('[name="password"]').parentNode.remove();
 
     // Contacts
-    users['contactsParse'] && Object.entries(users['contactsParse']).forEach(([k, v]) => {
+    ['phone', 'email'].forEach(k => {
       node = form.querySelector(`[name="${k}"]`);
-      if (node) {
-        if (oneElements) {
-          node.value = v;
-          node.type === 'tel' && f.initMask(node);
-        } else node.parentNode.remove();
-      }
+      if (oneElements && contacts[k]) {
+        node.value = contacts[k];
+        node.type === 'tel' && f.initMask(node);
+      } else node.parentNode.remove();
     });
 
+    // Manager fields
     node = form.querySelectorAll('.managerField');
     if (oneElements) {
       node.forEach(n => {
-        let input = n.querySelector('input[name], textarea[name], select[name]'),
-            name = input.name;
+        let nodes = n.querySelectorAll('input[name], textarea[name], select[name]'),
+            name  = nodes[0].name,
+            value = contacts[name];
 
-        users[name] && (input.value = users[name]);
+        if (value) {
+          if (!Array.isArray(value)) value = [value];
+
+          nodes.forEach(node => {
+            switch (node.type) {
+              default: node.value = value; return;
+              case 'radio':
+              case 'checkbox': node.checked = value.includes(node.value); return;
+            }
+          });
+        }
       });
     } else node.forEach(n => n.remove());
 
