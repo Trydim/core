@@ -242,7 +242,7 @@ export default class {
     f.Post({data}).then(data => {
       if (param.dbAction === 'changeStatusOrder') {
         const ws = this.websocket;
-        ws.readyState === ws.OPEN && ws.send(JSON.stringify({mode: param.dbAction}));
+        ws && ws.readyState === ws.OPEN && ws.send(JSON.stringify({mode: param.dbAction}));
       }
 
       if (this.needReload) {

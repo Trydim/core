@@ -43,7 +43,7 @@ foreach ($param['managerField'] as $k => $item) {
       $managerField[$k] = [];
       $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $o['table']);
 
-      if ($o['multiselect']) {
+      if ($o['multiselect'] ?? false) {
         $managerFieldHtml = '<div class="form-control managerField" style="height: 60px; overflow: hidden auto; resize: vertical">'; //  ' . ($o['multiselect'] ?? false ? 'multiple style="resize: vertical"' : '') . '>'
         foreach ($data as $row) {
           $rndId = uniqid();

@@ -520,6 +520,7 @@ function httpRequest(string $url, array $config = [], $params = []) {
 
   $curlConfig = [
     CURLOPT_URL => $url,
+    CURLOPT_SSL_VERIFYPEER => false,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER => [],
     CURLOPT_TIMEOUT => $config['timeout'] ?? 45,

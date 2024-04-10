@@ -371,7 +371,7 @@ class Xml {
       // переместить все параметры
       // Если новая строка, раздать параметры из шапки по умолчанию а не строки.
       if ((string) $xRow->attributes()->id !== $row[0/*$index*/]) {
-        $xml->rows[$r]->addAttribute('id', $row[0/*$index*/]);
+        $xRow->attributes()->id = $row[0/*$index*/];
       }
 
       if (!isset($xRow->children()->params)) $xRow->addChild('params');

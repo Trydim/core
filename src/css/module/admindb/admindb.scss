@@ -3,17 +3,23 @@
 
 .form-editor {
 
-  input {
+  .form-content input {
     border: none;
-
-    input.selected {
-      border: 1px red solid;
-    }
+    border-radius: 4px;
   }
 
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+
+
+  .cell {
+    border-radius: 4px;
+
+    &.selected {
+      box-shadow: 0 0 0 3px red;
+    }
   }
 }

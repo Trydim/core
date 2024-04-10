@@ -39,6 +39,13 @@
   'Auth no passing!' => 'Ошибка авторизации!',
 
   // CMS - settings
+  'Text (~200 characters)' => 'Текст (до 200 символов)',
+  'Text (many)' => 'Текст (много)',
+  'Number'      => 'Число',
+  'Checkbox'    => 'Да/Нет',
+  'Date'        => 'Дата',
+  'List'        => 'Список',
+  'Table'       => 'Таблица',
   // Mail
   'Mail settings'   => 'Настройки почты',
   'Mail to'   => 'Почта получения',
