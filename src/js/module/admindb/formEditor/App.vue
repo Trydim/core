@@ -15,8 +15,7 @@
             <template v-for="(row, i) of spoiler" :key="i">
               <div v-for="(cell, j) of row" :key="'' + i + j + cell.value" class="cell"
                    :class="{'selected': checkSelectedCell(i, j)}"
-                   @click="focusCell(cell)"
-                   @click.ctrl="selectCell(cell)"
+                   @click="selectCell($event, cell)"
               >
                 <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]" />
                 <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]" />
@@ -166,14 +165,15 @@ export default {
     },
     checkSelectedCell(i, j) { return this.selectedCells.hasOwnProperty(getCellKey(i, j)) },
 
-    focusCell(cell) {
-      this.focusedCell = cell;
-    },
-    selectCell(cell) {
+    selectCell(e, cell) {
       const key = getCellKey(cell.rowI, cell.cellI);
 
-      if (this.selectedCells[key]) delete this.selectedCells[key];
-      else this.selectedCells[key] = cell;
+      this.focusedCell = cell;
+
+      if (e.metaKey || e.ctrlKey) {
+        if (this.selectedCells[key]) delete this.selectedCells[key];
+        else this.selectedCells[key] = cell;
+      }
     },
     clearSelected() { this.selectedCells = {} },
 

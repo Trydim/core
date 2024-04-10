@@ -22,11 +22,11 @@ $field['content'] = <<<main
   <div></div>
   <div id="viewField" class="gap-1">
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" checked data-action="adminType">
+      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" data-action="adminType">
       <label class="form-check-label" for="formMode">Режим форм</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="table" id="formTable" data-action="adminType">
+      <input class="form-check-input" type="radio" name="adminType" value="table" id="formTable" checked data-action="adminType">
       <label class="form-check-label" for="formTable">Режим таблицы</label>
     </div>
     <div class="form-check">
