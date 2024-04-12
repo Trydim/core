@@ -67,7 +67,7 @@
 
   <div class="d-flex gap-3 my-3">
     <Button class="btn-warning" @click="changeDealer">{{ $t('Edit dealer') }}</Button>
-    <Button class="btn-warning" @click="changeDealerUser">{{ $t('Edit dealer users') }}</Button>
+    <!--<Button class="btn-warning" @click="changeDealerUser">{{ $t('Edit dealer users') }}</Button>-->
   </div>
 
   <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
@@ -240,10 +240,12 @@ export default {
   }),
   computed: {
     properties() {
-      return Object.entries(this.dealersProperties).reduce((r, [code, p]) => {
-        code = code.replace('prop_', '');
+      return this.dealersProperties;
+
+      /*return Object.entries(this.dealersProperties).reduce((r, [code, p]) => {
+        //code = code.replace('prop_', '');
         p.code = code; r[code] = p; return r;
-      }, Object.create(null));
+      }, {});*/
     },
 
     filteredDealers() {

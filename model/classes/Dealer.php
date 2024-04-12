@@ -176,7 +176,7 @@ class Dealer {
     ];
     $sqlQueryList = explode('###', $sqlText);
 
-    foreach ($this->main->db->loadDealers() as $dealer) {
+    foreach ($this->main->db->loadDealers(false, false) as $dealer) {
       if (count($selectedDealer) && !in_array($selectedDealer, $dealer['id'])) continue;
 
       $prefix = $dealer['cmsParam']['prefix'];

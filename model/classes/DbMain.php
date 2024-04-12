@@ -1059,14 +1059,14 @@ class DbMain extends R {
     return false;
   }
 
-  public function loadDealers(bool $activity = false): array {
+  public function loadDealers(bool $activity = false, bool $parseSettings = true): array {
     $sql = "SELECT ID AS 'id', cms_param AS 'cmsParam', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 
     if ($activity) $sql .= " WHERE activity <> 0";
 
     $dealers = $this->jsonParseField(self::getAll($sql));
-    return $this->parseDealerSettings($dealers);
+    return $parseSettings ? $this->parseDealerSettings($dealers) : $dealers;
   }
 
   /**
@@ -1076,7 +1076,7 @@ class DbMain extends R {
    */
   public function loadDealersUsers(string $login = ''): array {
     $result = [];
-    $dealers = $this->loadDealers(true);
+    $dealers = $this->loadDealers(true, false);
     $dealers = array_map(function ($dealer) {
       return [
         'id'     => $dealer['id'],

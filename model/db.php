@@ -833,7 +833,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'loadDealers':
-      $result['dealers'] = $db->loadDealers();
+      $result['dealers'] = $db->loadDealers(false, false);
       break;
     case 'loadDealerUsers':
       $dealer = $db->getDealerById($main->url->request->get('dealerId'));

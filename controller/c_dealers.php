@@ -8,7 +8,7 @@ if (includes($main->url->getRequestUri(), 'update')) {
   $start = time();
   $msg = gTxt('dealers') . ':<br>';
 
-  foreach ($main->db->loadDealers(true) as $dealer) {
+  foreach ($main->db->loadDealers(true, false) as $dealer) {
     $main->dealer->update($dealer['id']);
     $msg .= $dealer['name'] . '<br>';
   }
@@ -21,7 +21,7 @@ else if (includes($main->url->getRequestUri(), 'database')) {
   $param['isDBEditor'] = true;
   $param['dealerList'] = [];
 
-  foreach ($main->db->loadDealers() as $dealer) {
+  foreach ($main->db->loadDealers(false, false) as $dealer) {
     $param['dealerList'][] = [
       'id'   => $dealer['id'],
       'name' => $dealer['name'],

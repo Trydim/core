@@ -60,7 +60,7 @@ switch ($action) {
     }
 
     // Найти пользователя у всех дилеров
-    foreach ($db->loadDealers() as $dealer) {
+    foreach ($db->loadDealers(false, false) as $dealer) {
       $prefix = $dealer['cmsParam']['prefix'] ?? false;
       if (!$prefix) def($dealer['ID'] . ' not have prefix');
 
