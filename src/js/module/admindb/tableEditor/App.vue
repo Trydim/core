@@ -44,7 +44,7 @@
                       @updateSimpleListKeys="updateSimpleListKeys"
         ></EditedSelect>
         <p>ключ:значение</p>
-        <textarea v-model="simpleList[param.list]" class="w-100" rows="5"></textarea>
+        <textarea v-model="simpleListEntries" class="w-100" rows="5"></textarea>
       </div>
 
       <!--<div class="d-flex justify-content-between">
@@ -76,6 +76,11 @@ export default {
   name: "TableEditor",
   components: {EditedSelect, Modal},
   data() {
+    if (!this.$db.contentProperties) this.$db.contentProperties = {};
+    const contentProperties = this.$db.contentProperties;
+
+    if (!contentProperties.hasOwnProperty('simpleList')) contentProperties.simpleList = {'new': {}};
+
     return {
       paramType: {
         hidden       : 'Скрыт',
@@ -86,12 +91,15 @@ export default {
         checkbox     : 'Да/Нет',
         relationTable: 'Справочник',
         color        : 'Цвет',
+        customEvent  : 'Свой режим'
       },
 
       editParamModal: false,
 
       contentData: this.$db.contentData['rows'], // Всегда есть
-      contentProperties: this.$db.contentData['contentProperties'] || {},
+      contentProperties,
+
+      simpleList: contentProperties.simpleList, // Простые списки
 
       editedParam: {},
       param: {
@@ -100,7 +108,23 @@ export default {
     };
   },
   computed: {
-    simpleList() { return this.contentProperties.simpleList || {} },
+    simpleListEntries: {
+      get() {
+        // Преобразовывает из: {key1:'value1', key2:'value2'} в 'key1:value1\nkey2:value2'
+        return Object.entries(this.simpleList[this.param.list]).reduce((r, [k, v]) => {
+          r.push(k + ':' + v);
+          return r;
+        }, []).join('\n') || '';
+      },
+      set(v) {
+        // Преобразовывает из: 'key1:value1\nkey2:value2' в {key1:'value1', key2:'value2'}
+        this.simpleList[this.param.list] = v.split('\n').reduce((r, str) => {
+          const [k, v] = str.split(':');
+          r[k.trim()] = v.trim();
+          return r;
+        }, {});
+      }
+    }
   },
   watch: {
     contentData: {
@@ -122,17 +146,13 @@ export default {
           this.param.step = 1;
           break;
         case 'simpleList':
-          const list  = this.simpleList,
-                listK = Object.keys(list);
-
-          this.param.list = listK.length ? list[0] : '';
-
+          this.param.list = this.param.list || Object.keys(this.simpleList)[0];
           break;
       }
     },
   },
   methods: {
-    updateSimpleListKeys() {},
+    updateSimpleListKeys(options) { this.simpleList = options },
 
     onEditParam(param, i, j) {
       this.editedParam = {i, j};

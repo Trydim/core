@@ -177,6 +177,7 @@ INSERT INTO `files` (`ID`, `name`, `path`, `format`) VALUES
 
 CREATE TABLE `dealers` (
   `ID` int(10) UNSIGNED NOT NULL,
+  `cms_param` varchar(255) CHARACTER SET utf8 DEFAULT '{}',
   `name` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
   `contacts` varchar(255) CHARACTER SET utf8 DEFAULT '{}',
   `register_date` timestamp NOT NULL DEFAULT current_timestamp(),

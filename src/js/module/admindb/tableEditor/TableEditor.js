@@ -75,6 +75,7 @@ export class TableEditor extends Main {
     data.set('dbAction', 'saveXMLConfig');
     data.set('tableName', this.tableName);
     data.set('XMLConfig', JSON.stringify(this.contentData));
+    data.set('XMLProperties', JSON.stringify(this.contentProperties));
 
     f.Post({data}).then(data => {
       f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');

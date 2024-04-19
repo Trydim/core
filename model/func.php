@@ -230,36 +230,37 @@ function gTxtDB(string $db, string $str): string {
 /**
  * Find index of Levelshtein
  *
- * @param string - when search?
- * @param array - what search? arr of string
- * @param string - in charset in csv (autodetect)
- * @param bool - if true return word, default return index position
+ * @param string $input - when search?
+ * @param array  $row   - what search? arr of string
+ * @param string $inCharset - in charset in csv (autodetect)
+ * @param bool   $index - if true return word, default return index position
+ * @param bool   $strict -
  *
  * @return integer or string - int: return index of position keyword in array
  */
-function findWord($input, $cell, $inCharset = 'windows-1251', $index = false) {
+function findWord(string $input, array $row, string $inCharset = 'windows-1251', bool $index = false, bool $strict = false) {
+  $gc = false;
   $input = mb_strtolower($input, 'UTF-8');
   $shortest = -1;
-  $gc = false;
-  $nearest_word = null;
+  $nearestWord = null;
   $limit = getLimitLevenshtein($input); // Порог прохождения
-  foreach ($cell as $key => $item) {
-    $word = trim(mb_strtolower(iconv($inCharset, 'UTF-8', $item), 'UTF-8'));
+  foreach ($row as $key => $cell) {
+    $word = trim(mb_strtolower(iconv($inCharset, 'UTF-8', $cell), 'UTF-8'));
     $lev = levenshtein($input, $word);
+
     if ($lev === 0) {
       $gc = $key;
-      $nearest_word = $word;
+      $nearestWord = $word;
       break;
     }
-    if ($lev < $limit && ($lev <= $shortest || $shortest < 0)) {
+    if (!$strict && $lev < $limit && ($lev <= $shortest || $shortest < 0)) {
       $gc = $key;
       $shortest = $lev;
-      $nearest_word = $word;
+      $nearestWord = $word;
     }
   }
-  if ($index) {
-    return $nearest_word;
-  }
+
+  if ($index) return $nearestWord;
 
   return $gc;
 }
@@ -324,10 +325,11 @@ function isJSON(string $value): bool {
  * @param array  $dict     - dictionary for search on the key. example: ['name' => 'Имя'].
  * @param string $filename - csv filename with path
  * @param bool   $oneRang  - if true that return one rang array
+ * @param bool   $strict   - strict checking of column names
  *
  * @return array|bool
  */
-function loadCSV(array $dict, string $filename, bool $oneRang = false) {
+function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $strict = false) {
   global $main;
   $filename = file_exists($filename) ? $filename : $main->getCmsParam(VC::CSV_PATH) . $filename;
   $result = [];
@@ -341,16 +343,13 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false) {
       $inCharset = 'UTF-8'; //mb_detect_encoding(, ['windows-1251', 'UTF-8'], true);
 
       foreach ($dict as $key => $word) {
-        $bool = is_array($word);
-        $keyWord = $bool ? $word[0] : $word;
-        $i = findWord($keyWord, $data, $inCharset);
-        if ($i !== false) {
-          if ($bool) $keyIndex[$key] = [$i, $word[1]];
-          else $keyIndex[$key] = $i;
-        }
-      }
-      if ($oneRang) {
+        $isArr = is_array($word);
+        $i = findWord($isArr ? $word[0] : $word, $data, $inCharset, false, $strict);
 
+        if ($i !== false) $keyIndex[$key] = $isArr ? [$i, $word[1]] : $i;
+      }
+
+      if ($oneRang) {
         foreach ($keyIndex as $item) {
           $addpos = function ($data) use ($item) { return $data[$item]; };
         }

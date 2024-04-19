@@ -17,8 +17,10 @@
                    :class="{'selected': checkSelectedCell(i, j)}"
                    @click="selectCell($event, cell)"
               >
-                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]" />
-                <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]" />
+                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]"/>
+                <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]"/>
+                <SimpleList v-else-if="cell.param.type === 'simpleList'" :cell="cell" v-model="contentData[i][j]"/>
+                <CustomEvent v-else-if="cell.param.type === 'customEvent'" :cell="cell" v-model="contentData[i][j]"/>
               </div>
             </template>
           </div>
@@ -67,6 +69,8 @@
 
 import InputText from "./form/text.vue";
 import InputNumber from "./form/number.vue";
+import SimpleList from "./form/simpleList.vue";
+import CustomEvent from "./form/custom.vue";
 
 const getCellKey = (i, j) => `s${i}x${j}`;
 
@@ -75,6 +79,8 @@ export default {
   components: {
     InputText,
     InputNumber,
+    SimpleList,
+    CustomEvent,
   },
   data() {
     return {
@@ -117,6 +123,7 @@ export default {
   methods: {
     mergeData() {
       const config = this.contentConfig['rows'], // Есть всегда
+            props  = this.contentProperties,
             xmlDefRow = config[0].params.param,
             res = {
               s0: {}, // первый спойлер, если он будет один не отображать
@@ -141,6 +148,8 @@ export default {
                 isInherit = param.type === 'inherit';
 
           if (param.type === 'hidden' || (isInherit && defParam.type === 'hidden')) return cR;
+          // simpleList
+          if (props[param.type]) param.props = props[param.type][param.list];
 
           cR[cellI] = {
             rowI, cellI,

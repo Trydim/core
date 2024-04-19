@@ -1,9 +1,10 @@
 <template>
-  <div class="position-relative bg-white">
-    <select class="position-absolute start-0 top-0 m-0 w-100" v-model="selectV">
-      <option v-for="(v, k) of showOptions" :key="k" :value="k">{{ v }}</option>
+  <div class="position-relative bg-white" style="min-height: 60px">
+    <input type="text" class="start-0 top-0 m-0 border-end-0" style="width: 90%" v-model="inputV">
+    <button type="button" class="btn btn-sm pi pi-plus-circle" @click="addListItem"></button>
+    <select class="start-0 top-0 m-0 w-100" v-model="selectV">
+      <option v-for="(v, k) of options" :key="k" :value="k">{{ k }}</option>
     </select>
-    <input type="text" class="position-absolute start-0 top-0 m-0 border-end-0" style="width: 90%" v-model="inputV">
   </div>
 </template>
 
@@ -18,43 +19,37 @@ export default {
   },
   data() {
     return {
-      showOptions: {new: 'Новый'},
-
       selectV: '',
       inputV : '',
       isNew  : false,
     };
   },
+  computed: {},
   watch: {
     selectV() {
-      if (this.selectV === 'new') {
-        this.inputV = '';
+      /*if (this.selectV === 'new') {
         this.isNew  = true;
+        this.inputV = '';
       } else {
         this.isNew  = false;
         this.inputV = this.selectV;
-      }
+      }*/
 
-      //this.update();
+      this.$emit('update:modelValue', this.selectV);
     },
     inputV() {
       // проверка если инпут пустой
-      this.$emit('list', this.showOptions);
-      this.$emit('update:modelValue', this.inputV);
+      //this.$emit('list', this.showOptions);
+      //this.$emit('update:modelValue', this.inputV);
     },
-  },
-  computed: {
   },
   methods: {
-    update() {
+    update() {},
 
+    addListItem() {
+      this.options[this.inputV] = {};
     },
   },
-  mounted() {
-    debugger
-    const options = Object.keys(this.options).length ? this.options : {v1: 'v1', v2: 'v2'};
-
-    Object.assign(this.showOptions, options);
-  },
+  mounted() {},
 }
 </script>

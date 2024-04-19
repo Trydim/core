@@ -395,7 +395,7 @@ CREATE TABLE `dealers` (
   `register_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_edit_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `activity` int(1) NOT NULL DEFAULT 1,
-  `settings` varchar(1000) CHARACTER SET utf8 DEFAULT '{}'
+  `settings` mediumblob DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --

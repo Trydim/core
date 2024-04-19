@@ -114,19 +114,22 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       if (isset($dbTable)) {
         $result['csvValues'] = $db->openCsv();
         $result['XMLValues'] = Xml::syncXmlFile($dbTable);
-        $result['XMLProperties'] = $main->getSettings(VC::TABLE_XML_PROPERTIES);
+        $result['XMLProperties'] = json_decode($main->getSettings(VC::TABLE_XML_PROPERTIES));
       }
       break;
     case 'saveXMLConfig':
-      if (isset($dbTable) && isset($XMLConfig)) {
+      if (isset($dbTable) && isset($XMLConfig) && isset($XMLProperties)) {
         $result['error'] = Xml::saveXml($dbTable, json_decode($XMLConfig, true));
+
+        // if (empty($result['error'])) { }
+        $main->setSettings(VC::TABLE_XML_PROPERTIES, $XMLProperties)->saveSettings();
       }
       break;
     case 'loadXmlConfig':
       if (isset($dbTable)) {
         $result['XMLValues'] = Xml::syncXmlFile($dbTable);
 
-        $result['XMLProperties'] = $main->getSettings(VC::TABLE_XML_PROPERTIES);
+        $result['XMLProperties'] = json_decode($main->getSettings(VC::TABLE_XML_PROPERTIES));
       }
       break;
 
@@ -848,14 +851,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $name = $dealer['name'];
         if (strlen($name) < 2) { $result['error'] = 'Name must be 2 or more chars!'; break; }
 
-        $settings = [];
-        foreach ($dealer['settings'] as $k => $v) $settings['prop_' . $k] = $v;
-
         $param = [
           'name'     => $name,
           'contacts' => json_encode($dealer['contacts']),
           'activity' => intval(boolValue($dealer['activity'] ?? true)),
-          'settings' => gzcompress(json_encode($settings), 9),
+          'settings' => gzcompress(json_encode($dealer['settings']), 9),
         ];
 
         $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);
