@@ -20,7 +20,8 @@ export class TableEditor extends Main {
 
   async showData() {
     await this.dbAction('loadXmlConfig');
-    this.contentData       = this.queryResult['XMLValues'];
+    this.contentData       = this.queryResult['csvValues'];
+    this.contentConfig     = this.queryResult['XMLValues'];
     this.contentProperties = this.queryResult['XMLProperties'];
 
     this.setVueConfig();
@@ -74,7 +75,7 @@ export class TableEditor extends Main {
     data.set('mode', 'DB');
     data.set('dbAction', 'saveXMLConfig');
     data.set('tableName', this.tableName);
-    data.set('XMLConfig', JSON.stringify(this.contentData));
+    data.set('XMLConfig', JSON.stringify(this.contentConfig));
     data.set('XMLProperties', JSON.stringify(this.contentProperties));
 
     f.Post({data}).then(data => {

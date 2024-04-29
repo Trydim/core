@@ -1,5 +1,5 @@
 <template>
-  <select class="w-100" :disabled="cell.param.disabled" v-model="value">
+  <select class="form-select form-select-sm" :disabled="cell.param.disabled" v-model="value">
     <option v-for="(v, k) of cell.param.props" :key="k" :value="k">{{ v }}</option>
   </select>
 </template>

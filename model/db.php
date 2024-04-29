@@ -111,10 +111,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $db->fileForceDownload();
       break;
     case 'loadFormsTable':
+    case 'loadXmlConfig':
       if (isset($dbTable)) {
         $result['csvValues'] = $db->openCsv();
         $result['XMLValues'] = Xml::syncXmlFile($dbTable);
-        $result['XMLProperties'] = json_decode($main->getSettings(VC::TABLE_XML_PROPERTIES));
+        $result['XMLProperties'] = $main->getSettings(VC::TABLE_XML_PROPERTIES);
       }
       break;
     case 'saveXMLConfig':
@@ -122,14 +123,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $result['error'] = Xml::saveXml($dbTable, json_decode($XMLConfig, true));
 
         // if (empty($result['error'])) { }
-        $main->setSettings(VC::TABLE_XML_PROPERTIES, $XMLProperties)->saveSettings();
-      }
-      break;
-    case 'loadXmlConfig':
-      if (isset($dbTable)) {
-        $result['XMLValues'] = Xml::syncXmlFile($dbTable);
-
-        $result['XMLProperties'] = json_decode($main->getSettings(VC::TABLE_XML_PROPERTIES));
+        $main->setSettings(VC::TABLE_XML_PROPERTIES, json_decode($XMLProperties))->saveSettings();
       }
       break;
 
@@ -839,7 +833,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $result['dealers'] = $db->loadDealers(false, false);
       break;
     case 'loadDealerUsers':
-      $dealer = $db->getDealerById($main->url->request->get('dealerId'));
+      $dealer = $db->loadDealerById($main->url->request->get('dealerId'));
 
       $db->setPrefix($dealer['cmsParam']['prefix']);
 
@@ -859,6 +853,22 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         ];
 
         $result = $db->insert($columns, $dbTable, [$dealer['id'] => $param], true);
+
+        $login = $dealer['login'] ?? null;
+        $pass  = $dealer['password'] ?? null;
+        if (is_string($login) && is_string($pass)) {
+          if (strlen($login) > 2 && strlen($pass) > 2) {
+            $dealer = $db->loadDealerById($dealer['id']);
+            $db->setPrefix($dealer['cmsParam']['prefix']);
+
+            $change = $db->getUserById(1);
+
+            $param = ['login' => $login, 'password' => password_hash($pass, PASSWORD_BCRYPT)];
+            $result = $db->insert($db->getColumnsTable('users'), 'users', [1 => $param], true);
+          } else {
+            $result['error'] = 'Login or password is not validate!';
+          }
+        }
       }
       break;
     case 'deleteDealer':

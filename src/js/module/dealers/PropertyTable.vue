@@ -15,6 +15,10 @@ export default {
   name: 'PropertyTable',
   components: {Accordion, AccordionTab},
   props: {
+    propKey: {
+      required: true,
+      type: String,
+    },
     prop: {
       required: true,
       type: Object,
@@ -27,7 +31,7 @@ export default {
   emits: ['changed'],
   data() {
     const self = this,
-          prop = this.dealer.settings[this.prop.code];
+          prop = this.dealer.settings[this.propKey];
 
     return {
       handsontable: undefined,
@@ -98,7 +102,7 @@ export default {
   },
   methods: {
     emit() {
-      this.dealer.settings[this.prop.code] = this.handsontable.getData();
+      this.dealer.settings[this.propKey] = this.handsontable.getData();
       this.$emit('changed');
     },
 

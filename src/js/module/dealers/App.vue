@@ -148,7 +148,7 @@
 
       <div class="col-12">
         <template v-for="(prop, key) of properties" :key="key">
-          <PropertyTable v-if="prop.type === 'table'" :prop="prop" :dealer="dealer" @changed="changedTableProperty"
+          <PropertyTable v-if="prop.type === 'table'" :prop-key="key" :prop="prop" :dealer="dealer" @changed="changedTableProperty"
           ></PropertyTable>
         </template>
       </div>

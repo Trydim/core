@@ -3,10 +3,10 @@
     <div class="col-10">
       <!-- Спойлеры -->
       <template v-for="(spoiler, s) of mergedData" :key="s">
-        <details v-if="s !== 's0'" class="mt-3" open="open" :style="spoilerStyle">
-          <summary v-show="showSpoiler" class="border border-2 rounded-5 p-2 bg-white">Нажми на меня</summary>
+        <details v-if="s !== 's0'" class="mt-3 rounded-3" :style="spoilerStyle">
+          <summary v-show="showSpoiler" class="border border-2 rounded-3 p-2 bg-white">{{ s }}</summary>
 
-          <div class="form-content d-grid gap-2 mt-1 p-1" :style="contentStyle">
+          <div class="form-content d-grid gap-1 mt-1 p-1" :style="contentStyle">
             <!-- Шапка -->
             <div v-for="(head, k) of header" :key="k" class="fw-bold text-nowrap hidden text-center">
               <span>{{ head.value }}</span>
@@ -109,8 +109,8 @@ export default {
     header() { return this.mergedData['s0'][0] },
     columns() { return Object.keys(this.header).length },
     spoilerStyle() {
-      return this.showSpoiler ? 'background-image: linear-gradient(180deg, white 20px, #838383 20px)'
-                              : 'background: #838383';
+      return this.showSpoiler ? 'background-image: linear-gradient(180deg, white 20px, #E6E6E6CC 20px)'
+                              : 'background: #E6E6E6CC';
     },
     contentStyle() { return 'grid-template-columns: repeat(' + this.columns + ', auto)' },
   },
@@ -126,23 +126,22 @@ export default {
             props  = this.contentProperties,
             xmlDefRow = config[0].params.param,
             res = {
-              s0: {}, // первый спойлер, если он будет один не отображать
+              s0: {}, // первый спойлер, если будет только один не отображать
             };
 
-      let spoilerI = 0,
-          rowI = 0;
+      let spoilerKey = 's0';
 
-      this.contentData.forEach(csvRow => {
-        if (csvRow.join('').length === 0) return;
-        if (csvRow[0] === '<s>') {
-          spoilerI++;
-          res['s' + spoilerI] = {};
-          return;
-        }
-
+      this.contentData.forEach((csvRow, rowI) => {
         const xmlRow = config[rowI].params.param;
 
-        res['s' + spoilerI][rowI] = csvRow.reduce((cR, csvCell, cellI) => {
+        if (xmlRow[0]['@attributes'].type === 'spoiler') {
+          spoilerKey = xmlRow[0]['@attributes'].name;
+          res[spoilerKey] = {};
+          return;
+        }
+        if (csvRow.join('').length === 0) return;
+
+        res[spoilerKey][rowI] = csvRow.reduce((cR, csvCell, cellI) => {
           const defParam = xmlDefRow[cellI]['@attributes'],
                 param    = xmlRow[cellI]['@attributes'],
                 isInherit = param.type === 'inherit';
@@ -159,9 +158,6 @@ export default {
 
           return cR;
         }, {});
-
-        rowI++;
-
       });
 
       if (Object.keys(res).length === 1) {
@@ -175,6 +171,8 @@ export default {
     checkSelectedCell(i, j) { return this.selectedCells.hasOwnProperty(getCellKey(i, j)) },
 
     selectCell(e, cell) {
+      if (cell.param.type === 'customEvent') return;
+
       const key = getCellKey(cell.rowI, cell.cellI);
 
       this.focusedCell = cell;

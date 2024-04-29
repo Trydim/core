@@ -59,26 +59,24 @@ $main->publicMain();
 require ABS_SITE_PATH . 'public/public.php';
 if ($isDealer) {
   $main->publicDealer();
-  $dealPublic = $main->url->getPath(true) . 'public/public.php';
+  $path = $main->url->getPath(true) . 'public/public.php';
 
-  if (file_exists($dealPublic)) {
+  if (file_exists($path)) {
     $publicCss = $main->getCmsParam(VC::DEAL_URI_CSS);
     $publicJs = $main->getCmsParam(VC::DEAL_URI_JS);
-    require $dealPublic;
+    require $path;
   }
 }
 
 $main->publicMain();
-require ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
+$path = ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
+if (file_exists($path)) require $path;
 if ($isDealer) {
   $main->publicDealer();
-  $dealPublic = $main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php';
-  if (file_exists($dealPublic)) {
-    require $dealPublic;
-  }
-
-  unset($dealPublic, $dealCsvPath);
+  $path = $main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php';
+  if (file_exists($path)) require $path;
 }
+unset($path);
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_PUBLIC_TEMPLATE, $main);
 $main->response->setContent(template(OUTSIDE ? '_outside' : 'base', $field));

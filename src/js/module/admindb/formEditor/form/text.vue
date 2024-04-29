@@ -1,6 +1,6 @@
 <template>
   <input type="text"
-         class="w-100"
+         class="form-control form-control-sm"
          :disabled="cell.param.disabled"
          v-model="value"
   >

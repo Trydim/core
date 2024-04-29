@@ -1,5 +1,5 @@
 <template>
-  <input type="number" class="w-100 text-end"
+  <input type="number" class="form-control form-control-sm text-end"
          :min="cell.param.min || 0"
          :max="cell.param.max || 1e12"
          :step="cell.param.step || 1"

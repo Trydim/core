@@ -1,15 +1,17 @@
 <template>
-  <div class="overflow-auto">
-    <div v-for="(row, i) of contentData" :key="i" class="row flex-nowrap">
-      <div class="col-2 border">
-        <small v-if="row['@attributes']">{{ row['@attributes'].id }}</small>
-      </div>
-
-      <div v-for="(param, j) of row.params.param" :key="j" class="col-auto" role="button">
-        <span>{{ param['@attributes'].key }}</span>-<span>{{ param['@attributes'].type }}</span><br>
-        <i class="pointer pi pi-cog" @click="onEditParam(param, i, j)"></i>
-      </div>
-    </div>
+  <div class="d-grid gap-1 mt-1 p-1 overflow-auto" :style="contentStyle">
+    <template v-for="(row, i) of contentConfig" :key="i">
+      <template v-for="(param, j) of row.params.param" :key="j">
+        <div v-if="j === 0 || row.params.param[0]['@attributes'].type !== 'spoiler'"
+             class="border" :style="param['@attributes'].type === 'spoiler' ? 'grid-column: span ' + this.columns : ''"
+        >
+          <span>{{ param['@attributes'].key }}</span> - <span>{{ param['@attributes'].type }}</span>
+          <i class="ms-1 pointer pi pi-cog" @click="onEditParam(param, i, j)"></i>
+          <span v-if="param['@attributes'].type === 'spoiler'"> - {{ param['@attributes'].name }}</span>
+          <br><small class="opacity-50">{{ contentData[i][j] }}</small>
+        </div>
+      </template>
+    </template>
 
     <Modal v-if="editParamModal"
       title="Настройка параметров"
@@ -19,11 +21,18 @@
       <div class="d-flex w-100">
         <label>Тип:
           <select v-model="param.type">
-            <option v-for="(v, k) of paramType" :key="k" :value="k">{{ v }}</option>
+            <option v-for="(v, k) of paramType" :key="k"
+                    :disabled="disabledSpoiler(k)"
+                    :value="k">
+              {{ v }}
+            </option>
           </select>
         </label>
       </div>
-      <div v-if="param.type === 'string'" class="d-flex">
+      <div v-if="param.type === 'spoiler'" class="d-flex">
+        <label class="w-100">Заголовок<input type="text" v-model="param.name"></label>
+      </div>
+      <div v-else-if="param.type === 'string'" class="d-flex">
         <p>Нельзя редактировать</p>
         <input type="checkbox" v-model="param.disabled">
         <!--<p>ключ=значение.</p>
@@ -45,6 +54,9 @@
         ></EditedSelect>
         <p>ключ:значение</p>
         <textarea v-model="simpleListEntries" class="w-100" rows="5"></textarea>
+      </div>
+      <div v-else-if="param.type === 'customEvent'" class="">
+        <label class="w-100">Ключ<input type="text" v-model="param.id"></label>
       </div>
 
       <!--<div class="d-flex justify-content-between">
@@ -85,6 +97,7 @@ export default {
       paramType: {
         hidden       : 'Скрыт',
         inherit      : 'Наследовать',
+        spoiler      : 'Спойлер',     // Спойлер для первой колонки с пустым значением
         string       : 'Строка',
         number       : 'Число',
         simpleList   : 'Простой Список',
@@ -96,7 +109,8 @@ export default {
 
       editParamModal: false,
 
-      contentData: this.$db.contentData['rows'], // Всегда есть
+      contentData  : this.$db.contentData,
+      contentConfig: this.$db.contentConfig['rows'], // Всегда есть
       contentProperties,
 
       simpleList: contentProperties.simpleList, // Простые списки
@@ -108,6 +122,9 @@ export default {
     };
   },
   computed: {
+    columns() { return this.contentData[0].length },
+    contentStyle() { return 'grid-template-columns: repeat(' + this.columns + ', auto)' },
+
     simpleListEntries: {
       get() {
         // Преобразовывает из: {key1:'value1', key2:'value2'} в 'key1:value1\nkey2:value2'
@@ -127,7 +144,7 @@ export default {
     }
   },
   watch: {
-    contentData: {
+    contentConfig: {
       deep: true,
       handler() { this.$db.enableBtnSave() },
     },
@@ -153,6 +170,13 @@ export default {
   },
   methods: {
     updateSimpleListKeys(options) { this.simpleList = options },
+    disabledSpoiler(key) {
+      const {i, j} = this.editedParam;
+
+      if (key !== 'spoiler') return false;
+
+      return !(i > 0 && j === 0 && this.contentData[i][0] === '');
+    },
 
     onEditParam(param, i, j) {
       this.editedParam = {i, j};
@@ -162,7 +186,7 @@ export default {
     confirmEditParam() {
       const {i, j} = this.editedParam;
 
-      Object.assign(this.contentData[i].params.param[j]['@attributes'], this.param);
+      Object.assign(this.contentConfig[i].params.param[j]['@attributes'], this.param);
       this.closeModal();
     },
     closeModal() {

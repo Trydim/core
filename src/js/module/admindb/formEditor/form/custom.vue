@@ -1,5 +1,5 @@
 <template>
-  <div ref="field"></div>
+  <div></div>
 </template>
 
 <script>
@@ -33,6 +33,7 @@ export default {
 
     instance.customComponents[key] = {
       self: this,
+      param: this.cell.param,
       setValue: this.setValue,
     };
   },
