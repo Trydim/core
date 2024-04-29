@@ -185,7 +185,7 @@ trait DbOrders {
     return $this->jsonParseField(self::getAll($sql));
   }
 
-  public function loadVisitorOrderById(string $id) {
+  public function loadVisitorOrderById(string $id): array {
     $sql = "SELECT ID, create_date AS 'createDate',
             save_value AS 'saveValue', 
             important_value AS 'importantValue',
@@ -263,7 +263,7 @@ trait DbUsers {
   }
 
   /**
-   * @param $userId
+   * @param string|integer $userId
    *
    * @return array|null
    */
@@ -388,11 +388,11 @@ trait DbUsers {
       $user['onlyOne'] = $user['customization']['onlyOne'] ?? false;
     } else {
       try {
-        if (!file_exists(SYSTEM_PATH)) throw new \ErrorException('error');
+        if (!file_exists(SYSTEM_PATH)) throw new ErrorException('error');
         $value = file(SYSTEM_PATH);
         $value && $value = explode('|||', $value[0]);
-        if (count($value) < 2) throw new \ErrorException('error');
-      } catch (\ErrorException $e) {
+        if (count($value) < 2) throw new ErrorException('error');
+      } catch (ErrorException $e) {
         file_put_contents(SYSTEM_PATH, 'admin|||123|||');
         return false;
       }
@@ -448,7 +448,6 @@ trait DbCsv {
    * сделать поиск всех файлов, наверное. (хотя если их много переходить на БД, наверное)
    * @param $path {string}
    * @param $link {string}
-   *
    * @return mixed|null
    */
   public function scanDirCsv(string $path, string $link = '') {

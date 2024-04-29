@@ -76,6 +76,8 @@
   'Value is not valid' => 'Значение не верное',
   'Edit dealer'        => 'Редактировать дилера',
   'Edit dealer users'  => 'Редактировать пользователей',
+  'Login and password changed!' => 'Логин и пароль изменены!',
+  'Login or password is not validate!' => 'Логин или пароль слишком короткие!',
   // Manager settings
   'Manager settings' => 'Менеджеры',
   'Additional fields for managers' => 'Дополнительные поля',

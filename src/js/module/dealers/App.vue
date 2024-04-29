@@ -239,14 +239,7 @@ export default {
     },
   }),
   computed: {
-    properties() {
-      return this.dealersProperties;
-
-      /*return Object.entries(this.dealersProperties).reduce((r, [code, p]) => {
-        //code = code.replace('prop_', '');
-        p.code = code; r[code] = p; return r;
-      }, {});*/
-    },
+    properties() { return this.dealersProperties },
 
     filteredDealers() {
       if (this.search.length < 3) return this.dealers;
@@ -262,7 +255,18 @@ export default {
     dealer: {
       deep: true,
       handler() {
-        this.modal.confirmDisabled = !this.dealer.name;
+        let d = this.dealer,
+            valid = d.name.length > 2 ? 0b1 : 0b0;
+
+        valid |= d.login ? 0b10 : 0b0;
+        valid |= d.login && d.login.length > 2 ? 0b100 : 0b0;
+
+        valid |= d.password ? 0b1000 : 0b0;
+        valid |= d.password && d.password.length > 2 ? 0b10000 : 0b0;
+
+        this.msg.text = valid === 0b11111 ? this.$t('Login and password changed!') : '';
+
+        this.modal.confirmDisabled = !(valid === 0b11111 || valid === 0b1);
       },
     },
   },
