@@ -1,5 +1,5 @@
 <template>
-  <div class="d-grid gap-1 mt-1 p-1 overflow-auto" :style="contentStyle">
+  <div class="d-grid gap-1 mt-1 p-1 overflow-auto text-nowrap" :style="contentStyle">
     <template v-for="(row, i) of contentConfig" :key="i">
       <template v-for="(param, j) of row.params.param" :key="j">
         <div v-if="j === 0 || row.params.param[0]['@attributes'].type !== 'spoiler'"

@@ -3,10 +3,20 @@
     <div class="col-10">
       <!-- Спойлеры -->
       <template v-for="(spoiler, s) of mergedData" :key="s">
-        <details v-if="s !== 's0'" class="mt-3 rounded-3" :style="spoilerStyle">
-          <summary v-show="showSpoiler" class="border border-2 rounded-3 p-2 bg-white">{{ s }}</summary>
+        <div v-if="s !== 's0'" class="mt-3 rounded-3" :style="spoilerStyle">
+          <div v-show="showSpoiler" class="position-relative border border-2 rounded-3 p-2 bg-white"
+               @click="toggleSpoiler(s)"
+          >
+            {{ s }}
+            <i class="pi position-absolute end-0 p-1 pe-2"
+               :class="openSpoiler[s] ? 'pi-angle-up' : 'pi-angle-down'"
+            ></i>
+          </div>
 
-          <div class="form-content d-grid gap-1 mt-1 p-1" :style="contentStyle">
+          <div class="form-content d-grid gap-1 mt-1 p-1"
+               :class="openSpoiler[s] ? '' : 'd-none'"
+               :style="contentStyle"
+          >
             <!-- Шапка -->
             <div v-for="(head, k) of header" :key="k" class="fw-bold text-nowrap hidden text-center">
               <span>{{ head.value }}</span>
@@ -24,7 +34,7 @@
               </div>
             </template>
           </div>
-        </details>
+        </div>
       </template>
     </div>
     <div class="col-2">
@@ -86,6 +96,7 @@ export default {
     return {
       showModal: false,
       showSpoiler: true,
+      openSpoiler: {},
 
       contentData: this.$db.contentData,
       contentConfig: this.$db.contentConfig || {},
@@ -132,7 +143,7 @@ export default {
       let spoilerKey = 's0';
 
       this.contentData.forEach((csvRow, rowI) => {
-        const xmlRow = config[rowI].params.param;
+        const xmlRow = config[rowI] ? config[rowI].params.param : xmlDefRow;
 
         if (xmlRow[0]['@attributes'].type === 'spoiler') {
           spoilerKey = xmlRow[0]['@attributes'].name;
@@ -169,6 +180,8 @@ export default {
       this.mergedData = res;
     },
     checkSelectedCell(i, j) { return this.selectedCells.hasOwnProperty(getCellKey(i, j)) },
+
+    toggleSpoiler(s) { this.openSpoiler[s] = !this.openSpoiler[s] },
 
     selectCell(e, cell) {
       if (cell.param.type === 'customEvent') return;

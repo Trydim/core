@@ -9,8 +9,13 @@ import App from './App.vue';
 export class FormsTable extends Main {
   constructor() {
     super();
+    this.setPageStyle();
     this.showData();
     this.onEvent();
+  }
+
+  setPageStyle() {
+    document.body.style.overflow = 'auto';
   }
 
   async showData() {
