@@ -1,0 +1,54 @@
+@use "sass:math";
+
+// Подключение шрифта
+@mixin font($font_name, $file_name, $weight: 'normal') {
+  @font-face {
+    font-family: $font_name;
+    font-display: swap;
+    src: url("../fonts/#{$file_name}.woff2") format("woff2"), url("../fonts/#{$file_name}.woff") format("woff");
+    font-weight: #{$weight};
+    font-style: #{$style};
+  }
+}
+
+// Взять функцию
+// Динамический шрифт
+@function strip-unit($number) {
+  @if type-of($number) == "number" and not unitless($number) {
+    @return $number /*/ ($number * 0 + 1);*/
+  }
+  @return $number;
+}
+
+@function calcFluidFontSize($f-min, $f-max, $w-min, $w-max, $units: px) {
+  $k: math.div($f-max - $f-min, $w-max - $w-min);
+  $b: $f-min - $k * $w-min;
+  $b: $b + $units;
+  @return calc(#{$k} * 100vw + #{$b});
+}
+
+@mixin fluidFontSize($f-min, $f-max, $w-min, $w-max, $fallback: false) {
+  font-size: $f-min;
+  @media (min-width: $w-min) {
+    @if ($fallback) {
+      font-size: $fallback;
+    }
+    font-size: calcFluidFontSize($f-min, $f-max, $w-min, $w-max, px);
+  }
+  @media (min-width: $w-max) {
+    font-size: $f-max;
+  }
+}
+
+@mixin fz($fontSize, $lineHeight) {
+  font-size: rem($fontSize);
+  line-height: div($lineHeight, $fontSize);
+}
+
+/*  */
+@mixin fzAll($fontSize, $lineHeight) {
+  @include fz($fontSize, $lineHeight);
+  * {
+    @include fz($fontSize, $lineHeight);
+  }
+}

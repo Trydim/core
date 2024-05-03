@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Prime icons
-// https://www.primefaces.org/diamond/icons.xhtml
+// https://primevue.org/icons/
 // ---------------------------------------------------------------------------------------------------------------------
 
 $grays: (
@@ -26,9 +26,8 @@ $theme-colors: () !default;
 @font-face {
   font-family: 'primeicons';
   font-display: block;
-  src: //url('./fonts/primeicons.eot?#iefix') format('embedded-opentype'),
-       url(icons/fonts/primeicons.ttf) format('truetype'),
-       url(icons/fonts/primeicons.woff) format('woff');
+  src: url(./fonts/primeicons.ttf) format('truetype'),
+       url(./fonts/primeicons.woff) format('woff');
   font-weight: normal;
   font-style: normal;
 }

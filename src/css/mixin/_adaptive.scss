@@ -12,40 +12,33 @@ The smaller device rules always should write below the bigger device rules
 Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Component
 */
 
-$breakpoints-xs: 0!default;
-$breakpoints-sm: 575!default;
-$breakpoints-md: 767!default;
-$breakpoints-lg: 991!default;
-$breakpoints-xl: 1200!default;
-$breakpoints-xxl: 1800!default;
+$breakpoints-xs: 0 !default;
+$breakpoints-sm: 575 !default;
+$breakpoints-md: 767 !default;
+$breakpoints-lg: 991 !default;
+$breakpoints-xl: 1200 !default;
+$breakpoints-xxl: 1800 !default;
 
 /**
  * $breakpoint keys: phone/mobile/sm | phone-land/ | tab-port | tab-land | desktop | lg
  */
-
-@mixin respond($breakpoint: 'phone') {
+@mixin respond($breakpoint: 'phone', $rule: 'max-width') {
   @if ($breakpoint == "phone" or $breakpoint == "mobile" or $breakpoint == "sm") {
-    @media only screen and (max-width: em($breakpoints-sm)) { @content; }
+    @media only screen and ($rule: em($breakpoints-sm)) { @content; }
   }
 
   @if ($breakpoint == "phone-land" or $breakpoint == "md") {
-    @media only screen and (max-width: em($breakpoints-md)) { @content; }
+    @media only screen and ($rule: em($breakpoints-md)) { @content; }
   }
 
-  @if ($breakpoint == "tab-port") {
-    @media only screen and (max-width: em($breakpoints-lg)) { @content; }
-  }
-
-  @if ($breakpoint == "tab" or $breakpoint == "tab-land") {
-    @media only screen and (max-width: em($breakpoints-xl - 1)) { @content; }
+  @if ($breakpoint == "tab-port" or $breakpoint == "lg") {
+    @media only screen and ($rule: em($breakpoints-lg)) { @content; }
   }
 
   @if ($breakpoint == "desktop" or $breakpoint == "lg") {
-    @media only screen and (min-width: em($breakpoints-xl)) { @content; }
-  }
-
-  @if ($breakpoint == "xl") {
-    @media only screen and (min-width: em($breakpoints-xxl)) { @content; }
+    @media only screen and ($rule: em($breakpoints-xl)) { @content; }
+  } @else {
+    @media only screen and ($rule: em($breakpoints-xxl)) { @content; }
   }
 }
 

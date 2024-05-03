@@ -1,56 +1,7 @@
 .authentication-content {
   box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
   border-radius: 5px;
-
-  @at-root [data-theme-version="dark"] & {
-    background: $dark-card;
-    box-shadow: none;
-  }
 }
-
-/*
-.welcome-content {
-    background-size: cover;
-    background: url('./../images/1.jpg') center;
-    height: 100%;
-    padding: 75px 50px;
-    position: relative;
-    z-index: 1;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    &::after{
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background: $primary;
-        opacity: 0.75;
-        z-index: -1;
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
-    }
-    .welcome-title{
-        color: $white;
-        font-weight: 500;
-        font-size: 20px;
-    }
-
-    .brand-logo{
-        a{
-            display: inline-block;
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: $white;
-            font-size: 20px;
-        img{
-            width: 100px;
-        }
-        }
-    }
-}
-*/
 
 .auth-form {
   padding: rem(50);

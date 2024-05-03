@@ -24,6 +24,7 @@ module.exports = env => {
       clean     : !dev,
       path      : path.resolve(__dirname, '../../assets/'),
       filename  : 'js/[name].js',
+      //assetModuleFilename: '../../assets/',
       scriptType: 'module',
       module    : true,
       libraryTarget: 'module',
@@ -47,16 +48,11 @@ module.exports = env => {
       }),
       new VueLoaderPlugin(),
 
-      /*new HtmlWebpackPlugin({
-       title: 'title',
-       filename: 'view/content.php',
-       template: `content.php`,
-       }),*/
-
       new webpack.DefinePlugin({
         // Drop Options API from bundle
         __VUE_OPTIONS_API__  : 'true',
         __VUE_PROD_DEVTOOLS__: 'false',
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
       }),
     ],
     module: {
@@ -81,18 +77,29 @@ module.exports = env => {
 // Правила / Rules
 // ---------------------------------------------------------------------------------------------------------------------
 
-/** asset/resource - file-loader - в отдельный файл
- * asset/inline - url-loader - inline базе64
- * asset/source - raw-loader - ?
- * asset - автоматический выбор от размера по умолчанию 8к */
+/**
+ * Mini css extract plugin
+ */
+const getMiniCssExtractPlugin = () => ({
+  loader: MiniCssExtractPlugin.loader,
+  options: {
+    publicPath: '../',
+  },
+});
 
-/*const generator = {
- publicPath: '../', // папка относительно собранных файлов.
- }*/
+/**
+ * css-loader
+ * @return {object}
+ */
+const getCssLoader = () => ({
+  loader: 'css-loader',
+  options: {
+    sourceMap: true,
+  },
+});
 
 /**
  * Typescript
- * @return {object}
  */
 const getTypescriptRules = () => ({
   test  : /\.ts$/,
@@ -105,7 +112,6 @@ const getTypescriptRules = () => ({
 
 /**
  * Vue
- * @return {object}
  */
 const getVueRules = () => ({
   test  : /\.vue$/,
@@ -114,39 +120,47 @@ const getVueRules = () => ({
 
 /**
  * Scss
- * @return {object}
  */
 const getScssRules = dev => ({
   test: /\.s[ac]ss$/i,
   use : [
-    dev ? 'style-loader' : MiniCssExtractPlugin.loader,
-    'css-loader',
-    'sass-loader',
+    /*dev ? 'style-loader' : */getMiniCssExtractPlugin(),
+    getCssLoader(),
+    'resolve-url-loader',
+    {
+      loader: 'sass-loader',
+      options: {
+        sourceMap: true, // <-- !!IMPORTANT!!
+      }
+    },
   ],
 });
 
 /**
  * Css
- * @return {object}
  */
 const getCssRules = dev => ({
   test: /\.css$/i,
   use : [
-    dev ? 'style-loader' : MiniCssExtractPlugin.loader,
-    'css-loader',
+    /*dev ? 'style-loader' :*/ getMiniCssExtractPlugin(),
+    getCssLoader(),
   ],
 });
 
+/** asset/resource - file-loader - в отдельный файл
+ * asset/inline - url-loader - inline базе64
+ * asset/source - raw-loader - ?
+ * asset - автоматический выбор от размера по умолчанию 8к
+ */
+
 /**
- * Image loader
- * @return {object}
+ * Image
  */
 const getImageRules = () => ({
   test: /\.(png|jpe?g|gif|webp)$/i,
   type: 'asset',
   generator: {
-    filename: 'image/[name][ext]',
-    //publicPath: generator.publicPath,
+    filename: 'images/[name][ext]',
   },
   parser: {
     dataUrlCondition: {
@@ -156,16 +170,13 @@ const getImageRules = () => ({
 });
 
 /**
- * SVG
- * inline
- * @return {object}
+ * SVG - file-loader/inline
  */
 const getSVGRules = () => ({
-  test: /\.(svg)$/,
+  test: /\.svg$/,
   type: 'asset',
   generator: {
     filename: 'svg/[name][ext]',
-    //publicPath: generator.publicPath,
   },
   parser: {
     dataUrlCondition: {
@@ -176,13 +187,11 @@ const getSVGRules = () => ({
 
 /**
  * Шрифты
- * @return {object}
  */
 const getFontsRules = () => ({
   test: /\.(ttf|woff|woff2|eot)$/,
   type: "asset/resource",
   generator: {
     filename: 'fonts/[name][ext]',
-    //publicPath: generator.publicPath,
   },
 });

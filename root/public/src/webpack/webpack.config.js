@@ -173,7 +173,6 @@ const getVueRules = () => ({
 
 /**
  * Scss
- * @return {object}
  */
 const getScssRules = () => ({
   test: /\.s[ac]ss$/i,

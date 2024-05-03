@@ -1,25 +1,29 @@
 @charset "UTF-8";
 
+@import './variable';
+
+@import './mixin/functions';
+@import './mixin/adaptive';
+@import './mixin/fonts';
+
 // Core Bootstrap
-//@import "bootstrap/bootstrap";
-@import "./bootstrap/bootstrap5.2.css" layer(base);
+//@import 'bootstrap/bootstrap';
+@import './bootstrap/bootstrap5.2.css' layer(base);
 
 @layer base {
   // Icons (prime)
-  @import "icons/icons";
+  @import 'icons/icons';
 
-  // Theme
-  @import './variable';
-  @import "./admin/functions";
-  @import "./admin/mixin";
-  @import "./admin/abstracts/abstracts";
-  @import "admin/utilities/utilities";
+  @import 'admin/base/common';
+  // Layout
+  @import 'admin/layout/header';
+  @import 'admin/layout/sidebar';
+  @import 'admin/layout/content';
+  @import 'admin/layout/footer';
+  // Pages
+  @import 'admin/pages/page-auth';
 
-  @import "admin/preloader";
+  @import 'admin/preloader';
 
-  @import "admin/base/common";
-
-  @import "admin/layout/layout";
-
-  @import "admin/pages";
+  @import 'utilities/utilities';
 }
