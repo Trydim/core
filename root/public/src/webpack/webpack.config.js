@@ -40,6 +40,7 @@ module.exports = env => {
       path         : getOutputPath(),
       publicPath   : '/',
       filename     : 'js/[name].js',
+      assetModuleFilename: 'public/',
       chunkFilename: 'js/[name].chunk.js',
       scriptType   : 'module',
       module       : true,
@@ -79,10 +80,12 @@ module.exports = env => {
         // Drop Options API from bundle
         __VUE_OPTIONS_API__  : 'true',
         __VUE_PROD_DEVTOOLS__: 'false',
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
       }),
     ],
     module: {
       rules: [
+        getTypeScriptRules(),
         getReactRules(),
         getVueRules(),
         getScssRules(),
@@ -108,14 +111,44 @@ module.exports = env => {
 // Правила / Rules
 // ---------------------------------------------------------------------------------------------------------------------
 
-/** asset/resource - file-loader - в отдельный файл
- * asset/inline - url-loader - inline базе64
- * asset/source - raw-loader - ?
- * asset - автоматический выбор от размера по умолчанию 8к */
+/**
+ * Mini css extract plugin
+ */
+const getMiniCssExtractPlugin = () => ({
+  loader: MiniCssExtractPlugin.loader,
+  options: {
+    publicPath: '../',
+  },
+});
+
+/**
+ * css-loader
+ * @return {object}
+ */
+const getCssLoader = () => ({
+  loader: 'css-loader',
+  options: {
+    url: {
+      filter: l => !l.includes('/font')
+    },
+    sourceMap: true,
+  },
+});
+
+/**
+ * TypeScript
+ */
+const getTypeScriptRules = () => ({
+  test  : /\.ts$/,
+  loader: 'ts-loader',
+  exclude: /node_modules/,
+  options: {
+    appendTsSuffixTo: [/\.vue$/]
+  },
+});
 
 /**
  * React
- * @return {object}
  */
 const getReactRules = () => ({
   test: /\.(jsx)$/,
@@ -132,7 +165,6 @@ const getReactRules = () => ({
 
 /**
  * Vue
- * @return {object}
  */
 const getVueRules = () => ({
   test  : /\.vue$/,
@@ -146,28 +178,37 @@ const getVueRules = () => ({
 const getScssRules = () => ({
   test: /\.s[ac]ss$/i,
   use : [
-    MiniCssExtractPlugin.loader,
-    'css-loader',
-    'sass-loader',
+    getMiniCssExtractPlugin(),
+    getCssLoader(),
+    'resolve-url-loader',
+    {
+      loader: 'sass-loader',
+      options: {
+        sourceMap: true, // <-- !!IMPORTANT!!
+      }
+    },
   ],
 });
 
 /**
  * Css
- * @return {object}
  */
 const getCssRules = () => ({
   test: /\.css$/i,
   use : [
-    MiniCssExtractPlugin.loader,
-    'css-loader',
+    getMiniCssExtractPlugin(),
+    getCssLoader(),
   ],
 });
 
+/** asset/resource - file-loader - в отдельный файл
+ * asset/inline - url-loader - inline базе64
+ * asset/source - raw-loader - ?
+ * asset - автоматический выбор от размера по умолчанию 8к
+ */
+
 /**
  * Image
- * loader: 'svgo-loader', - какой-то инлайн лоадер
- * @return {object}
  */
 const getImageRules = () => ({
   test   : /\.(png|jpe?g|gif|webp)$/i,
@@ -183,9 +224,7 @@ const getImageRules = () => ({
 });
 
 /**
- * SVG
- * inline
- * @return {object}
+ * SVG - file-loader/inline
  */
 const getSVGRules = () => ({
   test: /\.(svg)$/,
@@ -202,7 +241,6 @@ const getSVGRules = () => ({
 
 /**
  * Шрифты
- * @return {object}
  */
 const getFontsRules = () => ({
   test   : /\.(ttf|woff|woff2|eot)$/,
