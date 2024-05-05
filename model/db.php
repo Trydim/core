@@ -47,8 +47,8 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       // Tables
     case 'showTable':
       $result['columns'] = $columns;
-      if (is_string($dbTable) && stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
-      elseif (is_string($dbTable) && $dbTable === 'content-js') $result['content'] = $db->loadContentEditorData();
+      if (stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
+      elseif ($dbTable === 'content-js') $result['content'] = $db->loadContentEditorData();
       else {
         if (CHANGE_DATABASE) {
           USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
@@ -107,8 +107,36 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $result['error'] = 'Nothing to save!';
       }
       break;
-    case 'loadCSV':
-      $db->fileForceDownload();
+    case 'loadTable':
+      $tables = json_decode($tables ?? '[]', true);
+
+      if (count($tables) === 0) {
+        if (empty($tableName)) { $result['error'] = 'Error table name'; break; }
+
+        $arrTable[] = [
+          'param' => json_decode($columns ?? '{}', true),
+          'file'  => $tableName,
+        ];
+      }
+
+      foreach ($tables as $file => $param) {
+        $key = pathinfo($file, PATHINFO_FILENAME);
+
+        $result[$key] = loadCSV(
+          is_array($param ?? null) ? $param : [],
+          $file,
+          false,
+          true
+        );
+
+        if ($param['saveJson'] ?? false) {
+          file_put_contents(
+            ABS_SITE_PATH . SHARE_PATH . 'json/' . str_replace('.csv', '.json', $file),
+            json_encode($result[$key]),
+          );
+        }
+      }
+
       break;
     case 'loadFormsTable':
     case 'loadXmlConfig':
@@ -892,7 +920,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
 
     default:
-      echo 'SWITCH default DB.php' . var_dump($_REQUEST);
+      echo 'db.php: switch default case:' . var_dump($_REQUEST);
       break;
   }
 }

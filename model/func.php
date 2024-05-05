@@ -88,16 +88,12 @@ function boolValue($var): bool {
  * @param $value
  * @return false|float
  */
-function convert($type, $value) {
+function csvTypeConvert($type, $value) {
   switch ($type) {
-    case 'int':
-    case 'integer':
-      return floor((integer)$value);
-    case 'float':
-    case 'double':
-      return floatval(str_replace(',', '.', $value));
+    default: return $value;
+    case 'int': case 'integer': return intval($value);
+    case 'float': case 'double': return floatval(str_replace(',', '.', $value));
   }
-  return $value;
 }
 
 function convertToArray($value): array {
@@ -161,19 +157,6 @@ function includes($hayStack, string $search): bool {
   return false;
 }
 
-/**
- * @param $word
- *
- * @return false|float|int
- */
-function getLimitLevenshtein($word) {
-  if (iconv_strlen($word) <= 3) {
-    return iconv_strlen($word);
-  }
-
-  return ceil(iconv_strlen($word) / 2);
-}
-
 function getPageAsString($data): string {
   $id = 'wrapCalcNode' . uniqid();
   $initJs = $data['initJs'];
@@ -232,20 +215,22 @@ function gTxtDB(string $db, string $str): string {
  *
  * @param string $input - when search?
  * @param array  $row   - what search? arr of string
- * @param string $inCharset - in charset in csv (autodetect)
  * @param bool   $index - if true return word, default return index position
  * @param bool   $strict -
  *
  * @return integer or string - int: return index of position keyword in array
  */
-function findWord(string $input, array $row, string $inCharset = 'windows-1251', bool $index = false, bool $strict = false) {
+function findWord(string $input, array $row, bool $index = false, bool $strict = false) {
   $gc = false;
-  $input = mb_strtolower($input, 'UTF-8');
   $shortest = -1;
   $nearestWord = null;
-  $limit = getLimitLevenshtein($input); // Порог прохождения
+
+  $input = mb_strtolower($input, 'UTF-8');
+  $limit = iconv_strlen($input);
+  $limit = $limit <= 3 ? $limit : ceil($limit / 2); // Pass level Limit
+
   foreach ($row as $key => $cell) {
-    $word = trim(mb_strtolower(iconv($inCharset, 'UTF-8', $cell), 'UTF-8'));
+    $word = trim(mb_strtolower($cell, 'UTF-8'));
     $lev = levenshtein($input, $word);
 
     if ($lev === 0) {
@@ -268,13 +253,13 @@ function findWord(string $input, array $row, string $inCharset = 'windows-1251',
 /**
  * Find key
  *
- * @param string - when search?
- * @param array - what search? array of keys
+ * @param string[] $cell - when searching?
+ * @param array $input - what search? array of keys
  *
- * @return string - keys or false
+ * @return string|bool - keys or false
  */
-function findKey($cell, $input) {
-  $count = count($input); // теперь всегда 1
+function findKey(array $cell, array $input) {
+  $count = count($input); // now forever 1
   $input = '/(' . implode('|', $input) . ')/i';
   foreach ($cell as $key => $item) {
     if (preg_match_all($input, $key) === $count) {
@@ -293,13 +278,10 @@ function findKey($cell, $input) {
 function findCsvFile(string $filename): string {
   global $main;
 
-  // Direct path
-  if (file_exists($filename)) return $filename;
-  // Dealer path
-  $path = $main->getCmsParam(VC::CSV_PATH) . $filename;
+  if (file_exists($filename)) return $filename;              // Direct path
+  $path = $main->getCmsParam(VC::CSV_PATH) . $filename;      // Dealer path
   if (file_exists($path)) return $path;
-  // Main path
-  $path = $main->getCmsParam(VC::CSV_PATH) . $filename;
+  $path = $main->getCmsParam(VC::CSV_MAIN_PATH) . $filename; // Main path
   if (file_exists($path)) return $path;
 
   return '';
@@ -327,45 +309,38 @@ function isJSON(string $value): bool {
  * @param bool   $oneRang  - if true that return one rang array
  * @param bool   $strict   - strict checking of column names
  *
- * @return array|bool
+ * @return array|string
  */
 function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $strict = false) {
-  global $main;
-  $filename = file_exists($filename) ? $filename : $main->getCmsParam(VC::CSV_PATH) . $filename;
+  $filename = findCsvFile($filename);
   $result = [];
 
   if (!count($dict)) return loadFullCSV($filename);
 
-  if (file_exists($filename) && ($handle = fopen($filename, "rt")) !== false) {
+  if (strlen($filename) && ($handle = fopen($filename, "rt")) !== false) {
     if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
       $keyIndex = [];
 
-      $inCharset = 'UTF-8'; //mb_detect_encoding(, ['windows-1251', 'UTF-8'], true);
-
       foreach ($dict as $key => $word) {
+        if (is_numeric($key)) $key = $word;
+
         $isArr = is_array($word);
-        $i = findWord($isArr ? $word[0] : $word, $data, $inCharset, false, $strict);
+        $i = findWord($isArr ? $word[0] : $word, $data, false, $strict);
 
         if ($i !== false) $keyIndex[$key] = $isArr ? [$i, $word[1]] : $i;
       }
 
       if ($oneRang) {
-        foreach ($keyIndex as $item) {
-          $addpos = function ($data) use ($item) { return $data[$item]; };
-        }
-
+        $item = end($keyIndex);
+        $addPos = function ($data) use ($item) { return $data[$item]; };
       } else {
 
-        $addpos = function ($data) use ($keyIndex, $inCharset) {
+        $addPos = function ($data) use ($keyIndex) {
           $arr = [];
           foreach ($keyIndex as $key => $item) {
-            if (is_array($item)) {
-              $arr[$key] = trim(iconv($inCharset, 'UTF-8', $data[$item[0]]));
-              $arr[$key] = convert($item[1], $arr[$key]);
-            } else {
-              $value = trim(iconv($inCharset, 'UTF-8', $data[$item]));
-              $arr[$key] = preg_replace('/^d_/', '', $value);
-            }
+            $arr[$key] = is_array($item)
+              ? csvTypeConvert($item[1], trim($data[$item[0]]))
+              : preg_replace('/^d_/', '', trim($data[$item]));
           }
           return $arr;
         };
@@ -373,13 +348,12 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
       }
 
       while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER)) !== false) {
-        $result[] = $addpos($data);
+        $result[] = $addPos($data);
       }
     }
     fclose($handle);
-  } else {
-    return 'File is not exist';
   }
+  else return 'File is not exist';
 
   return $result;
 }
@@ -388,7 +362,7 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
  * Поиск в первых пяти строках начала таблиц
  *
  * @param string $path
- * @return array|bool
+ * @return array|string
  */
 function loadFullCSV(string $path) {
   if ($path !== '' && ($handle = fopen($path, "rt")) !== false) {
@@ -436,7 +410,7 @@ if (!function_exists('removeFolder')) {
 /**
  * @param string $lang
  */
-function setUserLocale($lang = 'ru_RU') {
+function setUserLocale(string $lang = 'ru_RU') {
   /*switch ($lang) {
     case 'ru_RU':
       putenv('LANG=ru_RU.UTF8');
@@ -474,27 +448,19 @@ function template(string $path = 'base', array $vars = []): string {
   extract($vars);
   ob_start();
 
-  // Абсолютный путь файла
-  if (file_exists($path)) {
-    include $path;
-  }
-  // В корне сайта в public
-  else if (file_exists(ABS_SITE_PATH . "public/views/$path")) {
-    include ABS_SITE_PATH . "public/views/$path";
-  }
-  // в сms
-  else if (file_exists(CORE . "views/$path")) {
-    include CORE . "views/$path";
-  } else echo 'Template not found: ' . $path;
+  if (file_exists($path)) include $path; // Absolute path
+  else if (file_exists(ABS_SITE_PATH . "public/views/$path")) include ABS_SITE_PATH . "public/views/$path"; // In root public
+  else if (file_exists(CORE . "views/$path")) include CORE . "views/$path"; // In core
+  else echo 'Template not found: ' . $path;
 
   return ob_get_clean();
 }
 
 /**
- * @param $value {string}
+ * @param string $value
  * @return string
  */
-function translit($value): string {
+function translit(string $value): string {
   $converter = [
     'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
     'е' => 'e', 'ё' => 'e', 'ж' => 'zh', 'з' => 'z', 'и' => 'i',

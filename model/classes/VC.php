@@ -10,6 +10,7 @@ class VC {
   const PROJECT_TITLE = 'PROJECT_TITLE',
         DB_CONFIG     = 'dbConfig',
         ONLY_LOGIN    = 'onlyLogin',
+        CSV_MAIN_PATH = 'csvMain',
         CSV_PATH      = 'csvPath',
         LEGEND_PATH   = 'legendPath',
         IMG_PATH      = 'imgPath',

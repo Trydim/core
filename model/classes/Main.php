@@ -383,21 +383,17 @@ final class Main {
    * @var bool
    */
   public $publicDealer = true;
-  /**
-   * @var string
-   */
-  private $dealCsvPath = '';
 
   public function publicMain() {
     $this->publicDealer = false;
-    $this->dealCsvPath = $this->getCmsParam(VC::CSV_PATH);
-    $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam('csvMain'));
+    $this->setCmsParam('dealCsvPath', $this->getCmsParam(VC::CSV_PATH));
+    $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam(VC::CSV_MAIN_PATH));
   }
 
   public function publicDealer() {
     if ($this->isDealer()) {
       $this->publicDealer = true;
-      $this->setCmsParam(VC::CSV_PATH, $this->dealCsvPath);
+      $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam('dealCsvPath'));
     }
   }
 }

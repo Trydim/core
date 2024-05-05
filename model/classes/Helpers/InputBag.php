@@ -9,6 +9,23 @@ use Closure;
  * InputBag is a container for user input values such as $_GET, $_POST, $_REQUEST, and $_COOKIE.
  */
 final class InputBag extends ParameterBag {
+
+  public function __construct(array $parameters = []) {
+    parent::__construct($parameters);
+
+    if ($this->count() === 1) {
+      $phpInput = file_get_contents('php://input');
+
+      if (strlen($phpInput)) {
+        $parameters = json_decode($phpInput, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) parse_str($phpInput, $parameters);
+
+        if (is_array($parameters) && count($parameters)) $this->add($parameters);
+      }
+    }
+  }
+
   /**
    * Returns a scalar input value by name.
    *

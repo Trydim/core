@@ -10,7 +10,7 @@ trait Authorization {
    * @var string[]
    */
   static $AVAILABLE_ACTION = [
-    'loadCSV', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles', 'loadDealersProperties'
+    'loadTable', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles', 'loadDealersProperties'
   ];
   /**
    * @var string[] anytime and anyone available pages
@@ -93,10 +93,10 @@ trait Authorization {
         if (CHANGE_DATABASE) {
           $dbTables = array_merge($dbTables, $this->db->getTables());
         } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
-          $props = array_merge([[
-                                  'dbTable' => 'codes',
-                                  'name'    => gTxtDB('codes', 'codes')
-                                ]], $this->db->getTables('prop'));
+          $props = array_merge(
+            [['dbTable' => 'codes', 'name'=> gTxt('codes')]],
+            $this->db->getTables('prop')
+          );
 
           $props = array_map(function ($prop) {
             $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
@@ -203,7 +203,8 @@ trait Authorization {
     return $this;
   }
 
-  /** Нужна ли регистрация для действия
+  /**
+   * Checking if authorization is required for the action
    * @param string $action
    * @return bool
    */
