@@ -1,6 +1,23 @@
 
 @import "./handsontable.min.css";
 
+// base
+
+.btn-transparent {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.25);
+
+  //color: #FFF;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.table-name-header {
+  //color: #cacaca;
+  font-size: 24px;
+}
+
 .form-editor {
 
   .form-content input {
@@ -20,6 +37,39 @@
 
     &.selected {
       box-shadow: 0 0 0 3px red;
+    }
+  }
+
+  .content-wrap {
+    width: 80%;
+  }
+
+  .control-wrap {
+    width: 20%;
+    border-radius: 10px;
+    background: #695c8a;
+  }
+
+  .radio-group {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+
+
+    &__item {
+      flex: 1 0 0;
+      padding: 0 1.5rem;
+      border: 1px solid #bbb;
+
+      &:first-child {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+      }
+
+      &:last-child {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+      }
     }
   }
 }

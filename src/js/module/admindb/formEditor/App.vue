@@ -1,6 +1,6 @@
 <template>
-  <div class="form-editor container-fluid row">
-    <div class="col-10">
+  <div class="form-editor container-fluid d-flex gap-2">
+    <div class="content-wrap">
       <!-- Спойлеры -->
       <template v-for="(spoiler, s) of mergedData" :key="s">
         <div v-if="s !== 's0'" class="mt-3 rounded-3" :style="spoilerStyle">
@@ -26,6 +26,8 @@
               <div v-for="(cell, j) of row" :key="'' + i + j + cell.value" class="cell"
                    :class="{'selected': checkSelectedCell(i, j)}"
                    @click="selectCell($event, cell)"
+                   @mousedown="startSelect($event, cell)"
+                   @mouseup="stopSelect($event, cell)"
               >
                 <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]"/>
                 <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]"/>
@@ -37,17 +39,19 @@
         </div>
       </template>
     </div>
-    <div class="col-2">
-      <div class="row">
-        <div class="col-6 p-0">
-          <input type="radio" class="btn-check" id="changeTypeS" value="set" v-model="change.type">
-          <label class="btn btn-outline-primary w-100" for="changeTypeS">Установить</label>
+    <div class="control-wrap">
+
+      <div class="radio-group">
+        <div class="radio-group__item">
+          <input type="radio" hidden id="changeTypeS" value="set" v-model="change.type">
+          <label class="radio-group__btn" for="changeTypeS">Установить</label>
         </div>
-        <div class="col-6 p-0">
-          <input type="radio" class="btn-check" id="changeTypeC" value="change" v-model="change.type">
-          <label class="btn btn-outline-primary w-100" for="changeTypeC">Изменить</label>
+        <div class="radio-group__item">
+          <input type="radio" hidden id="changeTypeC" value="change" v-model="change.type">
+          <label class="radio-group__btn" for="changeTypeC">Изменить</label>
         </div>
       </div>
+
       <div class="row mt-2">
         <div class="col-6 p-0">
           <input type="radio" class="btn-check" id="changeValueA" value="absolute" v-model="change.valueType">
@@ -105,6 +109,7 @@ export default {
 
       focusedCell: undefined,
       selectedCells: {},
+      startCell: undefined,
       param: {
         type: 'string',
       },
@@ -197,6 +202,17 @@ export default {
       }
     },
     clearSelected() { this.selectedCells = {} },
+    startSelect(e, cell) {
+      //this.startCell = getCellKey(cell.rowI, cell.cellI);
+
+      // Если отпустил в любом другом месте прекратить выделение
+    },
+    stopSelect(e, cell) {
+      /*if (this.startCell === getCellKey(cell.rowI, cell.cellI)) {
+        this.startCell = undefined;
+        return;
+      }*/
+    },
 
     applyChange() {
       const c = this.change;

@@ -11,22 +11,20 @@ if (isset($legend[$tableActive])) {
 }
 
 $field['content'] = <<<main
-<div class="d-flex align-items-center justify-content-around pt-3">
-  <div class="text-center mr-5">
+<div class="d-flex align-items-center mx-2 gap-3">
+  <div class="table-name-header">
     <h2 id="tableNameField"></h2>
   </div>
   <div id="btnField">
-    <button type="button" class="btn btn-primary" id="btnSave" disabled>Сохранить</button>
-    <button type="button" class="btn btn-primary d-none" id="btnRefresh">Обновить Конфиг</button>
+    <button type="button" class="btn-transparent" id="btnSave" disabled>Сохранить</button>
   </div>
-  <div></div>
-  <div id="viewField" class="gap-1">
+  <div id="viewField" class="ms-auto">
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" data-action="adminType">
+      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" checked data-action="adminType">
       <label class="form-check-label" for="formMode">Режим форм</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="table" id="formTable" checked data-action="adminType">
+      <input class="form-check-input" type="radio" name="adminType" value="table" id="formTable" data-action="adminType">
       <label class="form-check-label" for="formTable">Режим таблицы</label>
     </div>
     <div class="form-check">
