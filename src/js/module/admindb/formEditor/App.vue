@@ -173,6 +173,7 @@ export default {
 
       if (Object.keys(res).length === 1) {
         this.showSpoiler = false;
+        this.openSpoiler.s1 = true;
         res.s1 = {...res.s0};
         delete res.s1[0]; // Удалить шапку
       }
