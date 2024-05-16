@@ -15,8 +15,8 @@ $field['content'] = <<<main
   <div class="table-name-header">
     <h2 id="tableNameField"></h2>
   </div>
-  <div id="btnField">
-    <button type="button" class="btn-transparent" id="btnSave" disabled>Сохранить</button>
+  <div id="btnField" class="px-1">
+    <button type="button" class="btn btn-transparent" id="btnSave" disabled>Сохранить</button>
   </div>
   <div id="viewField" class="ms-auto">
     <div class="form-check">
@@ -35,7 +35,7 @@ $field['content'] = <<<main
 </div>
 <div id="insertToDB" class="h-25"></div>
 <div class="position-fixed bottom-0 end-0" style="z-index: 10">
-  <input type="button" id="legend" class="btn btn-outline-primary m-1" value="Помощь">
+  <input type="button" id="legend" class="btn btn-gray m-2" value="Помощь">
 </div>
 main;
 

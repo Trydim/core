@@ -9,6 +9,7 @@
 
 .content-body {
   width: calc(100% - var(--theme-sidebar-width));
+  transition: width .2s ease;
   z-index: 1;
 
   @include respond(tab) {

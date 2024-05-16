@@ -1,30 +1,29 @@
 <template>
-  <div class="form-editor container-fluid d-flex gap-2">
+  <div class="form-editor container-fluid d-flex align-items-start gap-2">
     <div class="content-wrap">
       <!-- Спойлеры -->
       <template v-for="(spoiler, s) of mergedData" :key="s">
-        <div v-if="s !== 's0'" class="mt-3 rounded-3" :style="spoilerStyle">
-          <div v-show="showSpoiler" class="position-relative border border-2 rounded-3 p-2 bg-white"
-               @click="toggleSpoiler(s)"
-          >
+        <div v-if="s !== 's0'" class="content-spoiler" :class="{'solid': showSpoiler}">
+          <div v-show="showSpoiler" class="content-spoiler__header" @click="toggleSpoiler(s)">
             {{ s }}
-            <i class="pi position-absolute end-0 p-1 pe-2"
+            <i class="pi position-absolute end-0 top-0 p-2"
                :class="openSpoiler[s] ? 'pi-angle-up' : 'pi-angle-down'"
             ></i>
           </div>
 
-          <div class="form-content d-grid gap-1 mt-1 p-1"
-               :class="openSpoiler[s] ? '' : 'd-none'"
-               :style="contentStyle"
-          >
+          <div class="form-content" :class="openSpoiler[s] ? '' : 'd-none'" :style="contentStyle">
             <!-- Шапка -->
-            <div v-for="(head, k) of header" :key="k" class="fw-bold text-nowrap hidden text-center">
+            <div v-for="(head, k) of header" :key="k" class="form-content__header">
               <span>{{ head.value }}</span>
             </div>
             <!-- Содержимое -->
-            <template v-for="(row, i) of spoiler" :key="i">
-              <div v-for="(cell, j) of row" :key="'' + i + j + cell.value" class="cell"
-                   :class="{'selected': checkSelectedCell(i, j)}"
+            <template v-for="(row, i, rIndex) of spoiler" :key="i">
+              <div v-for="(cell, j, cIndex) of row" :key="'' + i + j + cell.value" class="cell"
+                   :class="{
+                     'first': cIndex === 0,
+                     'last-row': itemSpoiler[s] === rIndex + 1,
+                     'selected': checkSelectedCell(i, j),
+                   }"
                    @click="selectCell($event, cell)"
                    @mousedown="startSelect($event, cell)"
                    @mouseup="stopSelect($event, cell)"
@@ -40,36 +39,32 @@
       </template>
     </div>
     <div class="control-wrap">
-
       <div class="radio-group">
-        <div class="radio-group__item">
-          <input type="radio" hidden id="changeTypeS" value="set" v-model="change.type">
-          <label class="radio-group__btn" for="changeTypeS">Установить</label>
-        </div>
-        <div class="radio-group__item">
-          <input type="radio" hidden id="changeTypeC" value="change" v-model="change.type">
-          <label class="radio-group__btn" for="changeTypeC">Изменить</label>
-        </div>
+        <label class="radio-group__item">
+          <input type="radio" hidden value="set" v-model="change.type">
+          <span class="radio-group__span">Установить</span>
+        </label>
+        <label class="radio-group__item">
+          <input type="radio" hidden value="change" v-model="change.type">
+          <span class="radio-group__span">Изменить</span>
+        </label>
+      </div>
+      <div class="radio-group mt-2">
+        <label class="radio-group__item">
+          <input type="radio" hidden value="absolute" v-model="change.valueType">
+          <span class="radio-group__span">Значение</span>
+        </label>
+        <label class="radio-group__item">
+          <input type="radio" hidden value="relative" v-model="change.valueType">
+          <span class="radio-group__span">Проценты</span>
+        </label>
       </div>
 
-      <div class="row mt-2">
-        <div class="col-6 p-0">
-          <input type="radio" class="btn-check" id="changeValueA" value="absolute" v-model="change.valueType">
-          <label class="btn btn-outline-primary w-100" for="changeValueA">Значение</label>
-        </div>
-        <div class="col-6 p-0">
-          <input type="radio" class="btn-check" id="changeValueP" value="relative" v-model="change.valueType">
-          <label class="btn btn-outline-primary w-100" for="changeValueP">Проценты</label>
-        </div>
-      </div>
-      <div class="row mt-2">
-        <input type="text" class="form-control" v-model="change.value">
-      </div>
-      <div class="row mt-2">
-        <button type="button" class="col-12 btn btn-primary" @click="applyChange">Применить</button>
-      </div>
-      <div class="row mt-2">
-        <button type="button" class="col-6 btn btn-info" title="Снять выделение" @click="clearSelected">
+      <input type="text" class="control-input mt-2" v-model="change.value">
+
+      <div class="d-flex justify-content-between mt-4 gap-4">
+        <button type="button" class="col btn btn-white" @click="applyChange">Применить</button>
+        <button type="button" class="col btn btn-gray" title="Снять выделение" @click="clearSelected">
           <i class="pi pi-times"></i>
         </button>
       </div>
@@ -101,6 +96,7 @@ export default {
       showModal: false,
       showSpoiler: true,
       openSpoiler: {},
+      itemSpoiler: {},
 
       contentData: this.$db.contentData,
       contentConfig: this.$db.contentConfig || {},
@@ -122,12 +118,13 @@ export default {
     };
   },
   computed: {
-    header() { return this.mergedData['s0'][0] },
-    columns() { return Object.keys(this.header).length },
-    spoilerStyle() {
-      return this.showSpoiler ? 'background-image: linear-gradient(180deg, white 20px, #E6E6E6CC 20px)'
-                              : 'background: #E6E6E6CC';
+    header() {
+      return Object.values(this.mergedData['s0'][0]).map(k => {
+        k.value = window._(k.value);
+        return k;
+      });
     },
+    columns() { return Object.keys(this.header).length },
     contentStyle() { return 'grid-template-columns: repeat(' + this.columns + ', auto)' },
   },
   watch: {
@@ -151,6 +148,7 @@ export default {
         const xmlRow = config[rowI] ? config[rowI].params.param : xmlDefRow;
 
         if (xmlRow[0]['@attributes'].type === 'spoiler') {
+
           spoilerKey = xmlRow[0]['@attributes'].name;
           res[spoilerKey] = {};
           return;
@@ -174,6 +172,8 @@ export default {
 
           return cR;
         }, {});
+
+        this.itemSpoiler[spoilerKey] = Object.keys(res[spoilerKey]).length;
       });
 
       if (Object.keys(res).length === 1) {

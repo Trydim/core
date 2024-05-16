@@ -1,29 +1,51 @@
+@import '../../variable';
+
+@import '../../mixin/functions';
+@import '../../mixin/adaptive';
+@import '../../mixin/fonts';
 
 @import "./handsontable.min.css";
 
 // base
-
-.btn-transparent {
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.25);
-
-  //color: #FFF;
-  font-size: 12px;
+.btn {
+  padding: rem(6) rem(10);
+  border-radius: rem(8);
+  font-size: rem(12);
   font-weight: 500;
+
+  &-transparent {
+    background: rgba(255, 255, 255, 0.25);
+    //color: #FFF;
+
+    &:disabled {
+      border-color: gray;
+    }
+
+    &:not(:disabled) {
+      border-color: black;
+    }
+  }
+
+  &-white {
+    background: white;
+    color: #4B2779;
+  }
+
+  &-gray {
+    background: rgba(198, 198, 198, 0.76);
+    color: white;
+  }
 }
 
 .table-name-header {
   //color: #cacaca;
-  font-size: 24px;
+  font-size: rem(24);
 }
 
 .form-editor {
-
-  .form-content input {
-    border: none;
-    border-radius: 4px;
-  }
+  border-radius: rem(8);
+  min-height: 100vh;
+  background: linear-gradient(294deg, #596295 1.11%, #343957 98.61%);
 
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
@@ -31,45 +53,130 @@
     margin: 0;
   }
 
+  .content-wrap {
+    width: 80%;
+  }
+
+  .content-spoiler {
+    margin-top: rem(20);
+    background-image: linear-gradient(180deg, white 20px, #e6e6e6cc 20px);
+    border-radius: rem(8);
+
+    &__header {
+      position: relative;
+      border: 2px solid transparent;
+      border-radius: rem(8);
+      padding: rem(12) rem(20);
+      background: white;
+      font-size: rem(12);
+      color: #4B2779;
+      font-weight: 600;
+
+      i {
+        font-size: rem(24);
+      }
+    }
+
+    &.solid {
+      background: #e6e6e6cc;
+    }
+  }
+
+  .form-content {
+    display: grid;
+    margin-top: rem(5);
+
+    font-size: rem(12);
+
+    &__header {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-align: center;
+      padding: rem(5);
+      border-bottom: 1px solid #eee;
+
+      &:first-child {
+        //text-align: left;
+        padding-left: rem(20);
+      }
+    }
+  }
 
   .cell {
-    border-radius: 4px;
+    border-bottom: 1px solid #d5d7dd;
+    padding: rem(5) rem(10);
+
+    &.first {
+      padding-left: rem(20);
+    }
+
+    &.last-row {
+      border-bottom: none;
+    }
 
     &.selected {
       box-shadow: 0 0 0 3px red;
     }
   }
 
-  .content-wrap {
-    width: 80%;
+  .cell-control {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    padding: 0 rem(5);
+    background-clip: padding-box;
   }
 
   .control-wrap {
+    margin-top: rem(20);
     width: 20%;
-    border-radius: 10px;
-    background: #695c8a;
+    border-radius: rem(8);
+    background: rgba(255, 255, 255, 0.25);
+    padding: rem(20);
   }
 
   .radio-group {
     display: flex;
-    align-items: center;
-    padding: 0.75rem;
-
+    text-align: center;
+    font-size: rem(12);
+    color: white;
 
     &__item {
       flex: 1 0 0;
-      padding: 0 1.5rem;
-      border: 1px solid #bbb;
 
-      &:first-child {
-        border-top-left-radius: 0.25rem;
-        border-bottom-left-radius: 0.25rem;
+      &:first-child .radio-group__span {
+        border-top-left-radius: rem(8);
+        border-bottom-left-radius: rem(8);
       }
 
-      &:last-child {
-        border-top-right-radius: 0.25rem;
-        border-bottom-right-radius: 0.25rem;
+      &:last-child .radio-group__span {
+        border-top-right-radius: rem(8);
+        border-bottom-right-radius: rem(8);
       }
     }
+
+    &__span {
+      display: inline-block;
+      width: 100%;
+      border: 1px solid #bbb;
+      padding: rem(5);
+      cursor: pointer;
+    }
+
+    input:checked + .radio-group__span {
+      background: #4B2779;
+    }
+  }
+
+  .control-input {
+    padding: rem(5);
+    width: 100%;
+    background: transparent;
+    border: 1px solid #bbb;
+    border-radius: rem(8);
+    text-align: center;
+    color: white;
   }
 }
