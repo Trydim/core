@@ -1,14 +1,17 @@
 <template>
   <div class="d-grid gap-1 mt-1 p-1 overflow-auto text-nowrap" :style="contentStyle">
     <template v-for="(row, i) of contentConfig" :key="i">
+      <span class="d-flex align-items-center justify-content-center">{{ i + 1 }}</span>
       <template v-for="(param, j) of row.params.param" :key="j">
-        <div v-if="j === 0 || row.params.param[0]['@attributes'].type !== 'spoiler'"
-             class="border" :style="param['@attributes'].type === 'spoiler' ? 'grid-column: span ' + this.columns : ''"
+        <div v-if="j === 0 || !checkSpoiler(param)"
+             class="border px-1" :class="{'border-dark': checkSpoiler(param)}"
+             :style="checkSpoiler(param) ? 'grid-column: span ' + this.columns + 1 : ''"
         >
-          <span>{{ param['@attributes'].key }}</span> - <span>{{ param['@attributes'].type }}</span>
-          <i class="ms-1 pointer pi pi-cog" @click="onEditParam(param, i, j)"></i>
-          <span v-if="param['@attributes'].type === 'spoiler'"> - {{ param['@attributes'].name }}</span>
-          <br><small class="opacity-50">{{ contentData[i][j] }}</small>
+          <div class="text-center overflow-hidden pointer" title="Редактировать" @click="onEditParam(param, i, j)">
+            <span>{{ param['@attributes'].key }} - {{ param['@attributes'].type }}</span>
+            <span v-if="param['@attributes'].type === 'spoiler'"> - {{ param['@attributes'].name }}</span>
+            <br><small class="opacity-50">{{ contentData[i][j] }}</small>
+          </div>
         </div>
       </template>
     </template>
@@ -18,46 +21,53 @@
       @confirm="confirmEditParam"
       @cancel="closeModal"
     >
-      <div class="d-flex w-100">
-        <label>Тип:
-          <select v-model="param.type">
-            <option v-for="(v, k) of paramType" :key="k"
-                    :disabled="disabledSpoiler(k)"
-                    :value="k">
-              {{ v }}
-            </option>
-          </select>
+      <label class="d-flex justify-content-between align-items-center mb-2">
+        <span class="col-6">Тип:</span>
+        <select class="col-6" v-model="param.type">
+          <option v-for="(v, k) of paramType" :key="k"
+                  :disabled="disabledSpoiler(k)"
+                  :value="k">
+            {{ v }}
+          </option>
+        </select>
+      </label>
+
+      <label v-if="param.type === 'spoiler'" class="d-flex justify-content-between align-items-center">
+        <span class="col-5">Заголовок</span>
+        <input type="text" class="col" v-model="param.name">
+      </label>
+      <label v-else-if="param.type === 'string'" class="d-flex justify-content-between align-items-center">
+        <span class="col-6">Нельзя редактировать</span>
+        <span class="col-6 text-center"><input type="checkbox" v-model="param.disabled"></span>
+      </label>
+      <div v-else-if="param.type === 'number'">
+        <label class="d-flex justify-content-between align-items-center">
+          <span class="col-6">Минимум</span>
+          <input type="number" class="col" v-model="param.min">
+        </label>
+        <label class="d-flex justify-content-between align-items-center">
+          <span class="col-6">Максимум</span>
+          <input type="number" class="col" v-model="param.max">
+        </label>
+        <label class="d-flex justify-content-between align-items-center">
+          <span class="col-6">шаг</span>
+          <input type="number" class="col" v-model="param.step">
         </label>
       </div>
-      <div v-if="param.type === 'spoiler'" class="d-flex">
-        <label class="w-100">Заголовок<input type="text" v-model="param.name"></label>
-      </div>
-      <div v-else-if="param.type === 'string'" class="d-flex">
-        <p>Нельзя редактировать</p>
-        <input type="checkbox" v-model="param.disabled">
-        <!--<p>ключ=значение.</p>
-        <textarea name="listItems" cols="30" rows="5"></textarea>-->
-      </div>
-      <div v-else-if="param.type === 'number'" class="d-flex flex-column">
-        <label class="w-100">минимум<input type="number" v-model="param.min"></label>
-        <label class="w-100">максимум<input type="number" v-model="param.max"></label>
-        <label class="w-100">шаг<input type="number" v-model="param.step"></label>
-      </div>
-      <div v-else-if="param.type === 'checkbox'" class="d-flex">
-        Ограничения для флага
+      <div v-else-if="param.type === 'checkbox'" class="d-flex justify-content-between align-items-center">
+        <!--Ограничения для флага-->
       </div>
       <div v-else-if="param.type === 'simpleList'" class="">
         <!-- Выбор списка добавление/удаление/переименование списка -->
         <EditedSelect :options="simpleList" v-model="param.list"
-                      @list="updateSimpleListKeys"
-                      @updateSimpleListKeys="updateSimpleListKeys"
+                      @list="updateSimpleListKeys" @updateSimpleListKeys="updateSimpleListKeys"
         ></EditedSelect>
         <p>ключ:значение</p>
-        <textarea v-model="simpleListEntries" class="w-100" rows="5"></textarea>
+        <textarea @change="onchangeSimpleListEntries" class="w-100" rows="5">{{ simpleListEntries }}</textarea>
       </div>
-      <div v-else-if="param.type === 'customEvent'" class="">
-        <label class="w-100">Ключ<input type="text" v-model="param.id"></label>
-      </div>
+      <label v-else-if="param.type === 'customEvent'" class="d-flex justify-content-between align-items-center">
+        <span class="col-6">Ключ</span><input type="text" class="col" v-model="param.id">
+      </label>
 
       <!--<div class="d-flex justify-content-between">
         <label>Таблица (файл)</label>
@@ -123,25 +133,17 @@ export default {
   },
   computed: {
     columns() { return this.contentData[0].length },
-    contentStyle() { return 'grid-template-columns: repeat(' + this.columns + ', auto)' },
+    contentStyle() {
+      return 'grid-template-columns: 25px repeat(' + this.columns + ', minmax(auto, 250px))'
+    },
 
-    simpleListEntries: {
-      get() {
-        // Преобразовывает из: {key1:'value1', key2:'value2'} в 'key1:value1\nkey2:value2'
-        return Object.entries(this.simpleList[this.param.list]).reduce((r, [k, v]) => {
-          r.push(k + ':' + v);
-          return r;
-        }, []).join('\n') || '';
-      },
-      set(v) {
-        // Преобразовывает из: 'key1:value1\nkey2:value2' в {key1:'value1', key2:'value2'}
-        this.simpleList[this.param.list] = v.split('\n').reduce((r, str) => {
-          const [k, v] = str.split(':');
-          r[k.trim()] = v.trim();
-          return r;
-        }, {});
-      }
-    }
+    simpleListEntries() {
+      // Преобразовывает из: {key1:'value1', key2:'value2'} в 'key1:value1\nkey2:value2'
+      return Object.entries(this.simpleList[this.param.list]).reduce((r, [k, v]) => {
+        r.push(k + ':' + v);
+        return r;
+      }, []).join('\n') || '';
+    },
   },
   watch: {
     contentConfig: {
@@ -156,7 +158,10 @@ export default {
       };
 
       switch (this.param.type) {
-        case "string": break;
+        case "string":
+          this.param.min = 0;
+          this.param.max = 1000;
+          break;
         case "number":
           this.param.min  = 0;
           this.param.max  = 1e10;
@@ -170,6 +175,7 @@ export default {
   },
   methods: {
     updateSimpleListKeys(options) { this.simpleList = options },
+    checkSpoiler(param) { return param['@attributes'].type === 'spoiler' },
     disabledSpoiler(key) {
       const {i, j} = this.editedParam;
 
@@ -192,6 +198,16 @@ export default {
     closeModal() {
       this.editParamModal = false;
     },
+
+    onchangeSimpleListEntries(e) {
+      const v = e.target.value;
+      // Преобразовывает из: 'key1:value1\nkey2:value2' в {key1:'value1', key2:'value2'}
+      this.simpleList[this.param.list] = v.split('\n').reduce((r, str) => {
+        const [k, v] = str.split(':');
+        if (k && v) r[k.trim()] = v.trim();
+        return r;
+      }, {});
+    }
   },
 }
 

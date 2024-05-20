@@ -133,25 +133,18 @@ const sideMenuExpanded = function(e: Event) {
 
   const nodeS  = this.nextElementSibling,
         count  = nodeS.childElementCount,
-        height = count * 50;//e.target.parentNode.offsetHeight;
+        height = count * 50;
 
   if (this.getAttribute('aria-expanded') === 'true') {
     this.setAttribute('aria-expanded', 'false');
-    //setParentHeight(node, node.nextElementSibling.offsetHeight * -1);
     nodeS.style.height = nodeS.dataset.height;
 
-    setTimeout(() => {
-      nodeS.style.height = '0';
-    }, 0);
-
+    setTimeout(() => nodeS.style.height = '0', 0);
   } else {
     this.setAttribute('aria-expanded', 'true');
     nodeS.dataset.height = height + 'px';
     nodeS.style.height = height + 'px';
-    //setParentHeight(node, height);
-    setTimeout(() => {
-      nodeS.style.height = 'auto';
-    }, 300);
+    setTimeout(() => nodeS.style.height = 'auto', 300);
   }
 }
 
@@ -159,7 +152,7 @@ const sideMenuExpanded = function(e: Event) {
 // -------------------------------------------------------------------------------------------------------------------
 
 const onEvent = () => {
-  // Block Authorization
+  // Authorization block
   let node = f.gI(f.ID.AUTH_BLOCK);
   node && node.querySelectorAll('[data-action]')
               .forEach((n: HTMLElement) => n.addEventListener('click', cmsEvent));

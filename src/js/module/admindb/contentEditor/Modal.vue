@@ -24,8 +24,9 @@ export default {
     m.btnCancel.forEach(n => n.addEventListener('mouseup', () => this.$emit('cancel')));
   },
   unmounted() {
-    this.M.destroy();
-  }
+    this.M.hide();
+    setTimeout(this.M.destroy, 150);
+  },
 }
 
 </script>

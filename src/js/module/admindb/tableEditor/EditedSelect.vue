@@ -1,10 +1,17 @@
 <template>
-  <div class="position-relative bg-white" style="min-height: 60px">
-    <input type="text" class="start-0 top-0 m-0 border-end-0" style="width: 90%" v-model="inputV">
-    <button type="button" class="btn btn-sm pi pi-plus-circle" @click="addListItem"></button>
-    <select class="start-0 top-0 m-0 w-100" v-model="selectV">
-      <option v-for="(v, k) of options" :key="k" :value="k">{{ k }}</option>
-    </select>
+  <div class="edited-select">
+    <div class="edited-select__selected" >
+      <input type="text" class="edited-select__text" v-model="inputV">
+
+      <i class="edited-select__icon pi pi-plus-circle" @click="addListItem"></i>
+      <i class="edited-select__icon pi" :class="open ? 'pi-chevron-up' : 'pi-chevron-down'"
+         @click.stop="openOptions"
+      ></i>
+    </div>
+
+    <div v-show="open" class="edited-select__options">
+      <div v-for="(item, i) of options" :key="i" class="base-select__option" @click="selectV = i">{{ i }}</div>
+    </div>
   </div>
 </template>
 
@@ -17,8 +24,11 @@ export default {
       type: Object,
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
+      open: false,
+
       selectV: '',
       inputV : '',
       isNew  : false,
@@ -27,27 +37,32 @@ export default {
   computed: {},
   watch: {
     selectV() {
-      /*if (this.selectV === 'new') {
+      if (this.selectV === 'new') {
         this.isNew  = true;
         this.inputV = '';
       } else {
         this.isNew  = false;
         this.inputV = this.selectV;
-      }*/
+      }
 
       this.$emit('update:modelValue', this.selectV);
-    },
-    inputV() {
-      // проверка если инпут пустой
-      //this.$emit('list', this.showOptions);
-      //this.$emit('update:modelValue', this.inputV);
     },
   },
   methods: {
     update() {},
 
     addListItem() {
-      this.options[this.inputV] = {};
+      if (this.inputV === '') return;
+
+      this.options[this.inputV] = this.options[this.selectV];
+      delete this.options[this.selectV];
+      this.selectV = this.inputV;
+    },
+
+    openOptions() {
+      this.open = true;
+
+      document.body.addEventListener('click', () => this.open = false, {once: true});
     },
   },
   mounted() {},

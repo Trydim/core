@@ -3,7 +3,7 @@
     <div class="content-wrap">
       <!-- Спойлеры -->
       <template v-for="(spoiler, s) of mergedData" :key="s">
-        <div v-if="s !== 's0'" class="content-spoiler" :class="{'solid': showSpoiler}">
+        <div v-if="s !== 's0'" class="content-spoiler" :class="{'solid': !showSpoiler}">
           <div v-show="showSpoiler" class="content-spoiler__header" @click="toggleSpoiler(s)">
             {{ s }}
             <i class="pi position-absolute end-0 top-0 p-2"
@@ -234,14 +234,15 @@ export default {
           cell.value = this.contentData[i][j] = c.value;
         } else {
           let cV = cell.value,
-              nV = c.value;
+              nV = c.value,
+              result;
 
           if (isFinite(cV) || cell.param.type === 'number') {
-            cV = +cV;
-            nV = +nV;
+            result = c.valueType === 'absolute' ? +cV + +nV
+                                                : +cV * (1 + +nV / 100);
           }
 
-          cell.value = this.contentData[i][j] = cV + nV;
+          cell.value = this.contentData[i][j] = result;
         }
       });
     },

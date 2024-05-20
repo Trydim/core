@@ -37,6 +37,59 @@
   }
 }
 
+// select
+.edited-select {
+  position: relative;
+  cursor: pointer;
+
+  &__selected {
+    width: 100%;
+    border: 1px solid black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: white;
+  }
+
+  &__text {
+    padding: rem(3) rem(10);
+    width: 100%;
+    border: none;
+    background: transparent;
+  }
+
+  &__icon {
+    position: absolute;
+    top: 50%;
+    right: rem(10);
+    transform: translateY(-50%);
+
+    &.pi-plus-circle {
+      right: 2.25rem;
+    }
+  }
+
+  &__options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    border: 1px solid black;
+    background: white;
+    z-index: +1;
+  }
+
+  &__option {
+    padding: 0.1rem;
+    white-space: nowrap;
+
+    &:hover {
+      color: white;
+      background: #004bde;
+    }
+  }
+}
+
 .table-name-header {
   //color: #cacaca;
   font-size: rem(24);
