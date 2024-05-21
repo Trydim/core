@@ -65,7 +65,7 @@ class VC {
 
         OPTION_PROPERTIES = 'optionProperties',
         DEALER_PROPERTIES = 'dealersProperties',
-        TABLE_XML_PROPERTIES = 'xmlProperties';
+        TABLE_CONFIG_PROPERTIES = 'csvConfigProperties';
 
   /**
    * Setting action

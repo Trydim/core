@@ -1,10 +1,5 @@
 "use strict";
 
-import mustache from 'mustache';
-
-import "../../libs/handsontable.full.min";
-import {handson} from "./handsontable.option";
-
 export class Main {
   constructor() {
     this.action = '';
@@ -18,6 +13,7 @@ export class Main {
     this.tableName = new URLSearchParams(location.search).get('tableName') || '';
     this.loaderTable = new f.LoaderIcon(this.mainNode, false, true, {small: false});
 
+    this.setTableName();
     this.onBtnEvent();
     this.disableBtnSave();
   }
@@ -26,25 +22,19 @@ export class Main {
     this.action = typeof e === "string" ? e : e.target.dataset.dbaction;
 
     this.loaderTable.start();
+    f.eraseNode(this.mainNode);
 
-     return this.query().then(data => {
+    return this.query().then(data => {
       if (data.status) {
         this.queryResult = data;
-        this.setTableName();
-        f.eraseNode(this.mainNode);
-        this.handsontable && (this.handsontable.destroyEditor());
-        if (data['csvValues'] && data['XMLValues']) {
-          return 'form';
-        } else if (data['dbValues']) {
-          return 'db';
-        } else if (data['csvValues']) {
-          return 'csv';
-        } else if (data['XMLValues']) {
-          return 'XMLValues';
-        } else if (data['content']) {
-          return 'content';
-        }
-      }
+
+        if (data['csvValues'] && data['XMLValues']) return 'form';
+        else if (data['dbValues']) return 'db';
+        else if (data['csvValues']) return 'csv';
+        else if (data['XMLValues']) return 'XMLValues';
+        else if (data['content'])   return 'content';
+
+      } else this.queryResult = undefined;
       this.loaderTable.stop();
     });
   }
@@ -62,57 +52,7 @@ export class Main {
     let string = f.qS('#tablesListTmp').innerHTML;
     f.qS('#DBTablesWrap').innerHTML = f.replaceTemplate(string, data['tables'] || data['csvFiles']);
   }
-  showDbTable() {
-    const data = this.queryResult['dbValues'].reduce((r, row) => {
-            r.push(Object.values(row));
-            return r;
-          }, []),
-          columns = this.queryResult.columns,
-          colHeaders = [],
-          columnValueTmp = f.gT('#columnName'),
-          div = document.createElement('div');
 
-    this.mainNode.append(div);
-
-    columns.map(col => {
-      colHeaders.push(f.replaceTemplate(columnValueTmp, col));
-    });
-
-    // Table empty
-    if (!data.length) data.push(new Array(columns.length).fill(''));
-
-    this.handsontable = new window.Handsontable(div, Object.assign(handson.optionCommon, handson.optionDb, {
-      data: handson.removeSlashesData(data), colHeaders,
-      cells(row, col) {
-        const colParam = columns[col],
-              res = {readOnly: colParam.extra.includes('auto')};
-
-        if (['bit', 'int(1)'].includes(colParam.type)) {
-          res.type = 'checkbox';
-          res.checkedTemplate = '1';
-          res.uncheckedTemplate = '0';
-        }
-        else res.type = colParam.type.includes('varchar') ? 'text' : 'numeric';
-
-        return res;
-      }
-    }));
-
-    this.handsontable.updateSettings(handson.contextDb);
-    this.handsontable.admindb = this;
-  }
-  showCsvTable() {
-    const div = document.createElement('div');
-    this.mainNode.append(div);
-
-    this.handsontable = new Handsontable(div, Object.assign(handson.optionCommon, handson.optionCsv, {
-      data: handson.removeSlashesData(this.queryResult['csvValues']),
-      colHeaders: this.queryResult['csvValues'][0].map(h => _(h)),
-    }));
-
-    this.handsontable.updateSettings(handson.contextCsv);
-    this.handsontable.admindb = this;
-  }
   disableBtnSave() {
     if (this.btnSaveEnable) {
       this.btnSave.setAttribute('disabled', 'disabled');
@@ -129,12 +69,6 @@ export class Main {
     }
   }
 
-  checkTemplate(val) {
-    try {mustache.parse(val);}
-    catch (e) {
-      f.showMsg(`Ошибка в шаблоне (${e.message})` , 'warning');
-    }
-  }
   checkSavedTableChange(e) {
     if (this.btnSaveEnable && !confirm('Изменения будут потеряны, продолжить?')) {
       e.preventDefault();

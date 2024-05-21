@@ -15,11 +15,11 @@ class File extends SplFileInfo
      * Constructs a new file from the given path.
      *
      * @param string $path      The path to the file
-     * @param bool   $checkPath Whether to check the path or not
+     * @param bool $checkPath Whether to check the path or not
      *
      * @throws FileNotFoundException If the given path is not a file
      */
-    public function __construct(string $path, $checkPath = true)
+    public function __construct(string $path, bool $checkPath = true)
     {
         if ($checkPath && !is_file($path)) {
             throw new FileNotFoundException($path);
@@ -41,8 +41,7 @@ class File extends SplFileInfo
      * @see ExtensionGuesser
      * @see getMimeType()
      */
-    public function guessExtension()
-    {
+    public function guessExtension(): ?string {
         $type = $this->getMimeType();
         $guesser = ExtensionGuesser::getInstance();
 
@@ -60,8 +59,7 @@ class File extends SplFileInfo
      *
      * @see MimeTypeGuesser
      */
-    public function getMimeType()
-    {
+    public function getMimeType(): ?string {
         $guesser = MimeTypeGuesser::getInstance();
 
         return $guesser->guess($this->getPathname());
@@ -77,8 +75,7 @@ class File extends SplFileInfo
      *
      * @throws FileException if the target file could not be created
      */
-    public function move(string $directory, $name = null)
-    {
+    public function move(string $directory, string $name = null): File {
         $target = $this->getTargetFile($directory, $name);
 
         set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
@@ -93,7 +90,7 @@ class File extends SplFileInfo
         return $target;
     }
 
-    protected function getTargetFile($directory, $name = null)
+    protected function getTargetFile($directory, $name = null): File
     {
         if (!is_dir($directory)) {
             if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
@@ -115,12 +112,11 @@ class File extends SplFileInfo
      *
      * @return string containing
      */
-    protected function getName(string $name)
+    protected function getName(string $name): string
     {
         $originalName = str_replace('\\', '/', $name);
         $pos = strrpos($originalName, '/');
-        $originalName = false === $pos ? $originalName : substr($originalName, $pos + 1);
 
-        return $originalName;
+        return false === $pos ? $originalName : substr($originalName, $pos + 1);
     }
 }

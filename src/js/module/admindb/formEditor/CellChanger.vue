@@ -1,34 +1,34 @@
 <template>
-  <div class="row">
-    <div class="col-6 p-0">
-      <input type="radio" class="btn-check" id="changeTypeS" value="set" v-model="type">
-      <label class="btn btn-outline-primary w-100" for="changeTypeS">Установить</label>
+  <div>
+    <div class="radio-group">
+      <label class="radio-group__item">
+        <input type="radio" hidden value="set" v-model="change.type">
+        <span class="radio-group__span">Установить</span>
+      </label>
+      <label class="radio-group__item">
+        <input type="radio" hidden value="change" v-model="change.type">
+        <span class="radio-group__span">Изменить</span>
+      </label>
     </div>
-    <div class="col-6 p-0">
-      <input type="radio" class="btn-check" id="changeTypeC" value="change" v-model="type">
-      <label class="btn btn-outline-primary w-100" for="changeTypeC">Изменить</label>
+    <div class="radio-group mt-2">
+      <label class="radio-group__item">
+        <input type="radio" hidden value="absolute" v-model="change.valueType">
+        <span class="radio-group__span">Значение</span>
+      </label>
+      <label class="radio-group__item">
+        <input type="radio" hidden value="relative" v-model="change.valueType">
+        <span class="radio-group__span">Проценты</span>
+      </label>
     </div>
-  </div>
-  <div class="row mt-2">
-    <div class="col-6 p-0">
-      <input type="radio" class="btn-check" id="changeValueA" value="absolute" v-model="valueType">
-      <label class="btn btn-outline-primary w-100" for="changeValueA">Значение</label>
+
+    <input type="text" class="control-input mt-2" v-model="change.value">
+
+    <div class="d-flex justify-content-between mt-4 gap-4">
+      <button type="button" class="col btn btn-white" @click="applyChange">Применить</button>
+      <button type="button" class="col btn btn-gray" title="Снять выделение" @click="clearSelected">
+        <i class="pi pi-times"></i>
+      </button>
     </div>
-    <div class="col-6 p-0">
-      <input type="radio" class="btn-check" id="changeValueP" value="relative" v-model="valueType">
-      <label class="btn btn-outline-primary w-100" for="changeValueP">Проценты</label>
-    </div>
-  </div>
-  <div class="row mt-2">
-    <input type="text" class="form-control" v-model="value">
-  </div>
-  <div class="row mt-2">
-    <button type="button" class="col-12 btn btn-primary" @click="applyChange">Применить</button>
-  </div>
-  <div class="row mt-2">
-    <button type="button" class="col-6 btn btn-info" title="Снять выделение" @click="clearSelected">
-      <i class="pi pi-times"></i>
-    </button>
   </div>
 </template>
 

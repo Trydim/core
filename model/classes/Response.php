@@ -31,6 +31,8 @@ class Response {
   public $original;
 
   /**
+   * The content of the response after checked errors
+   *
    * @var string
    */
   private $content = '';
@@ -68,23 +70,26 @@ class Response {
     return
       sprintf('HTTP/%s %s %s', '1.0', $this->statusCode, $this->statusText) . "\r\n" .
       $this->headers . "\r\n" .
-      $this->getContent();
+      $this->original;//$this->getContent();
   }
 
   /**
    * Check if there is an error
    * Deep search for all error messages and return as an array
+   *
    * @param array $result
+   * @param array|null $error
+   * @param bool $insideError
    */
-  private function checkError(array &$result): void {
-    $error = [];
-    if (!empty($result['error'])) {
-      if (is_array($result['error'])) {
-        array_walk_recursive($result['error'], function ($v, $k) use (&$error) {
-          if (empty($v)) return;
-          $error[] = [$k => $v];
-        });
-      } else $error = $result['error'];
+  private function checkError(array &$result, ?array &$error = [], ?bool $insideError = false): void {
+    $error = $error ?? [];
+
+    foreach ($result as $k => $v) {
+      if ($k === 'error' || $insideError) {
+        if (is_array($v)) $this->checkError($v, $error, true);
+        else if (!empty($v)) $error[] = ($insideError ? $k . ': ' : '') . $v;
+      }
+      else if (is_array($v)) $this->checkError($v, $error);
     }
 
     if ($result['status'] = empty($error)) unset($result['error']);
@@ -124,13 +129,13 @@ class Response {
       throw new InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
     }
 
-    if (null === $text) {
+    if ($text === null) {
       $this->statusText = self::$statusTexts[$code] ?? 'unknown status';
 
       return $this;
     }
 
-    if (false === $text) {
+    if ($text === false) {
       $this->statusText = '';
 
       return $this;
@@ -227,7 +232,7 @@ class Response {
     }
 
     /*// If this content implements the "Renderable" interface then we will call the
-    // render method on the object so we will avoid any "__toString" exceptions
+    // render method on the object, so we will avoid any "__toString" exceptions
     // that might be thrown and have their errors obscured by PHP's handling.
     elseif ($content instanceof Renderable) {
       $content = $content->render();
@@ -240,11 +245,11 @@ class Response {
 
   /**
    * Gets the current response content.
-   *
-   * @return string
    */
-  public function getContent(): string {
-    return $this->content;
+  public function getContent() {
+    $content = json_decode($this->content, true);
+
+    return json_last_error() === JSON_ERROR_NONE ? $content : $this->content;
   }
 
   /**
@@ -311,10 +316,10 @@ class Response {
 
     if (function_exists('fastcgi_finish_request')) {
       fastcgi_finish_request();
-    } elseif (!in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+    } // elseif (!in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
       // Bitrix errors
       //static::closeOutputBuffers(0, true);
-    }
+    //}
 
     return $this;
   }

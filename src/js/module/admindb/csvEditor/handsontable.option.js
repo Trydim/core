@@ -1,5 +1,7 @@
 "use strict";
 
+import mustache from 'mustache';
+
 const addSlashes = value => value.replaceAll('\n', '\\n').replaceAll('\r', '\\r');
 const removeSlashes = value => value.replaceAll('\\n', '\n').replaceAll('\\r', '\r');
 
@@ -58,7 +60,13 @@ export const handson = {
       if (changes) {
         for (const [row, column, oldValue, newValue] of changes) {
           if (oldValue !== newValue) {
-            if (this.getColHeader(column).includes('template')) this.admindb.checkTemplate(newValue);
+            if (this.getColHeader(column).includes('template')) {
+              try {
+                mustache.parse(val);
+              } catch (e) {
+                f.showMsg(`Ошибка в шаблоне (${e.message})` , 'warning');
+              }
+            }
             this.admindb.enableBtnSave();
             !this.tableChanged && (this.tableChanged = true);
           }

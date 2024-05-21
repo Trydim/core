@@ -20,9 +20,12 @@ export class FormsTable extends Main {
 
   async showData() {
     await this.dbAction('loadFormsTable');
+
+    if (!this.queryResult) return;
+
     this.contentData       = this.queryResult['csvValues'];
-    this.contentConfig     = this.queryResult['XMLValues'];
-    this.contentProperties = this.queryResult['XMLProperties'];
+    this.contentConfig     = this.queryResult['configValues'];
+    this.contentProperties = this.queryResult['configProperties'];
 
     this.setVueConfig();
     this.vueInit();
@@ -49,7 +52,7 @@ export class FormsTable extends Main {
   }
 
   destroy() {
-    this.vueApp.unmount();
+    this.vueApp && this.vueApp.unmount();
     this.btnSave.onclick = undefined;
   }
 

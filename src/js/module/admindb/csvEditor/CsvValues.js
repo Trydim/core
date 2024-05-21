@@ -1,7 +1,9 @@
 "use strict";
 
+import "../../../libs/handsontable.full.min";
+
 import {handson} from "./handsontable.option";
-import {Main} from "./Main";
+import {Main} from "../Main";
 
 export class CsvValues extends Main {
   constructor() {
@@ -84,7 +86,60 @@ export class CsvValues extends Main {
     f.gI('errors').innerHTML = html;
   }
 
+  showDbTable() {
+    const data = this.queryResult['dbValues'].reduce((r, row) => {
+            r.push(Object.values(row));
+            return r;
+          }, []),
+          columns = this.queryResult.columns,
+          colHeaders = [],
+          columnValueTmp = f.gT('#columnName'),
+          div = document.createElement('div');
+
+    this.mainNode.append(div);
+
+    columns.map(col => {
+      colHeaders.push(f.replaceTemplate(columnValueTmp, col));
+    });
+
+    // Table empty
+    if (!data.length) data.push(new Array(columns.length).fill(''));
+
+    this.handsontable = new window.Handsontable(div, Object.assign(handson.optionCommon, handson.optionDb, {
+      data: handson.removeSlashesData(data), colHeaders,
+      cells(row, col) {
+        const colParam = columns[col],
+              res = {readOnly: colParam.extra.includes('auto')};
+
+        if (['bit', 'int(1)'].includes(colParam.type)) {
+          res.type = 'checkbox';
+          res.checkedTemplate = '1';
+          res.uncheckedTemplate = '0';
+        }
+        else res.type = colParam.type.includes('varchar') ? 'text' : 'numeric';
+
+        return res;
+      }
+    }));
+
+    this.handsontable.updateSettings(handson.contextDb);
+    this.handsontable.admindb = this;
+  }
+  showCsvTable() {
+    const div = document.createElement('div');
+    this.mainNode.append(div);
+
+    this.handsontable = new Handsontable(div, Object.assign(handson.optionCommon, handson.optionCsv, {
+      data: handson.removeSlashesData(this.queryResult['csvValues']),
+      colHeaders: this.queryResult['csvValues'][0].map(h => _(h)),
+    }));
+
+    this.handsontable.updateSettings(handson.contextCsv);
+    this.handsontable.admindb = this;
+  }
+
   destroy() {
+    this.handsontable && this.handsontable.destroyEditor();
     this.btnSave.onclick = undefined;
   }
 
@@ -92,7 +147,7 @@ export class CsvValues extends Main {
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
-   * @param e
+   * @param {Object} e
    */
   focusCell(e) {
     this.hideError(e.target);

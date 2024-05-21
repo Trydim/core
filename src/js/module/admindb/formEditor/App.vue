@@ -18,9 +18,12 @@
             </div>
             <!-- Содержимое -->
             <template v-for="(row, i, rIndex) of spoiler" :key="i">
-              <div v-for="(cell, j, cIndex) of row" :key="'' + i + j + cell.value" class="cell"
+              <div class="cell first pi pi-list pointer"
+                   :class="{'last-row': itemSpoiler[s] === rIndex + 1}"
+                   @click="selectRow($event, i)"
+              ></div>
+              <div v-for="(cell, j) of row" :key="'' + i + j + cell.value" class="cell"
                    :class="{
-                     'first': cIndex === 0,
                      'last-row': itemSpoiler[s] === rIndex + 1,
                      'selected': checkSelectedCell(i, j),
                    }"
@@ -28,15 +31,17 @@
                    @mousedown="startSelect($event, cell)"
                    @mouseup="stopSelect($event, cell)"
               >
-                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]"/>
-                <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]"/>
-                <SimpleList v-else-if="cell.param.type === 'simpleList'" :cell="cell" v-model="contentData[i][j]"/>
-                <CustomEvent v-else-if="cell.param.type === 'customEvent'" :cell="cell" v-model="contentData[i][j]"/>
+                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]" />
+                <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]" />
+                <SimpleList v-else-if="cell.param.type === 'simpleList'" :cell="cell" v-model="contentData[i][j]" />
+                <CustomEvent v-else-if="cell.param.type === 'customEvent'" :cell="cell" v-model="contentData[i][j]" />
               </div>
             </template>
           </div>
         </div>
       </template>
+
+      <ContextMenu v-if="selectedRow"></ContextMenu>
     </div>
     <div class="control-wrap">
       <div class="radio-group">
@@ -103,6 +108,7 @@ export default {
       contentProperties: this.$db.contentProperties || {},
       mergedData: {},
 
+      selectedRow: undefined,
       focusedCell: undefined,
       selectedCells: {},
       startCell: undefined,
@@ -119,13 +125,12 @@ export default {
   },
   computed: {
     header() {
-      return Object.values(this.mergedData['s0'][0]).map(k => {
-        k.value = window._(k.value);
-        return k;
-      });
+      const arr = [{value: ''}].concat(...Object.values(this.mergedData['s0'][0]));
+
+      return arr.map(k => { k.value = window._(k.value); return k; });
     },
-    columns() { return Object.keys(this.header).length },
-    contentStyle() { return 'grid-template-columns: repeat(' + this.columns + ', auto)' },
+    columns() { return Object.keys(this.header).length - 1 },
+    contentStyle() { return 'grid-template-columns: 30px repeat(' + this.columns + ', auto)' },
   },
   watch: {
     contentData: {
@@ -135,32 +140,29 @@ export default {
   },
   methods: {
     mergeData() {
-      const config = this.contentConfig['rows'], // Есть всегда
+      const config = this.contentConfig,
             props  = this.contentProperties,
-            xmlDefRow = config[0].params.param,
-            res = {
-              s0: {}, // первый спойлер, если будет только один не отображать
-            };
+            defaultRow = config[0],
+            res    = {s0: {}}; // первый спойлер, если будет только один не отображать
 
       let spoilerKey = 's0';
 
       this.contentData.forEach((csvRow, rowI) => {
-        const xmlRow = config[rowI] ? config[rowI].params.param : xmlDefRow;
+        const xRow = config[rowI] ? config[rowI] : defaultRow;
 
-        if (xmlRow[0]['@attributes'].type === 'spoiler') {
-
-          spoilerKey = xmlRow[0]['@attributes'].name;
+        if (xRow[0].type === 'spoiler') {
+          spoilerKey = xRow[0].name;
           res[spoilerKey] = {};
           return;
         }
         if (csvRow.join('').length === 0) return;
 
         res[spoilerKey][rowI] = csvRow.reduce((cR, csvCell, cellI) => {
-          const defParam = xmlDefRow[cellI]['@attributes'],
-                param    = xmlRow[cellI]['@attributes'],
+          const defParam = defaultRow[cellI],
+                param    = xRow[cellI],
                 isInherit = param.type === 'inherit';
-
-          if (param.type === 'hidden' || (isInherit && defParam.type === 'hidden')) return cR;
+          // Only a column can be hidden
+          if ((rowI === 0 && param.type === 'hidden') || defParam.type === 'hidden') return cR;
           // simpleList
           if (props[param.type]) param.props = props[param.type][param.list];
 
@@ -188,6 +190,10 @@ export default {
     checkSelectedCell(i, j) { return this.selectedCells.hasOwnProperty(getCellKey(i, j)) },
 
     toggleSpoiler(s) { this.openSpoiler[s] = !this.openSpoiler[s] },
+
+    selectRow(e, i) {
+      this.selectedRow = i;
+    },
 
     selectCell(e, cell) {
       if (cell.param.type === 'customEvent') return;

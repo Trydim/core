@@ -67,7 +67,7 @@ $publicConfig = [
 
   /**
    * Фильтр заказов
-   * @type string - dealers - фильтрация по дилерам
+   * @type {string|bool} - dealers - фильтрация по дилерам
    *  users - фильтрация по пользователям
    *  customers - по клиентам
    */

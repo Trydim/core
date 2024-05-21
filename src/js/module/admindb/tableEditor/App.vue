@@ -2,14 +2,14 @@
   <div class="d-grid gap-1 mt-1 p-1 overflow-auto text-nowrap" :style="contentStyle">
     <template v-for="(row, i) of contentConfig" :key="i">
       <span class="d-flex align-items-center justify-content-center">{{ i + 1 }}</span>
-      <template v-for="(param, j) of row.params.param" :key="j">
-        <div v-if="j === 0 || !checkSpoiler(param)"
+      <template v-for="(param, j) of row" :key="j">
+        <div v-if="j === 0 || !checkSpoiler(contentConfig[i][0])"
              class="border px-1" :class="{'border-dark': checkSpoiler(param)}"
-             :style="checkSpoiler(param) ? 'grid-column: span ' + this.columns + 1 : ''"
+             :style="checkSpoiler(param) ? 'grid-column: span ' + this.columns : ''"
         >
           <div class="text-center overflow-hidden pointer" title="Редактировать" @click="onEditParam(param, i, j)">
-            <span>{{ param['@attributes'].key }} - {{ param['@attributes'].type }}</span>
-            <span v-if="param['@attributes'].type === 'spoiler'"> - {{ param['@attributes'].name }}</span>
+            <span>{{ param.key }} - {{ param.type }}</span>
+            <span v-if="checkSpoiler(param)"> - {{ param.name }}</span>
             <br><small class="opacity-50">{{ contentData[i][j] }}</small>
           </div>
         </div>
@@ -23,7 +23,7 @@
     >
       <label class="d-flex justify-content-between align-items-center mb-2">
         <span class="col-6">Тип:</span>
-        <select class="col-6" v-model="param.type">
+        <select class="col" v-model="param.type">
           <option v-for="(v, k) of paramType" :key="k"
                   :disabled="disabledSpoiler(k)"
                   :value="k">
@@ -33,7 +33,7 @@
       </label>
 
       <label v-if="param.type === 'spoiler'" class="d-flex justify-content-between align-items-center">
-        <span class="col-5">Заголовок</span>
+        <span class="col-6">Заголовок</span>
         <input type="text" class="col" v-model="param.name">
       </label>
       <label v-else-if="param.type === 'string'" class="d-flex justify-content-between align-items-center">
@@ -120,7 +120,7 @@ export default {
       editParamModal: false,
 
       contentData  : this.$db.contentData,
-      contentConfig: this.$db.contentConfig['rows'], // Всегда есть
+      contentConfig: this.$db.contentConfig,
       contentProperties,
 
       simpleList: contentProperties.simpleList, // Простые списки
@@ -175,7 +175,7 @@ export default {
   },
   methods: {
     updateSimpleListKeys(options) { this.simpleList = options },
-    checkSpoiler(param) { return param['@attributes'].type === 'spoiler' },
+    checkSpoiler(param) { return param.type === 'spoiler' },
     disabledSpoiler(key) {
       const {i, j} = this.editedParam;
 
@@ -186,13 +186,13 @@ export default {
 
     onEditParam(param, i, j) {
       this.editedParam = {i, j};
-      Object.assign(this.param, param['@attributes']);
+      Object.assign(this.param, param);
       this.editParamModal = true;
     },
     confirmEditParam() {
       const {i, j} = this.editedParam;
 
-      Object.assign(this.contentConfig[i].params.param[j]['@attributes'], this.param);
+      Object.assign(this.contentConfig[i][j], this.param);
       this.closeModal();
     },
     closeModal() {

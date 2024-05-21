@@ -20,7 +20,7 @@ $field['content'] = <<<main
   </div>
   <div id="viewField" class="ms-auto">
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode"  data-action="adminType">
+      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" data-action="adminType" checked>
       <label class="form-check-label" for="formMode">Режим форм</label>
     </div>
     <div class="form-check">
@@ -28,7 +28,7 @@ $field['content'] = <<<main
       <label class="form-check-label" for="formTable">Режим таблицы</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="config" id="setupMode" checked data-action="adminType">
+      <input class="form-check-input" type="radio" name="adminType" value="config" id="setupMode" data-action="adminType">
       <label class="form-check-label" for="setupMode">Настройка формы (Для опытных)</label>
     </div>
   </div>

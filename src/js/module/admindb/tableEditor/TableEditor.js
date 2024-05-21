@@ -19,10 +19,13 @@ export class TableEditor extends Main {
   }
 
   async showData() {
-    await this.dbAction('loadXmlConfig');
+    await this.dbAction('loadCsvConfig');
+
+    if (!this.queryResult) return;
+
     this.contentData       = this.queryResult['csvValues'];
-    this.contentConfig     = this.queryResult['XMLValues'];
-    this.contentProperties = this.queryResult['XMLProperties'];
+    this.contentConfig     = this.queryResult['configValues'];
+    this.contentProperties = this.queryResult['configProperties'];
 
     this.setVueConfig();
     this.vueInit();
@@ -62,7 +65,7 @@ export class TableEditor extends Main {
   }
 
   destroy() {
-    this.vueApp.unmount();
+    this.vueApp && this.vueApp.unmount();
     this.btnSave.onclick = undefined;
   }
 
@@ -73,10 +76,10 @@ export class TableEditor extends Main {
     const data = new FormData();
 
     data.set('mode', 'DB');
-    data.set('dbAction', 'saveXMLConfig');
+    data.set('dbAction', 'saveCsvConfig');
     data.set('tableName', this.tableName);
-    data.set('XMLConfig', JSON.stringify(this.contentConfig));
-    data.set('XMLProperties', JSON.stringify(this.contentProperties));
+    data.set('csvConfig', JSON.stringify(this.contentConfig));
+    data.set('configProperties', JSON.stringify(this.contentProperties));
 
     f.Post({data}).then(data => {
       f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');

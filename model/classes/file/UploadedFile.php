@@ -15,7 +15,7 @@ class UploadedFile extends File {
    * Accepts the information of the uploaded file as provided by the PHP global $_FILES.
    *
    * The file object is only created when the uploaded file is valid (i.e. when the
-   * isValid() method returns true). Otherwise the only methods that could be called
+   * isValid() method returns true). Otherwise, the only methods that could be called
    * on an UploadedFile instance are:
    *
    *   * getClientOriginalName,
@@ -23,7 +23,7 @@ class UploadedFile extends File {
    *   * isValid,
    *   * getError.
    *
-   * Calling any other method on an non-valid instance will cause an unpredictable result.
+   * Calling any other method on a non-valid instance will cause an unpredictable result.
    *
    * @param string $path The full temporary path to the file
    * @param string $originalName The original file name of the uploaded file
@@ -36,12 +36,12 @@ class UploadedFile extends File {
    * @throws FileException         If file_uploads is disabled
    * @throws FileNotFoundException If the file does not exist
    */
-  public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false) {
+  public function __construct(string $path, string $originalName, string $mimeType = null, int $size = null, int $error = null, bool $test = false) {
     $this->originalName = $this->getName($originalName);
     $this->mimeType = $mimeType ?: 'application/octet-stream';
     $this->size = $size;
     $this->error = $error ?: UPLOAD_ERR_OK;
-    $this->test = (bool)$test;
+    $this->test = $test;
 
     parent::__construct($path, UPLOAD_ERR_OK === $this->error);
   }
@@ -54,7 +54,7 @@ class UploadedFile extends File {
    *
    * @return string The original name
    */
-  public function getClientOriginalName() {
+  public function getClientOriginalName(): string {
     return $this->originalName;
   }
 
@@ -66,7 +66,7 @@ class UploadedFile extends File {
    *
    * @return string The extension
    */
-  public function getClientOriginalExtension() {
+  public function getClientOriginalExtension(): string {
     return pathinfo($this->originalName, PATHINFO_EXTENSION);
   }
 
@@ -83,7 +83,7 @@ class UploadedFile extends File {
    *
    * @see getMimeType()
    */
-  public function getClientMimeType() {
+  public function getClientMimeType(): string {
     return $this->mimeType;
   }
 
@@ -104,7 +104,7 @@ class UploadedFile extends File {
    * @see guessExtension()
    * @see getClientMimeType()
    */
-  public function guessClientExtension() {
+  public function guessClientExtension(): ?string {
     $type = $this->getClientMimeType();
     $guesser = ExtensionGuesser::getInstance();
 
@@ -119,7 +119,7 @@ class UploadedFile extends File {
    *
    * @return int|null The file size
    */
-  public function getClientSize() {
+  public function getClientSize(): ?int {
     return $this->size;
   }
 
@@ -127,11 +127,11 @@ class UploadedFile extends File {
    * Returns the upload error.
    *
    * If the upload was successful, the constant UPLOAD_ERR_OK is returned.
-   * Otherwise one of the other UPLOAD_ERR_XXX constants is returned.
+   * Otherwise, one of the other UPLOAD_ERR_XXX constants is returned.
    *
    * @return int The upload error
    */
-  public function getError() {
+  public function getError(): int {
     return $this->error;
   }
 
@@ -140,7 +140,7 @@ class UploadedFile extends File {
    *
    * @return bool True if the file has been uploaded with HTTP and no error occurred
    */
-  public function isValid() {
+  public function isValid(): bool {
     $isOk = UPLOAD_ERR_OK === $this->error;
 
     return $this->test ? $isOk : $isOk && is_uploaded_file($this->getPathname());
@@ -150,13 +150,13 @@ class UploadedFile extends File {
    * Moves the file to a new location.
    *
    * @param string $directory The destination folder
-   * @param string $name The new file name
+   * @param string|null $name The new file name
    *
    * @return File A File object representing the new file
    *
    * @throws FileException if, for any reason, the file could not have been moved
    */
-  public function move($directory, $name = null) {
+  public function move(string $directory, string $name = null): File {
     if ($this->isValid()) {
       if ($this->test) {
         return parent::move($directory, $name);
@@ -184,7 +184,7 @@ class UploadedFile extends File {
    *
    * @return int The maximum size of an uploaded file in bytes
    */
-  public static function getMaxFilesize() {
+  public static function getMaxFilesize(): int {
     $sizePostMax = self::parseFilesize(ini_get('post_max_size'));
     $sizeUploadMax = self::parseFilesize(ini_get('upload_max_filesize'));
 
@@ -196,7 +196,7 @@ class UploadedFile extends File {
    *
    * @return int The given size in bytes
    */
-  private static function parseFilesize($size) {
+  private static function parseFilesize($size): int {
     if ('' === $size) {
       return 0;
     }
@@ -234,7 +234,7 @@ class UploadedFile extends File {
    *
    * @return string The error message regarding the specified error code
    */
-  public function getErrorMessage() {
+  public function getErrorMessage(): string {
     static $errors = [
       UPLOAD_ERR_INI_SIZE   => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d KiB).',
       UPLOAD_ERR_FORM_SIZE  => 'The file "%s" exceeds the upload limit defined in your form.',
@@ -247,7 +247,7 @@ class UploadedFile extends File {
 
     $errorCode = $this->error;
     $maxFilesize = UPLOAD_ERR_INI_SIZE === $errorCode ? self::getMaxFilesize() / 1024 : 0;
-    $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
+    $message = $errors[$errorCode] ?? 'The file "%s" was not uploaded due to an unknown error.';
 
     return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
   }

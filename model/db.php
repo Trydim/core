@@ -139,19 +139,19 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
       break;
     case 'loadFormsTable':
-    case 'loadXmlConfig':
+    case 'loadCsvConfig':
       if (isset($dbTable)) {
         $result['csvValues'] = $db->openCsv();
-        $result['XMLValues'] = Xml::syncXmlFile($dbTable);
-        $result['XMLProperties'] = $main->getSettings(VC::TABLE_XML_PROPERTIES);
+        $result['configValues'] = CsvConfig::syncFile($dbTable);
+        $result['configProperties'] = $main->getSettings(VC::TABLE_CONFIG_PROPERTIES);
       }
       break;
-    case 'saveXMLConfig':
-      if (isset($dbTable) && isset($XMLConfig) && isset($XMLProperties)) {
-        $result['error'] = Xml::saveXml($dbTable, json_decode($XMLConfig, true));
+    case 'saveCsvConfig':
+      if (isset($dbTable) && isset($csvConfig) && isset($configProperties)) {
+        $result['error'] = CsvConfig::saveConfig($dbTable, $csvConfig);
 
         // if (empty($result['error'])) { }
-        $main->setSettings(VC::TABLE_XML_PROPERTIES, json_decode($XMLProperties))->saveSettings();
+        $main->setSettings(VC::TABLE_CONFIG_PROPERTIES, json_decode($configProperties))->saveSettings();
       }
       break;
 

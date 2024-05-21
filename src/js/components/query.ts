@@ -7,9 +7,18 @@ const checkJSON = (data: string) => {
     return response;
   }
   catch (e) {
-    const msg = e['xdebug_message'] || e.message || e;
-    msg && f.showMsg(msg, 'error', false);
-    data && f.showMsg(data, 'error', false);
+    let msg = e['xdebug_message'] || e.message || e;
+
+    if (msg) {
+      if (!Array.isArray(msg)) msg = [msg.toString()];
+      Object.values(msg).forEach((m: any) => f.showMsg(m.toString(), 'error', false))
+    }
+
+    if (data) {
+      f.showMsg('For more info see console', 'error', false);
+      console.error(data);
+    }
+
     return {status: false};
   }
 };

@@ -359,28 +359,20 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
 }
 
 /**
- * Поиск в первых пяти строках начала таблиц
- *
  * @param string $path
- * @return array|string
+ * @return array
  */
-function loadFullCSV(string $path) {
+function loadFullCSV(string $path): array {
   if ($path !== '' && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
-    $emptyRow = 0;
-    while ($emptyRow < 5) { // Пять пустрых строк характеристик считаем что больше нету
-      if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
-        if (!mb_strlen(implode('', $data))) {
-          $emptyRow++;
-          continue;
-        }
-        if ($emptyRow > 0) $emptyRow = 0;
 
-        $result[] = array_map(function ($cell) { return preg_replace('/^d_/', '', $cell);}, $data);
-      } else $emptyRow++;
+    while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
+      $result[] = array_map(function ($cell) {
+        return preg_replace('/^d_/', '', $cell);
+      }, $data);
     }
     fclose($handle);
-  } else return 'File is not exist';
+  } else $result['error'] = 'File is not exist';
 
   return $result;
 }
