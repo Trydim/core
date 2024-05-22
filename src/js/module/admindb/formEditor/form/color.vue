@@ -1,6 +1,5 @@
 <template>
-  <input type="text"
-         class="cell-control"
+  <input type="color" class="cell-control py-1" style="height: 18px"
          :disabled="cell.param.disabled"
          v-model="value"
   >
@@ -8,7 +7,7 @@
 
 <script>
 export default {
-  name: "input-text",
+  name: "input-color",
   props: {
     modelValue: {},
     cell: Object,

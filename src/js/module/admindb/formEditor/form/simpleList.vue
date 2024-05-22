@@ -1,6 +1,6 @@
 <template>
-  <select class="form-select form-select-sm" :disabled="cell.param.disabled" v-model="value">
-    <option v-for="(v, k) of cell.param.props" :key="k" :value="k">{{ v }}</option>
+  <select class="cell-control" :disabled="disabled" v-model="value">
+    <option v-for="(v, k) of props" :key="k" :value="k">{{ v }}</option>
   </select>
 </template>
 
@@ -8,20 +8,24 @@
 export default {
   name: "simple-list",
   props: {
+    modelValue: {},
     cell: Object,
   },
-  emits: ['update:modelValue'],
   data() {
+    const p = this.cell.param;
+
     return {
-      value: this.cell.value,
+      disabled: p.disabled,
+      props: p.props,
     };
   },
-  watch: {
-    value() {
-      this.$emit('update:modelValue', this.value);
-    },
+  emits: ['update:modelValue'],
+  computed: {
+    value: {
+      get() { return this.modelValue },
+      set(v) { this.$emit('update:modelValue', v) }
+    }
   },
-  methods: {
-  },
+  methods: {},
 }
 </script>

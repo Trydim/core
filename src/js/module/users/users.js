@@ -84,7 +84,7 @@ const users = {
           return {key: _(key), value};
         });
 
-        item['contactsParse'] = item['contacts'];
+        item['contactsParse'] = item['contacts'] || {};
         item['contacts'] = f.replaceTemplate(contactsTmp, arr);
       }
 
@@ -244,7 +244,7 @@ const users = {
       if (oneElements && contacts[k]) {
         node.value = contacts[k];
         node.type === 'tel' && f.initMask(node);
-      } else node.parentNode.remove();
+      } else if (!oneElements) node.parentNode.remove();
     });
 
     // Manager fields

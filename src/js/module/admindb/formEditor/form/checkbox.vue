@@ -1,6 +1,5 @@
 <template>
-  <input type="text"
-         class="cell-control"
+  <input type="checkbox" class="cell-control"
          :disabled="cell.param.disabled"
          v-model="value"
   >
@@ -8,7 +7,7 @@
 
 <script>
 export default {
-  name: "input-text",
+  name: "input-checkbox",
   props: {
     modelValue: {},
     cell: Object,
@@ -16,9 +15,9 @@ export default {
   emits: ['update:modelValue'],
   computed: {
     value: {
-      get() { return this.modelValue },
-      set(v) { this.$emit('update:modelValue', v) }
-    }
+      get() { return this.modelValue === '+' },
+      set(v) { this.$emit('update:modelValue', v ? '+' : '-' ) }
+    },
   },
   methods: {},
 }

@@ -25,7 +25,7 @@ export default {
   },
   unmounted() {
     this.M.hide();
-    setTimeout(this.M.destroy, 150);
+    setTimeout(() => this.M.destroy(), 150);
   },
 }
 

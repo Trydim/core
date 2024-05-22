@@ -25,7 +25,6 @@ class CsvConfig {
    * @param string $configPath
    * @param string $csvPath
    * @return array
-   * @throws Exception
    */
   static function updateConfig(string $configPath, string $csvPath): array {
     $csv = loadCSV([], $csvPath);
@@ -35,7 +34,7 @@ class CsvConfig {
     $cfg = [];
 
     $currentIdColumnIndex = null;
-    foreach ($currentCfg[0] as $i => $cell) {
+    foreach ($currentCfg[0] ?? [] as $i => $cell) {
       if (includes(['id', 'key'], $cell['key'])) {
         $currentIdColumnIndex = $i; break;
       }
@@ -59,8 +58,6 @@ class CsvConfig {
       if ($idColumnIndex !== null && includes(['id', 'key'], strtolower($cell))) $idColumnIndex = $cell;
       $param[$c] = $cell;
     }
-
-    //$csv = array_values(array_filter($csv, function ($item) { return !empty(implode('', $item)); }));
 
     // If table have only one row
     if (count($csv) === 1) $csv[] = array_fill(0, count($param), '');
@@ -102,7 +99,6 @@ class CsvConfig {
   /**
    * @param string $csvPath
    * @return array
-   * @throws Exception
    */
   static function syncFile(string $csvPath): array {
     $csvPath = substr($csvPath, 1);

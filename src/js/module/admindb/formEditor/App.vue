@@ -2,29 +2,33 @@
   <div class="form-editor container-fluid d-flex align-items-start gap-2">
     <div class="content-wrap">
       <!-- Спойлеры -->
-      <template v-for="(spoiler, s) of mergedData" :key="s">
-        <div v-if="s !== 's0'" class="content-spoiler" :class="{'solid': !showSpoiler}">
-          <div v-show="showSpoiler" class="content-spoiler__header" @click="toggleSpoiler(s)">
-            {{ s }}
+      <template v-for="(spoiler, sKey) of mergedData" :key="sKey">
+        <div v-if="sKey !== 's0'" class="content-spoiler" :class="{'solid': !showSpoiler}">
+          <div v-show="showSpoiler" class="content-spoiler__header" @click="toggleSpoiler(sKey)">
+            {{ sKey }}
             <i class="pi position-absolute end-0 top-0 p-2"
-               :class="openSpoiler[s] ? 'pi-angle-up' : 'pi-angle-down'"
+               :class="openSpoiler[sKey] ? 'pi-angle-up' : 'pi-angle-down'"
             ></i>
           </div>
 
-          <div class="form-content" :class="openSpoiler[s] ? '' : 'd-none'" :style="contentStyle">
+          <div class="form-content" :class="openSpoiler[sKey] ? '' : 'd-none'" :style="contentStyle">
             <!-- Шапка -->
             <div v-for="(head, k) of header" :key="k" class="form-content__header">
               <span>{{ head.value }}</span>
             </div>
             <!-- Содержимое -->
             <template v-for="(row, i, rIndex) of spoiler" :key="i">
-              <div class="cell first pi pi-list pointer"
-                   :class="{'last-row': itemSpoiler[s] === rIndex + 1}"
-                   @click="selectRow($event, i)"
+              <div class="form-editor__menu-icon cell first pi pi-list"
+                   :class="{
+                     'selected-row': i === selected.row,
+                     'last-row': itemSpoiler[sKey] === rIndex + 1
+                   }"
+                   @click="selectRow($event, sKey, i)"
               ></div>
               <div v-for="(cell, j) of row" :key="'' + i + j + cell.value" class="cell"
                    :class="{
-                     'last-row': itemSpoiler[s] === rIndex + 1,
+                     'selected-row': i === selected.row,
+                     'last-row': itemSpoiler[sKey] === +rIndex + 1,
                      'selected': checkSelectedCell(i, j),
                    }"
                    @click="selectCell($event, cell)"
@@ -33,6 +37,8 @@
               >
                 <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]" />
                 <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]" />
+                <InputCheckbox v-else-if="cell.param.type === 'checkbox'" :cell="cell" v-model="contentData[i][j]" />
+                <InputColor v-else-if="cell.param.type === 'color'" :cell="cell" v-model="contentData[i][j]" />
                 <SimpleList v-else-if="cell.param.type === 'simpleList'" :cell="cell" v-model="contentData[i][j]" />
                 <CustomEvent v-else-if="cell.param.type === 'customEvent'" :cell="cell" v-model="contentData[i][j]" />
               </div>
@@ -41,38 +47,11 @@
         </div>
       </template>
 
-      <ContextMenu v-if="selectedRow"></ContextMenu>
+      <ContextMenu v-if="selected.row" :style="contextMenuPosition" v-model:show="selected.row"
+                   @remove="removeRow" @add-row="addRow" />
     </div>
     <div class="control-wrap">
-      <div class="radio-group">
-        <label class="radio-group__item">
-          <input type="radio" hidden value="set" v-model="change.type">
-          <span class="radio-group__span">Установить</span>
-        </label>
-        <label class="radio-group__item">
-          <input type="radio" hidden value="change" v-model="change.type">
-          <span class="radio-group__span">Изменить</span>
-        </label>
-      </div>
-      <div class="radio-group mt-2">
-        <label class="radio-group__item">
-          <input type="radio" hidden value="absolute" v-model="change.valueType">
-          <span class="radio-group__span">Значение</span>
-        </label>
-        <label class="radio-group__item">
-          <input type="radio" hidden value="relative" v-model="change.valueType">
-          <span class="radio-group__span">Проценты</span>
-        </label>
-      </div>
-
-      <input type="text" class="control-input mt-2" v-model="change.value">
-
-      <div class="d-flex justify-content-between mt-4 gap-4">
-        <button type="button" class="col btn btn-white" @click="applyChange">Применить</button>
-        <button type="button" class="col btn btn-gray" title="Снять выделение" @click="clearSelected">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
+      <CellChanger @apply="applyChange" @undo="undoChanges" @clear="clearSelected"></CellChanger>
     </div>
   </div>
 </template>
@@ -83,18 +62,22 @@
 
 import InputText from "./form/text.vue";
 import InputNumber from "./form/number.vue";
+import InputCheckbox from "./form/checkbox.vue";
+import InputColor from "./form/color.vue";
 import SimpleList from "./form/simpleList.vue";
 import CustomEvent from "./form/custom.vue";
+import ContextMenu from "./ContextMenu.vue";
+import CellChanger from "./CellChanger.vue";
 
-const getCellKey = (i, j) => `s${i}x${j}`;
+import methods from "./methods";
 
 export default {
   name: "FormsTable",
   components: {
-    InputText,
-    InputNumber,
-    SimpleList,
-    CustomEvent,
+    InputColor, InputCheckbox, InputText, InputNumber,
+    SimpleList, CustomEvent,
+    CellChanger,
+    ContextMenu,
   },
   data() {
     return {
@@ -108,7 +91,10 @@ export default {
       contentProperties: this.$db.contentProperties || {},
       mergedData: {},
 
-      selectedRow: undefined,
+      selected: {
+        spoiler: undefined,
+        row    : undefined,
+      },
       focusedCell: undefined,
       selectedCells: {},
       startCell: undefined,
@@ -116,11 +102,7 @@ export default {
         type: 'string',
       },
 
-      change: {
-        type: 'set',
-        valueType: 'absolute', // Значение или проценты
-        value: '',
-      },
+      contextMenuPosition: '',
     };
   },
   computed: {
@@ -129,8 +111,8 @@ export default {
 
       return arr.map(k => { k.value = window._(k.value); return k; });
     },
-    columns() { return Object.keys(this.header).length - 1 },
-    contentStyle() { return 'grid-template-columns: 30px repeat(' + this.columns + ', auto)' },
+    columns() { return Object.keys(this.header).length },
+    contentStyle() { return 'grid-template-columns: 30px repeat(' + (this.columns - 1) + ', auto)' },
   },
   watch: {
     contentData: {
@@ -138,121 +120,7 @@ export default {
       handler() { this.$db.enableBtnSave() },
     },
   },
-  methods: {
-    mergeData() {
-      const config = this.contentConfig,
-            props  = this.contentProperties,
-            defaultRow = config[0],
-            res    = {s0: {}}; // первый спойлер, если будет только один не отображать
-
-      let spoilerKey = 's0';
-
-      this.contentData.forEach((csvRow, rowI) => {
-        const xRow = config[rowI] ? config[rowI] : defaultRow;
-
-        if (xRow[0].type === 'spoiler') {
-          spoilerKey = xRow[0].name;
-          res[spoilerKey] = {};
-          return;
-        }
-        if (csvRow.join('').length === 0) return;
-
-        res[spoilerKey][rowI] = csvRow.reduce((cR, csvCell, cellI) => {
-          const defParam = defaultRow[cellI],
-                param    = xRow[cellI],
-                isInherit = param.type === 'inherit';
-          // Only a column can be hidden
-          if ((rowI === 0 && param.type === 'hidden') || defParam.type === 'hidden') return cR;
-          // simpleList
-          if (props[param.type]) param.props = props[param.type][param.list];
-
-          cR[cellI] = {
-            rowI, cellI,
-            value: csvCell,
-            param: isInherit ? defParam : param,
-          };
-
-          return cR;
-        }, {});
-
-        this.itemSpoiler[spoilerKey] = Object.keys(res[spoilerKey]).length;
-      });
-
-      if (Object.keys(res).length === 1) {
-        this.showSpoiler = false;
-        this.openSpoiler.s1 = true;
-        res.s1 = {...res.s0};
-        delete res.s1[0]; // Удалить шапку
-      }
-
-      this.mergedData = res;
-    },
-    checkSelectedCell(i, j) { return this.selectedCells.hasOwnProperty(getCellKey(i, j)) },
-
-    toggleSpoiler(s) { this.openSpoiler[s] = !this.openSpoiler[s] },
-
-    selectRow(e, i) {
-      this.selectedRow = i;
-    },
-
-    selectCell(e, cell) {
-      if (cell.param.type === 'customEvent') return;
-
-      const key = getCellKey(cell.rowI, cell.cellI);
-
-      this.focusedCell = cell;
-
-      if (e.metaKey || e.ctrlKey) {
-        if (this.selectedCells[key]) delete this.selectedCells[key];
-        else this.selectedCells[key] = cell;
-      }
-    },
-    clearSelected() { this.selectedCells = {} },
-    startSelect(e, cell) {
-      //this.startCell = getCellKey(cell.rowI, cell.cellI);
-
-      // Если отпустил в любом другом месте прекратить выделение
-    },
-    stopSelect(e, cell) {
-      /*if (this.startCell === getCellKey(cell.rowI, cell.cellI)) {
-        this.startCell = undefined;
-        return;
-      }*/
-    },
-
-    applyChange() {
-      const c = this.change;
-
-      if (c.value.toString() === '') {
-        f.showMsg('Введите значение', 'error');
-        return;
-      }
-      if (!Object.keys(this.selectedCells).length) {
-        f.showMsg('Ничего не выбрано', 'error');
-        return;
-      }
-
-      Object.values(this.selectedCells).forEach(cell => {
-        const i = cell.rowI,
-              j = cell.cellI;
-
-        if (c.type === 'set') {
-          cell.value = this.contentData[i][j] = c.value;
-        } else {
-          let cV = cell.value,
-              nV = c.value,
-              result;
-
-          if (isFinite(cV) || cell.param.type === 'number') {
-            result = c.valueType === 'absolute' ? +cV + +nV
-                                                : +cV * (1 + +nV / 100);
-          }
-
-          cell.value = this.contentData[i][j] = result;
-        }
-      });
-    },
-  },
+  methods,
   created() {
     this.mergeData();
   },
