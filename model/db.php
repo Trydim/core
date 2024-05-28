@@ -804,6 +804,8 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $dealer = json_decode($dealer, true);
 
         $dealerName = trim($dealer['name']);
+        if (strlen($dealerName) < 2) { $result['error'] = 'Name must be 2 or more chars!'; break; }
+
         $login = trim($dealer['login'] ?? '');
         $pass = password_hash($dealer['password'] ?? 123, PASSWORD_BCRYPT);
 
@@ -823,38 +825,26 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         }
 
         $id = $db->getLastID('dealers', ['name' => 'tmp']);
-
-        $settings = [];
-        foreach ($dealer['settings'] as $k => $v) $settings['prop_' . $k] = $v;
-
         $param = [
-          'name' => $dealerName,
+          'name'      => $dealerName,
           'cms_param' => json_encode(['prefix' => $prefix]),
+          'contacts'  => json_encode($dealer['contacts']),
           'activity'  => intval(boolValue($dealer['activity'] ?? true)),
-          'contacts'  => json_encode([
-            'address' => $dealer['address'] ?? '',
-            'email'   => $dealer['email'] ?? '',
-            'phone'   => $dealer['phone'] ?? '',
-          ]),
-          'settings' => gzcompress(json_encode($settings), 9),
+          'settings'  => gzcompress(json_encode($dealer['settings']), 9),
         ];
 
         $result = $db->insert($columns, 'dealers', [$id => $param], true);
 
         if ($login === '') $login = 'dealer' . $id;
 
-        $main->dealer->create(
-          $id,
-          [
-            'dealerName' => $dealer['name'],
-            'dbConfig' => $main->getSettings(VC::DB_CONFIG),
-          ],
-          [
-            'prefix' => $prefix,
-            'login' => $login,
-            'pass'  => $pass,
-          ]
-        );
+        $main->dealer->create($id, [
+          'dealerName' => $dealerName,
+          'dbConfig'   => $main->getSettings(VC::DB_CONFIG),
+        ], [
+          'prefix' => $prefix,
+          'login'  => $login,
+          'pass'   => $pass,
+        ]);
       }
       break;
     case 'loadDealers':
@@ -870,11 +860,12 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'changeDealer':
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
-        $name = $dealer['name'];
-        if (strlen($name) < 2) { $result['error'] = 'Name must be 2 or more chars!'; break; }
+
+        $dealerName = trim($dealer['name']);
+        if (strlen($dealerName) < 2) { $result['error'] = 'Name must be 2 or more chars!'; break; }
 
         $param = [
-          'name'     => $name,
+          'name'     => $dealerName,
           'contacts' => json_encode($dealer['contacts']),
           'activity' => intval(boolValue($dealer['activity'] ?? true)),
           'settings' => gzcompress(json_encode($dealer['settings']), 9),

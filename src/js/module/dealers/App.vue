@@ -316,27 +316,6 @@ export default {
 
       return res ? res.map(i => i.name).join(', ') : v;
     },
-    setProperty() {
-      const de = this.dealer;
-      de.settings = {};
-
-      Object.values(this.dealersProperties).forEach(prop => {
-        let v = 0,
-            currentValue = de.settings[prop] ? de.settings[prop].value : null;
-
-        if (prop.type === 'select') v = '1';
-        else {
-          switch (prop.type) {
-            case 'text': case 'textarea': v = ''; break;
-            case 'number': v = '0'; break;
-            case 'date': v = new Date().getTime(); break;
-            case 'bool': v = false; break;
-          }
-        }
-
-        de.settings[prop.code] = currentValue || v;
-      });
-    },
     updateProperty() {
       const keys = Object.keys(this.properties);
 
@@ -358,10 +337,10 @@ export default {
           email: '',
           address: '',
         },
+        settings: {},
         activity: true,
       };
 
-      this.setProperty();
       this.setModal('Добавить дилера', true);
       this.reloadFn = this.reload;
     },
@@ -373,7 +352,7 @@ export default {
       this.dealer = cloneDeep(this.selected);
       this.dealer.activity = !!+this.dealer.activity;
 
-      if (Object.keys(this.dealer.settings).length === 0) this.setProperty();
+      if (Object.keys(this.dealer.settings).length === 0) this.dealer.settings = {};
       else this.updateProperty();
 
       this.setModal('Настройка для дилера', true);
@@ -399,7 +378,7 @@ export default {
       this.modal.loading = true;
       this.setModal('Пользователи дилера', true);
     },
-    refreshProperties() { this.setProperty() },
+    refreshProperties() { this.dealer.settings = {} },
     deleteDealer() {
       if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
@@ -411,7 +390,6 @@ export default {
 
       this.setModal('Удалить выбранных дилеров', true);
       this.reloadFn = this.reload;
-      this.msg.text = `Дилер №${this.selected.id} - ${this.selected.name} удален!`;
     },
 
     dblClick(e) {
@@ -422,7 +400,15 @@ export default {
     },
 
     modalConfirm() {
+      this.msg.text = `Дилер №${this.selected.id} - ${this.selected.name}`;
       this.queryParam = {...this.queryParam, dealer: JSON.stringify(this.dealer)};
+
+      switch (this.queryParam.dbAction) {
+        case 'addDealer'   : this.msg.text += ' добавлен!'; break;
+        case 'changeDealer': this.msg.text += ' изменен!';  break;
+        case 'deleteDealer': this.msg.text += ' удален!';   break;
+      }
+
       this.query();
       this.modalCancel();
     },
