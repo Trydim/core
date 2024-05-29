@@ -2,87 +2,7 @@
 
 import Orders from "./OrdersClass";
 
-// Orders list for search
-class AllOrdersList {
-  constructor(param) {
-    const {node = false} = param;
-    if (!node) return;
-
-    const data = this.getFormData(param);
-
-    this.node            = node;
-    this.type            = param.tableType;
-    this.data            = [];
-    this.searchData      = Object.create(null);
-    this.searchComponent = f.searchInit();
-    this.loader          = new f.LoaderIcon(this.node);
-
-    f.Post({data}).then(data => {
-      data['orders'] && this.prepareSearchData(data['orders']);
-      this.init(param);
-      this.loader.stop();
-    });
-  }
-
-  getFormData(param) {
-    const fd = new FormData();
-    fd.set('mode', 'DB');
-    fd.set('dbAction', param.dbAction);
-    fd.set('countPerPage', '1000');
-    return fd;
-  }
-
-  init() {
-    //this.count = 1;
-    this.searchComponent.init({
-      popup: false,
-      node: this.node,
-      searchData: this.searchData,
-      showResult: this.showResult.bind(this),
-    });
-  }
-
-  prepareSearchData(data) {
-    if (this.type === 'order') {
-      this.data = data.reduce((r, i) => {
-        const id = i['ID'],
-              phone = i['customerContacts'].phone.replace(/ |-|_|\(|\)|@/g, '');
-
-        this.searchData[id] = id + i['customerName'] + phone + i['customerContacts'];
-        r[id] = i;
-        return r;
-      }, Object.create(null));
-    } else {
-      this.data = data.reduce((r, i) => {
-        this.searchData[i['cpNumber']] = i['cpNumber'] + ' ' + i['createDate'] + ' ' + i['total'];
-        r[i['cpNumber']] = i;
-        return r;
-      }, Object.create(null));
-    }
-  }
-
-  /**
-   *
-   * @param node
-   * @param {[]} resultIds
-   */
-  showResult(node, resultIds) {
-    let array = resultIds.reduce((r, i) => {r.push({...this.data[i]}); return r}, []);
-
-    OrdersInstance.setOrders(array, true);
-    /* Todo что бы учитывать настройки пагинации нужен запрос
-     if (resultIds.length) {
-     f.setLoading(this.node);
-     this.FD.set('search', '1');
-     this.FD.set('orderId', JSON.stringify(resultIds));
-
-     f.Post({data: this.FD}).then(data => {
-     f.removeLoading(this.node);
-     if (data['orders']) orders.fillTable(data['orders'], true);
-     });
-     } else orders.fillTable([], true);*/
-  }
-}
+let searchInProgress = false;
 
 export default class extends Orders {
   constructor() {
@@ -101,13 +21,13 @@ export default class extends Orders {
 
   onEvent() {
     // Top buttons
-    f.qA('input[data-action], button[data-action]', 'click', e => this.actionBtn.call(this, e));
+    f.qA('input[data-action], button[data-action]', 'click', e => this.actionBtn(e));
 
     // Select
-    f.qA('select[data-action]', 'change', e => this.actionSelect.call(this, e));
+    f.qA('select[data-action]', 'change', e => this.actionSelect(e));
 
     // Focus Search Init
-    f.qS('#search').addEventListener('focus', e => this.focusSearch(e), {once: true});
+    f.qS('#search').addEventListener('input', e => this.inputSearch(e));
   }
 
   // Добавить проверку почты
@@ -119,11 +39,27 @@ export default class extends Orders {
 
   // Events function
   //--------------------------------------------------------------------------------------------------------------------
-  focusSearch(e) {
-    const dbAction = this.orderType === 'visit' ? 'loadVisitorOrders' : this.mainAction,
-          tableType = this.orderType === 'visit' ? 'visitOrder' : 'order';
+  inputSearch(e) {
+    const node = e.target,
+          value = node.value.toString();
 
-    new AllOrdersList({dbAction, node: e.target, tableType});
+    const loader = new f.LoaderIcon(node);
+
+    if (value.length < 2) {
+      if (searchInProgress) {
+        this.queryParam.dbAction = this.orderType === 'visit' ? 'loadVisitorOrders' : this.mainAction;
+        searchInProgress = false;
+      } else {
+        loader.stop();
+        return;
+      }
+    } else {
+      searchInProgress = true;
+      this.queryParam.dbAction = this.orderType === 'visit' ? 'searchVisitorOrders' : 'searchOrder';
+      this.queryParam.searchValue = value;
+    }
+
+    this.query().then(() => loader.stop())
   }
 
   actionBtn(e) {

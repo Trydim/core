@@ -262,9 +262,6 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'loadOrders':
-      // Значит нужны все заказы (поиск)
-      if ($countPerPage > 999) $pagerParam['countPerPage'] = 1000000;
-
       if (isset($orderIds)) {
         $orderIds = json_decode($orderIds ?? '[]', true);
         $result['orders'] = $db->loadOrdersById($orderIds);
@@ -283,7 +280,13 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $result['orders'] = $db->loadOrders($pagerParam, $dateRange);
         $result['countRows'] = $db->getCountRows('orders');
       }
-      !isset($search) && $result['statusOrders'] = $db->loadOrderStatus();
+      $result['statusOrders'] = $db->loadOrderStatus();
+      break;
+    case 'searchOrder':
+      if (isset($searchValue)) {
+        $result['orders'] = $db->searchOrders($pagerParam, $searchValue);
+        $result['countRows'] = count($result['orders']);
+      }
       break;
     case 'changeStatusOrder':
       if (isset($orderIds) && isset($statusId) && count($columns)) {
@@ -320,12 +323,14 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'loadVisitorOrders':
       !isset($sortColumn) && $pagerParam['sortColumn'] = 'createDate';
 
-      //$searchValue = isset($searchValue);
-      // Значит нужны все заказы (поиск)
-      if ($countPerPage > 999) $pagerParam['countPerPage'] = 1000000;
-      else $result['countRows'] = $db->getCountRows('client_orders');
-
+      $result['countRows'] = $db->getCountRows('client_orders');
       $result['orders'] = $db->loadVisitorOrder($pagerParam);
+      break;
+    case 'searchVisitorOrders':
+      if (isset($searchValue)) {
+        $result['orders'] = $db->searchVisitorOrders($pagerParam, $searchValue);
+        $result['countRows'] = count($result['orders']);
+      }
       break;
     case 'delVisitorOrders':
       $orderIds = explode(',', $orderIds ?? '');
