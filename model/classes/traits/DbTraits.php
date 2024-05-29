@@ -132,6 +132,27 @@ trait DbOrders {
     return $this->jsonParseField(self::getAll($sql));
   }
 
+  /**
+   * @param array $pageParam
+   * @param string $searchValue
+   * @return array
+   */
+  public function searchOrders(array $pageParam, string $searchValue): array {
+    $searchValue = '%' . $searchValue . '%';
+
+    $sql = $this->getBaseOrdersQuery();
+    $sql .= "WHERE O.ID like '$searchValue' ";
+    $sql .= "OR O.important_value like '$searchValue' ";
+    $sql .= "OR C.contacts like '$searchValue' ";
+    $sql .= "OR U.name like '$searchValue' ";
+    $sql .= "OR C.name like '$searchValue' ";
+
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
+    $sql .= $this->getPaginatorQuery($pageParam);
+
+    return $this->jsonParseField(self::getAll($sql));
+  }
+
   public function changeOrders($columns, $dbTable, $commonValues, $status_id) {
     $param = [];
 
@@ -195,6 +216,23 @@ trait DbOrders {
             WHERE ID = :id";
 
     return $this->jsonParseField(self::getRow($sql, [':id' => $id]));
+  }
+
+  public function searchVisitorOrders(array $pageParam, string $searchValue): array {
+    $searchValue = '%' . $searchValue . '%';
+
+    $sql = "SELECT ID, create_date AS 'createDate',
+            save_value AS 'saveValue', 
+            important_value AS 'importantValue',
+            total
+            FROM " . $this->pf('client_orders') . "\n
+            WHERE ID like '$searchValue' 
+            OR importantValue like '$searchValue'";
+
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
+    $sql .= $this->getPaginatorQuery($pageParam);
+
+    return $this->jsonParseField(self::getAll($sql));
   }
 
   // Status

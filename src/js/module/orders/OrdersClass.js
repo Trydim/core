@@ -239,7 +239,7 @@ export default class {
     if (param.dbAction === this.mainAction) data.delete('orderIds');
 
     this.loaderTable.start();
-    f.Post({data}).then(data => {
+    return f.Post({data}).then(data => {
       if (param.dbAction === 'changeStatusOrder') {
         const ws = this.websocket;
         ws && ws.readyState === ws.OPEN && ws.send(JSON.stringify({mode: param.dbAction}));
@@ -260,6 +260,7 @@ export default class {
       if (data['statusOrders']) f.oneTimeFunction.exec('fillSelectStatus', data['statusOrders']);
 
       this.loaderTable.stop();
+      return true;
     });
   }
 }
