@@ -107,7 +107,7 @@ export default {
   },
   computed: {
     header() {
-      const arr = [{value: ''}].concat(...Object.values(this.mergedData['s0'][0]));
+      const arr = [{value: ''}].concat(...Object.values(Object.values(this.mergedData['s0'])[0]));
 
       return arr.map(k => { k.value = window._(k.value); return k; });
     },
