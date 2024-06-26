@@ -26,9 +26,22 @@ switch ($cmsAction) {
 
       if ($main->isDealer() || isset($user['dealerId'])) {
         $_SESSION['dealerId'] = $user['dealerId'] ?? $main->getCmsParam('dealerId');
+
+        // Subdomain or sub folder
+        $target = $main->url->getUri();
+
+        if (empty($main->url->getSubDomain())) {
+          $scheme = $main->url->getScheme();
+          $target = str_replace($scheme, $scheme . $user['urlPrefix'] . '.', $target);
+        } else {
+          $target .= "dealer/$user[dealerId]";
+        }
+
+        header('Location: ' . $target, true, 303);
+        die;
       }
 
-      $main->reDirect(isset($user['dealerId']) ? 'dealer/' . $user['dealerId'] : '');
+      else $main->reDirect('');
     } else $main->reDirect("login?status=error&login=$login");
     break;
   case 'exit':

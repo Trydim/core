@@ -42,6 +42,10 @@ class UrlGenerator {
    */
   private $host;
   /**
+   * @var string
+   */
+  private $subDomain = '';
+  /**
    * relative path from "Document Root"
    * @var string
    */
@@ -95,7 +99,7 @@ class UrlGenerator {
     $this->method = $this->server->get('REQUEST_METHOD');
 
     $this->setScheme();
-    $this->setHost();
+    $this->setSubDomain($this->setHost());
     $this->setBaseSitePath();
     $this->setMode();
     $this->setCoreUri();
@@ -106,7 +110,7 @@ class UrlGenerator {
     $https = $this->server->get('HTTPS') ?? false;
     $this->scheme = ($https ? 'https' : 'http') . '://';
   }
-  private function setHost() {
+  private function setHost(): string {
     if (!$host = $this->headers->get('HOST')) {
       if (!$host = $this->server->get('SERVER_NAME')) {
         $host = $this->server->get('SERVER_ADDR', '');
@@ -114,6 +118,17 @@ class UrlGenerator {
     }
 
     $this->host = $this->scheme . $host;
+
+    return $host;
+  }
+  private function setSubDomain(string $host) {
+    $host = explode('.', $host);
+    $subDomain  = $host[0];
+    $mainDomain = count($host) > 1 ? $host[1] : $host[0];
+
+    if ($subDomain !== $mainDomain) {
+      $this->subDomain = $subDomain;
+    }
   }
   private function setBaseSitePath() {
     $filename = basename($this->server->get('SCRIPT_FILENAME', ''));
@@ -268,42 +283,28 @@ class UrlGenerator {
   }
 
   private function checkDealer() {
-    $host = explode('.', $this->server->get('HTTP_HOST'));
-    $subDomain  = $host[0];
-    $mainDomain = count($host) > 1 ? $host[1] : $host[0];
-
     $requestUri = $this->getRequestUri();
+    $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
-    $isDealer = false;
-    // Have subdomain, but
-    if ($subDomain !== $mainDomain) {
-      $isDealer = true; //
-    } else {
+    if (!$isDealer) {
+      $httpOrigin = $this->server->get('HTTP_ORIGIN'); // ver 8 null, HTTP_REFERER too
+      if ($httpOrigin) $requestUri = str_replace($httpOrigin, '', $this->server->get('HTTP_REFERER'));
       $isDealer = includes($requestUri, DEALERS_PATH . '/');
-
-      if (!$isDealer) {
-        $httpOrigin = $this->server->get('HTTP_ORIGIN'); // ver 8 null, HTTP_REFERER too
-        if ($httpOrigin) $requestUri = str_replace($httpOrigin, '', $this->server->get('HTTP_REFERER'));
-        $isDealer = includes($requestUri, DEALERS_PATH . '/');
-      }
     }
 
-
-    else if (includes($requestUri, DEALERS_PATH . '/')) {
-
-
+    if ($isDealer) {
       preg_match('/' . DEALERS_PATH . '\/(.+?)\//', $requestUri, $match); // получить ID дилера
 
       if (!isset($match[1])) die('Dealer id not found!');
       if (is_numeric($match[1])) {
         if (!$this->isLocalDealer($match[1]) && !is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
-        else $this->main->setCmsParam('dealerId', $match[1]);
+        else $this->main->setCmsParam(VC::DEALER_ID, $match[1]);
       } else {
-        $this->main->setCmsParam('dealerLink', $match[1]);
+        $this->main->setCmsParam(VC::DEALER_LINK, $match[1]);
       }
     }
 
-    $this->main->setCmsParam('isDealer', $isDealer);
+    $this->main->setCmsParam(VC::IS_DEALER, $isDealer);
   }
   // Попытка сделать одну папку ресурсов для разработки дилеров
   public function isLocalDealer(string $id): bool {
@@ -313,9 +314,8 @@ class UrlGenerator {
   public function getScheme(): string {
     return $this->scheme;
   }
-  public function getHost(): string {
-    return $this->host;
-  }
+  public function getHost(): string { return $this->host; }
+  public function getSubDomain(): string { return $this->subDomain; }
   public function getBaseUri(): string {
     if ($this->baseUri === null) {
       $this->baseUri = $this->setBaseUri();

@@ -362,7 +362,7 @@ trait DbUsers {
     if (count($dealersUsers)) {
       foreach ($dealersUsers as $user) {
         if (password_verify($password, $user['password'])) {
-          $this->setPrefix($user['prefix']);
+          $this->setPrefix($user['dbPrefix']);
           return $user;
         }
       }

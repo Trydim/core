@@ -9,6 +9,9 @@ class VC {
   /** cmsParams */
   const PROJECT_TITLE = 'PROJECT_TITLE',
         DB_CONFIG     = 'dbConfig',
+        IS_DEALER     = 'isDealer',
+        DEALER_ID     = 'dealerId',
+        DEALER_LINK   = 'dealerLink',
         ONLY_LOGIN    = 'onlyLogin',
         CSV_MAIN_PATH = 'csvMain',
         CSV_PATH      = 'csvPath',

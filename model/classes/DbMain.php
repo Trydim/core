@@ -1021,28 +1021,44 @@ class DbMain extends R {
   /**
    * @return bool true if it was set
    */
-  public function setDealerLink(): bool {
+  public function checkDealerLink(): bool {
+    $m = $this->main;
+
+    $sqlValue = $m->url->getSubDomain();
+    if ($sqlValue === '' && !$m->isDealer()) return false;
+
     $sql = "SELECT ID as 'id', name, contacts, cms_param AS 'cmsParam' FROM dealers";
 
-    $sqlValue = $this->main->getCmsParam('dealerId');
+    // Check by subdomain
     if ($sqlValue) {
-      $sql .= " WHERE ID = :value";
-    } else {
-      $sqlValue = $this->main->getCmsParam('dealerLink');
       $sqlValue = "%$sqlValue%";
       $sql .= " WHERE cms_param LIKE :value";
+    } else {
+      $sqlValue = $m->getCmsParam(VC::DEALER_ID);
+      // Check by dealer id
+      if ($sqlValue) {
+        $sql .= " WHERE ID = :value";
+      }
+      // Check by dealer link
+      else {
+        $sqlValue = '%' . $m->getCmsParam(VC::DEALER_LINK) . '%';
+        $sql .= " WHERE cms_param LIKE :value";
+      }
     }
 
     $sql .= ' AND activity = 1 LIMIT 1';
     $row = $this->jsonParseField(self::getRow($sql, [':value' => $sqlValue]));
 
     if (isset($row['id']) && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
-      $this->main->setCmsParam('dealerId', $row['id']);
-      $this->main->setCmsParam(VC::PROJECT_TITLE, $row['name']);
       $this->prefix = $row['cmsParam']['dbPrefix'] ?? $row['cmsParam']['prefix']; // Support old name
+
+      $m->setCmsParam(VC::IS_DEALER, true);
+      $m->setCmsParam(VC::DEALER_ID, $row['id']);
+      $m->setCmsParam(VC::PROJECT_TITLE, $row['name']);
       return true;
     }
-    $this->main->setCmsParam('isDealer', false);
+
+    $m->setCmsParam(VC::IS_DEALER, false);
     return false;
   }
 
@@ -1067,7 +1083,8 @@ class DbMain extends R {
     $dealers = array_map(function ($dealer) {
       return [
         'id'     => $dealer['id'],
-        'prefix' => $dealer['cmsParam']['dbPrefix'] ?? $dealer['cmsParam']['prefix'], // Support old name
+        'urlPrefix' => $dealer['cmsParam']['urlPrefix'] ?? '',
+        'dbPrefix'  => $dealer['cmsParam']['dbPrefix'] ?? $dealer['cmsParam']['prefix'], // Support old name
       ];
     }, $dealers);
 
@@ -1085,13 +1102,14 @@ class DbMain extends R {
 
         $dealer = $dealers[$index];
         $sql .= " UNION SELECT ID as 'id', name, login, password, "
-              . "'" . $dealer['id'] . "' as dealerId, "
-              . "'" . $dealer['prefix'] . "' as prefix "
-              . 'FROM ' . $dealer['prefix'] . 'users '
+              . "'$dealer[id]' as dealerId, "
+              . "'$dealer[urlPrefix]' as urlPrefix, "
+              . "'$dealer[dbPrefix]' as dbPrefix "
+              . "FROM $dealer[dbPrefix]users "
               . ' WHERE activity = 1';
 
         if ($login) $sql .= ' AND login = "' . $login . '"';
-    }
+      }
 
       $result = array_merge($result, self::getAll(substr($sql, 7), [':login' => $login]));
       if ($login && count($result)) return $result;
