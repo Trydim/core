@@ -268,16 +268,30 @@ class UrlGenerator {
   }
 
   private function checkDealer() {
-    $requestUri = $this->getRequestUri();
-    $isDealer = includes($requestUri, DEALERS_PATH . '/');
+    $host = explode('.', $this->server->get('HTTP_HOST'));
+    $subDomain  = $host[0];
+    $mainDomain = count($host) > 1 ? $host[1] : $host[0];
 
-    if (!$isDealer) {
-      $httpOrigin = $this->server->get('HTTP_ORIGIN'); // ver 8 null, HTTP_REFERER too
-      if ($httpOrigin) $requestUri = str_replace($httpOrigin, '', $this->server->get('HTTP_REFERER'));
+    $requestUri = $this->getRequestUri();
+
+    $isDealer = false;
+    // Have subdomain, but
+    if ($subDomain !== $mainDomain) {
+      $isDealer = true; //
+    } else {
       $isDealer = includes($requestUri, DEALERS_PATH . '/');
+
+      if (!$isDealer) {
+        $httpOrigin = $this->server->get('HTTP_ORIGIN'); // ver 8 null, HTTP_REFERER too
+        if ($httpOrigin) $requestUri = str_replace($httpOrigin, '', $this->server->get('HTTP_REFERER'));
+        $isDealer = includes($requestUri, DEALERS_PATH . '/');
+      }
     }
 
-    if ($isDealer) {
+
+    else if (includes($requestUri, DEALERS_PATH . '/')) {
+
+
       preg_match('/' . DEALERS_PATH . '\/(.+?)\//', $requestUri, $match); // получить ID дилера
 
       if (!isset($match[1])) die('Dealer id not found!');

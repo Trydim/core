@@ -177,7 +177,7 @@ final class Main {
     }
 
     $settingPath = $this->url->getBasePath(true) . self::SETTINGS_PATH;
-    if ($this->isDealer()) {
+    if ($this->isDealer() && file_exists($settingPath)) {
       $mainSetting = json_decode(file_get_contents($settingPath), true);
       $setting[VC::OPTION_PROPERTIES] = $mainSetting[VC::OPTION_PROPERTIES] ?? [];
       $setting[VC::DEALER_PROPERTIES] = $mainSetting[VC::DEALER_PROPERTIES] ?? [];

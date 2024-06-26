@@ -38,11 +38,11 @@ class Dealer {
     $this->main = $main;
   }
 
-  private function setParam(string $id, string $prefix) {
+  private function setParam(string $id, string $dbPrefix) {
     $this->dealerDir  = $this::FOLDER . $id;
     $this->dealerPath = $this->dealerDir . DIRECTORY_SEPARATOR;
 
-    $this->prefix     = $prefix;
+    $this->prefix     = $dbPrefix;
   }
   private function createFolderDealers() {
     if (!is_dir($this::FOLDER)) {

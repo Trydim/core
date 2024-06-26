@@ -821,17 +821,17 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $login = trim($dealer['login'] ?? '');
         $pass = password_hash($dealer['password'] ?? 123, PASSWORD_BCRYPT);
 
-        $prefix = preg_replace('/[^a-zA-Z]/i', '', translit($dealerName));
-        $prefix = strtolower(substr($prefix, 0, 3)) . '_';
+        $urlPrefix = strtolower(preg_replace('/[^a-zA-Z]/i', '', translit($dealerName)));
+        $dbPrefix = substr($urlPrefix, 0, 3) . '_';
 
         $haveDealers = $db->selectQuery('dealers', 'cms_param');
         if (count($haveDealers)) {
-          $haveDealers = array_filter($haveDealers, function ($param) use ($prefix) {
-            $param = json_decode($param);
-            return ($param->prefix ?? false) === $prefix;
+          $haveDealers = array_filter($haveDealers, function ($param) use ($dbPrefix) {
+            $param = json_decode($param, true);
+            return ($param['dbPrefix'] ?? false) === $dbPrefix;
           });
           if (count($haveDealers)) {
-            $prefix = str_replace('_', '', $prefix) . substr(uniqid(), -3, 3) . '_';
+            $dbPrefix = str_replace('_', '', $dbPrefix) . substr(uniqid(), -3, 3) . '_';
           }
           unset($haveDealers);
         }
@@ -839,7 +839,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $id = $db->getLastID('dealers', ['name' => 'tmp']);
         $param = [
           'name'      => $dealerName,
-          'cms_param' => json_encode(['prefix' => $prefix]),
+          'cms_param' => json_encode(['urlPrefix' => $urlPrefix, 'dbPrefix' => $dbPrefix]),
           'contacts'  => json_encode($dealer['contacts']),
           'activity'  => intval(boolValue($dealer['activity'] ?? true)),
           'settings'  => gzcompress(json_encode($dealer['settings']), 9),
@@ -853,7 +853,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
           'dealerName' => $dealerName,
           'dbConfig'   => $main->getSettings(VC::DB_CONFIG),
         ], [
-          'prefix' => $prefix,
+          'prefix' => $dbPrefix,
           'login'  => $login,
           'pass'   => $pass,
         ]);

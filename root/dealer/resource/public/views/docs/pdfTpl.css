@@ -32,3 +32,62 @@ p, td, div {
   font-size: 14px;
   margin: 0;
 }
+
+table {
+  margin-top: 0;
+}
+
+.content {
+  margin-top: 0;
+  width: 100%;
+}
+
+.after-table-block div,
+.after-table-block p,
+.after-table-block table {
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.draw {
+  display: inline-block;
+  height: 0;
+}
+
+.table {
+  margin-top: 10px;
+  width: 100%;
+  border-collapse: collapse;
+  border-color: #ccc;
+}
+
+.table * {
+  font-size: 10px;
+  line-height: 1.1;
+}
+
+.table td, .table th {
+  padding: 2px;
+  border: 1px solid #ccc;
+  text-align: center;
+  height: min-content;
+}
+
+.table th {
+  background-color: #9f3a3a;
+  color: white;
+}
+
+.estimate__table tr td:nth-child(2) {
+  text-align: left;
+}
+
+.title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.table-legend td {
+  vertical-align: top;
+  padding-left: 15px;
+}

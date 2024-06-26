@@ -998,7 +998,7 @@ class DbMain extends R {
   // Dealers
   //--------------------------------------------------------------------------------------------------------------------
 
-  private function parseDealerSettings(array $dealers) {
+  private function parseDealerSettings(array $dealers): array {
     $properties = new Properties($this->main, 'dealer');
 
     $this->togglePrefix();
@@ -1039,7 +1039,7 @@ class DbMain extends R {
     if (isset($row['id']) && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
       $this->main->setCmsParam('dealerId', $row['id']);
       $this->main->setCmsParam(VC::PROJECT_TITLE, $row['name']);
-      $this->prefix = $row['cmsParam']['prefix'];
+      $this->prefix = $row['cmsParam']['dbPrefix'] ?? $row['cmsParam']['prefix']; // Support old name
       return true;
     }
     $this->main->setCmsParam('isDealer', false);
@@ -1067,7 +1067,7 @@ class DbMain extends R {
     $dealers = array_map(function ($dealer) {
       return [
         'id'     => $dealer['id'],
-        'prefix' => $dealer['cmsParam']['prefix'],
+        'prefix' => $dealer['cmsParam']['dbPrefix'] ?? $dealer['cmsParam']['prefix'], // Support old name
       ];
     }, $dealers);
 
@@ -1084,13 +1084,13 @@ class DbMain extends R {
         if ($index >= $countDealers) break;
 
         $dealer = $dealers[$index];
-      $sql .= " UNION SELECT ID as 'id', name, login, password, "
-            . "'" . $dealer['id'] . "' as dealerId, "
-            . "'" . $dealer['prefix'] . "' as prefix "
-            . 'FROM ' . $dealer['prefix'] . 'users '
-            . ' WHERE activity = 1';
+        $sql .= " UNION SELECT ID as 'id', name, login, password, "
+              . "'" . $dealer['id'] . "' as dealerId, "
+              . "'" . $dealer['prefix'] . "' as prefix "
+              . 'FROM ' . $dealer['prefix'] . 'users '
+              . ' WHERE activity = 1';
 
-      if ($login) $sql .= ' AND login = "' . $login . '"';
+        if ($login) $sql .= ' AND login = "' . $login . '"';
     }
 
       $result = array_merge($result, self::getAll(substr($sql, 7), [':login' => $login]));

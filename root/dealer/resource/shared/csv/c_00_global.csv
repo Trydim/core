@@ -1,0 +1,16 @@
+id;Назначение/Описание;param1;value
+;;;Ключ
+c_maker1;Производство 1;;test
+;;;
+c_defaultRate;Валюта по умолчанию (EUR, USD, RUB, BYN);;RUB
+c_pdfBaseRate;Валюта Pdf в базовой цене;;RUB
+;;;
+c_margin;Наценка, %;;0
+;;;
+;;;
+sendMailNotification;;;Gafiyatova_D@dorian.ru
+sendMailNotification;;;litvina_j@dorian.ru
+sendMailNotification;;;ivashkina_a@dorian.ru
+sendMailNotification;;;trydim@mail.ru
+;;;
+;;;

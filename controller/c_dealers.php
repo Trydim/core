@@ -37,8 +37,8 @@ $field = [
   'jsLinks'   => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],
 ];
 
-// all Properties
-$setting = $main->getSettings(VC::DEALER_PROPERTIES);
+// All dealers properties
+$setting = $main->getSettings(VC::DEALER_PROPERTIES) ?? [];
 foreach ($main->db->getTables('prop') as $table) {
   // Param saved in json
   $prop = $setting[$table['dbTable']] ?? [];
@@ -54,7 +54,7 @@ foreach ($main->db->getTables('prop') as $table) {
 }
 $field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . json_encode($setting) . "'>";
 
-// if user have table property, add libs
+// If user have table property, add libs
 $haveTable = array_filter($setting, function ($prop) { return $prop['type'] === 'table'; });
 if (count($haveTable)) {
   array_unshift($field['jsLinks'], CORE_JS . 'libs/handsontable.full.min.js?ver=f3bb2b6859');
