@@ -254,7 +254,7 @@ declare type CMSGlobalObject = {
 
   getSetting()
 
-  Valid()
+  Valid: typeof Valid
 }
 
 interface Window extends Window {

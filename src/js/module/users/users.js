@@ -5,7 +5,7 @@ const node = {
   tRow   : undefined,
   confirm: undefined,
 };
-const tmp = {
+const tmp  = {
   form    : undefined,
   contacts: undefined,
 }
@@ -68,25 +68,25 @@ const users = {
     const contactsTmp = tmp.contacts || (tmp.contacts = f.gT('#tableContactsValue'));
 
     users = users.map(item => {
+      let arr;
+
       if (item.activity) {
         item.activityValue = !!+item.activity;
         item.activity = item.activityValue ? 'check' : 'times';
         item.activity = `<i class="pi pi-${item.activity}"></i>`;
       }
 
-      if (item['contacts']) {
-        let arr = Object.entries(item['contacts']).map(([key, value]) => {
-          if (data.managerField[key]) {
-            if (!Array.isArray(value)) value = [value];
-            value = value.map(v => data.managerField[key][v]).join('<br>');
-          }
+      item['contactsParse'] = item['contacts'] = item['contacts'] || {};
+      arr = Object.entries(item['contacts']).map(([key, value]) => {
+        if (data.managerField[key]) {
+          if (!Array.isArray(value)) value = [value];
+          value = value.map(v => data.managerField[key][v]).join('<br>');
+        }
 
-          return {key: _(key), value};
-        });
+        return {key: _(key), value};
+      });
+      item['contacts'] = f.replaceTemplate(contactsTmp, arr);
 
-        item['contactsParse'] = item['contacts'] || {};
-        item['contacts'] = f.replaceTemplate(contactsTmp, arr);
-      }
 
       //if (true /* TODO настройки вывода даты */) {
       for (let i in item) {
@@ -278,7 +278,7 @@ const users = {
     this.M.show(_('Changing Users'), form);
     return form;
   },
-  changeUserPassword() { // TODO доработать изменение пароля
+  changeUserPassword() {
     if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Select only one user'), 'error'); return; }
 
     let id   = this.id.getSelected(),
@@ -290,13 +290,14 @@ const users = {
     let newPass = form.querySelector('[name="newPass"]'),
         repeatPass = form.querySelector('[name="repeatPass"]');
 
-    this.onEventNode(newPass, e => this.changeTextInput(e, repeatPass), {}, 'change');
-    this.onEventNode(repeatPass, e => this.changePassword(e, newPass), {}, 'change');
-
-    new f.Valid({form});
+    this.onEventNode(newPass, e => this.inputNewPass(e), {}, 'input');
+    this.onEventNode(newPass, e => this.changeNewPass(e, repeatPass), {}, 'change');
+    this.onEventNode(repeatPass, e => this.inputRepeatPass(e, newPass), {}, 'input');
+    this.onEventNode(repeatPass, e => this.changeRepeatPass(e, newPass), {}, 'change');
 
     this.confirmMsg = _('New password saved');
     this.M.show(_('Change user password') + ' ' + user['name'], form);
+    this.M.btnConfirm.disabled = true;
     return form;
   },
   delUser() {
@@ -307,21 +308,48 @@ const users = {
 
     this.confirmMsg = _('Deleted');
     this.M.show(_('Delete'), _('Delete selected users?'));
-    this.M.btnConfirm.classList.remove('cl-confirm-disabled');
-    this.M.btnConfirm.removeAttribute('disabled');
+    this.M.btnConfirm.disabled = false;
   },
 
-  changeTextInput(e, repeatPass) {
-    if (e.target.value.length <= 2) e.target.value = '';
-    repeatPass.value = '';
+  inputNewPass(e) {
+    const cl = e.target.parentNode.classList;
+
+    cl.remove('cl-input-valid');
+    cl.remove('cl-input-error');
+
+    if (e.target.value.length > 2) cl.add('cl-input-valid');
+    else if (e.target.value > 0) cl.add('cl-input-error');
   },
-  changePassword(e, newPass) {
+  changeNewPass(e, repeatPass) {
+    e.preventDefault();
+
+    if (e.target.value.length < 3) e.target.value = '';
+
+    repeatPass.dispatchEvent(new Event('input'));
+  },
+  inputRepeatPass(e, newPass) {
+    const cl = e.target.parentNode.classList,
+          btn = this.M.btnConfirm;
+
+    if (e.target.value === '') return;
+
     if (e.target.value !== newPass.value) {
-      e.target.value = newPass.value = '';
-      f.showMsg(_('Password mismatch'), 'error');
+      btn.disabled = true;
+
+      cl.remove('cl-input-valid');
+      cl.add('cl-input-error');
       return;
     }
+
+    btn.disabled = false;
+    cl.remove('cl-input-error');
+    cl.add('cl-input-valid');
     this.queryParam.validPass = e.target.value;
+  },
+  changeRepeatPass(e, newPass) {
+    e.preventDefault();
+
+    if (e.target.value !== newPass.value) f.showMsg(_('Password mismatch'), 'error');
   },
 
   // Bind events

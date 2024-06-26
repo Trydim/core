@@ -146,7 +146,6 @@ git submodule update --remote
 | setting | changePropertyOrder/changeDealersPropertyOrder |                    |                   |      | 
 | setting | loadProperties/loadDealersProperties           |                    |                   |      | 
 | setting | loadProperties/loadDealersProperties           |                    |                   |      | 
-| setting | loadProperty                                   |                    |                   |      | 
 | setting | deleteProperty/deleteDealersProperty           |                    |                   |      | 
 | socket  |                                                |                    |                   |      |
 | tBot    |                                                |                    |                   |      |

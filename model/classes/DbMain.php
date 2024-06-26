@@ -835,19 +835,6 @@ class DbMain extends R {
       $propTables = $this->getTables('prop');
       foreach ($propTables as $table) {
         $props[$table['dbTable']] = $this->loadTable($table['dbTable']);
-
-        // TODO временно
-        if ($table['dbTable'] === 'prop_brand') {
-          $tmp = array_map(function ($it) {
-            if ($it['logo_ids']) {
-              $it['logo_ids'] = $this->setImages($it['logo_ids']);
-              $it['logo'] = $it['logo_ids'][0]['src'];
-            }
-            return $it;
-          }, $props[$table['dbTable']]);
-
-          $props[$table['dbTable']] = $tmp;
-        }
       }
     }
 

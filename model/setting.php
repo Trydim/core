@@ -357,7 +357,7 @@ switch ($cmsAction) {
     break;
   case 'loadProperty':
     if (isset($props)) {
-      $result['propertyValue'] = $db->getColumnsTable($props); // todo загрузить просто
+      $result['propertyValue'] = $db->getColumnsTable($props);
     }
     break;
   case 'deleteProperty':  case 'deleteDealersProperty':

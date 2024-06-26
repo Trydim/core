@@ -193,7 +193,7 @@ export const methods = {
     this.element.parentId = this.getSectionId;
     this.element.activity = single ? !!el.activity : true;
     this.element.sort     = single ? f.toNumber(el.sort) : this.getAvgSort(this.elementsSelected);
-    this.element.simple   = single && el.simple && el.id; // TODO
+    this.element.simple   = single && el.simple && el.id;
 
     this.setElementModal('Редактировать элемент', single, single);
     this.reloadAction = reload(this);

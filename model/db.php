@@ -728,7 +728,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       foreach ($user as $k => $v) {
         if (in_array($k, ['login', 'name', 'permissionId'])) $param[$k] = $v;
         else if ($k === 'password') $param[$k] = password_hash($v, PASSWORD_BCRYPT);
-        else if ($k === 'activity') $param[$k] = '1'; // TODO
+        else if ($k === 'activity') $param[$k] = '1';
         else $contacts[$k] = $v;
       }
       $param['contacts'] = json_encode($contacts);
@@ -755,13 +755,18 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
           $contacts = [];
           foreach ($authForm as $k => $v) {
             if (in_array($k, ['login', 'name', 'permissionId'])) $param[$id][$k] = $v;
-            else if ($k === 'activity') $param[$id][$k] = '1'; // TODO
+            else if ($k === 'activity') $param[$id][$k] = '1';
             else $contacts[$k] = $v;
           }
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
         }
 
         $result = $db->insert($columns, 'users', $param, true);
+
+        // If this is the current user, will be updating the session login
+        if (empty($result['error']) && count($usersId) === 1 && $main->getLogin('id') === $usersId[0]) {
+          $_SESSION['login'] = $authForm['login'];
+        }
       }
       break;
     case 'changeUserPassword':
@@ -771,6 +776,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $param[$usersId[0]]['password'] = password_hash($validPass, PASSWORD_BCRYPT);
 
         $result = $db->insert($columns, 'users', $param, true);
+
+        // If this is the current user, will be updating the session password
+        if ($main->getLogin('id') === $usersId[0]) {
+          $_SESSION['password'] = $validPass;
+        }
       }
       break;
     case 'delUser':
@@ -798,9 +808,6 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
     case 'loadFiles':
       $result['files'] = $db->loadFiles();
-      break;
-
-    case 'openOrders': /* TODO когда это отправляется */
       break;
 
       // Dealers

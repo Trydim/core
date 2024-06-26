@@ -1,4 +1,3 @@
-
 declare class LoaderIcon {
   constructor(
     field: string | HTMLElement | any,
@@ -90,3 +89,15 @@ declare interface Searching {
 }
 
 declare interface User {}
+
+declare class Valid {
+  constructor(param: {
+    sendFunc: Function,
+    form?: HTMLFormElement | HTMLTemplateElement | string,
+    submit?: string,
+    fileFieldSelector?: boolean
+    initMask?: boolean,
+    phoneMask?: string,
+    classPrefix?: string,
+  })
+}
