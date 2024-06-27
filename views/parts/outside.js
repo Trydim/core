@@ -44,3 +44,5 @@ if (data['isShadow']) {
   node.innerHTML = '<div id="calcWrap">' + html + '</div>';
   importJs(document.body, data['js']);
 }
+
+setTimeout(() => document.dispatchEvent(new Event('DOMContentLoaded')), 50);

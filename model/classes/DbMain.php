@@ -673,7 +673,7 @@ class DbMain extends R {
       $path = FS::findingFile($item['path']);
       $item['id'] = $item['ID'];
       $item['path'] = $item['src'] = $path
-        ? $this->main->url->getUri() . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)
+        ? $this->main->url->getUri(true) . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)
         : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
 
       unset($item['ID']);
@@ -775,7 +775,7 @@ class DbMain extends R {
     return array_map(function ($option) {
       // set images
       if (strlen($option['images'])) {
-        //$option['images'] = [['path' => $this->main->url->getUri() . 'shared/upload/stone/1-corian-lime-ice.jpg']];
+        //$option['images'] = [['path' => $this->main->url->getUri(true) . 'shared/upload/stone/1-corian-lime-ice.jpg']];
         $option['images'] = $this->setImages($option['images']);
       }
 

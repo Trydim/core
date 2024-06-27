@@ -29,7 +29,7 @@ function addCssLink(string $cssLink) {
   global $main;
 
   if ($main instanceof Main) {
-    $cssLink = $main->url->getUri() . ltrim($cssLink, '/');
+    $cssLink = $main->url->getUri(true) . ltrim($cssLink, '/');
     return $main->addControllerField(VC::BASE_CSS_LINKS, $cssLink);
   }
 
@@ -49,7 +49,7 @@ function addJsLink(string $jsLink, string $position = 'after') {
   global $main;
 
   if ($main instanceof Main) {
-    $jsLink = $main->url->getUri() . ltrim($jsLink, '/');
+    $jsLink = $main->url->getUri(true) . ltrim($jsLink, '/');
     return $main->addControllerField(VC::BASE_JS_LINKS, $jsLink, $position);
   }
 
@@ -278,7 +278,7 @@ function findKey(array $cell, array $input) {
 function findCsvFile(string $filename): string {
   global $main;
 
-  if (file_exists($filename)) return $filename;              // Direct path
+  if (file_exists($filename)) return $filename;                    // Direct path
   $path = $main->getCmsParam(VC::CSV_PATH) . $filename;      // Dealer path
   if (file_exists($path)) return $path;
   $path = $main->getCmsParam(VC::CSV_MAIN_PATH) . $filename; // Main path

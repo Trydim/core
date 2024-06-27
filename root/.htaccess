@@ -27,6 +27,11 @@ RewriteRule ^(.*)$ /index.php?targetPage=$1 [L,QSA]
 	Allow from all
 </FilesMatch>
 
+# Разрешить 1 файл
+<FilesMatch "^outside.(php)$">
+	Allow from all
+</FilesMatch>
+
 # Для dev servera
 #<IfModule mod_headers.c>
 #    Header set Access-Control-Allow-Origin "*"

@@ -4,10 +4,12 @@
           // Путь к папке с калькулятором
     const path = '/admin_calc/',
           // Target string selector or HTMLElement
-          node = '#calcField';
+          node = '#calcField',
+          // Target page, default 'public'
+          targetPage = 'fence';
 
     /* в файле outside.php */
-    fetch(path + 'outside.php?osd=+').then(d => d.json()).then(data => {
+    fetch(path + 'outside.php?osd=+&targetPage=' + targetPage).then(d => d.json()).then(data => {
       (new Function('node', 'data', data['initJs']))(node, data);
     });
   })();

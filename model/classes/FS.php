@@ -37,7 +37,7 @@ class FS {
   public function __construct(Main $main) {
     $this->main = $main;
     $this->absUploadDir = $main->url->getPath(true) . $this::UPLOAD_DIR . DIRECTORY_SEPARATOR;
-    $this->fileUrl = $main->url->getUri() . $this::UPLOAD_DIR . '/';
+    $this->fileUrl = $main->url->getUri(true) . $this::UPLOAD_DIR . '/';
     $this->param = new class {};
     $this->config = $this->main->getSettings(VC::CATALOG_IMAGE_SIZE);
     $this->checkUploadDir();

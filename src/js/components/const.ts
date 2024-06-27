@@ -4,14 +4,15 @@
  * Global variables and simple functions
  */
 // @ts-ignore
-const cms = JSON.parse(window.CMS_CONST || '{}');
+const cms = JSON.parse(window.CMS_CONST || '{}'),
+      sitePath = cms['SITE_PATH'] || '/';
 
 export default {
   DEBUG        : cms['DEBUG'] || false,
   CSV_DEVELOP  : !!cms['CSV_DEVELOP'] || false,
   OUTSIDE      : cms['CL_OUTSIDE'],
-  SITE_PATH    : cms['SITE_PATH'] || '/',
-  MAIN_PHP_PATH: (cms['SITE_PATH'] || '/') + 'index.php',
+  SITE_PATH    : sitePath,
+  MAIN_PHP_PATH: cms['MAIN_PHP_PATH'] || (sitePath + 'index.php'),
 
   /**
    * @var {string} PATH_IMG

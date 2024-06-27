@@ -31,10 +31,15 @@ switch ($cmsAction) {
         $target = $main->url->getUri();
 
         if (empty($main->url->getSubDomain())) {
-          $scheme = $main->url->getScheme();
+          $scheme = '://';
           $target = str_replace($scheme, $scheme . $user['urlPrefix'] . '.', $target);
-        } else {
-          $target .= "dealer/$user[dealerId]";
+
+          $target .= '?save=' . $_SESSION['PHPSESSID'];
+        }
+
+        else if (!$main->getCmsParam(VC::USE_DEAL_SUBDOMAIN)) {
+          $dealLink = "dealer/$user[dealerId]";
+          if (!includes($target, $dealLink)) $target .= "dealer/$user[dealerId]";
         }
 
         header('Location: ' . $target, true, 303);

@@ -92,7 +92,7 @@ final class Main {
     if ($this->url->getRoute() === '404') return;
 
     if ($this->isDealer()) {
-      $this->checkDealer();
+      $this->checkDealer(); // Проверка два раза, вроде можно убрать
       $this->setDealerParam();
     }
   }
@@ -339,8 +339,8 @@ final class Main {
     $templateContent = ob_get_clean();
     $field['content'] = $field['content'] ?? (empty($templateContent) ? $target . ' default content.' : $templateContent);
     if ($isGlobal) $field['global'] = $field['content'];
-    $this->response->setContent(template('base', $field));
 
+    $this->response->setContent(template(OUTSIDE ? '_outside' : 'base', $field));
     return $this;
   }
 

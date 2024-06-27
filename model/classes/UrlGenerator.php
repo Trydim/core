@@ -122,9 +122,10 @@ class UrlGenerator {
     return $host;
   }
   private function setSubDomain(string $host) {
+    $count = $this->server->get('REMOTE_ADDR') === '127.0.0.1' ? 1 : 2;
     $host = explode('.', $host);
     $subDomain  = $host[0];
-    $mainDomain = count($host) > 1 ? $host[1] : $host[0];
+    $mainDomain = count($host) > $count ? $host[1] : $host[0];
 
     if ($subDomain !== $mainDomain) {
       $this->subDomain = $subDomain;
@@ -168,7 +169,7 @@ class UrlGenerator {
 
     if ($this->main->isDealer()) {
       $id = $this->main->getCmsParam('dealerId');
-      if ($this->isLocalDealer($id)) $id = 'resource';
+      //if ($this->isLocalDealer($id)) $id = 'resource';
       $dealLink = 'dealer/' . $id . '/';
     }
 
@@ -195,7 +196,10 @@ class UrlGenerator {
     return null;
   }*/
   private function setBaseUri(): string {
-    return $this->getHost() . $this->getBasePath();
+    $subdomain = $this->getSubDomain();
+    if (!empty($subdomain)) $subdomain = str_replace("$subdomain.", '', $this->getHost());
+
+    return $subdomain . $this->getBasePath();
   }
   private function setRequestUri() {
     $requestUri = '';
@@ -253,6 +257,26 @@ class UrlGenerator {
     }
   }
 
+  private function setRoute(): string {
+    $main = $this->main;
+
+    if (OUTSIDE) return $this->request->get('targetPage') ?? 'public';
+
+    if ($main->isDealer() && !$main->getCmsParam(VC::USE_DEAL_SUBDOMAIN)) {
+      preg_match('/^\/' . DEALERS_PATH . '\/(?:\d+)\/(\w+)/', $this->getRequestUri(), $match);
+    } else {
+      preg_match('/^\/(\w+)/', $this->getRequestUri(), $match);
+    }
+
+    if (isset($match[1])) {
+      if (in_array($match[1], [PUBLIC_PAGE, 'public'])) $match[1] = 'public';
+      else if (!$main->availablePage($match[1])) $match[1] = '404';
+    }
+    $route = $match[1] ?? ($this->main->availablePage(PUBLIC_PAGE) ? 'public' : $this->main->getSideMenu(true));
+    $this->requestUri = str_replace($route . '/', '', $this->requestUri);
+
+    return $route;
+  }
   private function setRoutePath(): string {
     $route = $this->route === 'public' ? PUBLIC_PAGE : $this->route;
     $view = CORE . 'views/';
@@ -317,22 +341,18 @@ class UrlGenerator {
   public function getHost(): string { return $this->host; }
   public function getSubDomain(): string { return $this->subDomain; }
   public function getBaseUri(): string {
-    if ($this->baseUri === null) {
-      $this->baseUri = $this->setBaseUri();
-    }
+    if ($this->baseUri === null) $this->baseUri = $this->setBaseUri();
 
     return $this->baseUri;
   }
-  public function getUri(): string {
-    return $this->getHost() . $this->getPath();
+  public function getUri(bool $useDealerPath = false): string {
+    return $this->getHost() . ($useDealerPath ? $this->getPath() : $this->getPathBySubdomain());
   }
 
   public function getCorePath(bool $absolute = false): string {
     return ($absolute ? $this->absolutePath : '') . $this->corePath;
   }
-  public function getCoreUri(): string {
-    return $this->coreUri;
-  }
+  public function getCoreUri(): string { return $this->coreUri; }
 
   public function getBasePath(bool $absolute = false): string {
     return $absolute ? $this->absolutePath : $this->baseSitePath;
@@ -349,6 +369,16 @@ class UrlGenerator {
 
     return $absolutePath . $this->sitePath;
   }
+  public function getPathBySubdomain(): string {
+    $link = '';
+
+    if ($this->main->isDealer() && !$this->main->getCmsParam(VC::USE_DEAL_SUBDOMAIN)) {
+      $id = $this->main->getCmsParam(VC::DEALER_ID);
+      $link = 'dealer/' . $id . '/';
+    }
+
+    return $this->getBasePath() . $link;
+  }
 
   /**
    * Returns the requested URI (path and query string).
@@ -361,26 +391,6 @@ class UrlGenerator {
     return $this->requestUri;
   }
 
-  private function setRoute(): string {
-    $main = $this->main;
-
-    if (OUTSIDE) return 'public';
-
-    if ($main->isDealer()) {
-      preg_match('/^\/' . DEALERS_PATH . '\/(?:\d+)\/(\w+)/', $this->getRequestUri(), $match);
-    } else {
-      preg_match('/^\/(\w+)/', $this->getRequestUri(), $match);
-    }
-
-    if (isset($match[1])) {
-      if (in_array($match[1], [PUBLIC_PAGE, 'public'])) $match[1] = 'public';
-      else if (!$main->availablePage($match[1])) $match[1] = '404';
-    }
-    $route = $match[1] ?? ($this->main->availablePage(PUBLIC_PAGE) ? 'public' : $this->main->getSideMenu(true));
-    $this->requestUri = str_replace($route . '/', '', $this->requestUri);
-
-    return $route;
-  }
   public function getRoute(): string {
     if ($this->route === null) $this->route = $this->setRoute();
 

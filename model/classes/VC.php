@@ -3,8 +3,11 @@
 class VC {
   /** Cms Const */
   const PUBLIC_PAGE     = 'PUBLIC_PAGE',
+        ACCESS_MENU     = 'ACCESS_MENU',
         USE_DATABASE    = 'USE_DATABASE',
-        CHANGE_DATABASE = 'CHANGE_DATABASE';
+        CHANGE_DATABASE = 'CHANGE_DATABASE',
+        USE_CONTENT_EDITOR = 'USE_CONTENT_EDITOR',
+        USE_DEAL_SUBDOMAIN = 'USE_DEAL_SUBDOMAIN';
 
   /** cmsParams */
   const PROJECT_TITLE = 'PROJECT_TITLE',
