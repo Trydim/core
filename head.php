@@ -33,6 +33,8 @@ if ($mode = $main->getCmsParam('mode')) {
       $main->response->setContent($e->getMessage());
     }
   } else $main->response->setContent(['error' => gTxt('Auth no passing!')]);
+} else if ($customMode = $main->url->request->get('customMode')) {
+  require ABS_SITE_PATH . 'public/public.php';
 } else {
   $main->beforeController();
 
