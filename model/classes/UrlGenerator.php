@@ -196,10 +196,11 @@ class UrlGenerator {
     return null;
   }*/
   private function setBaseUri(): string {
-    $subdomain = $this->getSubDomain();
+    /*$subdomain = $this->getSubDomain();
     if (!empty($subdomain)) $subdomain = str_replace("$subdomain.", '', $this->getHost());
 
-    return $subdomain . $this->getBasePath();
+    return $subdomain . $this->getBasePath();*/
+    return $this->getHost() . $this->getBasePath();
   }
   private function setRequestUri() {
     $requestUri = '';

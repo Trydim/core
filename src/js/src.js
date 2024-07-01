@@ -140,4 +140,7 @@ const m = {
   User,
 };
 
-window.f = Object.assign({}, c, f, q, m);
+Object.defineProperty(window, 'f', {
+  value: Object.assign({}, c, f, q, m),
+  writable: false,
+});

@@ -45,4 +45,4 @@ if (data['isShadow']) {
   importJs(document.body, data['js']);
 }
 
-setTimeout(() => document.dispatchEvent(new Event('DOMContentLoaded')), 50);
+setTimeout(() => document.dispatchEvent(new Event('DOMContentLoaded')), 500);
