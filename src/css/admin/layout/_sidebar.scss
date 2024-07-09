@@ -20,7 +20,7 @@
   .sidebar-menu {
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden auto;
     height: calc(100vh - 4rem);
 
     ul {

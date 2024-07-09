@@ -32,7 +32,7 @@ switch ($cmsAction) {
 
         if (empty($main->url->getSubDomain())) {
           $scheme = '://';
-          $target = str_replace($scheme, $scheme . $user['urlPrefix'] . '.', $target);
+          $target = str_replace('s' . $scheme, $scheme . $user['urlPrefix'] . '.', $target);
 
           $target .= '?save=' . $_SESSION['PHPSESSID'];
         }

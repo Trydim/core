@@ -136,7 +136,7 @@ class UrlGenerator {
 
     if (defined('OUTSIDE')) {
       $this->baseSitePath = '/' . basename(ABS_SITE_PATH) . '/';
-      $this->requestUri = '/';
+      //$this->requestUri = '/';
       return;
     } elseif (basename($this->server->get('SCRIPT_NAME', '')) === $filename) {
       $baseUrl = $this->server->get('SCRIPT_NAME');

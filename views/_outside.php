@@ -21,10 +21,12 @@ $jsGlobalConst = json_encode([
   'CL_OUTSIDE'    => true,
   'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
   'SITE_PATH'     => $main->url->getPath(),
-  'MAIN_PHP_PATH' => $main->url->getHost() . $main->url->getBasePath() . 'outside.php',
+  'MAIN_PHP_PATH' => $main->url->getHost() . $main->url->getPath() . 'outside.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
   'AUTH_STATUS'   => $main->checkStatus(),
+  'IS_DEAL'       => $main->isDealer(),
+  'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 
