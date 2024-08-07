@@ -25,7 +25,7 @@
                    }"
                    @click="selectRow($event, sKey, i)"
               ></div>
-              <div v-for="(cell, j) of row" :key="'' + i + j + cell.value" class="cell"
+              <div v-for="(cell, j) of row" :key="i + '-' + j" class="cell"
                    :class="{
                      'selected-row': i === selected.row,
                      'last-row': itemSpoiler[sKey] === +rIndex + 1,
@@ -35,8 +35,8 @@
                    @mousedown="startSelect($event, cell)"
                    @mouseup="stopSelect($event, cell)"
               >
-                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model="contentData[i][j]" />
-                <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model="contentData[i][j]" />
+                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model:cell="cell.value" v-model="contentData[i][j]" />
+                <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model:cell="cell.value" v-model="contentData[i][j]" />
                 <InputCheckbox v-else-if="cell.param.type === 'checkbox'" :cell="cell" v-model="contentData[i][j]" />
                 <InputColor v-else-if="cell.param.type === 'color'" :cell="cell" v-model="contentData[i][j]" />
                 <SimpleList v-else-if="cell.param.type === 'simpleList'" :cell="cell" v-model="contentData[i][j]" />

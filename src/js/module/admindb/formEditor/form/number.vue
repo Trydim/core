@@ -15,7 +15,7 @@ export default {
     modelValue: {},
     cell: Object,
   },
-  emits: ['update:modelValue'],
+  emits: ['update:cell', 'update:modelValue'],
   data() {
     const p = this.cell.param;
 
@@ -31,7 +31,10 @@ export default {
 
     value: {
       get() { return this.modelValue },
-      set(v) { this.$emit('update:modelValue', v) }
+      set(v) {
+        this.$emit('update:cell', v);
+        this.$emit('update:modelValue', v);
+      }
     }
   },
   methods: {

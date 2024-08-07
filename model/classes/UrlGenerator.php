@@ -127,7 +127,7 @@ class UrlGenerator {
     $subDomain  = $host[0];
     $mainDomain = count($host) > $count ? $host[1] : $host[0];
 
-    if ($subDomain !== $mainDomain) {
+    if ($subDomain !== $mainDomain && $subDomain !== 'dev') {
       $this->subDomain = $subDomain;
     }
   }

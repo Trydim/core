@@ -1,8 +1,8 @@
 const dataArchive = {
   data: [],
 
-  add(data, config) {
-    this.data.push(JSON.stringify({data, config}));
+  add(contentData, mergedData, config) {
+    this.data.push(JSON.stringify({contentData, mergedData, config}));
     if (this.data.length > 50) this.data.shift();
   },
 
@@ -11,14 +11,16 @@ const dataArchive = {
 
     const item = JSON.parse(this.data.pop());
 
-    app.contentData = item.data;
+    app.contentData = item.contentData;
+
     if (item.config) {
       app.contentConfig = item.config;
       app.mergeData();
+    } else {
+      app.mergedData  = item.mergedData;
     }
   }
 };
-
 
 const getCellKey = (i, j) => `s${i}x${j}`;
 
@@ -85,7 +87,7 @@ export default {
   removeRow() {
     const s = this.selected;
 
-    dataArchive.add(this.contentData, this.contentConfig);
+    dataArchive.add(this.contentData, this.mergedData, this.contentConfig);
     this.contentData.splice(s.row, 1);
     this.contentConfig.splice(s.row, 1);
     this.mergeData();
@@ -95,7 +97,7 @@ export default {
           start = +s.row + (position === 'after' ? 1 : 0),
           config = new Array(this.columns).fill({type: 'inherit'});
 
-    dataArchive.add(this.contentData, this.contentConfig);
+    dataArchive.add(this.contentData, this.mergedData, this.contentConfig);
     this.contentData.splice(start, 0, this.contentData[s.row]);
     this.contentConfig.splice(start, 0, config);
     this.mergeData();
@@ -133,7 +135,7 @@ export default {
     if (c.value.toString() === '') { f.showMsg('Введите значение', 'error'); return; }
     if (!Object.keys(this.selectedCells).length) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
-    dataArchive.add(this.contentData);
+    dataArchive.add(this.contentData, this.mergedData);
 
     Object.values(this.selectedCells).forEach(cell => {
       const i = cell.rowI,
@@ -142,11 +144,11 @@ export default {
       if (c.type === 'set') {
         cell.value = this.contentData[i][j] = c.value;
       } else {
-        let cV = cell.value,
+        let cV = cell.value.toString().replace(',', '.'),
             nV = c.value,
             result;
 
-        if (isFinite(cV) || cell.param.type === 'number') {
+        if (isFinite(+cV) || cell.param.type === 'number') {
           result = c.valueType === 'absolute' ? +cV + +nV
                                               : +cV * (1 + +nV / 100);
         }
@@ -157,5 +159,15 @@ export default {
   },
   undoChanges() {
     dataArchive.restore(this);
+
+    Object.values(this.mergedData).forEach(spoiler => {
+      Object.entries(spoiler).forEach(([i, row]) => {
+        Object.entries(row).forEach(([j, cell]) => {
+          const key = getCellKey(i, j);
+
+          if (this.selectedCells[key]) this.selectedCells[key] = cell;
+        })
+      })
+    })
   },
 }

@@ -13,11 +13,14 @@ export default {
     modelValue: {},
     cell: Object,
   },
-  emits: ['update:modelValue'],
+  emits: ['update:cell', 'update:modelValue'],
   computed: {
     value: {
       get() { return this.modelValue },
-      set(v) { this.$emit('update:modelValue', v) }
+      set(v) {
+        this.$emit('update:cell', v);
+        this.$emit('update:modelValue', v);
+      }
     }
   },
   methods: {},
