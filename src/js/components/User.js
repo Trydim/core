@@ -49,11 +49,17 @@ export default class User {
 
   /**
    *
-   * @param {string|'id'|'isAdmin'|'permission'|'tags'} key
+   * @param {string|'id'|'isAdmin'|'permission'|'tags'|'dealer'|'dealerSetting'} key
    * @return {*}
    */
   get(key) {
     return this.data[key];
+  }
+
+  getDealerSettings(prop) {
+    if (!f.IS_DEAL) return false;
+
+    return this.data.dealer.settings[prop];
   }
 
   /**

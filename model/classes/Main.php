@@ -1,5 +1,7 @@
 <?php
 
+use RedBeanPHP\RedException;
+
 require __DIR__ . '/traits/MainTraits.php';
 
 final class Main {
@@ -50,6 +52,22 @@ final class Main {
   public $frontSettingInit = false;
 
   /**
+   * @var UrlGenerator
+   */
+  public $url;
+
+  /**
+   * @var Dealer
+   */
+  public $dealer;
+
+  /**
+   * @var Response
+   */
+  public $response;
+
+
+  /**
    * Main constructor.
    * @param array $cmsParam
    * @param array $dbConfig
@@ -57,23 +75,21 @@ final class Main {
   public function __construct(array $cmsParam, array $dbConfig) {
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
+
+    $this->url    = new UrlGenerator($this, 'core/');
+    $this->response = new Response($this);
+
+    if ($this->isDealer()) $this->dealer = new Dealer($this);
   }
+
   /**
    * @param string $value
    * @return DbMain|Dealer|UrlGenerator|Response
+   * @throws RedException
    */
   public function __get(string $value) {
-    if ($value === 'url') {
-      $this->url = new UrlGenerator($this, 'core/');
-    }
-    else if ($value === 'db') {
+    if ($value === 'db') {
       $this->db = new DbMain($this);
-    }
-    else if ($value === 'dealer') {
-      $this->dealer = new Dealer($this);
-    }
-    else if ($value === 'response') {
-      $this->response = new Response($this);
     }
 
     return $this->$value;
@@ -83,18 +99,13 @@ final class Main {
          ->setHooks();
   }
   public function beforeController() {
-    if (!OUTSIDE) {
-      $this->checkAuth()
-        ->setAccount()
-        ->applyAuth();
-    }
+    if (OUTSIDE) return;
 
-    if ($this->url->getRoute() === '404') return;
+    if ($this->isDealer()) $this->setDealerParam();
 
-    if ($this->isDealer()) {
-      $this->checkDealer(); // Проверка два раза, вроде можно убрать
-      $this->setDealerParam();
-    }
+    $this->checkAuth()
+      ->setAccount()
+      ->applyAuth();
   }
 
   /* -------------------------------------------------------------------------------------------------------------------
@@ -114,10 +125,14 @@ final class Main {
     $this->setCmsParam('ACCESS_MENU',
       array_filter($this->getCmsParam('ACCESS_MENU'),
         function ($item) use ($filter) {
+          if (is_array($item)) $item = $item['link'];
+
           return !includes($filter, $item);
         }
       )
     );
+
+    $this->setDealer($this->db->loadDealerById());
 
     return $this;
   }
@@ -192,7 +207,6 @@ final class Main {
    * @return $this
    */
   private function setAccount(): Main {
-    // Меню
     $this->setSideMenu();
 
     return $this;
@@ -235,6 +249,11 @@ final class Main {
    */
   public function getSettings(string $key = '', bool $front = false) {
     $data = $this->setting[$key] ?? null;
+    if ($front) {
+      $data = $this->setting;
+      unset($data[VC::DB_CONFIG]);
+    }
+
     $jsonData = $key === 'json' || $front ? json_encode($data ?: $this->setting) : '';
 
     if ($front) {
@@ -273,7 +292,7 @@ final class Main {
       }
       else if (is_array($field)) {
         if ($position === 'before') array_unshift($field, $value);
-        else array_push($field, $value);
+        else $field[] = $value;
       }
       else if (is_object($field)) $field->$key = $value;
 
@@ -303,13 +322,9 @@ final class Main {
     return $this;
   }*/
 
-  public function getControllerField(): array {
-    return $this->controllerField;
-  }
+  public function getControllerField(): array { return $this->controllerField; }
 
-  public function getControllerParam(string $key) {
-    //return $this->controllerParam[$key] ?: false;
-  }
+  //public function getControllerParam(string $key) { return $this->controllerParam[$key] ?: false; }
 
   public function initDefaultController(): Main {
     $main = $this;
@@ -344,13 +359,9 @@ final class Main {
     return $this;
   }
 
-  public function getBaseTable(): array {
-    return $this->dbTables;
-  }
+  public function getBaseTable(): array { return $this->dbTables; }
 
-  public function getDB(): DbMain {
-    return $this->db;
-  }
+  public function getDB(): DbMain { return $this->db; }
 
   public function reDirect(string $target = '') {
     if ($target === '') {

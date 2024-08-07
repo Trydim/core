@@ -23,7 +23,12 @@ class Properties {
       case 'dealer': return VC::DEALER_PROPERTIES;
     }
   }
-  private function getPropertyName($prop) {
+
+  /**
+   * @param $prop
+   * @return string
+   */
+  private function getPropertyName($prop): string {
     return str_replace('prop_', '', $prop);
   }
 

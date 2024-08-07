@@ -88,7 +88,12 @@ declare interface Searching {
   })
 }
 
-declare interface User {}
+declare class User {
+  get(key: string|'id'|'isAdmin'|'permission'|'tags'|'dealer'|'dealerSetting')
+
+  getDealerSettings(prop: string): undefined | any[]
+  haveTags(tag: string): boolean
+}
 
 declare class Valid {
   constructor(param: {

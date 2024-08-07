@@ -1,6 +1,8 @@
 <?php
 
+use RedBeanPHP\OODBBean;
 use RedBeanPHP\QueryWriter\AQueryWriter as AQueryWriter;
+use RedBeanPHP\RedException;
 
 require __DIR__ . '/Rb.php';
 require __DIR__ . '/traits/DbTraits.php';
@@ -47,7 +49,7 @@ class DbMain extends R {
   /**
    * @var string
    */
-  private $prefix = '';
+  private $prefix;
 
   /**
    * @var string
@@ -60,16 +62,53 @@ class DbMain extends R {
   private $login;
 
   /**
+   * @param Main $main
+   * @param bool $freeze
+   * @throws RedException
+   */
+  public function __construct(Main $main, bool $freeze = true) {
+    $this->main = $main;
+
+    if (USE_DATABASE) {
+      $dbConfig = $main->getSettings(VC::DB_CONFIG);
+
+      if (!count($dbConfig)) {
+        require $main->url->getPath(true) . 'config.php';
+        if (!count($dbConfig)) exit('Configs error');
+      }
+
+      $this->dbName = $dbConfig['dbName'];
+      $this->setPrefix($dbConfig['dbPrefix'] ?? '');
+
+      self::setup(
+        'mysql:host=' . $dbConfig['dbHost'] . ';dbname=' . $dbConfig['dbName'],
+        $dbConfig['dbUsername'],
+        $dbConfig['dbPass']
+      );
+
+      !self::testConnection() && die('Data Base connect error!');
+
+      $this->setting();
+
+      //self::fancyDebug(DEBUG);
+      self::freeze($freeze);
+    }
+  }
+
+  /**
    * Plugin readBean for special name
    * @param $type
    * @param $count
    *
-   * @return array|\RedBeanPHP\OODBBean|null
+   * @return array|OODBBean|null
    */
   private function dis($type, $count) {
     return self::getRedBean()->dispense($type, $count);
   }
 
+  /**
+   * @throws RedException
+   */
   private function setting() {
     self::ext('xdispense', function ($type, $count = 1) {
       return $this->dis($type, $count);
@@ -136,7 +175,6 @@ class DbMain extends R {
    */
   public function jsonEncodeField(array $arr): array {
     $result = [];
-    //$arr = array_flatten($arr);
 
     foreach ($arr as $key => $value) {
       if (in_array($key, self::DB_JSON_FIELDS) && is_string($value) === false) {
@@ -149,41 +187,13 @@ class DbMain extends R {
     return $result;
   }
 
-  public function __construct(Main $main, bool $freeze = true) {
-    $this->main = $main;
-
-    if (USE_DATABASE) {
-      $dbConfig = $main->getSettings(VC::DB_CONFIG);
-
-      if (!count($dbConfig)) {
-        require $main->url->getPath(true) . 'config.php';
-        if (!count($dbConfig)) exit('Configs error');
-      }
-
-      $this->dbName = $dbConfig['dbName'];
-      $this->setPrefix($dbConfig['dbPrefix'] ?? $this->prefix);
-
-      self::setup(
-        'mysql:host=' . $dbConfig['dbHost'] . ';dbname=' . $dbConfig['dbName'],
-        $dbConfig['dbUsername'],
-        $dbConfig['dbPass']
-      );
-
-      !self::testConnection() && die('Data Base connect error!');
-
-      $this->setting();
-
-      //self::fancyDebug(DEBUG);
-      self::freeze($freeze);
-    }
-  }
-
   /**
    * Multiple databases
    * @param string $key
-   * @param array  $dbConfig
-   * @param bool   $freeze
+   * @param array $dbConfig
+   * @param bool $freeze
    * @return $this
+   * @throws RedException
    */
   public function addDb(string $key, array $dbConfig, bool $freeze = true): DbMain {
     self::addDatabase(
@@ -201,6 +211,7 @@ class DbMain extends R {
    * Select a database,
    * @param string $key
    * @return $this
+   * @throws RedException
    */
   public function selectDb(string $key): DbMain {
     self::selectDatabase($key);
@@ -232,9 +243,7 @@ class DbMain extends R {
     return $date ? $date->format($this::DB_DATE_FORMAT) : null;
   }
 
-  public function setPrefix(string $prefix) {
-    $this->prefix = $prefix ?? $this->prefix;
-  }
+  public function setPrefix(string $prefix) { $this->prefix = $prefix; }
 
   /**
    * Use or not prefix
@@ -295,7 +304,6 @@ class DbMain extends R {
 
           if ($change && $count > 2 || !$change && $count > 0) {
             $result[] = [
-              'id'         => $count[0],
               'columnName' => $col['columnName'],
               'value'      => $item[$col['columnName']],
               'cause'      => 'Must be unique value',
@@ -339,7 +347,7 @@ class DbMain extends R {
 
   /**
    * @param string $dbTable name of table
-   * @param array|string $columns of columns, if size of array is 1 (except all column '*') return simple array,
+   * @param array|string $columns of columns, if size of array is 1 (except all column "*") return simple array,
    * @param $filters string filter
    *
    * @return array
@@ -430,8 +438,9 @@ class DbMain extends R {
 
   /**
    * @param string $dbTable
-   * @param array  $requireParam
+   * @param array $requireParam
    * @return mixed
+   * @throws RedException\SQL
    */
   public function getLastID(string $dbTable, array $requireParam = []) {
     $bean = self::xdispense($this->pf($dbTable));
@@ -525,7 +534,7 @@ class DbMain extends R {
           self::exec($sql);
         }
       } else {
-        foreach ($param as $id => $item) {
+        foreach ($param as $item) {
           $sql = "INSERT INTO `$dbTable` ";
           $sql .= '(' . implode(', ', array_keys($item)) . ') VALUES ';
           $sql .= '(\'' . implode('\', \'', array_values($item)) . '\')';
@@ -562,7 +571,7 @@ class DbMain extends R {
         }
         self::storeAll($beans);
       }
-    } catch (\RedBeanPHP\RedException $e) {
+    } catch (RedException $e) {
       return [
         'result' => $result,
         'error'  => $e->getMessage(),
@@ -598,7 +607,7 @@ class DbMain extends R {
    * @param object $file
    * @return array
    */
-  public function setFiles(object $file) {
+  public function setFiles(object $file): array {
     $files = ['id' => ''];
 
     $name = $file->name ?? basename($file->path) ?? null;
@@ -773,13 +782,12 @@ class DbMain extends R {
     $options = self::getAll($sql);
 
     return array_map(function ($option) {
-      // set images
+      // Set images
       if (strlen($option['images'])) {
-        //$option['images'] = [['path' => $this->main->url->getUri(true) . 'shared/upload/stone/1-corian-lime-ice.jpg']];
         $option['images'] = $this->setImages($option['images']);
       }
 
-      // set property
+      // Set property
       $properties = json_decode($option['properties'] ?: '[]', true);
       $option['properties'] = [];
       foreach ($properties as $property => $id) {
@@ -862,8 +870,9 @@ class DbMain extends R {
 
     $error = self::exec($sql . ')');
     !$error && $error = self::exec("ALTER TABLE `$dbTable` ADD PRIMARY KEY (`ID`)");
+    !$error && $error = self::exec("ALTER TABLE `$dbTable` MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
 
-    return self::exec("ALTER TABLE `$dbTable` MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
+    return $error;
   }
 
   /**
@@ -932,9 +941,9 @@ class DbMain extends R {
    * @param array $pageParam[int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
    * @param array $ids
    *
-   * @return mixed
+   * @return string[][]
    */
-  public function loadCustomers(array $pageParam, array $ids = []) {
+  public function loadCustomers(array $pageParam, array $ids = []): array {
     $sql = "SELECT C.ID as 'id', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
       FROM " . $this->pf('customers') . " C
       LEFT JOIN " . $this->pf('orders') . " O on C.ID = O.customer_id\n";
@@ -982,6 +991,9 @@ class DbMain extends R {
     return $res;
   }
 
+  /**
+   * @throws RedException\SQL
+   */
   public function setMoney($rate) {
     $beans = self::xdispense($this->pf('money'), 1);
     $date = date($this::DB_DATE_FORMAT);
@@ -1018,19 +1030,16 @@ class DbMain extends R {
     return $dealers;
   }
 
-  /**
-   * @return bool true if it was set
-   */
-  public function checkDealerLink(): bool {
+  public function setDealerLink() {
     $m = $this->main;
 
     $sqlValue = $m->url->getSubDomain();
-    if ($sqlValue === '' && !$m->isDealer()) return false;
+    if (($sqlValue === '' || $sqlValue === 'dev') && !$m->isDealer()) return false;
 
-    $sql = "SELECT ID as 'id', name, contacts, cms_param AS 'cmsParam' FROM dealers";
+    $sql = "SELECT ID as 'id', name, cms_param AS 'cmsParam' FROM dealers";
 
     // Check by subdomain
-    if ($sqlValue) {
+    if ($sqlValue && $sqlValue !== 'dev') {
       $sqlValue = "%$sqlValue%";
       $sql .= " WHERE cms_param LIKE :value";
     } else {
@@ -1047,14 +1056,14 @@ class DbMain extends R {
     }
 
     $sql .= ' AND activity = 1 LIMIT 1';
-    $row = $this->jsonParseField(self::getRow($sql, [':value' => $sqlValue]));
+    $dealer = $this->jsonParseField(self::getRow($sql, [':value' => $sqlValue]));
 
-    if (isset($row['id']) && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $row['id'])) {
-      $this->prefix = $row['cmsParam']['dbPrefix'] ?? $row['cmsParam']['prefix']; // Support old name
+    if (isset($dealer['id']) && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $dealer['id'])) {
+      $this->prefix = $dealer['cmsParam']['dbPrefix'] ?? $dealer['cmsParam']['prefix']; // Support old name
 
-      $m->setCmsParam(VC::IS_DEALER, true);
-      $m->setCmsParam(VC::DEALER_ID, $row['id']);
-      $m->setCmsParam(VC::PROJECT_TITLE, $row['name']);
+      $m->setCmsParam(VC::IS_DEALER, true)
+        ->setCmsParam(VC::DEALER_ID, $dealer['id'])
+        ->setCmsParam(VC::PROJECT_TITLE, $dealer['name']);
       return true;
     }
 

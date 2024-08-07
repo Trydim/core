@@ -27,7 +27,7 @@ export default {
   IS_DEAL      : cms['IS_DEAL'] || false,
   INIT_SETTING : cms['INIT_SETTING'] || false,
 
-  PHONE_MASK_DEFAULT: '+_ (___) ___ __ __',
+  PHONE_MASK_DEFAULT: '+____________',
 
   // Global IDs
   // ------------------------------------------------------------------------------------------------

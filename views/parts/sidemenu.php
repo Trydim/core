@@ -14,6 +14,7 @@ const DEFAULT_ICON = [
   'orders'      => 'pi-inbox',
   'statistic'   => 'pi-chart-line',
   'users'       => 'pi-users',
+  'setting'     => 'pi-sliders-h',
 ];
 
 $adminMenu = '';
@@ -86,8 +87,8 @@ menu;
         </li>
       <?php }
 
-      foreach ($main->getSideMenu() as $item) {
-        if (in_array($item, [PUBLIC_PAGE, 'setting'])) continue;
+      foreach ($main->getSideMenu(false, true) as $item) {
+        if ($item === PUBLIC_PAGE) continue;
 
         if (is_array($item)) {
           if (isset($item['label'])) { ?>
@@ -121,16 +122,6 @@ menu;
           <a class="nav-item <?= $route === $link ? 'active' : '' ?>" href="<?= $siteLink . $link ?>">
             <i class="pi <?= $icon ?>"></i>
             <span class="nav-text"><?= gTxt($link) ?></span>
-          </a>
-        </li>
-        <?php
-        }
-
-      if (in_array('setting', $main->getSideMenu()) || $main->getLogin('admin')) { ?>
-        <li>
-          <a class="nav-item <?= $route === 'setting' ? 'active' : '' ?>" href="<?= $siteLink ?>setting">
-            <i class="pi pi-sliders-h"></i>
-            <span class="nav-text"><?= gTxt('setting') ?></span>
           </a>
         </li>
       <?php } ?>

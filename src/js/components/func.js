@@ -426,7 +426,7 @@ export default {
   initMask: (node, phoneMask) => {
     const minValue = 2,
           maskGl = f.getSetting('phoneMaskGlobal'),
-          matrix = phoneMask || maskGl || f.PHONE_MASK_DEFAULT;
+          matrix = phoneMask || (typeof maskGl === 'string' ? maskGl : f.PHONE_MASK_DEFAULT);
 
     if (!node || !f.toBool(matrix)) return;
 
@@ -853,7 +853,7 @@ export default {
    * @return mixed
    */
   getSetting(key) {
-    if (key) return f.CMS_SETTING[key] || false;
+    if (key) return f.CMS_SETTING[key];
     if (!f.INIT_SETTING || Object.keys(f.CMS_SETTING).length > 0) return null;
 
     let node = f.gI('dataSettings');

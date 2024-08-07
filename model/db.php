@@ -169,7 +169,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if ($customerChange) {
           $param = [$customerId => [
             'name' => $name ?? 'No name',
-            'ITN'  => $ITN ?? '',
+            'ITN'  => $ITN ?? $itn ?? '',
             'contacts' => json_encode([
               'phone'   => $phone ?? '',
               'email'   => $email ?? '',

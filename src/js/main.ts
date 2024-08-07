@@ -77,22 +77,27 @@ const setLinkMenu = () => {
     target.click();
   }
 
-  setSideMenuStyle(menu);
+  setSideMenuStyle();
 }
 
-const setSideMenuStyle = (menu: HTMLElement) => {
+const setSideMenuStyle = (init = true) => {
   const sidebarN = f.gI('sideLeft'),
         sidebarW = sidebarN && sidebarN.getBoundingClientRect().width;
 
-  sidebarW && sidebarN.querySelectorAll('a.nav-item').forEach((liN: HTMLElement | any) => {
-    const textS = liN.querySelector('.nav-text').getBoundingClientRect(),
-          w = textS.left + textS.width;
+  if (init) {
+    sidebarW && sidebarN.querySelectorAll('a.nav-item').forEach((liN: HTMLElement | any) => {
+      const textS = liN.querySelector('.nav-text').getBoundingClientRect(),
+            w = textS.left + textS.width;
 
-    if (w > sidebarW) {
-      liN.parentElement.style.width = w + 'px';
-      liN.classList.add('long');
-    }
-  });
+      if (w > sidebarW) {
+        liN.parentElement.style.width = w + 'px';
+        liN.classList.add('long');
+      }
+    });
+  } else {
+    sidebarN.querySelectorAll('.long').forEach((n: HTMLElement) => n.classList.remove('long'));
+    sidebarN.querySelectorAll('li').forEach((n: HTMLElement) => n.style.width = 'auto');
+  }
 }
 
 const stopPreloader = (short = true) => {
@@ -105,10 +110,18 @@ const stopPreloader = (short = true) => {
 // ---------------------------------------------------------------------------------------------------------------------
 
 const menuToggle = () => {
-  let node = f.gI('mainWrapper');
+  let node = f.gI('mainWrapper'), isShort: boolean;
   node.classList.toggle(MENU_CLASS);
-  storage.set('menuToggle', node.classList.contains(MENU_CLASS));
-  setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
+  isShort = node.classList.contains(MENU_CLASS);
+  storage.set('menuToggle', isShort);
+
+  setTimeout(() => {
+    window.dispatchEvent(new Event('resize'));
+  }, 200);
+  setTimeout(() => {
+    setSideMenuStyle(!isShort);
+  }, 500);
+
 }
 
 const themeToggle = () => {

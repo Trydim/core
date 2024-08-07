@@ -76,4 +76,3 @@ const Image = Node.create({
 });
 
 export { Image, Image as default, inputRegex };
-//# sourceMappingURL=tiptap-extension-image.esm.js.map

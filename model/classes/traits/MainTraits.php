@@ -15,7 +15,7 @@ trait Authorization {
   /**
    * @var string[] anytime and anyone available pages
    */
-  static $AVAILABLE_PAGE = ['login', '404', 'setting'];
+  static $AVAILABLE_PAGE = ['login', '404'];
 
   /**
    * @var string
@@ -23,9 +23,14 @@ trait Authorization {
   private $status = 'no';
 
   /**
-   * @var array
+   * @var array - Menus with params (links, icons and other)
    */
   private $sideMenu = [];
+
+  /**
+   * @var array - Menus link only
+   */
+  private $sideLinkMenu = [];
 
   /**
    * @var object []
@@ -51,6 +56,16 @@ trait Authorization {
   }
 
   /**
+   * @param array $dealer
+   * @return Main
+   */
+  public function setDealer(array $dealer): Main {
+    $this->user['dealer'] = $dealer;
+
+    return $this;
+  }
+
+  /**
    * @param string $status
    * @return $this|Main
    */
@@ -59,67 +74,9 @@ trait Authorization {
     return $this;
   }
 
-  private function setSideMenu() {
-    if ($this->checkStatus('no')) {
-      $this->sideMenu = $this->getCmsParam('ACCESS_MENU');
-      PUBLIC_PAGE && $this->sideMenu[] = PUBLIC_PAGE;
-      return;
-    }
-
-    $menuAccess = '';
-
-    if (USE_DATABASE) {
-      $menuAccess = $this->getLogin('permission')['menu'] ?? '';
-      $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
-      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
-    } else {
-      $filterMenu = ['orders', 'calendar', 'customers', 'users', 'statistic', 'catalog'];
-      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
-        return !in_array($m, $filterMenu);
-      });
-    }
-
-    if (empty($menuAccess) && PUBLIC_PAGE) {
-      $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
-    }
-
-    // Setting allowed for all
-    $this->sideMenu[] = 'setting';
-
-    // Set AdminDb tree menu
-    if ($this->availablePage('admindb')) {
-      $dbTables = [];
-      if (USE_DATABASE) {
-        if (CHANGE_DATABASE) {
-          $dbTables = array_merge($dbTables, $this->db->getTables());
-        } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
-          $props = array_merge(
-            [['dbTable' => 'codes', 'name'=> gTxt('codes')]],
-            $this->db->getTables('prop')
-          );
-
-          $props = array_map(function ($prop) {
-            $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
-            $setting && $setting['name'] && $prop['name'] = $setting['name'];
-            return $prop;
-          }, $props);
-          $dbTables = array_merge($dbTables, ['z_prop' => $props]);
-        }
-      }
-      $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
-
-      if (USE_CONTENT_EDITOR) {
-        $this->dbTables[] = [
-          'fileName' => 'content-js',
-          'name'     => gTxt('Content editor'),
-        ];
-      }
-    }
-  }
-
   /**
    * @param string $field - id, login, name, contacts, onlyOne, isAdmin, contacts, permission, customization
-   * @return mixed
+   * @return object|object[]|null
    */
   public function getLogin(string $field = 'login') {
     if ($field === 'id' && !isset($this->user[$field])) $this->checkAuth();
@@ -134,17 +91,6 @@ trait Authorization {
    */
   public function checkStatus(string $status = 'ok'): bool {
     return $this->status === $status;
-  }
-
-  private function checkDealer() {
-    $dealer = $this->db->loadDealerById();
-
-    // Activity
-    if (boolValue($dealer['activity']) === false) {
-      $this->reDirect('404');
-    }
-
-    $this->user['dealer'] = $dealer;
   }
 
   private function haveHeaderAuthorization(): bool {
@@ -194,7 +140,7 @@ trait Authorization {
       if ($route === 'login') {
         isset($_REQUEST['status']) && $this->setLoginStatus('error');
       } else {
-        $_SESSION['target'] = $route;
+        $_SESSION['target'] = $route !== '404' ? $route : '';
         if ($this->getCmsParam(VC::ONLY_LOGIN) || $route !== 'public' || !PUBLIC_PAGE) $this->reDirect('login');
       }
     } else {
@@ -204,6 +150,16 @@ trait Authorization {
 
     session_abort();
     return $this;
+  }
+
+  private function getSideLinkMenu(): array {
+    if (count($this->sideLinkMenu) === 0) {
+      $this->sideLinkMenu = array_map(function ($item) {
+        return is_array($item) ? $item['link'] : $item;
+      }, $this->sideMenu);
+    }
+
+    return $this->sideLinkMenu;
   }
 
   /**
@@ -222,14 +178,74 @@ trait Authorization {
     return $result;
   }
 
+  private function setSideMenu() {
+    if ($this->checkStatus('no')) {
+      $this->sideMenu = $this->getCmsParam('ACCESS_MENU');
+      PUBLIC_PAGE && $this->sideMenu[] = PUBLIC_PAGE;
+      return;
+    }
+
+    $menuAccess = '';
+
+    if (USE_DATABASE) {
+      $menuAccess = $this->getLogin('permission')['menu'] ?? '';
+      $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
+      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
+    } else {
+      $filterMenu = ['calendar', 'catalog', 'customers', 'orders', 'statistic', 'users'];
+      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
+        return !in_array($m, $filterMenu);
+      });
+    }
+
+    if (empty($menuAccess) && PUBLIC_PAGE) {
+      $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
+    }
+
+    // Setting allowed for all
+    $this->sideMenu[] = 'setting';
+
+    // Set AdminDb tree menu
+    if ($this->availablePage('admindb')) {
+      $dbTables = [];
+      if (USE_DATABASE) {
+        if (CHANGE_DATABASE) {
+          $dbTables = array_merge($dbTables, $this->db->getTables());
+        } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
+          $props = array_merge(
+            [['dbTable' => 'codes', 'name'=> gTxt('codes')]],
+            $this->db->getTables('prop')
+          );
+
+          $props = array_map(function ($prop) {
+            $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
+            $setting && $setting['name'] && $prop['name'] = $setting['name'];
+            return $prop;
+          }, $props);
+          $dbTables = array_merge($dbTables, ['z_prop' => $props]);
+        }
+      }
+      $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
+
+      if (USE_CONTENT_EDITOR) {
+        $this->dbTables[] = [
+          'fileName' => 'content-js',
+          'name'     => gTxt('Content editor'),
+        ];
+      }
+    }
+  }
+
   /**
    * get array of pages
    * @param bool $first
+   * @param bool $withParam
    * @return array|mixed
    */
-  public function getSideMenu(bool $first = false) {
-    return $first ? array_values($this->sideMenu)[0]
-      : $this->sideMenu;
+  public function getSideMenu(bool $first = false, bool $withParam = false) {
+    $sideMenu = $withParam ? $this->sideMenu : $this->getSideLinkMenu();
+
+    return $first ? array_values($sideMenu)[0] : $sideMenu;
   }
 
   /**
@@ -250,37 +266,6 @@ trait Authorization {
 }
 
 /**
- * Trait Page
- * @package cms
- */
-trait Page {
-  /**
-   * @var string - controller path
-   */
-  private $target;
-
-  /**
-   * @var array - controller
-   */
-  private $controllerField;
-
-  /**
-   * @return mixed
-   */
-  public function getTarget() {
-    return $this->target;
-  }
-
-  /**
-   * @param mixed $get
-   */
-  public function setTarget($get) {
-    $this->target = (isset($get['targetPage']) && $get['targetPage'] !== '') ?
-      str_replace('/', '', $get['targetPage']) : '/'; // HOME_PAGE
-  }
-}
-
-/**
  * Trait dictionary
  * @package cms
  */
@@ -291,7 +276,7 @@ trait Dictionary {
    */
   private $dictionaryPath = ABS_SITE_PATH . 'lang/dictionary.php';
 
-  public function initDictionary() {
+  public function initDictionary(): string {
     $mess = require $this->dictionaryPath;
     $mess = json_encode($mess);
     return $mess ? "<input type='hidden' id='dictionaryData' value='$mess'>" : '';
@@ -395,7 +380,7 @@ trait Cache {
     }
   }
 
-  public function loadPageCache() {
+  public function loadPageCache(): bool {
     /*
      const PAGE_CACHE_FILE = SHARE_PATH . 'pageCache.bin';
      if (file_exists(PAGE_CACHE_FILE)) {
@@ -453,13 +438,13 @@ trait Hooks {
     if ($this->hookExists($hookName)) {
       $func = $this->hooks[$hookName];
 
-      if (!isset($args) || !is_array($args)) $args = [];
+      if (!isset($args)) $args = [];
       if (isset($func)) return $func(...$args);
     }
     return false;
   }
 
-  public function hookExists($hookName) {
+  public function hookExists($hookName): bool {
     return isset($this->hooks[$hookName]);
   }
 }
@@ -473,7 +458,7 @@ trait Utilities {
   /**
    * @return bool
    */
-  public function isSafari() {
+  public function isSafari(): bool {
     return boolValue(preg_match("/^((?!chrome|android).)*safari/", strtolower($_SERVER['HTTP_USER_AGENT'])));
   }
 }

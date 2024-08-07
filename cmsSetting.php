@@ -34,7 +34,7 @@ $main->setCmsParam(VC::CSV_PATH, $url->getBasePath(true) . SHARE_PATH . ($public
      ->setCmsParam(VC::URI_CSS, $url->getBaseUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
      ->setCmsParam(VC::URI_JS, $url->getBaseUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 
-if ($main->db->checkDealerLink()) {
+if ($main->db->setDealerLink()) {
   require $url->getPath(true) . 'config.php';
 
   $main->setCmsParam(VC::CSV_MAIN_PATH, $main->getCmsParam(VC::CSV_PATH))
@@ -44,9 +44,8 @@ if ($main->db->checkDealerLink()) {
   $main->setCmsParam($publicConfig)->setSettings(VC::DB_CONFIG, $dbConfig ?? []);
 
   $main->setCmsParam(VC::DEAL_IMG_PATH, $url->getPath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
-       ->setCmsParam(VC::DEAL_URI_IMG, $url->getUri(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'));
-
-  $main->setCmsParam(VC::DEAL_URI_CSS, $url->getUri(true) . ($publicConfig['URI_CSS'] ?? 'public/css/'))
+       ->setCmsParam(VC::DEAL_URI_IMG, $url->getUri(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
+       ->setCmsParam(VC::DEAL_URI_CSS, $url->getUri(true) . ($publicConfig['URI_CSS'] ?? 'public/css/'))
        ->setCmsParam(VC::DEAL_URI_JS, $url->getUri(true) . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 }
 
