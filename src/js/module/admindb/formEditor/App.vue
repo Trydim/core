@@ -32,6 +32,8 @@
                      'selected': checkSelectedCell(i, j),
                    }"
                    @click="selectCell($event, cell)"
+                   @touchstart="startSelect($event, cell)"
+                   @touchend="stopSelect($event, cell)"
                    @mousedown="startSelect($event, cell)"
                    @mouseup="stopSelect($event, cell)"
               >

@@ -42,6 +42,20 @@ $pr: 'vs_';
   backface-visibility: hidden;
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
 
+  &.#{$pr}active {
+    opacity: 1;
+    transform: scale(1);
+
+    .#{$pr}modal-content {
+      opacity: 1;
+    }
+
+    .#{$pr}modal-close {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
   & &-header {
     display: flex;
     align-items: center;
@@ -101,38 +115,42 @@ $pr: 'vs_';
     justify-content: space-around;
     bottom: 1rem;
   }
-
-  &.#{$pr}active {
-    opacity: 1;
-    transform: scale(1);
-
-    .#{$pr}modal-content {
-      opacity: 1;
-    }
-
-    .#{$pr}modal-close {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
 }
 
 /**
  * Mobile styling
  */
 @media only screen and (max-width: 39.9375em) {
+  .#{$pr}modal-overlay {
+    align-items: center;
+    justify-content: center;
+  }
+
   .#{$pr}modal {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    min-width: 60vw;
+    min-width: 80vw;
     max-width: 100%;
     width: 100%;
     height: 100%;
     border-radius: 0;
-    transform: scale(1.1);
+
+    &.#{$pr}active {
+      z-index: 200;
+    }
+
+    & &-footer {
+      position: fixed;
+      left: 1rem;
+      right: 1rem;
+
+      > * {
+        flex-basis: 50%;
+      }
+    }
   }
 
   .#{$pr}close-modal {

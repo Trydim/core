@@ -11,14 +11,14 @@ if (isset($legend[$tableActive])) {
 }
 
 $field['content'] = <<<main
-<div class="d-flex align-items-center mx-2 gap-3">
+<div class="d-flex flex-wrap flex-md-nowrap align-items-center mx-2 gap-3">
   <div class="table-name-header">
     <h2 id="tableNameField"></h2>
   </div>
   <div id="btnField" class="px-1">
     <button type="button" class="btn btn-transparent" id="btnSave" disabled>Сохранить</button>
   </div>
-  <div id="viewField" class="ms-auto">
+  <div id="viewField" class="ms-md-auto">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" data-action="adminType">
       <label class="form-check-label" for="formMode">Режим форм</label>

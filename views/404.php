@@ -20,7 +20,7 @@ $dbError = isset($_REQUEST['dbError']);
           <h4 class="mt-4">
             <i class="pi pi-ban pi-danger"></i> Страница не найдена!
           </h4>
-          <p>You may have mistyped the address or the page may have moved.</p>
+          <p><?= gTxt('You may have mistyped the address or the page may have moved.') ?></p>
         </div>
         <?php } else { ?>
         <div class="form-input-content text-center">

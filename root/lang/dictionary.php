@@ -125,6 +125,8 @@
   'Phone mask' => 'Шаблон номера телефона',
   'register date' => 'Дата регистрации',
   'activity' => 'Активен',
+  // 404
+  'You may have mistyped the address or the page may have moved.' => 'Возможно, вы ошиблись в вводе адреса или страница переместилась.',
 
   'z_prop' => 'Справочник',
   'config' => 'Конфигурация',

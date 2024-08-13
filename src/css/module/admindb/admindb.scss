@@ -97,8 +97,13 @@
 
 .form-editor {
   border-radius: rem(8);
+  min-width: rem(1800);
   min-height: 100vh;
   background: linear-gradient(294deg, #596295 1.11%, #343957 98.61%);
+
+  @include respond() {
+    flex-direction: column-reverse;
+  }
 
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
@@ -114,6 +119,10 @@
 
   .content-wrap {
     width: 80%;
+
+    @include respond() {
+      width: 100%;
+    }
   }
 
   .content-spoiler {
@@ -200,6 +209,10 @@
     border-radius: rem(8);
     background: rgba(255, 255, 255, 0.25);
     padding: rem(20);
+
+    @include respond() {
+      width: 93vw;
+    }
   }
 
   .radio-group {

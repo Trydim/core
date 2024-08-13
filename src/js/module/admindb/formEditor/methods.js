@@ -104,25 +104,32 @@ export default {
     this.mergeData();
   },
 
-  selectCell(e, cell) {
+  selectCell(e, cell, doubleClick = false) {
     if (cell.param.type === 'customEvent') return;
 
     const key = getCellKey(cell.rowI, cell.cellI);
 
     this.focusedCell = cell;
 
-    if (e.metaKey || e.ctrlKey) {
+    if (e.metaKey || e.ctrlKey || doubleClick) {
       if (this.selectedCells[key]) delete this.selectedCells[key];
       else this.selectedCells[key] = cell;
     }
   },
   clearSelected() { this.selectedCells = {} },
   startSelect(e, cell) {
+    this.startTouch = new Date().getTime();
     //this.startCell = getCellKey(cell.rowI, cell.cellI);
 
     // Если отпустил в любом другом месте прекратить выделение
   },
   stopSelect(e, cell) {
+    if (new Date().getTime() - this.startTouch > 1000) {
+      const key = getCellKey(cell.rowI, cell.cellI);
+
+      if (this.selectedCells[key]) delete this.selectedCells[key];
+      else this.selectedCells[key] = cell;
+    }
     /*if (this.startCell === getCellKey(cell.rowI, cell.cellI)) {
      this.startCell = undefined;
      return;
