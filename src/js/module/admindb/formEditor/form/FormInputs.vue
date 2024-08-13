@@ -7,19 +7,21 @@ import SimpleList from "./simpleList.vue";
 import CustomEvent from "./custom.vue";
 
 export default {
-  name: "form-inputs",
+  name: "FormInputs",
   components: {
     InputColor, InputCheckbox, InputText, InputNumber,
     SimpleList, CustomEvent,
   },
   props: {
+    modelValue: {},
     component: {
       required: true,
       type: String,
     },
-    modelValue: {},
+    cellValue: {},
     cell: Object,
   },
+  emits: ['update:cellValue', 'update:modelValue'],
   computed: {
     componentName() {
       switch (this.component) {
@@ -30,12 +32,21 @@ export default {
         case 'simpleList':  return 'SimpleList';
         case 'customEvent': return 'CustomEvent';
       }
+    },
+
+    _cellValue: {
+      get() { return this.cellValue },
+      set(v) { this.$emit('update:cellValue', v) },
+    },
+    _modelValue: {
+      get() { return this.modelValue },
+      set(v) { this.$emit('update:modelValue', v) },
     }
-  }
+  },
 }
 
 </script>
 
 <template>
-  <component :is="componentName" />
+  <component :is="componentName" :cell v-model:cell="_cellValue" v-model="_modelValue"/>
 </template>

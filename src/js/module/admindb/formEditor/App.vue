@@ -35,12 +35,13 @@
                    @mousedown="startSelect($event, cell)"
                    @mouseup="stopSelect($event, cell)"
               >
-                <InputText v-if="cell.param.type === 'string' || i === 0" :cell="cell" v-model:cell="cell.value" v-model="contentData[i][j]" />
-                <InputNumber v-else-if="cell.param.type === 'number'" :cell="cell" v-model:cell="cell.value" v-model="contentData[i][j]" />
-                <InputCheckbox v-else-if="cell.param.type === 'checkbox'" :cell="cell" v-model="contentData[i][j]" />
-                <InputColor v-else-if="cell.param.type === 'color'" :cell="cell" v-model="contentData[i][j]" />
-                <SimpleList v-else-if="cell.param.type === 'simpleList'" :cell="cell" v-model="contentData[i][j]" />
-                <CustomEvent v-else-if="cell.param.type === 'customEvent'" :cell="cell" v-model="contentData[i][j]" />
+                <FormInputs :ref="`cell${i}x${j}`"
+                            :component="i === 0 ? 'string' : cell.param.type"
+                            :cell="cell"
+                            v-model:cellValue="cell.value"
+                            v-model="contentData[i][j]"
+                            @keydown="inputKeyDown($event, i, j)"
+                />
               </div>
             </template>
           </div>
@@ -50,9 +51,8 @@
       <ContextMenu v-if="selected.row" :style="contextMenuPosition" v-model:show="selected.row"
                    @remove="removeRow" @add-row="addRow" />
     </div>
-    <div class="control-wrap">
-      <CellChanger @apply="applyChange" @undo="undoChanges" @clear="clearSelected"></CellChanger>
-    </div>
+
+    <CellChanger class="control-wrap" @apply="applyChange" @undo="undoChanges" @clear="clearSelected" />
   </div>
 </template>
 
@@ -60,12 +60,7 @@
 
 //import Modal from "../contentEditor/Modal";
 
-import InputText from "./form/text.vue";
-import InputNumber from "./form/number.vue";
-import InputCheckbox from "./form/checkbox.vue";
-import InputColor from "./form/color.vue";
-import SimpleList from "./form/simpleList.vue";
-import CustomEvent from "./form/custom.vue";
+import FormInputs from "./form/FormInputs.vue";
 import ContextMenu from "./ContextMenu.vue";
 import CellChanger from "./CellChanger.vue";
 
@@ -73,12 +68,7 @@ import methods from "./methods";
 
 export default {
   name: "FormsTable",
-  components: {
-    InputColor, InputCheckbox, InputText, InputNumber,
-    SimpleList, CustomEvent,
-    CellChanger,
-    ContextMenu,
-  },
+  components: {FormInputs, CellChanger, ContextMenu},
   data() {
     return {
       showModal: false,

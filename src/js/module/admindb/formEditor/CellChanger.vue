@@ -10,7 +10,7 @@
         <span class="radio-group__span">Изменить</span>
       </label>
     </div>
-    <div class="radio-group mt-2">
+    <div v-show="type === 'change'" class="radio-group mt-2">
       <label class="radio-group__item">
         <input type="radio" hidden value="absolute" v-model="valueType">
         <span class="radio-group__span">Значение</span>
@@ -18,6 +18,10 @@
       <label class="radio-group__item">
         <input type="radio" hidden value="relative" v-model="valueType">
         <span class="radio-group__span">Проценты</span>
+      </label>
+      <label class="radio-group__item">
+        <input type="radio" hidden value="multi" v-model="valueType">
+        <span class="radio-group__span">Умножить</span>
       </label>
     </div>
 
@@ -45,6 +49,11 @@ export default {
       valueType: 'absolute', // Значение или проценты
       value: '',
     };
+  },
+  watch: {
+    type() {
+      if (this.type === 'set') this.valueType = 'absolute';
+    }
   },
   methods: {
     applyChange() {

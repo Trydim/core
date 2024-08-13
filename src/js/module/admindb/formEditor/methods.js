@@ -25,6 +25,7 @@ const dataArchive = {
 const getCellKey = (i, j) => `s${i}x${j}`;
 
 export default {
+  addArchive() { dataArchive.add(this.contentData, this.mergedData) },
   mergeData() {
     const config = this.contentConfig,
           props  = this.contentProperties,
@@ -98,7 +99,7 @@ export default {
           config = new Array(this.columns).fill({type: 'inherit'});
 
     dataArchive.add(this.contentData, this.mergedData, this.contentConfig);
-    this.contentData.splice(start, 0, this.contentData[s.row]);
+    this.contentData.splice(start, 0, [...this.contentData[s.row]]);
     this.contentConfig.splice(start, 0, config);
     this.mergeData();
   },
@@ -128,6 +129,14 @@ export default {
      }*/
   },
 
+  inputKeyDown(e, i, j) {
+    if (e.key !== 'Enter') return;
+
+    const key = `cell${+i + 1}x${j}`;
+
+    if (this.$refs[key]) this.$refs[key][0].$el.focus();
+  },
+
   /**
    * @param {{type: 'set'|'change', value: string, valueType: 'absolute'|'relative'}} c
    */
@@ -135,7 +144,7 @@ export default {
     if (c.value.toString() === '') { f.showMsg('Введите значение', 'error'); return; }
     if (!Object.keys(this.selectedCells).length) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
-    dataArchive.add(this.contentData, this.mergedData);
+    this.addArchive();
 
     Object.values(this.selectedCells).forEach(cell => {
       const i = cell.rowI,
@@ -149,8 +158,9 @@ export default {
             result;
 
         if (isFinite(+cV) || cell.param.type === 'number') {
-          result = c.valueType === 'absolute' ? +cV + +nV
-                                              : +cV * (1 + +nV / 100);
+          if (c.valueType === 'absolute') result = +cV + +nV;
+          else if (c.valueType === 'relative') result = +cV * (1 + +nV / 100);
+          else result = +cV * +nV;
         }
 
         cell.value = this.contentData[i][j] = result;
@@ -159,15 +169,13 @@ export default {
   },
   undoChanges() {
     dataArchive.restore(this);
+    // Reselect cells
+    Object.keys(this.selectedCells).forEach((key) => {
+      const [i, j] = key.slice(1).split('x');
 
-    Object.values(this.mergedData).forEach(spoiler => {
-      Object.entries(spoiler).forEach(([i, row]) => {
-        Object.entries(row).forEach(([j, cell]) => {
-          const key = getCellKey(i, j);
-
-          if (this.selectedCells[key]) this.selectedCells[key] = cell;
-        })
+      Object.values(this.mergedData).forEach(spoiler => {
+        if (spoiler[i] && spoiler[i][j]) this.selectedCells[key] = spoiler[i][j];
       })
-    })
+    });
   },
 }
