@@ -97,7 +97,7 @@
 
 .form-editor {
   border-radius: rem(8);
-  min-width: rem(1800);
+  //min-width: rem(1800);
   min-height: 100vh;
   background: linear-gradient(294deg, #596295 1.11%, #343957 98.61%);
 
@@ -112,7 +112,7 @@
   }
 
   &__menu-icon {
-    padding-top: 8px !important;
+    padding-top: 7px !important;
     color: #596295;
     cursor: pointer;
   }
@@ -156,6 +156,7 @@
     margin-top: rem(5);
 
     font-size: rem(12);
+    user-select: none;
 
     &__header {
       font-weight: 600;
@@ -174,10 +175,10 @@
 
   .cell {
     border-bottom: 1px solid #d5d7dd;
-    padding: rem(5) rem(10);
+    padding: 0.2rem;
 
     &.first {
-      padding-left: rem(20);
+      padding-left: 1rem;
     }
 
     &.last-row {

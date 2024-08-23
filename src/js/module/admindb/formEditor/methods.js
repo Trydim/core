@@ -117,23 +117,58 @@ export default {
     }
   },
   clearSelected() { this.selectedCells = {} },
-  startSelect(e, cell) {
+  startTouch(e, cell) {
     this.startTouch = new Date().getTime();
-    //this.startCell = getCellKey(cell.rowI, cell.cellI);
+    this.startCell = getCellKey(cell.rowI, cell.cellI);
 
     // Если отпустил в любом другом месте прекратить выделение
   },
-  stopSelect(e, cell) {
+  stopTouch(e, cell) {
     if (new Date().getTime() - this.startTouch > 1000) {
       const key = getCellKey(cell.rowI, cell.cellI);
 
       if (this.selectedCells[key]) delete this.selectedCells[key];
       else this.selectedCells[key] = cell;
     }
-    /*if (this.startCell === getCellKey(cell.rowI, cell.cellI)) {
-     this.startCell = undefined;
-     return;
-     }*/
+  },
+  startSelect(e, cell) {
+    this.startCell = {rowI: cell.rowI, cellI: cell.cellI};
+
+    // Если отпустил в любом другом месте прекратить выделение
+  },
+  moveSelect(e, cell, sKey) {
+    if (!this.startCell) return;
+
+    const sCell = this.startCell,
+          rowI  = cell.rowI,
+          cellI = cell.cellI;
+
+    this.selectedCells = {};
+
+    let i  = Math.min(sCell.rowI, rowI),
+        sJ = Math.min(sCell.cellI, cellI), j = sJ,
+        lI = Math.abs(rowI - sCell.rowI) + i,
+        lJ = Math.abs(cellI - sCell.cellI) + j;
+
+    for (; i <= lI; i++) {
+      for (j = sJ; j <= lJ; j++) {
+        const key = getCellKey(i, j);
+
+        if (this.mergedData[sKey][i] && this.mergedData[sKey][i][j]) {
+          this.selectedCells[key] = this.mergedData[sKey][i][j];
+        }
+      }
+    }
+  },
+  stopSelect(e, cell) {
+    const sCell = this.startCell,
+          rowI  = cell.rowI,
+          cellI = cell.cellI;
+
+    if (sCell && sCell.rowI === rowI && sCell.cellI === cellI) this.selectedCells = {};
+
+    this.selectedCells[getCellKey(rowI, cellI)] = cell;
+    this.startCell = undefined;
   },
 
   inputKeyDown(e, i, j) {

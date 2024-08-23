@@ -78,8 +78,7 @@ final class Main {
 
     $this->url    = new UrlGenerator($this, 'core/');
     $this->response = new Response($this);
-
-    if ($this->isDealer()) $this->dealer = new Dealer($this);
+    $this->dealer   = new Dealer($this);
   }
 
   /**

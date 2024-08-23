@@ -32,9 +32,10 @@
                      'selected': checkSelectedCell(i, j),
                    }"
                    @click="selectCell($event, cell)"
-                   @touchstart="startSelect($event, cell)"
-                   @touchend="stopSelect($event, cell)"
+                   @touchstart="startTouch($event, cell)"
+                   @touchend="stopTouch($event, cell)"
                    @mousedown="startSelect($event, cell)"
+                   @mousemove="moveSelect($event, cell, sKey)"
                    @mouseup="stopSelect($event, cell)"
               >
                 <FormInputs :ref="`cell${i}x${j}`"
