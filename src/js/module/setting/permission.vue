@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 border" id="controlForm">
+  <div class="col-12 col-md-6 border" id="controlForm">
     <h3 class="col text-center">{{ $t('Access control') }}</h3>
 
     <div class="input-group my-3">

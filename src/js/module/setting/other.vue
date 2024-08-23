@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 border" id="otherForm">
+  <div class="col-12 col-md-6 border" id="otherForm">
     <h3 class="col text-center">{{ $t('Other') }}</h3>
     <div class="form-floating mb-3" v-tooltip.bottom="$t('For the mask, use _. Leave blank to disable')">
       <p-input-text class="form-control" placeholder="" v-model="phoneMask.global" />

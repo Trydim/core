@@ -95,6 +95,10 @@
   padding: 0 0 0 var(--theme-sidebar-width);
   transition: all .2s ease;
 
+  @include respond() {
+    padding-left: 3rem;
+  }
+
   &-content {
     display: flex;
     justify-content: space-between;
@@ -103,7 +107,7 @@
     padding-right: 2rem;
 
     @include customMedia($max: 575px) {
-      padding-left: 2.375rem;
+      padding-left: 2.5rem;
     }
   }
 }

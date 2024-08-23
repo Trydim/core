@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 border" id="statsForm">
+  <div class="col-12 col-md-6 border" id="statsForm">
     <h3 class="w-100 text-center">Внешний доступ (ключи)</h3>
     <div id="ordersStatusForm" class="col">
       <div class="input-group my-3">
@@ -13,16 +13,15 @@
         <template v-for="(item, index) of status" :key="item.ID">
           <div v-if="!item.delete" class="input-group mb-1">
             <p-input-text v-tooltip.bottom="'код (необязательно)'" class="form-control"
-                          :disabled="+item.required" v-model="item.code"
-            ></p-input-text>
-            <p-input-text v-model="item.name" class="form-control w-50"></p-input-text>
-            <p-input-text v-tooltip.bottom="'сортировка'" v-model="item.sort" class="form-control"></p-input-text>
+                          :disabled="+item.required" v-model="item.code" />
+            <p-input-text v-model="item.name" class="form-control w-50" />
+            <p-input-text v-tooltip.bottom="'сортировка'" v-model="item.sort" class="form-control" />
             <div class="input-group-text">
-              <p-radiobutton v-tooltip.bottom="'По умолчанию'" v-model="statusDef" :value="item.ID"></p-radiobutton>
+              <p-radiobutton v-tooltip.bottom="'По умолчанию'" v-model="statusDef" :value="item.ID" />
             </div>
             <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-times" class="p-button-danger"
                       :disabled="+item.required"
-                      @click="removeStatus(index)"></p-button>
+                      @click="removeStatus(index)" />
           </div>
         </template>
       </div>

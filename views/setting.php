@@ -25,22 +25,22 @@ $isAdmin = $main->getLogin('isAdmin');
     <setting-permission @update="updatePermission"></setting-permission>
 
     <setting-manager-field :prop-fields="managerFields" @update="updateManagerFields"></setting-manager-field>
-  <?php } ?>
+  <?php }
 
-  <?php if ($isAdmin && USE_DATABASE) { ?>
+  if ($isAdmin && USE_DATABASE) { ?>
     <setting-rate @update="updateRate"></setting-rate>
-  <?php } ?>
+  <?php }
 
-  <?php if ($isAdmin && $main->availablePage('orders')) { ?>
+  if ($isAdmin && $main->availablePage('orders')) { ?>
     <setting-order-status :prop-status-def="statusDefault" @update="updateOrderStatus"></setting-order-status>
-  <?php } ?>
+  <?php }
 
-  <?php if ($isAdmin) { ?>
+  if ($isAdmin) { ?>
     <setting-other :prop-other-fields="otherFields" @update="updateOtherFields"></setting-other>
-  <?php } ?>
+  <?php }
 
-  <?php if ($isAdmin && $main->availablePage('orders') && false) { ?>
-    <setting-tokens @update=""></setting-tokens>
+  if ($isAdmin && $main->availablePage('orders') && false) { ?>
+    <setting-tokens></setting-tokens>
   <?php } ?>
 
   <div class="col-12 text-center">
@@ -50,9 +50,9 @@ $isAdmin = $main->getLogin('isAdmin');
 
   <?php if ($main->availablePage('catalog')) { ?>
     <setting-properties type="catalog" :query="query" :query-param="queryParam" @update="updateProperties"></setting-properties>
-  <?php } ?>
+  <?php }
 
-  <?php if ($main->availablePage('dealers')) { ?>
+  if ($main->availablePage('dealers')) { ?>
     <setting-properties type="dealer" title="" :query="query" :query-param="queryParam" @update="updateDealersProperties"></setting-properties>
   <?php } ?>
 </div>

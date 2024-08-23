@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 border" id="managerForm">
+  <div class="col-12 col-md-6 border" id="managerForm">
     <h3 class="col-12 text-center">{{ $t('Manager settings') }}</h3>
 
     <div class="input-group my-3">

@@ -5,9 +5,8 @@
  */
 
 ?>
-
 <div class="d-flex justify-content-between pb-3" id="actionBtnWrap">
-  <div>
+  <div class="d-inline-flex flex-wrap gap-1">
     <input type="button" class="btn btn-success" value="<?= gTxt('Add') ?>" data-action="addCustomer">
     <input type="button" class="btn btn-warning" value="<?= gTxt('Change') ?>" data-action="changeCustomer">
   </div>
@@ -19,8 +18,7 @@
   <input type="button" class="btn btn-success" value="<?= gTxt('Confirm') ?>" data-action="confirmYes">
   <input type="button" class="btn btn-warning" value="<?= gTxt('Cancel') ?>" data-action="confirmNo">
 </div>
-<div class="res-table">
-
+<div class="res-table overflow-auto w-100">
   <div class="input-group">
     <span class="input-group-text"><?= gTxt('Search') ?>:</span>
     <input type="text" id="search" class="form-control" value="" autocomplete="off">

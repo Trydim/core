@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 border" id="rateForm">
+  <div class="col-12 col-md-6 border" id="rateForm">
     <h3 class="col-12 text-center">{{ $t('Exchange rates') }}</h3>
 
     <div class="col-12 row">

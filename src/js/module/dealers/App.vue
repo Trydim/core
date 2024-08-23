@@ -4,7 +4,7 @@
     <Button v-if="!false" @click="deleteDealer" class="p-button-danger">{{ $t('Delete') }}</Button>
   </div>
 
-  <div class="col-4 flex justify-content-between mb-3 position-relative">
+  <div class="col-12 col-md-4 flex justify-content-between mb-3 position-relative">
     <InputText class="w-100" :placeholder="this.$t('Keyword Search')" v-model="search"></InputText>
     <i class="position-absolute h-100 end-0 pi pi-search" style="padding: 16px"></i>
   </div>
@@ -75,8 +75,8 @@
       <h4>{{ modal.title }}</h4>
     </template>
 
-    <div v-if="queryParam.dbAction !== 'deleteDealer'" class="row" style="min-width: 500px; max-width: 80vw">
-      <div class="col-6">
+    <div v-if="queryParam.dbAction !== 'deleteDealer'" class="row" style="max-width: 80vw">
+      <div class="col-12 col-md-6">
         <!-- Название -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Название:</span>
@@ -116,7 +116,7 @@
         </div>
       </div>
 
-      <div class="col-6">
+      <div class="col-12 col-md-6">
         <!--<Button label="Обновить" icon="pi pi-refresh" class="w-100 my-2"
           v-tooltip.bottom="'Обновить свойства'"
           @click="refreshProperties"

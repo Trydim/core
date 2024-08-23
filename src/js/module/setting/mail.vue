@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 border" id="mailForm">
+  <div class="col-12 col-md-6 border" id="mailForm">
     <h3 class="col text-center">{{ $t('Mail settings') }}</h3>
     <div class="form-floating my-3">
       <p-input-text ref="mailTarget" class="form-control" placeholder="" v-model="mail.target"></p-input-text>

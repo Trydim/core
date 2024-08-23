@@ -63,5 +63,7 @@ $field['footerContent'] .= <<<footerContent
 </template>
 footerContent;
 
-$field['footerContent'] .= template('docs/printTpl');
+$printTpl = template('docs/printTpl');
+if (!includes($printTpl, 'not found')) $field['footerContent'] .= template('docs/printTpl');
+
 $field['footerContent'] .= $main->initDictionary();

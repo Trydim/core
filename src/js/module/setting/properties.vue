@@ -13,8 +13,8 @@
                  @rowReorder="onRowReorder"
                  @dblclick="dblClickProperty($event)"
         >
-          <p-t-column :rowReorder="true" header-style="width: 3rem" header="Очередность"></p-t-column>
-          <p-t-column field="name" header="Название"></p-t-column>
+          <p-t-column :rowReorder="true" header-style="width: 3rem" header="Очередность" />
+          <p-t-column field="name" header="Название" />
           <p-t-column field="code" header="Код">
             <template #body="slotProps">
               <span :data-code="slotProps.data.code">{{ slotProps.data.code }}</span>
@@ -29,11 +29,11 @@
 
         <div class="my-3 text-center">
           <p-button v-tooltip.bottom="'Добавить'" icon="pi pi-plus-circle" class="p-button-warning mx-1"
-                    :loading="loading" @click="createProperty"></p-button>
+                    :loading="loading" @click="createProperty" />
           <p-button v-tooltip.bottom="'Изменить'" icon="pi pi-cog" class="p-button-warning mx-1"
-                    :loading="loading" @click="changeProperty"></p-button>
+                    :loading="loading" @click="changeProperty" />
           <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-trash" class="p-button-danger mx-1"
-                    :loading="loading" @click="deleteProperty"></p-button>
+                    :loading="loading" @click="deleteProperty" />
         </div>
       </p-accordion-tab>
     </p-accordion>
@@ -69,8 +69,7 @@
                       :options="propertiesTypes"
                       option-group-label="label" option-group-children="items"
                       option-value="id" option-label="name"
-                      v-model="property.type">
-            </p-select>
+                      v-model="property.type" />
           </div>
         </div>
         <!-- Составной тип (справочники) -->
@@ -80,7 +79,7 @@
             <div class="col">
               <p-button v-tooltip.bottom="'Добавить поле'" icon="pi pi-plus-circle" class="w-100 p-button-raised"
                         label="Добавить поле"
-                        @click="addPropertyField"></p-button>
+                        @click="addPropertyField" />
             </div>
           </div>
 
@@ -97,7 +96,7 @@
             </div>
             <div class="col-1 text-center">
               <p-button v-tooltip.bottom="'Удалить поле'" icon="pi pi-times" class="p-button-danger"
-                        @click="removePropertyField(key)"></p-button>
+                        @click="removePropertyField(key)" />
             </div>
           </div>
         </template>
@@ -107,7 +106,7 @@
             <div class="col">
               <p-button v-tooltip.bottom="'Добавить колонку в таблицу'" icon="pi pi-plus-circle" class="w-100 p-button-raised"
                         label="Добавить колонку"
-                        @click="addTableColumn"></p-button>
+                        @click="addTableColumn" />
             </div>
           </div>
 
@@ -117,7 +116,7 @@
             </div>
             <div v-if="property.fields.length > 1" class="col-1 m-0 text-center">
               <p-button v-tooltip.bottom="'Удалить колонку'" icon="pi pi-times" class="p-button-danger"
-                        @click="removeTableColumn(index)"></p-button>
+                        @click="removeTableColumn(index)" />
             </div>
           </div>
         </template>
@@ -127,8 +126,8 @@
       </div>
 
       <template #footer>
-        <p-button :label="this.$t('Yes')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="propertiesConfirm"></p-button>
-        <p-button :label="this.$t('No')" icon="pi pi-times" class="p-button-text" @click="propertiesCancel"></p-button>
+        <p-button :label="this.$t('Yes')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="propertiesConfirm" />
+        <p-button :label="this.$t('No')" icon="pi pi-times" class="p-button-text" @click="propertiesCancel" />
       </template>
     </p-dialog>
   </div>

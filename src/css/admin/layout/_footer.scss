@@ -12,4 +12,8 @@ $theme-footer-height: 3rem !default;
   width: 100%;
   background-color: $body-bg;
   height: $theme-footer-height;
+
+  @include respond() {
+    padding: 0;
+  }
 }

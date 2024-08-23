@@ -7,24 +7,24 @@
  */
 
 ?>
-<div class="d-flex justify-content-between mb-4 pt-1 position-sticky top-0 bg-white" id="actionBtnWrap" style="z-index: +2">
+<div class="d-flex justify-content-between mb-4 pt-1 position-sticky top-0 bg-white gap-5 gap-md-0" id="actionBtnWrap" style="z-index: +2">
   <div>
-    <input type="button" class="btn btn-success mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
+    <input type="button" class="btn btn-success float-start mt-1 mt-md-0 mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
     <span id="orderBtn">
-      <input type="button" class="btn btn-warning mainOnly" value="<?= gTxt('Change status') ?>" data-action="changeStatusOrder">
-      <input type="button" class="btn btn-primary" value="Pdf" data-action="savePdf">
-      <input type="button" class="btn btn-primary" value="<?= gTxt('Print') ?>" data-action="printOrder">
-      <input type="button" class="btn btn-primary" value="<?= gTxt('Send mail') ?>" data-action="sendOrder">
+      <input type="button" class="btn btn-warning float-start ms-1 mt-1 mt-md-0 mainOnly" value="<?= gTxt('Change status') ?>" data-action="changeStatusOrder">
+      <input type="button" class="btn btn-primary float-start ms-1 mt-1 mt-md-0" value="Pdf" data-action="savePdf">
+      <input type="button" class="btn btn-primary float-start ms-1 mt-1 mt-md-0" value="<?= gTxt('Print') ?>" data-action="printOrder">
+      <input type="button" class="btn btn-primary float-start ms-1 mt-1 mt-md-0" value="<?= gTxt('Send mail') ?>" data-action="sendOrder">
     </span>
   </div>
   <div>
-    <input type="button" id="deleteOrderBtn" class="btn btn-danger mainOnly" value="<?= gTxt('Delete') ?>" data-action="delOrders">
+    <input type="button" id="deleteOrderBtn" class="btn btn-danger mt-1 mt-md-0 mainOnly" value="<?= gTxt('Delete') ?>" data-action="delOrders">
   </div>
 </div>
 <div class="position-sticky mb-4 pt-1 top-0 bg-white d-none" id="confirmField" style="z-index: +2">
-  <label><select id="selectStatus" class="d-none form-select" data-action="statusOrders"></select></label>
-  <input type="button" class="btn btn-success" value="<?= gTxt('Confirm') ?>" data-action="confirmYes">
-  <input type="button" class="btn btn-warning ms-1" value="<?= gTxt('Cancel') ?>" data-action="confirmNo">
+  <label class="d-md-inline w-100"><select id="selectStatus" class="d-none form-select" data-action="statusOrders"></select></label>
+  <input type="button" class="btn btn-success mt-1 mt-md-0" value="<?= gTxt('Confirm') ?>" data-action="confirmYes">
+  <input type="button" class="btn btn-warning ms-1 mt-1 mt-md-0" value="<?= gTxt('Cancel') ?>" data-action="confirmNo">
 </div>
 <?php if ($main->getCmsParam('USERS_ORDERS')) { ?>
   <div class="d-flex mb-4" style="justify-content: left">
@@ -60,7 +60,7 @@
   <?php } ?>
 </div>
 
-<div class="mt-1 position-relative">
+<div class="mt-1 position-relative overflow-auto w-100">
   <button type="button" class="position-absolute top-0 btn btn-light pi pi-cog mt-2 p-2" style="z-index: +1" data-action="setupColumns"></button>
   <table id="orderTable" class="text-center table table-striped mb-0">
     <thead><tr></tr></thead>

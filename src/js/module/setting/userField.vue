@@ -1,5 +1,5 @@
 <template>
-  <div class="col-6 border" id="userForm">
+  <div class="col-12 col-md-6 border" id="userForm">
     <h3 class="col text-center">{{ $t('User') }}</h3>
     <div class="form-floating my-3">
       <p-input-text class="form-control" placeholder="" v-model="user.login"></p-input-text>
