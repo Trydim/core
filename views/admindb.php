@@ -18,7 +18,6 @@ $field['content'] = <<<main
   <div id="btnField" class="px-1">
     <button type="button" class="btn btn-transparent" id="btnSave" disabled>Сохранить</button>
   </div>
-  <div id="formModeChanger" class="mx-auto"></div>
   <div id="viewField" class="ms-md-auto">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" data-action="adminType">

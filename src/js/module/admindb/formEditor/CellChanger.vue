@@ -1,33 +1,37 @@
 <template>
-  <div>
-    <div class="radio-group">
-      <label class="radio-group__item">
-        <input type="radio" hidden value="set" v-model="type">
-        <span class="radio-group__span">Установить</span>
-      </label>
-      <label class="radio-group__item">
-        <input type="radio" hidden value="change" v-model="type">
-        <span class="radio-group__span">Изменить</span>
-      </label>
-    </div>
-    <div v-show="type === 'change'" class="radio-group mt-2">
-      <label class="radio-group__item">
-        <input type="radio" hidden value="absolute" v-model="valueType">
-        <span class="radio-group__span">Значение</span>
-      </label>
-      <label class="radio-group__item">
-        <input type="radio" hidden value="relative" v-model="valueType">
-        <span class="radio-group__span">Проценты</span>
-      </label>
-      <label class="radio-group__item">
-        <input type="radio" hidden value="multi" v-model="valueType">
-        <span class="radio-group__span">Умножить</span>
-      </label>
+  <div class="form-editor-changer">
+    <div class="col">
+      <div class="radio-group">
+        <label class="radio-group__item mb-2">
+          <input type="radio" hidden value="set" v-model="type">
+          <span class="radio-group__span">Установить</span>
+        </label>
+        <label class="radio-group__item">
+          <input type="radio" hidden value="change" v-model="type">
+          <span class="radio-group__span">Изменить</span>
+        </label>
+      </div>
+      <div v-show="type === 'change'" class="radio-group">
+        <label class="radio-group__item">
+          <input type="radio" hidden value="absolute" v-model="valueType">
+          <span class="radio-group__span">Значение</span>
+        </label>
+        <label class="radio-group__item">
+          <input type="radio" hidden value="relative" v-model="valueType">
+          <span class="radio-group__span">Проценты</span>
+        </label>
+        <label class="radio-group__item">
+          <input type="radio" hidden value="multi" v-model="valueType">
+          <span class="radio-group__span">Умножить</span>
+        </label>
+      </div>
     </div>
 
-    <input type="text" class="control-input mt-2" v-model="value">
+    <div class="col">
+      <input type="text" class="control-input mb-2" v-model="value">
+    </div>
 
-    <div class="d-flex justify-content-between mt-4 gap-4">
+    <div class="d-flex justify-content-center gap-3 w-100">
       <button type="button" class="col btn btn-white" @click="applyChange">Применить</button>
       <button type="button" class="col btn btn-white" @click="undoChanges">Отменить</button>
       <button type="button" class="col-2 btn btn-gray" title="Снять выделение" @click="clearSelected">

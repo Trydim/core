@@ -96,14 +96,8 @@
 }
 
 .form-editor {
-  border-radius: rem(8);
   //min-width: rem(1800);
   min-height: 100vh;
-  background: linear-gradient(294deg, #596295 1.11%, #343957 98.61%);
-
-  @include respond() {
-    flex-direction: column-reverse;
-  }
 
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
@@ -117,14 +111,6 @@
     cursor: pointer;
   }
 
-  .content-wrap {
-    width: 80%;
-
-    @include respond() {
-      width: 100%;
-    }
-  }
-
   .content-spoiler {
     margin-top: rem(20);
     background-image: linear-gradient(180deg, white 20px, #e6e6e6cc 20px);
@@ -132,7 +118,7 @@
 
     &__header {
       position: relative;
-      border: 2px solid transparent;
+      border: 2px solid #343957;
       border-radius: rem(8);
       padding: rem(12) rem(20);
       background: white;
@@ -204,17 +190,30 @@
     background-clip: padding-box;
   }
 
-  .control-wrap {
-    margin-top: rem(20);
-    width: 20%;
+  .control-input {
+    padding: rem(5);
+    width: 100%;
+    background: transparent;
+    border: 1px solid #bbb;
     border-radius: rem(8);
-    background: rgba(255, 255, 255, 0.25);
-    padding: rem(20);
-
-    @include respond() {
-      width: 93vw;
-    }
+    text-align: center;
+    color: white;
   }
+}
+
+.form-editor-changer {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1rem;
+  border-radius: rem(8);
+  padding: rem(10);
+  width: 600px;
+  background: linear-gradient(294deg, #596295 1.11%, #343957 98.61%);
+  transform: translate(-50%);
+  z-index: 5;
 
   .radio-group {
     display: flex;
@@ -240,7 +239,7 @@
       display: inline-block;
       width: 100%;
       border: 1px solid #bbb;
-      padding: rem(5);
+      padding: rem(8);
       cursor: pointer;
     }
 

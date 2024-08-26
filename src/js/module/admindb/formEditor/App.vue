@@ -1,5 +1,5 @@
 <template>
-  <div class="form-editor container-fluid d-flex align-items-start gap-2">
+  <div class="form-editor">
     <div class="content-wrap">
       <!-- Спойлеры -->
       <template v-for="(spoiler, sKey) of mergedData" :key="sKey">
@@ -14,7 +14,7 @@
           <div class="form-content" :class="openSpoiler[sKey] ? '' : 'd-none'" :style="contentStyle">
             <!-- Шапка -->
             <div v-for="(head, k) of header" :key="k" class="form-content__header">
-              <span>{{ head.value }}</span>
+              <span>{{ head.translateValue }}</span>
             </div>
             <!-- Содержимое -->
             <template v-for="(row, i, rIndex) of spoiler" :key="i">
@@ -55,7 +55,9 @@
                    @remove="removeRow" @add-row="addRow" />
     </div>
 
-    <CellChanger class="control-wrap" @apply="applyChange" @undo="undoChanges" @clear="clearSelected" />
+    <teleport to="body">
+      <CellChanger @apply="applyChange" @undo="undoChanges" @clear="clearSelected" />
+    </teleport>
   </div>
 </template>
 
@@ -102,10 +104,29 @@ export default {
     header() {
       const arr = [{value: ''}].concat(...Object.values(Object.values(this.mergedData['s0'])[0]));
 
-      return arr.map(k => { k.value = window._(k.value); return k; });
+      return arr.map(k => { k.translateValue = window._(k.value); return k; });
     },
     columns() { return Object.keys(this.header).length },
-    contentStyle() { return 'grid-template-columns: 30px repeat(' + (this.columns - 1) + ', auto)' },
+    contentStyle() {
+      let str = 'grid-template-columns: 30px';
+
+      Object.values(this.header).forEach((header) => {
+        if (!header.value) return;
+
+        let columnI = this.contentData[0].indexOf(header.value),
+            maxChar = -1;
+
+        this.contentData.forEach(row => {
+          if (maxChar < row[columnI].length) maxChar = row[columnI].length;
+        });
+
+        debugger
+
+        //str += ' ';
+      })
+
+      return 'grid-template-columns: 30px repeat(' + (this.columns - 1) + ', auto)'
+    },
   },
   watch: {
     contentData: {
