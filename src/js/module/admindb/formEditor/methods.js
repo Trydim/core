@@ -75,6 +75,20 @@ export default {
 
     this.mergedData = res;
   },
+  calcColumnsWidth() {
+    Object.values(this.header).forEach(header => {
+      if (!header.value) return;
+
+      let columnI  = this.contentData[0].indexOf(header.value),
+          maxWidth = -1;
+
+      this.contentData.forEach(row => {
+        maxWidth = Math.max(maxWidth, row[columnI].toString().length);
+      });
+
+      this.columnWidths.push(maxWidth);
+    });
+  },
 
   checkSelectedCell(i, j) { return this.selectedCells.hasOwnProperty(getCellKey(i, j)) },
 
@@ -220,4 +234,30 @@ export default {
       })
     });
   },
+}
+
+
+function calculateColumnWidths(data, maxWidth) {
+  const columnCount = data[0].length;
+  const columnWidths = new Array(columnCount).fill(0);
+
+  // Определение максимальной ширины для каждой колонки
+  for (const row of data) {
+    row.forEach((cell, index) => {
+      columnWidths[index] = Math.max(columnWidths[index], cell.toString().length);
+    });
+  }
+
+  // Подсчет общей ширины колонок
+  const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+
+  // Нормализация ширины, если необходимо
+  if (totalWidth > maxWidth) {
+    const scaleFactor = maxWidth / totalWidth;
+    for (let i = 0; i < columnWidths.length; i++) {
+      columnWidths[i] = Math.floor(columnWidths[i] * scaleFactor);
+    }
+  }
+
+  return columnWidths;
 }

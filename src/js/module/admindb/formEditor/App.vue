@@ -85,6 +85,8 @@ export default {
       contentConfig: this.$db.contentConfig || {},
       contentProperties: this.$db.contentProperties || {},
       mergedData: {},
+      containerWidth: this.$db.mainNode.getBoundingClientRect().width - 30, // первая колонка и скролл
+      columnWidths: [],
 
       selected: {
         spoiler: undefined,
@@ -108,24 +110,15 @@ export default {
     },
     columns() { return Object.keys(this.header).length },
     contentStyle() {
-      let str = 'grid-template-columns: 30px';
+      let style = 'grid-template-columns: 30px',
+          totalWidth = this.columnWidths.reduce((r, w) => r += w, 0),
+          scale = this.containerWidth / totalWidth;
 
-      Object.values(this.header).forEach((header) => {
-        if (!header.value) return;
+      this.columnWidths.forEach(w => {
+        style += ' ' + Math.floor(w * scale) + 'px';
+      });
 
-        let columnI = this.contentData[0].indexOf(header.value),
-            maxChar = -1;
-
-        this.contentData.forEach(row => {
-          if (maxChar < row[columnI].length) maxChar = row[columnI].length;
-        });
-
-        debugger
-
-        //str += ' ';
-      })
-
-      return 'grid-template-columns: 30px repeat(' + (this.columns - 1) + ', auto)'
+      return style;
     },
   },
   watch: {
@@ -136,7 +129,17 @@ export default {
   },
   methods,
   created() {
+    this.observer = new ResizeObserver(entries => {
+      setTimeout(() => this.containerWidth = entries[0].contentRect.width - 30, 300);
+    });
+
+    this.observer.observe(this.$db.mainNode);
+
     this.mergeData();
+    this.calcColumnsWidth();
+  },
+  unmounted() {
+    this.observer.unobserve(this.$db.mainNode);
   },
 }
 </script>
