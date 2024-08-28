@@ -43,6 +43,12 @@
 
 <script>
 
+const disabledBtn = (btn) => {
+  btn.disabled = true;
+
+  setTimeout(() => btn.disabled = false, 500);
+};
+
 export default {
   name: "CellChanger",
 
@@ -60,7 +66,9 @@ export default {
     }
   },
   methods: {
-    applyChange() {
+    applyChange(e) {
+      disabledBtn(e.target);
+
       this.$emit('apply', {
         type     : this.type,
         valueType: this.valueType,

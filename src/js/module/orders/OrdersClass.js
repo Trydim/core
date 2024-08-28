@@ -7,7 +7,7 @@ export default class {
 
   mainAction = 'loadOrders';
   needReload = false;
-  headRendered = false; // Шапка отрисована
+  headRendered = false;
   queryParam = {
     mode        : 'DB',
     dbAction    : '',
@@ -80,7 +80,11 @@ export default class {
   ordersHeadRender() {
     const thead = this.table.querySelector('thead'),
           html = this.config[this.getTypeConfig()].reduce((r, column) => {
-            return r += f.replaceTemplate(this.template.tableHeader, column);
+            const tmp = this.config.ordersAllColumns.includes(column['dbName'])
+              ? this.template.tableHeader : '<th>${name}</th>';
+
+            r += f.replaceTemplate(tmp, column);
+            return r;
           }, '');
 
     thead.querySelector('tr').innerHTML = '<th></th>' + html;
