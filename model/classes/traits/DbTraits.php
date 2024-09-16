@@ -306,9 +306,14 @@ trait DbUsers {
    * @return array|null
    */
   public function getUserById($userId): ?array {
-    return self::getRow("SELECT * FROM " . $this->pf('users') . " WHERE ID = :id",
+    return $this->jsonParseField(self::getRow(
+      "SELECT U.ID AS 'id', U.name AS 'name', U.contacts AS 'contacts',
+                  P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
+       FROM " . $this->pf('users') . " U
+       JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
+       WHERE U.ID = :id",
       [':id' => $userId]
-    );
+    ));
   }
 
   /**
@@ -320,21 +325,25 @@ trait DbUsers {
                    U.name AS 'name', contacts, customization, activity,
                    P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
             FROM " . $this->pf('users') . " U
-            LEFT JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
+            JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
             WHERE login = :login";
 
     return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
   }
 
   /**
-   * @param string|int $id
+   * @param string|int $orderId
    * @return array|null
    */
-  public function getUserByOrderId($id): ?array {
-    return self::getRow("SELECT U.name AS 'name', U.contacts AS 'contacts'
-            FROM " . $this->pf('users') . " U 
-            JOIN " . $this->pf('orders') . " O ON U.ID = O.user_id
-            WHERE O.ID = :id", [':id' => $id]);
+  public function getUserByOrderId($orderId): ?array {
+    return $this->jsonParseField(self::getRow(
+      "SELECT U.ID AS 'id', U.name AS 'name', U.contacts AS 'contacts',
+                  P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
+       FROM " . $this->pf('users') . " U
+       JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
+       JOIN " . $this->pf('orders') . " O ON U.ID = O.user_id
+       WHERE O.ID = :id", [':id' => $orderId]
+    ));
   }
 
   /**

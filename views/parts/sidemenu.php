@@ -22,13 +22,20 @@ $dbTables = $main->getBaseTable();
 $route    = $main->url->getRoute();
 $siteLink = $main->url->getUri();
 
+$usersTags = $main->getLogin('permission')['tags'];
+$skipSubMenu = [];
+if (includes($usersTags, 'alumodoor')) $skipSubMenu = ['price2'];
+else if (includes($usersTags, 'dp')) $skipSubMenu = ['price'];
+
 if (is_array($dbTables)) {
 
   class CreateMenu {
     private $siteLink;
+    private $skipSubMenu;
 
-    public function __construct($siteLink) {
+    public function __construct($siteLink, $skipSubMenu) {
       $this->siteLink = $siteLink;
+      $this->skipSubMenu = $skipSubMenu;
     }
 
     public function subSideMenuItem($fileName, $name, $active): string {
@@ -59,6 +66,8 @@ menu;
       $items = '';
       foreach ($tables as $key => $item) {
         if (!is_numeric($key)) {
+          if (in_array($key, $this->skipSubMenu)) continue;
+
           $items .= '<li>' . $this->create($key, $item, $link . '/' . $key, false) . '</li>';
           continue;
         }
@@ -72,7 +81,7 @@ menu;
     }
   }
 
-  $adminMenu = (new CreateMenu($siteLink))->create('adminDB', $dbTables);
+  $adminMenu = (new CreateMenu($siteLink, $skipSubMenu))->create('adminDB', $dbTables);
 } ?>
 <aside id="sideLeft" class="sidebar"> <!-- data-background-color="white"-->
   <div class="position-sticky top-0">

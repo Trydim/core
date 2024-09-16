@@ -27,10 +27,7 @@ if (isset($addManager)) {
     $userData = $main->db->getUserById($main->getLogin('id'));
   }
 
-  if (count($userData)) {
-    $userData['contacts'] = json_decode($userData['contacts'], true);
-    $data['userData'] = $userData;
-  }
+  if (count($userData)) $data['userData'] = $userData;
   unset($userData);
 }
 

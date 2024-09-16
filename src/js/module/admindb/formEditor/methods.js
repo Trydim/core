@@ -76,8 +76,8 @@ export default {
     this.mergedData = res;
   },
   calcColumnsWidth() {
-    Object.values(this.header).forEach(header => {
-      if (!header.value) return;
+    Object.values(this.header).forEach((header, index) => {
+      if (index === 0) return;
 
       let columnI  = this.contentData[0].indexOf(header.value),
           maxWidth = -1;
@@ -194,7 +194,7 @@ export default {
   },
 
   /**
-   * @param {{type: 'set'|'change', value: string, valueType: 'absolute'|'relative'}} c
+   * @param {{type: 'set'|'change', value: string, valueType: 'absolute'|'relative', fraction: number}} c
    */
   applyChange(c) {
     if (c.value.toString() === '') { f.showMsg('Введите значение', 'error'); return; }
@@ -209,7 +209,7 @@ export default {
       if (c.type === 'set') {
         cell.value = this.contentData[i][j] = c.value;
       } else {
-        let cV = cell.value.toString().replace(',', '.'),
+        let cV = (cell.value || '').toString().replace(',', '.'),
             nV = c.value,
             result;
 
@@ -217,6 +217,8 @@ export default {
           if (c.valueType === 'absolute') result = +cV + +nV;
           else if (c.valueType === 'relative') result = +cV * (1 + +nV / 100);
           else result = +cV * +nV;
+
+          result = result.toFixed(c.fraction);
         }
 
         cell.value = this.contentData[i][j] = result;

@@ -1,8 +1,8 @@
 <template>
   <div class="form-editor-changer">
     <div class="col">
-      <div class="radio-group">
-        <label class="radio-group__item mb-2">
+      <div class="radio-group mb-2">
+        <label class="radio-group__item">
           <input type="radio" hidden value="set" v-model="type">
           <span class="radio-group__span">Установить</span>
         </label>
@@ -11,7 +11,7 @@
           <span class="radio-group__span">Изменить</span>
         </label>
       </div>
-      <div v-show="type === 'change'" class="radio-group">
+      <div v-show="type === 'change'" class="radio-group mb-2">
         <label class="radio-group__item">
           <input type="radio" hidden value="absolute" v-model="valueType">
           <span class="radio-group__span">Значение</span>
@@ -28,6 +28,14 @@
     </div>
 
     <div class="col">
+      <div v-show="type === 'change' && isFinite(value)" class="radio-group mb-2">
+        <span class="radio-group__item">
+          <label for="fraction" class="radio-group__span">Округление</label>
+        </span>
+        <span class="radio-group__item">
+          <input type="text" id="fraction" class="radio-group__span" min="0" max="20" v-model.number="fraction">
+        </span>
+      </div>
       <input type="text" class="control-input mb-2" v-model="value">
     </div>
 
@@ -58,6 +66,7 @@ export default {
       type: 'set',
       valueType: 'absolute', // Значение или проценты
       value: '',
+      fraction: 0,
     };
   },
   watch: {
@@ -73,6 +82,7 @@ export default {
         type     : this.type,
         valueType: this.valueType,
         value    : this.value,
+        fraction : this.fraction,
       });
     },
     undoChanges() { this.$emit('undo') },
