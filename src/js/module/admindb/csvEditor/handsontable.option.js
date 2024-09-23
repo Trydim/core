@@ -47,7 +47,7 @@ export const handson = {
     rowHeaders        : true,
     colHeaders        : true, //filters   : true,
     columnSorting     : false,
-    dropdownMenu      : true,
+    dropdownMenu      : false,
     contextMenu       : true,
     manualColumnResize: true,
     manualRowResize   : true,

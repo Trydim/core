@@ -82,9 +82,10 @@ export default {
       let columnI  = this.contentData[0].indexOf(header.value),
           maxWidth = -1;
 
-      this.contentData.forEach(row => {
+      for (const row of this.contentData) {
+        if (maxWidth > 50) {maxWidth = 50; break;}
         maxWidth = Math.max(maxWidth, row[columnI].toString().length);
-      });
+      }
 
       this.columnWidths.push(maxWidth);
     });

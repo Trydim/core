@@ -18,14 +18,16 @@ export default {
    * @var {string} PATH_IMG
    * @deprecated use URI_IMG
    */
-  PATH_IMG     : (cms['URI_IMG'] || 'public/images/'), // для обратной совместимости
-  URI_IMG      : (cms['URI_IMG'] || 'public/images/'),
+  PATH_IMG  : cms['URI_IMG'] || 'public/images/', // для обратной совместимости
+  URI_IMG   : cms['URI_IMG'] || 'public/images/',
+  URI_SHARED: cms['URI_SHARED'] || 'shared/',
 
-  DEAL_URI_IMG : cms['DEAL_URI_IMG'],
+  DEAL_URI_IMG   : cms['DEAL_URI_IMG'],
+  DEAL_URI_SHARED: cms['DEAL_URI_SHARED'],
 
-  AUTH_STATUS  : cms['AUTH_STATUS'] || false,
-  IS_DEAL      : cms['IS_DEAL'] || false,
-  INIT_SETTING : cms['INIT_SETTING'] || false,
+  AUTH_STATUS : cms['AUTH_STATUS'] || false,
+  IS_DEAL     : cms['IS_DEAL'] || false,
+  INIT_SETTING: cms['INIT_SETTING'] || false,
 
   PHONE_MASK_DEFAULT: '+____________',
 

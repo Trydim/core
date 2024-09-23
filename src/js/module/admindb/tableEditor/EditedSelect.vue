@@ -24,7 +24,7 @@ export default {
       type: Object,
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'addListKey'],
   data() {
     return {
       open: false,
@@ -53,10 +53,9 @@ export default {
 
     addListItem() {
       if (this.inputV === '') return;
+      if (this.options.hasOwnProperty(this.inputV)) { f.showMsg('Имя существует', 'error'); return; }
 
-      this.options[this.inputV] = this.options[this.selectV];
-      delete this.options[this.selectV];
-      this.selectV = this.inputV;
+      this.$emit('addListKey', this.inputV);
     },
 
     openOptions() {
@@ -65,6 +64,8 @@ export default {
       document.body.addEventListener('click', () => this.open = false, {once: true});
     },
   },
-  mounted() {},
+  mounted() {
+    this.selectV = 'new';
+  },
 }
 </script>

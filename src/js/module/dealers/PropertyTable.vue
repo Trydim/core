@@ -40,7 +40,7 @@ export default {
         data: Array.isArray(prop) && prop.length ? prop : [new Array(this.prop.columns.length).fill('')],
 
         rowHeaders   : true,
-        dropdownMenu : true,
+        dropdownMenu : false,
         columnSorting: false,
         manualColumnResize: true,
         manualRowResize   : true,

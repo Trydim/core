@@ -11,7 +11,7 @@ export default {
   props: {
     title: String,
   },
-  emits: ['confirm', 'cancel'],
+  emits: ['confirm', 'cancel', 'update:show'],
   data: () => ({
     M: f.initModal(),
   }),
@@ -20,8 +20,14 @@ export default {
 
     m.show(this.title, this.$refs.content);
 
-    m.btnConfirm.addEventListener('click', () => this.$emit('confirm'));
-    m.btnCancel.forEach(n => n.addEventListener('mouseup', () => this.$emit('cancel')));
+    m.btnConfirm.addEventListener('click', () => {
+      this.$emit('confirm');
+      this.$emit('update:show', false);
+    });
+    m.btnCancel.forEach(n => n.addEventListener('mouseup', () => {
+      this.$emit('cancel');
+      this.$emit('update:show', false);
+    }));
   },
   unmounted() {
     this.M.hide();

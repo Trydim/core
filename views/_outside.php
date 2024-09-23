@@ -24,9 +24,11 @@ $jsGlobalConst = json_encode([
   'MAIN_PHP_PATH' => $main->url->getHost() . $main->url->getPath() . 'outside.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
   'URI_IMG'       => URI_IMG,
+  'URI_SHARE'     => $main->url->getBaseUri() . $main->getCmsParam('SHARE_PATH'),
   'AUTH_STATUS'   => $main->checkStatus(),
   'IS_DEAL'       => $main->isDealer(),
   'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG),
+  'DEAL_URI_SHARED' => $main->url->getUri(true) . $main->getCmsParam('SHARE_PATH'),
   'INIT_SETTING'  => $main->frontSettingInit,
 ]);
 

@@ -111,11 +111,11 @@ export default {
     columns() { return Object.keys(this.header).length },
     contentStyle() {
       let style = 'grid-template-columns: 30px',
-          totalWidth = this.columnWidths.reduce((r, w) => r += w, 0),
+          totalWidth = this.columnWidths.reduce((r, w) => r += (w + 2), 0),
           scale = this.containerWidth / totalWidth;
 
       this.columnWidths.forEach(w => {
-        style += ' ' + Math.floor(w * scale) + 'px';
+        style += ' ' + Math.floor((w + 2) * scale) + 'px';
       });
 
       return style;

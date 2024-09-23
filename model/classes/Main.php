@@ -332,7 +332,7 @@ final class Main {
 
     $field = [
       'main'        => $this,
-      'pageTitle'   => gTxt($target),
+      'pageTitle'   => $main->getCmsParam(VC::PROJECT_TITLE) . ' ' . gTxt(ucfirst($target)),
       'headContent' => '',
       'cssLinks'    => [],
       'jsLinks'     => [],

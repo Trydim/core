@@ -25,8 +25,12 @@ declare type CMSGlobalObject = {
   PATH_IMG: string
   /** Uri to images folder */
   URI_IMG: string
+  /** Uri to file manager folder */
+  URI_SHARED: string
   /** Uri to dealer images folder */
   DEAL_URI_IMG : string,
+  /** Uri to dealer file manager folder */
+  DEAL_URI_SHARED : string,
   /** User is authorized */
   AUTH_STATUS: boolean
   /** app starting as dealer module */

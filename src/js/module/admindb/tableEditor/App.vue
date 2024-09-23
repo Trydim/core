@@ -16,11 +16,7 @@
       </template>
     </template>
 
-    <Modal v-if="editParamModal"
-      title="Настройка параметров"
-      @confirm="confirmEditParam"
-      @cancel="closeModal"
-    >
+    <Modal v-if="editParamModal" title="Настройка параметров" @confirm="confirmEditParam" @cancel="closeModal">
       <label class="d-flex justify-content-between align-items-center mb-2">
         <span class="col-6">Тип:</span>
         <select class="col" v-model="param.type">
@@ -57,17 +53,23 @@
       <div v-else-if="param.type === 'checkbox'" class="d-flex justify-content-between align-items-center">
         <!--Ограничения для флага-->
       </div>
-      <div v-else-if="param.type === 'simpleList'" class="">
+      <div v-else-if="param.type === 'simpleList'">
         <!-- Выбор списка добавление/удаление/переименование списка -->
-        <EditedSelect :options="simpleList" v-model="param.list"
-                      @list="updateSimpleListKeys" @updateSimpleListKeys="updateSimpleListKeys"
-        ></EditedSelect>
-        <p>ключ:значение</p>
-        <textarea @change="onchangeSimpleListEntries" class="w-100" rows="5">{{ simpleListEntries }}</textarea>
+        <div class="d-flex align-items-center mb-2">
+          <span class="col-3">Название:</span>
+          <EditedSelect class="col" :options="simpleList" v-model="param.list" @addListKey="addListKey" />
+        </div>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="col-6">Множественный</span>
+          <span class="col-6 text-center"><input type="checkbox" v-model="param.multiple"></span>
+        </div>
+        <p class="text-center">значение / ключ : значение</p>
+        <textarea class="w-100" rows="5" v-model="simpleListEntries"></textarea>
       </div>
       <label v-else-if="param.type === 'customEvent'" class="d-flex justify-content-between align-items-center">
         <span class="col-6">Ключ</span><input type="text" class="col" v-model="param.id">
       </label>
+      <div v-else-if="param.type === 'relationTable'"></div>
 
       <!--<div class="d-flex justify-content-between">
         <label>Таблица (файл)</label>
@@ -90,6 +92,8 @@
 </template>
 
 <script>
+
+import cloneDeep from 'lodash/clonedeep';
 
 import EditedSelect from "./EditedSelect.vue";
 import Modal from "../contentEditor/Modal.vue";
@@ -136,19 +140,15 @@ export default {
     contentStyle() {
       return 'grid-template-columns: 25px repeat(' + this.columns + ', minmax(auto, 250px))'
     },
-
-    simpleListEntries() {
-      // Преобразовывает из: {key1:'value1', key2:'value2'} в 'key1:value1\nkey2:value2'
-      return Object.entries(this.simpleList[this.param.list]).reduce((r, [k, v]) => {
-        r.push(k + ':' + v);
-        return r;
-      }, []).join('\n') || '';
-    },
   },
   watch: {
     contentConfig: {
       deep: true,
       handler() { this.$db.enableBtnSave() },
+    },
+
+    editParamModal() {
+      if (this.editParamModal && this.param.list === 'simpleList') this.convertSimpleList();
     },
 
     'param.type'() {
@@ -169,12 +169,35 @@ export default {
           break;
         case 'simpleList':
           this.param.list = this.param.list || Object.keys(this.simpleList)[0];
+          this.param.multiple = false;
           break;
       }
     },
+    'param.list'() {
+      this.convertSimpleList();
+    },
+    simpleListEntries() {
+      // Преобразовывает из: 'key1:value1\nkey2:value2' в {key1:'value1', key2:'value2'}
+      this.simpleList[this.param.list] = this.simpleListEntries.split('\n').reduce((r, str) => {
+        const [k, v] = str.split(':');
+        if (k) r[k.trim()] = v ? v.trim() : k.trim();
+        return r;
+      }, {});
+    },
   },
   methods: {
-    updateSimpleListKeys(options) { this.simpleList = options },
+    addListKey(listKey) {
+      this.simpleList[listKey] = cloneDeep(this.simpleList['new']);
+      this.param.list = listKey;
+      this.simpleList['new'] = {};
+    },
+    convertSimpleList() {
+      // Преобразовывает из: {key1:'value1', key2:'value2'} в 'key1:value1\nkey2:value2'
+      this.simpleListEntries = Object.entries(this.simpleList[this.param.list]).reduce((r, [k, v]) => {
+        r.push(k === v ? k : k + ':' + v);
+        return r;
+      }, []).join('\n') || '';
+    },
     checkSpoiler(param) { return param.type === 'spoiler' },
     disabledSpoiler(key) {
       const {i, j} = this.editedParam;
@@ -198,16 +221,6 @@ export default {
     closeModal() {
       this.editParamModal = false;
     },
-
-    onchangeSimpleListEntries(e) {
-      const v = e.target.value;
-      // Преобразовывает из: 'key1:value1\nkey2:value2' в {key1:'value1', key2:'value2'}
-      this.simpleList[this.param.list] = v.split('\n').reduce((r, str) => {
-        const [k, v] = str.split(':');
-        if (k && v) r[k.trim()] = v.trim();
-        return r;
-      }, {});
-    }
   },
 }
 
