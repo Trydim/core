@@ -2,12 +2,12 @@
   <div>
     <template v-for="(item, index) in items">
       <div v-if="item.type === 'divider'" class="divider" :key="`divider${index}`"></div>
-      <MenuItem v-else :ref="'menu-' + (item.id || index)" :key="index" v-bind="item"></MenuItem>
+      <MenuItem v-else :ref="'menu-' + (item.id || index)" :key="index" v-bind="item" />
     </template>
 
-    <ColorPicker v-if="colorPick" :editor="editor" v-model="color[colorKey]" @close="colorPick = false"></ColorPicker>
-    <FontSize v-if="fontSizeEditor" :editor="editor" @close="fontSizeEditor = false"></FontSize>
-    <ImageModal v-if="imageModal" @image="setImage" @close="closeImageModal"></ImageModal>
+    <ColorPicker v-if="colorPick" :editor="editor" v-model="color[colorKey]" @close="colorPick = false" />
+    <FontSize v-if="fontSizeEditor" :editor="editor" @close="fontSizeEditor = false" />
+    <ImageModal v-if="imageModal" @image="setImage" @close="closeImageModal" />
   </div>
 </template>
 

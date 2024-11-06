@@ -7,6 +7,9 @@ import { createApp } from 'vue';
 import App from "./App.vue";
 
 import PrimeVue from 'primevue/config';
+import { definePreset } from '@primevue/themes';
+import Lara from '@primevue/themes/lara';
+
 import Tooltip from 'primevue/tooltip';
 
 const vue = createApp(App);
@@ -24,7 +27,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const app = f.gI('dealerApp');
 
   if (app) {
-    vue.use(PrimeVue);
+    const preset = definePreset(Lara, {
+      semantic: {
+        primary: {
+          50: '{indigo.50}',
+          100: '{indigo.100}',
+          200: '{indigo.200}',
+          300: '{indigo.300}',
+          400: '{indigo.400}',
+          500: '{indigo.500}',
+          600: '{indigo.600}',
+          700: '{indigo.700}',
+          800: '{indigo.800}',
+          900: '{indigo.900}',
+          950: '{indigo.950}'
+        }
+      }
+    });
+
+    vue.use(PrimeVue, {
+      theme: {preset, options: {prefix: 'p', cssLayer: false}}
+    });
     vue.directive('tooltip', Tooltip);
 
     window.DealersInstance = vue;

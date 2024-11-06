@@ -66,6 +66,10 @@ final class Main {
    */
   public $response;
 
+  /**
+   * @var bool
+   */
+  public $publicDealer = true;
 
   /**
    * Main constructor.
@@ -253,7 +257,7 @@ final class Main {
       unset($data[VC::DB_CONFIG]);
     }
 
-    $jsonData = $key === 'json' || $front ? json_encode($data ?: $this->setting) : '';
+    $jsonData = $key === 'json' || $front ? json_encode($data ?: $this->setting, JSON_HEX_APOS | JSON_HEX_QUOT) : '';
 
     if ($front) {
       $this->frontSettingInit = true;
@@ -385,14 +389,8 @@ final class Main {
     ];
     $rate = new Course($rateParam, $this->db);
     $rate = $justRate ? array_map(function ($rate) { return $rate['rate']; }, $rate->rate) : $rate->rate;
-    $rate = json_encode($rate);
-    return "<input type='hidden' id='$dataId' value='$rate'>";
+    return $this->getFrontContent($dataId, $rate);
   }
-
-  /**
-   * @var bool
-   */
-  public $publicDealer = true;
 
   public function publicMain() {
     $this->publicDealer = false;

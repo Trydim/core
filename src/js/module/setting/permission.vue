@@ -4,23 +4,21 @@
 
     <div class="input-group my-3">
       <span class="input-group-text">{{ $t('Add type') }}</span>
-      <p-input-text class="form-control" v-model="permission.name"></p-input-text>
-      <p-button v-tooltip.bottom="this.$t('Add access type')" icon="pi pi-plus-circle" class="p-button-success"
-                @click="addPermission"></p-button>
+      <p-input-text class="form-control" v-model="permission.name" />
+      <p-button v-tooltip.bottom="$t('Add access type')" icon="pi pi-plus-circle" class="p-button-success"
+                @click="addPermission" />
     </div>
 
     <div class="input-group mb-3">
       <span class="input-group-text">{{ $t('Access type') }}</span>
       <p-select class="col"
                 option-label="name" option-value="id"
-                :editable="true"
-                :options="permissionsData"
+                :editable="true" :options="permissionsData"
                 v-model="permission.id"
-                @input="changePermission"
-      ></p-select>
-      <p-button v-tooltip.bottom="this.$t(isPermissionDelete ? 'Cancel deletion' : 'Delete access type')"
+                @input="changePermission" />
+      <p-button v-tooltip.bottom="$t(isPermissionDelete ? 'Cancel deletion' : 'Delete access type')"
                 icon="pi pi-trash" class="p-button-danger"
-                @click="removePermission"></p-button>
+                @click="removePermission" />
     </div>
 
     <div class="input-group mb-3">
@@ -31,8 +29,7 @@
           ></i>
         </span>
       <p-input-text class="form-control" :disabled="isPermissionDelete"
-                    v-model="propertyTags" @change="changePermissionTags"
-      ></p-input-text>
+                    v-model="propertyTags" @change="changePermissionTags" />
     </div>
 
     <div class="col mb-3">
@@ -52,9 +49,7 @@
           {{ $t('Available') }}
         </template>
         <template #item="slotProps">
-          <div class="product-item">
-            {{ slotProps.item.name }}
-          </div>
+          <div class="product-item">{{ slotProps.item.name }}</div>
         </template>
       </p-picklist>
     </div>

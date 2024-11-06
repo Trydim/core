@@ -6,12 +6,12 @@
 
 $db = $main->getDB();
 
-function prepareData($data) {
-  return json_encode(array_map(function ($item) {
+function catalogPrepareData($data): array {
+  return array_map(function ($item) {
     $item['id'] = $item['ID'];
     unset($item['ID']);
     return $item;
-  }, array_values($data)));
+  }, array_values($data));
 }
 
 $field = [
@@ -32,13 +32,12 @@ $field['footerContent'] .= "<input type='hidden' id='optionsColumn' value='$valu
 
 // Типы товаров
 $value = $db->selectQuery('codes', ['symbolCode', 'name']);
-$field['footerContent'] .= "<input type='hidden' id='dataCodes' value='" . json_encode($value) . "'>";
+$field['footerContent'] .= $main->getFrontContent('dataCodes', $value);
 // Единиц измерения
 $value = $db->selectQuery('units', ['ID', 'name', 'shortName']);
-$field['footerContent'] .= "<input type='hidden' id='dataUnits' value='" . prepareData($value) . "'>";
+$field['footerContent'] .= $main->getFrontContent('dataUnits', catalogPrepareData($value));
 // Валюта
-$value = $db->getMoney();
-$field['footerContent'] .= "<input type='hidden' id='dataMoney' value='" . prepareData($value) . "'>";
+$field['footerContent'] .= $main->getFrontContent('dataMoney', catalogPrepareData($db->getMoney()));
 
 // Все свойства
 $value = $main->getSettings(VC::OPTION_PROPERTIES);
@@ -51,7 +50,7 @@ foreach ($db->getTables('prop') as $table) {
     }, $db->loadTable($table['dbTable'])),
   ];
 }
-$field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . json_encode($value) . "'>";
+$field['footerContent'] .= $main->getFrontContent('dataProperties', $value);
 
 unset($value, $propSetting, $mess);
 

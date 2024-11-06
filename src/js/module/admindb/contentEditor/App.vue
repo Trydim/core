@@ -1,7 +1,7 @@
 <template>
-  <Search :contentData="contentData" v-model:section="selectedSection" v-model:field="selectedField"></Search>
+  <Search :contentData="contentData" v-model:section="selectedSection" v-model:field="selectedField" />
 
-  <Section :contentData="contentData" v-model="selectedSection"></Section>
+  <Section :contentData="contentData" v-model="selectedSection" />
 
   <div class="row">
     <div class="col-4">
@@ -27,9 +27,9 @@
             </li>
           </ul>
         </h5>
-        <Editor v-if="editorTypeHtml === false && value" v-model="value" :newValue="newValue"></Editor>
+        <Editor v-if="editorTypeHtml === false && value" v-model="value" :newValue="newValue" />
         <keep-alive v-if="editorTypeHtml">
-          <CodeMirror v-if="value" :newValue="newValue" v-model="value"></CodeMirror>
+          <CodeMirror v-if="value" :newValue="newValue" v-model="value" />
         </keep-alive>
       </div>
       <div class="d-flex flex-column align-items-center mt-1">
@@ -38,7 +38,7 @@
             <span class="nav-link">Предпросмотр</span>
           </span>
         </h5>
-        <Preview :content="value"></Preview>
+        <Preview :content="value" />
       </div>
     </div>
   </div>

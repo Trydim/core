@@ -11,7 +11,7 @@ $param = [
 $field = [
   'pageTitle' => 'Заказы',
   'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
-  'footerContent' => "<input type='hidden' id='dataUser' value='". json_encode($main->getLogin('all')) . "'>",
+  'footerContent' => $main->getFrontContent('dataUser', $main->getLogin('all')),
 ];
 
 // получить конфиг текущего пользователя
@@ -21,7 +21,7 @@ $setting = $setting ?: [];
 // Все доступные поля для заказов
 $columns = $main->db->getBaseOrdersQueryColumns();
 $param['orderColumns'] = $columns;
-$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersAllColumn' value='" . json_encode($columns) . "'>";
+$field[VC::BASE_FOOTER_CONTENT] .= $main->getFrontContent('dataOrdersAllColumn', $columns);
 // Колонки, которые отображаются.
 $columns = $setting['ordersShowColumns'] ?? ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
 $columns = array_map(function ($item) {
@@ -30,7 +30,7 @@ $columns = array_map(function ($item) {
     'name'   => gTxtDB('orders', $item),
   ];
 }, $columns);
-$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersColumn' value='". json_encode($columns) . "'>";
+$field[VC::BASE_FOOTER_CONTENT] .= $main->getFrontContent('dataOrdersColumn', $columns);
 
 
 // Пользовательские заказы
@@ -41,11 +41,9 @@ $columns = array_map(function ($item) {
     'name'   => gTxtDB('visitorOrders', $item),
   ];
 }, $columns);
-$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataOrdersVisitColumn' value='". json_encode($columns) . "'>";
+$field[VC::BASE_FOOTER_CONTENT] .= $main->getFrontContent('dataOrdersVisitColumn', $columns);
 
-if ($param['showFilter']) {
-  $param['filterOptions'] = $main->db->selectQuery($param['showFilter'], ['id', 'name']);
-}
+if ($param['showFilter']) $param['filterOptions'] = $main->db->selectQuery($param['showFilter'], ['id', 'name']);
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);
 require $main->url->getRoutePath();

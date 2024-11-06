@@ -4,29 +4,28 @@
 
     <div class="input-group my-3">
       <span class="input-group-text flex-grow-1">{{ $t('Additional fields for managers') }}</span>
-      <p-button v-tooltip.bottom="this.$t('Add new field')" icon="pi pi-plus-circle" class="p-button-success"
-                @click="addField"></p-button>
+      <p-button v-tooltip.bottom="$t('Add new field')" icon="pi pi-plus-circle" class="p-button-success"
+                @click="addField" />
     </div>
 
     <template v-for="(item, key) of managerFields" :key="key">
       <div class="input-group mb-1">
-        <p-input-text v-model="item.code" class="form-control"></p-input-text>
-        <p-input-text v-model="item.name" class="form-control"></p-input-text>
+        <p-input-text v-model="item.code" class="form-control" />
+        <p-input-text v-model="item.name" class="form-control" />
         <p-select class="col-5"
                   :options="managerFieldTypes"
                   option-value="id" option-label="name"
-                  v-model="item.type"
-        ></p-select>
+                  v-model="item.type" />
         <p-button v-tooltip.bottom="this.$t('Delete field')" icon="pi pi-times" class="p-button-danger"
-                  @click="removeField(key)"></p-button>
+                  @click="removeField(key)" />
       </div>
       <div v-if="item.type === 'list'" class="px-3">
         <div v-for="(option, index) of item.options" :key="index" class="input-group mb-1">
-          <p-input-text v-model="item.options[index]" class="form-control"></p-input-text>
+          <p-input-text v-model="item.options[index]" class="form-control" />
           <p-button v-tooltip.bottom="this.$t('Add option')" icon="pi pi-plus-circle" class="p-button-success"
-                    @click="addOption(item, index)"></p-button>
+                    @click="addOption(item, index)" />
           <p-button v-tooltip.bottom="this.$t('Delete option')" icon="pi pi-times" class="p-button-danger"
-                    @click="removeOption(item, index)"></p-button>
+                    @click="removeOption(item, index)" />
         </div>
       </div>
       <div v-if="item.type === 'csvTable'" class="px-3">
@@ -35,13 +34,12 @@
                     :loading="loadingTable"
                     :options="csvTable"
                     option-value="fileName" option-label="name"
-                    v-model="item.options.table"
-          ></p-select>
-          <p-input-text class="col-3 form-control" v-tooltip.bottom="this.$t('Column for save')" v-model="item.options.saveKey"></p-input-text>
-          <p-input-text class="col-3 form-control" v-tooltip.bottom="this.$t('Column for show')" v-model="item.options.showKey"></p-input-text>
+                    v-model="item.options.table" />
+          <p-input-text class="col-3 form-control" v-tooltip.bottom="$t('Column for save')" v-model="item.options.saveKey" />
+          <p-input-text class="col-3 form-control" v-tooltip.bottom="$t('Column for show')" v-model="item.options.showKey" />
           <div class="col-3 d-flex justify-content-center align-items-center gap-1">
             <label :for="'multiselect'">{{ $t('Multiselect') }}</label>
-            <p-checkbox input-id="multiselect" binary v-model="item.options.multiselect"></p-checkbox>
+            <p-checkbox input-id="multiselect" binary v-model="item.options.multiselect" />
           </div>
         </div>
       </div>

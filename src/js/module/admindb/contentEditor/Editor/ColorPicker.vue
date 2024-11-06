@@ -18,9 +18,7 @@ export default {
     value,
   }),
   computed: {
-    value: {
-      get() { return this.modelValue; },
-    },
+    value() { return this.modelValue },
 
     style() {
       const editorSize = this.editor.rootEl.getBoundingClientRect();
@@ -28,9 +26,7 @@ export default {
     }
   },
   watch: {
-    value() {
-      this.$emit('update:modelValue', this.value);
-    },
+    value() { this.$emit('update:modelValue', this.value) },
   },
   methods: {
     colorPick() {
@@ -38,14 +34,11 @@ export default {
       this.close();
     },
 
-    close() {
-      this.$emit('close');
-    },
+    close() { this.$emit('close') },
   },
   created() {
     this.value = this.modelValue;
-  },
-  mounted() {},
+  }
 }
 
 </script>

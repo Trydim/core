@@ -1,5 +1,5 @@
 import Button from 'primevue/button';
-import { ObjectUtils, DomHandler, UniqueComponentId } from 'primevue/utils';
+import { ObjectUtils, DomHandler, UniqueComponentId } from '@primevue/core/utils';
 import Ripple from 'primevue/ripple';
 import { resolveComponent, resolveDirective, openBlock, createBlock, createVNode, renderSlot, createCommentVNode, TransitionGroup, withCtx, Fragment, renderList, withDirectives } from 'vue';
 

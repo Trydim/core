@@ -5,7 +5,7 @@
   </div>
 
   <div class="col-12 col-md-4 flex justify-content-between mb-3 position-relative">
-    <InputText class="w-100" :placeholder="this.$t('Keyword Search')" v-model="search"></InputText>
+    <InputText class="w-100" :placeholder="$t('Keyword Search')" v-model="search" />
     <i class="position-absolute h-100 end-0 pi pi-search" style="padding: 16px"></i>
   </div>
 
@@ -28,35 +28,34 @@
                       placeholder="Настроить колонки" style="width: 20em"
       ></p-multi-select>
     </template>-->
-    <Column v-if="checkColumn('id')" field="id" :sortable="true" :header="this.$t('id')" class="text-center">
+    <Column v-if="checkColumn('id')" field="id" :sortable="true" :header="$t('id')" class="text-center">
       <template #body="slotProps">
         <a target="_blank" :href="'../dealer/' + slotProps.data.id" :data-id="slotProps.data.id">{{ slotProps.data.id }}</a>
       </template>
     </Column>
-    <Column field="name" :sortable="true" :header="this.$t('Name')"></Column>
-    <Column field="contacts" :sortable="false" :header="this.$t('Contacts')">
+    <Column field="name" :sortable="true" :header="$t('Name')" />
+    <Column field="contacts" :sortable="false" :header="$t('Contacts')">
       <template #body="slotProps">
         <div v-if="slotProps.data.contacts.phone">{{ slotProps.data.contacts.phone }}</div>
         <div v-if="slotProps.data.contacts.email">{{ slotProps.data.contacts.email }}</div>
         <div v-if="slotProps.data.contacts.address">{{ slotProps.data.contacts.address }}</div>
       </template>
     </Column>
-    <Column field="registerDate" :sortable="false" :header="this.$t('Register date')"></Column>
-    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" :header="this.$t('Activity')" class="text-center">
+    <Column field="registerDate" :sortable="false" :header="$t('Register date')" />
+    <Column v-if="checkColumn('activity')" field="activity" :sortable="true" :header="$t('Activity')" class="text-center">
       <template #body="slotProps">
         <span v-if="!!+slotProps.data.activity" class="pi pi-check pi-green"></span>
         <span v-else class="pi pi-times pi-red"></span>
       </template>
     </Column>
-    <Column field="settings" :sortable="false" :header="this.$t('setting')">
+    <Column field="settings" :sortable="false" :header="$t('setting')">
       <template #body="slotProps">
         <template v-for="(value, key) of slotProps.data.settings" :key="key">
           <p v-if="getPropertyType(key) === 'bool'" class="m-0">
             {{ getPropertyName(key) }}: <i class="ms-2 pi fw-bold" :class="value ? 'pi-green pi-plus' : 'pi-red pi-times'"></i>
           </p>
           <TablePropertyValue v-else-if="getPropertyType(key) === 'table'"
-                              :name="getPropertyName(key)" :value="value"
-          ></TablePropertyValue>
+                              :name="getPropertyName(key)" :value="value" />
           <p v-else class="m-0 text-nowrap">
             {{ getPropertyName(key) }}: {{ getPropertyValue(key, value) }}
           </p>
@@ -80,39 +79,38 @@
         <!-- Название -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Название:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.name" autofocus></InputText>
+          <InputText class="p-inputtext-sm" v-model="dealer.name" autofocus />
         </div>
 
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Логин:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.login"></InputText>
+          <InputText class="p-inputtext-sm" v-model="dealer.login" />
         </div>
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Пароль:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.password"></InputText>
+          <InputText class="p-inputtext-sm" v-model="dealer.password" />
         </div>
         <!-- Контакты номер -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Телефон:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.contacts.phone"></InputText>
+          <InputText class="p-inputtext-sm" v-model="dealer.contacts.phone" />
         </div>
         <!-- Контакты почта -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Почта:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.contacts.email"></InputText>
+          <InputText class="p-inputtext-sm" v-model="dealer.contacts.email" />
         </div>
         <!-- Контакты адрес -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Адрес:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.contacts.address"></InputText>
+          <InputText class="p-inputtext-sm" v-model="dealer.contacts.address" />
         </div>
         <!-- Доступен -->
         <div class="p-inputgroup my-2">
           <span class="p-inputgroup-addon col-5">Доступ:</span>
           <ToggleButton on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
                         on-label="Активен" off-label="Неактивен"
-                        v-model="dealer.activity"
-          ></ToggleButton>
+                        v-model="dealer.activity" />
         </div>
       </div>
 
@@ -125,51 +123,47 @@
           <div v-if="prop.type !== 'table'" class="p-inputgroup my-2">
             <span class="p-inputgroup-addon col-5">{{ prop.name }}</span>
 
-            <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]"></InputText>
-            <InputNumber v-else-if="prop.type === 'number'" :max-fraction-digits="10" v-model="dealer.settings[key]" @focus="this.value = ''"></InputNumber>
-            <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px"></Textarea>
+            <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]" />
+            <InputNumber v-else-if="prop.type === 'number'"
+                         :max-fraction-digits="10" v-model="dealer.settings[key]" @focus="this.value = ''" />
+            <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px" />
             <ToggleButton v-else-if="prop.type === 'bool'" class="w-100"
                           on-icon="pi pi-check" off-icon="pi pi-times"
                           on-label="Да" off-label="Нет"
-                          v-model="dealer.settings[key]"
-            ></ToggleButton>
-            <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"></Calendar>
+                          v-model="dealer.settings[key]" />
+            <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]" />
             <Dropdown v-else-if="prop.type === 'select'" option-label="name" option-value="ID"
                       :options="Object.values(prop.values)"
-                      v-model="dealer.settings[key]"
-            ></Dropdown>
+                      v-model="dealer.settings[key]" />
             <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="ID"
                          :options="Object.values(prop.values)"
-                         v-model="dealer.settings[key]"
-            ></MultiSelect>
+                         v-model="dealer.settings[key]" />
           </div>
         </template>
       </div>
 
       <div class="col-12">
         <template v-for="(prop, key) of properties" :key="key">
-          <PropertyTable v-if="prop.type === 'table'" :prop-key="key" :prop="prop" :dealer="dealer" @changed="changedTableProperty"
-          ></PropertyTable>
+          <PropertyTable v-if="prop.type === 'table'"
+                         :prop-key="key" :prop="prop" :dealer="dealer" @changed="changedTableProperty" />
         </template>
       </div>
     </div>
     <div v-else class="fw-bold">
       Последствия не обратимы!<br>Для продолжения наберите <span class="pi-red">{{ secureCode }}</span>!
       <div class="p-inputgroup my-2">
-        <InputText class="p-inputtext-sm" v-model="inputSecureCode"></InputText>
+        <InputText class="p-inputtext-sm" v-model="inputSecureCode" />
       </div>
     </div>
 
     <template #footer>
-      <Button :label="this.$t('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm"></Button>
-      <Button :label="this.$t('Cancel')" icon="pi pi-times" class="p-button-text" @click="modalCancel"></Button>
+      <Button :label="$t('Confirm')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="modalConfirm" />
+      <Button :label="$t('Cancel')" icon="pi pi-times" class="p-button-text" @click="modalCancel" />
     </template>
   </Dialog>
 </template>
 
 <script>
-
-import 'primevue/resources/themes/saga-blue/theme.css';
 
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
@@ -264,7 +258,7 @@ export default {
         valid |= d.password ? 0b1000 : 0b0;
         valid |= d.password && d.password.length > 2 ? 0b10000 : 0b0;
 
-        this.msg.text = valid === 0b11111 ? this.$t('Login and password changed!') : '';
+        this.msg.text = valid === 0b11111 ? $t('Login and password changed!') : '';
 
         this.modal.confirmDisabled = !(valid === 0b11111 || valid === 0b1);
       },

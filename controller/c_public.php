@@ -29,11 +29,11 @@ if ($authStatus && isset($_GET['orderId'])) {
     $order = $main->db->loadOrdersById($orderId, true);
 
     if ($order) {
-      $dbContent .= "<input type='hidden' id='dataOrder' value='" . json_encode($order) . "'>";
+      $dbContent .= $main->getFrontContent('dataOrder', $order);
 
       $customer = $main->db->loadCustomerByOrderId($order['ID']);
       if ($customer) {
-        $dbContent .= "<input type='hidden' id='dataCustomer' value='" . json_encode($customer) . "'>";
+        $dbContent .= $main->getFrontContent('dataCustomer', $customer);
       }
     }
   }
@@ -47,9 +47,7 @@ else if ($authStatus && isset($_GET['orderVisitorId'])) {
   if (is_finite($orderId)) {
     $order = $main->db->loadVisitorOrderById($orderId);
 
-    if (count($order)) {
-      $dbContent .= "<input type='hidden' id='dataVisitorOrder' value='" . json_encode($order) . "'>";
-    }
+    if (count($order)) $dbContent .= $main->getFrontContent('dataVisitorOrder', $order);
   }
 
   unset($order, $orderId);

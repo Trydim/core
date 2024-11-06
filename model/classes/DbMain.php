@@ -178,7 +178,7 @@ class DbMain extends R {
 
     foreach ($arr as $key => $value) {
       if (in_array($key, self::DB_JSON_FIELDS) && is_string($value) === false) {
-        $result[$key] = json_encode($value, true);
+        $result[$key] = json_encode($value, JSON_HEX_APOS | JSON_HEX_QUOT);
       } else {
         $result[$key] = $value;
       }

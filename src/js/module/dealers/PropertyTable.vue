@@ -1,19 +1,22 @@
 <template>
   <Accordion style="min-width: 78vw">
-    <AccordionTab :header="prop.name">
-      <div ref="table"></div>
-    </AccordionTab>
+    <AccordionPanel>
+      <AccordionHeader>{{ prop.name }}</AccordionHeader>
+      <AccordionContent><div ref="table"></div></AccordionContent>
+    </AccordionPanel>
   </Accordion>
 </template>
 
 <script>
 
 import Accordion from 'primevue/accordion';
-import AccordionTab from 'primevue/accordiontab';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
 
 export default {
   name: 'PropertyTable',
-  components: {Accordion, AccordionTab},
+  components: {Accordion, AccordionPanel, AccordionHeader, AccordionContent},
   props: {
     propKey: {
       required: true,

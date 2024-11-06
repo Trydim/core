@@ -11,12 +11,10 @@ $field = [
   'jsLinks'    => [CORE_JS . 'module/setting.js?ver=2239ad0927'],
 ];
 
-$user = $main->getLogin('all');
+$field['footerContent'] .= $main->getFrontContent('dataUser', $main->getLogin('all'))
+                           . $main->getSettings('json', true);
 
-$field['footerContent'] .= "<input type='hidden' id='dataUser' value='" . json_encode($user) . "'>"
-  . $main->getSettings('json', true);
-
-if (USE_DATABASE && $user['isAdmin']) {
+if (USE_DATABASE && $main->getLogin('isAdmin')) {
   $permissions['permissions'] = $main->db->loadTable('permission');
 
   $permissions['permissions'] = array_map(function ($row) {
@@ -31,17 +29,16 @@ if (USE_DATABASE && $user['isAdmin']) {
     return ['id' => $menu, 'name' => gTxt($menu)];
   }, $main->getSideMenu());
 
-  $field['footerContent'] .= "<input type='hidden' id='dataPermissions' value='" . json_encode($permissions) . "'>";
+  $field['footerContent'] .= $main->getFrontContent('dataPermissions', $permissions);
 
   // if available orders
   if ($main->availablePage('orders')) {
-    $status = json_encode($main->db->loadOrderStatus());
-    $field['footerContent'] .= "<input type='hidden' id='dataOrdersStatus' value='$status'>";
+    $field['footerContent'] .= $main->getFrontContent('dataOrdersStatus', $main->db->loadOrderStatus());
   }
 
   $field['footerContent'] .= $main->getCourse();
 
-  unset($permissions, $status);
+  unset($permissions);
 }
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_SETTING_TEMPLATE, $main);

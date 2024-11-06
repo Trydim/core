@@ -1,7 +1,7 @@
 <template>
   <div class="editor" v-if="editor">
-    <menu-bar class="editor__header" :editor="editor"></menu-bar>
-    <editor-content ref="editor" class="editor__content" :editor="editor" @click="clickEditor"></editor-content>
+    <menu-bar class="editor__header" :editor="editor" />
+    <editor-content ref="editor" class="editor__content" :editor="editor" @click="clickEditor" />
 
     <div v-if="isImage" class="position-fixed" :style="getSizePosition">
       <div class="d-flex justify-content-around w-100">
@@ -54,17 +54,11 @@ export default {
       this.editor.commands.setContent(this.modelValue);
       this.editor.commands.focus('end');
     },
-    param1() {
-      this.rulesCss[0] = 'width: ' + this.param1 + 'px';
-    },
-    param2() {
-      this.rulesCss[1] = 'height: ' + this.param2 + 'px';
-    },
+    param1() { this.rulesCss[0] = 'width: ' + this.param1 + 'px' },
+    param2() { this.rulesCss[1] = 'height: ' + this.param2 + 'px' },
   },
   computed: {
-    isImage() {
-      return this.selectedNode && this.selectedNode.tagName === 'IMG';
-    },
+    isImage() { return this.selectedNode && this.selectedNode.tagName === 'IMG' },
     getSizePosition() {
       const editorSize = this.editor.rootEl.getBoundingClientRect(),
             size = this.selectedNode.getBoundingClientRect();
@@ -87,15 +81,9 @@ export default {
         content: this.modelValue,
         injectCSS: true,
         extensions: [
-          StarterKit.configure({
-            history: false,
-          }),
-          History.configure({
-            depth: 10,
-          }),
-          TextAlign.configure({
-            types: ['heading', 'paragraph'],
-          }),
+          StarterKit.configure({history: false}),
+          History.configure({depth: 10}),
+          TextAlign.configure({types: ['heading', 'paragraph']}),
           TextStyle,
           Highlight,
           Color,

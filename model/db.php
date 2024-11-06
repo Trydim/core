@@ -592,21 +592,19 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
         foreach ($optionsId as $id) {
           if ($single) $param[$id]['name'] = $name;
-          if ($single || $fieldChange['unitId']) $param[$id]['unit_id'] = $option['unitId'];
-          if ($single || $fieldChange['moneyInputId']) $param[$id]['money_input_id'] = $option['moneyInputId'];
-          if ($single || $fieldChange['moneyInput']) $param[$id]['input_price'] = $option['inputPrice'];
+          if ($single || $fieldChange['unitId'])        $param[$id]['unit_id']         = $option['unitId'];
+          if ($single || $fieldChange['moneyInputId'])  $param[$id]['money_input_id']  = $option['moneyInputId'];
+          if ($single || $fieldChange['moneyInput'])    $param[$id]['input_price']     = $option['inputPrice'];
           if ($single || $fieldChange['moneyOutputId']) $param[$id]['money_output_id'] = $option['moneyOutputId'];
-          if ($single || $fieldChange['moneyOutput']) $param[$id]['output_price'] = $option['outputPrice'];
-          if ($single || $fieldChange['activity']) $param[$id]['activity'] = intval(boolValue($option['activity']));
-          if ($single || $fieldChange['sort']) $param[$id]['sort'] = $option['sort'];
-          if ($single || $fieldChange['properties']) $param[$id]['properties'] = json_encode($option['properties']);
+          if ($single || $fieldChange['moneyOutput'])   $param[$id]['output_price']    = $option['outputPrice'];
+          if ($single || $fieldChange['activity'])      $param[$id]['activity']        = intval(boolValue($option['activity']));
+          if ($single || $fieldChange['sort'])          $param[$id]['sort']            = $option['sort'];
+          if ($single || $fieldChange['properties'])    $param[$id]['properties']      = json_encode($option['properties']);
 
           // Change percent
           if ($single) $param[$id]['output_percent'] = $option['percent'];
           else if ($fieldChange['percent']) {
-            $currentOption = array_filter($currentOptions, function ($option) use ($id) {
-              return $option['id'] === $id;
-            });
+            $currentOption = array_filter($currentOptions, function ($option) use ($id) { return $option['id'] === $id; });
             $currentOption = array_values($currentOption)[0];
 
             $param[$id]['output_percent'] = $option['percent'];

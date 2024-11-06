@@ -456,9 +456,23 @@ trait Hooks {
 trait Utilities {
 
   /**
+   * @param string $id
+   * @param mixed $data
+   * @return string
+   */
+  public function getFrontContent(string $id, $data): string {
+    $data = json_encode($data, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    return "<input type='hidden' id='$id' value='$data'>";
+  }
+
+  /**
    * @return bool
    */
   public function isSafari(): bool {
-    return boolValue(preg_match("/^((?!chrome|android).)*safari/", strtolower($_SERVER['HTTP_USER_AGENT'])));
+    return boolValue(
+      preg_match(
+        "/^((?!chrome|android).)*safari/",
+        strtolower($this->url->server->get('HTTP_USER_AGENT')))
+    );
   }
 }

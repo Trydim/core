@@ -22,7 +22,7 @@ foreach ($param['managerField'] as $k => $item) {
     case 'checkbox':
       $managerFieldHtml .= '<div class="row managerField">
         <div class="col-12 col-md-6 ps-4">
-          <label class="w-100" for="' . $rndId . '">' . $item['name'] .':</label>
+          <label class="w-100" for="' . $rndId . '" role="button">' . $item['name'] .':</label>
         </div>
         <div class="col-12 col-md-6">
           <div class="form-check form-switch mb-3 text-center">
@@ -34,7 +34,8 @@ foreach ($param['managerField'] as $k => $item) {
     case 'list':
       $input = '<select name="' . $k . '" class="form-select">';
       foreach ($item['options'] as $option) {
-        $input .= '<option value="' . $option . '">' . $option . '</option>';
+        if (empty($option)) continue;
+        $input .= '<option value="' . htmlspecialchars($option) . '">' .  htmlspecialchars($option) . '</option>';
       }
       $input .= '</select>';
       break;
@@ -66,7 +67,7 @@ foreach ($param['managerField'] as $k => $item) {
           $dV = $row[$o['showKey']];
 
           $managerField[$k][$dK] = $dV;
-          $input .= '<option value="' . $dK . '">' . $dV . '</option>';
+          $input .= '<option value="' . htmlspecialchars($dK) . '">' . htmlspecialchars($dV) . '</option>';
         }
         $input .= '</select>';
       }
@@ -79,7 +80,7 @@ foreach ($param['managerField'] as $k => $item) {
 }
 unset($k, $dK, $dV, $item, $rndId, $data, $o, $row, $input);
 
-$field[VC::BASE_FOOTER_CONTENT] .= "<input type='hidden' id='dataManagerField' value='" . json_encode($managerField) . "'>";
+$field[VC::BASE_FOOTER_CONTENT] .= $main->getFrontContent('dataManagerField', $managerField);
 
 $field[VC::BASE_FOOTER_CONTENT] .= '
 <template id="permission">

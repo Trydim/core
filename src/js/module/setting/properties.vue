@@ -1,41 +1,44 @@
 <template>
   <div class="col-12" id="propertiesWrap">
-    <p-accordion @tab-open="openAccordion()">
-      <p-accordion-tab :header="accordionHeader">
-        <p-table v-if="propertiesData"
-                 :value="propertiesData"
-                 :loading="loading"
-                 :resizable-columns="true" column-resize-mode="fit" show-gridlines
-                 selection-mode="single" :meta-key-selection="false"
-                 :scrollable="true"
-                 responsive-layout="scroll"
-                 v-model:selection="propertiesSelected"
-                 @rowReorder="onRowReorder"
-                 @dblclick="dblClickProperty($event)"
-        >
-          <p-t-column :rowReorder="true" header-style="width: 3rem" header="Очередность" />
-          <p-t-column field="name" header="Название" />
-          <p-t-column field="code" header="Код">
-            <template #body="slotProps">
-              <span :data-code="slotProps.data.code">{{ slotProps.data.code }}</span>
-            </template>
-          </p-t-column>
-          <p-t-column field="type" header="Тип">
-            <template #body="slotProps">
-              {{ getTypeLang(slotProps.data.type) }}
-            </template>
-          </p-t-column>
-        </p-table>
+    <p-accordion @tabOpen="openAccordion()">
+      <p-accordion-panel :active="false">
+        <p-accordion-header>{{ accordionHeader }}</p-accordion-header>
+        <p-accordion-content>
+          <p-table v-if="propertiesData"
+                   :value="propertiesData"
+                   :loading="loading"
+                   :resizable-columns="true" column-resize-mode="fit" show-gridlines
+                   selection-mode="single" :meta-key-selection="false"
+                   :scrollable="true"
+                   responsive-layout="scroll"
+                   v-model:selection="propertiesSelected"
+                   @rowReorder="onRowReorder"
+                   @dblclick="dblClickProperty($event)"
+          >
+            <p-t-column :rowReorder="true" header-style="width: 3rem" header="Очередность" />
+            <p-t-column field="name" header="Название" />
+            <p-t-column field="code" header="Код">
+              <template #body="slotProps">
+                <span :data-code="slotProps.data.code">{{ slotProps.data.code }}</span>
+              </template>
+            </p-t-column>
+            <p-t-column field="type" header="Тип">
+              <template #body="slotProps">
+                {{ getTypeLang(slotProps.data.type) }}
+              </template>
+            </p-t-column>
+          </p-table>
 
-        <div class="my-3 text-center">
-          <p-button v-tooltip.bottom="'Добавить'" icon="pi pi-plus-circle" class="p-button-warning mx-1"
-                    :loading="loading" @click="createProperty" />
-          <p-button v-tooltip.bottom="'Изменить'" icon="pi pi-cog" class="p-button-warning mx-1"
-                    :loading="loading" @click="changeProperty" />
-          <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-trash" class="p-button-danger mx-1"
-                    :loading="loading" @click="deleteProperty" />
-        </div>
-      </p-accordion-tab>
+          <div class="my-3 text-center">
+            <p-button v-tooltip.bottom="'Добавить'" icon="pi pi-plus-circle" class="p-button-warning mx-1"
+                      :loading="loading" @click="createProperty" />
+            <p-button v-tooltip.bottom="'Изменить'" icon="pi pi-cog" class="p-button-warning mx-1"
+                      :loading="loading" @click="changeProperty" />
+            <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-trash" class="p-button-danger mx-1"
+                      :loading="loading" @click="deleteProperty" />
+          </div>
+        </p-accordion-content>
+      </p-accordion-panel>
     </p-accordion>
 
     <p-dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
@@ -48,7 +51,7 @@
         <div class="col-12 row my-1">
           <div class="col">Название свойства:</div>
           <div class="col">
-            <p-input-text class="w-100" v-model="property.newName" autofocus></p-input-text>
+            <p-input-text class="w-100" v-model="property.newName" autofocus />
           </div>
         </div>
         <!-- Код свойства -->
@@ -58,7 +61,7 @@
             <i class="ms-1 pi pi-tag" v-tooltip.bottom="'При изменении, обновить значение у дилеров'"></i>
           </div>
           <div class="col">
-            <p-input-text class="w-100" v-model="property.newCode"></p-input-text>
+            <p-input-text class="w-100" v-model="property.newCode" />
           </div>
         </div>
         <!-- Тип данных -->
@@ -85,14 +88,13 @@
 
           <div v-for="(field, key) of property.fields" class="row mb-1 border" :key="key">
             <div class="col-5 text-center">
-              <p-input-text class="w-100" v-model="field.newName"></p-input-text>
+              <p-input-text class="w-100" v-model="field.newName" />
             </div>
             <div class="col-6">
               <p-select class="w-100"
                         :options="propertiesDataBaseTypes"
                         option-value="id" option-label="name"
-                        v-model="field.type">
-              </p-select>
+                        v-model="field.type" />
             </div>
             <div class="col-1 text-center">
               <p-button v-tooltip.bottom="'Удалить поле'" icon="pi pi-times" class="p-button-danger"
@@ -105,14 +107,13 @@
             <div class="col">Колонки:</div>
             <div class="col">
               <p-button v-tooltip.bottom="'Добавить колонку в таблицу'" icon="pi pi-plus-circle" class="w-100 p-button-raised"
-                        label="Добавить колонку"
-                        @click="addTableColumn" />
+                        label="Добавить колонку" @click="addTableColumn" />
             </div>
           </div>
 
           <div v-for="(field, index) of property.fields" class="row  mb-1 border" :key="index">
             <div class="col flex-grow-1 p-0 text-center">
-              <p-input-text class="w-100" v-model="property.fields[index]"></p-input-text>
+              <p-input-text class="w-100" v-model="property.fields[index]" />
             </div>
             <div v-if="property.fields.length > 1" class="col-1 m-0 text-center">
               <p-button v-tooltip.bottom="'Удалить колонку'" icon="pi pi-times" class="p-button-danger"
@@ -126,8 +127,8 @@
       </div>
 
       <template #footer>
-        <p-button :label="this.$t('Yes')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="propertiesConfirm" />
-        <p-button :label="this.$t('No')" icon="pi pi-times" class="p-button-text" @click="propertiesCancel" />
+        <p-button :label="$t('Yes')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="propertiesConfirm" />
+        <p-button :label="$t('No')" icon="pi pi-times" class="p-button-text" @click="propertiesCancel" />
       </template>
     </p-dialog>
   </div>

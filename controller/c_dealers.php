@@ -52,7 +52,7 @@ foreach ($main->db->getTables('prop') as $table) {
     }, $main->db->loadTable($table['dbTable'])),
   ];
 }
-$field['footerContent'] .= "<input type='hidden' id='dataProperties' value='" . json_encode($setting) . "'>";
+$field['footerContent'] .= $main->getFrontContent('dataProperties', $setting);
 
 // If user have table property, add libs
 $haveTable = array_filter($setting, function ($prop) { return $prop['type'] === 'table'; });

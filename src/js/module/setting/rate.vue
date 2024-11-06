@@ -6,23 +6,21 @@
       <p class="col-8">{{ $t('Automatically update rates') }}</p>
       <div class="col-4 d-inline-flex">
         <p class="col mt-0 text-center">{{ $t('No') }}</p>
-        <p-switch v-model="autoRefresh"></p-switch>
+        <p-switch v-model="autoRefresh" />
         <p class="col mt-0 text-center">{{ $t('Yes') }}</p>
       </div>
     </div>
 
     <div v-if="autoRefresh" class="col-12 row mb-3">
       <div v-for="(label, key) of serverName" class="col-4 d-flex align-items-center">
-        <p-radiobutton v-model="serverRefresh" :value="key" :id="'server' + key"></p-radiobutton>
+        <p-radiobutton v-model="serverRefresh" :value="key" :id="'server' + key" />
         <label class="ms-1" :for="'server' + key">{{ label }}</label>
       </div>
     </div>
 
     <div v-if="!autoRefresh" class="col-12 text-center mb-3">
-      <p-button v-tooltip.bottom="this.$t('Edit rates')" icon="pi pi-sliders-h" class="p-button-success"
-                :label="this.$t('Edit')"
-                @click="editRate"
-      ></p-button>
+      <p-button v-tooltip.bottom="$t('Edit rates')" icon="pi pi-sliders-h" class="p-button-success"
+                :label="this.$t('Edit')" @click="editRate" />
     </div>
   </div>
 
@@ -41,49 +39,48 @@
              @cell-edit-complete="onEditComplete"
              style="width: 60vw; user-select: none;"
     >
-      <p-t-column field="ID" header="ID"></p-t-column>
+      <p-t-column field="ID" header="ID" />
       <p-t-column field="code" :sortable="true" header="Код">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
+          <p-input-text class="p-inputtext-sm" v-model="data[field]" />
         </template>
       </p-t-column>
       <p-t-column field="name" :sortable="true" header="Название">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
+          <p-input-text class="p-inputtext-sm" v-model="data[field]" />
         </template>
       </p-t-column>
       <p-t-column field="scale" header="Номинал">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]"></p-input-text>
+          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
       <p-t-column field="rate" header="Курс">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]"></p-input-text>
+          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
       <p-t-column field="shortName" header="Обозначение">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" v-model="data[field]"></p-input-text>
+          <p-input-text class="p-inputtext-sm" v-model="data[field]" />
         </template>
       </p-t-column>
       <p-t-column field="main" header="Основная">
         <template #body="slotProps">
           <p-checkbox type="radio" class="mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
-                      @click="setMain(slotProps.data.ID)"
-          ></p-checkbox>
+                      @click="setMain(slotProps.data.ID)" />
         </template>
       </p-t-column>
       <p-t-column field="lastEditDate" header="Удалить">
         <template #body="slotProps">
-          <p-button class="mx-auto p-button-rounded p-button-text p-button-sm" icon="pi pi-times" @click="deleteRate(slotProps.data.ID)"></p-button>
+          <p-button class="mx-auto p-button-rounded p-button-text p-button-sm" icon="pi pi-times" @click="deleteRate(slotProps.data.ID)" />
         </template>
       </p-t-column>
     </p-table>
 
     <template #footer>
-      <p-button class="float-start p-button-success" label="Добавить" icon="pi pi-plus" @click="addRate()"></p-button>
-      <p-button label="Закрыть" icon="pi pi-check" @click="modalHide"></p-button>
+      <p-button class="float-start p-button-success" label="Добавить" icon="pi pi-plus" @click="addRate()" />
+      <p-button label="Закрыть" icon="pi pi-check" @click="modalHide" />
     </template>
   </p-dialog>
 </template>

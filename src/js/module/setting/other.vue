@@ -6,11 +6,11 @@
       <label>{{ $t('Phone mask') }}</label>
     </div>
     <!--<div class="form-floating mb-3">
-      <p-input-text  class="form-control" placeholder="" v-model="phoneMask.Customers"></p-input-text>
+      <p-input-text class="form-control" placeholder="" v-model="phoneMask.Customers" />
       <label>Шаблон телефона для клиентов</label>
     </div>
     <div class="form-floating mb-3">
-      <p-input-text class="form-control" placeholder="" v-model="phoneMask.global"></p-input-text>
+      <p-input-text class="form-control" placeholder="" v-model="phoneMask.global" />
       <label>Шаблон телефона для остальных пользователей</label>
     </div>-->
 
@@ -25,7 +25,7 @@
       </div>
       <div class="input-group mb-3">
         <div class="input-group-text col-1">
-          <p-checkbox id="createMiniImage" v-model="catalogImageSize.createPrev" :binary="true"></p-checkbox>
+          <p-checkbox id="createMiniImage" v-model="catalogImageSize.createPrev" :binary="true" />
         </div>
         <label class="input-group-text col" for="createMiniImage">
           Формировать мини-изображение
@@ -34,8 +34,8 @@
       </div>
       <div v-if="catalogImageSize.createPrev" class="input-group mb-3">
         <span class="input-group-text col-8">Макс. Размер миниаютюры, px (ш*в)</span>
-        <p-input-text v-model="catalogImageSize.prevMaxHeight" class="form-control"></p-input-text>
-        <p-input-text v-model="catalogImageSize.prevMaxWidth" class="form-control"></p-input-text>
+        <p-input-text v-model="catalogImageSize.prevMaxHeight" class="form-control" />
+        <p-input-text v-model="catalogImageSize.prevMaxWidth" class="form-control" />
       </div>
     </template>
   </div>
