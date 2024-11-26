@@ -110,7 +110,8 @@ trait DbOrders {
     $connect = '';
 
     if (isset($filters['userId'])) {
-      $sql .= "O.user_id = '" . $filters['userId'] . "'";
+      $userId = $filters['userId'];
+      $sql .= 'O.user_id = ' . implode(' or O.user_id = ', is_array($userId) ? $userId : [$userId]);
       $connect = ' AND ';
     }
 
@@ -127,7 +128,7 @@ trait DbOrders {
     }
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn']);
-    $sql .= $this->getPaginatorQuery($pageParam);
+    $sql .= ' ' . $this->getPaginatorQuery($pageParam);
 
     return $this->jsonParseField(self::getAll($sql));
   }

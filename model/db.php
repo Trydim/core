@@ -265,17 +265,22 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       if (isset($orderIds)) {
         $orderIds = json_decode($orderIds ?? '[]', true);
         $result['orders'] = $db->loadOrdersById($orderIds);
-      } else if (isset($ordersFilter)) { // Загрузка по менеджеру, клиенту или статусу
+      } else if (isset($ordersFilter)) { // Загрузка по менеджеру, клиенту и/или статусу
         $ordersFilter = json_decode($ordersFilter, true);
         $result['orders'] = $db->loadOrdersByRelatedKey($pagerParam, $ordersFilter);
 
-        if (isset($ordersFilter['userId'])) $ordersFilter = 'user_id = ' . $ordersFilter['userId'];
-        else if (isset($ordersFilter['customerId'])) $ordersFilter = 'customer_id = ' . $ordersFilter['customerId'];
-        else if ($statusId = isset($ordersFilter['statusId'])) $ordersFilter = 'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
+        if (isset($ordersFilter['userId'])) {
+          $userId = $ordersFilter['userId'];
+          $ordersFilter = 'user_id = ' . implode(' or user_id = ', is_array($userId) ? $userId : [$userId]);
+        } else if (isset($ordersFilter['customerId'])) {
+          $ordersFilter = 'customer_id = ' . $ordersFilter['customerId'];
+        } else if (isset($ordersFilter['statusId'])) {
+          $statusId = $ordersFilter['statusId'];
+          $ordersFilter = 'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
+        }
 
         $result['countRows'] = $db->getCountRows('orders', $ordersFilter);
-      } //
-      else {
+      } else {
         $dateRange = json_decode($dateRange ?? '[]', true);
         $result['orders'] = $db->loadOrders($pagerParam, $dateRange);
         $result['countRows'] = $db->getCountRows('orders');
@@ -826,7 +831,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if (count($haveDealers)) {
           $haveDealers = array_filter($haveDealers, function ($param) use ($dbPrefix) {
             $param = json_decode($param, true);
-            return ($param['dbPrefix'] ?? false) === $dbPrefix;
+            return ($param['dbPrefix'] ?? $param['prefix'] ?? false) === $dbPrefix;
           });
           if (count($haveDealers)) {
             $dbPrefix = str_replace('_', '', $dbPrefix) . substr(uniqid(), -3, 3) . '_';

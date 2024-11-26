@@ -22,7 +22,7 @@ foreach ($param['managerField'] as $k => $item) {
     case 'checkbox':
       $managerFieldHtml .= '<div class="row managerField">
         <div class="col-12 col-md-6 ps-4">
-          <label class="w-100" for="' . $rndId . '" role="button">' . $item['name'] .':</label>
+          <label class="w-100" for="' . $rndId . '">' . $item['name'] .':</label>
         </div>
         <div class="col-12 col-md-6">
           <div class="form-check form-switch mb-3 text-center">
@@ -45,7 +45,7 @@ foreach ($param['managerField'] as $k => $item) {
       $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $o['table']);
 
       if ($o['multiselect'] ?? false) {
-        $managerFieldHtml = '<div class="form-control managerField mb-3" style="height: 60px; overflow: hidden auto; resize: vertical">'; //  ' . ($o['multiselect'] ?? false ? 'multiple style="resize: vertical"' : '') . '>'
+        $managerFieldHtml .= '<div class="form-control managerField mb-3" style="height: 60px; overflow: hidden auto; resize: vertical">'; //  ' . ($o['multiselect'] ?? false ? 'multiple style="resize: vertical"' : '') . '>'
         foreach ($data as $row) {
           $rndId = uniqid();
           $dK = $row[$o['saveKey']];
@@ -122,12 +122,12 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
     </div>' .
     $managerFieldHtml
     . '<div id="changeField" class="row">
-      <div class="col-12 col-md-6 ps-4">
-        <label class="w-100" for="pActivity" role="button">' . gTxt('Activity') . ':</label>
-      </div>
+      <div class="col-12 col-md-6 ps-4">' . gTxt('Activity') . ':</div>
       <div class="col-12 col-md-6">
         <div class="form-check form-switch mb-3 text-center">
-          <input class="form-check-input float-none" type="checkbox" role="switch" name="activity" id="pActivity">
+          <label class="w-100">
+            <input class="form-check-input float-none" type="checkbox" role="switch" name="activity" id="pActivity">
+          </label>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@
  */
 
 ?>
-<div class="d-flex justify-content-between pb-4" id="actionBtnWrap">
+<div class="d-flex justify-content-between mb-4 pt-1 position-sticky top-0 bg-white gap-5 gap-md-0" id="actionBtnWrap" style="z-index: +2">
   <div class="d-inline-flex flex-wrap gap-1">
     <input type="button" class="btn btn-success" value="<?= gTxt('Add') ?>" data-action="addUser">
     <input type="button" class="btn btn-warning" value="<?= gTxt('Change') ?>" data-action="changeUser">

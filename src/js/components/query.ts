@@ -27,12 +27,11 @@ const getFileName = (data: any) => {
   let fileName = data.headers.get('Content-Disposition');
 
   if (typeof fileName === 'string') {
-    const match = /(?:filename=")\w+\.\w+(?=")/i.exec(fileName); // safari error
-    fileName = Array.isArray(match) && match.length === 1 && match[0];
-    if (fileName.replace) fileName = fileName.replace('filename="', '');
+    const match = /(?:filename=")(.+)(?=")/i.exec(fileName);
+    fileName = Array.isArray(match) && match.length === 2 && match[1];
   }
 
-  return fileName || JSON.parse(data.headers.get('fileName')) || '';
+  return fileName || data.headers.get('File-Name') || 'document.pdf';
 }
 const downloadBody = async (data: any) => {
   const fileName = getFileName(data),

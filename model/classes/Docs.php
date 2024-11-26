@@ -295,6 +295,7 @@ class Docs {
           return $path . $this->fileName;
         } else {
           if ($this->main->isSafari()) {
+            header('File-Name: ' . $this->fileName);
             $this->docs->stream($this->fileName, ["Attachment" => false]);
             exit();
           }
