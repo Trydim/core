@@ -289,7 +289,9 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
     case 'searchOrder':
       if (isset($searchValue)) {
-        $result['orders'] = $db->searchOrders($pagerParam, $searchValue);
+        $ordersFilter = json_decode($ordersFilter ?? '[]', true);
+
+        $result['orders'] = $db->searchOrders($pagerParam, $searchValue, $ordersFilter);
         $result['countRows'] = count($result['orders']);
       }
       break;

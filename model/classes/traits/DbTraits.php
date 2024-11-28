@@ -111,7 +111,7 @@ trait DbOrders {
 
     if (isset($filters['userId'])) {
       $userId = $filters['userId'];
-      $sql .= 'O.user_id = ' . implode(' or O.user_id = ', is_array($userId) ? $userId : [$userId]);
+      $sql .= 'O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]);
       $connect = ' AND ';
     }
 
@@ -136,17 +136,23 @@ trait DbOrders {
   /**
    * @param array $pageParam
    * @param string $searchValue
+   * @param array $filters
    * @return array
    */
-  public function searchOrders(array $pageParam, string $searchValue): array {
+  public function searchOrders(array $pageParam, string $searchValue, array $filters = []): array {
     $searchValue = '%' . $searchValue . '%';
 
     $sql = $this->getBaseOrdersQuery();
-    $sql .= "WHERE O.ID like '$searchValue' ";
+    $sql .= "WHERE (O.ID like '$searchValue' ";
     $sql .= "OR O.important_value like '$searchValue' ";
     $sql .= "OR C.contacts like '$searchValue' ";
     $sql .= "OR U.name like '$searchValue' ";
-    $sql .= "OR C.name like '$searchValue' ";
+    $sql .= "OR C.name like '$searchValue') ";
+
+    if (isset($filters['userId'])) {
+      $userId = $filters['userId'];
+      $sql .= 'AND O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]) . ' ';
+    }
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
     $sql .= $this->getPaginatorQuery($pageParam);
