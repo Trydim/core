@@ -183,7 +183,7 @@ function gTxt(string $str): string {
     if ($main->isDealer()) {
       $path = $main->url->getPath(true) . 'lang/dictionary.php';
       $dTxt = file_exists($path) ? include $path : [];
-      $txt = array_replace($txt, $dTxt);
+      $txt = array_merge(array_replace($txt, $dTxt), $dTxt);
     }
   }
   return $txt[$str] ?? $str;

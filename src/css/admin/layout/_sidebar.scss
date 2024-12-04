@@ -46,7 +46,7 @@
       color: #bdbdc7;
       text-decoration: none;
       white-space: nowrap;
-      transition: all 0.8s linear;
+      transition: background-color 0.8s linear, transform 2s linear;
 
       > i {
         font-size: 1.125rem;

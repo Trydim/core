@@ -6,6 +6,7 @@ import {FormsTable} from "./formEditor/FormsTable";
 import {CsvValues} from "./csvEditor/CsvValues";
 import {TableEditor} from "./tableEditor/TableEditor.js";
 import ContentEditor from './contentEditor/ContentEditor';
+import localStorage from "../../components/LocalStorage";
 
 /**
  * Erase template from ${}
@@ -20,16 +21,23 @@ const checkAddedFile = function (e) {
   if (!input.value.includes('csv')) return;
 }*/
 
+const storage = new f.LocalStorage();
+
 const adminDb = {
   init() {
     this.onEvent();
     if (this.checkLoadContentEditor()) this.switchAdminType('content');
-    else this.setDefault();
+    else this.setTableMode();
 
     return this;
   },
-  setDefault() {
-    setTimeout(() => f.qS('input[data-action]:checked').click(), 0);
+  setTableMode() {
+    const mode = storage.get('tableMode');
+
+    setTimeout(() => {
+      if (mode) f.qS(`input[value="${mode}"]`).click();
+      else f.qS('input[data-action]:checked').click();
+    }, 0);
   },
 
   checkLoadContentEditor() {
@@ -47,6 +55,7 @@ const adminDb = {
     select[action] && select[action]();
   },
   switchAdminType(value) {
+    storage.set('tableMode', value);
     this.adminType && this.adminType.destroy();
 
     switch (value) {
