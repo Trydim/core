@@ -22,7 +22,7 @@
   </div>
 </div>
 <div class="position-sticky mb-4 pt-1 top-0 bg-white d-none" id="confirmField" style="z-index: +2">
-  <label class="d-md-inline w-100"><select id="selectStatus" class="d-none form-select" data-action="statusOrders"></select></label>
+  <label class="d-block d-md-inline-block"><select id="selectStatus" class="d-none form-select" data-action="statusOrders"></select></label>
   <input type="button" class="btn btn-success mt-1 mt-md-0" value="<?= gTxt('Confirm') ?>" data-action="confirmYes">
   <input type="button" class="btn btn-warning ms-1 mt-1 mt-md-0" value="<?= gTxt('Cancel') ?>" data-action="confirmNo">
 </div>

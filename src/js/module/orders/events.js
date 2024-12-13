@@ -359,13 +359,10 @@ export default class extends Orders {
   }
 
   statusOrders(target) {
+    this.queryParam.currentStatusId = this.orders[this.selected.getSelected()[0]].statusId;
     this.queryParam.statusId = target.value;
   }
-  changeEmailInput(e) {
-    this.queryParam.email = e.target.value;
-  }
+  changeEmailInput(e) { this.queryParam.email = e.target.value }
 
-  resetSelected() {
-    this.selected.clear();
-  }
+  resetSelected() { this.selected.clear() }
 }

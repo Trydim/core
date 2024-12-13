@@ -29,10 +29,11 @@ switch ($cmsAction) {
 
         // Subdomain or sub folder
         $target = $main->url->getUri();
-
-        if (empty($main->url->getSubDomain())) {
-          $scheme = '://';
-          $target = str_replace('s' . $scheme, $scheme . $user['urlPrefix'] . '.', $target);
+        if ($main->getCmsParam(VC::USE_DEAL_SUBDOMAIN) && empty($main->url->getSubDomain())) {
+          if (empty($user['urlPrefix'])) {
+            $scheme = 's://'; // SSL получается обязательно, так не очень
+            $target = str_replace($scheme, $scheme . $user['urlPrefix'] . '.', $target);
+          }
 
           $target .= '?save=' . $_SESSION['PHPSESSID'];
         }

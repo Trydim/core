@@ -297,12 +297,17 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
     case 'changeStatusOrder':
       if (isset($orderIds) && isset($statusId) && count($columns)) {
-        if (!is_finite($statusId)) {
-          $result['error'] = 'status_id_error';
-          break;
+        $orderIds = explode(',', $orderIds);
+
+        if (!is_finite($statusId)) { $result['error'] = 'status_id_error'; break; }
+
+        if (!isset($currentStatusId)) { $result['error'] = 'current_status_id_error'; break; }
+
+        foreach ($db->loadOrdersById($orderIds) as $order) {
+          if ($order['statusId'] !== $currentStatusId) { $result['error'] = 'current_status_is_not_equal_error'; break; }
         }
 
-        $db->changeOrders($columns, $dbTable, explode(',', $orderIds), $statusId);
+        $db->changeOrders($columns, $dbTable, $orderIds, $statusId);
       }
       break;
     case 'delOrders':

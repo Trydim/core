@@ -1,5 +1,9 @@
 <?php
 
+namespace Helpers;
+use ParameterBag;
+use UploadedFile;
+
 /**
  * FileBag is a container for uploaded files.
  */
