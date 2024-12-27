@@ -124,9 +124,14 @@ class Dealer {
     $this->migrateDb->createOrders();
     $this->migrateDb->createClientOrders();
 
-    $this->migrateDb->addAdmin($param['login'], $param['pass']);
-    $this->migrateDb->addStatus($param['status'] ?? []);
-    $this->migrateDb->addMoneyRate($param['money'] ?? []);
+    if ($this->migrateDb->checkResourceDump()) {
+      $this->migrateDb->seedingResourceDump();
+      $this->migrateDb->updateAdmin($param['login'], $param['pass']);
+    } else {
+      $this->migrateDb->addAdmin($param['login'], $param['pass']);
+      $this->migrateDb->addStatus($param['status'] ?? []);
+      $this->migrateDb->addMoneyRate($param['money'] ?? []);
+    }
   }
 
   /**

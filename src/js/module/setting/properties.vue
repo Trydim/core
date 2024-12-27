@@ -1,7 +1,7 @@
 <template>
   <div class="col-12" id="propertiesWrap">
-    <p-accordion @tabOpen="openAccordion()">
-      <p-accordion-panel :active="false">
+    <p-accordion @tabOpen="openAccordion()" value="-1">
+      <p-accordion-panel value="0">
         <p-accordion-header>{{ accordionHeader }}</p-accordion-header>
         <p-accordion-content>
           <p-table v-if="propertiesData"

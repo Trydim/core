@@ -57,10 +57,10 @@ CREATE TABLE `money` (
 -- Дамп данных таблицы `money`
 --
 
-INSERT INTO `money` (`ID`, `code`, `name`, `short_name`, `rate`, `main`) VALUES
-(1, 'USD', 'United State Dollar', '$', '1.0000', 1),
-(2, 'RUB', 'Российский рубль', 'руб.', '60.0000', 0),
-(3, 'BYN', 'рубль', 'руб.', '2.5000', 0);
+INSERT INTO `money` (`ID`, `code`, `name`, `short_name`, `main`) VALUES
+(1, 'USD', 'United State Dollar', '$', 1),
+(2, 'RUB', 'Российский рубль', 'руб.', 0),
+(3, 'BYN', 'рубль', 'руб.', 0);
 
 -- --------------------------------------------------------
 

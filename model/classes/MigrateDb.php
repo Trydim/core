@@ -15,6 +15,12 @@ class MigrateDb {
   private $charset = 'utf8mb4';
 
   /**
+   * Resources dump files list
+   * @var string[]
+   */
+  private $resourceDumps = [];
+
+  /**
    * @var Main
    */
   private $main;
@@ -23,6 +29,8 @@ class MigrateDb {
    * @var Db
    */
   private $db;
+
+
 
   /**
    * @param string $prefix
@@ -349,6 +357,25 @@ class MigrateDb {
     SIDES
   --------------------------------------------------------------------------------------------------------------------*/
 
+  public function checkResourceDump(string $dir = 'resource'): bool {
+    $path = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR;
+
+    array_map(function (string $file) use ($path) {
+      if (includes($file, '.sql')) {
+        $this->resourceDumps[] = $path . $file;
+      }
+    }, scandir($path));
+
+    return count($this->resourceDumps) > 0;
+  }
+  public function seedingResourceDump() {
+    foreach ($this->resourceDumps AS $path) {
+      $sql = file_get_contents($path);
+      $sql = str_replace('$prefix', $this->prefix, $sql);
+      $this->db::exec($sql);
+    }
+  }
+
   public function addAdmin(string $login, string $pass) {
     $bean = $this->db::xdispense($this->pf('permission'));
     $bean->name = 'Администратор';
@@ -359,9 +386,22 @@ class MigrateDb {
 
     $bean = $this->db::xdispense($this->pf('users'));
     $bean->permission_id = $permId;
-    $bean->login = $login ?? $this::DEAL_LOGIN;
+    $bean->login         = $login ?? $this::DEAL_LOGIN;
+    $bean->password      = $pass ?? $this::DEAL_PASS;
+    $bean->name          = $login ?? $this::DEAL_LOGIN;
+    $this->db->store($bean);
+  }
+
+  /**
+   * Update login after user migrate DB
+   */
+  public function updateAdmin(string $login, string $pass) {
+    if ($login === '' || $pass === '') return;
+
+    $bean = $this->db::xdispense($this->pf('users'));
+    $bean->id       = '1';
+    $bean->login    = $login ?? $this::DEAL_LOGIN;
     $bean->password = $pass ?? $this::DEAL_PASS;
-    $bean->name = $login ?? $this::DEAL_LOGIN;
     $this->db->store($bean);
   }
   public function addStatus(array $rows) {
@@ -379,36 +419,39 @@ class MigrateDb {
     $bean->name = $this::ORDER_STATUS;
     $this->db->store($bean);
   }
-  public function addMoneyRate(array $rows) {
-    $bean = $this->db::xdispense($this->pf('money'));
-    $bean->code = 'USD';
-    $bean->name = 'United State Dollar';
-    $bean->short_name = '$';
-    $bean->scale = 1;
-    $bean->rate = 1;
-    $bean->main = 1;
-    $this->db->store($bean);
+  public function addMoneyRate() {
+    $rows = [
+      [
+        'code' => 'USD',
+        'name' => 'United State Dollar',
+        'short_name' => '$',
+        'main' => 1,
+      ],
+      [
+        'code' => 'EUR',
+        'name' => 'Euro',
+        'short_name' => '€',
+      ],
+      [
+        'code' => 'RUB',
+        'name' => 'Российский рубль',
+        'short_name' => 'руб.',
+        'scale' => 100,
+      ],
+      [
+        'code' => 'BYN',
+        'name' => 'Белорусский рубль',
+        'short_name' => 'руб.',
+      ],
+    ];
 
-    $bean->code = 'EUR';
-    $bean->name = 'Euro';
-    $bean->short_name = '€';
-    $bean->scale = 1;
-    $bean->rate = 1;
-    $this->db->store($bean);
-
-    $bean->code = 'RUB';
-    $bean->name = 'Российский рубль';
-    $bean->short_name = 'руб.';
-    $bean->scale = 100;
-    $bean->rate  = 60;
-    $this->db->store($bean);
-
-    $bean->code = 'BYN';
-    $bean->name = 'Белорусский рубль';
-    $bean->short_name = 'руб.';
-    $bean->scale = 1;
-    $bean->rate  = 1;
-    $this->db->store($bean);
+    foreach ($rows AS $row) {
+      $bean = $this->db::xdispense($this->pf('money'));
+      foreach ($row AS $column => $value) {
+        $bean->$column = $value;
+      }
+      $this->db->store($bean);
+    }
   }
 
   public function drop($prefix, int $deep = 0) {

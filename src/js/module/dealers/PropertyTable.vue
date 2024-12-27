@@ -1,6 +1,6 @@
 <template>
-  <Accordion style="min-width: 78vw">
-    <AccordionPanel>
+  <Accordion style="min-width: 78vw" value="-1">
+    <AccordionPanel value="0">
       <AccordionHeader>{{ prop.name }}</AccordionHeader>
       <AccordionContent><div ref="table"></div></AccordionContent>
     </AccordionPanel>

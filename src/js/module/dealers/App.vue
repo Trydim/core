@@ -77,41 +77,42 @@
     <div v-if="queryParam.dbAction !== 'deleteDealer'" class="row" style="max-width: 80vw">
       <div class="col-12 col-md-6">
         <!-- Название -->
-        <div class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">Название:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.name" autofocus />
-        </div>
+        <InputGroup>
+          <InputGroupAddon class="col-5" v-html="'Название:'" />
+          <InputText placeholder="'ООО' Новый дилер" v-model="dealer.name" />
+        </InputGroup>
 
-        <div class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">Логин:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.login" />
-        </div>
-        <div class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">Пароль:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.password" />
-        </div>
-        <!-- Контакты номер -->
-        <div class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">Телефон:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.contacts.phone" />
-        </div>
-        <!-- Контакты почта -->
-        <div class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">Почта:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.contacts.email" />
-        </div>
-        <!-- Контакты адрес -->
-        <div class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">Адрес:</span>
-          <InputText class="p-inputtext-sm" v-model="dealer.contacts.address" />
-        </div>
-        <!-- Доступен -->
-        <div class="p-inputgroup my-2">
-          <span class="p-inputgroup-addon col-5">Доступ:</span>
+        <InputGroup class="my-2">
+          <InputGroupAddon class="col-5" v-html="'Логин:'" />
+          <InputText placeholder="admin" v-model="dealer.login" />
+        </InputGroup>
+
+        <InputGroup class="my-2">
+          <InputGroupAddon class="col-5" v-html="'Пароль:'" />
+          <InputText placeholder="123" v-model="dealer.password" />
+        </InputGroup>
+
+        <InputGroup class="my-2">
+          <InputGroupAddon class="col-5" v-html="'Телефон:'" />
+          <InputText placeholder="" v-model="dealer.contacts.phone" />
+        </InputGroup>
+
+        <InputGroup class="my-2">
+          <InputGroupAddon class="col-5" v-html="'Почта:'" />
+          <InputText placeholder="" v-model="dealer.contacts.email" />
+        </InputGroup>
+
+        <InputGroup class="my-2">
+          <InputGroupAddon class="col-5" v-html="'Адрес:'" />
+          <InputText placeholder="" v-model="dealer.contacts.address" />
+        </InputGroup>
+
+        <InputGroup class="my-2">
+          <InputGroupAddon class="col-5" v-html="'Доступ:'" />
           <ToggleButton on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
                         on-label="Активен" off-label="Неактивен"
                         v-model="dealer.activity" />
-        </div>
+        </InputGroup>
       </div>
 
       <div class="col-12 col-md-6">
@@ -120,13 +121,14 @@
           @click="refreshProperties"
         ></Button>-->
         <template v-for="(prop, key) of properties" :key="key">
-          <div v-if="prop.type !== 'table'" class="p-inputgroup my-2">
-            <span class="p-inputgroup-addon col-5">{{ prop.name }}</span>
+          <InputGroup v-if="prop.type !== 'table'" class="mb-2">
+            <InputGroupAddon class="col-5" v-html="prop.name" />
 
             <InputText v-if="prop.type === 'text'" v-model="dealer.settings[key]" />
             <InputNumber v-else-if="prop.type === 'number'"
                          :max-fraction-digits="10" v-model="dealer.settings[key]" @focus="this.value = ''" />
-            <Textarea v-else-if="prop.type === 'textarea'" v-model="dealer.settings[key]" style="min-height: 42px" />
+            <Textarea v-else-if="prop.type === 'textarea'" class="w-100" style="min-height: 46px"
+                      v-model="dealer.settings[key]" />
             <ToggleButton v-else-if="prop.type === 'bool'" class="w-100"
                           on-icon="pi pi-check" off-icon="pi pi-times"
                           on-label="Да" off-label="Нет"
@@ -138,7 +140,7 @@
             <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="ID"
                          :options="Object.values(prop.values)"
                          v-model="dealer.settings[key]" />
-          </div>
+          </InputGroup>
         </template>
       </div>
 
@@ -171,6 +173,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ToggleButton from 'primevue/togglebutton';
 import Checkbox from 'primevue/checkbox';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import InputNumber from 'primevue/inputnumber';
@@ -186,7 +190,9 @@ import PropertyTable from "./PropertyTable.vue";
 export default {
   name: 'dealer',
   components: {
-    Button, Checkbox, ToggleButton, InputText, InputNumber, Textarea, Calendar, Dropdown, MultiSelect,
+    Button, Checkbox, ToggleButton,
+    InputGroup, InputGroupAddon,
+    InputText, InputNumber, Textarea, Calendar, Dropdown, MultiSelect,
     DataTable, Column,
     TablePropertyValue, PropertyTable,
     Dialog,
@@ -199,16 +205,17 @@ export default {
 
     dealers: [],
     selected: {},
-
     dealer: {
       id: undefined,
-      name: undefined,
+      name: '',
+      login: '',
+      password: '',
       contacts: {
-        phone: undefined,
-        email: undefined,
-        address: undefined,
+        phone: '',
+        email: '',
+        address: '',
       },
-      activity: undefined,
+      activity: true,
       settings: {},
     },
     dealersProperties: {},
@@ -262,6 +269,16 @@ export default {
 
         this.modal.confirmDisabled = !(valid === 0b11111 || valid === 0b1);
       },
+    },
+    'dealer.login'() {
+      if (!this.dealer.login) return;
+      const v = this.dealer.login.trim();
+      if (v !== this.dealer.login) this.dealer.login = v;
+    },
+    'dealer.password'() {
+      if (!this.dealer.password) return;
+      const v = this.dealer.password.trim();
+      if (v !== this.dealer.password) this.dealer.password = v;
     },
   },
   methods: {
@@ -326,6 +343,8 @@ export default {
 
       this.dealer = {
         name: '',
+        login: '',
+        password: '',
         contacts: {
           phone: '',
           email: '',
@@ -417,7 +436,13 @@ export default {
     this.queryParam.dbAction = 'loadDealers';
     this.query();
   },
-  mounted() { },
 }
 
 </script>
+
+<style>
+:root {
+  --p-accordion-header-padding: 10px !important;
+  --p-form-field-placeholder-color: var(--p-surface-300) !important;
+}
+</style>
