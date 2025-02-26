@@ -1,7 +1,5 @@
 <?php
 
-//const RESULT_PATH = 'shared/'; // Папка для временных файлов
-
 !defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
@@ -82,7 +80,7 @@ class Docs {
 
     $this->setFileTpl($fileTpl);
     $this->setDefaultParam();
-    $this->getFileName();
+    $this->getFilename();
     switch ($this->docsType) {
       case 'pdf':
         $this->prepareTemplate();
@@ -100,7 +98,7 @@ class Docs {
     }
   }
 
-  private function getFileName() {
+  private function getFilename() {
     $file = str_replace($this->main->url->getScheme(), '', $this->main->url->getHost())
       . '_' . substr(uniqid(), 9, 4)
       . '_' . date('dmY');
@@ -295,7 +293,7 @@ class Docs {
           return $path . $this->fileName;
         } else {
           if ($this->main->isSafari()) {
-            header('File-Name: ' . $this->fileName);
+            header('filename: ' . $this->fileName);
             $this->docs->stream($this->fileName, ["Attachment" => false]);
             exit();
           }

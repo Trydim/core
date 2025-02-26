@@ -174,7 +174,7 @@ declare type CMSGlobalObject = {
    * type: 'base64',
    * blob: 'data:application/pdf;base64,' + data['pdfBody']}
    */
-  saveFile(data: {name: string, type: undefined | string  | 'json' | 'base64', lob: string}): void
+  saveFile(data: {name: string, type: undefined | string  | 'json' | 'base64', blob: string}): void
   /**
    * Replace latin to cyrillic symbol
    */

@@ -265,7 +265,7 @@ export default {
         valid |= d.password ? 0b1000 : 0b0;
         valid |= d.password && d.password.length > 2 ? 0b10000 : 0b0;
 
-        this.msg.text = valid === 0b11111 ? $t('Login and password changed!') : '';
+        this.msg.text = valid === 0b11111 ? this.$t('Login and password changed!') : '';
 
         this.modal.confirmDisabled = !(valid === 0b11111 || valid === 0b1);
       },

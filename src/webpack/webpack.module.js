@@ -6,13 +6,13 @@ const fs = require('fs'),
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizer = require('css-minimizer-webpack-plugin');
 
-const absPath = '../../',
-      resFileName = 'webpackModule.json';
+const ABS_PATH = '../../',
+      RES_FILENAME = 'webpackModule.json';
 
 let entry;
 
-if (fs.existsSync(absPath + 'public/' + resFileName)) {
-  let rd = fs.readFileSync(absPath + 'public/' + resFileName, {encoding: 'utf8'});
+if (fs.existsSync(ABS_PATH + 'public/' + RES_FILENAME)) {
+  let rd = fs.readFileSync(ABS_PATH + 'public/' + RES_FILENAME, {encoding: 'utf8'});
   entry  = JSON.parse(rd);
 } else {
   console.log("\x1b[31m", 'Error.\nFile webpackModule.json not exist. Check config.php and run createResourceFile!');

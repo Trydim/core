@@ -139,7 +139,7 @@ export default {
     setPermissionTags(id) {
       if (typeof id === 'string') id = this.permissionsChangeId;
       const sPer = this.permissionsData.find(i => i.id === id);
-      sPer.properties.tags = this.permission.tags;
+      sPer.properties.tags = this.permission.current.properties.tags;
     },
 
     // Events
@@ -176,7 +176,7 @@ export default {
       }
     },
     changePermissionTags() {
-      this.permission.tags = this.permission.tags.toLowerCase();
+      this.permission.current.properties.tags = this.permission.current.properties.tags.toLowerCase();
       this.setPermissionTags(this.permission.id);
     },
     removePermission() {

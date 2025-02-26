@@ -4,7 +4,7 @@
  * @var Main $main - global
  */
 
-$isGlobal = true;
+$main->addControllerField(VC::BASE_IS_GLOBAL, true);
 $sitePath = $main->url->getUri();
 $login    = $_REQUEST['login'] ?? '';
 $dealers  = $dealers ?? [];
@@ -37,7 +37,7 @@ $dealers  = $dealers ?? [];
             </div>
           </div>
           <div class="form-group">
-            <a href="forgot"><?= gTxt('Forgotten password?') ?></a>
+            <a href="/forgot"><?= gTxt('Forgotten password?') ?></a>
           </div>
         </div>
 

@@ -273,6 +273,12 @@ final class Main {
    * @return Main
    */
   public function setControllerField(&$field): Main {
+    if (!empty($this->controllerField)) {
+      foreach ($this->controllerField as $k => $v) {
+        $field[$k] = $v;
+      }
+    }
+
     $this->controllerField =& $field;
     return $this;
   }
@@ -325,18 +331,32 @@ final class Main {
     return $this;
   }*/
 
-  public function getControllerField(): array { return $this->controllerField; }
+  public function getControllerField($key = '', $default = null) {
+    return empty($key) ? $this->controllerField : ($this->controllerField[$key] ?? $default);
+  }
+
+  /**
+   * @Danger
+   * @param string $path
+   * @return void
+   */
+  public function setControllerViewField(string $path) {
+    $main = $this;
+    $field =& $this->controllerField;
+    ob_start();
+    if (file_exists($path)) require $path;
+    $templateContent = ob_get_clean();
+    $this->controllerField['content'] = $field['content'] ?? (empty($templateContent) ? $this->url->getRoute() . ' default content.' : $templateContent);
+  }
 
   //public function getControllerParam(string $key) { return $this->controllerParam[$key] ?: false; }
 
   public function initDefaultController(): Main {
-    $main = $this;
-    $isGlobal = false;
     $target = $this->url->getRoute();
 
     $field = [
       'main'        => $this,
-      'pageTitle'   => $main->getCmsParam(VC::PROJECT_TITLE) . ' ' . gTxt(ucfirst($target)),
+      'pageTitle'   => $this->getCmsParam(VC::PROJECT_TITLE) . ' ' . gTxt(ucfirst($target)),
       'headContent' => '',
       'cssLinks'    => [],
       'jsLinks'     => [],
@@ -352,13 +372,11 @@ final class Main {
     ];
 
     $this->setControllerField($field)->fireHook($target . 'Template', $field);
-    ob_start();
-    include $this->url->getRoutePath();
-    $templateContent = ob_get_clean();
-    $field['content'] = $field['content'] ?? (empty($templateContent) ? $target . ' default content.' : $templateContent);
-    if ($isGlobal) $field['global'] = $field['content'];
+    $this->setControllerViewField($this->url->getRoutePath());
+    // Can be set to view component
+    if ($this->getControllerField(VC::BASE_IS_GLOBAL)) $field[VC::BASE_GLOBAL] = $field[VC::BASE_CONTENT];
 
-    $this->response->setContent(template(OUTSIDE ? '_outside' : 'base', $field));
+    $this->response->setContent(template(OUTSIDE ? '_outside' : 'base',  $this->getControllerField()));
     return $this;
   }
 
@@ -392,16 +410,20 @@ final class Main {
     return $this->getFrontContent($dataId, $rate);
   }
 
-  public function publicMain() {
+  public function publicMain(): Main {
     $this->publicDealer = false;
     $this->setCmsParam('dealCsvPath', $this->getCmsParam(VC::CSV_PATH));
     $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam(VC::CSV_MAIN_PATH));
+
+    return $this;
   }
 
-  public function publicDealer() {
+  public function publicDealer(): Main {
     if ($this->isDealer()) {
       $this->publicDealer = true;
       $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam('dealCsvPath'));
     }
+
+    return $this;
   }
 }

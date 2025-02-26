@@ -39,7 +39,8 @@ class VC {
         USER_DEALER     = 'dealer';
 
   /** Base views field */
-  const BASE_GLOBAL           = 'global',
+  const BASE_IS_GLOBAL        = 'isGlobal',
+        BASE_GLOBAL           = 'global',
         BASE_PAGE_TITLE       = 'pageTitle',
         BASE_HEAD_CONTENT     = 'headContent',
         BASE_PAGE_HEADER      = 'pageHeader',

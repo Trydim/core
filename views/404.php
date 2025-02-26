@@ -4,7 +4,7 @@
  * @var Main $main - global
  */
 
-$isGlobal = true;
+$main->addControllerField(VC::BASE_IS_GLOBAL, true);
 $dbError = isset($_REQUEST['dbError']);
 ?>
 <div class="authentication" style="height: 100vh">

@@ -141,15 +141,15 @@ switch ($cmsAction) {
     }
     break;
   case 'createFile':
-    if (isset($fileName)) {
-      $name = pathinfo($fileName, PATHINFO_FILENAME);
-      $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-      if (file_exists($fileName)) { $result['error'] = 'File exist!'; break; }
+    if (isset($filename)) {
+      $name = pathinfo($filename, PATHINFO_FILENAME);
+      $ext = pathinfo($filename, PATHINFO_EXTENSION);
+      if (file_exists($filename)) { $result['error'] = 'File exist!'; break; }
       if (empty($name) || empty($ext)) { $result['error'] = 'File name error!'; break; }
 
       $data = $ext === 'csv' ? ";;;\n;;;\n;;;\n" : '';
 
-      $result['error'] = file_put_contents($fileName, $data);
+      $result['error'] = file_put_contents($filename, $data);
       if (!$result['error']) $result['error'] = 'Error create file!';
     }
     break;
@@ -198,8 +198,8 @@ switch ($cmsAction) {
 
       if (ob_get_level()) ob_end_clean();
 
-      header('FileName: ' . json_encode(basename($zip_file)));
-      header('Content-Length: ' . filesize($zip_file));
+      header('filename: ' . json_encode(basename($zip_file)));
+      header('content-length: ' . filesize($zip_file));
       if (readfile($zip_file)) {
         $zip = dirname(__FILE__) . '/' . $zip_file;
         unlink($zip);
@@ -219,8 +219,8 @@ switch ($cmsAction) {
           ob_end_clean();
         }
 
-        header('FileName: ' . json_encode(basename($file)));
-        header('Content-Length: ' . filesize($file));
+        header('filename: ' . json_encode(basename($file)));
+        header('content-length: ' . filesize($file));
 
         if ($fd = fopen($file, 'rb')) {
           while (!feof($fd)) {

@@ -59,7 +59,7 @@ export default class User {
   getDealerSettings(prop) {
     if (!f.IS_DEAL) return false;
 
-    return this.data.dealer.settings[prop];
+    return (this.data.dealer || {settings: {}}).settings[prop];
   }
 
   /**

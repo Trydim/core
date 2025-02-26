@@ -95,7 +95,7 @@ const fileManager = {
       i.preventDefault();
 
       if (r) {
-        fileManager.query({cmsAction: 'createFile', fileName: u + r}, function () {
+        fileManager.query({cmsAction: 'createFile', filename: u + r}, function () {
           t(u);
           let ext = r.substr(r.lastIndexOf(".") + 1);
           $("#tree div.selected").next("ul")
@@ -256,7 +256,7 @@ const fileManager = {
     type && (queryParam.type = type);
 
     f.Post(queryParam).then(data => {
-      if (type === 'body') f.saveFile({name: data['fileName'], blob: data});
+      if (type === 'body') f.saveFile({name: data['filename'], blob: data});
       else func(data['html']);
     });
   },
