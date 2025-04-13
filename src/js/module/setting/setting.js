@@ -66,6 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const node = f.gI('settingForm'),
         preset = definePreset(Lara, {
+          root: {
+            inputtextFocusBorderColor: 'transparent',
+          },
           semantic: {
             primary: {
               50: '{indigo.50}',
@@ -79,12 +82,19 @@ document.addEventListener("DOMContentLoaded", () => {
               800: '{indigo.800}',
               900: '{indigo.900}',
               950: '{indigo.950}'
-            }
+            },
+            /*focusRing: {
+              width: '20px',
+              style: 'dashed',
+              color: '{primary.color}',
+              offset: '1px'
+            }*/
           }
         });
 
   app.use(PrimeVue, {
-    theme: {preset, options: {prefix: 'p', cssLayer: false}}
+    theme: {preset, options: {prefix: 'p', cssLayer: false}},
+    locale: {emptyMessage: ''},
   });
   app.component('p-accordion', Accordion);
   app.component('p-accordion-panel', AccordionPanel);

@@ -20,67 +20,68 @@
 
     <div v-if="!autoRefresh" class="col-12 text-center mb-3">
       <p-button v-tooltip.bottom="$t('Edit rates')" icon="pi pi-sliders-h" class="p-button-success"
-                :label="this.$t('Edit')" @click="editRate" />
+                :label="$t('Edit')" @click="display = true" />
     </div>
   </div>
 
-  <p-dialog v-model:visible="display" :modal="true">
+  <p-dialog v-model:visible="display" :modal="true" :closable="false">
     <template #header>
       <h4>Курсы валют</h4>
     </template>
 
     <p-table :value="rate"
-             :class="'text-center user-select-none'"
+             class="text-center user-select-none"
              :rowClass="rowClass"
              :resizableColumns="true" columnResizeMode="fit" showGridlines
              :scrollable="true"
              editMode="cell"
              responsiveLayout="scroll"
              @cell-edit-complete="onEditComplete"
-             style="width: 60vw; user-select: none;"
+             style="width: 60vw"
     >
-      <p-t-column field="ID" header="ID" />
-      <p-t-column field="code" :sortable="true" header="Код">
+      <p-t-column field="ID" header="ID" style="width: 5%" />
+      <p-t-column field="code" :sortable="true" header="Код" style="width: 10%" >
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" v-model="data[field]" />
+          <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="name" :sortable="true" header="Название">
+      <p-t-column field="name" :sortable="true" header="Название" style="width: 30%" >
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" v-model="data[field]" />
+          <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="scale" header="Номинал">
+      <p-t-column field="scale" header="Номинал" style="width: 10%" >
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]" />
+          <p-input-text class="p-inputtext-sm w-100" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="rate" header="Курс">
+      <p-t-column field="rate" header="Курс" style="width: 20%" >
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" :disabled="autoRefresh" v-model.number="data[field]" />
+          <p-input-text class="p-inputtext-sm w-100" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="shortName" header="Обозначение">
+      <p-t-column field="shortName" header="Обозначение" style="width: 10%">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm" v-model="data[field]" />
+          <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="main" header="Основная">
+      <p-t-column field="main" header="Основная" style="width: 10%">
         <template #body="slotProps">
-          <p-checkbox type="radio" class="mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
+          <p-checkbox type="radio" class="d-block mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
                       @click="setMain(slotProps.data.ID)" />
         </template>
       </p-t-column>
       <p-t-column field="lastEditDate" header="Удалить">
         <template #body="slotProps">
-          <p-button class="mx-auto p-button-rounded p-button-text p-button-sm" icon="pi pi-times" @click="deleteRate(slotProps.data.ID)" />
+          <p-button class="d-block mx-auto p-button-rounded p-button-text p-button-sm text-center" icon="pi pi-times"
+                    @click="deleteRate(slotProps.data.ID)" />
         </template>
       </p-t-column>
     </p-table>
 
     <template #footer>
-      <p-button class="float-start p-button-success" label="Добавить" icon="pi pi-plus" @click="addRate()" />
-      <p-button label="Закрыть" icon="pi pi-check" @click="modalHide" />
+      <p-button class="p-button-info me-auto" label="Добавить" icon="pi pi-plus" @click="addRate()" />
+      <p-button class="p-button-success" label="Закрыть" icon="pi pi-check" @click="modalHide" />
     </template>
   </p-dialog>
 </template>
@@ -98,8 +99,9 @@ export default {
     autoRefresh: f['CMS_SETTING']['autoRefresh'] || false,
     serverRefresh: f['CMS_SETTING']['serverRefresh'] || 'RUS',
 
+    changed: false,
     display: false,
-    rate: {},
+    rate: [],
   }),
   watch: {
     autoRefresh() { this.update(); },
@@ -118,15 +120,8 @@ export default {
       return data.delete ? 'bg-danger' : '';
     },
     setMain(ID) {
-      this.$nextTick(() => {
-        let notMain = true;
-
-        this.rate.forEach(rate => {
-          if (rate.ID !== ID) rate.main = false;
-          if (notMain && rate.main) notMain = false;
-        });
-
-        if (notMain) this.rate[0].main = true;
+      this.rate.forEach(rate => {
+        if (rate.ID !== ID) rate.main = false;
       });
     },
     onEditComplete(event) {
@@ -150,6 +145,9 @@ export default {
       }
     },
     update() {
+      if (!this.changed) this.changed = true;
+
+      console.log(this.rate);
       this.$emit('update', {
         data: this.rate,
         autoRefresh: this.autoRefresh,
@@ -157,35 +155,39 @@ export default {
       });
     },
 
-    modalHide() {
-      this.display = false;
-    },
     addRate() {
-      const newRate = Object.entries(this.rate[0]).reduce((r, [k]) => {
-        if (k === 'ID') r[k] = 'new';
-        else if (k === 'lastEditDate') r[k] = new Date().toLocaleString().slice(0, 10);
-        else r[k] = '';
-        return r;
-      }, {});
-
-      this.rate.push(newRate);
-    },
-    editRate() {
-      this.display = true;
+      this.rate.push({
+        ID  : 'new' + f.random(),
+        code: '', name: '', shortName: '',
+        scale: 1, rate : 1,
+        main: false,
+        lastEditDate: new Date().toLocaleString().slice(0, 10),
+      });
     },
     deleteRate(id) {
       this.rate.forEach(i => {
         if (i.ID === id) i.delete = i.delete !== undefined ? !i.delete : true;
       });
     },
+    modalHide() {
+      // Дождаться обновления компонентов v-model
+      setTimeout(() => {
+        this.display = false;
+
+        if (this.changed) {
+          f.showMsg('Что бы применить изменения для курсов нажмите "Сохранить"', 'warning');
+        }
+      }, 100);
+    },
   },
   created() {
     this.loadData();
-
+  },
+  mounted() {
     this.$watch('rate', {
       deep: true,
       handler: this.update,
     });
-  },
+  }
 }
 </script>

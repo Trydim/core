@@ -57,7 +57,7 @@ if ($orderId && count($reportValue) === 0) {
   $data['order'] = $reportValue;
   $data['reportValue'] = &$reportValue['reportValue'];
 } else if (count($reportValue)) {
-  $data['reportValue'] = $reportValue;
+  $data['reportValue'] = $reportValue['reportValue'] ?? $reportValue;
 }
 
 // Create docs
