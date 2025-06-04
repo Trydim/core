@@ -41,7 +41,7 @@ if (isset($addCustomer)) {
   } else $customerData = $customer ?? [];
 
   if (count($customerData)) {
-    $userData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);
+    $customerData['contacts'] = json_decode($customerData['contacts'] ?? '{}', true);
     $data['customerData'] = $customerData;
   }
   unset($customerData);
@@ -57,7 +57,7 @@ if ($orderId && count($reportValue) === 0) {
   $data['order'] = $reportValue;
   $data['reportValue'] = &$reportValue['reportValue'];
 } else if (count($reportValue)) {
-  $data['reportValue'] = $reportValue;
+  $data['reportValue'] = $reportValue['reportValue'] ?? $reportValue;
 }
 
 // Create docs

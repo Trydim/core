@@ -22,7 +22,7 @@ foreach ($param['managerField'] as $k => $item) {
     case 'checkbox':
       $managerFieldHtml .= '<div class="row managerField">
         <div class="col-12 col-md-6 ps-4">
-          <label class="w-100" for="' . $rndId . '">' . $item['name'] .':</label>
+          <label class="w-100" for="' . $rndId . '" role="button">' . $item['name'] .':</label>
         </div>
         <div class="col-12 col-md-6">
           <div class="form-check form-switch mb-3 text-center">
@@ -122,7 +122,9 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
     </div>' .
     $managerFieldHtml
     . '<div id="changeField" class="row">
-      <div class="col-12 col-md-6 ps-4">' . gTxt('Activity') . ':</div>
+      <div class="col-12 col-md-6 ps-4">
+        <label class="w-100" for="pActivity" role="button">' . gTxt('Activity') . ':</label>
+      </div>
       <div class="col-12 col-md-6">
         <div class="form-check form-switch mb-3 text-center">
           <label class="w-100">

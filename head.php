@@ -35,6 +35,13 @@ if ($mode = $main->getCmsParam('mode')) {
   } else $main->response->setContent(['error' => gTxt('Auth no passing!')]);
 } else if ($customMode = $main->url->request->get('customMode')) {
   require ABS_SITE_PATH . 'public/public.php';
+
+  if ($main->isDealer()) {
+    $main->publicDealer();
+    $path = $main->url->getPath(true) . 'public/public.php';
+
+    if (file_exists($path)) { require $path; }
+  }
 } else {
   $main->beforeController();
 

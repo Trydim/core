@@ -2,9 +2,6 @@ $pr: 'vs_';
 
 @media only screen and (min-width: 40em) {
   .#{$pr}modal-overlay {
-    display: none;
-    /*align-items: center;
-    justify-content: center;*/
     position: fixed;
     top: 0;
     left: 0;
@@ -14,39 +11,36 @@ $pr: 'vs_';
     padding: 2rem;
     overflow-y: auto;
     background-color: rgba(0, 0, 0, 0.6);
+    visibility: hidden;
     backface-visibility: hidden;
     transition: opacity 0.6s cubic-bezier(0.55, 0, 0.1, 1), visibility 0.6s cubic-bezier(0.55, 0, 0.1, 1);
     z-index: 200;
 
     &.#{$pr}active {
-      display: flex;
+      visibility: visible;
       opacity: 1;
     }
   }
 }
 
 .#{$pr}modal {
-  /*display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;*/
+  position: relative;
   margin: auto;
   background-color: #fff;
   min-width: 30rem;
   max-width: 80vw;
-  /*min-height: 20rem;*/
   padding: 1.5rem;
   border-radius: 0.1rem;
   opacity: 0;
   overflow-y: auto;
+  visibility: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   backface-visibility: hidden;
   transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1);
 
   &.#{$pr}active {
+    visibility: visible;
     opacity: 1;
-    transform: scale(1);
 
     .#{$pr}modal-content {
       opacity: 1;
@@ -69,6 +63,10 @@ $pr: 'vs_';
   & &-title {
     font-size: 1.7rem;
     font-weight: 600;
+
+    @include respond() {
+      font-size: 1rem;
+    }
   }
 
   & &-close {
@@ -79,6 +77,10 @@ $pr: 'vs_';
     transform: translateY(-10px);
     transition: opacity 0.3s cubic-bezier(0.55, 0, 0.1, 1), transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
     cursor: pointer;
+
+    @include respond() {
+      right: 20px !important;
+    }
 
     .#{$pr}close-icon {
       font-size: 1.8rem;
@@ -105,8 +107,6 @@ $pr: 'vs_';
     margin-top: 1rem;
     min-height: 160px;
     width: 100%;
-    /*max-height: 80vh;
-    overflow-y: auto;*/
     opacity: 0;
     backface-visibility: hidden;
   }
@@ -123,11 +123,6 @@ $pr: 'vs_';
  * Mobile styling
  */
 @media only screen and (max-width: 39.9375em) {
-  .#{$pr}modal-overlay {
-    align-items: center;
-    justify-content: center;
-  }
-
   .#{$pr}modal {
     position: fixed;
     top: 0;
@@ -140,10 +135,6 @@ $pr: 'vs_';
     height: 100%;
     border-radius: 0;
 
-    &.#{$pr}active {
-      z-index: 200;
-    }
-
     & &-footer {
       position: fixed;
       left: 1rem;
@@ -153,9 +144,5 @@ $pr: 'vs_';
         flex-basis: 50%;
       }
     }
-  }
-
-  .#{$pr}close-modal {
-    right: 20px !important;
   }
 }

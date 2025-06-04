@@ -60,7 +60,7 @@ const query = (url: string, body: BodyInit | null, type = 'json') => {
 
     if (typeof body === 'object') {
       Object.entries(body).forEach(([k, v]) => {
-        data.set(k, typeof v === 'object' ? JSON.stringify(v) : v.toString());
+        v !== undefined && data.set(k, typeof v === 'object' ? JSON.stringify(v) : v.toString());
       });
     }
     else data.set('content', body);

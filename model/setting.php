@@ -157,10 +157,11 @@ switch ($cmsAction) {
             'name' => $item['name'],
             'short_name' => $item['shortName'],
             'rate' => $item['rate'],
+            'scale' => $item['scale'],
             'main' => intval($item['main']),
           ];
 
-          if ($id === 'new') $param['new'][uniqid()] = $field;
+          if (includes($id, 'new')) $param['new'][uniqid()] = $field;
           else $param['change'][$id] = $field;
         }
 

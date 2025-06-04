@@ -50,6 +50,30 @@ switch ($cmsAction) {
       else $main->reDirect('');
     } else $main->reDirect("login?status=error&login=$login");
     break;
+
+  case 'token':
+    $requestParams = $main->url->request->all();
+    $token = $requestParams['param'] ?? '';
+    $token = $main->decrypt($token);
+
+    if (!empty($token) && $user = $main->db->findToken($token)) {
+      $_SESSION['id']       = $user['id'];
+      $_SESSION['name']     = $user['name'];
+      $_SESSION['login']    = $user['login'];
+      $_SESSION['token']    = $token;
+      $_SESSION['PHPSESSID'] = $_COOKIE['PHPSESSID'];
+
+      $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
+      $main->db->setUserHash($user['id'], $_SESSION['hash']);
+
+      foreach (['targetPage', 'mode', 'cmsAction', 'param', 'PHPSESSID'] as $key) {
+        unset($requestParams[$key]);
+      }
+
+      $main->reDirect('?' . http_build_query($requestParams));
+    }
+    break;
+
   case 'exit':
     if (isset($_SESSION['id'])) {
       $userId = $_SESSION['id'];

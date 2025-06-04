@@ -40,8 +40,8 @@ CREATE TABLE `client_orders` (
 -- Дамп данных таблицы `client_orders`
 --
 
-INSERT INTO `client_orders` (`ID`, `cp_number`, `create_date`, `input_value`, `important_value`, `total`) VALUES
-(1, '1', '2021-04-30 11:56:33', '{}', '{}', 1);
+INSERT INTO `client_orders` (`ID`, `save_value`, `important_value`, `total`) VALUES
+(1, '{}', '{}', 1);
 
 -- --------------------------------------------------------
 

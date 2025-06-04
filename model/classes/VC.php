@@ -11,6 +11,8 @@ class VC {
 
   /** cmsParams */
   const PROJECT_TITLE = 'PROJECT_TITLE',
+        ENCRYPT_ALGO  = 'ENCRYPT_ALGO',
+        ENCRYPT_KEY   = 'ENCRYPT_KEY',
         DB_CONFIG     = 'dbConfig',
         IS_DEALER     = 'isDealer',
         DEALER_ID     = 'dealerId',

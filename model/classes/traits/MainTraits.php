@@ -475,4 +475,25 @@ trait Utilities {
         strtolower($this->url->server->get('HTTP_USER_AGENT')))
     );
   }
+
+  public function encrypt(string $value): string {
+    $ca = $this->getCmsParam(VC::ENCRYPT_ALGO);
+    $key = $this->getCmsParam(VC::ENCRYPT_KEY) ?? 'eKey';
+
+    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($ca));
+    $encrypted = openssl_encrypt($value, $ca, $key, 0, $iv);
+    $encrypted = substr($encrypted, 0, -1) . substr(uniqid(), 7);
+    return base64_encode($encrypted . '::' . $iv);
+  }
+
+  public function decrypt(string $param): string {
+    $ca = $this->getCmsParam(VC::ENCRYPT_ALGO);
+    $key = $this->getCmsParam(VC::ENCRYPT_KEY) ?? 'eKey';
+
+    list($encryptedData, $iv) = explode('::', base64_decode($param));
+    $encryptedData = substr($encryptedData, 0, -6) . '=';
+    $token = openssl_decrypt($encryptedData, $ca, $key, 0, $iv);
+
+    return $token ?: '';
+  }
 }

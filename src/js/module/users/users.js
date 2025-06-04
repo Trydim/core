@@ -18,10 +18,12 @@ const data = {
 }
 
 const users = {
+  node, tmp, data,
+
   form: new FormData(),
 
   needReload: false,
-  impValue: '',
+  impValue  : '',
 
   confirmMsg: false,
 

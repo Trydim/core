@@ -836,14 +836,17 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
         $haveDealers = $db->selectQuery('dealers', 'cms_param');
         if (count($haveDealers)) {
-          $haveDealers = array_filter($haveDealers, function ($param) use ($dbPrefix) {
-            $param = json_decode($param, true);
-            return ($param['dbPrefix'] ?? $param['prefix'] ?? false) === $dbPrefix;
-          });
-          if (count($haveDealers)) {
-            $dbPrefix = str_replace('_', '', $dbPrefix) . substr(uniqid(), -3, 3) . '_';
-          }
-          unset($haveDealers);
+          do {
+            $findDealer = array_filter($haveDealers, function ($param) use ($dbPrefix) {
+              $param = json_decode($param, true);
+              return ($param['dbPrefix'] ?? $param['prefix'] ?? false) === $dbPrefix;
+            });
+
+            if (count($findDealer)) {
+              $dbPrefix = substr($dbPrefix, 0, 3) . substr(uniqid(), -3, 3) . '_';
+            }
+          } while (count($findDealer));
+          unset($haveDealers, $findDealer);
         }
 
         $id = $db->getLastID('dealers', ['name' => 'tmp']);

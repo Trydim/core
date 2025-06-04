@@ -137,12 +137,13 @@ trait DbOrders {
    * @param array $pageParam
    * @param string $searchValue
    * @param array $filters
+   * @param bool $includeValues
    * @return array
    */
-  public function searchOrders(array $pageParam, string $searchValue, array $filters = []): array {
+  public function searchOrders(array $pageParam, string $searchValue, array $filters = [], bool $includeValues = false): array {
     $searchValue = '%' . $searchValue . '%';
 
-    $sql = $this->getBaseOrdersQuery();
+    $sql = $this->getBaseOrdersQuery($includeValues);
     $sql .= "WHERE (O.ID like '$searchValue' ";
     $sql .= "OR O.important_value like '$searchValue' ";
     $sql .= "OR C.contacts like '$searchValue' ";
@@ -151,7 +152,7 @@ trait DbOrders {
 
     if (isset($filters['userId'])) {
       $userId = $filters['userId'];
-      $sql .= 'AND O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]) . ' ';
+      $sql .= 'AND (O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]) . ') ';
     }
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
@@ -387,6 +388,12 @@ trait DbUsers {
     return false;
   }
 
+  public function findToken(string $token): array {
+    $sql = "SELECT ID as 'id', name, login, password 
+            FROM " . $this->pf('users') . " WHERE contacts LIKE :contacts and activity = 1";
+    return self::getRow($sql, [':contacts' => "%$token%"]);
+  }
+
   public function changeUser($loginId, $param) {
     $user = self::xdispense($this->pf('users'));
     $user->ID = $loginId;
@@ -458,10 +465,14 @@ trait DbUsers {
       ];
     }
 
-    $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
-                           : password_verify($session['password'], $user['password'])
-                             ||
-                             md5($session['password']) === '0192023a7bbd73250516f069df18b500';
+    if (isset($session['token']) && isset($user['contacts']['token'])) {
+      $ok = $session['token'] === $user['contacts']['token'];
+    } else {
+      $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
+                             : password_verify($session['password'], $user['password'])
+                               ||
+                               md5($session['password']) === '0192023a7bbd73250516f069df18b500';
+    }
 
     return $ok ? $user : false;
   }

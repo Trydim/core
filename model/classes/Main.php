@@ -22,6 +22,7 @@ final class Main {
   const CMS_PARAM = [
     'PROJECT_TITLE' => 'Project title',
     'ACCESS_MENU'   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
+    'ENCRYPT_ALGO'  => 'aes-256-cbc',
   ];
 
   const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';
