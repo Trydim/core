@@ -312,6 +312,8 @@ class XLSXWriter {
     $style = &$col_options;
 
     $col_widths = isset($col_options['widths']) ? (array)$col_options['widths'] : array();
+    $customHt    = isset($col_options['height']);
+    $ht          = isset($col_options['height']) ? floatval($col_options['height']) : 12.1;
     $auto_filter = isset($col_options['auto_filter']) ? intval($col_options['auto_filter']) : false;
     $freeze_rows = isset($col_options['freeze_rows']) ? intval($col_options['freeze_rows']) : false;
     $freeze_columns = isset($col_options['freeze_columns']) ? intval($col_options['freeze_columns']) : false;
@@ -321,10 +323,10 @@ class XLSXWriter {
     if (!$suppress_row) {
       $header_row = array_keys($header_types);
 
-      $sheet->file_writer->write('<row collapsed="false" customFormat="false" customHeight="false" hidden="false" ht="12.1" outlineLevel="0" r="' . ($sheet->row_count + 1) . '">');
+      $sheet->file_writer->write('<row collapsed="false" customFormat="false" customHeight="' . ($customHt ? 'true' : 'false') . '" hidden="false" ht="' . ($ht) . '" outlineLevel="0" r="' . ($sheet->row_count + 1) . '">');
       foreach ($header_row as $c => $v) {
         $cell_style_idx = empty($style) ? $sheet->columns[$c]['default_cell_style'] : $this->addCellStyle('GENERAL', json_encode(isset($style[0]) ? $style[$c] : $style));
-        $this->writeCell($sheet->file_writer, $sheet->row_count, $c, $v, 'n_string', $cell_style_idx);
+        $this->writeCell($sheet->file_writer, $sheet->row_count, $c, '', 'n_string', $cell_style_idx);
       }
       $sheet->file_writer->write('</row>');
       $sheet->row_count++;
@@ -838,8 +840,8 @@ class XLSXWriter {
     if ($imageOptions['endColNum'] == 0) $imageOptions['endColNum'] = $imageOptions['startColNum'] + round($width / 96);
     if ($imageOptions['endRowNum'] == 0) $imageOptions['endRowNum'] = $imageOptions['startRowNum'] + round($height / 28);
 
-    $endColOffset = round($width * 431.8);
-    $endRowOffset = round($height * 86.358);
+    $endColOffset = round($width);
+    $endRowOffset = round($height);
 
     return '
     <xdr:wsDr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing">
