@@ -4,8 +4,8 @@
   <div class="container-fluid">
     <div class="row">
       <div id="searchField" class="position-relative form-group col-12 pt-2">
-        <span v-if="searchShow" class="p-float-label">
-          <p-input-text v-model="search" class="w-100"></p-input-text>
+        <span v-if="searchShow" class="form-floating">
+          <p-input-text class="form-control" placeholder="" v-model="search"></p-input-text>
           <label>Поиск</label>
         </span>
         <p-button v-tooltip.left="'Скрыть'" :label="searchShow ? '-' : '+'" class="position-absolute p-0"
@@ -20,7 +20,7 @@
            :style="{'max-width': sectionShow ? '25%' : '20px'}"
            :class="{'p-0': !sectionShow}">
         <p-button v-tooltip.bottom="'Скрыть'" :label="sectionShow ? '<' : '>'"
-                  class="position-absolute p-0 p-button-white end-0 bottom-0 top-0"
+                  class="position-absolute p-0 end-0 bottom-0 top-0"
                   style="width: 20px"
                   @click="sectionShow = !sectionShow"
         ></p-button>
@@ -49,29 +49,29 @@
             </template>
 
             <div v-if="queryParam.dbAction !== 'deleteSection'">
-              <div class="p-inputgroup my-2">
-                <span class="col-6 p-inputgroup-addon">Имя раздела:</span>
+              <div class="input-group my-2">
+                <span class="col-6 input-group-text">Имя раздела:</span>
                 <p-input-text v-model="section.name" autofocus></p-input-text>
               </div>
-              <div class="p-inputgroup my-2">
-                <span class="col-6 p-inputgroup-addon">Символьный код раздела:</span>
+              <div class="input-group my-2">
+                <span class="col-6 input-group-text">Символьный код раздела:</span>
                 <span class="p-input-icon-right">
                   <i v-if="sectionModalLoading" class="pi pi-spin pi-spinner"></i>
-                  <p-input-text class="w-100" v-model="section.code" @input="codeChange()"></p-input-text>
+                  <p-input-text class="form-control" v-model="section.code" @input="codeChange()"></p-input-text>
                 </span>
               </div>
-              <div class="p-inputgroup my-2">
-                <span class="col-6 p-inputgroup-addon">Родительский раздел:</span>
-                <p-tree-select selectionMode="single"
+              <div class="input-group my-2">
+                <span class="col-6 input-group-text">Родительский раздел:</span>
+                <p-tree-select selectionMode="single" class="form-control"
                                :options="sectionTree"
                                :disabled="sectionModalSelectedDisabled"
                                v-model="sectionModalSelected"
                                @change="sectionSelectChange($event)"
                 ></p-tree-select>
               </div>
-              <div class="p-inputgroup my-2">
-                <span class="col-6 p-inputgroup-addon">Доступен:</span>
-                <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
+              <div class="input-group my-2">
+                <span class="col-6 input-group-text">Доступен:</span>
+                <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" class="form-control"
                                  on-label="Активен" off-label="Неактивен"
                                  v-model="section.activity"
                 ></p-toggle-button>
@@ -93,7 +93,7 @@
       <div class="col-9">
         <div class="position-relative" :style="{'max-height': elementShow ? '100%' : '30px'}">
           <div style="height: 20px">
-            <p-button v-tooltip.left="'Скрыть'" :label="elementShow ? '-' : '+'" class="position-absolute p-0 p-button-white"
+            <p-button v-tooltip.left="'Скрыть'" :label="elementShow ? '-' : '+'" class="position-absolute p-0"
                       style="width: 30px; height: 20px; right: 1px; top: 1px;"
                       :style="{'z-index': 100}"
                       @click="elementShow = !elementShow"
@@ -190,9 +190,9 @@
 
               <div v-if="queryParam.dbAction !== 'deleteElements'" style="min-width: 500px">
                 <!-- Тип элемента -->
-                <div class="p-inputgroup my-2">
-                  <span class="p-inputgroup-addon col-5">Тип элемента:</span>
-                  <span v-if="!elementsModal.single" class="p-inputgroup-addon">
+                <div class="input-group my-2">
+                  <span class="input-group-text col-5">Тип элемента:</span>
+                  <span v-if="!elementsModal.single" class="input-group-text">
                     <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.type"></p-checkbox>
                   </span>
                   <p-select option-label="name" option-value="symbolCode"
@@ -203,16 +203,16 @@
                   ></p-select>
                 </div>
                 <!-- Имя элемента -->
-                <div v-if="elementsModal.single" class="p-inputgroup my-2">
-                  <span class="p-inputgroup-addon col-5">Имя элемента:</span>
+                <div v-if="elementsModal.single" class="input-group my-2">
+                  <span class="input-group-text col-5">Имя элемента:</span>
                   <p-input-text v-model="element.name" @input="elementNameInput()" autofocus></p-input-text>
                 </div>
                 <!-- Раздел -->
-                <div class="p-inputgroup my-2">
-                  <span class="p-inputgroup-addon col-5">
+                <div class="input-group my-2">
+                  <span class="input-group-text col-5">
                     Родительский раздел <i class="pi pi-question pi-red" v-tooltip.bottom="'Выберите раздел!'"></i>:
                   </span>
-                  <span v-if="!elementsModal.single" class="p-inputgroup-addon">
+                  <span v-if="!elementsModal.single" class="input-group-text">
                     <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.parentId"></p-checkbox>
                   </span>
                   <p-tree-select selectionMode="single"
@@ -223,21 +223,21 @@
                   </p-tree-select>
                 </div>
                 <!-- Доступен -->
-                <div class="p-inputgroup my-2">
-                  <span class="p-inputgroup-addon col-5">Доступ:</span>
-                  <span v-if="!elementsModal.single" class="p-inputgroup-addon">
+                <div class="input-group my-2">
+                  <span class="input-group-text col-5">Доступ:</span>
+                  <span v-if="!elementsModal.single" class="input-group-text">
                     <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.activity"></p-checkbox>
                   </span>
-                  <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
+                  <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" class="form-control"
                                    on-label="Активен" off-label="Неактивен"
                                    :disabled="!fieldChange.activity"
                                    v-model="element.activity"
                   ></p-toggle-button>
                 </div>
                 <!-- Сортировка -->
-                <div class="p-inputgroup my-2">
-                  <span class="p-inputgroup-addon col-5">Сортировка:</span>
-                  <span v-if="!elementsModal.single" class="p-inputgroup-addon">
+                <div class="input-group my-2">
+                  <span class="input-group-text col-5">Сортировка:</span>
+                  <span v-if="!elementsModal.single" class="input-group-text">
                     <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.sort"></p-checkbox>
                   </span>
                   <p-input-number :disabled="!fieldChange.sort" :min="0" v-model="element.sort"></p-input-number>
@@ -370,14 +370,14 @@
         <!-- Основное -->
         <div class="col-6">
           <!-- Имя -->
-          <div v-if="optionsModal.single" class="p-inputgroup my-2">
-            <span class="p-inputgroup-addon col-5">Имя варианта</span>
+          <div v-if="optionsModal.single" class="input-group my-2">
+            <span class="input-group-text col-5">Имя варианта</span>
             <p-input-text v-model="option.name" autofocus></p-input-text>
           </div>
           <!-- Единица измерения -->
-          <div class="p-inputgroup my-2">
-            <span class="p-inputgroup-addon col-5 text-nowrap">Единица измерения</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+          <div class="input-group my-2">
+            <span class="input-group-text col-5 text-nowrap">Единица измерения</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.unitId"></p-checkbox>
             </span>
             <p-select option-label="name" option-value="id"
@@ -390,10 +390,10 @@
 
           <!-- Входная цена -->
           <div class="col text-center">Входная цена</div>
-          <div class="p-inputgroup my-2">
+          <div class="input-group my-2">
             <!-- Валюта -->
-            <span class="p-inputgroup-addon">Валюта</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+            <span class="input-group-text">Валюта</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true"
                           v-model="fieldChange.moneyInputId"
               ></p-checkbox>
@@ -403,8 +403,8 @@
                       :options="money" v-model="option.moneyInputId"
             ></p-select>
             <!-- Сумма -->
-            <span class="p-inputgroup-addon">Сумма</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+            <span class="input-group-text">Сумма</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyInput"></p-checkbox>
             </span>
             <p-input-number mode="decimal" :min-fraction-digits="2"
@@ -415,10 +415,10 @@
 
           <!-- Выходная цена -->
           <div class="col-12 text-center">Розничная цена</div>
-          <div class="p-inputgroup my-2">
-            <!-- Наценка -->
-            <span class="p-inputgroup-addon col-5">Наценка</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+<!--          <div class="input-group my-2">
+            &lt;!&ndash; Наценка &ndash;&gt;
+            <span class="input-group-text col-5">Наценка</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.percent"></p-checkbox>
             </span>
             <p-input-number v-model="option.percent" class="p-inputtext-sm" show-buttons
@@ -428,11 +428,11 @@
                             @input="changePercent()"
                             @blur="changePercent()"
             ></p-input-number>
-          </div>
-          <div class="p-inputgroup my-2">
+          </div>-->
+          <div class="input-group my-2">
             <!-- Валюта -->
-            <span class="p-inputgroup-addon">Валюта</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+            <span class="input-group-text">Валюта</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyOutputId"></p-checkbox>
             </span>
             <p-select option-label="shortName" option-value="id"
@@ -441,8 +441,8 @@
                       v-model="option.moneyOutputId"
             ></p-select>
             <!-- Сумма -->
-            <span class="p-inputgroup-addon">Сумма</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+            <span class="input-group-text">Сумма</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.moneyOutput"></p-checkbox>
             </span>
             <p-input-number mode="decimal" :min-fraction-digits="2"
@@ -453,21 +453,21 @@
             ></p-input-number>
           </div>
           <!-- Доступен -->
-          <div class="p-inputgroup my-2">
-            <span class="p-inputgroup-addon col-5">Доступен</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+          <div class="input-group my-2">
+            <span class="input-group-text col-5">Доступен</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.activity"></p-checkbox>
             </span>
-            <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" class="w-100"
+            <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" class="form-control"
                              on-label="Активен" off-label="Неактивен"
                              :disabled="!fieldChange.activity"
                              v-model="option.activity"
             ></p-toggle-button>
           </div>
           <!-- Сортировка -->
-          <div class="p-inputgroup my-2">
-            <span class="p-inputgroup-addon col-5">Сортировка</span>
-            <span v-if="!optionsModal.single" class="p-inputgroup-addon">
+          <div class="input-group my-2">
+            <span class="input-group-text col-5">Сортировка</span>
+            <span v-if="!optionsModal.single" class="input-group-text">
               <p-checkbox v-tooltip.bottom="'Не редактировать'" :binary="true" v-model="fieldChange.sort"></p-checkbox>
             </span>
             <p-input-number :disabled="!fieldChange.sort"
@@ -475,12 +475,12 @@
             ></p-input-number>
           </div>
           <!-- Показать параметры -->
-          <div v-if="!optionsModal.single" class="p-inputgroup mt-5">
-            <span class="p-inputgroup-addon col">Показать параметры</span>
+          <div v-if="!optionsModal.single" class="input-group mt-5">
+            <span class="input-group-text col">Показать параметры</span>
             <p-toggle-button on-icon="pi pi-check" off-icon="pi pi-times" v-model="fieldChange.properties"></p-toggle-button>
           </div>
           <!-- Показать параметры -->
-          <div v-if="!optionsModal.single" class="p-inputgroup my-2">
+          <div v-if="!optionsModal.single" class="input-group my-2">
             <p-button label="Изменить все" icon="pi pi-check" class="p-button-success p-button-outlined w-50"
                       @click="setFieldChange(true)"></p-button>
             <p-button label="Снять изменения" icon="pi pi-times" class="p-button-danger p-button-outlined w-50"
@@ -519,8 +519,8 @@
         <!-- Пользовательские параметры -->
         <div v-if="optionsModal.single || fieldChange.properties" class="col-6">
           <div class="form-label text-center mb-3">Параметры</div>
-          <div v-for="(prop, key) of properties" class="p-inputgroup mb-2" :key="'t' + key">
-            <span class="p-inputgroup-addon col-6 text-nowrap">{{ prop.name }}</span>
+          <div v-for="(prop, key) of properties" class="input-group mb-2" :key="'t' + key">
+            <span class="input-group-text col-6 text-nowrap">{{ prop.name }}</span>
             <p-input-text v-if="prop.type === 'text'" v-model="option.properties[key]"></p-input-text>
             <p-input-number v-else-if="prop.type === 'number'" class="p-inputtext-sm" show-buttons
                             v-model="option.properties[key]"
@@ -532,7 +532,7 @@
                              on-label="Да" off-label="Нет"
                              v-model="option.properties[key]"
             ></p-toggle-button>
-            <p-select v-else option-label="name" option-value="id"
+            <p-select v-else option-label="name" option-value="id" class="col-6"
                       :options="prop.values"
                       v-model="option.properties[key]"
             ></p-select>
