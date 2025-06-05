@@ -1,6 +1,6 @@
 'use strict';
 
-import './styles/style.scss';
+import '../../../css/components/toast/style.scss';
 
 import Options from "./options";
 import Toast from "./toast";
