@@ -210,6 +210,9 @@ export const methods = {
     });
   },
   setDefaultProperty() {
+    // TODO хуита №1
+    if (!this.properties) return;
+
     Object.keys(this.properties).map(key => this.option.properties[key] = undefined);
   },
   setOptionProperty(el) {
