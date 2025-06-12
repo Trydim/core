@@ -269,18 +269,161 @@ trait Authorization {
  * Trait dictionary
  * @package cms
  */
-trait Dictionary {
+trait Dictionary
+{
+  private string $dictionaryPath = ABS_SITE_PATH . '/lang/dictionary.php';
+  private string $dbDictionaryPath = ABS_SITE_PATH . '/lang/dbDictionary.php';
+  /**
+   * @var array<string, string> Словарь переводов: ключ => значение
+   */
+  private array $dictionary = [];
 
   /**
-   * @var string
+   * @var array<string, array<string, string>> Переводы по таблицам базы данных: [таблица][ключ] => значение
    */
-  private $dictionaryPath = ABS_SITE_PATH . 'lang/dictionary.php';
+  private array $dbDictionary = [];
 
-  public function initDictionary(): string {
-    $mess = require $this->dictionaryPath;
-    $mess = json_encode($mess);
-    return $mess ? "<input type='hidden' id='dictionaryData' value='$mess'>" : '';
+  /**
+   * Функция для использования словаря на фронтенде
+   * @return string
+   */
+  public function initDictionary(): string
+  {
+
+    $this->initLocales();
+
+    $jsonDictionary = json_encode($this->dictionary, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
+
+    return "<input type='hidden' id='dictionaryData' value='$jsonDictionary'>";
   }
+
+  private function initLocales()
+  {
+    if ($this->dictionary) return;
+
+    $locales = $this->cmsParam['LOCALES'] ?? null;
+
+    if ($locales) {
+      $baseLang = $locales['BASE_LANG'] ?? 'ru';
+      $targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
+
+      $dictionaryCSVPaths = $locales['CSV_FILES'] ?? [];
+
+      // Подключаем словарь только если языки различаются или целевой язык явно указан
+      if ($baseLang !== $targetLang) {
+        $this->dictionaryPath = ABS_SITE_PATH . "lang/{$targetLang}/dictionary.php";
+        $this->dbDictionaryPath = ABS_SITE_PATH . "lang/{$targetLang}/dbDictionary.php";
+      }
+    }
+
+    $baseDictionary = $this->loadBaseDictionary();
+    $csvDictionary = $this->loadCSVDictionary($dictionaryCSVPaths, $targetLang);
+    $dealerDictionary = $this->loadDealerDictionary();
+
+    $this->dictionary = array_merge($baseDictionary, $csvDictionary, $dealerDictionary);
+    $this->dbDictionary = $this->loadDbDictionary();
+
+  }
+
+  /**
+   * Загрузка базового словаря PHP
+   *
+   * @return array<string, string>
+   */
+  private function loadBaseDictionary(): array
+  {
+    if (!file_exists($this->dictionaryPath)) return [];
+
+    return include $this->dictionaryPath;
+  }
+
+  /**
+   * Загрузка переводов из CSV-файлов и объединение с основным словарем
+   *
+   * @param ?array<int, string> $csvPaths
+   * @param ?string $lang
+   * @return array<string, string>
+   */
+  private function loadCSVDictionary(?array $csvPaths, ?string $lang): array
+  {
+    if (!$csvPaths || !$lang) return [];
+
+    $csvParam = [
+      'id' => 'id',
+      $lang => $lang,
+    ];
+
+    $csvAllData = [];
+
+    foreach ($csvPaths as $csvPath) {
+      $csvData = loadCSV($csvParam, $csvPath);
+      $csvAllData = array_merge($csvAllData, $csvData);
+    }
+
+    if (!empty($csvAllData)) {
+      $csvDictionary = array_column($csvAllData, $lang, 'id');
+    }
+
+    return $csvDictionary ?? [];
+  }
+
+  /**
+   * Подключение словаря дилера, если есть
+   *
+   * @return array<string, string>
+   */
+  private function loadDealerDictionary(): array
+  {
+    if (!$this->isDealer()) {
+      return [];
+    }
+
+    $dealerPath = $this->url->getPath(true) . $this->dictionaryPath;
+
+    if (file_exists($dealerPath)) {
+      return include $dealerPath;
+    }
+
+    return [];
+  }
+
+  /**
+   * Загрузка словаря для БД
+   * @return array<string, array<string, string>>
+   */
+  private function loadDbDictionary(): array
+  {
+    $dictionary = file_exists($this->dbDictionaryPath) ? include $this->dbDictionaryPath : [];
+
+    if ($this->isDealer()) {
+      $dealerPath = $this->url->getPath(true) . $this->dbDictionaryPath;
+      $dealerDict = file_exists($dealerPath) ? include $dealerPath : [];
+      // Приоритет у дилерского перевода
+      $dictionary = array_replace_recursive($dictionary, $dealerDict);
+    }
+
+    return $dictionary;
+  }
+
+  /**
+   * @return array<string, string> возвращает массив словаря
+   */
+  public function getDictionary(): array
+  {
+    $this->initLocales();
+    return $this->dictionary;
+  }
+
+  /**
+   * @return array<string, array<string, string>> возвращает массив баз данных
+   */
+  public function getDbDictionary(): array
+  {
+    $this->initLocales();
+    return $this->dbDictionary;
+  }
+
+
 }
 
 /** Trait Cache */

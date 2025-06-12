@@ -177,15 +177,11 @@ function getPageAsString($data): string {
 function gTxt(string $str): string {
   global $main;
   static $txt;
-  if (!$txt) {
-    $txt = include ABS_SITE_PATH . 'lang/dictionary.php';
 
-    if ($main->isDealer()) {
-      $path = $main->url->getPath(true) . 'lang/dictionary.php';
-      $dTxt = file_exists($path) ? include $path : [];
-      $txt = array_merge(array_replace($txt, $dTxt), $dTxt);
-    }
+  if (!$txt) {
+    $txt = $main->getDictionary();
   }
+
   return $txt[$str] ?? $str;
 }
 
@@ -198,17 +194,14 @@ function gTxt(string $str): string {
 function gTxtDB(string $db, string $str): string {
   global $main;
   static $txt;
-  if (!$txt) {
-    $txt = include ABS_SITE_PATH . 'lang/dbDictionary.php';
 
-    if ($main->isDealer()) {
-      $path = $main->url->getPath(true) . 'lang/dbDictionary.php';
-      $dTxt = file_exists($path) ? include $path : [];
-      $txt = array_replace($txt, $dTxt);
-    }
+  if (!$txt) {
+    $txt = $main->getDbDictionary();
   }
+
   return $txt[$db][$str] ?? $str;
 }
+
 
 /**
  * Find index of Levelshtein
