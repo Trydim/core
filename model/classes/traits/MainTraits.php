@@ -357,7 +357,11 @@ trait Dictionary
 
     foreach ($csvPaths as $csvPath) {
       $csvData = loadCSV($csvParam, $csvPath);
-      $csvAllData = array_merge($csvAllData, $csvData);
+
+      if (is_array($csvData)) {
+        $csvAllData = array_merge($csvAllData, $csvData);
+      }
+
     }
 
     if (!empty($csvAllData)) {
