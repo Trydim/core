@@ -271,8 +271,12 @@ trait Authorization {
  */
 trait Dictionary
 {
+
   private string $dictionaryPath = ABS_SITE_PATH . '/lang/dictionary.php';
   private string $dbDictionaryPath = ABS_SITE_PATH . '/lang/dbDictionary.php';
+  private string $targetLang;
+  private bool $needTranslate = false;
+
   /**
    * @var array<string, string> Словарь переводов: ключ => значение
    */
@@ -297,7 +301,29 @@ trait Dictionary
     return "<input type='hidden' id='dictionaryData' value='$jsonDictionary'>";
   }
 
-  private function initLocales()
+  /**
+   * Инициализирует локализацию системы
+   *
+   * Метод выполняет следующие задачи:
+   * 1. Загружает базовые настройки локализации из конфигурации CMS
+   * 2. Определяет целевой язык (из куки или настроек по умолчанию)
+   * 3. Загружает словари переводов:
+   *    - Базовый словарь из PHP-файла
+   *    - Дополнительные переводы из CSV-файлов
+   *    - Специфичные переводы для дилеров (если есть)
+   *    - Переводы для базы данных
+   *
+   * Если словарь уже был инициализирован ранее, метод завершается без повторной инициализации.
+   *
+   * Результаты работы сохраняются в свойствах класса:
+   * - $dictionary - основной словарь переводов
+   * - $dbDictionary - словарь переводов для базы данных
+   * - $needTranslate - флаг необходимости перевода
+   * - $targetLang - целевой язык перевода
+   *
+   * @return void
+   */
+  private function initLocales(): void
   {
     if ($this->dictionary) return;
 
@@ -305,24 +331,25 @@ trait Dictionary
 
     if ($locales) {
       $baseLang = $locales['BASE_LANG'] ?? 'ru';
-      $targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
+      $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
 
       $dictionaryCSVPaths = $locales['CSV_FILES'] ?? [];
 
       // Подключаем словарь только если языки различаются или целевой язык явно указан
-      if ($baseLang !== $targetLang) {
-        $this->dictionaryPath = ABS_SITE_PATH . "lang/{$targetLang}/dictionary.php";
-        $this->dbDictionaryPath = ABS_SITE_PATH . "lang/{$targetLang}/dbDictionary.php";
+      if ($baseLang !== $this->targetLang) {
+        $this->dictionaryPath = ABS_SITE_PATH . "lang/{$this->targetLang}/dictionary.php";
+        $this->dbDictionaryPath = ABS_SITE_PATH . "lang/{$this->targetLang}/dbDictionary.php";
+        $this->needTranslate = true;
       }
     }
 
     $baseDictionary = $this->loadBaseDictionary();
-    $csvDictionary = $this->loadCSVDictionary($dictionaryCSVPaths, $targetLang);
+    $csvDictionary = $this->loadCSVDictionary($dictionaryCSVPaths, $this->targetLang);
     $dealerDictionary = $this->loadDealerDictionary();
 
     $this->dictionary = array_merge($baseDictionary, $csvDictionary, $dealerDictionary);
-    $this->dbDictionary = $this->loadDbDictionary();
 
+    $this->dbDictionary = $this->loadDbDictionary();
   }
 
   /**
@@ -425,6 +452,24 @@ trait Dictionary
   {
     $this->initLocales();
     return $this->dbDictionary;
+  }
+
+  /**
+   * @return bool возвращает нужно ли переводить на целевой язык, по умолчанию 'ru'
+   */
+  public function isNeedTranslate(): bool
+  {
+    $this->initLocales();
+    return $this->needTranslate;
+  }
+
+  /**
+   * @return string возвращает целевой язык, по умолчанию 'ru'
+   */
+  public function getTargetLang(): string
+  {
+    $this->initLocales();
+    return $this->targetLang;
   }
 
 
