@@ -15,14 +15,14 @@
                    @rowReorder="onRowReorder"
                    @dblclick="dblClickProperty($event)"
           >
-            <p-t-column :rowReorder="true" header-style="width: 3rem" header="Очередность" />
-            <p-t-column field="name" header="Название" />
-            <p-t-column field="code" header="Код">
+            <p-t-column :rowReorder="true" header-style="width: 3rem" :header="$t('Priority')" />
+            <p-t-column field="name" :header="$t('Name')" />
+            <p-t-column field="code" :header="$t('Code')">
               <template #body="slotProps">
                 <span :data-code="slotProps.data.code">{{ slotProps.data.code }}</span>
               </template>
             </p-t-column>
-            <p-t-column field="type" header="Тип">
+            <p-t-column field="type" :header="$t('type')">
               <template #body="slotProps">
                 {{ getTypeLang(slotProps.data.type) }}
               </template>
@@ -30,11 +30,11 @@
           </p-table>
 
           <div class="my-3 text-center">
-            <p-button v-tooltip.bottom="'Добавить'" icon="pi pi-plus-circle" class="p-button-warning mx-1"
+            <p-button v-tooltip.bottom="$t('Add')" icon="pi pi-plus-circle" class="p-button-warning mx-1"
                       :loading="loading" @click="createProperty" />
-            <p-button v-tooltip.bottom="'Изменить'" icon="pi pi-cog" class="p-button-warning mx-1"
+            <p-button v-tooltip.bottom="$t('Change')" icon="pi pi-cog" class="p-button-warning mx-1"
                       :loading="loading" @click="changeProperty" />
-            <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-trash" class="p-button-danger mx-1"
+            <p-button v-tooltip.bottom="$t('Delete')" icon="pi pi-trash" class="p-button-danger mx-1"
                       :loading="loading" @click="deleteProperty" />
           </div>
         </p-accordion-content>
@@ -49,7 +49,7 @@
       <div v-if="queryParam.cmsAction !== deleteAction" style="width: 600px">
         <!-- Имя -->
         <div class="col-12 row my-1">
-          <div class="col">Название свойства:</div>
+          <div class="col">{{ $t('Name of the property')}}:</div>
           <div class="col">
             <p-input-text class="w-100" v-model="property.newName" autofocus />
           </div>
@@ -57,8 +57,8 @@
         <!-- Код свойства -->
         <div class="col-12 row my-1">
           <div class="col">
-            Код свойства:
-            <i class="ms-1 pi pi-tag" v-tooltip.bottom="'При изменении, обновить значение у дилеров'"></i>
+            {{ $t('Property Code')}}:
+            <i class="ms-1 pi pi-tag" v-tooltip.bottom="$t('property_code_tooltip')"></i>
           </div>
           <div class="col">
             <p-input-text class="w-100" v-model="property.newCode" />
@@ -66,7 +66,7 @@
         </div>
         <!-- Тип данных -->
         <div class="col-12 row my-1">
-          <div class="col">Тип данных:</div>
+          <div class="col">{{ $t('Data type')}}:</div>
           <div class="col">
             <p-select class="w-100"
                       :options="propertiesTypes"
@@ -78,10 +78,10 @@
         <!-- Составной тип (справочники) -->
         <template v-if="typeIsSelect">
           <div class="col-12 row mb-1">
-            <div class="col">Дополнительные поля свойства (имя есть):</div>
+            <div class="col"> {{$t('Additional fields of the property (there is a name)')}} :</div>
             <div class="col">
-              <p-button v-tooltip.bottom="'Добавить поле'" icon="pi pi-plus-circle" class="w-100 p-button-raised"
-                        label="Добавить поле"
+              <p-button v-tooltip.bottom="$t('Add a field')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+                        :label="$t('Add a field')"
                         @click="addPropertyField" />
             </div>
           </div>
@@ -97,17 +97,17 @@
                         v-model="field.type" />
             </div>
             <div class="col-1 text-center">
-              <p-button v-tooltip.bottom="'Удалить поле'" icon="pi pi-times" class="p-button-danger"
+              <p-button v-tooltip.bottom="$t('Delete Field')" icon="pi pi-times" class="p-button-danger"
                         @click="removePropertyField(key)" />
             </div>
           </div>
         </template>
         <template v-if="typeIsTable">
           <div class="col-12 row mb-1">
-            <div class="col">Колонки:</div>
+            <div class="col">{{$t('Columns')}}:</div>
             <div class="col">
-              <p-button v-tooltip.bottom="'Добавить колонку в таблицу'" icon="pi pi-plus-circle" class="w-100 p-button-raised"
-                        label="Добавить колонку" @click="addTableColumn" />
+              <p-button v-tooltip.bottom="$t('Add a column to the table')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+                        :label="$t('Add a column')" @click="addTableColumn" />
             </div>
           </div>
 
@@ -116,14 +116,14 @@
               <p-input-text class="w-100" v-model="property.fields[index]" />
             </div>
             <div v-if="property.fields.length > 1" class="col-1 m-0 text-center">
-              <p-button v-tooltip.bottom="'Удалить колонку'" icon="pi pi-times" class="p-button-danger"
+              <p-button v-tooltip.bottom="$t('Delete column')" icon="pi pi-times" class="p-button-danger"
                         @click="removeTableColumn(index)" />
             </div>
           </div>
         </template>
       </div>
       <div v-else style="min-width: 300px">
-        Удалить свойство
+        {{$t('Delete a property')}}
       </div>
 
       <template #footer>
@@ -170,7 +170,7 @@ export default {
     },
     propertiesTypes: [
       {
-        label: 'Простые',
+        label: _('Simple'),
         items: [
           {id: 'text',     name: _('Text (~200 characters)')},
           {id: 'textarea', name: _('Text (many)')},
@@ -180,28 +180,28 @@ export default {
         ]
       },
       {
-        label: 'Составные',
+        label: _('Composite'),
         items: [
-          {id: 'select', name: 'Справочник'},
-          {id: 'multiSelect', name: 'Справочник множественный'},
-          {id: 'table', name: 'Таблица'},
+          {id: 'select', name: _('Reference')},
+          {id: 'multiSelect', name: _('Multiple reference')},
+          {id: 'table', name: _('Table')},
         ]
       }
     ],
     propertiesDataBaseTypes: [
-      {id: 'text', name: 'Текст (~200 символов)'},
-      {id: 'textarea', name: 'Текст (много)'},
-      {id: 'int', name: 'Целое число'},
-      {id: 'float', name: 'Дробное число'},
-      {id: 'date', name: 'Дата'},
-      {id: 'file', name: 'Файл'},
-      {id: 'bool', name: 'Флаг (да/нет)'},
+      {id: 'text', name: _('Text (~200 characters)')},
+      {id: 'textarea', name: _('Text (many)')},
+      {id: 'int', name: _('Integer')},
+      {id: 'float', name: _('Float')},
+      {id: 'date', name: _('Date')},
+      {id: 'file', name: _('File')},
+      {id: 'bool', name: _('Flag (yes/no)')},
     ],
   }),
   computed: {
     accordionHeader() {
-      return this.type === 'catalog' ? 'Редактировать параметры каталога'
-                                     : 'Редактировать параметры дилеров';
+      return this.type === 'catalog' ? _('Edit catalog parameters')
+                                     : _('Edit dealer parameters');
     },
     responseKey() {
       return this.type === 'catalog' ? 'optionProperties'
@@ -286,7 +286,7 @@ export default {
       this.property.code = '';
       this.property.type = 'text';
 
-      this.modal.title = 'Создать свойство';
+      this.modal.title = _('Create property');
       this.modal.display = true;
     },
     dblClickProperty(e) {
@@ -314,7 +314,7 @@ export default {
       }
       this.$nextTick(() => this.property.code = this.propertiesSelected.code);
 
-      this.modal.title = 'Редактирование свойства';
+      this.modal.title = _('Edit property');
       this.modal.display = true;
     },
     deleteProperty() {
@@ -322,7 +322,7 @@ export default {
 
       this.property = {...this.propertiesSelected};
 
-      this.modal.title = 'Удалить свойство';
+      this.modal.title = _('Delete property');
       this.modal.display = true;
     },
 

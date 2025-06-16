@@ -25,7 +25,7 @@
         <span class="input-group-text">
           {{ $t('Tags') }}
           <i class="ms-1 pi pi-tag"
-             v-tooltip.bottom="'Теги особых свойств (через пробел):\n\'защита/guard\' - защита от удаления\n'"
+             v-tooltip.bottom="$t('tags_tooltip')"
           ></i>
         </span>
       <p-input-text class="form-control" :disabled="isPermissionDelete"
@@ -35,7 +35,7 @@
     <div class="col mb-3">
       <p class="col-12 mt-2 text-center">
         {{ $t('Available menus') }}
-        <i class="pi pi-tag" v-tooltip.bottom="'Если в `Доступные` пусто, значит доступны все'"></i>
+        <i class="pi pi-tag" v-tooltip.bottom="$t('available_menus_tooltip')"></i>
       </p>
       <p-picklist class="w-100" data-key="id"
                   list-style="height:220px"
@@ -57,6 +57,8 @@
 </template>
 
 <script>
+
+
 
 export default {
   emits: ['update'],
@@ -149,7 +151,7 @@ export default {
             name = this.permission.name
 
       if (this.checkPermName(name)) {
-        f.showMsg(`Тип доступа ${name} существует`);
+        f.showMsg(_('access_type_exists', name));
         return;
       }
 
@@ -171,7 +173,7 @@ export default {
       } else {
         this.errorTimeOut = setTimeout(() => {
           this.permission.id = this.permissionsData[0].id;
-          f.showMsg('Пустое имя не допустимо', 'error');
+          f.showMsg(_('empty_name_not_allowed'), 'error');
         }, 3000);
       }
     },
@@ -184,15 +186,15 @@ export default {
             sPer = this.permissionsData.find(i => i.id === id);
 
       if (/защ|guard/i.test(sPer.properties.tags)) {
-        f.showMsg('Для удаления требуется снять защиту! Удаление защищенных прав может нарушить работу приложения!', 'warning');
+        f.showMsg(_('protected_delete_warning'), 'warning');
         return;
       }
 
       if (sPer.delete) {
-        sPer.name = sPer.name.replace(' (удаление)', '');
+        sPer.name = sPer.name.replace(' (удаление)', ''); //ToDo найти эту строку
         delete sPer.delete;
       } else {
-        sPer.name += ' (удаление)';
+        sPer.name += ' (удаление)'; //ToDo найти эту строку
         sPer.delete = true;
       }
     },

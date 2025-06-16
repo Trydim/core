@@ -26,7 +26,7 @@
 
   <p-dialog v-model:visible="display" :modal="true" :closable="false">
     <template #header>
-      <h4>Курсы валют</h4>
+      <h4>{{$t('Currency rates')}}</h4>
     </template>
 
     <p-table :value="rate"
@@ -40,38 +40,38 @@
              style="width: 60vw"
     >
       <p-t-column field="ID" header="ID" style="width: 5%" />
-      <p-t-column field="code" :sortable="true" header="Код" style="width: 10%" >
+      <p-t-column field="code" :sortable="true" :header="$t('Code')"  style="width: 10%" >
         <template #editor="{data, field}">
           <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="name" :sortable="true" header="Название" style="width: 30%" >
+      <p-t-column field="name" :sortable="true" :header="$t('Name')" style="width: 30%" >
         <template #editor="{data, field}">
           <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="scale" header="Номинал" style="width: 10%" >
+      <p-t-column field="scale" :header="$t('Nominal')" style="width: 10%" >
         <template #editor="{data, field}">
           <p-input-text class="p-inputtext-sm w-100" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="rate" header="Курс" style="width: 20%" >
+      <p-t-column field="rate" :header="$t('Rate')" style="width: 20%" >
         <template #editor="{data, field}">
           <p-input-text class="p-inputtext-sm w-100" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="shortName" header="Обозначение" style="width: 10%">
+      <p-t-column field="shortName" :header="$t('Symbol')" style="width: 10%">
         <template #editor="{data, field}">
           <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="main" header="Основная" style="width: 10%">
+      <p-t-column field="main" :header="$t('Main')" style="width: 10%">
         <template #body="slotProps">
           <p-checkbox type="radio" class="d-block mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
                       @click="setMain(slotProps.data.ID)" />
         </template>
       </p-t-column>
-      <p-t-column field="lastEditDate" header="Удалить">
+      <p-t-column field="lastEditDate" :header="$t('Delete')">
         <template #body="slotProps">
           <p-button class="d-block mx-auto p-button-rounded p-button-text p-button-sm text-center" icon="pi pi-times"
                     @click="deleteRate(slotProps.data.ID)" />
@@ -80,8 +80,8 @@
     </p-table>
 
     <template #footer>
-      <p-button class="p-button-info me-auto" label="Добавить" icon="pi pi-plus" @click="addRate()" />
-      <p-button class="p-button-success" label="Закрыть" icon="pi pi-check" @click="modalHide" />
+      <p-button class="p-button-info me-auto" :label="$t('Add')" icon="pi pi-plus" @click="addRate()" />
+      <p-button class="p-button-success" :label="$t('Close')" icon="pi pi-check" @click="modalHide" />
     </template>
   </p-dialog>
 </template>
@@ -175,7 +175,7 @@ export default {
         this.display = false;
 
         if (this.changed) {
-          f.showMsg('Что бы применить изменения для курсов нажмите "Сохранить"', 'warning');
+          f.showMsg(_('changing_rate_message_warning'), 'warning');
         }
       }, 100);
     },
