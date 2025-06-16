@@ -294,6 +294,38 @@ function isJSON(string $value): bool {
   );
 }
 
+
+/**
+ * Adds language suffix to CSV parameter names for translation.
+ *
+ * @param array $csvParam CSV parameters (e.g. ['value' => 'title'])
+ * @param string ...$columnNames Parameters to translate (e.g. 'value', 'name')
+ * @return array Modified parameters (e.g. ['value' => 'title_en', ...])
+ */
+function convertCsvParamToTranslate(array $csvParam, string ...$columnNames): array {
+  global $main;
+
+  if (!$main->isNeedTranslate() || empty($columnNames)) {
+    return $csvParam;
+  }
+
+  $targetLang = $main->getTargetLang();
+
+  foreach ($columnNames as $column) {
+    if (!isset($csvParam[$column])) {
+      continue;
+    }
+
+    if (is_array($csvParam[$column])) {
+      $csvParam[$column][0] .= '_' . $targetLang;
+    } else {
+      $csvParam[$column] .= '_' . $targetLang;
+    }
+  }
+
+  return $csvParam;
+}
+
 /**
  * Load csv to array$_FILES['pictureHead']['error']
  *
