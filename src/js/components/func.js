@@ -1,7 +1,5 @@
 "use strict";
 
-import './_loading.scss';
-
 const cacheStringFunction = fn => {
   const cache = Object.create(null);
   return (str => {

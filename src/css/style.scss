@@ -1,5 +1,3 @@
-@charset "UTF-8";
-
 @import './variable';
 
 @import './mixin/functions';
@@ -26,4 +24,8 @@
   @import 'admin/preloader';
 
   @import 'utilities/utilities';
+
+  @import 'components/loading';
+  @import 'components/valid';
+  @import 'components/modal';
 }

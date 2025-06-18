@@ -1,7 +1,5 @@
 'use strict';
 
-import './_valid.scss';
-
 const defaultSendFunc = (data, finish, e) => {
   f.setLoading(e.target);
 

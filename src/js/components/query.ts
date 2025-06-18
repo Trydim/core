@@ -51,9 +51,19 @@ const downloadBody = async (data: any) => {
   }
   return Object.assign(new Blob(chunks), {fileName});
 }
+const translateCookie = (): string => {
+  document.cookie.split(';').forEach((p: string) => {
+    if (/[а-я]/i.test(p)) {
+      const [key, value] = p.trim().split('=');
+      document.cookie = `${f.transLit(key)}=${f.transLit(value)}`;
+    }
+  });
+
+  return document.cookie;
+}
 
 const query = (url: string, body: BodyInit | null, type = 'json') => {
-  const headers = {'Cookie': document.cookie} as any;
+  const headers = {'Cookie': translateCookie()};
 
   if (body && ['object', 'string'].includes(typeof body) && !(body instanceof FormData)) {
     let data = new FormData();
