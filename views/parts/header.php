@@ -7,12 +7,14 @@
 $siteLink = $main->url->getUri();
 
 /** Временно обработка выбора языка */
+$availableLanguages = $main->getAvailableLanguages();
+
 if (isset($_GET['lang'])) {
   $lang = $_GET['lang'];
 
-  if (in_array($lang, ['en', 'ru'])) {
+  if (in_array($lang, array_column($availableLanguages, 'code'))) {
     // Устанавливаем на 30 дней
-    setcookie('target_lang', $lang, time() + (30 * 24 * 60 * 60), '/');
+    setcookie('target_lang', $lang, time() + (12 * 30 * 24 * 60 * 60), '/');
     // Перенаправляем без параметра lang в URL
     $url = strtok($_SERVER['REQUEST_URI'], '?'); // Базовый URL без query
     $query = $_GET;
@@ -26,7 +28,8 @@ if (isset($_GET['lang'])) {
     exit;
   }
 }
-$currentLang = $_COOKIE['target_lang'] ?? 'ru';
+
+$currentLang = $main->getTargetLang();
 /** /end */
 
 if ($main->checkStatus()) {
@@ -59,7 +62,7 @@ if ($main->checkStatus()) {
             <div class="d-flex align-items-center form-check form-switch">
                 <input class="form-check-input" type="checkbox" data-action-cms="themeToggle">
             </div>
-
+            <?php if ($availableLanguages && count($availableLanguages) > 1): ?>
             <!-- ВРЕМЕННО select для выбора языка -->
             <style>
                 .language-selector {
@@ -117,14 +120,9 @@ if ($main->checkStatus()) {
 
             <div class="language-selector">
                 <select id="languageSelector">
-              <?php if ($currentLang == 'ru'): ?>
-                  <option value="ru">Русский</option>
-                  <option value="en">English</option>
-              <?php else: ?>
-
-                  <option value="en">English</option>
-                  <option value="ru">Русский</option>
-              <?php endif; ?>
+                <?php foreach ($availableLanguages as $language): ?>
+                    <option <?= $language['code'] === $currentLang ? 'selected' : ''; ?> value="<?= $language['code']; ?>"><?= $language['name']; ?></option>
+                <?php endforeach; ?>
                 </select>
             </div>
 
@@ -140,6 +138,8 @@ if ($main->checkStatus()) {
                     });
                 });
             </script>
+
+            <?php endif; ?>
 
             <nav class="navbar navbar-expand">
                 <div class="collapse navbar-collapse">

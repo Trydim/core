@@ -4,7 +4,8 @@
  * Trait Authorization
  * @package cms
  */
-trait Authorization {
+trait Authorization
+{
 
   /**
    * @var string[]
@@ -41,13 +42,14 @@ trait Authorization {
    * @param array $user
    * @return $this|Main
    */
-  public function setLogin(array $user): Main {
-    $this->user['id']    = $user['id'];
+  public function setLogin(array $user): Main
+  {
+    $this->user['id'] = $user['id'];
     $this->user['login'] = $user['login'];
-    $this->user['name']  = $user['name'];
+    $this->user['name'] = $user['name'];
     $this->user['contacts'] = $user['contacts'] ?? [];
-    $this->user['onlyOne']  = $user['onlyOne'];
-    $this->user['permission']    = $user['permissionValue'] ?? [];
+    $this->user['onlyOne'] = $user['onlyOne'];
+    $this->user['permission'] = $user['permissionValue'] ?? [];
     $this->user['customization'] = $user['customization'] ?? [];
 
     $this->user['isAdmin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
@@ -59,7 +61,8 @@ trait Authorization {
    * @param array $dealer
    * @return Main
    */
-  public function setDealer(array $dealer): Main {
+  public function setDealer(array $dealer): Main
+  {
     $this->user['dealer'] = $dealer;
 
     return $this;
@@ -69,7 +72,8 @@ trait Authorization {
    * @param string $status
    * @return $this|Main
    */
-  public function setLoginStatus(string $status): Main {
+  public function setLoginStatus(string $status): Main
+  {
     $this->status = $status;
     return $this;
   }
@@ -78,7 +82,8 @@ trait Authorization {
    * @param string $field - id, login, name, contacts, onlyOne, isAdmin, contacts, permission, customization
    * @return object|object[]|null
    */
-  public function getLogin(string $field = 'login') {
+  public function getLogin(string $field = 'login')
+  {
     if ($field === 'id' && !isset($this->user[$field])) $this->checkAuth();
     if ($field === 'all') return $this->user;
     return $this->user[$field] ?? null;
@@ -89,34 +94,38 @@ trait Authorization {
    *
    * @return bool
    */
-  public function checkStatus(string $status = 'ok'): bool {
+  public function checkStatus(string $status = 'ok'): bool
+  {
     return $this->status === $status;
   }
 
-  private function haveHeaderAuthorization(): bool {
-    $login    = $this->url->server->get('PHP_AUTH_USER');
+  private function haveHeaderAuthorization(): bool
+  {
+    $login = $this->url->server->get('PHP_AUTH_USER');
     $password = $this->url->server->get('PHP_AUTH_PW');
 
     if (!empty($login) && !empty($password)) {
-      $_SESSION['login']     = $login;
-      $_SESSION['password']  = $password;
+      $_SESSION['login'] = $login;
+      $_SESSION['password'] = $password;
       return true;
     }
     return false;
   }
+
   /**
    * Проверка пароля
    * @return $this|Main
    */
-  private function checkAuth(): Main {
+  private function checkAuth(): Main
+  {
     // Restore session id (set in auth.php)
     $id = $this->url->request->get('save');
     if ($id) session_id($_COOKIE['PHPSESSID'] = $id);
     !isset($_SESSION) && session_start();
 
-    if ( (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
-         ||
-         $this->haveHeaderAuthorization()
+    if ((isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
+      ||
+      $this->haveHeaderAuthorization()
     ) {
       $user = $this->db->checkUserHash($_SESSION);
       $user && $this->setLogin($user);
@@ -124,6 +133,7 @@ trait Authorization {
 
     return $this;
   }
+
   /**
    * Если отк. страница доступна без регистрации, то перейти
    * Если отк. стр-ца не доступна без регистрации, то перейти на login
@@ -133,7 +143,8 @@ trait Authorization {
    *
    * @return $this|Main
    */
-  private function applyAuth(): Main {
+  private function applyAuth(): Main
+  {
     $route = $this->url->getRoute();
 
     if ($this->checkStatus('no')) {
@@ -152,7 +163,8 @@ trait Authorization {
     return $this;
   }
 
-  private function getSideLinkMenu(): array {
+  private function getSideLinkMenu(): array
+  {
     if (count($this->sideLinkMenu) === 0) {
       $this->sideLinkMenu = array_map(function ($item) {
         return is_array($item) ? $item['link'] : $item;
@@ -167,7 +179,8 @@ trait Authorization {
    * @param string $action
    * @return bool
    */
-  public function checkAction(string $action): bool {
+  public function checkAction(string $action): bool
+  {
     $result = in_array($action, $this::$AVAILABLE_ACTION) || $this->checkAuth()->checkStatus();
 
     if ($result === false) {
@@ -178,7 +191,8 @@ trait Authorization {
     return $result;
   }
 
-  private function setSideMenu() {
+  private function setSideMenu()
+  {
     if ($this->checkStatus('no')) {
       $this->sideMenu = $this->getCmsParam('ACCESS_MENU');
       PUBLIC_PAGE && $this->sideMenu[] = PUBLIC_PAGE;
@@ -213,7 +227,7 @@ trait Authorization {
           $dbTables = array_merge($dbTables, $this->db->getTables());
         } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
           $props = array_merge(
-            [['dbTable' => 'codes', 'name'=> gTxt('codes')]],
+            [['dbTable' => 'codes', 'name' => gTxt('codes')]],
             $this->db->getTables('prop')
           );
 
@@ -230,7 +244,7 @@ trait Authorization {
       if (USE_CONTENT_EDITOR) {
         $this->dbTables[] = [
           'fileName' => 'content-js',
-          'name'     => gTxt('Content editor'),
+          'name' => gTxt('Content editor'),
         ];
       }
     }
@@ -242,7 +256,8 @@ trait Authorization {
    * @param bool $withParam
    * @return array|mixed
    */
-  public function getSideMenu(bool $first = false, bool $withParam = false) {
+  public function getSideMenu(bool $first = false, bool $withParam = false)
+  {
     $sideMenu = $withParam ? $this->sideMenu : $this->getSideLinkMenu();
 
     return $first ? array_values($sideMenu)[0] : $sideMenu;
@@ -253,14 +268,16 @@ trait Authorization {
    * @param string $page
    * @return bool
    */
-  public function availablePage(string $page): bool {
+  public function availablePage(string $page): bool
+  {
     return in_array($page, $this::$AVAILABLE_PAGE) || in_array($page, $this->getSideMenu());
   }
 
   /**
    * @return bool
    */
-  public function isDealer(): bool {
+  public function isDealer(): bool
+  {
     return $this->getCmsParam('isDealer');
   }
 }
@@ -272,11 +289,16 @@ trait Authorization {
 trait Dictionary
 {
 
-  private string $dictionaryPath = ABS_SITE_PATH . '/lang/dictionary.php';
-  private string $dbDictionaryPath = ABS_SITE_PATH . '/lang/dbDictionary.php';
+  private string $dictionaryPath = '/lang/dictionary.php';
+
+  private string $dbDictionaryPath = '/lang/dbDictionary.php';
+
   private string $targetLang;
+
   private bool $needTranslate = false;
 
+  /** @var array<array{name: string, code: string}> $availableLanguages */
+  private array $availableLanguages = [];
   /**
    * @var array<string, string> Словарь переводов: ключ => значение
    */
@@ -320,6 +342,7 @@ trait Dictionary
    * - $dbDictionary - словарь переводов для базы данных
    * - $needTranslate - флаг необходимости перевода
    * - $targetLang - целевой язык перевода
+   * - $availableLanguages - доступные языки
    *
    * @return void
    */
@@ -327,20 +350,28 @@ trait Dictionary
   {
     if ($this->dictionary) return;
 
-    $locales = $this->cmsParam['LOCALES'] ?? null;
+    /**
+     * @var array{
+     *      BASE_LANG: string,
+     *      TARGET_LANG: string,
+     *      ALL_LANGUAGES: array<array{name: string, code: string}>,
+     *      CSV_FILES?: string[]
+     *  }|null $locales
+     */
+    $locales = $this->cmsParam['LOCALES'] ?? [];
 
-    if ($locales) {
-      $baseLang = $locales['BASE_LANG'] ?? 'ru';
-      $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
+    $baseLang = $locales['BASE_LANG'] ?? 'ru';
+    $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
 
-      $dictionaryCSVPaths = $locales['CSV_FILES'] ?? [];
+    $this->initAvailableLanguages($locales);
 
-      // Подключаем словарь только если языки различаются или целевой язык явно указан
-      if ($baseLang !== $this->targetLang) {
-        $this->dictionaryPath = ABS_SITE_PATH . "lang/{$this->targetLang}/dictionary.php";
-        $this->dbDictionaryPath = ABS_SITE_PATH . "lang/{$this->targetLang}/dbDictionary.php";
-        $this->needTranslate = true;
-      }
+    $dictionaryCSVPaths = $locales['CSV_FILES'] ?? [];
+
+    // Подключаем словарь только если языки различаются
+    if ($baseLang !== $this->targetLang) {
+      $this->dictionaryPath = "lang/{$this->targetLang}/dictionary.php";
+      $this->dbDictionaryPath = "lang/{$this->targetLang}/dbDictionary.php";
+      $this->needTranslate = true;
     }
 
     $baseDictionary = $this->loadBaseDictionary();
@@ -359,9 +390,9 @@ trait Dictionary
    */
   private function loadBaseDictionary(): array
   {
-    if (!file_exists($this->dictionaryPath)) return [];
+    if (!file_exists(ABS_SITE_PATH . $this->dictionaryPath)) return [];
 
-    return include $this->dictionaryPath;
+    return include ABS_SITE_PATH . $this->dictionaryPath;
   }
 
   /**
@@ -424,7 +455,7 @@ trait Dictionary
    */
   private function loadDbDictionary(): array
   {
-    $dictionary = file_exists($this->dbDictionaryPath) ? include $this->dbDictionaryPath : [];
+    $dictionary = file_exists(ABS_SITE_PATH . $this->dbDictionaryPath) ? include ABS_SITE_PATH . $this->dbDictionaryPath : [];
 
     if ($this->isDealer()) {
       $dealerPath = $this->url->getPath(true) . $this->dbDictionaryPath;
@@ -446,7 +477,7 @@ trait Dictionary
   }
 
   /**
-   * @return array<string, array<string, string>> возвращает массив баз данных
+   * @return array<string, array<string, string>> возвращает массив словаря баз данных
    */
   public function getDbDictionary(): array
   {
@@ -472,11 +503,45 @@ trait Dictionary
     return $this->targetLang;
   }
 
+  /**
+   * @return array возвращает доступные языки или пустой массив
+   */
+  public function getAvailableLanguages(): array
+  {
+    $this->initLocales();
+    return $this->availableLanguages;
+  }
+
+  /**
+   * @param array|null $baseLanguages
+   * @return void
+   */
+  private function initAvailableLanguages(array $locales = []): void
+  {
+    if ($this->isDealer()) {
+      $availableLanguages = $this->user['dealer']['settings']['available_languages'];
+
+      if (!$availableLanguages) {
+        $this->targetLang = $locales['TARGET_LANG'] ?? $locales['BASE_LANG'] ?? 'ru';
+        return;
+      }
+
+      $this->availableLanguages = $availableLanguages;
+      if (!in_array($this->targetLang, array_column($availableLanguages, 'code'), true)) {
+        $this->targetLang = $availableLanguages[0]['code'];
+      }
+      return;
+    }
+
+    $this->availableLanguages = $locales['ALL_LANGUAGES'] ?? [];
+  }
+
 
 }
 
 /** Trait Cache */
-trait Cache {
+trait Cache
+{
   /**
    * @var array - const
    */
@@ -495,7 +560,8 @@ trait Cache {
    */
   private $cacheVars = ['all'];
 
-  private function getCacheDir(): string {
+  private function getCacheDir(): string
+  {
     /*if ($this->publicDealer && $this->url->getRoute() === 'public') {
       $cachePath = $this->url->getPath(true);
     } else {
@@ -509,34 +575,40 @@ trait Cache {
    * Return path for cache, different for dealer and main.
    * @return string
    */
-  private function getCachePath(): string {
+  private function getCachePath(): string
+  {
     return $this->getCacheDir() . $this->cacheKey . $this->CACHE['FILE_NAME'];
   }
 
-  private function getCacheKeyPath(): string {
+  private function getCacheKeyPath(): string
+  {
     return $this->getCmsParam(VC::CSV_PATH) . $this->cacheKey . $this->CACHE['KEY_FILE_NAME'];
   }
 
-  private function cacheIsActual(string $cachePath): bool {
+  private function cacheIsActual(string $cachePath): bool
+  {
     return abs(filemtime($this->getCacheKeyPath()) - filemtime($cachePath)) < 10;
   }
 
-  public function setCsvVariable(array $vars): Main {
+  public function setCsvVariable(array $vars): Main
+  {
     $this->cacheVars = $vars;
     return $this;
   }
 
-  public function setCacheKey(string $key): Main {
+  public function setCacheKey(string $key): Main
+  {
     $this->cacheKey = $key;
     return $this;
   }
 
   /**
    * @param string $cacheKey
-   * @param mixed  ...$vars
+   * @param mixed ...$vars
    * @return bool
    */
-  public function loadCsvCache(string $cacheKey, &...$vars): bool {
+  public function loadCsvCache(string $cacheKey, &...$vars): bool
+  {
     $this->setCacheKey($cacheKey);
     $cachePath = $this->getCachePath();
 
@@ -555,7 +627,8 @@ trait Cache {
    * @param string $cacheKey
    * @param        ...$vars
    */
-  public function saveCsvCache(string $cacheKey, ...$vars) {
+  public function saveCsvCache(string $cacheKey, ...$vars)
+  {
     $data = [];
     $this->setCacheKey($cacheKey);
 
@@ -564,7 +637,8 @@ trait Cache {
     //file_put_contents($this->getCacheKeyPath(), uniqid());
   }
 
-  public function deleteCsvCache() {
+  public function deleteCsvCache()
+  {
     $cacheDir = scandir($this->getCacheDir());
 
     foreach ($cacheDir as $path) {
@@ -572,7 +646,8 @@ trait Cache {
     }
   }
 
-  public function loadPageCache(): bool {
+  public function loadPageCache(): bool
+  {
     /*
      const PAGE_CACHE_FILE = SHARE_PATH . 'pageCache.bin';
      if (file_exists(PAGE_CACHE_FILE)) {
@@ -590,7 +665,8 @@ trait Cache {
   /**
    * @param {any} $data
    */
-  public function savePageCache($data) {
+  public function savePageCache($data)
+  {
     file_put_contents($this->cachePath(), gzcompress(json_encode($data), 1));
   }
 }
@@ -599,14 +675,16 @@ trait Cache {
  * Trait hooks
  * @package cms
  */
-trait Hooks {
+trait Hooks
+{
   private $hooksPath = ABS_SITE_PATH . 'public/hooks.php';
   private $hooks = [];
 
   /**
    * add public hooks
    */
-  private function setHooks() {
+  private function setHooks()
+  {
     require_once CORE . 'model/hooks.php';
     if (file_exists($this->hooksPath)) require_once $this->hooksPath;
   }
@@ -615,7 +693,8 @@ trait Hooks {
    * @param string $hookName
    * @param callable $callable
    */
-  public function addHook(string $hookName, callable $callable) {
+  public function addHook(string $hookName, callable $callable)
+  {
     if (empty($hookName)) die('Hook name can\'t be empty!');
 
     $this->hooks[$hookName] = $callable;
@@ -626,7 +705,8 @@ trait Hooks {
    * @param $args - array
    * @return mixed
    */
-  public function fireHook($hookName, ...$args) {
+  public function fireHook($hookName, ...$args)
+  {
     if ($this->hookExists($hookName)) {
       $func = $this->hooks[$hookName];
 
@@ -636,7 +716,8 @@ trait Hooks {
     return false;
   }
 
-  public function hookExists($hookName): bool {
+  public function hookExists($hookName): bool
+  {
     return isset($this->hooks[$hookName]);
   }
 }
@@ -645,14 +726,16 @@ trait Hooks {
  * Trait Page
  * @package cms
  */
-trait Utilities {
+trait Utilities
+{
 
   /**
    * @param string $id
    * @param mixed $data
    * @return string
    */
-  public function getFrontContent(string $id, $data): string {
+  public function getFrontContent(string $id, $data): string
+  {
     $data = json_encode($data, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     return "<input type='hidden' id='$id' value='$data'>";
   }
@@ -660,7 +743,8 @@ trait Utilities {
   /**
    * @return bool
    */
-  public function isSafari(): bool {
+  public function isSafari(): bool
+  {
     return boolValue(
       preg_match(
         "/^((?!chrome|android).)*safari/",
@@ -668,7 +752,8 @@ trait Utilities {
     );
   }
 
-  public function encrypt(string $value): string {
+  public function encrypt(string $value): string
+  {
     $ca = $this->getCmsParam(VC::ENCRYPT_ALGO);
     $key = $this->getCmsParam(VC::ENCRYPT_KEY) ?? 'eKey';
 
@@ -678,7 +763,8 @@ trait Utilities {
     return base64_encode($encrypted . '::' . $iv);
   }
 
-  public function decrypt(string $param): string {
+  public function decrypt(string $param): string
+  {
     $ca = $this->getCmsParam(VC::ENCRYPT_ALGO);
     $key = $this->getCmsParam(VC::ENCRYPT_KEY) ?? 'eKey';
 
