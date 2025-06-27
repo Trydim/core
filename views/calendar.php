@@ -13,7 +13,10 @@ $field['content'] = <<<CONTENT
 CONTENT;
 
 $field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>';
+$gTxt = 'gTxt'; //функция перевода для вызова в Heredoc
+
 $field['footerContent'] .= <<<footerContent
+
 <template id="orderTemplate">
   <div>
     <span>Статус заказа: \${status}</span><br>
@@ -25,6 +28,6 @@ $field['footerContent'] .= <<<footerContent
   </div>
 </template>
 <template id="orderBtnTemplate">
-  <input type="button" class="btn btn-success" value="Редактировать" data-action="openOrder">
+  <input type="button" class="btn btn-success" value="{$gTxt('Edit')}" data-action="openOrder">
 </template>
 footerContent;

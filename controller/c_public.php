@@ -29,6 +29,10 @@ if ($authStatus && isset($_GET['orderId'])) {
     $order = $main->db->loadOrdersById($orderId, true);
 
     if ($order) {
+      //Старые заказы всегда сохраняются на русском
+      $targetLang = $order['importantValue']['targetLang'] ?? 'ru';
+      $main->setTargetLang($targetLang);
+
       $dbContent .= $main->getFrontContent('dataOrder', $order);
 
       $customer = $main->db->loadCustomerByOrderId($order['ID']);

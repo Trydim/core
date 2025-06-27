@@ -310,6 +310,19 @@ trait Dictionary
   private array $dbDictionary = [];
 
   /**
+   * Принудительно устанавливает целевой язык,
+   * нужно вызывать до инициализации словарей
+   * @param string $lang ru, en,
+   * @return void
+   */
+  public function setTargetLang(string $lang): void
+  {
+    if (isset($this->targetLang)) return;
+
+    $this->targetLang = $lang;
+  }
+
+  /**
    * Функция для использования словаря на фронтенде
    * @return string
    */
@@ -361,9 +374,11 @@ trait Dictionary
     $locales = $this->cmsParam['LOCALES'] ?? [];
 
     $baseLang = $locales['BASE_LANG'] ?? 'ru';
-    $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
 
-    $this->initAvailableLanguages($locales);
+    if (!isset($this->targetLang)) {
+      $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
+      $this->initAvailableLanguages($locales);
+    }
 
     $dictionaryCSVPaths = $locales['CSV_FILES'] ?? [];
 

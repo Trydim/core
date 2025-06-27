@@ -30,6 +30,10 @@ if (isset($_GET['lang'])) {
 }
 
 $currentLang = $main->getTargetLang();
+echo "<input type='hidden' id='targetLang' value='$currentLang'>";
+?>
+
+<?php
 /** /end */
 
 if ($main->checkStatus()) {
