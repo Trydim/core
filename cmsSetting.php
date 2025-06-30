@@ -61,4 +61,25 @@ define('USE_CONTENT_EDITOR', $publicConfig['USE_CONTENT_EDITOR'] ?? false);
 
 $main->afterConstDefine();
 
+//Обработка смены языка
+if (isset($_GET['lang'])) {
+  $lang = $_GET['lang'];
+
+  if (in_array($lang, array_column($main->getAvailableLanguages(), 'code'))) {
+    // Устанавливаем на 10 лет
+    setcookie('target_lang', $lang, time() + (120 * 30 * 24 * 60 * 60), '/');
+    // Перенаправляем без параметра lang в URL
+    $url = strtok($_SERVER['REQUEST_URI'], '?'); // Базовый URL без query
+    $query = $_GET;
+    unset($query['lang']); // Удаляем параметр lang
+
+    if (!empty($query)) {
+      $url .= '?' . http_build_query($query);
+    }
+
+    header('Location: ' . $url);
+    exit;
+  }
+}
+
 unset($url, $publicConfig, $publicPage, $dealConfig, $dbConfig);

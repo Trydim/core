@@ -6,31 +6,10 @@
 
 $siteLink = $main->url->getUri();
 
-/** Временно обработка выбора языка */
 $availableLanguages = $main->getAvailableLanguages();
-
-if (isset($_GET['lang'])) {
-  $lang = $_GET['lang'];
-
-  if (in_array($lang, array_column($availableLanguages, 'code'))) {
-    // Устанавливаем на 30 дней
-    setcookie('target_lang', $lang, time() + (12 * 30 * 24 * 60 * 60), '/');
-    // Перенаправляем без параметра lang в URL
-    $url = strtok($_SERVER['REQUEST_URI'], '?'); // Базовый URL без query
-    $query = $_GET;
-    unset($query['lang']); // Удаляем параметр lang
-
-    if (!empty($query)) {
-      $url .= '?' . http_build_query($query);
-    }
-
-    header('Location: ' . $url);
-    exit;
-  }
-}
-
 $currentLang = $main->getTargetLang();
 echo "<input type='hidden' id='targetLang' value='$currentLang'>";
+
 ?>
 
 <?php
@@ -67,60 +46,6 @@ if ($main->checkStatus()) {
                 <input class="form-check-input" type="checkbox" data-action-cms="themeToggle">
             </div>
             <?php if ($availableLanguages && count($availableLanguages) > 1): ?>
-            <!-- ВРЕМЕННО select для выбора языка -->
-            <style>
-                .language-selector {
-                    position: relative;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-
-                    width: 120px;
-                }
-
-                .language-selector select {
-                    appearance: none;
-                    -webkit-appearance: none;
-                    -moz-appearance: none;
-                    width: 100%;
-                    padding: 10px 15px;
-                    padding-right: 35px;
-                    font-size: 14px;
-                    color: #333;
-                    background-color: #f8f8f8;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    outline: none;
-                    transition: all 0.3s ease;
-                }
-
-                .language-selector select:hover {
-                    border-color: #aaa;
-                    background-color: #fff;
-                }
-
-                .language-selector select:focus {
-                    border-color: #4a90e2;
-                    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-                }
-
-                .language-selector::after {
-                    content: "▼";
-                    font-size: 10px;
-                    color: #666;
-                    position: absolute;
-                    right: 12px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    pointer-events: none;
-                }
-
-                .language-selector option {
-                    padding: 8px;
-                    background: #fff;
-                }
-            </style>
 
             <div class="language-selector">
                 <select id="languageSelector">
