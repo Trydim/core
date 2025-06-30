@@ -49,7 +49,7 @@
 
         <label :class="{'col-6 input-group-text': item.type !== 'text' && item.type !== 'textarea'}"
                :for="item.type + key">
-          {{ item.name }}
+          {{ $t(item.name) }}
         </label>
 
         <p-input-number v-if="item.type === 'number'"

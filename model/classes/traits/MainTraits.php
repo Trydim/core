@@ -347,6 +347,7 @@ trait Dictionary
    *    - Базовый словарь из PHP-файла
    *    - Специфичные переводы для дилеров (если есть)
    *    - Переводы для базы данных
+   *    - Дополнительные переводы из CSV-файлов
    *
    * Если словарь уже был инициализирован ранее, метод завершается без повторной инициализации.
    *
@@ -367,7 +368,8 @@ trait Dictionary
      * @var array{
      *      BASE_LANG: string,
      *      TARGET_LANG: string,
-     *      ALL_LANGUAGES: array<array{name: string, code: string}>
+     *      ALL_LANGUAGES: array<array{name: string, code: string}>,
+     *      CSV_FILES?: string[]
      *  } $locales
      */
     $locales = $this->cmsParam['LOCALES'] ?? [];
@@ -387,16 +389,16 @@ trait Dictionary
       $this->needTranslate = true;
     }
 
-    $this->dictionary = $this->loadDictionary();
+    $this->dictionary = $this->loadDictionary($locales['CSV_FILES']);
     $this->dbDictionary = $this->loadDbDictionary();
   }
 
   /**
-   * Загружает и объединяет базовый словарь и словарь дилера (если есть)
+   * Загружает и объединяет базовый словарь, словарь дилера и csv словари
    *
    * @return array<string, string>
    */
-  private function loadDictionary(): array
+  private function loadDictionary(?array $csvPaths): array
   {
     $dictionary = [];
 
@@ -415,7 +417,48 @@ trait Dictionary
       }
     }
 
+    //Загрузка кастомных словарей администратора из CSV (приоритет директории дилера)
+    $csvDictionary = $this->loadCSVDictionary($csvPaths);
+
+    if ($csvDictionary) {
+      $dictionary = array_merge($dictionary, $csvDictionary);
+    }
+
     return $dictionary;
+  }
+
+  /**
+   * Загрузка переводов из CSV-файлов
+   *
+   * @param ?array<int, string> $csvPaths
+   * @return array<string, string>
+   */
+  private function loadCSVDictionary(?array $csvPaths): array
+  {
+    if (!$csvPaths) return [];
+
+    $csvParam = [
+      'id' => 'id',
+      'value' => $this->targetLang,
+    ];
+
+    $csvChunks = [];
+
+    foreach ($csvPaths as $csvPath) {
+      $csvData = loadCSV($csvParam, $csvPath);
+
+      if (is_array($csvData)) {
+        $csvChunks[] = $csvData;
+      }
+    }
+
+    $csvAllData = array_merge([], ...$csvChunks);
+
+    if (!empty($csvAllData)) {
+      $csvDictionary = array_column($csvAllData, 'value', 'id');
+    }
+
+    return $csvDictionary ?? [];
   }
 
 

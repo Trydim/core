@@ -86,6 +86,14 @@ $publicConfig = [
   /*'LOCALES' => [
     'BASE_LANG' => 'ru',
     'TARGET_LANG' => 'ru', //en, pl, ..
+    'ALL_LANGUAGES' => [
+      ['name' => 'Русский', 'code' => 'ru'],
+      ['name' => 'English', 'code' => 'en']
+    ],
+    'CSV_FILES' => [
+       'locales/common_phrases.csv',
+      'locales/user_fields.csv',
+    ]
   ]*/
 ];
 
