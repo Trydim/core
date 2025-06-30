@@ -86,10 +86,6 @@ $publicConfig = [
   /*'LOCALES' => [
     'BASE_LANG' => 'ru',
     'TARGET_LANG' => 'ru', //en, pl, ..
-    'CSV_FILES' => [
-      'locales/common.csv',
-      'locales/prices.csv'
-    ]
   ]*/
 ];
 

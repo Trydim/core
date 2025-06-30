@@ -58,7 +58,7 @@ if ($orderId && count($reportValue) === 0) {
   $data['reportValue'] = &$reportValue['reportValue'];
 
   //Старые заказы всегда сохраняются на русском
-  $targetLang = $data['order']['importantValue']['targetLang'] ?? 'ru';
+  $targetLang = $data['order']['importantValue']['targetLang'] ?? $main::$BASE_LANG;
   $main->setTargetLang($targetLang);
 } else if (count($reportValue)) {
   $data['reportValue'] = $reportValue['reportValue'] ?? $reportValue;

@@ -288,6 +288,7 @@ trait Authorization
  */
 trait Dictionary
 {
+  public static string $BASE_LANG = 'ru'; //константа, если язык не установлен по умолчанию в config.php
 
   private string $dictionaryPath = '/lang/dictionary.php';
 
@@ -311,7 +312,7 @@ trait Dictionary
 
   /**
    * Принудительно устанавливает целевой язык,
-   * нужно вызывать до инициализации словарей
+   * нужно вызывать до инициализации словарей (нужно при отображении заказа, pdf, excel)
    * @param string $lang ru, en,
    * @return void
    */
@@ -337,14 +338,13 @@ trait Dictionary
   }
 
   /**
-   * Инициализирует локализацию системы
+   * Инициализирует локализацию системы, вызывается при вызове любого метода получения свойсв класса
    *
    * Метод выполняет следующие задачи:
    * 1. Загружает базовые настройки локализации из конфигурации CMS
-   * 2. Определяет целевой язык (из куки или настроек по умолчанию)
+   * 2. Определяет целевой язык (из куки или настроек по умолчанию) или язык из заказа
    * 3. Загружает словари переводов:
    *    - Базовый словарь из PHP-файла
-   *    - Дополнительные переводы из CSV-файлов
    *    - Специфичные переводы для дилеров (если есть)
    *    - Переводы для базы данных
    *
@@ -367,20 +367,18 @@ trait Dictionary
      * @var array{
      *      BASE_LANG: string,
      *      TARGET_LANG: string,
-     *      ALL_LANGUAGES: array<array{name: string, code: string}>,
-     *      CSV_FILES?: string[]
-     *  }|null $locales
+     *      ALL_LANGUAGES: array<array{name: string, code: string}>
+     *  } $locales
      */
     $locales = $this->cmsParam['LOCALES'] ?? [];
 
-    $baseLang = $locales['BASE_LANG'] ?? 'ru';
+    $baseLang = $locales['BASE_LANG'] ?? self::$BASE_LANG;
 
+    //Если целевой язык уже установлен, через метод setTargetLang, значит будет один язык (для заказов и шаблонов pdf, excel)
     if (!isset($this->targetLang)) {
       $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
       $this->initAvailableLanguages($locales);
     }
-
-    $dictionaryCSVPaths = $locales['CSV_FILES'] ?? [];
 
     // Подключаем словарь только если языки различаются
     if ($baseLang !== $this->targetLang) {
@@ -389,80 +387,37 @@ trait Dictionary
       $this->needTranslate = true;
     }
 
-    $baseDictionary = $this->loadBaseDictionary();
-    $csvDictionary = $this->loadCSVDictionary($dictionaryCSVPaths, $this->targetLang);
-    $dealerDictionary = $this->loadDealerDictionary();
-
-    $this->dictionary = array_merge($baseDictionary, $csvDictionary, $dealerDictionary);
-
+    $this->dictionary = $this->loadDictionary();
     $this->dbDictionary = $this->loadDbDictionary();
   }
 
   /**
-   * Загрузка базового словаря PHP
+   * Загружает и объединяет базовый словарь и словарь дилера (если есть)
    *
    * @return array<string, string>
    */
-  private function loadBaseDictionary(): array
+  private function loadDictionary(): array
   {
-    if (!file_exists(ABS_SITE_PATH . $this->dictionaryPath)) return [];
+    $dictionary = [];
 
-    return include ABS_SITE_PATH . $this->dictionaryPath;
-  }
+    // Загрузка базового словаря
+    $baseDictPath = ABS_SITE_PATH . $this->dictionaryPath;
+    if (file_exists($baseDictPath)) {
+      $dictionary = include $baseDictPath;
+    }
 
-  /**
-   * Загрузка переводов из CSV-файлов и объединение с основным словарем
-   *
-   * @param ?array<int, string> $csvPaths
-   * @param ?string $lang
-   * @return array<string, string>
-   */
-  private function loadCSVDictionary(?array $csvPaths, ?string $lang): array
-  {
-    if (!$csvPaths || !$lang) return [];
-
-    $csvParam = [
-      'id' => 'id',
-      $lang => $lang,
-    ];
-
-    $csvAllData = [];
-
-    foreach ($csvPaths as $csvPath) {
-      $csvData = loadCSV($csvParam, $csvPath);
-
-      if (is_array($csvData)) {
-        $csvAllData = array_merge($csvAllData, $csvData);
+    // Добавление словаря дилера (если это дилер и словарь существует)
+    if ($this->isDealer()) {
+      $dealerPath = $this->url->getPath(true) . $this->dictionaryPath;
+      if (file_exists($dealerPath)) {
+        $dealerDictionary = include $dealerPath;
+        $dictionary = array_merge($dictionary, $dealerDictionary);
       }
-
     }
 
-    if (!empty($csvAllData)) {
-      $csvDictionary = array_column($csvAllData, $lang, 'id');
-    }
-
-    return $csvDictionary ?? [];
+    return $dictionary;
   }
 
-  /**
-   * Подключение словаря дилера, если есть
-   *
-   * @return array<string, string>
-   */
-  private function loadDealerDictionary(): array
-  {
-    if (!$this->isDealer()) {
-      return [];
-    }
-
-    $dealerPath = $this->url->getPath(true) . $this->dictionaryPath;
-
-    if (file_exists($dealerPath)) {
-      return include $dealerPath;
-    }
-
-    return [];
-  }
 
   /**
    * Загрузка словаря для БД
@@ -470,8 +425,14 @@ trait Dictionary
    */
   private function loadDbDictionary(): array
   {
-    $dictionary = file_exists(ABS_SITE_PATH . $this->dbDictionaryPath) ? include ABS_SITE_PATH . $this->dbDictionaryPath : [];
+    $dictionary = [];
 
+    // Загрузка базового словаря для баз данных
+    $baseDictPath = ABS_SITE_PATH . $this->dbDictionaryPath;
+    if (file_exists($baseDictPath)) {
+      $dictionary = include $baseDictPath;
+    }
+    // Добавление словаря дилера для баз данных  (если это дилер и словарь существует)
     if ($this->isDealer()) {
       $dealerPath = $this->url->getPath(true) . $this->dbDictionaryPath;
       $dealerDict = file_exists($dealerPath) ? include $dealerPath : [];
@@ -501,7 +462,7 @@ trait Dictionary
   }
 
   /**
-   * @return bool возвращает нужно ли переводить на целевой язык, по умолчанию 'ru'
+   * @return bool возвращает нужно ли переводить на целевой язык, по умолчанию $BASE_LANG = 'ru'
    */
   public function isNeedTranslate(): bool
   {
@@ -510,7 +471,7 @@ trait Dictionary
   }
 
   /**
-   * @return string возвращает целевой язык, по умолчанию 'ru'
+   * @return string возвращает целевой язык, по умолчанию $BASE_LANG = 'ru'
    */
   public function getTargetLang(): string
   {
@@ -528,7 +489,12 @@ trait Dictionary
   }
 
   /**
-   * @param array|null $baseLanguages
+   * Инициализация доступных язык, не должен вызываться если целевой язык уже установлен
+   * @param array{
+   *       BASE_LANG: string,
+   *       TARGET_LANG: string,
+   *       ALL_LANGUAGES: array<array{name: string, code: string}>
+   *   } $locales
    * @return void
    */
   private function initAvailableLanguages(array $locales = []): void
@@ -536,8 +502,9 @@ trait Dictionary
     if ($this->isDealer()) {
       $availableLanguages = $this->user['dealer']['settings']['available_languages'];
 
+      //Если у дилера нет доступных языков в настройках, то будет отсутвовать выбор языка у дилера
       if (!$availableLanguages) {
-        $this->targetLang = $locales['TARGET_LANG'] ?? $locales['BASE_LANG'] ?? 'ru';
+        $this->targetLang = $locales['TARGET_LANG'] ?? $locales['BASE_LANG'] ?? self::$BASE_LANG;
         return;
       }
 
@@ -550,7 +517,6 @@ trait Dictionary
 
     $this->availableLanguages = $locales['ALL_LANGUAGES'] ?? [];
   }
-
 
 }
 
