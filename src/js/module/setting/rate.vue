@@ -3,7 +3,7 @@
     <h3 class="col-12 text-center">{{ $t('Exchange rates') }}</h3>
 
     <div class="col-12 row">
-      <p class="col-8">{{ $t('Automatically update rates') }}</p>
+      <p class="col-8">{{ $t('Auto-update') }}</p>
       <div class="col-4 d-inline-flex">
         <p class="col mt-0 text-center">{{ $t('No') }}</p>
         <p-switch v-model="autoRefresh" />
@@ -175,7 +175,7 @@ export default {
         this.display = false;
 
         if (this.changed) {
-          f.showMsg(_('changing_rate_message_warning'), 'warning');
+          f.showMsg(_('To apply the changes to the courses, click "Save"'), 'warning');
         }
       }, 100);
     },

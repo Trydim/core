@@ -3,7 +3,7 @@
 class MigrateDb {
   const DEAL_LOGIN = 'deal';
   const DEAL_PASS = '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS';
-  const ORDER_STATUS = 'order created';
+  const ORDER_STATUS = 'Order created';
   /**
    * @var string
    */

@@ -70,7 +70,7 @@ export default class extends Orders {
 
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
     if (['loadOrder', 'openOrder', 'printOrder', 'savePdf', 'sendOrder'].includes(action) && selectedSize !== 1) {
-      f.showMsg(_('choose_one_order_message_warning'), 'warning'); return;
+      f.showMsg(_('Select 1 order!'), 'warning'); return;
     }
     if (!selectedSize && !['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo'].includes(action)) {
       f.showMsg('Выберите заказ!', 'warning'); return;

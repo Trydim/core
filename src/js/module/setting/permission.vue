@@ -1,9 +1,9 @@
 <template>
   <div class="col-12 col-md-6 border" id="controlForm">
-    <h3 class="col text-center">{{ $t('Access control') }}</h3>
+    <h3 class="col text-center">{{ $t('Access') }}</h3>
 
     <div class="input-group my-3">
-      <span class="input-group-text">{{ $t('Add type') }}</span>
+      <span class="input-group-text">{{ $t('Add') }}</span>
       <p-input-text class="form-control" v-model="permission.name" />
       <p-button v-tooltip.bottom="$t('Add access type')" icon="pi pi-plus-circle" class="p-button-success"
                 @click="addPermission" />
@@ -25,7 +25,7 @@
         <span class="input-group-text">
           {{ $t('Tags') }}
           <i class="ms-1 pi pi-tag"
-             v-tooltip.bottom="$t('tags_tooltip')"
+             v-tooltip.bottom="$t('Special property tags (separated by a space):\n\'protection/guard\' - protection from deletion\n')"
           ></i>
         </span>
       <p-input-text class="form-control" :disabled="isPermissionDelete"
@@ -35,7 +35,7 @@
     <div class="col mb-3">
       <p class="col-12 mt-2 text-center">
         {{ $t('Available menus') }}
-        <i class="pi pi-tag" v-tooltip.bottom="$t('available_menus_tooltip')"></i>
+        <i class="pi pi-tag" v-tooltip.bottom="$t('If `Available` is empty, then everything is available')"></i>
       </p>
       <p-picklist class="w-100" data-key="id"
                   list-style="height:220px"
@@ -57,8 +57,6 @@
 </template>
 
 <script>
-
-
 
 export default {
   emits: ['update'],
@@ -151,7 +149,7 @@ export default {
             name = this.permission.name
 
       if (this.checkPermName(name)) {
-        f.showMsg(_('access_type_exists', name));
+        f.showMsg(_('Access type %1 exists', name));
         return;
       }
 
@@ -173,7 +171,7 @@ export default {
       } else {
         this.errorTimeOut = setTimeout(() => {
           this.permission.id = this.permissionsData[0].id;
-          f.showMsg(_('empty_name_not_allowed'), 'error');
+          f.showMsg(_('Empty name is not allowed'), 'error');
         }, 3000);
       }
     },
@@ -186,7 +184,10 @@ export default {
             sPer = this.permissionsData.find(i => i.id === id);
 
       if (/защ|guard/i.test(sPer.properties.tags)) {
-        f.showMsg(_('protected_delete_warning'), 'warning');
+        f.showMsg(
+          _('To delete, protection must be removed! Deleting protected rights may disrupt functionality of the application!'),
+          'warning'
+        );
         return;
       }
 

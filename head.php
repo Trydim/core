@@ -32,7 +32,7 @@ if ($mode = $main->getCmsParam('mode')) {
     } catch (Exception $e) {
       $main->response->setContent($e->getMessage());
     }
-  } else $main->response->setContent(['error' => gTxt('Auth no passing!')]);
+  } else $main->response->setContent(['error' => gTxt('Authorization error!')]);
 } else if ($customMode = $main->url->request->get('customMode')) {
   require ABS_SITE_PATH . 'public/public.php';
 

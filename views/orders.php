@@ -21,7 +21,7 @@ foreach ($param['orderColumns'] as $column) {
     </div>';
 }
 
-$mail = gTxt('Mail');
+$mail = gTxt('E-Mail');
 
 $field['footerContent'] .= <<<footerContent
 <template id="changeStatus">

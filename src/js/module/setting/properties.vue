@@ -49,7 +49,7 @@
       <div v-if="queryParam.cmsAction !== deleteAction" style="width: 600px">
         <!-- Имя -->
         <div class="col-12 row my-1">
-          <div class="col">{{ $t('Name of the property')}}:</div>
+          <div class="col">{{ $t('Property Name') }}:</div>
           <div class="col">
             <p-input-text class="w-100" v-model="property.newName" autofocus />
           </div>
@@ -58,7 +58,7 @@
         <div class="col-12 row my-1">
           <div class="col">
             {{ $t('Property Code')}}:
-            <i class="ms-1 pi pi-tag" v-tooltip.bottom="$t('property_code_tooltip')"></i>
+            <i class="ms-1 pi pi-tag" v-tooltip.bottom="$t('When changed, update the value for dealers')"></i>
           </div>
           <div class="col">
             <p-input-text class="w-100" v-model="property.newCode" />
@@ -80,8 +80,8 @@
           <div class="col-12 row mb-1">
             <div class="col"> {{$t('Additional fields of the property (there is a name)')}} :</div>
             <div class="col">
-              <p-button v-tooltip.bottom="$t('Add a field')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
-                        :label="$t('Add a field')"
+              <p-button v-tooltip.bottom="$t('Add field')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+                        :label="$t('Add field')"
                         @click="addPropertyField" />
             </div>
           </div>
@@ -106,8 +106,8 @@
           <div class="col-12 row mb-1">
             <div class="col">{{$t('Columns')}}:</div>
             <div class="col">
-              <p-button v-tooltip.bottom="$t('Add a column to the table')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
-                        :label="$t('Add a column')" @click="addTableColumn" />
+              <p-button v-tooltip.bottom="$t('Add column to the table')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+                        :label="$t('Add column')" @click="addTableColumn" />
             </div>
           </div>
 
@@ -123,7 +123,7 @@
         </template>
       </div>
       <div v-else style="min-width: 300px">
-        {{$t('Delete a property')}}
+        {{$t('Delete property')}}
       </div>
 
       <template #footer>
@@ -173,9 +173,9 @@ export default {
         label: _('Simple'),
         items: [
           {id: 'text',     name: _('Text (~200 characters)')},
-          {id: 'textarea', name: _('Text (many)')},
+          {id: 'textarea', name: _('Text (long)')},
           {id: 'number',   name: _('Number')},
-          {id: 'bool',     name: _('Checkbox')},
+          {id: 'bool',     name: _('Yes/No')},
           {id: 'date',     name: _('Date')},
         ]
       },
@@ -190,7 +190,7 @@ export default {
     ],
     propertiesDataBaseTypes: [
       {id: 'text', name: _('Text (~200 characters)')},
-      {id: 'textarea', name: _('Text (many)')},
+      {id: 'textarea', name: _('Text (long)')},
       {id: 'int', name: _('Integer')},
       {id: 'float', name: _('Float')},
       {id: 'date', name: _('Date')},
@@ -314,7 +314,7 @@ export default {
       }
       this.$nextTick(() => this.property.code = this.propertiesSelected.code);
 
-      this.modal.title = _('Edit property');
+      this.modal.title = _('Editing property');
       this.modal.display = true;
     },
     deleteProperty() {

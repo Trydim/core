@@ -1,9 +1,9 @@
 <template>
   <div class="col-12 col-md-6 border" id="managerForm">
-    <h3 class="col-12 text-center">{{ $t('Manager settings') }}</h3>
+    <h3 class="col-12 text-center">{{ $t('Manager') }}</h3>
 
     <div class="input-group my-3">
-      <span class="input-group-text flex-grow-1">{{ $t('Additional fields for managers') }}</span>
+      <span class="input-group-text flex-grow-1">{{ $t('Additional fields') }}</span>
       <p-button v-tooltip.bottom="$t('Add new field')" icon="pi pi-plus-circle" class="p-button-success"
                 @click="addField" />
     </div>
@@ -70,9 +70,9 @@ export default {
 
     managerFieldTypes: [
       {id: 'text',     name: _('Text (~200 characters)')},
-      {id: 'textarea', name: _('Text (many)')},
+      {id: 'textarea', name: _('Text (long)')},
       {id: 'number',   name: _('Number')},
-      {id: 'checkbox', name: _('Checkbox')},
+      {id: 'checkbox', name: _('Yes/No')},
       {id: 'date',     name: _('Date')},
       {id: 'list',     name: _('List')},
       {id: 'csvTable', name: _('Table')},

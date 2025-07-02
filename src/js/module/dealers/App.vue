@@ -66,7 +66,7 @@
 
   <div class="d-flex gap-3 my-3">
     <Button class="btn-warning" @click="changeDealer">{{ $t('Edit dealer') }}</Button>
-    <!--<Button class="btn-warning" @click="changeDealerUser">{{ $t('Edit dealer users') }}</Button>-->
+    <!--<Button class="btn-warning" @click="changeDealerUser">{{ $t('Edit users') }}</Button>-->
   </div>
 
   <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">

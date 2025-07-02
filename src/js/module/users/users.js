@@ -211,12 +211,12 @@ const users = {
     data.currentLogin = '';
     this.validLogin(form, new f.Valid({form}));
 
-    this.confirmMsg = _('New user added');
-    this.M.show(_('Add new user'), form);
+    this.confirmMsg = _('User added');
+    this.M.show(_('Add user'), form);
     return form;
   },
   changeUser() {
-    if (!this.id.getSelectedSize()) { f.showMsg(_('Please select at least 1 user'), 'error'); return; }
+    if (!this.id.getSelectedSize()) { f.showMsg(_('Please select at least one user'), 'error'); return; }
 
     let oneElements = this.id.getSelectedSize() === 1, node,
         id    = this.id.getSelected(),
@@ -277,11 +277,11 @@ const users = {
     if (oneElements) this.validLogin(form, new f.Valid({form}));
 
     this.confirmMsg = _('Changes saved');
-    this.M.show(_('Changing Users'), form);
+    this.M.show(_('Edit user'), form);
     return form;
   },
   changeUserPassword() {
-    if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Select only one user'), 'error'); return; }
+    if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Please select only one user'), 'error'); return; }
 
     let id   = this.id.getSelected(),
         user = data.usersList.get(id[0]),
@@ -298,7 +298,7 @@ const users = {
     this.onEventNode(repeatPass, e => this.changeRepeatPass(e, newPass), {}, 'change');
 
     this.confirmMsg = _('New password saved');
-    this.M.show(_('Change user password') + ' ' + user['name'], form);
+    this.M.show(_('Change password') + ' ' + user['name'], form);
     this.M.btnConfirm.disabled = true;
     return form;
   },
@@ -351,7 +351,7 @@ const users = {
   changeRepeatPass(e, newPass) {
     e.preventDefault();
 
-    if (e.target.value !== newPass.value) f.showMsg(_('Password mismatch'), 'error');
+    if (e.target.value !== newPass.value) f.showMsg(_('Passwords don\'t match'), 'error');
   },
 
   // Bind events

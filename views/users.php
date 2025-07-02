@@ -92,13 +92,13 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
 <template id="userForm">
   <form action="#">
     <div class="form-floating my-3">
-      <input type="text" class="form-control" id="pName" placeholder="' . gTxt('User name') . '" name="name" required>
-      <label for="pName">' . gTxt('User name') . '</label>
+      <input type="text" class="form-control" id="pName" placeholder="' . gTxt('Full name') . '" name="name" required>
+      <label for="pName">' . gTxt('Full name') . '</label>
     </div>
 
     <div class="form-floating mb-3">
       <select class="form-select" id="permissionId" name="permissionId">' . $param['permission'] . '</select>
-      <label for="permissionId">' . gTxt('Permission') . '</label>
+      <label for="permissionId">' . gTxt('Permissions') . '</label>
     </div>
 
     <div class="form-floating mb-3">

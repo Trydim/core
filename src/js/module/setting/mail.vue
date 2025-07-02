@@ -3,7 +3,7 @@
     <h3 class="col text-center">{{ $t('Mail settings') }}</h3>
     <div class="form-floating my-3">
       <p-input-text ref="mailTarget" class="form-control" placeholder="" v-model="mail.target" />
-      <label>{{ $t('Mail to') }}</label>
+      <label>{{ $t('E-Mail To:') }}</label>
     </div>
 
     <div class="form-floating mb-3">
@@ -16,7 +16,7 @@
     </div>
     <div class="form-floating mb-3">
       <p-input-text class="form-control" placeholder="" v-model="mail.fromName" />
-      <label>{{ $t('From name') }}</label>
+      <label>{{ $t('From') }}</label>
     </div>
   </div>
 </template>

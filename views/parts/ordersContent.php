@@ -31,13 +31,13 @@
     <div class="form-check">
       <input class="form-check-input" type="radio" name="orderType" value="order" id="orderTypeO" checked data-action="orderTypeChange">
       <label class="form-check-label" for="orderTypeO" title="<?= gTxt('Orders saved by manager') ?>">
-        <?= gTxt('Manager orders') ?>
+        <?= gTxt('Orders') ?>
       </label>
     </div>
     <div class="form-check ms-1">
       <input class="form-check-input" type="radio" name="orderType" value="visit" id="orderTypeV" data-action="orderTypeChange">
       <label class="form-check-label" for="orderTypeV" title="<?= gTxt('Results saved by customers') ?>">
-        <?= gTxt('Customer orders') ?>
+        <?= gTxt('Preliminary estimates') ?>
       </label>
     </div>
   </div>

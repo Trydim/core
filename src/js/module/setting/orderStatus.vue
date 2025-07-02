@@ -3,7 +3,7 @@
     <h3 class="w-100 text-center">{{ $t('Statuses') }}</h3>
     <div id="ordersStatusForm" class="col">
       <div class="input-group my-3">
-        <span class="input-group-text flex-grow-1">{{ $t('Setting order statuses') }}</span>
+        <span class="input-group-text flex-grow-1">{{ $t('Set order statuses') }}</span>
         <button type="button" class="btn btn-outline-secondary" @click="addStatus()">
           <i class="pi pi-plus-circle align-text-bottom pi-green"></i>
         </button>
@@ -12,7 +12,7 @@
       <div class="mb-3" style="max-height: 140px; overflow-y: auto">
         <template v-for="(item, index) of status" :key="item.ID">
           <div v-if="!item.delete" class="input-group mb-1">
-            <p-input-text v-tooltip.bottom="$t('code (optional)')" class="form-control"
+            <p-input-text v-tooltip.bottom="$t('Code (optional)')" class="form-control"
                           :disabled="+item.required" v-model="item.code" />
             <p-input-text v-model="item.name" class="form-control w-50" />
             <p-input-text v-tooltip.bottom="$t('Sorting')" v-model="item.sort" class="form-control" />

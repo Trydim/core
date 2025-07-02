@@ -300,7 +300,7 @@ const customers = {
 
         this.confirmMsg = _('Changes saved');
         this.M.btnConfig('confirmYes', {value: _('Confirm')});
-        this.M.show(_('Changing a client'), form);
+        this.M.show(_('Edit client'), form);
         f.relatedOption(form);
       },
       'delCustomer': () => {
