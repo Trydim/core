@@ -4,6 +4,8 @@
  * @var array $publicConfig - config from public
  */
 
+date_default_timezone_set('Europe/Moscow');
+
 require ABS_SITE_PATH . 'config.php';
 require __DIR__ . '/model/func.php';
 
@@ -11,6 +13,7 @@ spl_autoload_register('cmsAutoloader');
 
 const CORE          = __DIR__ . '/',
       SHARE_PATH    = 'shared/',
+      STORAGE_PATH  = 'storage/',
       DEALERS_PATH  = 'dealer',
       SYSTEM_PATH   = ABS_SITE_PATH . SHARE_PATH . 'system.php'; // TODO перенести в DB
 
@@ -29,6 +32,7 @@ define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
 define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 
 $main->setCmsParam(VC::CSV_PATH, $url->getBasePath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
+     ->setCmsParam(VC::CSV_HISTORY_PATH, $url->getBasePath(true) . STORAGE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
      ->setCmsParam(VC::IMG_PATH, $url->getBasePath(true) . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam(VC::URI_IMG, $url->getBaseUri() . ($publicConfig['PATH_IMG'] ?? 'public/images/'))
      ->setCmsParam(VC::URI_CSS, $url->getBaseUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
@@ -60,5 +64,4 @@ define('USE_CONTENT_EDITOR', $publicConfig['USE_CONTENT_EDITOR'] ?? false);
 !defined('OUTSIDE') && define('OUTSIDE', array_key_exists('outside', $_GET));
 
 $main->afterConstDefine();
-
 unset($url, $publicConfig, $publicPage, $dealConfig, $dbConfig);

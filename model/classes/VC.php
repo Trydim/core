@@ -20,6 +20,7 @@ class VC {
         ONLY_LOGIN    = 'onlyLogin',
         CSV_MAIN_PATH = 'csvMain',
         CSV_PATH      = 'csvPath',
+        CSV_HISTORY_PATH = 'csvHistoryPath',
         LEGEND_PATH   = 'legendPath',
         IMG_PATH      = 'imgPath',
         URI_IMG       = 'uriImg',

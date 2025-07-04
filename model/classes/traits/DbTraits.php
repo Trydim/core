@@ -581,6 +581,7 @@ trait DbCsv {
    */
   public function saveCsv(array $csvData) {
     $csvPath = $this->main->getCmsParam(VC::CSV_PATH);
+    $csvHistoryPath = $this->main->getCmsParam(VC::CSV_HISTORY_PATH);
 
     if (file_exists($csvPath . $this->csvTable)) {
       $fileStrings = [];
@@ -590,6 +591,11 @@ trait DbCsv {
         $v[$length - 1] .= PHP_EOL;
         $fileStrings[] = implode(CSV_DELIMITER, $v);
       }
+
+      $history = new CsvHistory($csvPath, $csvHistoryPath);
+      $metaFields = [];
+
+      $history->saveBackup($this->csvTable, implode($fileStrings), $metaFields);
 
       file_put_contents($csvPath . $this->csvTable, $fileStrings);
       $this->main->deleteCsvCache();
