@@ -96,7 +96,7 @@ class CsvHistory
 
     foreach ($files as $file) {
       if (substr($file, -5) === '.json') {
-        $meta = json_decode(file_get_contents($historyDir . $file), true);
+        $meta = json_decode(file_get_contents($file), true);
 
         if ($meta) {
           $history[] = $meta;
@@ -210,7 +210,7 @@ class CsvHistory
    * @return array{current: string, previous: string} Ассоциативный массив с содержимым текущего и предыдущего CSV-бэкапа
    * @throws RuntimeException Если метаинформация или один из бэкапов не найден или не читается
    */
-  public function getBackupsForDiffById(string $relativeFilePath, string $backupId): array
+  public function getBackupsForDiff(string $relativeFilePath, string $backupId): array
   {
     $meta = $this->getBackupMeta($relativeFilePath, $backupId);
 
@@ -297,6 +297,10 @@ class CsvHistory
   public function getHistoryTree(): array
   {
     $tree = [];
+
+    if (!is_dir($this->historyPath)) {
+      return $tree;
+    }
 
     $basePathLength = strlen($this->historyPath);
 

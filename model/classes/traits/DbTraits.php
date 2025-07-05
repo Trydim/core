@@ -593,7 +593,10 @@ trait DbCsv {
       }
 
       $history = new CsvHistory($csvPath, $csvHistoryPath);
-      $metaFields = [];
+      $metaFields = [
+        'userId' => (int)$this->main->user['id'],
+        'userName' => $this->main->user['name'],
+      ];
 
       $history->saveBackup($this->csvTable, implode($fileStrings), $metaFields);
 
