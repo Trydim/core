@@ -6,6 +6,8 @@ class VC {
         ACCESS_MENU     = 'ACCESS_MENU',
         USE_DATABASE    = 'USE_DATABASE',
         CHANGE_DATABASE = 'CHANGE_DATABASE',
+        LOCALES         = 'LOCALES',
+        LOCALES_BASE_LANG  = 'LOCALES_BASE_LANG',
         USE_CONTENT_EDITOR = 'USE_CONTENT_EDITOR',
         USE_DEAL_SUBDOMAIN = 'USE_DEAL_SUBDOMAIN';
 
@@ -41,7 +43,8 @@ class VC {
         USER_DEALER     = 'dealer';
 
   /** Base views field */
-  const BASE_GLOBAL           = 'global',
+  const BASE_IS_GLOBAL        = 'isGlobal',
+        BASE_GLOBAL           = 'global',
         BASE_PAGE_TITLE       = 'pageTitle',
         BASE_HEAD_CONTENT     = 'headContent',
         BASE_PAGE_HEADER      = 'pageHeader',

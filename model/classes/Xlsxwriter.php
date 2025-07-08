@@ -341,7 +341,7 @@ class XLSXWriter {
     $this->initializeSheet($sheet_name);
     $sheet = &$this->sheets[$sheet_name];
     if (count($sheet->columns) < count($row)) {
-      $default_column_types = $this->initializeColumnTypes(array_fill($from = 0, $until = count($row), 'GENERAL'));//will map to n_auto
+      $default_column_types = $this->initializeColumnTypes(array_fill(0, count($row), 'GENERAL')); // will map to n_auto
       $sheet->columns = array_merge((array)$sheet->columns, $default_column_types);
     }
 
@@ -360,6 +360,11 @@ class XLSXWriter {
     foreach ($row as $v) {
       $number_format = $sheet->columns[$c]['number_format'];
       $number_format_type = $sheet->columns[$c]['number_format_type'];
+      // If value is not number set auto format
+      if ($number_format_type === 'n_numeric' && !is_numeric($v)) {
+        list($number_format, $number_format_type) = array_values($this->initializeColumnTypes(['GENERAL'])[0]);
+      }
+
       $cell_style_idx = empty($style) ? $sheet->columns[$c]['default_cell_style'] : $this->addCellStyle($number_format, json_encode(isset($style[0]) ? $style[$c] : $style));
       $this->writeCell($sheet->file_writer, $sheet->row_count, $c, $v, $number_format_type, $cell_style_idx);
       $c++;

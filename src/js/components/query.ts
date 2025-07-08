@@ -23,18 +23,18 @@ const checkJSON = (data: string) => {
   }
 };
 
-const getFileName = (data: any) => {
-  let fileName = data.headers.get('Content-Disposition');
+const getFilename = (data: any) => {
+  let filename = data.headers.get('content-disposition');
 
-  if (typeof fileName === 'string') {
-    const match = /(?:filename=")(.+)(?=")/i.exec(fileName);
-    fileName = Array.isArray(match) && match.length === 2 && match[1];
+  if (typeof filename === 'string') {
+    const match = /(?:filename=")(.+)(?=")/i.exec(filename);
+    filename = Array.isArray(match) && match.length === 2 && match[1];
   }
 
-  return fileName || data.headers.get('File-Name') || 'document.pdf';
+  return filename || data.headers.get('filename') || 'document.pdf';
 }
 const downloadBody = async (data: any) => {
-  const fileName = getFileName(data),
+  const filename = getFilename(data),
         reader   = data.body.getReader();
   let chunks    = [],
       countSize = 0;
@@ -49,7 +49,7 @@ const downloadBody = async (data: any) => {
     chunks.push(value);
     countSize += value.length;
   }
-  return Object.assign(new Blob(chunks), {fileName});
+  return Object.assign(new Blob(chunks), {filename, fileName: filename});
 }
 const translateCookie = (): string => {
   document.cookie.split(';').forEach((p: string) => {

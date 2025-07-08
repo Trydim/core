@@ -33,7 +33,7 @@
           <p-select class="col-3"
                     :loading="loadingTable"
                     :options="csvTable"
-                    option-value="fileName" option-label="name"
+                    option-value="filename" option-label="name"
                     v-model="item.options.table" />
           <p-input-text class="col-3 form-control" v-tooltip.bottom="$t('Column for save')" v-model="item.options.saveKey" />
           <p-input-text class="col-3 form-control" v-tooltip.bottom="$t('Column for show')" v-model="item.options.showKey" />
@@ -51,7 +51,7 @@
 
 const prepareCsvList = (data, path = '') => {
   return Object.entries(data).reduce((r, [k, v]) => {
-    if (isFinite(+k)) r.push({ fileName: path + v.fileName, name: v.name });
+    if (isFinite(+k)) r.push({ filename: path + v.filename, name: v.name });
     else r = r.concat(prepareCsvList(v, k + '/' + path));
     return r;
   }, []);
@@ -103,7 +103,7 @@ export default {
       return f.Get({data: 'mode=DB&cmsAction=tables'}).then(d => {
         if (d.status) {
           this.csvTable = prepareCsvList(d['csvFiles']);
-          if (!field.options.table) field.options.table = this.csvTable[0].fileName;
+          if (!field.options.table) field.options.table = this.csvTable[0].filename;
         }
 
         this.loadingTable = false;
@@ -116,7 +116,7 @@ export default {
           if (!field.options.saveKey) field.options = {saveKey: 'id', showKey: 'name'};
 
           if (this.csvTable.length === 0) this.loadCsv(field);
-          if (!field.options.table) field.options.table = this.csvTable[0].fileName;
+          if (!field.options.table) field.options.table = this.csvTable[0].filename;
           if (field.options.multiselect === undefined) field.options.multiselect = false;
         }
       });

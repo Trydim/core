@@ -24,10 +24,12 @@ if ($mode = $main->getCmsParam('mode')) {
         case 'load':
         case 'DB':      require $componentPath . 'db.php'; break;
         case 'docs':    require $componentPath . 'docs.php'; break;
+        case 'dictionary': require $componentPath . 'dictionary.php'; break;
         case 'FM':      require $componentPath . 'fileManager.php'; break;
         case 'setting': require $componentPath . 'setting.php'; break;
         case 'socket':  require $componentPath . 'socket.php'; break;
-        case 'tBot': require  __DIR__ . '/modelBot.php';
+        case 'tBot':
+        case 'bot':     require $componentPath . 'bot.php'; break;
       }
     } catch (Exception $e) {
       $main->response->setContent($e->getMessage());

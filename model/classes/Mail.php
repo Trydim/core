@@ -35,21 +35,22 @@ class Mail {
    */
   private $main;
 
-  private $mailTpl, $body = '', $docPath = [], $pdfFileName = [];
+  private $mailTpl, $body = '', $docPath = [], $pdfFilename = [];
   private $mailTarget;
   private $subject, $fromName;
   private $otherMail       = [];
   private $attachmentFiles = [];
 
-  /**
-   * @param string $fileName
+  /*
+   * @param string $filename
    * @return string
    */
-  private function findFile(string $fileName): string {
+  /*private function findFile(string $filename): string {
     return __DIR__ . '/template/mailTpl.php';
-  }
+  }*/
 
   /**
+   * @param Main $main
    * @param string $mailTpl
    */
   public function __construct(Main $main, string $mailTpl) {
@@ -87,6 +88,7 @@ class Mail {
       // default template
       ob_clean();
       $this->body = $this->getDefaultTemplate();
+      return;
     } while (false);
 
     $this->body = ob_get_clean();
@@ -109,12 +111,12 @@ class Mail {
 
   /**
    * @param string $docPath
-   * @param string $fileName
+   * @param string $filename
    */
-  public function addFile(string $docPath, string $fileName = '') {
-    $fileName = !empty($fileName) ? $fileName : basename($docPath);
+  public function addFile(string $docPath, string $filename = '') {
+    $filename = !empty($filename) ? $filename : basename($docPath);
     $this->docPath[] = $docPath;
-    $this->pdfFileName[] = empty($fileName) ? uniqid() . '.pdf' : $fileName;
+    $this->pdfFilename[] = empty($filename) ? uniqid() . '.pdf' : $filename;
   }
 
   public function addOtherFile($files) {
@@ -178,7 +180,7 @@ class Mail {
       $resource = [];
       foreach ($this->docPath as $index => $filePath) {
         if (is_file($filePath)) {
-          $mail->addAttachment($filePath, $this->pdfFileName[$index]);
+          $mail->addAttachment($filePath, $this->pdfFilename[$index]);
           $resource[] = $filePath;
         }
       }

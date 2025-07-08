@@ -4,8 +4,7 @@
  * Trait Authorization
  * @package cms
  */
-trait Authorization
-{
+trait Authorization {
 
   /**
    * @var string[]
@@ -44,12 +43,12 @@ trait Authorization
    */
   public function setLogin(array $user): Main
   {
-    $this->user['id'] = $user['id'];
+    $this->user['id']    = $user['id'];
     $this->user['login'] = $user['login'];
-    $this->user['name'] = $user['name'];
+    $this->user['name']  = $user['name'];
     $this->user['contacts'] = $user['contacts'] ?? [];
-    $this->user['onlyOne'] = $user['onlyOne'];
-    $this->user['permission'] = $user['permissionValue'] ?? [];
+    $this->user['onlyOne']  = $user['onlyOne'];
+    $this->user['permission']    = $user['permissionValue'] ?? [];
     $this->user['customization'] = $user['customization'] ?? [];
 
     $this->user['isAdmin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
@@ -105,7 +104,7 @@ trait Authorization
     $password = $this->url->server->get('PHP_AUTH_PW');
 
     if (!empty($login) && !empty($password)) {
-      $_SESSION['login'] = $login;
+      $_SESSION['login']    = $login;
       $_SESSION['password'] = $password;
       return true;
     }
@@ -123,9 +122,9 @@ trait Authorization
     if ($id) session_id($_COOKIE['PHPSESSID'] = $id);
     !isset($_SESSION) && session_start();
 
-    if ((isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
-      ||
-      $this->haveHeaderAuthorization()
+    if ( (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
+         ||
+         $this->haveHeaderAuthorization()
     ) {
       $user = $this->db->checkUserHash($_SESSION);
       $user && $this->setLogin($user);
@@ -227,7 +226,7 @@ trait Authorization
           $dbTables = array_merge($dbTables, $this->db->getTables());
         } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
           $props = array_merge(
-            [['dbTable' => 'codes', 'name' => gTxt('codes')]],
+            [['dbTable' => 'codes', 'name' => 'codes']],
             $this->db->getTables('prop')
           );
 
@@ -244,7 +243,7 @@ trait Authorization
       if (USE_CONTENT_EDITOR) {
         $this->dbTables[] = [
           'fileName' => 'content-js',
-          'name' => gTxt('Content editor'),
+          'name'     => 'Content editor',
         ];
       }
     }
@@ -288,18 +287,43 @@ trait Authorization
  */
 trait Dictionary
 {
-  public static string $BASE_LANG = 'ru'; //константа, если язык не установлен по умолчанию в config.php
+  /**
+   * Array of available dictionary
+   * @var array
+   */
+  private array $dictionaryList = [
+    'en' => ['name' => 'English', 'code' => 'en'],
+    'ru' => ['name' => 'Русский', 'code' => 'ru'],
+  ];
 
-  private string $dictionaryPath = '/lang/dictionary.php';
+  /**
+   * @var string - Директория хранения пользовательских переводов.
+   */
+  private string $DICTIONARY_PATH_FILES = SHARE_PATH . 'lang/';
 
-  private string $dbDictionaryPath = '/lang/dbDictionary.php';
+  /**
+   * @var string - Директория используемых переводов
+   */
+  private string $dictionaryPath = '';
 
-  private string $targetLang;
+  /**
+   * @var string - Директория используемх переводов колонок БД
+   */
+  private string $dbDictionaryPath = '';
 
+  /**
+   * @var string - Используемый язык, по умолчанию равен базовому
+   */
+  private string $targetLang = '';
+
+  /**
+   * @var bool - нужно ли переводить? (всегда нужно)
+   */
   private bool $needTranslate = false;
 
   /** @var array<array{name: string, code: string}> $availableLanguages */
   private array $availableLanguages = [];
+
   /**
    * @var array<string, string> Словарь переводов: ключ => значение
    */
@@ -311,30 +335,103 @@ trait Dictionary
   private array $dbDictionary = [];
 
   /**
-   * Принудительно устанавливает целевой язык,
-   * нужно вызывать до инициализации словарей (нужно при отображении заказа, pdf, excel)
-   * @param string $lang ru, en,
-   * @return void
+   * @var string - Константа, если язык не установлен по умолчанию в config.php
    */
-  public function setTargetLang(string $lang): void
-  {
-    if (isset($this->targetLang)) return;
+  public static string $BASE_LANG = 'ru';
 
-    $this->targetLang = $lang;
+  /**
+   * Загружает и объединяет базовый словарь, словарь дилера и csv словари
+   *
+   * @return array<string, string>
+   */
+  private function loadDictionary(): array
+  {
+    $dictionary = [];
+
+    // Загрузка базового словаря
+    $baseDictPath = ABS_SITE_PATH . $this->dictionaryPath;
+    if (file_exists($baseDictPath)) {
+      $dictionary = include $baseDictPath;
+    }
+
+    // Добавление словаря дилера (если это дилер и словарь существует)
+    if ($this->isDealer()) {
+      $dealerPath = $this->url->getPath(true) . $this->dictionaryPath;
+      if (file_exists($dealerPath)) {
+        $dealerDictionary = include $dealerPath;
+        $dictionary = array_merge($dictionary, $dealerDictionary);
+      }
+    }
+
+    // Загрузка кастомных словарей администратора из CSV (приоритет директории дилера)
+    $csvDictionary = $this->loadCSVDictionary();
+
+    if ($csvDictionary) {
+      $dictionary = array_merge($dictionary, $csvDictionary);
+    }
+
+    return $dictionary;
   }
 
   /**
-   * Функция для использования словаря на фронтенде
-   * @return string
+   * Загрузка переводов из CSV-файлов
+   *
+   * @param ?array<int, string> $csvPaths
+   * @return array<string, string>
    */
-  public function initDictionary(): string
+  private function loadCSVDictionary(): array
   {
+    $csvPaths = $this->db->scanDirCsv($this->DICTIONARY_PATH_FILES);
 
-    $this->initLocales();
+    if (count($csvPaths) === 0) return [];
 
-    $jsonDictionary = json_encode($this->dictionary, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
+    $csvParam = [
+      'id' => 'id',
+      'value' => $this->targetLang,
+    ];
 
-    return "<input type='hidden' id='dictionaryData' value='$jsonDictionary'>";
+    $csvChunks = [];
+
+    foreach ($csvPaths as $csv) {
+      $csvPath = ABS_SITE_PATH . $this->DICTIONARY_PATH_FILES . $csv['fileName'];
+      $csvData = loadCSV($csvParam, $csvPath);
+
+      if (is_array($csvData)) {
+        $csvChunks[] = $csvData;
+      }
+    }
+
+    $csvAllData = array_merge([], ...$csvChunks);
+
+    if (!empty($csvAllData)) {
+      $csvDictionary = array_column($csvAllData, 'value', 'id');
+    }
+
+    return $csvDictionary ?? [];
+  }
+
+  /**
+   * Загрузка словаря для БД
+   * @return array<string, array<string, string>>
+   */
+  private function loadDbDictionary(): array
+  {
+    $dictionary = [];
+
+    // Загрузка базового словаря для баз данных
+    $baseDictPath = ABS_SITE_PATH . $this->dbDictionaryPath;
+    if (file_exists($baseDictPath)) {
+      $dictionary = include $baseDictPath;
+    }
+    // Добавление словаря дилера для баз данных  (если это дилер и словарь существует)
+    if ($this->isDealer()) {
+      $dealerPath = $this->url->getPath(true) . $this->dbDictionaryPath;
+      $dealerDict = file_exists($dealerPath) ? include $dealerPath : [];
+      // Приоритет у дилерского перевода
+      $dictionary = array_replace_recursive($dictionary, $dealerDict);
+    }
+
+    return $dictionary;
   }
 
   /**
@@ -364,126 +461,46 @@ trait Dictionary
   {
     if ($this->dictionary) return;
 
-    /**
-     * @var array{
-     *      BASE_LANG: string,
-     *      TARGET_LANG: string,
-     *      ALL_LANGUAGES: array<array{name: string, code: string}>,
-     *      CSV_FILES?: string[]
-     *  } $locales
-     */
-    $locales = $this->cmsParam['LOCALES'] ?? [];
-
-    $baseLang = $locales['BASE_LANG'] ?? self::$BASE_LANG;
-
-    //Если целевой язык уже установлен, через метод setTargetLang, значит будет один язык (для заказов и шаблонов pdf, excel)
+    /*//Если целевой язык уже установлен, через метод setTargetLang, значит будет один язык (для заказов и шаблонов pdf, excel)
     if (!isset($this->targetLang)) {
       $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
       $this->initAvailableLanguages($locales);
-    }
+    }*/
 
     // Подключаем словарь только если языки различаются
+    $baseLang = $this->getCmsParam(VC::LOCALES_BASE_LANG) ?? self::$BASE_LANG;
     if ($baseLang !== $this->targetLang) {
-      $this->dictionaryPath = "lang/{$this->targetLang}/dictionary.php";
-      $this->dbDictionaryPath = "lang/{$this->targetLang}/dbDictionary.php";
       $this->needTranslate = true;
     }
 
-    $this->dictionary = $this->loadDictionary($locales['CSV_FILES']);
+    $this->dictionaryPath   = "lang/{$this->targetLang}/dictionary.php";
+    $this->dbDictionaryPath = "lang/{$this->targetLang}/dbDictionary.php";
+
+    $this->dictionary = $this->loadDictionary();
     $this->dbDictionary = $this->loadDbDictionary();
   }
 
   /**
-   * Загружает и объединяет базовый словарь, словарь дилера и csv словари
-   *
-   * @return array<string, string>
+   * Принудительно устанавливает целевой язык,
+   * нужно вызывать до инициализации словарей (нужно при отображении заказа, pdf, excel)
+   * @param string $lang ru, en,
+   * @return void
    */
-  private function loadDictionary(?array $csvPaths): array
+  public function setTargetLang(string $lang = ''): void
   {
-    $dictionary = [];
-
-    // Загрузка базового словаря
-    $baseDictPath = ABS_SITE_PATH . $this->dictionaryPath;
-    if (file_exists($baseDictPath)) {
-      $dictionary = include $baseDictPath;
-    }
-
-    // Добавление словаря дилера (если это дилер и словарь существует)
-    if ($this->isDealer()) {
-      $dealerPath = $this->url->getPath(true) . $this->dictionaryPath;
-      if (file_exists($dealerPath)) {
-        $dealerDictionary = include $dealerPath;
-        $dictionary = array_merge($dictionary, $dealerDictionary);
-      }
-    }
-
-    //Загрузка кастомных словарей администратора из CSV (приоритет директории дилера)
-    $csvDictionary = $this->loadCSVDictionary($csvPaths);
-
-    if ($csvDictionary) {
-      $dictionary = array_merge($dictionary, $csvDictionary);
-    }
-
-    return $dictionary;
+    //if (isset($this->targetLang)) return;
+    $this->targetLang = $lang === '' ? $this::$BASE_LANG : $lang;
   }
 
   /**
-   * Загрузка переводов из CSV-файлов
-   *
-   * @param ?array<int, string> $csvPaths
-   * @return array<string, string>
+   * Функция для использования словаря на фронтенде
+   * @return string
    */
-  private function loadCSVDictionary(?array $csvPaths): array
+  public function initDictionary(): string
   {
-    if (!$csvPaths) return [];
+    $this->initLocales();
 
-    $csvParam = [
-      'id' => 'id',
-      'value' => $this->targetLang,
-    ];
-
-    $csvChunks = [];
-
-    foreach ($csvPaths as $csvPath) {
-      $csvData = loadCSV($csvParam, $csvPath);
-
-      if (is_array($csvData)) {
-        $csvChunks[] = $csvData;
-      }
-    }
-
-    $csvAllData = array_merge([], ...$csvChunks);
-
-    if (!empty($csvAllData)) {
-      $csvDictionary = array_column($csvAllData, 'value', 'id');
-    }
-
-    return $csvDictionary ?? [];
-  }
-
-
-  /**
-   * Загрузка словаря для БД
-   * @return array<string, array<string, string>>
-   */
-  private function loadDbDictionary(): array
-  {
-    $dictionary = [];
-
-    // Загрузка базового словаря для баз данных
-    $baseDictPath = ABS_SITE_PATH . $this->dbDictionaryPath;
-    if (file_exists($baseDictPath)) {
-      $dictionary = include $baseDictPath;
-    }
-    // Добавление словаря дилера для баз данных  (если это дилер и словарь существует)
-    if ($this->isDealer()) {
-      $dealerPath = $this->url->getPath(true) . $this->dbDictionaryPath;
-      $dealerDict = file_exists($dealerPath) ? include $dealerPath : [];
-      // Приоритет у дилерского перевода
-      $dictionary = array_replace_recursive($dictionary, $dealerDict);
-    }
-
-    return $dictionary;
+    return $this->getFrontContent('dictionaryData', $this->dictionary);
   }
 
   /**
@@ -543,7 +560,11 @@ trait Dictionary
   private function initAvailableLanguages(array $locales = []): void
   {
     if ($this->isDealer()) {
-      $availableLanguages = $this->user['dealer']['settings']['available_languages'];
+      // Нет так. Надо несколько вариантов:
+      // Проект не предусматривает что есть языки. Вообще.
+      // Проект предусматривает что есть языки и дилерам можно пользоваться всеми без ограничений.
+      // Проект предусматривает что есть языки и дилерам можно задать доступные.
+      $availableLanguages = $this->user['dealer']['settings']['available_languages'] ?? [];
 
       //Если у дилера нет доступных языков в настройках, то будет отсутвовать выбор языка у дилера
       if (!$availableLanguages) {
@@ -553,8 +574,9 @@ trait Dictionary
 
       $this->availableLanguages = $availableLanguages;
       if (!in_array($this->targetLang, array_column($availableLanguages, 'code'), true)) {
-        $this->targetLang = $availableLanguages[0]['code'];
+        $this->targetLang = $availableLanguages[0]['code'] ?? self::$BASE_LANG;
       }
+
       return;
     }
 

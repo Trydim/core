@@ -1,12 +1,12 @@
 const fs = require('fs');
 
-const absPath = '../../', // может можно как-то по другому?
-      coreBuildPath = '../assets/',
-      publicSrcPath = absPath + 'public/src/',
-      coreSrcCssModulePath = './css/module/',
-      coreSrcJsModulePath = './js/module/',
-      resFileName = 'webpackModule.json',
-      configName = 'config.php';
+const ABS_PATH = '../../', // может можно как-то по другому?
+      //CORE_BUILD_PATH = '../assets/',
+      //PUBLIC_SRC_PATH = ABS_PATH + 'public/src/',
+      //CORE_SRC_CSS_MODULE_PATH = './css/module/',
+      CORE_SRC_JS_MODULE_PATH = './js/module/',
+      RES_FILENAME = 'webpackModule.json',
+      CONFIG_NAME = 'config.php';
 
 let content = Object.create(null);
 
@@ -35,12 +35,12 @@ function addEntry(path, mName, js = false) {
 
 function addModule(mName) {
   if (menu.includes(mName.toLowerCase()) || mName === 'setting') {
-    addEntry(coreSrcJsModulePath, mName, true);
+    addEntry(CORE_SRC_JS_MODULE_PATH, mName, true);
     console.log('Added module: ' + mName);
   }
 }
 
-const config = fs.readFileSync(absPath + configName, {encoding: 'utf8'}),
+const config = fs.readFileSync(ABS_PATH + CONFIG_NAME, {encoding: 'utf8'}),
       configRows = config.split('\n');
 
 let acceptMenu = false, menu;
@@ -55,5 +55,5 @@ modules.forEach((name) => {
   addModule(name);
 });
 
-fs.writeFileSync(absPath + 'public/' + resFileName, JSON.stringify(content));
+fs.writeFileSync(ABS_PATH + 'public/' + RES_FILENAME, JSON.stringify(content));
 console.log('complete');

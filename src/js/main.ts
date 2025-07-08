@@ -23,7 +23,7 @@ const dictionaryInit = () => {
   d.getTitle = (key: string) => d.data[key] || key;
 
   /**
-   * Template string can be param (%1, %2)
+   * The template can have params such as %1, %2 and etc
    * @param key - array, first item must be string
    * @returns {*}
    */
@@ -49,7 +49,7 @@ const storageLoad = () => {
   let node = f.gI('mainWrapper');
   if (node && storage.get('menuToggle') === 'true') node.classList.add(MENU_CLASS);
 
-  // set Theme
+  // Set theme
   if (storage.get('themeToggle') === 'true') {
     let node = f.qS('[data-action-cms="themeToggle"]');
     node && (node.checked = true);
@@ -100,15 +100,18 @@ const setSideMenuStyle = (init = true) => {
   }
 }
 
+const startPreloader = () => {
+  f.show(f.gI('preloader'));
+};
+
 const stopPreloader = (short = true) => {
   if (f.OUTSIDE) return;
-  f.gI('preloader').remove();
+  f.hide(f.gI('preloader'));
   short && f.gI('mainWrapper').classList.add('show');
 }
 
 // Event function
 // ---------------------------------------------------------------------------------------------------------------------
-
 const menuToggle = () => {
   let node = f.gI('mainWrapper'), isShort: boolean;
   node.classList.toggle(MENU_CLASS);
@@ -121,7 +124,6 @@ const menuToggle = () => {
   setTimeout(() => {
     setSideMenuStyle(!isShort);
   }, 500);
-
 }
 
 const themeToggle = () => {
@@ -130,15 +132,28 @@ const themeToggle = () => {
   storage.set('themeToggle', isLight);
 }
 
+const langChange = (target: HTMLSelectElement) => {
+  target.onchange = () => {
+    startPreloader();
+    // Page will be reloaded
+    void f.Post({data: {
+      mode     : 'dictionary',
+      cmsAction: 'langChange',
+      lang     : target.value,
+    }})
+  }
+}
+
 const cmsEvent = function() {
   let action = this.dataset.actionCms;
 
   let select = {
     menuToggle, themeToggle,
+    langChange,
     exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };
   // @ts-ignore
-  select[action] && select[action]();
+  select[action] && select[action](this);
 };
 
 const sideMenuExpanded = function(e: Event) {

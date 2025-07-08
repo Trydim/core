@@ -37,14 +37,10 @@ export default {
       queryParam: {
         mode: 'setting',
       },
-
-      //loadingPage: true,
     };
 
     return loadData(d);
   },
-  computed: {},
-  watch   : {},
   methods: {
     setFieldMask() {
       /*let node = this.$refs['mailTarget'];

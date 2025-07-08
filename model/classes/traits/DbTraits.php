@@ -521,7 +521,7 @@ trait DbCsv {
         if (stripos($item, '.csv')) {
           $r[] = [
             'fileName' => $item,
-            'name'     => gTxt(str_replace('.csv', '', $item)),
+            'name'     => str_replace('.csv', '', $item),
           ];
         } else {
           $csvPath = $this->main->getCmsParam(VC::CSV_PATH);

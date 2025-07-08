@@ -70,15 +70,13 @@ if ($isDealer) {
   }
 }
 
-$main->publicMain();
-$path = ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php';
-if (file_exists($path)) require $path;
+$main->publicMain()
+     ->setControllerViewField(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php');
 if ($isDealer) {
-  $main->publicDealer();
-  $path = $main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php';
-  if (file_exists($path)) require $path;
+  $main->publicDealer()
+       ->setControllerViewField($main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php');
 }
 unset($path);
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_PUBLIC_TEMPLATE, $main);
-$main->response->setContent(template(OUTSIDE ? '_outside' : 'base', $field));
+$main->response->setContent(template(OUTSIDE ? '_outside' : 'base', $main->getControllerField()));

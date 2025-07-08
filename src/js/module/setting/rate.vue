@@ -26,7 +26,7 @@
 
   <p-dialog v-model:visible="display" :modal="true" :closable="false">
     <template #header>
-      <h4>{{$t('Currency rates')}}</h4>
+      <h4>{{ $t('Currency rates') }}</h4>
     </template>
 
     <p-table :value="rate"

@@ -463,7 +463,7 @@ class DbMain extends R {
     return array_reduce($this::getCol($sql), function ($acc, $item) {
       $acc[] = [
         'dbTable' => $item,
-        'name'    => gTxt(str_replace('prop_', '', $item)),
+        'name'    => str_replace('prop_', '', $item),
       ];
       return $acc;
     }, []);

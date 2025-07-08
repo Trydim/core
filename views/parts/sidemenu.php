@@ -73,9 +73,9 @@ menu;
         }
 
         global $tableActive;
-        $linkTarget = $item['fileName'] ?? $item['dbTable'] ?? $item['name'];
+        $linkTarget = $item['fileName'] ?? $item['dbTable'];
         $active = $tableActive === $link . '/' . $linkTarget ? 'active' : '';
-        $items .= $this->subSideMenuItem($link . '/' . $linkTarget, $item['name'], $active);
+        $items .= $this->subSideMenuItem($link . '/' . $linkTarget, gTxt($item['name']), $active);
       }
       return $this->subSideMenu(gTxt($title), $items, $root);
     }
