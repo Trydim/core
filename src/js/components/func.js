@@ -816,18 +816,27 @@ export default {
   setFormat: (value, fractionDigits = 0) =>
     ((+value).toFixed(fractionDigits)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '),
 
-  /**
-   * УДАЛИТЬ
-   * Get value
-   * @param {string|HTMLSelectElement} selector
-   * @return {boolean|array}
-   */
-  getMultiSelect: selector => {
-    const node = typeof selector === 'string' ? f.qS(selector) : selector;
-    if (node) {
-      return [...node.selectedOptions].reduce((r, option) => { r.push(option.value); return r}, []);
+  cookieSet(key, value, time) {
+    let expires = "";
+
+    if (!value.toString) { throw new Error("Parameter is not a valid!") }
+    if (typeof value !== 'string') value = value.toString();
+
+    if (time) {
+      const date = new Date();
+      date.setTime(date.getTime() + time * 1000);
+      expires = "; expires=" + date.toUTCString();
     }
-    return false;
+
+    document.cookie = key + "=" + (value || "") + expires + "; path=/";
+  },
+
+  cookieGet(key) {
+    const r = document.cookie.split(';')
+                      .map((i) => i.trim().split('='))
+                      .find(i => i[0] === key);
+
+    return r ? r[1] : undefined;
   },
 
   /**

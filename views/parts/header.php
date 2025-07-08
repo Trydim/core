@@ -6,14 +6,10 @@
 
 $siteLink = $main->url->getUri();
 
-// Обработка смены языка
+// Обработка смены языка (запрос на доступные языки)
 $availableLanguages = $main->getAvailableLanguages();
 
-// на фронте брать из куки?
-$currentLang = $main->getTargetLang(); ?>
-<input type="hidden" id="targetLang" value="<?= $currentLang ?>">
-
-<?php if ($main->checkStatus()) {
+if ($main->checkStatus()) {
   $imgSrc = '';
   $getLogoString = function (string $pathK, string $uriK) use ($main): string {
     $path = $main->getCmsParam($pathK);
@@ -43,19 +39,11 @@ $currentLang = $main->getTargetLang(); ?>
     <div class="d-flex align-items-center form-check form-switch">
       <input class="form-check-input" type="checkbox" data-action-cms="themeToggle">
     </div>
-    <?php if (count($availableLanguages)): ?>
-      <select class="mx-auto align-self-center form-select" data-action-cms="langChange">
-        <?php foreach ($availableLanguages as $language): ?>
-          <option <?= $language['code'] === $currentLang ? 'selected' : ''; ?> value="<?= $language['code']; ?>">
-            <?= $language['name']; ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-
-      <?php if ($main->url->request->has('tableName')) { ?>
-        <input type="hidden" name="tableName" value="<?= $main->url->request->get('tableName') ?>">
-      <?php } ?>
-    <?php endif; ?>
+    <?php if ($main->getCmsParam(VC::LOCALES)) { ?>
+      <div class="mx-auto align-self-center">
+        <select id="cmsLangSelect" class="form-select" data-action-cms="langChange"></select>
+      </div>
+    <?php } ?>
 
     <nav class="navbar navbar-expand">
       <div class="collapse navbar-collapse">

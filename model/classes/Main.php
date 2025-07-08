@@ -100,9 +100,8 @@ final class Main {
   }
   public function afterConstDefine() {
     // If locales is not need, use base lang
-    if ($this->getCmsParam(VC::LOCALES) === null) {
-      $this->setTargetLang();
-    }
+    $lang = $this->getCmsParam(VC::LOCALES) ? ($_COOKIE['lang'] ?? '') : '';
+    $this->setTargetLang($lang ?: $this->getCmsParam(VC::LOCALES_BASE_LANG, ''));
 
     $this->loadSetting()
          ->setHooks();

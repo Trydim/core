@@ -166,6 +166,10 @@ declare type CMSGlobalObject = {
    */
   objectFlat(obj: Object): [string, any][]
 
+  /** Cookie get */
+  cookieSet(key: string, value: string): void
+  cookieGet(key: string): string | undefined,
+
   /**
    * Save file from browser
    *

@@ -316,13 +316,8 @@ trait Dictionary
    */
   private string $targetLang = '';
 
-  /**
-   * @var bool - нужно ли переводить? (всегда нужно)
-   */
-  private bool $needTranslate = false;
-
   /** @var array<array{name: string, code: string}> $availableLanguages */
-  private array $availableLanguages = [];
+  private array $availableLanguages;
 
   /**
    * @var array<string, string> Словарь переводов: ключ => значение
@@ -451,7 +446,6 @@ trait Dictionary
    * Результаты работы сохраняются в свойствах класса:
    * - $dictionary - основной словарь переводов
    * - $dbDictionary - словарь переводов для базы данных
-   * - $needTranslate - флаг необходимости перевода
    * - $targetLang - целевой язык перевода
    * - $availableLanguages - доступные языки
    *
@@ -467,12 +461,6 @@ trait Dictionary
       $this->initAvailableLanguages($locales);
     }*/
 
-    // Подключаем словарь только если языки различаются
-    $baseLang = $this->getCmsParam(VC::LOCALES_BASE_LANG) ?? self::$BASE_LANG;
-    if ($baseLang !== $this->targetLang) {
-      $this->needTranslate = true;
-    }
-
     $this->dictionaryPath   = "lang/{$this->targetLang}/dictionary.php";
     $this->dbDictionaryPath = "lang/{$this->targetLang}/dbDictionary.php";
 
@@ -484,12 +472,14 @@ trait Dictionary
    * Принудительно устанавливает целевой язык,
    * нужно вызывать до инициализации словарей (нужно при отображении заказа, pdf, excel)
    * @param string $lang ru, en,
-   * @return void
+   * @return Main
    */
-  public function setTargetLang(string $lang = ''): void
+  public function setTargetLang(string $lang = ''): Main
   {
     //if (isset($this->targetLang)) return;
     $this->targetLang = $lang === '' ? $this::$BASE_LANG : $lang;
+
+    return $this;
   }
 
   /**
@@ -522,15 +512,6 @@ trait Dictionary
   }
 
   /**
-   * @return bool возвращает нужно ли переводить на целевой язык, по умолчанию $BASE_LANG = 'ru'
-   */
-  public function isNeedTranslate(): bool
-  {
-    $this->initLocales();
-    return $this->needTranslate;
-  }
-
-  /**
    * @return string возвращает целевой язык, по умолчанию $BASE_LANG = 'ru'
    */
   public function getTargetLang(): string
@@ -544,8 +525,7 @@ trait Dictionary
    */
   public function getAvailableLanguages(): array
   {
-    $this->initLocales();
-    return $this->availableLanguages;
+    return array_values($this->availableLanguages ?? $this->dictionaryList);
   }
 
   /**

@@ -20,7 +20,7 @@ class UrlGenerator {
   /**
    * @var HeaderBag
    */
-  private $headers;
+  public $headers;
   /**
    * @var string
    */

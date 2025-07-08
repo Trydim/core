@@ -29,8 +29,10 @@ if ($authStatus && isset($_GET['orderId'])) {
     $order = $main->db->loadOrdersById($orderId, true);
 
     if ($order) {
-      //Старые заказы всегда сохраняются на русском
-      $targetLang = $order['importantValue']['targetLang'] ?? $main::$BASE_LANG;
+      // сохранять тип языка принудительно при сохраннении заказа если доступны разные языки (или нет. нет)
+      // Название переменной не очень
+      // Старые заказы всегда сохраняются на русском
+      $targetLang = $order['importantValue']['targetLang'] ?? $main->getTargetLang();
       $main->setTargetLang($targetLang);
 
       $dbContent .= $main->getFrontContent('dataOrder', $order);
@@ -57,6 +59,8 @@ else if ($authStatus && isset($_GET['orderVisitorId'])) {
   unset($order, $orderId);
 }
 
+$main->setControllerField($field)->fireHook(VC::HOOKS_PUBLIC_TEMPLATE, $main);
+
 $main->publicMain();
 require ABS_SITE_PATH . 'public/public.php';
 if ($isDealer) {
@@ -76,7 +80,7 @@ if ($isDealer) {
   $main->publicDealer()
        ->setControllerViewField($main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php');
 }
-unset($path);
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_PUBLIC_TEMPLATE, $main);
 $main->response->setContent(template(OUTSIDE ? '_outside' : 'base', $main->getControllerField()));
+
+unset($path);

@@ -12,6 +12,26 @@ const cancelFormSubmit = () => {
   });
 }
 
+const loadLangList = () => {
+  const node = f.qS('#cmsLangSelect');
+  if (!node) return;
+
+  f.Get({data: {mode: 'dictionary', cmsAction: 'loadLanguages'}}).then((data: any) => {
+    if (data.status) {
+      const list = data['languagesList'],
+            v = f.cookieGet('lang') || list[0].code;
+
+      node.innerHTML = list.map((i: {code: string, name: string}) => {
+        return `<option value="${i.code}">${i.name}</option>`;
+      }).join('');
+
+      node.value = v;
+      f.cookieSet('lang', v);
+    } else {
+      node.remove();
+    }
+  });
+}
 const dictionaryInit = () => {
   const d = Object.create(null),
         node = f.qS('#dictionaryData');
@@ -102,7 +122,8 @@ const setSideMenuStyle = (init = true) => {
 
 const startPreloader = () => {
   f.show(f.gI('preloader'));
-};
+  f.gI('mainWrapper').classList.remove('show');
+}
 
 const stopPreloader = (short = true) => {
   if (f.OUTSIDE) return;
@@ -135,13 +156,18 @@ const themeToggle = () => {
 const langChange = (target: HTMLSelectElement) => {
   target.onchange = () => {
     startPreloader();
-    // Page will be reloaded
-    void f.Post({data: {
+
+    f.Post({data: {
       mode     : 'dictionary',
-      cmsAction: 'langChange',
+      cmsAction: 'changeLang',
       lang     : target.value,
-    }})
-  }
+    }}).then(data => {
+      if (data.status) {
+        f.cookieSet('lang', target.value);
+        location.reload()
+      }
+    });
+  };
 }
 
 const cmsEvent = function() {
@@ -195,6 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (f.gI('authForm')) { stopPreloader(false); return; }
 
   cancelFormSubmit();
+  loadLangList();
   dictionaryInit();
   f.getSetting();
   f.relatedOption();
