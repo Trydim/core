@@ -16,12 +16,12 @@ class CsvHistory
    * @param int $maxDays максимальное количество дней хранения истории
    * @param int $minKeepVersions
    */
-  public function __construct(string $basePath, string $historyPath, int $maxDays = 30, int $minKeepVersions = 1)
+  public function __construct(string $basePath, string $historyPath, int $maxDays = 90, int $minKeepVersions = 1)
   {
     $this->basePath = rtrim($basePath, '/\\') . '/';
     $this->historyPath = rtrim($historyPath, '/\\') . '/';
     $this->maxDays = $maxDays;
-    $this->minKeepVersions = max($minKeepVersions, 1);
+    $this->minKeepVersions = max($minKeepVersions, 1) + 1; //+1 для хранения последнего резервного бэкапа
   }
 
   /**
@@ -35,11 +35,11 @@ class CsvHistory
   {
     $history = $this->getHistoryList($relativeFilePath);
 
-    $lastMetaFields = empty($history)
+    $newestMetaFields = empty($history)
       ? $this->createInitialBackup($relativeFilePath)
       : $history[0];
 
-    $metaFields['prevBackupId'] = $lastMetaFields['backupId'] ?? null;
+    $metaFields['prevBackupId'] = $newestMetaFields['backupId'] ?? null;
     $newMetaFields = $this->createBackup($relativeFilePath, $fileContent, $metaFields);
 
     return $newMetaFields['backupId'];
@@ -104,30 +104,32 @@ class CsvHistory
       }
     }
 
+    $history = $this->cleanupHistory($relativeFilePath, $history);
+
     usort($history, function ($a, $b) {
       return $b['timestamp'] <=> $a['timestamp']; // Новые → старые
     });
 
-    $history = $this->cleanupHistory($relativeFilePath, $history);
     $filePath = $this->basePath . $relativeFilePath;
 
     // Сравним md5 текущего файла с последним в истории
     if (is_readable($filePath) && !empty($history)) {
       $currentMd5 = md5_file($filePath);
-      $lastMd5 = $history[0]['fileMd5'] ?? null;
-      $lastBackupId = $history[0]['backupId'] ?? null;
+      $newestMd5 = $history[0]['fileMd5'] ?? null;
+      $newestBackupId = $history[0]['backupId'] ?? null;
 
-      if ($lastMd5 !== null && $currentMd5 !== $lastMd5) {
-        $lastMetaFields = $this->createBackup($relativeFilePath, file_get_contents($filePath), [
+      if ($newestMd5 !== null && $currentMd5 !== $newestMd5) {
+        $newestMetaFields = $this->createBackup($relativeFilePath, file_get_contents($filePath), [
           'note' => 'Auto backup: file modified outside history system',
           'userId' => self::EXTERNAL_USER_ID,
-          'prevBackupId' => $lastBackupId
+          'prevBackupId' => $newestBackupId
         ]);
-        array_unshift($history, $lastMetaFields);
+        array_unshift($history, $newestMetaFields);
       }
     }
 
-    // Убрать initial backup (самый старый, последний в списке)
+
+    // Убираем последний бэкап из списка
     if (count($history) > 1) {
       array_pop($history);
     }
@@ -136,9 +138,9 @@ class CsvHistory
   }
 
   /**
-   * Очищает старые версии файлов на основе переданной отсортированной истории и возвращает новую историю
+   * Очищает старые версии файлов на основе переданной неотсортированной истории и возвращает новую историю
    * @param string $relativeFilePath Относительный путь к файлу
-   * @param array $history Массив истории (отсортированный от новых к старым)
+   * @param array $history Массив истории
    * @return array Возвращает обновленную историю
    */
   private function cleanupHistory(string $relativeFilePath, array $history): array
@@ -149,9 +151,12 @@ class CsvHistory
       return $history;
     }
 
-    $historyDir = $this->getHistoryDir($relativeFilePath);
+
     $now = time();
+
     $threshold = $now - ($this->maxDays * 86400);
+
+    $historyDir = $this->getHistoryDir($relativeFilePath);
     $cleanedHistory = [];
 
     foreach ($history as $index => $entry) {
