@@ -208,41 +208,40 @@ class CsvHistory
 
 
   /**
-   * Возвращает содержимое текущего и предыдущего бэкапа по идентификатору.
+   * Возвращает содержимое и метаданные текущего и предыдущего бэкапа по идентификатору.
    *
    * @param string $relativeFilePath Относительный путь к файлу, например /price/00_price.csv
    * @param string $backupId Идентификатор текущего бэкапа
-   * @return array{current: string, previous: string} Ассоциативный массив с содержимым текущего и предыдущего CSV-бэкапа
+   * @return array{
+   *   current: array{content: string, meta: array},
+   *   previous: array{content: string, meta: array}
+   * }
    * @throws RuntimeException Если метаинформация или один из бэкапов не найден или не читается
    */
   public function getBackupsForDiff(string $relativeFilePath, string $backupId): array
   {
-    $meta = $this->getBackupMeta($relativeFilePath, $backupId);
-
-    if ($meta === null) {
-      throw new \RuntimeException("Metadata not found for backupId: {$backupId}");
-    }
-
+    $currentMeta = $this->getBackupMeta($relativeFilePath, $backupId);
     $currentContent = $this->getBackupContent($relativeFilePath, $backupId);
 
-    if ($currentContent === null) {
-      throw new \RuntimeException("Failed to read current backup: {$backupId}");
+    if (!$currentMeta || !$currentContent) {
+      throw new \RuntimeException("Current backup not found or unreadable: {$backupId}");
     }
 
-    $prevBackupId = $meta['prevBackupId'] ?? null;
+    $prevBackupId = $currentMeta['prevBackupId'] ?? null;
+    $prevMeta = $prevBackupId ? $this->getBackupMeta($relativeFilePath, $prevBackupId) : null;
+    $prevContent = $prevBackupId ? $this->getBackupContent($relativeFilePath, $prevBackupId) : null;
 
-    $prevContent = $this->getBackupContent($relativeFilePath, $prevBackupId);
-
-    if ($prevContent === null) {
-      throw new \RuntimeException("Failed to read previous backup: {$prevBackupId}");
+    if (!$prevMeta || !$prevContent) {
+      throw new \RuntimeException("Previous backup not found or unreadable: {$prevBackupId}");
     }
 
     return [
-      'current' => $currentContent,
-      'previous' => $prevContent
+      'currentContent' => $currentContent,
+      'currentMeta' => $currentMeta,
+      'previousContent' =>  $prevContent,
+      'previousMeta' => $prevMeta
     ];
   }
-
   /**
    * Получает распакованное содержимое CSV-бэкапа по идентификатору.
    *
