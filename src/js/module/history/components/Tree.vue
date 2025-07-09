@@ -62,16 +62,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "./../index.scss";
+
 .tree {
-  max-width: 400px;
+  max-width: rem(400);
   user-select: none;
 
   .tree-node {
-    margin-left: 20px;
+    margin-left: rem(20);
   }
 
   .node-item {
-    padding: 5px 10px;
+    padding: 5px rem(10);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -106,15 +108,15 @@ export default {
 
   .children {
     border-left: 1px dashed #ccc;
-    margin-left: 10px;
+    margin-left: rem(10);
   }
 
   .child-nodes {
-    margin-left: 15px;
+    margin-left: rem(15);
   }
 
   .empty-message {
-    padding: 20px;
+    padding: rem(20);
     color: #888;
     font-style: italic;
   }

@@ -17,12 +17,14 @@
         :rows="filteredFilteredRows"
         side="left"
         :sideLabel="$t('Предыдущая версия таблицы')"
+        :meta="diff?.previousMeta"
       />
       <TableSide
         :columns="filteredColumns"
         :rows="filteredFilteredRows"
         side="right"
         :sideLabel="$t('Новая версия таблицы')"
+        :meta="diff?.currentMeta"
       />
     </div>
   </div>
@@ -101,25 +103,28 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "./../index.scss";
+
 .diff-wrapper {
-  padding: 10px;
+  padding: rem(10);
   overflow-x: auto;
 }
 
 .toggle-row {
-  margin-bottom: 10px;
+  margin-bottom: rem(10);
   display: flex;
   align-items: center;
+
+  label {
+    user-select: none;
+  }
 }
 
-.toggle-row label {
-  user-select: none;
-}
 
 .tables-row {
   display: flex;
   gap: 20px;
-  min-width: 800px;
+  min-width: rem(800);
 }
 </style>

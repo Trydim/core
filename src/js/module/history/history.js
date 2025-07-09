@@ -1,10 +1,35 @@
 import { createApp } from 'vue';
+
 import App from './HistoryApp.vue';
+import Widget from './HistoryWidget.vue';
 
-const app = createApp(App)
+import './index.scss';
 
-app.config.globalProperties.$t = function(id, ...params) {
-  return window._(id, ...params);
-};
+const applyAppSettings = (app) => {
+  app.config.globalProperties.$t = function(id, ...params) {
+    return window._(id, ...params);
+  };
+}
 
-app.mount('#history-page');
+const btnShowHistory = document.getElementById('btnShowHistory');
+
+if (btnShowHistory) {
+  const app = createApp(Widget)
+
+  applyAppSettings(app);
+
+  const widgetContainer = document.createElement('div');
+  app.mount(widgetContainer);
+
+  btnShowHistory.addEventListener('click', () => {
+    window.dispatchEvent(new Event('open-history-widget'));
+  });
+
+} else {
+  const app = createApp(App)
+
+  applyAppSettings(app);
+
+  app.mount('#history-page');
+}
+

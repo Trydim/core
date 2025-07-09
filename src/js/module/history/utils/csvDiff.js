@@ -1,3 +1,29 @@
+/**
+ * Сравнивает две CSV строки и возвращает разницу между ними в структурированном виде
+ * @typedef {Object} CellDiff
+ * @property {string} value - Значение ячейки
+ * @property {'line-number'|'changed-old'|'changed-new'|'normal'|'empty'|'inserted'|'deleted'} status - Статус ячейки
+*/
+
+/** @typedef {Object} RowDiff
+ * @property {CellDiff[]} left - Ячейки левой (старой) версии
+ * @property {CellDiff[]} right - Ячейки правой (новой) версии
+ *
+*/
+
+/**
+ * @typedef {Object} CsvDiffResult
+ * @property {string[]} columns - Заголовки столбцов (первый элемент - "№ строки")
+ * @property {RowDiff[]} rows - Массив строк с различиями
+*/
+
+/**
+ * @param {string} oldCsv - Исходная CSV строка
+ * @param {string} newCsv - Новая CSV строка для сравнения
+ * @param {string} [separator=';'] - Разделитель столбцов в CSV
+ * @returns {CsvDiffResult} Объект с результатами сравнения CSV
+ */
+
 export function csvDiff(oldCsv, newCsv, separator = ';') {
   const parse = (text) => {
     const lines = text.replace(/\r\n?/g, '\n').split('\n').map((l) => l.trimEnd());
@@ -15,13 +41,16 @@ export function csvDiff(oldCsv, newCsv, separator = ';') {
 
   const old = parse(oldCsv);
   const current = parse(newCsv);
-  const keyIndex = 0;
+
+  // Найти индекс колонки id (без учёта регистра), если нет — использовать 0
+  const keyIndex = current.headers.findIndex(h => h.toLowerCase() === 'id');
+  const finalKeyIndex = keyIndex >= 0 ? keyIndex : 0;
 
   const resultRowsWithLine = [];
   const matchedOldRows = new Set();
 
   const makeRowKey = (row) => {
-    const id = row.cells[keyIndex]?.trim();
+    const id = row.cells[finalKeyIndex]?.trim();
     if (id) return `id:${id}`;
     return 'row:' + row.cells.map(cell => cell.trim().toLowerCase()).join('|');
   };
@@ -93,10 +122,12 @@ export function csvDiff(oldCsv, newCsv, separator = ';') {
   }
 
   // Сортировка по lineNumber
-  resultRowsWithLine.sort((a, b) => a.lineNumber - b.lineNumber); //ToDo подумать
+  resultRowsWithLine.sort((a, b) => a.lineNumber - b.lineNumber);
 
   return {
     columns: ['№ строки', ...current.headers],
     rows: resultRowsWithLine.map(item => item.row)
   };
 }
+
+

@@ -35,6 +35,15 @@
  * @property {TreeNode[]} [historyTree]
  */
 
+/**
+ * Обработанный объект различий, содержащий результат сравнения CSV и метаданные
+ * @typedef {Object} ProcessedCsvDiff
+ * @property {string[]} columns - Заголовки столбцов
+ * @property {RowDiff[]} rows - Массив строк с различиями
+ * @property {BackupMeta} currentMeta - Метаданные текущей (новой) версии
+ * @property {BackupMeta} previousMeta - Метаданные предыдущей (старой) версии
+ */
+
 import Tree from './components/Tree.vue';
 import List from './components/List.vue';
 import TableDiff from './components/TableDiff.vue';
@@ -56,7 +65,7 @@ export default {
       data.set('dbAction', 'getCsvHistoryTree');
 
 
-      const response =  /** @type {TreeApiResponse} */ await f.Get({data});
+      const response =  /** @type {TreeApiResponse} */ await f.Post({data});
       if (response.status) {
         this.treeData = response.historyTree?.length ? response.historyTree.map(node => ({
           ...node,
@@ -67,6 +76,10 @@ export default {
     handleFileSelected(filePath) {
       this.selectedFile = filePath;
     },
+
+    /**
+     * @param {ProcessedCsvDiff} diff - Объект с обработанными различиями между версиями CSV
+     */
     handleEntrySelected(diff) {
       this.currentDiff = diff;
     }
@@ -77,14 +90,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "./index.scss";
+
 .history-app {
   display: grid;
-  grid-template-columns: 400px max-content;
+  grid-template-columns: rem(400) max-content;
   grid-template-rows: auto 1fr;
-  gap: 20px;
+  gap: rem(20);
   height: 100vh;
-  padding: 20px;
+  padding: rem(20);
 }
 
 .tree-container {
@@ -93,8 +108,8 @@ export default {
   max-height: 40vh;
   overflow-y: auto;
   border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 15px;
+  border-radius: rem(8);
+  padding: rem(15);
 }
 
 .list-container {
@@ -102,8 +117,8 @@ export default {
   grid-row: 2;
   overflow-y: auto;
   border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 15px;
+  border-radius: rem(8);
+  padding: rem(15);
 }
 
 .diff-container {
@@ -111,8 +126,8 @@ export default {
   grid-row: 1 / span 2;
   overflow: auto;
   border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 15px;
+  border-radius: rem(8);
+  padding: rem(15);
 }
 
 </style>

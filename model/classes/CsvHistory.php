@@ -16,7 +16,7 @@ class CsvHistory
    * @param int $maxDays максимальное количество дней хранения истории
    * @param int $minKeepVersions
    */
-  public function __construct(string $basePath, string $historyPath, int $maxDays = 90, int $minKeepVersions = 1)
+  public function __construct(string $basePath, string $historyPath, int $maxDays = 90, int $minKeepVersions = 20)
   {
     $this->basePath = rtrim($basePath, '/\\') . '/';
     $this->historyPath = rtrim($historyPath, '/\\') . '/';

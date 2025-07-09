@@ -16,7 +16,8 @@ $field['content'] = <<<main
     <h2 id="tableNameField"></h2>
   </div>
   <div id="btnField" class="px-1">
-    <button type="button" class="btn btn-transparent" id="btnSave" disabled>Сохранить</button>
+     <button type="button" class="btn btn-transparent" id="btnSave" disabled>Сохранить</button>
+     <button type="button" class="btn btn-transparent" id="btnShowHistory">История изменений</button>
   </div>
   <div id="viewField" class="ms-md-auto">
     <div class="form-check">
