@@ -463,7 +463,7 @@ function translit(string $value): string {
 
 /**
  * @param string $url
- * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'auth', 'contentType', 'timeout'
+ * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'login', 'password', 'contentType', 'timeout'
  * @param string|array<string, string> $params - assoc array
  * @return string|array
  */
@@ -472,14 +472,16 @@ function httpRequest(string $url, array $config = [], $params = []) {
 
   $curlConfig = [
     CURLOPT_URL => $url,
-    CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_SSL_VERIFYPEER => false, // Добавить: Определять есть ли ssl
+    CURLOPT_SSL_VERIFYHOST => false, // Добавить: Определять есть ли ssl
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER => [],
     CURLOPT_TIMEOUT => $config['timeout'] ?? 45,
   ];
 
-  if (isset($config['auth'])) {
-    $curlConfig[CURLOPT_HTTPHEADER][] = 'Authorization:' . $config['auth'];
+  if (isset($config['login']) && isset($config['password'])) {
+    $curlConfig[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+    $curlConfig[CURLOPT_USERPWD]  = $config['login'] . ':' . $config['password'];
   }
 
   if (strtolower($config['method'] ?? 'get') === 'get') {
@@ -489,6 +491,7 @@ function httpRequest(string $url, array $config = [], $params = []) {
     $curlConfig[CURLOPT_HTTPGET] = false;
     $curlConfig[CURLOPT_POST] = true;
     $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Type: ' . ($config['contentType'] ?? 'application/json; charset=utf-8');
+    $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Length: ' . strlen(is_string($params) ? $params : json_encode($params));
     $curlConfig[CURLOPT_POSTFIELDS]   = $params;
   }
 

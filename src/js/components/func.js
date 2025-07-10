@@ -368,7 +368,7 @@ export default {
           link  = f.createLink(name);
 
     if (data.type === 'json') link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(blob.toString());
-    if (data.type === 'base64') link.href = blob;
+    else if (data.type === 'base64') link.href = blob;
     else link.href = URL.createObjectURL(blob);
 
     document.body.append(link);
