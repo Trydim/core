@@ -95,10 +95,11 @@ export default {
 
 .history-app {
   display: grid;
-  grid-template-columns: rem(400) max-content;
+  grid-template-columns: rem(360) 1fr;
   grid-template-rows: auto 1fr;
   gap: rem(20);
-  height: 100vh;
+  height: 100%;
+  max-height: 100%;
   padding: rem(20);
 }
 

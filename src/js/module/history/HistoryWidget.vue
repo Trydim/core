@@ -75,10 +75,10 @@ export default {
 
 .history-widget {
   display: grid;
-  grid-template-columns: rem(400) 1fr;
-  grid-template-rows: auto;
+  grid-template-columns: rem(360) 1fr;
+  grid-template-rows: auto 1fr;
   gap: rem(20);
-  height: 100vh;
+  height: 100%;
   padding: rem(20);
 }
 
