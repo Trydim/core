@@ -290,20 +290,29 @@ class Docs {
           $this->docs->getCanvas()->page_text($t['x'], $t['y'], $t['text'], $font, $t['size'], $t['color'], $t['word_space'], $t['char_space'] ,$t['angle']);
         }
 
-        if ($dest === 'save') {
-          file_put_contents($path . $this->fileName, $this->docs->output());
-          return $path . $this->fileName;
-        } else {
-          if ($this->main->isSafari()) {
-            header('File-Name: ' . $this->fileName);
-            $this->docs->stream($this->fileName, ["Attachment" => false]);
-            exit();
-          }
+        switch ($dest) {
+          default:
+            if ($this->main->isSafari()) {
+              header('File-Name: ' . $this->fileName);
+              $this->docs->stream($this->fileName, ["Attachment" => false]);
+              exit();
+            }
 
-          return [
-            'name'    => $this->fileName,
-            'pdfBody' => base64_encode($this->docs->output()),
-          ];
+            return [
+              'name'    => $this->fileName,
+              'pdfBody' => base64_encode($this->docs->output()),
+            ];
+          case 'save':
+            file_put_contents($path . $this->fileName, $this->docs->output());
+
+            return $path . $this->fileName;
+          case 'saveWithUrl':
+            file_put_contents($path . $this->fileName, $this->docs->output());
+
+            return [
+              'name' => $this->fileName,
+              'url' => $this->main->url->getUri() . $this::RESULT_PATH . $this->fileName
+            ];
         }
       case 'mpdf':
       /** Default: \Mpdf\Output\Destination::INLINE
