@@ -12,13 +12,6 @@ class Docs {
   const RESULT_PATH = 'shared/';
 
   /**
-   * What library use
-   *
-   * @var string [dompdf/mpdf/html2pdf]
-   */
-  private $pdfLibrary;
-
-  /**
    * Page orientation
    *
    * @var string [P/L]
@@ -63,7 +56,7 @@ class Docs {
   /**
    * @var string
    */
-  public $fileName;
+  public $filename;
 
   /**
    * Docs constructor.
@@ -75,7 +68,6 @@ class Docs {
   public function __construct(Main $main, array $param, $data, string $fileTpl = 'default') {
     $this->main = $main ?? null;
 
-    $this->pdfLibrary = $param['library'] ?? 'dompdf';
     $this->pdfOrientation = $param['orientation'] ?? 'P';
     $this->docsType = $param['docType'] ?? 'pdf';
     $this->data = $data;
@@ -89,7 +81,6 @@ class Docs {
         $this->initPdf();
         break;
       case 'print':
-        $this->pdfLibrary = 'print';
         $this->prepareTemplate();
         $this->initPrint();
         break;
@@ -109,7 +100,7 @@ class Docs {
       case 'pdf': $file .= '.pdf'; break;
       case 'excel': $file .= '.xlsx'; break;
     }
-    $this->fileName = $file;
+    $this->filename = $file;
   }
 
   private function setFileTpl($fileTpl) {
@@ -168,64 +159,20 @@ class Docs {
   private function initPdf() {
     require_once CORE . 'libs/vendor/autoload.php';
 
-    switch ($this->pdfLibrary) {
-      case 'dompdf':
-        try {
-          $this->docs = new Dompdf\Dompdf($this->pdfParam);
+    try {
+      $this->docs = new Dompdf\Dompdf($this->pdfParam);
 
-          $this->docs->setPaper('A4', $this->pdfParam['orientation'] === 'P' ? 'portrait' : 'landscape');
+      $this->docs->setPaper('A4', $this->pdfParam['orientation'] === 'P' ? 'portrait' : 'landscape');
 
-          //$this->docs->getOptions()->setDebugLayout(true);
-          //$this->docs->getOptions()->setDebugLayoutBlocks(true);
-          //$this->docs->getOptions()->setDebugPng(true);
-          $this->docs->getOptions()->setIsRemoteEnabled(true);
-          $this->docs->getOptions()->setIsPhpEnabled(true);
+      //$this->docs->getOptions()->setDebugLayout(true);
+      //$this->docs->getOptions()->setDebugLayoutBlocks(true);
+      //$this->docs->getOptions()->setDebugPng(true);
+      $this->docs->getOptions()->setIsRemoteEnabled(true);
+      $this->docs->getOptions()->setIsPhpEnabled(true);
 
-          $this->docs->loadHtml('<html><head><style>' . ($this->styleContent ?? '') . '</style></head><body>' . $this->content . '</body></html>');
-        } catch (\Mpdf\MpdfException $e) {
-          echo $e->getMessage();
-        }
-        break;
-      case 'mpdf':
-        try {
-          $this->docs = new Mpdf\Mpdf($this->pdfParam);
-          //$this->docs->charset_in = 'cp1252';
-          //$this->pdf->useOnlyCoreFonts = true;
-          //$this->pdf->SetDisplayMode('fullpage');
-
-          $this->docs->WriteHTML($this->styleContent, \Mpdf\HTMLParserMode::HEADER_CSS);
-
-          //$this->pdf->SetHTMLHeader('');
-          $this->docs->SetHTMLFooter($this->footerPage);
-
-          $this->docs->WriteHTML($this->content, \Mpdf\HTMLParserMode::HTML_BODY);
-        } catch (\Mpdf\MpdfException $e) {
-          echo $e->getMessage();
-        }
-        break;
-      case 'html2pdf':
-        try {
-          $format = $this->pdfParam['format'];
-          $param = [
-            $this->pdfParam['margin_left'],
-            $this->pdfParam['margin_top'],
-            $this->pdfParam['margin_right'],
-            $this->pdfParam['margin_bottom'],
-          ];
-          $this->docs = new Spipu\Html2Pdf\Html2Pdf($this->pdfOrientation, $format, 'ru', true, 'UTF-8', $param);
-
-          DEBUG && $this->docs->setModeDebug();
-          $this->docs->setDefaultFont('freesans');
-
-          $this->docs->writeHTML('<style>' . $this->styleContent . '</style>');
-          $this->docs->writeHTML($this->content);
-
-        } catch (Spipu\Html2Pdf\Exception\Html2PdfException $e) {
-          $this->docs->clean();
-          $formatter = new Spipu\Html2Pdf\Exception\ExceptionFormatter($e);
-          echo $formatter->getHtmlMessage();
-        }
-        break;
+      $this->docs->loadHtml('<html><head><style>' . ($this->styleContent ?? '') . '</style></head><body>' . $this->content . '</body></html>');
+    } catch (\Mpdf\MpdfException $e) {
+      echo $e->getMessage();
     }
   }
 
@@ -256,22 +203,15 @@ class Docs {
     }
   }
 
-  private function getFunc() {
-    switch ($this->docsType) {
-      case 'pdf': return 'Pdf';
-      case 'print': return 'Print';
-      case 'excel': return 'Excel';
-    }
-    return false;
-  }
-
   /**
    * Return file as:
-   * save - save on server in RESULT_PATH, any other value send to browser
-   * I - inline, D - DOWNLOAD, F - save local file, S - string
+   * save|savePath - save on server in RESULT_PATH;<br>
+   * saveUrl - save on server in RESULT_PATH and return HTTP link as string;<br>
+   * saveWithUrl - save on server in RESULT_PATH and return HTTP link and filename as array;<br>
+   * any other value send to browser
    * @param string $path
-   * @param string $dest
-   * @return array|false|string
+   * @param string $dest - "", "save|savePath", "saveUrl", "saveWithUrl"
+   * @return array|string
    */
   private function getPdf(string $path, string $dest) {
     if (isset($_REQUEST['resource'])) {
@@ -281,81 +221,44 @@ class Docs {
       ];
     }
 
-    switch ($this->pdfLibrary) {
-      case 'dompdf':
-        $this->docs->render();
+    $this->docs->render();
 
-        foreach ($this->domFooter as $t) {
-          $font = $this->docs->getFontMetrics()->getFont($t['font'], "normal");
-          $this->docs->getCanvas()->page_text($t['x'], $t['y'], $t['text'], $font, $t['size'], $t['color'], $t['word_space'], $t['char_space'] ,$t['angle']);
-        }
-
-        switch ($dest) {
-          default:
-            if ($this->main->isSafari()) {
-              header('File-Name: ' . $this->fileName);
-              $this->docs->stream($this->fileName, ["Attachment" => false]);
-              exit();
-            }
-
-            return [
-              'name'    => $this->fileName,
-              'pdfBody' => base64_encode($this->docs->output()),
-            ];
-          case 'save':
-            file_put_contents($path . $this->fileName, $this->docs->output());
-
-            return $path . $this->fileName;
-          case 'saveWithUrl':
-            file_put_contents($path . $this->fileName, $this->docs->output());
-
-            return [
-              'name' => $this->fileName,
-              'url' => $this->main->url->getUri() . $this::RESULT_PATH . $this->fileName
-            ];
-        }
-      case 'mpdf':
-      /** Default: \Mpdf\Output\Destination::INLINE
-       *        Values:
-       *  \Mpdf\Output\Destination::INLINE, or "I"
-       *  send the file inline to the browser. The plug-in is used if available. The name given by $filename is used when one selects the “Save as” option on the link generating the PDF.
-       *  \Mpdf\Output\Destination::DOWNLOAD, or "D"
-       *  send to the browser and force a file download with the name given by $filename.
-       *  \Mpdf\Output\Destination::FILE, or "F"
-       *  save to a local file with the name given by $filename (may include a path).
-       *  \Mpdf\Output\Destination::STRING_RETURN, or "S"
-       *  return the document as a string. $filename is ignored.
-       */
-        if ($dest === 'save') {
-          $this->docs->Output($path . $this->fileName, 'F');
-          return $path . $this->fileName;
-        } else {
-          return [
-            'name'    => $this->fileName,
-            'pdfBody' => base64_encode($this->docs->Output('', 'S')),
-          ];
-        }
-      case 'html2pdf':
-      /** Destination where to send the document. It can take one of the following values:
-       * I: send the file inline to the browser (default). The plug-in is used if available. The name given by name is used when one selects the "Save as" option on the link generating the PDF.
-       * D: send to the browser and force a file download with the name given by name.
-       * F: save to a local server file with the name given by name.
-       * S: return the document as a string (name is ignored).
-       * FI: equivalent to F + I option
-       * FD: equivalent to F + D option
-       * E: return the document as base64 mime multi-part email attachment (RFC 2045)
-       */
-        if ($dest === 'save') {
-          $this->docs->output($path . $this->fileName, 'F');
-          return $path . $this->fileName;
-        } else {
-          return [
-            'name'    => $this->fileName,
-            'pdfBody' => base64_encode($this->docs->Output('', 'S')),
-          ];
-        }
+    foreach ($this->domFooter as $t) {
+      $font = $this->docs->getFontMetrics()->getFont($t['font'], "normal");
+      $this->docs->getCanvas()->page_text($t['x'], $t['y'], $t['text'], $font, $t['size'], $t['color'], $t['word_space'], $t['char_space'] ,$t['angle']);
     }
-    return false;
+
+    switch ($dest) {
+      default:
+        if ($this->main->isSafari()) {
+          header('file-name: ' . $this->filename);
+          $this->docs->stream($this->filename, ["Attachment" => false]);
+          exit();
+        }
+
+        return [
+          'name'    => $this->filename,
+          'pdfBody' => base64_encode($this->docs->output()),
+        ];
+
+      case 'save': case 'savePath':
+        file_put_contents($path . $this->filename, $this->docs->output());
+
+        return $path . $this->filename;
+
+      case 'saveUrl':
+        file_put_contents($path . $this->filename, $this->docs->output());
+
+        return $this->main->url->getUri() . $this::RESULT_PATH . $this->filename;
+
+      case 'saveWithUrl':
+        file_put_contents($path . $this->filename, $this->docs->output());
+
+        return [
+          'name' => $this->filename,
+          'url' => $this->main->url->getUri() . $this::RESULT_PATH . $this->filename
+        ];
+    }
   }
 
   /**
@@ -366,12 +269,12 @@ class Docs {
   private function getPrint(string $path, string $dest) {
     switch ($dest) {
       case 'save':
-        file_put_contents($path . $this->fileName, $this->content);
-        return $path . $this->fileName;
+        file_put_contents($path . $this->filename, $this->content);
+        return $path . $this->filename;
       case 'S':
       default:
         return [
-          'name'      => $this->fileName,
+          'name'      => $this->filename,
           'printBody' => $this->content,
         ];
     }
@@ -385,12 +288,12 @@ class Docs {
   private function getExcel(string $path, string $dest) {
     switch ($dest) {
       case 'save':
-        $this->docs->writeToFile($path . $this->fileName);
-        return $path . $this->fileName;
+        $this->docs->writeToFile($path . $this->filename);
+        return $path . $this->filename;
       case 'S':
       default:
         return [
-          'name'    => $this->fileName,
+          'name'    => $this->filename,
           'excelBody' => base64_encode($this->docs->writeToString()),
         ];
     }
@@ -508,8 +411,12 @@ class Docs {
     $path = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $this::RESULT_PATH;
     if (!is_dir($path)) mkdir($path);
 
-    $func = 'get' . $this->getFunc();
-    $result = $this->$func($path, $dest);
+    switch ($this->docsType) {
+      default:
+      case 'pdf': $result = $this->getPdf($path, $dest); break;
+      case 'print': $result = $this->getPrint($path, $dest); break;
+      case 'excel': $result = $this->getExcel($path, $dest); break;
+    }
 
     $this->unlinkTmpFiles();
     return $result;
