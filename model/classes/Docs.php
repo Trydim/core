@@ -49,14 +49,21 @@ class Docs {
    * @var array
    */
   private $tmpFiles = [];
+
   /**
    * @var Main|null
    */
   private $main;
+
   /**
    * @var string
    */
-  public $filename;
+  private $filename;
+
+  /**
+   * @var string
+   */
+  public $fileName;
 
   /**
    * Docs constructor.
@@ -74,7 +81,7 @@ class Docs {
 
     $this->setFileTpl($fileTpl);
     $this->setDefaultParam();
-    $this->getFileName();
+    $this->getFilename();
     switch ($this->docsType) {
       case 'pdf':
         $this->prepareTemplate();
@@ -91,7 +98,7 @@ class Docs {
     }
   }
 
-  private function getFileName() {
+  private function getFilename() {
     $file = str_replace($this->main->url->getScheme(), '', $this->main->url->getHost())
       . '_' . substr(uniqid(), 9, 4)
       . '_' . date('dmY');
@@ -171,7 +178,7 @@ class Docs {
       $this->docs->getOptions()->setIsPhpEnabled(true);
 
       $this->docs->loadHtml('<html><head><style>' . ($this->styleContent ?? '') . '</style></head><body>' . $this->content . '</body></html>');
-    } catch (\Mpdf\MpdfException $e) {
+    } catch (\Dompdf\Exception $e) {
       echo $e->getMessage();
     }
   }
@@ -221,6 +228,7 @@ class Docs {
       ];
     }
 
+    $filename = $this->fileName ?? $this->filename;
     $this->docs->render();
 
     foreach ($this->domFooter as $t) {
@@ -231,32 +239,34 @@ class Docs {
     switch ($dest) {
       default:
         if ($this->main->isSafari()) {
-          header('file-name: ' . $this->filename);
-          $this->docs->stream($this->filename, ["Attachment" => false]);
+          header('filename: ' . $filename);
+          $this->docs->stream($filename, ["Attachment" => false]);
           exit();
         }
 
         return [
-          'name'    => $this->filename,
-          'pdfBody' => base64_encode($this->docs->output()),
+          'name'     => $filename,
+          'filename' => $filename,
+          'pdfBody'  => base64_encode($this->docs->output()),
         ];
 
       case 'save': case 'savePath':
-        file_put_contents($path . $this->filename, $this->docs->output());
+        file_put_contents($path . $filename, $this->docs->output());
 
-        return $path . $this->filename;
+        return $path . $filename;
 
       case 'saveUrl':
-        file_put_contents($path . $this->filename, $this->docs->output());
+        file_put_contents($path . $filename, $this->docs->output());
 
-        return $this->main->url->getUri() . $this::RESULT_PATH . $this->filename;
+        return $this->main->url->getUri() . $this::RESULT_PATH . $filename;
 
       case 'saveWithUrl':
-        file_put_contents($path . $this->filename, $this->docs->output());
+        file_put_contents($path . $filename, $this->docs->output());
 
         return [
-          'name' => $this->filename,
-          'url' => $this->main->url->getUri() . $this::RESULT_PATH . $this->filename
+          'name'     => $filename,
+          'filename' => $filename,
+          'url'      => $this->main->url->getUri() . $this::RESULT_PATH . $filename
         ];
     }
   }
@@ -267,16 +277,19 @@ class Docs {
    * @return array|string
    */
   private function getPrint(string $path, string $dest) {
+    $filename = $this->fileName ?? $this->filename;
+
     switch ($dest) {
-      case 'save':
-        file_put_contents($path . $this->filename, $this->content);
-        return $path . $this->filename;
-      case 'S':
       default:
         return [
-          'name'      => $this->filename,
+          'name'      => $filename,
+          'filename'  => $filename,
           'printBody' => $this->content,
         ];
+
+      case 'save':
+        file_put_contents($path . $filename, $this->content);
+        return $path . $filename;
     }
   }
 
@@ -286,16 +299,21 @@ class Docs {
    * @return array|string
    */
   private function getExcel(string $path, string $dest) {
+    $filename = $this->fileName ?? $this->filename;
+
     switch ($dest) {
-      case 'save':
-        $this->docs->writeToFile($path . $this->filename);
-        return $path . $this->filename;
-      case 'S':
       default:
         return [
-          'name'    => $this->filename,
+          'name'      => $filename,
+          'filename'  => $filename,
           'excelBody' => base64_encode($this->docs->writeToString()),
         ];
+
+      case 'save':
+        $this->docs->writeToFile($path . $filename);
+
+        return $path . $filename;
+
     }
   }
 
@@ -350,6 +368,16 @@ class Docs {
   }
 
   /**
+   * @param string $filename
+   * @return Docs
+   */
+  public function setFilename(string $filename): Docs {
+    $this->filename = $filename;
+
+    return $this;
+  }
+
+  /**
    * Writes text at the specified x and y coordinates on every page.
    *
    * The strings '{PAGE_NUM}' and '{PAGE_COUNT}' are automatically replaced
@@ -360,13 +388,13 @@ class Docs {
    * @param string $text       The text to write
    * @param string $font       The font file to use
    * @param float  $size       The font size, in points
-   * @param array  $color      Color array in the format `[r, g, b, "alpha" => alpha]`
+   * @param array $color      Color array in the format `[r, g, b, "alpha" => alpha]`
    *                           where r, g, b, and alpha are float values between 0 and 1
-   * @param float  $word_space Word spacing adjustment
-   * @param float  $char_space Char spacing adjustment
-   * @param float  $angle      Angle to write the text at, measured clockwise starting from the x-axis
+   * @param float $word_space Word spacing adjustment
+   * @param float $char_space Char spacing adjustment
+   * @param float $angle      Angle to write the text at, measured clockwise starting from the x-axis
    * */
-  public function setFooter(float $x, float $y, string $text, $font = 'Helvetica', $size = 16.0, $color = [0, 0, 0], $word_space = 0.0, $char_space = 0.0, $angle = 0.0) {
+  public function setFooter(float $x, float $y, string $text, string $font = 'Helvetica', float $size = 16.0, array $color = [0, 0, 0], float $word_space = 0.0, float $char_space = 0.0, float $angle = 0.0) {
     $this->domFooter[] = [
       'x'     => $x,
       'y'     => $y,
@@ -382,11 +410,11 @@ class Docs {
 
   /**
    * Add bottom page counter
-   * @param string $position
-   * @param string $template -
-   * @param float  $size       The font size, in points
+   * @param ?string $position
+   * @param ?string $template - '{PAGE_NUM} / {PAGE_COUNT}'
+   * @param ?float  $size     - The font size, in points
    */
-  public function addPageCounter($position = 'right', $template = '{PAGE_NUM} / {PAGE_COUNT}', $size = 12.0) {
+  public function addPageCounter(string $position = 'right', string $template = '{PAGE_NUM} / {PAGE_COUNT}', float $size = 12.0) {
     $isPortrait = $this->pdfOrientation === 'P';
     $getX = function ($x) use ($isPortrait) { return round($x / 100 * ($isPortrait ? 612 : 792)); };
     $getY = function ($y) use ($isPortrait) { return round($y / 100 * ($isPortrait ? 792 : 612)); };
@@ -405,9 +433,9 @@ class Docs {
 
   /**
    * @param string $dest
-   * @return mixed
+   * @return array|string
    */
-  public function getDocs(string $dest = 'S') {
+  public function getDocs(string $dest = '') {
     $path = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $this::RESULT_PATH;
     if (!is_dir($path)) mkdir($path);
 
@@ -434,10 +462,14 @@ class Docs {
   }
 
   /**
-   * @param $path
+   * For What?
+   * @param string $path
+   * @return Docs
    */
-  public function setTmpFile($path) {
+  public function setTmpFile(string $path): Docs {
     $this->tmpFiles[] = $path;
+
+    return $this;
   }
 
   /**

@@ -336,16 +336,16 @@ export default {
 
   /**
    * Получить и скачать файл
-   * @param {string} fileName
+   * @param {string} filename
    * @return {HTMLAnchorElement}
    */
-  createLink: fileName => {
+  createLink: filename => {
     //let date = new Date();
-    //fileName += '_' + date.getDate() + ("0" + (date.getMonth() + 1)).slice(-2) + (date.getYear() - 100) + '_' + date.getHours() + date.getMinutes() + date.getSeconds() + '.pdf';
-    let a = document.createElement('a'),
+    //filename += '_' + date.getDate() + ("0" + (date.getMonth() + 1)).slice(-2) + (date.getYear() - 100) + '_' + date.getHours() + date.getMinutes() + date.getSeconds() + '.pdf';
+    let a    = document.createElement('a'),
         span = document.createElement('span');
 
-    a.setAttribute('download', fileName);
+    a.setAttribute('download', filename);
     a.append(span);
     span.onclick = () => {};
     return a;
@@ -364,8 +364,8 @@ export default {
    * blob: 'data:application/pdf;base64,' + data['pdfBody']}
    */
   saveFile: data => {
-    const {name = 'download.file', blob} = data,
-          link  = f.createLink(name);
+    const {name = 'download.file', filename = 'download.file', blob} = data,
+          link  = f.createLink(name || filename);
 
     if (data.type === 'json') link.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(blob.toString());
     if (data.type === 'base64') link.href = blob;
@@ -543,7 +543,7 @@ export default {
    *
    * @param {HTMLElement} target - loading field
    * @param {object} report - send to pdf
-   * @param {string?} report.fileName - result file name without extension
+   * @param {string?} report.filename - result file name without extension
    * @param {string?} report.fileTpl - pdf template file without extension
    * @param {string?} report.pdfOrientation ['P', 'L'] - pdf orientation
    * @param {boolean?} report.addManager - manager information will be loaded
@@ -553,7 +553,7 @@ export default {
    * @param {function?} err
    */
   downloadPdf(target, report = {}, data = new FormData(), finishOk = () => {}, err = () => {}) {
-    let fileName = report.fileName || false;
+    let filename = report.filename || false;
 
     f.setLoading(target);
     target.setAttribute('disabled', 'disabled');
@@ -572,14 +572,14 @@ export default {
       target.removeAttribute('disabled');
       if (data['pdfBody']) {
         f.saveFile({
-          name: fileName || data['name'],
+          name: filename || data['filename'],
           type: 'base64',
           blob: 'data:application/pdf;base64,' + data['pdfBody'],
         });
       }
       if (data instanceof Blob) {
         f.saveFile({
-          name: fileName || data.fileName || 'pdf.pdf',
+          name: filename || data['filename'] || 'pdf.pdf',
           blob: data,
         });
       }

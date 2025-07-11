@@ -31,7 +31,7 @@ const getFileName = (data: any) => {
     fileName = Array.isArray(match) && match.length === 2 && match[1];
   }
 
-  return fileName || data.headers.get('File-Name') || 'document.pdf';
+  return fileName || data.headers.get('filename') || 'document.pdf';
 }
 const downloadBody = async (data: any) => {
   const fileName = getFileName(data),
