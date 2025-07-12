@@ -83,7 +83,7 @@ switch ($cmsAction) {
   case 'excel':
   case 'pdf':
   case 'print':
-    $docType && $main->response->setContent($docs->getDocs($main->url->request->get('fileMode', 'S')));
+    $docType && $main->response->setContent($docs->getDocs($main->url->request->get('fileMode', '')));
     break;
   case 'mail':
     $docType && $docsPath = $docs->getDocs('save');

@@ -258,7 +258,7 @@ declare type CMSGlobalObject = {
   }
 
   /* Without description */
-  createLink(fileName: string): HTMLAnchorElement
+  createLink(filename: string): HTMLAnchorElement
 
   getSetting()
 

@@ -423,7 +423,7 @@ export class Pagination {
 
     //this.l = new LoaderIcon(this.node);
     this.checkBtn();
-    this.query(this.dbAction);
+    this.query();
   }
 
   template() {
@@ -514,7 +514,7 @@ export class SortColumns {
     if (this.sortParam.sortDirect) input.value = input.value.replace(arrowReg, arrowUp);
     else input.value = input.value.replace(arrowReg, arrowDown);
 
-    this.query(this.dbAction);
+    this.query();
   }
 }
 
