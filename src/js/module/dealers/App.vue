@@ -322,7 +322,7 @@ export default {
     getPropertyName(k) { return this.properties[k] ? this.properties[k].name : k; },
     getPropertyType(k) { return this.properties[k] ? this.properties[k].type : k; },
     getPropertyValue(k, v) {
-      v = v.toString();
+      v = v ? v.toString() : '';
       const res = this.properties[k] && this.properties[k].values && this.properties[k].values.filter(i => v.includes(i.id));
 
       return res ? res.map(i => i.name).join(', ') : v;

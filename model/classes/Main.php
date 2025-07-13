@@ -103,6 +103,8 @@ final class Main {
     $lang = $this->getCmsParam(VC::LOCALES) ? ($_COOKIE['lang'] ?? '') : '';
     $this->setTargetLang($lang ?: $this->getCmsParam(VC::LOCALES_BASE_LANG, ''));
 
+    if (empty($lang)) setcookie('lang', $this::$BASE_LANG, time() + (3600 * 24 * 3600), '/');
+
     $this->loadSetting()
          ->setHooks();
   }
