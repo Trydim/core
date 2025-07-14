@@ -253,6 +253,7 @@ class DbMain extends R {
     return $this->usePrefix = !$this->usePrefix;
   }
 
+
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
 
@@ -589,6 +590,14 @@ class DbMain extends R {
     return self::exec($sql);
   }
 
+
+  // Locales
+  //------------------------------------------------------------------------------------------------------------------
+
+  public function loadLocales(): array {
+    return self::getAll('SELECT * FROM locales');
+  }
+
   // Files
   //------------------------------------------------------------------------------------------------------------------
 
@@ -799,7 +808,8 @@ class DbMain extends R {
     }, $options);
   }
 
-  // Property only main cms
+
+  // Settings/Dealers Properties only main cms
   //------------------------------------------------------------------------------------------------------------------
 
   private function parseSimpleProperty($type, $value) {
@@ -970,6 +980,7 @@ class DbMain extends R {
     return self::getRow($sql, [':id' => $orderId]);
   }
 
+
   // Money
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -1007,6 +1018,7 @@ class DbMain extends R {
     }
   }
 
+
   // Dealers
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -1030,7 +1042,8 @@ class DbMain extends R {
     return $dealers;
   }
 
-  public function setDealerLink() {
+  public function setDealerLink(): bool
+  {
     $m = $this->main;
 
     $sqlValue = $m->url->getSubDomain();

@@ -1,6 +1,15 @@
 <?php
 
 class Properties {
+
+  /**
+   * Настройки для дилеров, которые под особым управлением, пока только языки
+   *
+   * Пока так
+   */
+  const PROP_CMS_SETTINGS = [
+    'prop_locales' => ['table' => 'locales', 'type' => 'multiselect'],
+  ];
   /**
    * @var Main
    */
@@ -38,14 +47,20 @@ class Properties {
    * @return array
    */
   public function getValue($prop, $value): array {
-    $propParam = $this->propSetting[$prop] ?? null;
+    $cmsParam  = $this::PROP_CMS_SETTINGS[$prop] ?? null;
+    $propParam = $cmsParam ?: $this->propSetting[$prop] ?? null;
     $propType = $propParam['type'] ?? '';
     $haveValue = boolValue($value);
 
-    if ($propParam === null) {
+    if ($cmsParam === null && $propParam === null) {
       $value = 'Property error';
+    } else if ($cmsParam && $haveValue && includes($propType, 'select')) {
+      if (!is_array($value)) $value = [$value];
+      // TODO дважды в БД лезем
+      $value = $this->main->db->loadPropertyTable($cmsParam['table'], $value);
     } else if ($haveValue && includes($propType, 'select')) {
       if (!is_array($value)) $value = [$value];
+
       $value = $this->main->db->loadPropertyTable($prop, $value);
     } else if ($haveValue && $propType === 'table') {
       $res = [];

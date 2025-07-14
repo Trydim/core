@@ -30,10 +30,8 @@ if ($authStatus && isset($_GET['orderId'])) {
 
     if ($order) {
       // сохранять тип языка принудительно при сохраннении заказа если доступны разные языки (или нет. нет)
-      // Название переменной не очень
       // Старые заказы всегда сохраняются на русском
-      $targetLang = $order['importantValue']['targetLang'] ?? $main->getTargetLang();
-      $main->setTargetLang($targetLang);
+      $main->setLocale($order['importantValue']['locale'] ?? '');
 
       $dbContent .= $main->getFrontContent('dataOrder', $order);
 

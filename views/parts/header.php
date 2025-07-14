@@ -6,9 +6,6 @@
 
 $siteLink = $main->url->getUri();
 
-// Обработка смены языка (запрос на доступные языки)
-$availableLanguages = $main->getAvailableLanguages();
-
 if ($main->checkStatus()) {
   $imgSrc = '';
   $getLogoString = function (string $pathK, string $uriK) use ($main): string {

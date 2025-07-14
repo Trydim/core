@@ -27,6 +27,8 @@ const loadLangList = () => {
 
       node.value = v;
       f.cookieSet('lang', v);
+
+      if (list.length === 1) node.remove();
     } else {
       node.remove();
     }

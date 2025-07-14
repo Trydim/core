@@ -569,3 +569,18 @@ if (!function_exists('get_debug_type')) {
     return (get_parent_class($class) ?: key(class_implements($class)) ?: 'class') . '@anonymous';
   }
 }
+
+if (!function_exists('array_find')) {
+  /**
+   * @param array $array - The array to search.
+   * @param callable $callback - The callback to run for each element.
+   * @return mixed|null
+   */
+  function array_find(array $array, callable $callback) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound
+    foreach ( $array as $key => $value ) {
+      if ($callback($value, $key)) return $value;
+    }
+
+    return null;
+  }
+}

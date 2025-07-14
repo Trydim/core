@@ -10,32 +10,34 @@ if (isset($legend[$tableActive])) {
   $legendHtml = "<template id='dataTableLegend'><div>" . $legend[$tableActive] . "</div></template>";
 }
 
+$gTxt = 'gTxt';
+
 $field['content'] = <<<main
 <div class="d-flex flex-wrap flex-md-nowrap align-items-center mx-2 gap-3">
   <div class="table-name-header">
     <h2 id="tableNameField"></h2>
   </div>
   <div id="btnField" class="px-1">
-    <button type="button" class="btn btn-transparent" id="btnSave" disabled>Сохранить</button>
+    <button type="button" class="btn btn-transparent" id="btnSave" disabled>{$gTxt('Save')}</button>
   </div>
   <div id="viewField" class="ms-md-auto">
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" data-action="adminType" checked>
-      <label class="form-check-label" for="formMode">Режим форм</label>
+      <input class="form-check-input" type="radio" name="adminType" value="form" id="formMode" data-action="adminType">
+      <label class="form-check-label" for="formMode">{$gTxt('Form mode')}</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="adminType" value="table" id="formTable" data-action="adminType">
-      <label class="form-check-label" for="formTable">Режим таблицы</label>
+      <input class="form-check-input" type="radio" name="adminType" value="table" id="formTable" data-action="adminType" checked>
+      <label class="form-check-label" for="formTable">{$gTxt('Table mode')}</label>
     </div>
     <div class="form-check">
       <input class="form-check-input" type="radio" name="adminType" value="config" id="setupMode" data-action="adminType">
-      <label class="form-check-label" for="setupMode">Настройка формы (Для опытных)</label>
+      <label class="form-check-label" for="setupMode">{$gTxt('Setup mode (Expert only)')}</label>
     </div>
   </div>
 </div>
 <div id="insertToDB" class="h-25"></div>
 <div class="position-fixed bottom-0 end-0" style="z-index: 10">
-  <input type="button" id="legend" class="btn btn-gray m-2" value="Помощь">
+  <input type="button" id="legend" class="btn btn-gray m-2" value="{$gTxt('Help')}">
 </div>
 main;
 

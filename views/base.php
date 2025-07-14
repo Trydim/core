@@ -42,7 +42,7 @@ $jsGlobalConst = json_encode([
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= $main->url->getPath() ?>favicon.ico">
   <?php if ($isAuth || $main->url->getRoute() === 'login') { ?>
-    <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=9ae425560d6'>
+    <link rel="stylesheet" href='<?= CORE_CSS ?>admin.css?ver=1.2'>
   <?php } else { ?>
     <style>.main-wrapper {--theme-sidebar-width: 0;}</style>
   <?php }
@@ -55,8 +55,8 @@ $jsGlobalConst = json_encode([
     window.CMS_CONST = '<?= $jsGlobalConst ?>'
   </script>
 
-  <link rel="prefetch" href="<?= CORE_JS ?>src.js?ver=1353431" as="script" crossorigin>
-  <link rel="prefetch" href="<?= CORE_JS ?>main.js?ver=16844b1b6f1" as="script" crossorigin>
+  <link rel="prefetch" href="<?= CORE_JS ?>src.js?ver=1.2" as="script" crossorigin>
+  <link rel="prefetch" href="<?= CORE_JS ?>main.js?ver=1.2" as="script" crossorigin>
 
   <?php array_map(function ($item) { ?>
     <link rel="prefetch" href="<?= $item ?>" as="script" crossorigin>
@@ -97,8 +97,8 @@ $jsGlobalConst = json_encode([
   </main>
 <?php } else echo $global; ?>
 
-<script defer type="module" src="<?= CORE_JS ?>src.js?ver=1353431"></script>
-<script defer type="module" src="<?= CORE_JS ?>main.js?ver=16844b1b6f1"></script>
+<script defer type="module" src="<?= CORE_JS ?>src.js?ver=1.2"></script>
+<script defer type="module" src="<?= CORE_JS ?>main.js?ver=1.2"></script>
 
 <?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= $item ?>"></script>

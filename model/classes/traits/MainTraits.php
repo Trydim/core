@@ -288,13 +288,10 @@ trait Authorization {
 trait Dictionary
 {
   /**
-   * Array of available dictionary
+   * Array of available locales
    * @var array
    */
-  private array $dictionaryList = [
-    'en' => ['name' => 'English', 'code' => 'en'],
-    'ru' => ['name' => 'Русский', 'code' => 'ru'],
-  ];
+  private array $localesList = [];
 
   /**
    * @var string - Директория хранения пользовательских переводов.
@@ -314,7 +311,7 @@ trait Dictionary
   /**
    * @var string - Используемый язык, по умолчанию равен базовому
    */
-  private string $targetLang = '';
+  private string $targetLocale = '';
 
   /** @var array<array{name: string, code: string}> $availableLanguages */
   private array $availableLanguages;
@@ -335,11 +332,78 @@ trait Dictionary
   public static string $BASE_LANG = 'ru';
 
   /**
+   * If locales is not need, use base lang
+   * @return Main
+   */
+  private function initLocales(): Main {
+    $lang = '';
+    $currentLang = $_COOKIE['lang'] ?? '';
+    $useLocales  = $this->getCmsParam(VC::LOCALES);
+
+    if ($useLocales) {
+      $this->localesList = $this->db->loadLocales();
+      $lang = $currentLang;
+    }
+
+    if ($lang) {
+      // Check available locales
+      $availableLocales = array_column($this->getAvailableLanguages(), 'code');
+
+      if (count($availableLocales)) $lang = in_array($lang, $availableLocales) ? $lang : $availableLocales[0];
+    } else {
+      $lang = $this->getCmsParam(VC::LOCALES_BASE_LANG, $this::$BASE_LANG);
+    }
+
+    $this->setLocale($lang);
+
+    if ($useLocales && $currentLang !== $lang) setcookie('lang', $lang, time() + (3600 * 24 * 3600), '/');
+
+    return $this;
+  }
+
+  /**
+   * Загрузка переводов из CSV-файлов
+   *
+   * @param ?array<int, string> $csvPaths
+   * @return array<string, string>
+   */
+  private function loadCSVDictionary(): array
+  {
+    $csvPaths = $this->db->scanDirCsv($this->DICTIONARY_PATH_FILES);
+
+    if (count($csvPaths) === 0) return [];
+
+    $csvParam = [
+      'id' => 'id',
+      'value' => $this->targetLocale,
+    ];
+
+    $csvChunks = [];
+
+    foreach ($csvPaths as $csv) {
+      $csvPath = ABS_SITE_PATH . $this->DICTIONARY_PATH_FILES . $csv['fileName'];
+      $csvData = loadCSV($csvParam, $csvPath);
+
+      if (is_array($csvData)) {
+        $csvChunks[] = $csvData;
+      }
+    }
+
+    $csvAllData = array_merge([], ...$csvChunks);
+
+    if (!empty($csvAllData)) {
+      $csvDictionary = array_column($csvAllData, 'value', 'id');
+    }
+
+    return $csvDictionary ?? [];
+  }
+
+  /**
    * Загружает и объединяет базовый словарь, словарь дилера и csv словари
    *
    * @return array<string, string>
    */
-  private function loadDictionary(): array
+  private function loadAllDictionary(): array
   {
     $dictionary = [];
 
@@ -366,43 +430,6 @@ trait Dictionary
     }
 
     return $dictionary;
-  }
-
-  /**
-   * Загрузка переводов из CSV-файлов
-   *
-   * @param ?array<int, string> $csvPaths
-   * @return array<string, string>
-   */
-  private function loadCSVDictionary(): array
-  {
-    $csvPaths = $this->db->scanDirCsv($this->DICTIONARY_PATH_FILES);
-
-    if (count($csvPaths) === 0) return [];
-
-    $csvParam = [
-      'id' => 'id',
-      'value' => $this->targetLang,
-    ];
-
-    $csvChunks = [];
-
-    foreach ($csvPaths as $csv) {
-      $csvPath = ABS_SITE_PATH . $this->DICTIONARY_PATH_FILES . $csv['fileName'];
-      $csvData = loadCSV($csvParam, $csvPath);
-
-      if (is_array($csvData)) {
-        $csvChunks[] = $csvData;
-      }
-    }
-
-    $csvAllData = array_merge([], ...$csvChunks);
-
-    if (!empty($csvAllData)) {
-      $csvDictionary = array_column($csvAllData, 'value', 'id');
-    }
-
-    return $csvDictionary ?? [];
   }
 
   /**
@@ -446,86 +473,26 @@ trait Dictionary
    * Результаты работы сохраняются в свойствах класса:
    * - $dictionary - основной словарь переводов
    * - $dbDictionary - словарь переводов для базы данных
-   * - $targetLang - целевой язык перевода
+   * - $targetLocale - целевой язык перевода
    * - $availableLanguages - доступные языки
    *
    * @return void
    */
-  private function initLocales(): void
+  private function loadDictionary(): void
   {
     if ($this->dictionary) return;
 
-    /*//Если целевой язык уже установлен, через метод setTargetLang, значит будет один язык (для заказов и шаблонов pdf, excel)
-    if (!isset($this->targetLang)) {
-      $this->targetLang = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
+    /*//Если целевой язык уже установлен, через метод setLocale, значит будет один язык (для заказов и шаблонов pdf, excel)
+    if (!isset($this->targetLocale)) {
+      $this->targetLocale = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
       $this->initAvailableLanguages($locales);
     }*/
 
-    $this->dictionaryPath   = "lang/{$this->targetLang}/dictionary.php";
-    $this->dbDictionaryPath = "lang/{$this->targetLang}/dbDictionary.php";
+    $this->dictionaryPath   = "lang/{$this->targetLocale}/dictionary.php";
+    $this->dbDictionaryPath = "lang/{$this->targetLocale}/dbDictionary.php";
 
-    $this->dictionary = $this->loadDictionary();
+    $this->dictionary   = $this->loadAllDictionary();
     $this->dbDictionary = $this->loadDbDictionary();
-  }
-
-  /**
-   * Принудительно устанавливает целевой язык,
-   * нужно вызывать до инициализации словарей (нужно при отображении заказа, pdf, excel)
-   * @param string $lang ru, en,
-   * @return Main
-   */
-  public function setTargetLang(string $lang = ''): Main
-  {
-    //if (isset($this->targetLang)) return;
-    $this->targetLang = $lang === '' ? $this::$BASE_LANG : $lang;
-
-    return $this;
-  }
-
-  /**
-   * Функция для использования словаря на фронтенде
-   * @return string
-   */
-  public function initDictionary(): string
-  {
-    $this->initLocales();
-
-    return $this->getFrontContent('dictionaryData', $this->dictionary);
-  }
-
-  /**
-   * @return array<string, string> возвращает массив словаря
-   */
-  public function getDictionary(): array
-  {
-    $this->initLocales();
-    return $this->dictionary;
-  }
-
-  /**
-   * @return array<string, array<string, string>> возвращает массив словаря баз данных
-   */
-  public function getDbDictionary(): array
-  {
-    $this->initLocales();
-    return $this->dbDictionary;
-  }
-
-  /**
-   * @return string возвращает целевой язык, по умолчанию $BASE_LANG = 'ru'
-   */
-  public function getTargetLang(): string
-  {
-    $this->initLocales();
-    return $this->targetLang;
-  }
-
-  /**
-   * @return array возвращает доступные языки или пустой массив
-   */
-  public function getAvailableLanguages(): array
-  {
-    return array_values($this->availableLanguages ?? $this->dictionaryList);
   }
 
   /**
@@ -537,32 +504,116 @@ trait Dictionary
    *   } $locales
    * @return void
    */
-  private function initAvailableLanguages(array $locales = []): void
+  /*private function initAvailableLanguages(array $locales = []): array
   {
+
     if ($this->isDealer()) {
-      // Нет так. Надо несколько вариантов:
+      // Не так. Надо несколько вариантов:
       // Проект не предусматривает что есть языки. Вообще.
       // Проект предусматривает что есть языки и дилерам можно пользоваться всеми без ограничений.
       // Проект предусматривает что есть языки и дилерам можно задать доступные.
-      $availableLanguages = $this->user['dealer']['settings']['available_languages'] ?? [];
+      $availableLanguages = $this->user['dealer'];
 
       //Если у дилера нет доступных языков в настройках, то будет отсутвовать выбор языка у дилера
       if (!$availableLanguages) {
-        $this->targetLang = $locales['TARGET_LANG'] ?? $locales['BASE_LANG'] ?? self::$BASE_LANG;
+        $this->targetLocale = $locales['TARGET_LANG'] ?? $locales['BASE_LANG'] ?? self::$BASE_LANG;
         return;
       }
 
       $this->availableLanguages = $availableLanguages;
-      if (!in_array($this->targetLang, array_column($availableLanguages, 'code'), true)) {
-        $this->targetLang = $availableLanguages[0]['code'] ?? self::$BASE_LANG;
+      if (!in_array($this->targetLocale, array_column($availableLanguages, 'code'), true)) {
+        $this->targetLocale = $availableLanguages[0]['code'] ?? self::$BASE_LANG;
       }
-
-      return;
     }
 
-    $this->availableLanguages = $locales['ALL_LANGUAGES'] ?? [];
+    return $this->localesList;
+    // Зачем?
+    // $this->availableLanguages = $locales['ALL_LANGUAGES'] ?? [];
+  }*/
+
+  /**
+   * Принудительно устанавливает целевой язык,
+   * нужно вызывать до инициализации словарей (нужно при отображении заказа, pdf, excel)
+   * @param string $locale ru, en,
+   * @return Main
+   */
+  public function setLocale(string $locale = ''): Main
+  {
+    $this->targetLocale = $locale === '' ? $this->getCmsParam(VC::LOCALES_BASE_LANG, $this::$BASE_LANG)
+                                         : $locale;
+
+    if ($_COOKIE['lang'] ?? '' !== $this->targetLocale) {
+      setcookie('lang', $this->targetLocale, time() + (3600 * 24 * 3600), '/');
+    }
+
+    return $this;
   }
 
+  /**
+   * Функция для использования словаря на фронтенде
+   * @return string
+   */
+  public function initDictionary(): string
+  {
+    $this->loadDictionary();
+
+    return $this->getFrontContent('dictionaryData', $this->dictionary);
+  }
+
+  /**
+   * @return array<string, string> возвращает массив словаря
+   */
+  public function getDictionary(): array
+  {
+    $this->loadDictionary();
+    return $this->dictionary;
+  }
+
+  /**
+   * @return array<string, array<string, string>> возвращает массив словаря баз данных
+   */
+  public function getDbDictionary(): array
+  {
+    $this->loadDictionary();
+    return $this->dbDictionary;
+  }
+
+  /**
+   * @return string возвращает целевой язык, по умолчанию $BASE_LANG = 'ru'
+   */
+  public function getTargetLang(): string
+  {
+    $this->loadDictionary();
+    return $this->targetLocale;
+  }
+
+  /**
+   * Надо 3 вараинта:
+   * Когда управляем доступными языками через старницу управляения языками (страницы пока нет) загружаем все доступные.
+   * Когда управляем доступными языками для дилера через страницу дилеры, загружаем также все?
+   * Когда вход под дилером, загружать только доступные ему
+   *
+   *
+   * @return array возвращает доступные языки
+   */
+  public function getAvailableLanguages(): array
+  {
+    $result = $this->localesList;
+
+    if ($this->isDealer()) {
+      $dealer = $this->setDealerParam()->getLogin(VC::USER_DEALER);
+      $dealerLocales = array_column($dealer['settings']['locales'] ?? [], 'ID');
+
+      // If dealer locales empty then available all locales
+      if (count($dealerLocales)) {
+        $result = array_filter($result, function ($item) use ($dealerLocales) {
+          return in_array($item['ID'], $dealerLocales);
+        });
+      }
+    }
+
+    return array_values($result);
+  }
 }
 
 /** Trait Cache */
@@ -754,7 +805,6 @@ trait Hooks
  */
 trait Utilities
 {
-
   /**
    * @param string $id
    * @param mixed $data

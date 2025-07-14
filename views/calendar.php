@@ -13,7 +13,7 @@ $field['content'] = <<<CONTENT
 CONTENT;
 
 $field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>';
-$gTxt = 'gTxt'; //функция перевода для вызова в Heredoc
+$gTxt = 'gTxt'; // Функция перевода для вызова в Heredoc
 
 $field['footerContent'] .= <<<footerContent
 

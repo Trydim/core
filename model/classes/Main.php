@@ -53,6 +53,11 @@ final class Main {
   public $frontSettingInit = false;
 
   /**
+   * @var DbMain
+   */
+  public $db;
+
+  /**
    * @var UrlGenerator
    */
   public $url;
@@ -76,36 +81,21 @@ final class Main {
    * Main constructor.
    * @param array $cmsParam
    * @param array $dbConfig
+   * @throws RedException
    */
   public function __construct(array $cmsParam, array $dbConfig) {
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
 
+    $this->db       = new DbMain($this);
     $this->url      = new UrlGenerator($this, 'core/');
     $this->response = new Response($this);
     $this->dealer   = new Dealer($this);
   }
 
-  /**
-   * @param string $value
-   * @return DbMain|Dealer|UrlGenerator|Response
-   * @throws RedException
-   */
-  public function __get(string $value) {
-    if ($value === 'db') {
-      $this->db = new DbMain($this);
-    }
-
-    return $this->$value;
-  }
   public function afterConstDefine() {
-    // If locales is not need, use base lang
-    $lang = $this->getCmsParam(VC::LOCALES) ? ($_COOKIE['lang'] ?? '') : '';
-    $this->setTargetLang($lang ?: $this->getCmsParam(VC::LOCALES_BASE_LANG, ''));
-
-    if (empty($lang)) setcookie('lang', $this::$BASE_LANG, time() + (3600 * 24 * 3600), '/');
-
-    $this->loadSetting()
+    $this->initLocales()
+         ->loadSetting()
          ->setHooks();
   }
   public function beforeController() {
