@@ -90,7 +90,8 @@ export default {
 @import "./../index.scss";
 
 .table-wrapper {
-  overflow-y: auto;
+  overflow: auto;
+  max-height: 100%;
 
   .table-title {
     padding: rem(6) 0;
@@ -100,7 +101,7 @@ export default {
 
 .diff-table {
   border-collapse: collapse;
-  width: 100%;
+
   font-size: rem(13);
 
   th, td {
@@ -114,6 +115,12 @@ export default {
     background-color: #f5f5f5;
     position: sticky;
     top: 0;
+    z-index: 1;
+  }
+
+  tbody tr td:first-child {
+    position: sticky;
+    left: 0;
     z-index: 1;
   }
 

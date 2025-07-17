@@ -1,7 +1,7 @@
 <template>
   <div class="tree">
     <div v-if="treeData.length === 0" class="empty-message">
-      История изменений отсутствует
+      {{ $t('История изменений отсутствует') }}
     </div>
 
     <div v-for="node in treeData" :key="node.path" class="tree-node">
@@ -69,11 +69,10 @@ export default {
   user-select: none;
 
   .tree-node {
-    margin-left: rem(20);
   }
 
   .node-item {
-    padding: 5px rem(10);
+    padding: rem(4) rem(8);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -99,7 +98,7 @@ export default {
   }
 
   .node-icon {
-    margin-right: 8px;
+    margin-right: rem(5);
   }
 
   .node-name {
@@ -108,11 +107,11 @@ export default {
 
   .children {
     border-left: 1px dashed #ccc;
-    margin-left: rem(10);
+    margin-left: rem(8);
   }
 
   .child-nodes {
-    margin-left: rem(15);
+    margin-left: rem(8);
   }
 
   .empty-message {

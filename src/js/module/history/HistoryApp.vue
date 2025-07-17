@@ -96,39 +96,41 @@ export default {
 .history-app {
   display: grid;
   grid-template-columns: rem(360) 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 0.8fr 1.2fr;
   gap: rem(20);
-  height: 100%;
+  height: 95vh;
   max-height: 100%;
-  padding: rem(20);
+  padding: rem(10);
 }
 
 .tree-container {
   grid-column: 1;
   grid-row: 1;
-  max-height: 40vh;
+  height: 100%;
   overflow-y: auto;
   border: 1px solid #eee;
   border-radius: rem(8);
-  padding: rem(15);
+  padding: rem(10);
 }
 
 .list-container {
   grid-column: 1;
   grid-row: 2;
+  height: 100%;
   overflow-y: auto;
   border: 1px solid #eee;
   border-radius: rem(8);
-  padding: rem(15);
+  padding: rem(10);
 }
 
 .diff-container {
   grid-column: 2;
   grid-row: 1 / span 2;
-  overflow: auto;
+  overflow: hidden;
   border: 1px solid #eee;
   border-radius: rem(8);
   padding: rem(15);
+  height: 100%;
 }
 
 </style>

@@ -11,25 +11,29 @@ const applyAppSettings = (app) => {
   };
 }
 
-const btnShowHistory = document.getElementById('btnShowHistory');
 
-if (btnShowHistory) {
-  const app = createApp(Widget)
+window.addEventListener("DOMContentLoaded", (e) => {
+  const btnShowHistory = document.getElementById('btnShowHistory');
 
-  applyAppSettings(app);
+  if (btnShowHistory) {
+    const app = createApp(Widget)
 
-  const widgetContainer = document.createElement('div');
-  app.mount(widgetContainer);
+    applyAppSettings(app);
 
-  btnShowHistory.addEventListener('click', () => {
-    window.dispatchEvent(new Event('open-history-widget'));
-  });
+    const widgetContainer = document.createElement('div');
+    app.mount(widgetContainer);
 
-} else {
-  const app = createApp(App)
+    btnShowHistory.addEventListener('click', () => {
+      window.dispatchEvent(new Event('open-history-widget'));
+    });
 
-  applyAppSettings(app);
+  } else {
+    const app = createApp(App)
 
-  app.mount('#history-page');
-}
+    applyAppSettings(app);
 
+    app.mount('#history-page');
+  }
+
+
+});

@@ -108,7 +108,7 @@ export default {
 
 .diff-wrapper {
   padding: rem(10);
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .toggle-row {
@@ -125,6 +125,7 @@ export default {
 .tables-row {
   display: flex;
   gap: 20px;
-  min-width: rem(800);
+  height: calc(100vh - 150px);
+  align-items: flex-start;
 }
 </style>

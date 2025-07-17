@@ -4,7 +4,6 @@
       <button class="close-btn" @click="close">×</button>
 
       <div class="modal-content">
-        <div class="modal-content-scrollable">
 
           <div class="history-widget">
             <div class="list-container">
@@ -15,7 +14,6 @@
             </div>
           </div>
 
-        </div>
       </div>
     </div>
   </teleport>
@@ -76,7 +74,7 @@ export default {
 .history-widget {
   display: grid;
   grid-template-columns: rem(360) 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr;
   gap: rem(20);
   height: 100%;
   padding: rem(20);
@@ -87,16 +85,17 @@ export default {
   overflow-y: auto;
   border: 1px solid #eee;
   border-radius: rem(8);
-  padding: rem(15);
+  padding: rem(10);
+  height: 100%;
 }
 
 .diff-container {
   grid-column: 2;
-  overflow: auto;
+  overflow: hidden;
   border: 1px solid #eee;
   border-radius: rem(8);
-  padding: rem(15);
-
+  padding: rem(10);
+  height: 100%;
 }
 
 .modal-history-overlay {
@@ -123,18 +122,10 @@ export default {
   padding: 0;
 }
 
-.modal-content-scrollable {
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-  padding: 20px;
-  border-radius: inherit;
-}
-
 .close-btn {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
   font-size: 20px;
   background: white;
   border: none;
@@ -143,8 +134,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
 }
 
