@@ -113,7 +113,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 8px;
+  border-radius: rem(8);
   height: 96vh;
   width: 96vw;
   overflow: hidden;
@@ -124,9 +124,9 @@ export default {
 
 .close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 20px;
+  top: rem(12);
+  right: rem(12);
+  font-size: rem(20);
   background: white;
   border: none;
   cursor: pointer;
@@ -134,8 +134,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: rem(30);
+  height: rem(30);
   border-radius: 50%;
 }
 

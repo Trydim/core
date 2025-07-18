@@ -124,7 +124,7 @@ export default {
 
 .tables-row {
   display: flex;
-  gap: 20px;
+  gap: rem(20);
   height: calc(100vh - 150px);
   align-items: flex-start;
 }
