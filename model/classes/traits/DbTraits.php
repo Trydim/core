@@ -626,9 +626,9 @@ trait DbCsv
 
       $history = new CsvHistory($csvPath, $csvHistoryPath);
       $metaFields = [
-        'userId' => (int)$this->main->user['id'],
-        'userName' => $this->main->user['name'],
-        'userLogin' => $this->main->user['login'],
+        'userId'    => (int)$this->main->getLogin('id'),
+        'userName'  => $this->main->getLogin('name'),
+        'userLogin' => $this->main->getLogin(''),
       ];
 
       $history->saveBackup($this->csvTable, $fileContent, $metaFields);

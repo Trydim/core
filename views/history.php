@@ -6,6 +6,4 @@ if (!defined('MAIN_ACCESS')) die('access denied!');
  */
 global $field;
 
-$field[VC::BASE_CONTENT] .= '<div class="history-page" id="history-page"></div>';
-
-
+$field[VC::BASE_CONTENT] = '<div class="history-page" id="history-page"></div>';
