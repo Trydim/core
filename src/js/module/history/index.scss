@@ -1,0 +1,13 @@
+@use "sass:math";
+
+// Px to rem function
+@function rem($px) {
+  @if (type-of($px) != number) {
+    @return $px;
+  }
+  @return math.div($px, 16) + rem;
+}
+
+.history-page {
+  height: 100%;
+}

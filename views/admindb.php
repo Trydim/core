@@ -19,6 +19,7 @@ $field['content'] = <<<main
   </div>
   <div id="btnField" class="px-1">
     <button type="button" class="btn btn-transparent" id="btnSave" disabled>{$gTxt('Save')}</button>
+    <button type="button" class="btn btn-transparent" id="btnShowHistory">{$gTxt('Change history')}</button>
   </div>
   <div id="viewField" class="ms-md-auto">
     <div class="form-check">
