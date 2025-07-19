@@ -1,6 +1,5 @@
 <template>
-  <div ref="preview" class="w-100 border bg-white flex-grow-1 p-2" style="min-height: 15rem">
-  </div>
+  <div ref="preview" class="w-100 border bg-white flex-grow-1 p-2" style="min-height: 15rem"></div>
 </template>
 
 <script>

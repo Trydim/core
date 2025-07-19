@@ -8,8 +8,7 @@
       <Fields v-if="selectedSection" ref="fields"
               :selectedSection="selectedSection"
               :contentData="contentData"
-              v-model="selectedField"
-      ></Fields>
+              v-model="selectedField" />
     </div>
     <div class="col-8">
       <div>
@@ -18,12 +17,12 @@
             <li class="nav-item">
               <span class="nav-link"
                     :class="{active: !editorTypeHtml}"
-                    @click="editorTypeHtml = false">Редактор</span>
+                    @click="editorTypeHtml = false">{{ $t('Editor') }}</span>
             </li>
             <li class="nav-item">
               <span class="nav-link"
                     :class="{active: editorTypeHtml}"
-                    @click="editorTypeHtml = true">Разметка</span>
+                    @click="editorTypeHtml = true">{{ $t('Html') }}</span>
             </li>
           </ul>
         </h5>
@@ -35,7 +34,7 @@
       <div class="d-flex flex-column align-items-center mt-1">
         <h5 class="nav nav-pills">
           <span class="nav-item">
-            <span class="nav-link">Предпросмотр</span>
+            <span class="nav-link">{{ $t('Preview') }}</span>
           </span>
         </h5>
         <Preview :content="value" />
@@ -66,6 +65,7 @@ export default {
   data: () => ({
     newValue: 1,
     value: undefined,
+    locale: f.cookieGet('lang') || f.BASE_LANG,
     editorTypeHtml: false,
 
     selectedSection: '',
@@ -74,11 +74,13 @@ export default {
   }),
   watch: {
     value() {
-      this.fields[this.selectedField].value = this.value;
+      this.fields[this.selectedField]['value_' + this.locale] = this.value;
     },
 
     selectedField() {
-      this.value = this.fields[this.selectedField].value;
+      const field = this.fields[this.selectedField];
+
+      this.value = field['value_' + this.locale] || field.value; // Support old version
       this.newValue = f.random();
     },
   },

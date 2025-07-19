@@ -657,12 +657,16 @@ trait ContentEditor {
     }
 
     if ($flatten) {
-      $data = array_reduce($data, function($r, $section) use ($assoc) {
+      $locale = $this->main->getTargetLang();
+
+      $data = array_reduce($data, function($r, $section) use ($locale, $assoc) {
         foreach ($section['fields'] as $key => $value) {
-          if ($assoc) $r[$key] = $value['value'];
+          $value = $value['value_' . $locale] ?? $value['value'];
+
+          if ($assoc) $r[$key] = $value;
           else $r[] = [
             'id' => $key,
-            'value' => $value['value'],
+            'value' => $value,
           ];
         }
 

@@ -35,7 +35,11 @@ export default class extends Main {
     this.component = {};
 
     this.self = {
-      install: app => app.config.globalProperties.$db = this,
+      install: app => {
+        app.config.globalProperties.$db = this
+
+        app.config.globalProperties.$t = (id, ...params) => window._(id, ...params);
+      },
     };
   }
   vueInit() {

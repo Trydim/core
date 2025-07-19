@@ -28,6 +28,7 @@ $jsGlobalConst = json_encode([
   'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG),
   'DEAL_URI_SHARED' => $main->url->getUri(true) . $main->getCmsParam('SHARE_PATH'),
   'INIT_SETTING'  => $main->frontSettingInit,
+  'BASE_LANG'     => $main::$BASE_LANG,
 ]);
 
 ?>

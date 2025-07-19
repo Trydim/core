@@ -8,7 +8,7 @@
 
         <span v-if="showSectionEditor(key)">
           <label class="d-flex align-items-center justify-content-around">
-            <span>Название</span>
+            <span>{{ $t('Name') }}</span>
             <input type="text" class="ms-1" v-model="item.name" @blur="changeSection($event.target, key)">
             <i v-if="count > 1" class="ms-3 pi pi-trash" @click.stop="deleteField(key, item)"></i>
             <i class="ms-3 pi"

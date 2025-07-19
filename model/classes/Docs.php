@@ -430,6 +430,37 @@ class Docs {
   }
 
   /**
+   * Add bottom signature form
+   * @param string $position
+   * @param string $template -
+   * @param float  $size       The font size, in points
+   */
+  public function addSignatureForm(
+    $position = 'left',
+    $customerName,
+    $userName,
+    $size = 8
+  ) {
+    $userName = strip_tags($userName);
+    $customerName = strip_tags($customerName);
+    $isPortrait = $this->pdfOrientation === 'P';
+    $getX = function ($x) use ($isPortrait) { return round($x / 100 * ($isPortrait ? 612 : 792)); };
+    $getY = function ($y) use ($isPortrait) { return round($y / 100 * ($isPortrait ? 792 : 612)); };
+    $template = "ФИО Заказчика  $customerName Подпись _______        ФИО Менеджера $userName Подпись _______";
+
+    switch ($position) {
+      default: case 'left':
+      $x = $getX(3);  $y = $getY(90);
+      break;
+      case 'right':
+        $x = $getX(97); $y = $getY(90);
+        break;
+    }
+
+    $this->setFooter($x, $y,  $template, 'DejaVu Sans', $size);
+  }
+
+  /**
    * @param string $dest
    * @return array|string
    */

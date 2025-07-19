@@ -479,7 +479,11 @@ function httpRequest(string $url, array $config = [], $params = []) {
     CURLOPT_TIMEOUT => $config['timeout'] ?? 45,
   ];
 
-  if (isset($config['login']) && isset($config['password'])) {
+  if (isset($config['auth'])) {
+    $curlConfig[CURLOPT_HTTPHEADER][] = 'Authorization:' . $config['auth'];
+  }
+
+  else if (isset($config['login']) && isset($config['password'])) {
     $curlConfig[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
     $curlConfig[CURLOPT_USERPWD]  = $config['login'] . ':' . $config['password'];
   }
@@ -488,10 +492,12 @@ function httpRequest(string $url, array $config = [], $params = []) {
     $curlConfig[CURLOPT_HTTPGET] = true;
     $curlConfig[CURLOPT_URL] .= '?' . http_build_query($params);
   } else {
+    $contentType = $config['contentType'] ?? 'application/json; charset=utf-8';
+
     $curlConfig[CURLOPT_HTTPGET] = false;
     $curlConfig[CURLOPT_POST] = true;
-    $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Type: ' . ($config['contentType'] ?? 'application/json; charset=utf-8');
-    $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Length: ' . strlen(is_string($params) ? $params : json_encode($params));
+    $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Type: ' . $contentType;
+    if (is_string($params)) $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Length: ' . strlen($params);
     $curlConfig[CURLOPT_POSTFIELDS]   = $params;
   }
 

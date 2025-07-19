@@ -14,6 +14,8 @@ export default {
   SITE_PATH    : sitePath,
   MAIN_PHP_PATH: cms['MAIN_PHP_PATH'] || (sitePath + 'index.php'),
 
+  BASE_LANG    : cms['BASE_LANG'],
+
   /**
    * @var {string} PATH_IMG
    * @deprecated use URI_IMG

@@ -18,6 +18,8 @@ declare type CMSGlobalObject = {
   SITE_PATH: string
   /** path to calc index.php */
   MAIN_PHP_PATH: string
+  /** Base lang from config or from Main class */
+  BASE_LANG: string,
   /**
    * use URI_IMG
    * @deprecated

@@ -1,18 +1,18 @@
 <template>
   <div class="mb-3 form-floating">
-    <input type="text" class="form-control" id="search" v-model="search" placeholder="Поиск"
+    <input type="text" class="form-control" id="search" v-model="search" :placeholder="$t('Search')"
            @focus="showResult = true"
            @blur="showResult = false"
     >
-    <label for="search">Поиск</label>
+    <label for="search">{{ $t('Search') }}</label>
 
     <div v-if="showResult && result.length" class="position-absolute start-0 top-100 bg-white w-100">
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col" style="width: 10%">Раздел</th>
-            <th scope="col" style="width: 15%">Значение</th>
-            <th scope="col">Контент</th>
+            <th scope="col" style="width: 10%">{{ $t('Section') }}</th>
+            <th scope="col" style="width: 15%">{{ $t('Value') }}</th>
+            <th scope="col">{{ $t('Content') }}</th>
           </tr>
         </thead>
         <tbody style="cursor: pointer">

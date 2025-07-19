@@ -10,7 +10,7 @@
 
       <template v-if="showFieldEditor(key)">
         <label class="d-flex align-items-center">
-          <span class="col-4">Ключ</span>
+          <span class="col-4">{{ $t('Key') }}</span>
           <input type="text" class="ms-1 col-6" :value="key"
                  :disabled="item.locked"
                  @blur="changeKey($event.target, key, item)">
@@ -21,7 +21,7 @@
         </label>
 
         <label class="d-flex align-items-center">
-          <span class="col-4">Название</span>
+          <span class="col-4">{{ $t('Name') }}</span>
           <input type="text" class="ms-1 col-6" v-model="item.name" @blur="changeField($event.target, key)">
           <i v-if="count > 1" class="ms-auto pi pi-trash pointer" @click.stop="deleteField(key, item)"></i>
         </label>

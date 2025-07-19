@@ -47,7 +47,7 @@ export default {
       if (k === 'tab' && editor.hasFocus()) {
         let cursor = editor.getCursor(),
             line = editor.getLine(cursor.line),
-            str = line.substr(0, cursor.ch),
+            str = line.substring(0, cursor.ch),
             sl = str.length;
 
         if (str[sl - 1] && /[a-z]/.test(str[sl - 1])) {
@@ -57,7 +57,7 @@ export default {
           if (str[sl - word.length - 1] !== '<') {
             let data = editor.getValue().split('\n'),
                 scroll = editor.getScrollInfo();
-            data[cursor.line] = str.substr(0, sl - word.length) + '<' + word + '></' + word + '>' + line.substr(sl + 1);
+            data[cursor.line] = str.substring(0, sl - word.length) + '<' + word + '></' + word + '>' + line.substr(sl + 1);
 
             editor.setValue(data.join('\n'));
             editor.setCursor(cursor.line, cursor.ch + 1);
