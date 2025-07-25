@@ -73,7 +73,8 @@ class CsvHistory
 
     return $this->createBackup($relativeFilePath, $oldContent, [
       'note' => 'Initial backup from disk before first save',
-      'prevBackupId' => null
+      'prevBackupId' => null,
+      'timestamp' => 1
     ]);
   }
 
@@ -128,9 +129,7 @@ class CsvHistory
       }
     }
 
-
-    // Убираем последний бэкап из списка
-    if (count($history) > 1) {
+    if (!empty($history)) {
       array_pop($history);
     }
 
