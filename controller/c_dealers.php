@@ -18,24 +18,45 @@ if (includes($main->url->getRequestUri(), 'update')) {
   return;
 }
 
-else if (includes($main->url->getRequestUri(), 'database')) {
+if (includes($main->url->getRequestUri(), 'script')) {
+  $start = time();
+
+  $nameScript = $_GET['name'] ?? null;
+
+  if (!$nameScript) {
+    $main->response->setContent('<br>The script name is not specified in ' . (time() - $start) . ' sec!');
+    return;
+  }
+
+  $scriptPath = ABS_SITE_PATH . "core/scripts/{$nameScript}/index.php";
+
+  if (!file_exists($scriptPath)) {
+    $main->response->setContent('<br>The script not found in ' . (time() - $start) . ' sec!');
+    return;
+  }
+
+  include_once $scriptPath;
+
+  $main->response->setContent('<br>The script is executed in ' . (time() - $start) . ' sec!');
+  return;
+} else if (includes($main->url->getRequestUri(), 'database')) {
   $param['isDBEditor'] = true;
   $param['dealerList'] = [];
 
   foreach ($main->db->loadDealers(false, false) as $dealer) {
     $param['dealerList'][] = [
-      'id'   => $dealer['id'],
+      'id' => $dealer['id'],
       'name' => $dealer['name'],
     ];
   }
 }
 
 $field = [
-  'pageTitle'     => gTxt('Dealers'),
-  'sideRight'     => '',
+  'pageTitle' => gTxt('Dealers'),
+  'sideRight' => '',
   'footerContent' => $main->initDictionary(),
-  'cssLinks'  => [CORE_CSS . 'module/dealers.css?ver=8cdf94ab40'],
-  'jsLinks'   => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],
+  'cssLinks' => [CORE_CSS . 'module/dealers.css?ver=8cdf94ab40'],
+  'jsLinks' => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],
 ];
 
 $dealerProps = [];
@@ -43,8 +64,8 @@ $dealerProps = [];
 // CMS Languages is enabled
 if ($main->getCmsParam(VC::LOCALES)) {
   $dealerProps['prop_locales'] = [
-    'name'   => gTxt('Available languages'),
-    'type'   => 'multiSelect',
+    'name' => gTxt('Available languages'),
+    'type' => 'multiSelect',
     'values' => array_map(function ($row) {
       $row['id'] = $row['ID'];
       return $row;
@@ -59,8 +80,8 @@ foreach ($main->db->getTables('prop') as $table) {
   $prop = $dealerProps[$table['dbTable']] ?? [];
 
   $dealerProps[$table['dbTable']] = [
-    'name'   => $prop['name'] ?? $table['name'],
-    'type'   => $prop['type'] ?? 'select',
+    'name' => $prop['name'] ?? $table['name'],
+    'type' => $prop['type'] ?? 'select',
     'values' => array_map(function ($row) {
       $row['id'] = $row['ID'];
       return $row;
@@ -70,7 +91,9 @@ foreach ($main->db->getTables('prop') as $table) {
 $field['footerContent'] .= $main->getFrontContent('dataProperties', $dealerProps);
 
 // If user have table property, add libs
-$haveTable = array_find($dealerProps, function ($prop) { return $prop['type'] === 'table'; });
+$haveTable = array_find($dealerProps, function ($prop) {
+  return $prop['type'] === 'table';
+});
 if (!empty($haveTable)) {
   array_unshift($field['jsLinks'], CORE_JS . 'libs/handsontable.full.min.js?ver=f3bb2b6859');
 }
