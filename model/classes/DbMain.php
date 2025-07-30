@@ -140,7 +140,7 @@ class DbMain extends R {
    * @param array $arr
    * @return array
    */
-  private function jsonParseField(array $arr): array {
+  public function jsonParseField(array $arr): array {
     $result = [];
     //$arr = array_flatten($arr);
 
@@ -1022,7 +1022,7 @@ class DbMain extends R {
   // Dealers
   //--------------------------------------------------------------------------------------------------------------------
 
-  private function parseDealerSettings(array $dealers): array {
+  public function parseDealerSettings(array $dealers): array {
     $properties = new Properties($this->main, 'dealer');
 
     $this->togglePrefix();
