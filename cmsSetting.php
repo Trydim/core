@@ -42,7 +42,8 @@ if ($main->db->setDealerLink()) {
   require $url->getPath(true) . 'config.php';
 
   $main->setCmsParam(VC::CSV_MAIN_PATH, $main->getCmsParam(VC::CSV_PATH))
-       ->setCmsParam(VC::CSV_PATH, $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'));
+       ->setCmsParam(VC::CSV_PATH, $url->getPath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
+       ->setCmsParam(VC::CSV_HISTORY_PATH, $url->getBasePath(true) . STORAGE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/') . DEALERS_PATH . '/' . $main->getCmsParam(VC::DEALER_ID) . '/');
 
   unset($publicConfig['PATH_CSV']);
   $main->setCmsParam($publicConfig)->setSettings(VC::DB_CONFIG, $dbConfig ?? []);
