@@ -328,7 +328,7 @@ class Docs {
   <p>Use "$this->data" for all data</p>
   <p>Use "$this->imgPath" for link to image</p>
   <p>Use $this->numFormat(\'1000\') for result "1 000"</p>
-  
+
 </div>';
   }
 
@@ -427,37 +427,6 @@ class Docs {
     }
 
     $this->setFooter($x, $y, $template, 'DejaVu Sans', $size);
-  }
-
-  /**
-   * Add bottom signature form
-   * @param string $position
-   * @param string $template -
-   * @param float  $size       The font size, in points
-   */
-  public function addSignatureForm(
-    $position = 'left',
-    $customerName,
-    $userName,
-    $size = 8
-  ) {
-    $userName = strip_tags($userName);
-    $customerName = strip_tags($customerName);
-    $isPortrait = $this->pdfOrientation === 'P';
-    $getX = function ($x) use ($isPortrait) { return round($x / 100 * ($isPortrait ? 612 : 850)); };
-    $getY = function ($y) use ($isPortrait) { return round($y / 100 * ($isPortrait ? 850 : 612)); };
-    $template = "ФИО Заказчика  $customerName Подпись _______        ФИО Менеджера $userName Подпись _______";
-
-    switch ($position) {
-      default: case 'left':
-      $x = $getX(3);  $y = $getY(90);
-      break;
-      case 'right':
-        $x = $getX(97); $y = $getY(90);
-        break;
-    }
-
-    $this->setFooter($x, $y + 20,  $template, 'DejaVu Sans', $size);
   }
 
   /**
