@@ -259,16 +259,18 @@ declare type CMSGlobalObject = {
     del(name: string)
   }
 
-  /* Without description */
+  /** Without description */
   createLink(filename: string): HTMLAnchorElement
 
-  getSetting()
+  getSetting(key: string)
 
   Valid: typeof Valid
 }
 
 interface Window extends Window {
   f: CMSGlobalObject
+
+  _(...a: string[]): string
 }
 
 declare const f: CMSGlobalObject;

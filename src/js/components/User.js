@@ -32,14 +32,14 @@ export default class User {
     if (f.INIT_SETTING) {
       let interval,
           applySetting = () => {
-        Object.entries(f.CMS_SETTING).forEach(([id, setting]) => {
-          if (this.data.fields[id] !== undefined) {
-            this.data.fields[id] = {value: this.data.fields[id], ...setting};
-          }
-        });
+            Object.entries(f.CMS_SETTING).forEach(([id, setting]) => {
+              if (this.data.fields[id] !== undefined) {
+                this.data.fields[id] = {value: this.data.fields[id], ...setting};
+              }
+            });
 
-        clearInterval(interval);
-      }
+            clearInterval(interval);
+          }
 
       if (f.CMS_SETTING) applySetting();
       else interval = setInterval(applySetting, 90);
@@ -50,10 +50,11 @@ export default class User {
   /**
    *
    * @param {string|'id'|'isAdmin'|'permission'|'tags'|'dealer'|'dealerSetting'} key
+   * @param {any|undefined} defValue
    * @return {*}
    */
-  get(key) {
-    return this.data[key];
+  get(key, defValue) {
+    return this.data[key] || defValue;
   }
 
   getDealerSettings(prop) {

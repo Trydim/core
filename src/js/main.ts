@@ -35,21 +35,20 @@ const loadLangList = () => {
   });
 }
 const dictionaryInit = () => {
-  const d = Object.create(null),
+  const d    = Object.create(null),
         node = f.qS('#dictionaryData');
 
-  if (!node) return;
-  d.data = JSON.parse(node.value);
-  node.remove();
+  d.data = node && node.value ? JSON.parse(node.value) : Object.create(null);
+  node && node.remove();
 
   d.getTitle = (key: string) => d.data[key] || key;
 
   /**
    * The template can have params such as %1, %2 and etc
-   * @param key - array, first item must be string
-   * @returns {*}
+   * @param key
+   * @return string
    */
-  d.translate = (...key: string[]) => {
+  d.translate = (...key: string[]): string => {
     if (key.length === 1) return d.getTitle(key[0]);
 
     let str = d.getTitle(key[0]);
@@ -58,7 +57,7 @@ const dictionaryInit = () => {
     }
     return str;
   };
-  // @ts-ignore
+
   window._ = d.translate;
 }
 
@@ -124,13 +123,13 @@ const setSideMenuStyle = (init = true) => {
 
 const startPreloader = () => {
   f.show(f.gI('preloader'));
-  f.gI('mainWrapper').classList.remove('show');
+  f.gI('mainWrapper').classList?.remove('show');
 }
 
 const stopPreloader = (short = true) => {
   if (f.OUTSIDE) return;
   f.hide(f.gI('preloader'));
-  short && f.gI('mainWrapper').classList.add('show');
+  short && f.gI('mainWrapper').classList?.add('show');
 }
 
 // Event function

@@ -89,7 +89,7 @@ declare interface Searching {
 }
 
 declare class User {
-  get(key: string|'id'|'isAdmin'|'permission'|'tags'|'dealer'|'dealerSetting')
+  get(key: string|'id'|'isAdmin'|'permission'|'tags'|'dealer'|'dealerSetting', defValue?: any)
 
   getDealerSettings(prop: string): undefined | any[]
   haveTags(tag: string): boolean

@@ -984,7 +984,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
 
     default:
-      echo 'db.php: switch default case:' . var_dump($_REQUEST);
+      $result['error'] = 'db.php - switch default case: ' . $cmsAction;
       break;
   }
 }

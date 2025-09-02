@@ -21,7 +21,6 @@ module.exports = env => {
     },
 
     output : {
-      clean     : !dev,
       path      : path.resolve(__dirname, '../../assets/'),
       filename  : 'js/[name].js',
       //assetModuleFilename: '../../assets/',

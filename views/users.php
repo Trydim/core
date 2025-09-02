@@ -87,7 +87,7 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
   <option value="${ID}">${name}</option>
 </template>
 <template id="tableContactsValue">
-  <div class="d-flex align-items-center justify-content-center gap-2"><div>${key}:</div><div>${value}</div></div>
+  <div class="d-flex align-items-center justify-content-start gap-2"><div>${key}:</div><div>${value}</div></div>
 </template>
 <template id="userForm">
   <form action="#">

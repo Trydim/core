@@ -3,17 +3,20 @@
   "description": "Public project",
   "name": "my-webpack-project",
   "private": true,
+  "type": "module",
   "scripts": {
-    "updateVersion": "node ./webpack/updateVersion.js",
+    "updateVersion": "node ./bundler/updateVersion.js",
 
-    "publicBuildProd": "webpack --env production --config ./webpack/webpack.config.js && node ./webpack/updateVersion.js",
-    "publicBuildDev": "webpack --config ./webpack/webpack.config.js",
+    "publicBuildProd": "webpack --env production --config ./bundler/webpack.config.js && node ./webpack/updateVersion.js",
+    "publicBuildDev": "webpack --config ./bundler/webpack.config.js",
 
     "localCypressTest": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=false",
     "cypressDeployProd": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=true",
 
-    "publicDevServe": "webpack serve --config ./webpack/webpack.config.js",
+    "createDealerDev": "node ./webpack/createDealerDev.js",
 
-    "createDealerDev": "node ./webpack/createDealerDev.js"
+    "publicBuildProdVite": "vite build --config ./bundler/vite.config.ts && node ./bundler/updateVersion.js",
+    "publicBuildDevVite": "vite build --mode develop --config ./bundler/vite.config.ts",
+    "publicBuildServVite": "vite --config ./bundler/vite.config.ts"
   }
 }

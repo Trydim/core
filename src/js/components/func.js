@@ -14,12 +14,13 @@ export default {
 
   /**
    * @param {string} msg
+   * @param {'log' | 'error'} type
    */
-  log: msg => f.DEBUG && console.log('Error:' + msg),
+  log: (msg, type = 'log') => f.DEBUG && console[type]('Error:' + msg),
 
   // String
   // -------------------------------------------------------------------------------------------------------------------
-  capitalize: cacheStringFunction(str => str.trimLeft().charAt(0).toUpperCase() + str.slice(1)),
+  capitalize: cacheStringFunction(str => str.trimStart().charAt(0).toUpperCase() + str.slice(1)),
   camelize: cacheStringFunction(str => {
     return str.toLowerCase()
               .replace(/\W(\w+)/g, (_, w) => w ? f.capitalize(w) : '')
@@ -545,7 +546,7 @@ export default {
    * @param {object} report - send to pdf
    * @param {string?} report.filename - result file name without extension
    * @param {string?} report.fileTpl - pdf template file without extension
-   * @param {string?} report.pdfOrientation ['P', 'L'] - pdf orientation
+   * @param {string?} report.pdfOrientation - ['P', 'L'] pdf orientation
    * @param {boolean?} report.addManager - manager information will be loaded
    * @param {boolean?} report.addCustomer - customer information will be loaded
    * @param {FormData?} data - object of formData to send in query Body

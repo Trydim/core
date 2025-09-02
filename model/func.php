@@ -480,7 +480,7 @@ function httpRequest(string $url, array $config = [], $params = []) {
   ];
 
   if (isset($config['auth'])) {
-    $curlConfig[CURLOPT_HTTPHEADER][] = 'Authorization:' . $config['auth'];
+    $curlConfig[CURLOPT_HTTPHEADER][] = 'Authorization: ' . $config['auth'];
   }
 
   else if (isset($config['login']) && isset($config['password'])) {
@@ -490,7 +490,7 @@ function httpRequest(string $url, array $config = [], $params = []) {
 
   if (strtolower($config['method'] ?? 'get') === 'get') {
     $curlConfig[CURLOPT_HTTPGET] = true;
-    $curlConfig[CURLOPT_URL] .= '?' . http_build_query($params);
+    if (!empty($params)) $curlConfig[CURLOPT_URL] .= '?' . http_build_query($params);
   } else {
     $contentType = $config['contentType'] ?? 'application/json; charset=utf-8';
 
@@ -499,6 +499,10 @@ function httpRequest(string $url, array $config = [], $params = []) {
     $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Type: ' . $contentType;
     if (is_string($params)) $curlConfig[CURLOPT_HTTPHEADER][] = 'Content-Length: ' . strlen($params);
     $curlConfig[CURLOPT_POSTFIELDS]   = $params;
+  }
+
+  if (isset($config['headers'])) {
+    $curlConfig[CURLOPT_HTTPHEADER] = array_merge($curlConfig[CURLOPT_HTTPHEADER], $config['headers']);
   }
 
   curl_setopt_array($myCurl, $curlConfig);

