@@ -10,7 +10,7 @@ export default class {
   headRendered = false;
   queryParam = {
     mode        : 'DB',
-    dbAction    : '',
+    dbAction    : 'loadOrders',
     tableName   : 'orders',
     sortColumn  : 'createDate',
     sortDirect  : true, // true = DESC, false
@@ -29,22 +29,8 @@ export default class {
 
   constructor() {
     this.setParam();
-    this.queryParam.dbAction = this.mainAction;
   }
-  init() {
-    this.p = new f.Pagination( '#paginator', {
-      dbAction : this.mainAction,
-      sortParam: this.queryParam,
-      query: this.query.bind(this),
-    });
 
-    this.loaderTable = new f.LoaderIcon(this.table);
-    this.selected = new f.SelectedRow({table: this.table, observerKey: 'selectedOrders'});
-    this.selected.subscribe(this.selectedRender.bind(this));
-
-    this.initSocket();
-    this.query();
-  }
   setParam() {
     this.M = new f.initModal();
 
@@ -70,6 +56,21 @@ export default class {
 
     f.oneTimeFunction.add('ordersHeadRender', this.ordersHeadRender.bind(this));
     f.oneTimeFunction.add('fillSelectStatus', this.fillSelectStatus.bind(this));
+  }
+
+  init() {
+    this.p = new f.Pagination( '#paginator', {
+      dbAction : this.mainAction,
+      sortParam: this.queryParam,
+      query: this.query.bind(this),
+    });
+
+    this.loaderTable = new f.LoaderIcon(this.table);
+    this.selected = new f.SelectedRow({table: this.table, observerKey: 'selectedOrders'});
+    this.selected.subscribe(this.selectedRender.bind(this));
+
+    this.initSocket();
+    void this.query();
   }
 
   getTypeConfig() {
@@ -256,7 +257,7 @@ export default class {
         this.queryParam.orderIds = '[]';
         return this.query();
       } else {
-        this.confirmMsg && f.showMsg(this.confirmMsg, data.status) && (this.confirmMsg = false);
+        this.confirmMsg && f.showMsg(this.confirmMsg, data.status ? 'success' : 'error') && (this.confirmMsg = false);
       }
 
       if (data['orders']) this.setOrders(data['orders']);

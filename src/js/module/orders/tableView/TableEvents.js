@@ -1,10 +1,10 @@
 "use strict";
 
-import Orders from "./OrdersClass";
+import TableBase from "./TableBase";
 
 let searchInProgress = false;
 
-export default class extends Orders {
+export default class extends TableBase {
   constructor() {
     super();
     this.onEvent();
@@ -365,4 +365,8 @@ export default class extends Orders {
   changeEmailInput(e) { this.queryParam.email = e.target.value }
 
   resetSelected() { this.selected.clear() }
+
+  unmounted() {
+    this.resetSelected();
+  }
 }

@@ -21,6 +21,7 @@
     "cypressDeployProd": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=true"
   },
   "dependencies": {
+    "@syncfusion/ej2-kanban": "^30.2.4",
     "@tiptap/extension-color": "latest",
     "@tiptap/extension-highlight": "latest",
     "@tiptap/extension-link": "latest",

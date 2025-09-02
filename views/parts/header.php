@@ -32,12 +32,22 @@ if ($main->checkStatus()) {
 </div>
 
 <div class="header">
-  <div class="header-content">
+  <div class="header-content position-relative">
     <div class="d-flex align-items-center form-check form-switch">
       <input class="form-check-input" type="checkbox" data-action-cms="themeToggle">
     </div>
-    <?php if ($main->getCmsParam(VC::LOCALES)) { ?>
-      <div class="mx-auto align-self-center">
+
+    <?php if ($main->url->getRoute() === 'orders') { ?>
+      <div class="ms-2 me-auto align-self-center btn-group" role="group">
+        <input id="orderView-table" type="radio" class="btn-check" data-action="changeView" data-target="orderTemplateTable" name="orderView" value="table">
+        <label for="orderView-table" class="btn btn-sm btn-outline-primary"><?= gTxt('List') ?></label>
+        <input id="orderView-kanban" type="radio" class="btn-check" data-action="changeView" data-target="orderTemplateKanban" name="orderView" value="kanban">
+        <label for="orderView-kanban" class="btn btn-sm btn-outline-primary"><?= gTxt('Kanban') ?></label>
+      </div>
+    <?php }
+
+    if ($main->getCmsParam(VC::LOCALES)) { ?>
+      <div class="position-absolute start-50 translate-middle-x align-self-center">
         <select id="cmsLangSelect" class="form-select" data-action-cms="langChange"></select>
       </div>
     <?php } ?>

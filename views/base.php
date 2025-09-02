@@ -39,7 +39,6 @@ $jsGlobalConst = json_encode([
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <?= $headContent ?? '' ?>
   <title><?= $pageTitle ?? 'VistegraCMS' ?></title>
   <link rel="icon" href="<?= $main->url->getPath() ?>favicon.ico">
   <?php if ($isAuth || $main->url->getRoute() === 'login') { ?>
@@ -62,6 +61,8 @@ $jsGlobalConst = json_encode([
   <?php array_map(function ($item) { ?>
     <link rel="prefetch" href="<?= $item ?>" as="script" crossorigin>
   <?php }, $jsLinks ?? []); ?>
+
+  <?= $headContent ?? '' ?>
 </head>
 
 <!-- dark -->

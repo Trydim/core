@@ -9,9 +9,10 @@ $param = [
 ];
 
 $field = [
-  'pageTitle' => 'Заказы',
-  'jsLinks'   => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
-  'footerContent' => $main->getFrontContent('dataUser', $main->getLogin('all')),
+  VC::BASE_PAGE_TITLE => 'Заказы',
+  VC::BASE_CSS_LINKS => [CORE_CSS . 'module/orders.css?ver=1'],
+  VC::BASE_JS_LINKS  => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
+  VC::BASE_FOOTER_CONTENT => $main->getFrontContent('dataUser', $main->getLogin('all')),
 ];
 
 // получить конфиг текущего пользователя
