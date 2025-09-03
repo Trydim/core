@@ -71,41 +71,61 @@
   <div class="mt-3" id="paginator"></div>
 </div>
 <div data-relation="!orderTemplateTable && orderTemplateKanban" class="d-none">
+  <div class="d-flex align-items-center px-3 py-1">
+    <div class="col-auto me-2"><?= gTxt('Searching') ?></div>
+    <div class="col-2">
+      <input id="searchText" class="form-control" placeholder="Enter search text" />
+    </div>
+    <div class="col-auto mx-2"><?= gTxt('Status') ?></div>
+    <div class="col-2">
+      <select id="filterSelect" class="form-select"></select>
+    </div>
+    <div class="col-auto mx-2"><?= gTxt('Sort By') ?></div>
+    <div class="col-2">
+      <select id="sortField" class="form-select">
+        <option value="Id"><?= gTxt('By id') ?></option>
+        <option value="lastEditDate" selected><?= gTxt('By edit date') ?></option>
+      </select>
+    </div>
+    <div class="col-2">
+      <select id="sortDirect" class="form-select">
+        <option value="Ascending"><?= gTxt('Ascending') ?></option>
+        <option value="Descending" selected><?= gTxt('Descending') ?></option>
+      </select>
+    </div>
+  </div>
   <div id="orderKanban" class="control-section">
     <div class="control_wrapper" style="max-width: 100%; overflow-x: auto">
       <div id="Kanban"></div>
     </div>
 
-    <script id="cardTemplate" type="text/x-jsrender">
-      <div class="p-1">
-        <div class="card-header">
-          <div class="card-header-caption">
-            <div class="card-header-title tooltip-text">${title}</div>
-            ${edited}
-          </div>
-        </div>
-        <div class="card-content tooltip-text">
-          <div class="text">${Summary}</div>
+    <div class=""></div>
 
-        </div>
-        <div>${customerName} итого ${total}</div>
+    <script id="cardTemplate" type="text/x-jsrender">
+      <div class="d-flex flex-column justify-content-between p-1 lh-sm h-100">
+        <div class="fw-bold text-center">${title}</div>
+        <small class="fst-italic">${edited}</small>
+        <div class="my-1">Менеджер: ${userName}</div>
+        <div>Клиент: ${customerName}</div>
+        <small class="d-block">${Summary}</small>
+        <div class="text-end">${total}</div>
       </div>
     </script>
     <script id="dialogTemplate" type="text/x-template">
       <table>
         <tbody>
         <tr>
-          <td class="e-label">ID</td>
-          <td><input id="Id" name="Id" type="text" class="e-field" value="${Id}" disabled required/></td>
+          <td class="label">Номер</td>
+          <td><input id="Id" type="text" class="w-100" name="Id" value="${Id}" disabled required /></td>
         </tr>
         <tr>
-          <td class="e-label">Status</td>
-          <td><input type="text" name="Status" id="Status" class="e-field" value=${Status} required /></td>
+          <td class="label">Статус</td>
+          <td><input id="Status" type="text" class="w-100" name="Status" value=${Status} required /></td>
         </tr>
         <tr>
-          <td class="e-label">Summary</td>
+          <td class="label">Комментарий (нужен?)</td>
           <td>
-            <textarea type="text" name="Summary" id="Summary" class="e-field" value=${Summary}>${Summary}</textarea>
+            <textarea id="Summary" type="text"  class="w-100" name="Summary" value=${Summary}>${Summary}</textarea>
             <span class="e-float-line"></span>
           </td>
         </tr>

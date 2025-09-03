@@ -17,8 +17,11 @@ const getDateString = (v) => {
 }
 
 export default class {
-
   kanbanNode = undefined;
+  searchNode = undefined;
+  filterNode = undefined;
+  sortFieldNode  = undefined;
+  sortDirectNode = undefined;
   kanbanObj = {};
 
   mainAction = 'loadOrders';
@@ -64,7 +67,6 @@ export default class {
       dialogSettings: {
         template: '#dialogTemplate',
       },
-      //dialogOpen: onDialogOpen,
 
       height: (window.screen.height - 250).toString() + 'px',
       cardHeight: '150px',
@@ -101,6 +103,10 @@ export default class {
   }
   setParam() {
     this.kanbanNode = f.gI('orderKanban');
+    this.searchNode = f.gI('searchText');
+    this.filterNode = f.gI('filterSelect');
+    this.sortFieldNode  = f.gI('sortField');
+    this.sortDirectNode = f.gI('sortDirect');
 
     f.oneTimeFunction.add('fillSelectStatus', this.fillSelectStatus.bind(this));
   }
@@ -113,16 +119,6 @@ export default class {
   }
 
   ordersPrepare(data) {
-    /**
-     * Id: +
-     * Title: 'Task '+ id,
-     * Status: status[Math.floor(Math.random() * status.length)],
-     * Summary: summary,
-     *
-     *
-     *
-     *
-    */
     return data.map(item => {
       // Обязательный поля для библиотеки
       item.Id     = item['ID'];
@@ -134,7 +130,7 @@ export default class {
 
       if (item.customerContacts) {
         let value = Object.entries(item.customerContacts).map(n => ({key: window._(n[0]), value: n[1]}));
-        item.customerContacts = f.replaceTemplate('${key}:${value}', value);
+        item.customerContacts = f.replaceTemplate('${value} ', value);
         item.Summary = item.customerContacts;
       }
 
@@ -172,8 +168,11 @@ export default class {
     if (data.length > 4) {
       this.kanbanObj.width = (data.length * screen.width / 5).toString() + 'px';
     }
+    // Filter status
+    this.filterNode.innerHTML = ['All'].concat(Object.keys(this.statusList)).map((item) => {
+      return `<option value="${item}">${_(item)}</option>`;
+    }).join('');
   }
-
 
   query(action) {
     const data  = {},
@@ -210,5 +209,13 @@ export default class {
       this.loaderTable.stop();
       return true;
     });
+  }
+
+  reset() {
+    this.kanbanObj.query = new Query();
+  }
+
+  unmounted() {
+
   }
 }
