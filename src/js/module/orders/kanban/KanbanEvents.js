@@ -54,11 +54,14 @@ export default class extends KanbanBase {
     }
   }
 
+  // Kanban ------------------------------------------------------------------------------------------------------------
   onCardClick(args) {
     console.log('Kanban - ' + args.data.Id + ' - <b>Card Click</b> event called<hr>');
   }
   onDragStop(args) {
     const order = args.data[0];
+
+    debugger
 
     if (order.Status === order.status) {
       this.applySort();
@@ -68,6 +71,7 @@ export default class extends KanbanBase {
     this.changeStatus(args.data[0])
   }
 
+  // Edit dialog -------------------------------------------------------------------------------------------------------
   onDialogOpen(args) {
     args.element.querySelector('#Kanban_dialog_wrapper_title').innerHTML = _('Edit card details');
     args.element.querySelector('.e-dialog-edit').innerHTML = _('Save');
@@ -78,8 +82,14 @@ export default class extends KanbanBase {
     if (args['requestType'] === 'Edit') {
       let curData = args.data;
 
+      /*let node = args.element.querySelector('#Status');
+      args.element.querySelector('#Status').innerHTML = Object.keys(this.statusList).map((s) => {
+        return `<option value="${s}">${s}</option>`;
+      }).join('');
+      node.value = curData.Status;*/
+
       let statusDropObj = new DropDownList({
-        value: curData.Status, popupHeight: '300px',
+        value: curData.Status,
         dataSource: Object.keys(this.statusList),
         fields: { text: 'Status', value: 'Status' }, placeholder: 'Status'
       });
@@ -94,6 +104,7 @@ export default class extends KanbanBase {
     }
   }
 
+  // Search ------------------------------------------------------------------------------------------------------------
   onSearchFocus(e) {
     if (e.target.value === '') this.reset();
   }
@@ -113,6 +124,7 @@ export default class extends KanbanBase {
     this.kanbanObj.query = searchQuery;
   }
 
+  // Filter ------------------------------------------------------------------------------------------------------------
   onFilterChange(e) {
     let filterQuery = new Query();
 
@@ -123,6 +135,7 @@ export default class extends KanbanBase {
     this.kanbanObj.query = filterQuery;
   }
 
+  // Sort --------------------------------------------------------------------------------------------------------------
   onSortFieldChange(e) {
     field = e.target.value;
     this.applySort();
@@ -133,11 +146,10 @@ export default class extends KanbanBase {
   }
 
   unmounted() {
-    this.$parent.unmounted();
-
-    this.resetSelected();
+    super.unmounted();
   }
 
+  // Unused
   onCreate() {
     console.log('Kanban <b>Load</b> event called<hr>');
   }

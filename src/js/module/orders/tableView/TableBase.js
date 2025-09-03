@@ -42,11 +42,15 @@ export default class {
     this.selectStatus = f.gI('selectStatus');
     this.btnMainOnly  = f.qA('#actionBtnWrap input.mainOnly');
 
-    this.config = {
-      ordersAllColumns: f.getData('#dataOrdersAllColumn'),
-      ordersColumns   : f.getData('#dataOrdersColumn'),
-      ordersVisitColumns: f.getData('#dataOrdersVisitColumn'),
-    };
+    if (!window.tableViewConfig) {
+      window.tableViewConfig = {
+        ordersAllColumns: f.getData('#dataOrdersAllColumn'),
+        ordersColumns   : f.getData('#dataOrdersColumn'),
+        ordersVisitColumns: f.getData('#dataOrdersVisitColumn'),
+      }
+    }
+
+    this.config = window.tableViewConfig;
 
     this.template = {
       tableHeader: f.gT('#tableHeaderCell'),

@@ -9,6 +9,7 @@ import { ChangeEventArgs, CheckBox } from '@syncfusion/ej2-buttons';
 import { NumericTextBox, TextBox } from '@syncfusion/ej2-inputs';
 import { DropDownList, SelectEventArgs, ChangeEventArgs as DropDownChangeArgs } from '@syncfusion/ej2-dropdowns';
 
+import {generateData}  from "./data/getData";
 import * as dataSource from './data/datasource.json';
 
 const getDateString = (v) => {
@@ -47,8 +48,8 @@ export default class {
   constructor() {
     this.kanbanObj = new Kanban({ //Initialize Kanban control
       enableVirtualization: true, // To enable virtual scrolling feature.
-      //dataSource: generateKanbanDataVirtualScrollData(),
-      //dataSource: dataSource.kanbanData,
+      dataSource: generateData(),
+
       keyField: 'Status',
       cardSettings: {
         headerField: 'Id',
@@ -62,28 +63,14 @@ export default class {
       /*cardRendered: (args: CardRenderedEventArgs) => {
        let val: string = ((<{[key: string]: Object}>(args.data)).Priority as string).toLowerCase();
        addClass([args.element], val);
-       },*/
+      },*/
 
       dialogSettings: {
         template: '#dialogTemplate',
       },
 
-      height: (window.screen.height - 250).toString() + 'px',
-      cardHeight: '150px',
-
-      /*created        : event.OnCreate,
-      actionBegin    : event.OnActionBegin,
-      actionComplete : event.OnActionComplete,
-      actionFailure  : event.OnActionFailure,
-      dataBinding    : event.OnDataBinding,
-      dataBound      : event.OnDataBound,
-      cardRendered   : event.OnCardRendered,
-      queryCellInfo  : event.OnQueryCellInfo,
-      cardClick      : event.OnCardClick,
-      cardDoubleClick: event.OnCardDoubleClick,
-      dragStart      : event.OnDragStart,
-      drag           : event.OnDrag,
-      dragStop       : event.OnDragStop,*/
+      height: (window.screen.height - 300).toString() + 'px',
+      cardHeight: '125px',
     });
 
     this.setTemplateFunc();
@@ -147,9 +134,10 @@ export default class {
   }
 
   setOrders(data) {
-    data = this.ordersPrepare(data);
+    //data = this.ordersPrepare(data);
 
-    this.kanbanObj.dataSource = data;
+    //this.kanbanObj.dataSource = data;
+    //this.kanbanObj.dataSource = generateData();
   }
 
   // Заполнить статусы
@@ -216,6 +204,6 @@ export default class {
   }
 
   unmounted() {
-
+    this.kanbanObj.destroy();
   }
 }

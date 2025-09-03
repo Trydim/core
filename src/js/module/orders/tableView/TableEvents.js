@@ -68,6 +68,8 @@ export default class extends TableBase {
         hideActionWrap = false,
         selectedSize   = this.selected.getSelectedSize();
 
+    if (action === 'changeView') return;
+
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
     if (['loadOrder', 'openOrder', 'printOrder', 'savePdf', 'sendOrder'].includes(action) && selectedSize !== 1) {
       f.showMsg(_('Select 1 order!'), 'warning'); return;

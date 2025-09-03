@@ -81,7 +81,7 @@
       <select id="filterSelect" class="form-select"></select>
     </div>
     <div class="col-auto mx-2"><?= gTxt('Sort By') ?></div>
-    <div class="col-2">
+    <div class="col-2 mx-2">
       <select id="sortField" class="form-select">
         <option value="Id"><?= gTxt('By id') ?></option>
         <option value="lastEditDate" selected><?= gTxt('By edit date') ?></option>
@@ -94,12 +94,11 @@
       </select>
     </div>
   </div>
+
   <div id="orderKanban" class="control-section">
-    <div class="control_wrapper" style="max-width: 100%; overflow-x: auto">
+    <div class="control_wrapper" style="max-width: 100%; overflow-x: auto; overflow-y: hidden">
       <div id="Kanban"></div>
     </div>
-
-    <div class=""></div>
 
     <script id="cardTemplate" type="text/x-jsrender">
       <div class="d-flex flex-column justify-content-between p-1 lh-sm h-100">
