@@ -1,13 +1,14 @@
 import '../../../../css/module/orders/orders.scss';
 
-import { Kanban, SortDirection, SortOrderBy, DialogEventArgs } from '@syncfusion/ej2-kanban';
+import {Kanban} from '@syncfusion/ej2-kanban';
 
-//import { extend } from '@syncfusion/ej2-base';
+import * as Locale from './locale/ru.json';
+import { L10n } from '@syncfusion/ej2-base';
 import { Query } from '@syncfusion/ej2-data';
 
-import { ChangeEventArgs, CheckBox } from '@syncfusion/ej2-buttons';
-import { NumericTextBox, TextBox } from '@syncfusion/ej2-inputs';
-import { DropDownList, SelectEventArgs, ChangeEventArgs as DropDownChangeArgs } from '@syncfusion/ej2-dropdowns';
+//import { CheckBox } from '@syncfusion/ej2-buttons';
+//import { NumericTextBox, TextBox } from '@syncfusion/ej2-inputs';
+//import { DropDownList, SelectEventArgs } from '@syncfusion/ej2-dropdowns';
 
 import {generateData}  from "./data/getData";
 import * as dataSource from './data/datasource.json';
@@ -16,6 +17,8 @@ const getDateString = (v) => {
   const d = new Date(v);
   return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU').slice(0, 5);
 }
+
+L10n.load({ru: Locale.ru});
 
 export default class {
   kanbanNode = undefined;
@@ -48,8 +51,6 @@ export default class {
   constructor() {
     this.kanbanObj = new Kanban({ //Initialize Kanban control
       enableVirtualization: true, // To enable virtual scrolling feature.
-      dataSource: generateData(),
-
       keyField: 'Status',
       cardSettings: {
         headerField: 'Id',
@@ -59,6 +60,8 @@ export default class {
       swimlaneSettings: {
         //keyField: 'Assignee'
       },
+
+      locale: f.cookieGet('lang'),
 
       /*cardRendered: (args: CardRenderedEventArgs) => {
        let val: string = ((<{[key: string]: Object}>(args.data)).Priority as string).toLowerCase();
@@ -70,7 +73,7 @@ export default class {
       },
 
       height: (window.screen.height - 300).toString() + 'px',
-      cardHeight: '125px',
+      cardHeight: '180px',
     });
 
     this.setTemplateFunc();
@@ -112,8 +115,9 @@ export default class {
       item.Status = item.status;
       item.Summary = '';
 
-      item.title  = `№${item.Id} от ` + getDateString(item['createDate']);
-      item.edited = item['createDate'] !== item['lastEditDate'] ? 'Изменено: ' + getDateString(item['lastEditDate']) : '';
+      item.title   = `№${item.Id} от `;
+      item.created = getDateString(item['createDate']);
+      item.edited  = item['createDate'] !== item['lastEditDate'] ? 'Изменено: ' + getDateString(item['lastEditDate']) : '';
 
       if (item.customerContacts) {
         let value = Object.entries(item.customerContacts).map(n => ({key: window._(n[0]), value: n[1]}));
@@ -134,9 +138,7 @@ export default class {
   }
 
   setOrders(data) {
-    //data = this.ordersPrepare(data);
-
-    //this.kanbanObj.dataSource = data;
+    this.kanbanObj.dataSource = this.ordersPrepare(data);
     //this.kanbanObj.dataSource = generateData();
   }
 
@@ -146,7 +148,8 @@ export default class {
       this.statusList[s.name] = s.ID;
 
       this.kanbanObj.addColumn({
-        allowToggle  : true,
+        //template: '#headerTemplate',
+        allowToggle  : false,
         showItemCount: true,
         headerText   : s.name,
         keyField     : s.name,

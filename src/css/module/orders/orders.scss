@@ -1,20 +1,10 @@
-/*
-@use "buttons";
-@use "dropdowns";
-@use "inputs";
-@use "kanban";
-@use "layouts";
-@use "navigations";
-@use "popups";
-*/
+@import 'base/bootstrap5.scss';
 
-//@import '@syncfusion/ej2-base/styles/bootstrap5.css';
-@import '@syncfusion/ej2-notifications/styles/bootstrap5.css';
-@import '@syncfusion/ej2-buttons/styles/bootstrap5.css';
-@import '@syncfusion/ej2-layouts/styles/bootstrap5.css';
-@import '@syncfusion/ej2-dropdowns/styles/bootstrap5.css';
-@import '@syncfusion/ej2-inputs/styles/bootstrap5.css';
-@import '@syncfusion/ej2-navigations/styles/bootstrap5.css';
-@import '@syncfusion/ej2-popups/styles/bootstrap5.css';
-@import '@syncfusion/ej2-kanban/styles/bootstrap5.css';
+@import "icons";
 
+@import "inputs.scss";
+@import "dropdowns.scss";
+@import "buttons.scss";
+@import "skeleton.scss";
+@import "kanban";
+@import "popups";

@@ -61,8 +61,6 @@ export default class extends KanbanBase {
   onDragStop(args) {
     const order = args.data[0];
 
-    debugger
-
     if (order.Status === order.status) {
       this.applySort();
       return;

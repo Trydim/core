@@ -100,12 +100,18 @@
       <div id="Kanban"></div>
     </div>
 
+<!--    <script id="headerTemplate" type="text/x-jsrender">
+      <div class="text-center w-100">
+        <div>${headerText}</div>
+      </div>
+    </script>-->
     <script id="cardTemplate" type="text/x-jsrender">
       <div class="d-flex flex-column justify-content-between p-1 lh-sm h-100">
-        <div class="fw-bold text-center">${title}</div>
-        <small class="fst-italic">${edited}</small>
-        <div class="my-1">Менеджер: ${userName}</div>
-        <div>Клиент: ${customerName}</div>
+        <div class="fw-bold">${title}</div>
+        <div class="my-1">Создан: ${created}</small>
+        <div class="">${edited}</small>
+        <div class="my-1">Клиент: <span class="fw-bold">${customerName}</span></div>
+        <div class="my-1">Менеджер: <span class="fw-bold">${userName}</span></div>
         <small class="d-block">${Summary}</small>
         <div class="text-end">${total}</div>
       </div>
