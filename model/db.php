@@ -718,6 +718,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
 
       // Users
+    case 'loadUser':
+      if (isset($userId)) $result['user'] = $db->getUserById($userId);
+      else if(isset($userLogin)) $result['user'] = $db->getUserByLogin($userLogin);
+      else $result['error'] = 'loadUser error: userId or userLogin is not exist';
+      break;
     case 'loadUsers':
       $result['countRows'] = $db->getCountRows('users');
 
