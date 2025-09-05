@@ -1,0 +1,108 @@
+.e-ddl,
+.e-icons {
+  font-family: 'primeicons' !important;
+}
+
+@include export-module('input-bootstrap5-icons') {
+  .e-float-input,
+  .e-float-input.e-control-wrapper {
+    .e-clear-icon::before {
+      content: '\e7e7';
+    }
+  }
+
+  .e-input-group,
+  .e-input-group.e-control-wrapper {
+    .e-clear-icon::before {
+      content: '\e7e7';
+    }
+  }
+}
+
+
+.e-ddl .e-search-icon::before {
+  content: "\e754";
+}
+
+.e-ddl .e-back-icon::before {
+  content: "\e773";
+}
+
+.e-ddl.e-input-group.e-control-wrapper .e-ddl-icon::before {
+  content: "\e930";
+}
+
+.e-ddl.e-popup.e-resize .e-icons.e-resizer-right::before {
+  content: "\e832";
+}
+
+.e-ddt .e-ddt-icon::before {
+  content: "\e734";
+}
+
+.e-ddt .e-chips-close::before {
+  content: "\e7e7";
+}
+
+
+@include export-module('kanban-bootstrap-icons') {
+  .e-kanban {
+    .e-column-expand::before {
+      content: "\e931";
+    }
+
+    .e-column-collapse::before {
+      content: "\e932";
+    }
+
+    .e-swimlane-row-expand::before {
+      content: '\e729';
+    }
+
+    .e-swimlane-row-collapse::before {
+      content: '\e748';
+    }
+
+    .e-show-add-icon::before {
+      content: '\e805';
+    }
+
+    .e-swimlane-header-toolbar {
+      & .e-icon-menu::before {
+        content: '\e799';
+      }
+    }
+  }
+
+  .e-mobile-popup-wrapper .e-close-icon::before {
+    content: '\e7e7';
+  }
+}
+
+@include export-module('dialog-bootstrap5-icons') {
+  .e-dialog {
+    .e-icon-dlg-close::before {
+      content: '\e7e7';
+      position: relative;
+    }
+
+    .e-icon-dlg-close {
+      opacity: initial;
+    }
+
+    .e-icon-dlg-close:active {
+      opacity: initial;
+    }
+
+    .e-icon-dlg-close:hover {
+      opacity: initial;
+    }
+
+    .e-south-east::before,
+    .e-south-west::before,
+    .e-north-east::before,
+    .e-north-west::before {
+      content: '\e832';
+    }
+  }
+}

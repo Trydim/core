@@ -1,0 +1,31 @@
+{
+  "type": "project",
+  "name": "mindplay/php-vite-mpa",
+  "description": "Example MPA based on mindplay/php-vite",
+  "scripts": {
+    "start": "npx concurrently \"composer start:server\" \"composer start:vite\" --names \"PHP,Vite\" --kill-others",
+
+    "start:server": "@php -S localhost:8001 -t ./ bundler/server/index.php",
+    "start:vite": "npm run publicBuildViteServ",
+
+    "preview": [
+      "composer build",
+      "APP_ENV=production composer start:server"
+    ]
+  },
+  "require": {
+    "mindplay/php-vite": "dev-master"
+  },
+  "config": {
+    "disable-tls": true,
+    "process-timeout": 0,
+    "preferred-install": {
+      "mindplay/php-vite": "source"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "server/src/"
+    }
+  }
+}
