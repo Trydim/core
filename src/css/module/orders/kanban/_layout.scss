@@ -168,12 +168,9 @@
         }
 
         .e-item-count {
-          font-size: $kanban-header-item-count-font-size;
-          font-weight: $kanban-header-item-count-font-weight;
-          line-height: $kanban-header-item-count-line-height;
-          margin-top: $kanban-header-item-count-margin-top;
-          opacity: $kanban-header-item-count-opacity;
-          text-transform: $kanban-header-item-count-text-transform;
+          font-size: $kanban-header-text-font-size;
+          font-weight: $kanban-header-text-font-weight;
+          line-height: $kanban-header-text-line-height;
         }
 
         .e-limits {
@@ -306,27 +303,27 @@
             }
 
             .e-card {
+              position: relative;
               border: $kanban-card-border;
               border-radius: $kanban-card-border-radius;
               box-shadow: $kanban-card-normal-box-shadow;
               margin-bottom: $kanban-card-margin-bottom;
-              min-height: 50px;
+              padding: 10px;
+              font-size: 13px;
+              color: #6d6d6d;
+
+              .color-main {
+                color: black;
+              }
 
               &.e-draggable {
                 cursor: all-scroll;
               }
 
               .e-card-header {
-                padding: $kanban-card-header-padding;
-                @if ($skin-name == 'tailwind3') {
-                  border-bottom: 0;
-                }
-
-                .e-card-header-title {
-                  font-size: $kanban-card-header-title-font-size;
-                  font-weight: $kanban-card-header-title-font-weight;
-                  line-height: $kanban-card-header-title-line-height;
-                }
+                font-size: $kanban-card-header-title-font-size;
+                font-weight: bold;
+                line-height: $kanban-card-header-title-line-height;
               }
 
               .e-card-footer {
@@ -410,13 +407,16 @@
                 &:hover {
                   border: $kanban-card-selection-hover-border;
                   box-shadow: $kanban-card-selection-hover-box-shadow;
-                  padding: $kanban-card-selection-hover-padding;
                 }
               }
 
               &:hover {
                 border: $kanban-card-hover-border;
                 box-shadow: $kanban-card-normal-hover-box-shadow;
+
+                .e-card-action {
+                  display: block;
+                }
               }
 
               &:focus {
@@ -432,6 +432,27 @@
 
               &.e-kanban-dragged-card {
                 display: none;
+              }
+
+              .e-card-action {
+                display: none;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 1rem;
+              }
+
+              .e-card-action-btn {
+                display: inline-block;
+                margin-bottom: 10px;
+
+                :hover {
+                  cursor: pointer;
+
+                  svg, path {
+                    stroke: blue;
+                  }
+                }
               }
             }
 
@@ -471,18 +492,10 @@
               border-right: 1px dashed $kanban-border-color;
 
               .e-text {
-                opacity: .5;
                 text-align: center;
-
-                @if ($skin-name == 'highcontrast') {
-                  color: $kanban-default-font-color;
-                }
-
-                @if ($skin-name == 'tailwind' or $skin-name == 'bootstrap5') {
-                  color: $content-text-color-disabled;
-                  font-size: $kanban-text-base;
-                  opacity: 1;
-                }
+                color: $content-text-color-disabled;
+                font-size: $kanban-text-base;
+                opacity: 1;
               }
             }
 
@@ -692,18 +705,8 @@
     z-index: 1004;
 
     .e-popup-header {
-      @if $skin-name == 'bootstrap4' {
-        padding-top: 3px;
-      }
-
       .e-close {
-        @if $skin-name != 'bootstrap4' {
-          background: transparent;
-        }
-
-        @if ($skin-name == 'fabric' or $skin-name == 'bootstrap') {
-          border: 0;
-        }
+        background: transparent;
       }
     }
 
@@ -772,3 +775,28 @@
     padding: $kanban-card-container-padding;
   }
 }
+
+.kanban {
+  &-header {
+    padding: 4px 10px;
+
+    .btn-sm {
+      padding: 8px !important;
+    }
+  }
+
+  &-column {
+    width: 308px;
+    margin-right: 10px;
+
+    .form-control {
+
+    }
+  }
+
+  &-fz-12 {
+    font-size: 12px;
+  }
+}
+
+

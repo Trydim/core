@@ -91,7 +91,7 @@ const m = {
   SelectedRow: SelectedRow,
 
   /**
-   * @type class
+   * @type ToastClass
    * https://f3oall.github.io/awesome-notifications/docs/
    * @param {object} options
    */

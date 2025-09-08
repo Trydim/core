@@ -112,7 +112,7 @@
   }
 }
 
-/* Компактное меню */
+/* Compact menu */
 .menu-toggle {
   .brand-logo {
     justify-content: space-around;
@@ -127,58 +127,3 @@
     transform: rotate(180deg);
   }
 }
-
-/* Селект для выбора языка */
-.language-selector {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  width: 120px;
-}
-
-.language-selector select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  width: 100%;
-  padding: 10px 15px;
-  padding-right: 35px;
-  font-size: 14px;
-  color: #333;
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.language-selector select:hover {
-  border-color: #aaa;
-  background-color: #fff;
-}
-
-.language-selector select:focus {
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-}
-
-.language-selector::after {
-  content: "▼";
-  font-size: 10px;
-  color: #666;
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.language-selector option {
-  padding: 8px;
-  background: #fff;
-}
-
-

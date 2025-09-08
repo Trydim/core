@@ -106,3 +106,33 @@
     }
   }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Bootstrap icons
+// https://icons.getbootstrap.com/
+// ---------------------------------------------------------------------------------------------------------------------
+
+@mixin getSVG($key) {
+  content: '';
+  background: url('./icons/' + $key + '.svg') center no-repeat;
+  background-size: contain;
+}
+
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  display: inline-block;
+  min-width: 16px;
+  min-height: 16px;
+  vertical-align: middle;
+}
+
+.bi-list::before { @include getSVG('list') }
+.bi-kanban::before { @include getSVG('kanban') }
+
+
+.bi-kanban::before { @include getSVG('kanban') }
+.bi-kanban::before { @include getSVG('kanban') }
+.bi-kanban::before { @include getSVG('kanban') }
+.bi-kanban::before { @include getSVG('kanban') }
+

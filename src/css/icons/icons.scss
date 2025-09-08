@@ -439,7 +439,7 @@ $theme-colors: () !default;
 /*
 @mixin getSVG($key) {
   content: '';
-  background: url('icons/' + $key + '.svg') center no-repeat;
+  background: url($key + '.svg') center no-repeat;
   background-size: contain;
 }
 

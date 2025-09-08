@@ -10,8 +10,8 @@ import { Query } from '@syncfusion/ej2-data';
 //import { NumericTextBox, TextBox } from '@syncfusion/ej2-inputs';
 //import { DropDownList, SelectEventArgs } from '@syncfusion/ej2-dropdowns';
 
-import {generateData}  from "./data/getData";
-import * as dataSource from './data/datasource.json';
+//import {generateData}  from "./data/getData";
+//import * as dataSource from './data/datasource.json';
 
 const getDateString = (v) => {
   const d = new Date(v);
@@ -96,7 +96,7 @@ export default class {
     this.searchNode = f.gI('searchText');
     this.filterNode = f.gI('filterSelect');
     this.sortFieldNode  = f.gI('sortField');
-    this.sortDirectNode = f.gI('sortDirect');
+    this.sortDirectNode = f.qA('[name="sortDirect"]');
 
     f.oneTimeFunction.add('fillSelectStatus', this.fillSelectStatus.bind(this));
   }
@@ -115,14 +115,14 @@ export default class {
       item.Status = item.status;
       item.Summary = '';
 
-      item.title   = `№${item.Id} от `;
+      item.title   = '№' + item.Id;
       item.created = getDateString(item['createDate']);
       item.edited  = item['createDate'] !== item['lastEditDate'] ? 'Изменено: ' + getDateString(item['lastEditDate']) : '';
 
       if (item.customerContacts) {
         let value = Object.entries(item.customerContacts).map(n => ({key: window._(n[0]), value: n[1]}));
-        item.customerContacts = f.replaceTemplate('${value} ', value);
-        item.Summary = item.customerContacts;
+        item.phone   = item.customerContacts.phone || '-';
+        item.Summary = f.replaceTemplate('${value} ', value);
       }
 
       if (item.importantValue) {
@@ -130,6 +130,8 @@ export default class {
         let value = Object.entries(item.importantValue).map(n => ({key: window._(n[0]), value: n[1]}));
         item.importantValue = f.replaceTemplate('${key}:${value}', value);
       }
+
+      item.total = new Intl.NumberFormat("ru-RU").format(item.total)
 
       this.orders[item['ID']] = item;
 
@@ -157,12 +159,29 @@ export default class {
     });
 
     if (data.length > 4) {
-      this.kanbanObj.width = (data.length * screen.width / 5).toString() + 'px';
+      this.kanbanObj.width = (data.length * 320).toString() + 'px';
     }
     // Filter status
     this.filterNode.innerHTML = ['All'].concat(Object.keys(this.statusList)).map((item) => {
       return `<option value="${item}">${_(item)}</option>`;
     }).join('');
+    this.setStyle();
+  }
+  setStyle() {
+    const styleNode = document.createElement('style');
+
+    const colors = ['#07A5D066', '#28AD004D', '#FFCC004D', '#FF00004D'];
+
+    styleNode.innerHTML = Object.keys(this.statusList).map((s) => {
+      const cI = f.random(0, 3);
+
+      return `
+        th[data-role="kanban-column"][data-key="${s}"] { background: ${colors[cI]} !important; }
+        .e-card[data-key="${s}"] { border-left: 4px ${colors[cI]} solid !important; }
+      `;
+    }).join('');
+
+    document.head.append(styleNode);
   }
 
   query(action) {

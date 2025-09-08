@@ -49,6 +49,7 @@
   'List'        => 'Список',
   'Table'       => 'Таблица',
   'For the mask, use _. Leave blank to disable' => 'Для маски используйте _. Оставьте пустым, чтобы отключить',
+  'This status name exists! It is highly recommended to use unique names.' => 'Название статуса дублируются! Рекомендуется использовать уникальные имена',
   // Mail
   'Mail settings'   => 'Настройки почты',
   'Mail to'   => 'Почта получения',

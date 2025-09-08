@@ -1152,11 +1152,11 @@
   .e-input-group .e-clear-icon.e-small,
   .e-input-group.e-control-wrapper.e-small .e-clear-icon,
   .e-input-group.e-control-wrapper .e-clear-icon.e-small {
-    min-height: $input-bigger-clear-icon-min-height;
-    min-width: $input-bigger-clear-icon-min-width;
-    padding-bottom: $input-clear-icon-bigger-padding-bottom;
-    padding-right: $input-clear-icon-bigger-padding-right;
-    padding-top: $input-clear-icon-bigger-padding-top;
+    min-height: 0;
+    min-width: 0;
+    padding-bottom: 0;
+    padding-right: 0;
+    padding-top: 0;
   }
 
   .e-input-group.e-small .e-clear-icon,

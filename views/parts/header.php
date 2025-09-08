@@ -38,11 +38,16 @@ if ($main->checkStatus()) {
     </div>
 
     <?php if ($main->url->getRoute() === 'orders') { ?>
-      <div class="ms-2 me-auto align-self-center btn-group" role="group">
+      <div class="ms-2 me-auto align-self-center">
         <input id="orderView-table" type="radio" class="btn-check" data-action="changeView" data-target="orderTemplateTable" name="orderView" value="table">
-        <label for="orderView-table" class="btn btn-sm btn-outline-primary"><?= gTxt('List') ?></label>
+        <label for="orderView-table" class="btn btn-sm btn-outline-primary">
+          <i class="pi pi-list align-middle me-1"></i><?= gTxt('List') ?>
+        </label>
         <input id="orderView-kanban" type="radio" class="btn-check" data-action="changeView" data-target="orderTemplateKanban" name="orderView" value="kanban">
-        <label for="orderView-kanban" class="btn btn-sm btn-outline-primary"><?= gTxt('Kanban') ?></label>
+        <label for="orderView-kanban" class="btn btn-sm btn-outline-primary">
+          <i class="pi pi-align-left align-middle me-1" style="transform: rotate(90deg)"></i>
+          <?= gTxt('Kanban') ?>
+        </label>
       </div>
     <?php }
 

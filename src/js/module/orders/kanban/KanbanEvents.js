@@ -23,9 +23,11 @@ export default class extends KanbanBase {
     this.filterNode.onchange = this.onFilterChange.bind(this);
 
     this.sortFieldNode.onchange  = this.onSortFieldChange.bind(this);
-    this.sortDirectNode.onchange = this.onSortDirectChange.bind(this);
 
-    this.applySort();
+    this.sortDirectNode.forEach((node) => {
+      node.onchange = this.onSortDirectChange.bind(this);
+      if (node.value === direct) node.click();
+    });
   }
 
   resetSelected() { }
@@ -54,9 +56,52 @@ export default class extends KanbanBase {
     }
   }
 
+  itemOpen(args) {
+    const link = f.gI(f.ID.PUBLIC_PAGE),
+          id  = args.data['ID'];
+
+    link.href += '?' + 'orderId=' + id;
+    link.click();
+  }
+  itemPdf(args) {
+    f.setLoading(args.element, true);
+    //target.setAttribute('disabled', 'disabled');
+
+    f.Post({
+      data: {
+        mode: 'docs',
+        cmsAction: 'pdf',
+        addCustomer: true,
+        orderId: args.data['ID'],
+      },
+    }).then(data => {
+      f.removeLoading(args.element);
+      //target.removeAttribute('disabled');
+      if (data['pdfBody']) {
+        f.saveFile({
+          name: data['name'],
+          type: 'base64',
+          blob: 'data:application/pdf;base64,' + data['pdfBody']
+        });
+      }
+    });
+  }
+  itemExcel(args) { console.log(args.data); }
+  itemView(args) { console.log(args.data); }
+
   // Kanban ------------------------------------------------------------------------------------------------------------
   onCardClick(args) {
-    console.log('Kanban - ' + args.data.Id + ' - <b>Card Click</b> event called<hr>');
+    const target = args.event.target,
+          action = target.dataset.action || target.closest('[data-action]').dataset.action;
+
+    if (action) {
+      switch (action) {
+        case 'itemOpen' : this.itemOpen(args); break;
+        case 'itemPdf'  : this.itemPdf(args); break;
+        case 'itemExcel': this.itemExcel(args); break;
+        case 'itemView' : this.itemView(args); break;
+      }
+    }
   }
   onDragStop(args) {
     const order = args.data[0];

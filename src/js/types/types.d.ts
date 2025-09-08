@@ -196,7 +196,7 @@ declare type CMSGlobalObject = {
   /**
    * Set loading spinner icon
    */
-  setLoading(node: HTMLElement, isLight?: false): void
+  setLoading(node: HTMLElement, isLight?: boolean): void
   /**
    * Remove loading spinner icon
    */
@@ -251,6 +251,7 @@ declare type CMSGlobalObject = {
   Pagination: typeof Pagination
   SelectedRow: typeof SelectedRow
   SortColumns: typeof SortColumns
+  Toast: typeof ToastClass
   User: typeof User
 
   oneTimeFunction: {
@@ -262,7 +263,7 @@ declare type CMSGlobalObject = {
   /** Without description */
   createLink(filename: string): HTMLAnchorElement
 
-  getSetting(key: string)
+  getSetting(key: string | undefined = undefined)
 
   Valid: typeof Valid
 }

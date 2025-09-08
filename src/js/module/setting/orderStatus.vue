@@ -13,14 +13,14 @@
         <template v-for="(item, index) of status" :key="item.ID">
           <div v-if="!item.delete" class="input-group mb-1">
             <p-input-text v-tooltip.bottom="$t('Code (optional)')" class="form-control"
-                          :disabled="+item.required" v-model="item.code" />
-            <p-input-text v-model="item.name" class="form-control w-50" />
+                          :disabled="!!+item.required" v-model="item.code" />
+            <p-input-text v-model="item.name" class="form-control w-50" @blur="checkNames" />
             <p-input-text v-tooltip.bottom="$t('Sorting')" v-model="item.sort" class="form-control" />
             <div class="input-group-text">
-              <p-radiobutton v-tooltip.bottom="$t('Default')" v-model="statusDef" :value="item.ID"></p-radiobutton>
+              <p-radiobutton v-tooltip.bottom="$t('Default')" v-model="statusDef" :value="item.ID" />
             </div>
             <p-button v-tooltip.bottom="$t('Delete')" icon="pi pi-times" class="p-button-danger"
-                      :disabled="+item.required"
+                      :disabled="!!+item.required"
                       @click="removeStatus(index)" />
           </div>
         </template>
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+
+const toast = new f.Toast();
 
 export default {
   props: {
@@ -63,7 +65,7 @@ export default {
 
     addStatus() {
       this.status.push({
-        ID: Math.random(),
+        ID: f.random(1e3, 1e4),
         code: 'status',
         name: 'Новый статус',
         sort: 50,
@@ -71,7 +73,17 @@ export default {
     },
     removeStatus(index) {
       this.status[index].delete = true;
-    }
+    },
+
+    checkNames() {
+      const names = new Set(),
+            list = Object.values(this.status);
+
+      list.forEach((item) => names.add(item.name));
+
+      if (list.length !== names.size) toast.warning(_('This status name exists! It is highly recommended to use unique names.'));
+      else toast.closeToasts();
+    },
   },
   created() {
     this.statusDef = this.propStatusDef.toString();
