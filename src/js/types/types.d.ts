@@ -10,6 +10,8 @@ declare interface Hooks {
 declare type CMSGlobalObject = {
   /** Global debug flag */
   DEBUG: boolean
+  /** Global debug flag */
+  IS_LOCAL: boolean
   /** Yes or not safe editing csv tables */
   CSV_DEVELOP: boolean
   /** app starting as external module */
@@ -268,10 +270,12 @@ declare type CMSGlobalObject = {
   Valid: typeof Valid
 }
 
-interface Window extends Window {
-  f: CMSGlobalObject
+declare global {
+  interface Window {
+    f: CMSGlobalObject
 
-  _(...a: string[]): string
+    _(...a: string[]): string
+  }
 }
 
 declare const f: CMSGlobalObject;

@@ -17,6 +17,7 @@ $footerContentBase = $footerContentBase ?? '';
 
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
+  'IS_LOCAL'      => $main->url->server->get('REMOTE_ADDR') === $main->url->server->get('SERVER_ADDR'),
   'CSV_DEVELOP'   => $main->getCmsParam('CSV_DEVELOP') ?: false,
   'SITE_PATH'     => $main->url->getBasePath(),
   'MAIN_PHP_PATH' => $main->url->getBasePath() . 'index.php',

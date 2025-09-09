@@ -1133,7 +1133,7 @@ class DbMain extends R {
         if ($login) $sql .= ' AND login = "' . $login . '"';
       }
 
-      $result = array_merge($result, self::getAll(substr($sql, 7), [':login' => $login]));
+      $result = array_merge($result, self::getAll(substr($sql, 7)));
       if ($login && count($result)) return $result;
     }
 

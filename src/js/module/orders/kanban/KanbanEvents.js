@@ -91,8 +91,8 @@ export default class extends KanbanBase {
 
   // Kanban ------------------------------------------------------------------------------------------------------------
   onCardClick(args) {
-    const target = args.event.target,
-          action = target.dataset.action || target.closest('[data-action]').dataset.action;
+    let target = args.event.target,
+        action = target.dataset.action || target.closest('[data-action]')?.dataset.action;
 
     if (action) {
       switch (action) {

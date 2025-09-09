@@ -48,11 +48,11 @@
 @include export-module('kanban-bootstrap-icons') {
   .e-kanban {
     .e-column-expand::before {
-      content: "\e931";
+      content: "\e92d";
     }
 
     .e-column-collapse::before {
-      content: "\e932";
+      content: "\e92e";
     }
 
     .e-swimlane-row-expand::before {

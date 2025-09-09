@@ -100,11 +100,11 @@
       <div id="Kanban"></div>
     </div>
 
-<!--    <script id="headerTemplate" type="text/x-jsrender">
-      <div class="text-center w-100">
-        <div>${headerText}</div>
+    <script id="headerTemplate" type="text/x-jsrender">
+      <div class="e-header-text fw-bold text-center w-100">
+        <div>${headerText} (${count})</div>
       </div>
-    </script>-->
+    </script>
     <script id="cardTemplate" type="text/x-jsrender">
       <div>
         <div class="e-card-header">${title}</div>
@@ -157,13 +157,13 @@
           <td class="label">Статус</td>
           <td><input id="Status" type="text" class="w-100" name="Status" value=${Status} required /></td>
         </tr>
-        <tr>
+<!--        <tr>
           <td class="label">Комментарий (нужен?)</td>
           <td>
             <textarea id="Summary" type="text"  class="w-100" name="Summary" value=${Summary}>${Summary}</textarea>
             <span class="e-float-line"></span>
           </td>
-        </tr>
+        </tr>-->
         </tbody>
       </table>
     </script>

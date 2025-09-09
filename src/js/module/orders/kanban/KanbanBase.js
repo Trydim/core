@@ -72,7 +72,7 @@ export default class {
         template: '#dialogTemplate',
       },
 
-      height: (window.screen.height - 300).toString() + 'px',
+      height: (window.screen.height - 310).toString() + 'px',
       cardHeight: '180px',
     });
 
@@ -150,8 +150,8 @@ export default class {
       this.statusList[s.name] = s.ID;
 
       this.kanbanObj.addColumn({
-        //template: '#headerTemplate',
-        allowToggle  : false,
+        template: '#headerTemplate',
+        allowToggle  : true,
         showItemCount: true,
         headerText   : s.name,
         keyField     : s.name,

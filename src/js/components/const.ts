@@ -9,6 +9,7 @@ const cms = JSON.parse(window.CMS_CONST || '{}'),
 
 export default {
   DEBUG        : cms['DEBUG'] || false,
+  IS_LOCAL     : cms['IS_LOCAL'] || !location.host.includes('.') || location.host.includes('localhost'),
   CSV_DEVELOP  : !!cms['CSV_DEVELOP'] || false,
   OUTSIDE      : cms['CL_OUTSIDE'],
   SITE_PATH    : sitePath,

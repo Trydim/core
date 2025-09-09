@@ -27,7 +27,6 @@ define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);
 $GLOBALS['main'] = $main = new Main($publicConfig, $dbConfig ?? []);
 $url = $main->url;
 
-//define('IS_LOCAL', $main->isDealer() && $url->isLocalDealer('1')); // Only for first
 define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
 define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 

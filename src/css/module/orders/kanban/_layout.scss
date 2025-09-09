@@ -103,6 +103,7 @@
 
           .e-header-title {
             display: flex;
+            align-items: center;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
@@ -193,9 +194,6 @@
     }
 
     .e-kanban-content {
-      overflow: auto;
-      padding-bottom: 10px;
-
       .e-content-row {
         .e-content-cells {
           .e-limits {
