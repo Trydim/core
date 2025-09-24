@@ -96,7 +96,7 @@ switch ($cmsAction) {
     $mail->prepareMail($param);
     $docType && $mail->addFile($docsPath);
 
-    $otherMail = $otherMail ?? [];
+    $otherMail = json_decode($otherMail ?? '[]', true);
     isset($email) && !empty($email) && $otherMail[] = $email;
     $mail->addMail($otherMail);
     $main->response->setContent(['mail' => $mail->send()]);

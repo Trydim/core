@@ -98,12 +98,13 @@ trait Authorization {
     $password = $this->url->server->get('PHP_AUTH_PW');
 
     if (!empty($login) && !empty($password)) {
-      $_SESSION['login']     = $login;
-      $_SESSION['password']  = $password;
+      $_SESSION['login']    = $login;
+      $_SESSION['password'] = $password;
       return true;
     }
     return false;
   }
+
   /**
    * Проверка пароля
    * @return $this|Main
@@ -124,6 +125,7 @@ trait Authorization {
 
     return $this;
   }
+
   /**
    * Если отк. страница доступна без регистрации, то перейти
    * Если отк. стр-ца не доступна без регистрации, то перейти на login

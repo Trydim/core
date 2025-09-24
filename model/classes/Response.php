@@ -228,7 +228,7 @@ class Response {
       $this->header('Content-Type', 'application/json');
 
       $this->checkError($content);
-      $content = json_encode($content);
+      $content = json_encode($content, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
     }
 
     /*// If this content implements the "Renderable" interface then we will call the

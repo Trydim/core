@@ -53,6 +53,11 @@ final class Main {
   public $frontSettingInit = false;
 
   /**
+   * @var DbMain
+   */
+  public $db;
+
+  /**
    * @var UrlGenerator
    */
   public $url;
@@ -76,28 +81,18 @@ final class Main {
    * Main constructor.
    * @param array $cmsParam
    * @param array $dbConfig
+   * @throws RedException
    */
   public function __construct(array $cmsParam, array $dbConfig) {
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
 
-    $this->url    = new UrlGenerator($this, 'core/');
+    $this->db       = new DbMain($this);
+    $this->url      = new UrlGenerator($this, 'core/');
     $this->response = new Response($this);
     $this->dealer   = new Dealer($this);
   }
 
-  /**
-   * @param string $value
-   * @return DbMain|Dealer|UrlGenerator|Response
-   * @throws RedException
-   */
-  public function __get(string $value) {
-    if ($value === 'db') {
-      $this->db = new DbMain($this);
-    }
-
-    return $this->$value;
-  }
   public function afterConstDefine() {
     $this->loadSetting()
          ->setHooks();
@@ -166,15 +161,16 @@ final class Main {
 
   /**
    * @param string $param
+   * @param ?mixed $default
    * @return mixed|string|null
    */
-  public function getCmsParam(string $param) {
+  public function getCmsParam(string $param, $default = null) {
     $param = explode('.', $param);
 
     if (count($param) === 1) {
-      return $this->cmsParam[$param[0]] ?? null;
+      return $this->cmsParam[$param[0]] ?? $default;
     } else {
-      return $this->cmsParam[$param[0]][$param[1]] ?? null;
+      return $this->cmsParam[$param[0]][$param[1]] ?? $default;
     }
   }
 
@@ -337,7 +333,7 @@ final class Main {
 
     $field = [
       'main'        => $this,
-      'pageTitle'   => $main->getCmsParam(VC::PROJECT_TITLE) . ' ' . gTxt(ucfirst($target)),
+      'pageTitle'   => $this->getCmsParam(VC::PROJECT_TITLE) . ' ' . gTxt(ucfirst($target)),
       'headContent' => '',
       'cssLinks'    => [],
       'jsLinks'     => [],
@@ -393,16 +389,20 @@ final class Main {
     return $this->getFrontContent($dataId, $rate);
   }
 
-  public function publicMain() {
+  public function publicMain(): Main {
     $this->publicDealer = false;
     $this->setCmsParam('dealCsvPath', $this->getCmsParam(VC::CSV_PATH));
     $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam(VC::CSV_MAIN_PATH));
+
+    return $this;
   }
 
-  public function publicDealer() {
+  public function publicDealer(): Main {
     if ($this->isDealer()) {
       $this->publicDealer = true;
       $this->setCmsParam(VC::CSV_PATH, $this->getCmsParam('dealCsvPath'));
     }
+
+    return $this;
   }
 }

