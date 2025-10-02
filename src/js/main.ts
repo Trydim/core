@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelFormSubmit();
   loadLangList();
   dictionaryInit();
-  f.getSetting();
+  f.getSetting('');
   f.relatedOption();
   storageLoad();
   onEvent();

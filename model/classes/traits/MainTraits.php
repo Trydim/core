@@ -193,7 +193,7 @@ trait Authorization {
   private function setSideMenu()
   {
     if ($this->checkStatus('no')) {
-      $this->sideMenu = $this->getCmsParam('ACCESS_MENU');
+      $this->sideMenu = $this->getCmsParam(VC::ACCESS_MENU);
       PUBLIC_PAGE && $this->sideMenu[] = PUBLIC_PAGE;
       return;
     }
@@ -203,17 +203,15 @@ trait Authorization {
     if (USE_DATABASE) {
       $menuAccess = $this->getLogin('permission')['menu'] ?? '';
       $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
-      $this->sideMenu = $menuAccess ?: $this->getCmsParam('ACCESS_MENU');
+      $this->sideMenu = $menuAccess ?: $this->getCmsParam(VC::ACCESS_MENU);
     } else {
       $filterMenu = ['calendar', 'catalog', 'customers', 'orders', 'statistic', 'users'];
-      $this->sideMenu = array_filter($this->getCmsParam('ACCESS_MENU'), function ($m) use ($filterMenu) {
+      $this->sideMenu = array_filter($this->getCmsParam(VC::ACCESS_MENU), function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);
       });
     }
 
-    if (empty($menuAccess) && PUBLIC_PAGE) {
-      $this->sideMenu = array_merge([PUBLIC_PAGE], $this->sideMenu);
-    }
+    if (empty($menuAccess) && PUBLIC_PAGE) array_unshift($this->sideMenu, PUBLIC_PAGE);
 
     // Setting allowed for all
     $this->sideMenu[] = 'setting';

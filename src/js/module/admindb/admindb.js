@@ -2,24 +2,12 @@
 
 import '../../../css/module/admindb/admindb.scss';
 
-import {FormsTable} from "./formEditor/FormsTable";
-import {CsvValues} from "./csvEditor/CsvValues";
-import {TableEditor} from "./tableEditor/TableEditor.js";
+import {FormsTable}  from './formEditor/FormsTable';
+import {CsvValues}   from './csvEditor/CsvValues';
+import {TableEditor} from './tableEditor/TableEditor.js';
 import ContentEditor from './contentEditor/ContentEditor';
-import localStorage from "../../components/LocalStorage";
 
-/**
- * Erase template from ${}
- * @param tmpString
- * @return string
- */
-//const eraseTemplate = tmpString => tmpString.replace(/\$\{.+?\}/g, '');
-
-/* Проверка файла перед добавлением (не знаю что хотел проверить)
-const checkAddedFile = function (e) {
-  let input = e.target;
-  if (!input.value.includes('csv')) return;
-}*/
+import '../history/history';
 
 const storage = new f.LocalStorage();
 
@@ -61,10 +49,6 @@ const adminDb = {
     switch (value) {
       case 'form':    this.adminType = new FormsTable();    break;
       case 'table':   this.adminType = new CsvValues();     break;
-        /*
-         f.Get({data: 'mode=load&dbAction=tables'})
-         .then(data => this.showTablesName(data));
-        */
       case 'config':  this.adminType = new TableEditor();   break;
       case 'content': this.adminType = new ContentEditor(); break;
     }
@@ -75,7 +59,7 @@ const adminDb = {
   },
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   window.AdminDbInstance = adminDb;
   // Delay for hooks
   setTimeout(() => adminDb.init(), 0);

@@ -63,18 +63,30 @@ class DbMain extends R {
 
   /**
    * @param Main $main
-   * @param bool $freeze
    * @throws RedException
    */
-  public function __construct(Main $main, bool $freeze = true) {
+  public function __construct(Main $main) {
     $this->main = $main;
 
     if (USE_DATABASE) {
-      $dbConfig = $main->getSettings(VC::DB_CONFIG);
+      $this->setting();
+    }
+  }
+
+  public function connect() {
+    if (!USE_DATABASE) return;
+
+    if (!self::testConnection()) {
+      $dbConfig = $this->main->getSettings(VC::DB_CONFIG);
 
       if (!count($dbConfig)) {
-        require $main->url->getPath(true) . 'config.php';
-        if (!count($dbConfig)) exit('Configs error');
+        $pathConfig = $this->main->url->getPath(true) . 'config.php';
+
+        if (file_exists($pathConfig)) {
+          require $pathConfig;
+        }
+
+        if (!count($dbConfig)) die('Configs error');
       }
 
       $this->dbName = $dbConfig['dbName'];
@@ -88,10 +100,8 @@ class DbMain extends R {
 
       !self::testConnection() && die('Data Base connect error!');
 
-      $this->setting();
-
       //self::fancyDebug(DEBUG);
-      self::freeze($freeze);
+      self::freeze();
     }
   }
 

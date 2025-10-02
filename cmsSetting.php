@@ -38,7 +38,7 @@ $main->setCmsParam(VC::CSV_PATH, $url->getBasePath(true) . SHARE_PATH . ($public
      ->setCmsParam(VC::URI_CSS, $url->getBaseUri() . ($publicConfig['URI_CSS'] ?? 'public/css/'))
      ->setCmsParam(VC::URI_JS, $url->getBaseUri() . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 
-if ($main->db->setDealerLink()) {
+if ($main->isDealer() && $main->db->setDealerLink()) {
   require $url->getPath(true) . 'config.php';
 
   $main->setCmsParam(VC::CSV_MAIN_PATH, $main->getCmsParam(VC::CSV_PATH))

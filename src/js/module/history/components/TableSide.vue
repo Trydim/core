@@ -87,7 +87,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "./../index.scss";
+@import './../../../../css/mixin/functions.scss';
 
 .table-wrapper {
   overflow: auto;

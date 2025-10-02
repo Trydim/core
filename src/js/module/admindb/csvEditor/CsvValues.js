@@ -99,6 +99,7 @@ export class CsvValues extends Main {
     this.mainNode.append(div);
 
     columns.map(col => {
+      Object.entries(col).map(([k, v]) => col[k] = _(v));
       colHeaders.push(f.replaceTemplate(columnValueTmp, col));
     });
 

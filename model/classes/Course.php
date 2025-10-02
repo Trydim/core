@@ -14,7 +14,11 @@ class Course {
     'BYN' => "https://www.nbrb.by/services/xmlexrates.aspx",
   ];
 
+  /**
+   * @var DbProxy
+   */
   private $db;
+
   private $xml;
   private $dataFile;
   private $sourceKey;

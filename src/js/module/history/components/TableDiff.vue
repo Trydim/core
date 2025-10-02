@@ -2,29 +2,35 @@
   <div class="diff-wrapper">
     <div class="toggle-row">
       <label>
-        <input type="checkbox" v-model="showOnlyChanges" />
-        {{ $t('Показать только измененные строки') }}
+        <input type="checkbox" class="form-check-input" v-model="showOnlyChanges" />
+        {{ $t('Show only changed rows') }}
       </label>
-      <label style="margin-left: 20px;">
-        <input type="checkbox" v-model="showOnlyChangedColumns" />
-        {{ $t('Показать только изменённые столбцы') }}
+      <label class="ms-4">
+        <input type="checkbox" class="form-check-input" v-model="showOnlyChangedColumns" />
+        {{ $t('Show only changed columns') }}
+      </label>
+      <label class="ms-4">
+        <input type="checkbox" class="form-check-input" v-model="syncScroll" />
+        {{ $t('Synchronize scrolling') }}
       </label>
     </div>
 
     <div class="tables-row">
-      <TableSide
-        :columns="filteredColumns"
-        :rows="filteredFilteredRows"
+      <TableSide ref="tPrev"
         side="left"
-        :sideLabel="$t('Предыдущая версия таблицы')"
-        :meta="diff?.previousMeta"
-      />
-      <TableSide
         :columns="filteredColumns"
         :rows="filteredFilteredRows"
+        :sideLabel="$t('Previous version')"
+        :meta="diff?.previousMeta"
+        @scroll="onSyncScroll(tPrev, tCurrent)"
+      />
+      <TableSide ref="tCurrent"
         side="right"
-        :sideLabel="$t('Новая версия таблицы')"
+        :columns="filteredColumns"
+        :rows="filteredFilteredRows"
+        :sideLabel="$t('Current version')"
         :meta="diff?.currentMeta"
+        @scroll="onSyncScroll(tCurrent, tPrev)"
       />
     </div>
   </div>
@@ -45,7 +51,11 @@ export default {
     return {
       showOnlyChanges: false,
       showOnlyChangedColumns: false,
+      syncScroll: true,
       normalStatuses: new Set(['normal', 'empty', 'line-number']),
+
+      tPrev   : undefined,
+      tCurrent: undefined,
     };
   },
   computed: {
@@ -98,13 +108,24 @@ export default {
   methods: {
     filterRowByColumns(rowCells) {
       return this.visibleColumnIndexes.map(idx => rowCells[idx]);
-    }
-  }
+    },
+
+    onSyncScroll(source, target) {
+      if (!this.syncScroll) return;
+
+      target.scrollTop  = source.scrollTop;
+      target.scrollLeft = source.scrollLeft;
+    },
+  },
+  mounted() {
+    this.tPrev    = this.$refs.tPrev.$el;
+    this.tCurrent = this.$refs.tCurrent.$el;
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-@import "./../index.scss";
+@import './../../../../css/mixin/functions.scss';
 
 .diff-wrapper {
   padding: rem(10);
@@ -120,7 +141,6 @@ export default {
     user-select: none;
   }
 }
-
 
 .tables-row {
   display: flex;

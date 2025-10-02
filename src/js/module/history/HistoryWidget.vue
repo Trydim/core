@@ -69,7 +69,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "index";
+@import './../../../css/mixin/functions.scss';
 
 .history-widget {
   display: grid;

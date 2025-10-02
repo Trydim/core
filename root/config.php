@@ -6,7 +6,7 @@
 
 $publicConfig = [
   'PROJECT_TITLE' => 'PROJECT_TITLE',
-  /** Любое значение включает режим отладки */
+  /** Любое истинное значение включает режим отладки */
   //'DEBUG' => true,
 
   /** Почта */
@@ -14,8 +14,8 @@ $publicConfig = [
   //'MAIL_SMTP' => true,
   //'MAIL_PORT' => 465,
   //'MAIL_HOST' => 'smtp.yandex.ru';
-  //'MAIL_FROM' => 'noreplycalcby@yandex.ru';
-  //'MAIL_PASSWORD' => '638ch1';
+  //'MAIL_FROM' => 'mail.common@list.ru';
+  //'MAIL_PASSWORD' => 'eBsv3cj7LtofBLULy6ni';
 
   /** Расскоментировать, если требуется изменить путь */
   //'PATH_CSS' => 'public/css/',
@@ -34,6 +34,8 @@ $publicConfig = [
   //'PATH_LEGEND' => 'public/views/legend.php',
   /** Папка csv файлов */
   //'PATH_CSV'    => 'shared/csv/',
+  /** Сохранять историю изменений */
+  //'CSV_CHANGE_HISTORY' => true,
 
   /** Количество символов в csv */
   //'CSV_STRING_LENGTH' => '1000',

@@ -60,12 +60,10 @@ export default {
   },
   methods: {
     async fetchTreeData() {
-      const data = new FormData();
-      data.set('mode', 'DB');
-      data.set('dbAction', 'getCsvHistoryTree');
+      const response =  /** @type {TreeApiResponse} */ await f.Post({data: {
+          mode: 'DB', dbAction: 'loadHistoryTree',
+      }});
 
-
-      const response =  /** @type {TreeApiResponse} */ await f.Post({data});
       if (response.status) {
         this.treeData = response.historyTree?.length ? response.historyTree.map(node => ({
           ...node,
@@ -91,7 +89,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "./index.scss";
+@import './../../../css/mixin/functions.scss';
 
 .history-app {
   display: grid;

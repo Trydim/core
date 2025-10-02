@@ -3,18 +3,18 @@
 class VC {
   /** Cms Const */
   const PUBLIC_PAGE     = 'PUBLIC_PAGE',
-        ACCESS_MENU     = 'ACCESS_MENU',
+        ACCESS_MENU     = 'accessMenu',
         USE_DATABASE    = 'USE_DATABASE',
         CHANGE_DATABASE = 'CHANGE_DATABASE',
         LOCALES         = 'LOCALES',
-        LOCALES_BASE_LANG  = 'LOCALES_BASE_LANG',
-        USE_CONTENT_EDITOR = 'USE_CONTENT_EDITOR',
-        USE_DEAL_SUBDOMAIN = 'USE_DEAL_SUBDOMAIN';
+        LOCALES_BASE_LANG  = 'localesBase',
+        USE_CONTENT_EDITOR = 'useContentEditor',
+        USE_DEAL_SUBDOMAIN = 'useDealSubdomain';
 
   /** cmsParams */
-  const PROJECT_TITLE = 'PROJECT_TITLE',
-        ENCRYPT_ALGO  = 'ENCRYPT_ALGO',
-        ENCRYPT_KEY   = 'ENCRYPT_KEY',
+  const PROJECT_TITLE = 'projectTitle',
+        ENCRYPT_ALGO  = 'encryptAlgo',
+        ENCRYPT_KEY   = 'encryptKey',
         DB_CONFIG     = 'dbConfig',
         IS_DEALER     = 'isDealer',
         DEALER_ID     = 'dealerId',
@@ -77,16 +77,14 @@ class VC {
 
         OPTION_PROPERTIES = 'optionProperties',
         DEALER_PROPERTIES = 'dealersProperties',
-        TABLE_CONFIG_PROPERTIES = 'csvConfigProperties';
+        TABLE_CONFIG_PROPERTIES = 'csvConfigProperties',
 
-  /**
-   * Setting action
-   */
+        SAVE_CHANGE_HISTORY = 'saveHistory';
+
+  /** Setting action */
 
 
-  /**
-   * Hooks
-   */
+  /** Hooks */
   const HOOKS_PUBLIC_TEMPLATE   = 'publicTemplate',
         HOOKS_ADMIN_DB_TEMPLATE = 'admindbTemplate',
         HOOKS_CALENDAR_TEMPLATE = 'calendarTemplate',

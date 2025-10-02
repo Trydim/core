@@ -1,7 +1,7 @@
 <template>
-  <div v-if="!filePath" class="empty-message">{{ $t('Выберите файл, чтобы посмотреть историю.') }}</div>
+  <div v-if="!filePath" class="empty-message">{{ $t('Select a file to view history') }}</div>
   <div v-else class="history-list">
-    <h3>{{ $t('История изменений')}}</h3>
+    <h3>{{ $t('Change history')}}</h3>
     <ul v-if="history.length">
       <li
         v-for="entry in history"
@@ -11,11 +11,11 @@
         @click="selectEntry(entry)"
       >
         <div class="date">{{ entry.createdAt }}</div>
-        <div class="user"><strong>{{ entry.userLogin || $t('Система') }}</strong></div>
+        <div class="user"><strong>{{ entry.userLogin || $t('System') }}</strong></div>
         <div v-if="entry.note" class="note">{{ $t(entry.note) }}</div>
       </li>
     </ul>
-    <div v-else class="empty-message">{{ $t('История пуста') }}</div>
+    <div v-else class="empty-message">{{ $t('History is empty') }}</div>
   </div>
 </template>
 
@@ -76,19 +76,13 @@ export default {
   },
   methods: {
     async fetchHistory(path) {
-      const data = new FormData();
-      data.set('mode', 'DB');
-      data.set('dbAction', 'getCsvHistory');
-      data.set('relativePath', path);
+      const response = await f.Post({data: {
+        mode: 'DB',
+        dbAction: 'loadHistory',
+        relativePath: path,
+      }});
 
-
-      const response = await f.Post({data});
-      if (response.status) {
-        this.history = response.history;
-      } else {
-        this.history = [];
-      }
-
+      this.history = response.status ? response['history'] : [];
     },
 
     async selectEntry(entry) {
@@ -98,16 +92,14 @@ export default {
     },
 
     async fetchDiff(entry) {
-      const data = new FormData();
-      data.set('mode', 'DB');
-      data.set('dbAction', 'getCsvBackupForDiff');
-      data.set('backupId', entry.backupId);
-      data.set('relativePath', this.filePath);
-
-      const response = /** @type {DiffApiResponse} */ await f.Post({data});
+      const response = /** @type {DiffApiResponse} */ await f.Post({data: {
+        mode: 'DB',
+        dbAction: 'loadHistoryBackup',
+        backupId: entry.backupId,
+        relativePath: this.filePath,
+      }});
 
       if (response?.diff?.previousContent && response?.diff?.currentContent) {
-
         this.diff = {
           ...csvDiff(response.diff.previousContent, response.diff.currentContent),
           currentMeta: response.diff?.currentMeta ?? {},
@@ -122,7 +114,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "./../index.scss";
+@import './../../../../css/mixin/functions.scss';
 
 .history-list {
   width: 100%;

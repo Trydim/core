@@ -1,7 +1,7 @@
 <template>
   <div class="tree">
     <div v-if="treeData.length === 0" class="empty-message">
-      {{ $t('История изменений отсутствует') }}
+      {{ $t('История пуста') }}
     </div>
 
     <div v-for="node in treeData" :key="node.path" class="tree-node">
@@ -62,14 +62,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "./../index.scss";
+@import './../../../../css/mixin/functions.scss';
 
 .tree {
   max-width: rem(400);
   user-select: none;
-
-  .tree-node {
-  }
 
   .node-item {
     padding: rem(4) rem(8);
