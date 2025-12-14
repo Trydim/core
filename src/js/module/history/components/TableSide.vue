@@ -215,7 +215,6 @@ export default {
 
 .text-row {
   position: relative;
-  overflow: hidden;
 
   display: flex;
   height: rem(20);
