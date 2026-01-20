@@ -1,5 +1,5 @@
-/// <reference lib="component.d.ts" />
-/// <reference lib="sweetalert2.d.ts" />
+/// <reference path="./component.d.ts" />
+/// <reference path="./sweetalert2.d.ts" />
 
 declare interface Hooks {
   beforeCreateApp: Function|null

@@ -36,12 +36,12 @@ class Course {
    */
   public function __construct(array $refreshParam, &$db,  string $dataFile = '') {
     $dataFile = empty($dataFile) ? $this::COURSE_CACHE : $dataFile;
-    $this->sourceKey = $refreshParam[VC::SERVER_REFRESH] ?: $this::DEFAULT_CURRENCY;
+    $this->sourceKey = $refreshParam[VC::RATE_SERVER_REFRESH] ?: $this::DEFAULT_CURRENCY;
 
     if (is_object($db)) $this->getRateFromDb($db);
     else $this->getRateFromFile($dataFile);
 
-    if ($refreshParam[VC::AUTO_REFRESH] ?? true) $this->refresh();
+    if ($refreshParam[VC::RATE_AUTO_REFRESH] ?? true) $this->refresh();
   }
 
   private function checkTableMoney() {

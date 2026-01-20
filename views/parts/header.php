@@ -37,16 +37,15 @@ if ($main->checkStatus()) {
       <input class="form-check-input" type="checkbox" data-action-cms="themeToggle">
     </div>
 
-    <?php if ($main->url->getRoute() === 'orders') { ?>
+    <?php if ($main->url->getRoute() === 'orders' && $main->getCmsParam(VC::ORDERS_KANBAN)) { ?>
       <div class="ms-2 me-auto align-self-center">
         <input id="orderView-table" type="radio" class="btn-check" data-action="changeView" data-target="orderTemplateTable" name="orderView" value="table">
         <label for="orderView-table" class="btn btn-sm btn-outline-primary">
-          <i class="pi pi-list align-middle me-1"></i><?= gTxt('List') ?>
+          <i class="pi pi-list align-middle me-1"></i><?= gTxt('Table') ?>
         </label>
         <input id="orderView-kanban" type="radio" class="btn-check" data-action="changeView" data-target="orderTemplateKanban" name="orderView" value="kanban">
         <label for="orderView-kanban" class="btn btn-sm btn-outline-primary">
-          <i class="pi pi-align-left align-middle me-1" style="transform: rotate(90deg)"></i>
-          <?= gTxt('Kanban') ?>
+          <i class="pi pi-align-left align-middle me-1" style="transform: rotate(90deg)"></i><?= gTxt('Kanban') ?>
         </label>
       </div>
     <?php }

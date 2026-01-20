@@ -265,7 +265,7 @@ trait DbOrders
 
     if (strlen($filters)) $sql .= 'WHERE ' . $filters . "\n ";
 
-    $sql .= "ORDER BY sort";
+    $sql .= "ORDER BY sort, ID";
 
     return self::getAll($sql);
   }

@@ -5,28 +5,28 @@
  */
 
 $publicConfig = [
-  'PROJECT_TITLE' => 'PROJECT_TITLE',
+  VC::PROJECT_TITLE => 'PROJECT_TITLE',
   /** Любое истинное значение включает режим отладки */
   //'DEBUG' => true,
 
   /** Почта */
-  //'MAIL_TARGET_DEBUG' => 'trydim@mail.ru',
+  //VC::MAIL_TARGET_DEBUG => 'trydim@mail.ru',
   //'MAIL_SMTP' => true,
   //'MAIL_PORT' => 465,
   //'MAIL_HOST' => 'smtp.yandex.ru';
   //'MAIL_FROM' => 'mail.common@list.ru';
   //'MAIL_PASSWORD' => 'eBsv3cj7LtofBLULy6ni';
 
-  /** Расскоментировать, если требуется изменить путь */
+  /** Раскомментировать, если требуется изменить путь */
   //'PATH_CSS' => 'public/css/',
   //'PATH_IMG' => 'public/images/',
   //'PATH_JS'  => 'public/js/',
 
   /** Использовать БД для авторизации */
-  //'USE_DATABASE' => true,
+  //VC::USE_DATABASE => true,
 
   /** Возможность прямого редактирования БД из админки */
-  //'CHANGE_DATABASE' => false,
+  //VC::CHANGE_DATABASE => false,
 
   /** Режим разработчика для csv редактора (true/false*) */
   //'CSV_DEVELOP' => false,
@@ -44,15 +44,17 @@ $publicConfig = [
 
   /** Сохранять пользовательские расчеты */
   //'USERS_ORDERS' => false,
+  /** Доступность "Канбан" для страницы заказов, если страница не доступна не имеет значения */
+  //VC::ORDERS_KANBAN => true,
 
   /** Вход только с регистрацией. Определяется в зависимости от доступной страницы. */
-  'ONLY_LOGIN' => true,
+  VC::ONLY_LOGIN => true,
   /** Страница для доступа без регистрации: файл/файлы с таким именем должен быть в public/views/
    * Если пользователь не зарегистрирован, переход на эту страницу.
    * (позже) или через запятую если несколько страниц.
    * если false, то константа ONLY_LOGIN всегда true
    */
-  'PUBLIC_PAGE' => 'calculator',
+  VC::PUBLIC_PAGE => 'calculator',
 
   /** Какую библиотеку использовать (добавить в настройки) mpdf, html2pdf */
   // внутри битрикс не доступно mpdf
@@ -65,7 +67,7 @@ $publicConfig = [
   админ-ние   календарь   каталог    клиенты      дилеры     заказы    ФМ             статистика   мен-ры
   hr - черта в меню
   */
-  'ACCESS_MENU' => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'users', 'customPage'],
+  VC::ACCESS_MENU => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'users', 'customPage'],
 
   /**
    * Фильтр заказов
@@ -79,7 +81,7 @@ $publicConfig = [
   // 'SHARE_PATH' => 'public/images/',
 
   /** Контент редактор */
-  // 'USE_CONTENT_EDITOR' => true,
+  // VC::USE_CONTENT_EDITOR => true,
 
   /** Поддомены для дилеров */
   //'USE_DEAL_SUBDOMAIN' => true,

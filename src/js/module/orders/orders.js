@@ -6,9 +6,14 @@ import Kanban from './kanban/Kanban';
 const storage = new f.LocalStorage();
 
 class Orders {
+  /**
+   * @type {'table' | 'kanban'}
+   */
   selectedView = 'table'; // table|kanban
-
-  viewInstance = {};
+  /**
+   * @type {Table | Kanban | object}
+   */
+  viewInstance = {init() {}, unmounted() {}};
 
   constructor() {
     if (storage.has('orderView')) {
@@ -37,18 +42,16 @@ class Orders {
 
   onEvent() {
     const inputs = f.qA('.header input[data-action]');
+    // Kanban is not available
+    if (!inputs.length) this.actionBtn({value: 'table'});
 
     inputs.forEach((input) => {
-      input.onclick = (e) => this.actionBtn(e);
+      input.onclick = (e) => this.actionBtn(e.target);
       if (input.value === this.selectedView) input.click();
     });
   }
 
-  actionBtn(e) {
-    let target = e.target;
-
-    //if (this.selectedView === target.value) return;
-
+  actionBtn(target) {
     this.selectedView = target.value;
     this.switchView();
 

@@ -444,7 +444,7 @@ class DbMain extends R {
 
       $count = self::trashAll($beans);
     }
-    return $count;
+    return count($ids) === $count ? $count : 0;
   }
 
   /**

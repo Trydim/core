@@ -20,9 +20,9 @@ final class Main {
    * @var array - global Cms param
    */
   const CMS_PARAM = [
-    'PROJECT_TITLE' => 'Project title',
-    'ACCESS_MENU'   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
-    'ENCRYPT_ALGO'  => 'aes-256-cbc',
+    VC::PROJECT_TITLE => 'Project title',
+    VC::ACCESS_MENU   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
+    VC::ENCRYPT_ALGO  => 'aes-256-cbc',
   ];
 
   const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';
@@ -412,8 +412,8 @@ final class Main {
    */
   public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
     $rateParam = [
-      VC::AUTO_REFRESH   => $this->getSettings(VC::AUTO_REFRESH),
-      VC::SERVER_REFRESH => $this->getSettings(VC::SERVER_REFRESH),
+      VC::RATE_AUTO_REFRESH => $this->getSettings(VC::RATE_AUTO_REFRESH),
+      VC::RATE_SERVER_REFRESH => $this->getSettings(VC::RATE_SERVER_REFRESH),
     ];
     $rate = new Course($rateParam, $this->db);
     $rate = $justRate ? array_map(function ($rate) { return $rate['rate']; }, $rate->rate) : $rate->rate;

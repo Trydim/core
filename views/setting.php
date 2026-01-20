@@ -32,7 +32,7 @@ $isAdmin = $main->getLogin('isAdmin');
   <?php }
 
   if ($isAdmin && $main->availablePage('orders')) { ?>
-    <setting-order-status :prop-status-def="statusDefault" @update="updateOrderStatus"></setting-order-status>
+    <setting-order-status :status-list="status" :prop-status-def="statusDefault" @update="updateOrderStatus"></setting-order-status>
   <?php }
 
   if ($isAdmin) { ?>

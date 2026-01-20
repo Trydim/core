@@ -594,3 +594,6 @@ if (!function_exists('array_find')) {
     return null;
   }
 }
+
+date_default_timezone_set('Europe/Moscow');
+spl_autoload_register('cmsAutoloader');

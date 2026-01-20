@@ -1,20 +1,21 @@
 {
   "version": "1.0.0",
-  "description": "CMS project",
-  "name": "core-webpack",
+  "description": "CMS",
+  "name": "core-bundler",
   "private": true,
   "scripts": {
     "update": "git pull && npm run coreProd && npm run createResourceFile && npm run coreModuleProd",
 
     "startLIVEReload": "webpack-dev-server",
 
-    "createResourceFile": "node ./webpack/createResourceFile.js",
-    "coreProd": "webpack --env production --config ./webpack/webpack.config.js",
-    "coreModuleProd": "webpack --env production --config ./webpack/webpack.module.js",
-    "updateVersion": "node ./webpack/updateVersion.js",
+    "createResourceFile": "node ./bundler/createResourceFile.js",
+    "coreProd": "webpack --env production --config ./bundler/webpack.config.js",
+    "coreModuleProd": "webpack --env production --config ./bundler/webpack.module.js",
+    "updateVersion": "node ./bundler/updateVersion.js",
 
-    "coreDev": "webpack --config ./webpack/webpack.config.js",
-    "coreModuleDev": "webpack --config ./webpack/webpack.module.js",
+    "type-check": "vue-tsc --build",
+    "coreDev": "webpack --config ./bundler/webpack.config.js",
+    "coreModuleDev": "webpack --config ./bundler/webpack.module.js",
 
     "createCypress": "node ./test/createCypressConfig.js",
     "localCypressTest": "cypress open --project ../../ --config-file ./core/src/test/cypress.json",
@@ -29,6 +30,7 @@
     "@tiptap/extension-text-style": "latest",
     "@tiptap/starter-kit": "latest",
     "@tiptap/vue-3": "latest",
+    "diff": "^8.0.3",
     "mustache": "latest",
     "normalize-scss": "latest",
     "primevue": "latest",

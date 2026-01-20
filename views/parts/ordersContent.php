@@ -7,13 +7,13 @@
  */
 
 ?>
-<div data-relation="orderTemplateTable && !orderTemplateKanban" class="d-none">
+<div data-relation="orderTemplateTable && !orderTemplateKanban" class="<?= $main->getCmsParam(VC::ORDERS_KANBAN) ? 'd-none' : '' ?>">
   <div class="d-flex justify-content-between mb-4 pt-1 position-sticky top-0 bg-white gap-5 gap-md-0" id="actionBtnWrap" style="z-index: +2">
     <div>
       <input type="button" class="btn btn-success float-start mt-1 mt-md-0 mainOnly" value="<?= gTxt('Edit') ?>" data-action="openOrder">
       <span id="orderBtn">
         <input type="button" class="btn btn-warning float-start ms-1 mt-1 mt-md-0 mainOnly" value="<?= gTxt('Change status') ?>" data-action="changeStatusOrder">
-        <input type="button" class="btn btn-primary float-start ms-1 mt-1 mt-md-0" value="Pdf" data-action="savePdf">
+        <input type="button" class="btn btn-primary float-start ms-1 mt-1 mt-md-0" value="<?= gTxt('Pdf') ?>" data-action="savePdf">
         <input type="button" class="btn btn-primary float-start ms-1 mt-1 mt-md-0" value="<?= gTxt('Print') ?>" data-action="printOrder">
         <input type="button" class="btn btn-primary float-start ms-1 mt-1 mt-md-0" value="<?= gTxt('Send mail') ?>" data-action="sendOrder">
       </span>

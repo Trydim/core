@@ -67,6 +67,7 @@
   'Date'        => 'Дата',
   'List'        => 'Список',
   'Table'       => 'Таблица',
+  'Kanban'      => 'Канбан',
   'For the mask, use _. Leave blank to disable' => 'Для маски используйте _. Оставьте пустым, чтобы отключить',
   'This status name exists! It is highly recommended to use unique names.' => 'Название статуса дублируются! Рекомендуется использовать уникальные имена',
   // Mail
@@ -105,6 +106,7 @@
   'Login or password is not validate!' => 'Логин или пароль слишком короткие!',
   // Manager settings
   'Manager settings' => 'Менеджеры',
+  'Additional fields' => 'Дополнительные поля',
   'Additional fields for managers' => 'Дополнительные поля',
   // Rate
   'Exchange rates' => 'Курсы',
@@ -136,6 +138,7 @@
   'Sorting'         => 'Сортировка',
   'Default'         => 'По умолчанию',
   'order created'   => 'Заказ создан',
+  'Set order statuses' => 'Добавить новый статус',
   // Orders
   'Orders' => 'Заказы',
   'Order' => 'Заказ',
@@ -173,6 +176,5 @@
   'email'   => 'почта',
   'address' => 'адрес',
 
-  'Deleted' => 'Удалено',
   'Delete selected clients?' => 'Удалить выбранных?'
 ];

@@ -1,35 +1,52 @@
-const path    = require('path'),
+const fs = require('fs'),
+      path = require('path'),
       webpack = require('webpack'),
       { VueLoaderPlugin } = require('vue-loader');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizer = require('css-minimizer-webpack-plugin');
+
+const ABS_PATH = '../../',
+      RES_FILENAME = 'webpackModule.json';
+
+let entry;
+
+if (fs.existsSync(ABS_PATH + 'public/' + RES_FILENAME)) {
+  let rd = fs.readFileSync(ABS_PATH + 'public/' + RES_FILENAME, {encoding: 'utf8'});
+  entry  = JSON.parse(rd);
+} else {
+  console.log("\x1b[31m", 'Error.\nFile webpackModule.json not exist. Check config.php and run createResourceFile!');
+  process.exit();
+}
+
 
 module.exports = env => {
   const dev = !env.production;
 
   return {
-    mode : dev ? 'development' : 'production',
-    watch: dev, // слежка за изменениями файлов
+    mode        : dev ? 'development' : 'production',
+    watch       : dev, // слежка за изменениями файлов
     watchOptions: {aggregateTimeout: 300}, // задержка оценки изменений в мс
-    entry       : {
-      main: './js/main.ts',
-      src : './js/src.js',
-    },
+    entry,
 
     experiments: {
       outputModule: true,
     },
 
-    output : {
-      path      : path.resolve(__dirname, '../../assets/'),
-      filename  : 'js/[name].js',
-      //assetModuleFilename: '../../assets/',
+    output: {
+      //clean   : !dev,
+      path    : path.resolve(__dirname, '../../assets/'),
+      filename: 'js/module/[name].js',
+      library : {
+        type: 'module',
+      },
       scriptType: 'module',
       module    : true,
       libraryTarget: 'module',
     },
+
     resolve: {
-      extensions: ['.ts', '.js'],
+      extensions: ['.ts', '.js', '.vue'],
       alias: {
         vue: dev ? 'vue/dist/vue.esm-bundler.js' : 'vue/dist/vue.esm-browser.prod.js',
       }
@@ -37,15 +54,23 @@ module.exports = env => {
 
     devtool: dev ? 'source-map' : false, //source mapping
     optimization: {
-      minimize : !dev,
-
-      minimizer: [`...`],
+      minimize: !dev,
+      minimizer: [
+        new CssMinimizer(),
+        `...`,
+      ],
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "css/admin.css",
+        filename: "css/module/[name].css",
       }),
       new VueLoaderPlugin(),
+
+      /*new HtmlWebpackPlugin({
+       title: 'title',
+       filename: 'view/content.php',
+       template: `content.php`,
+       }),*/
 
       new webpack.DefinePlugin({
         // Drop Options API from bundle
@@ -54,12 +79,20 @@ module.exports = env => {
         __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
       }),
     ],
+
     module: {
+      noParse: /handsontable.full.min|fullCalendar.min|canvasjs.min/,
       parser: {
         javascript: {commonjsMagicComments: true},
       },
-      //noParse: /bootstrap5\.2/,
       rules: [
+        {
+          test: /handsontable.full.min.js|fullCalendar.min|canvasjs.min/,
+          type: "asset/resource",
+          generator: {
+            filename: 'js/libs/[name][ext]',
+          },
+        },
         getTypescriptRules(),
         getVueRules(),
         getScssRules(dev),
@@ -67,7 +100,7 @@ module.exports = env => {
         getImageRules(),
         getSVGRules(),
         getFontsRules(),
-      ]
+      ],
     },
   };
 };
@@ -76,90 +109,68 @@ module.exports = env => {
 // Правила / Rules
 // ---------------------------------------------------------------------------------------------------------------------
 
-/**
- * Mini css extract plugin
- */
-const getMiniCssExtractPlugin = () => ({
-  loader: MiniCssExtractPlugin.loader,
-  options: {
-    publicPath: '../',
-  },
-});
-
-/**
- * css-loader
- * @return {object}
- */
-const getCssLoader = () => ({
-  loader: 'css-loader',
-  options: {
-    sourceMap: true,
-  },
-});
+/** asset/resource - file-loader - в отдельный файл
+ * asset/inline - url-loader - inline базе64
+ * asset/source - raw-loader - ?
+ * asset - автоматический выбор от размера по умолчанию 8к */
 
 /**
  * Typescript
+ * @return {object}
  */
 const getTypescriptRules = () => ({
   test  : /\.ts$/,
   loader: 'ts-loader',
   exclude: /node_modules/,
   options: {
+    configFile: path.resolve(__dirname, 'tsconfig.webpack.json'),
     appendTsSuffixTo: [/\.vue$/]
   },
 });
 
 /**
  * Vue
+ * @return {object}
  */
 const getVueRules = () => ({
-  test  : /\.vue$/,
+  test: /\.vue$/,
   loader: "vue-loader"
 });
 
 /**
  * Scss
+ * @return {object}
  */
 const getScssRules = dev => ({
   test: /\.s[ac]ss$/i,
-  use : [
-    /*dev ? 'style-loader' : */getMiniCssExtractPlugin(),
-    getCssLoader(),
-    'resolve-url-loader',
-    {
-      loader: 'sass-loader',
-      options: {
-        sourceMap: true, // <-- !!IMPORTANT!!
-      }
-    },
+  use: [
+    dev ? 'style-loader' : MiniCssExtractPlugin.loader,
+    'css-loader',
+    'sass-loader',
   ],
 });
 
 /**
  * Css
+ * @return {object}
  */
 const getCssRules = dev => ({
   test: /\.css$/i,
-  use : [
-    /*dev ? 'style-loader' :*/ getMiniCssExtractPlugin(),
-    getCssLoader(),
+  use: [
+    dev ? 'style-loader' : MiniCssExtractPlugin.loader,
+    'css-loader',
   ],
 });
 
-/** asset/resource - file-loader - в отдельный файл
- * asset/inline - url-loader - inline базе64
- * asset/source - raw-loader - ?
- * asset - автоматический выбор от размера по умолчанию 8к
- */
-
 /**
- * Image
+ * Image loader
+ * @return {object}
  */
 const getImageRules = () => ({
   test: /\.(png|jpe?g|gif|webp)$/i,
   type: 'asset',
   generator: {
-    filename: 'images/[name][ext]',
+    filename: 'image/[name][ext]',
   },
   parser: {
     dataUrlCondition: {
@@ -169,10 +180,12 @@ const getImageRules = () => ({
 });
 
 /**
- * SVG - file-loader/inline
+ * SVG
+ * inline
+ * @return {object}
  */
 const getSVGRules = () => ({
-  test: /\.svg$/,
+  test: /\.(svg)$/,
   type: 'asset',
   generator: {
     filename: 'svg/[name][ext]',
@@ -186,6 +199,7 @@ const getSVGRules = () => ({
 
 /**
  * Шрифты
+ * @return {object}
  */
 const getFontsRules = () => ({
   test: /\.(ttf|woff|woff2|eot)$/,

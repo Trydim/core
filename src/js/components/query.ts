@@ -1,17 +1,22 @@
-// Query Object -----------------------------------------------------------------------------------------------------------------
-
+/**
+ * Parse JSON response body and show backend errors via `f.showMsg`.
+ * Always returns an object; on parse/error returns `{ status: false }`.
+ * @param {string} data Raw response text.
+ * @returns {any|{status:false}} Parsed JSON or a failure object.
+ */
 const checkJSON = (data: string) => {
   try {
     const response = JSON.parse(data);
     if (response['error']) throw response['error'];
     return response;
   }
-  catch (e) {
-    let msg = e['xdebug_message'] || e.message || e;
+  catch (e: unknown) {
+    const err = e as { xdebug_message?: unknown; message?: unknown };
+    let msg: unknown = err?.xdebug_message ?? err?.message ?? e;
 
     if (msg) {
-      if (!Array.isArray(msg)) msg = [msg.toString()];
-      Object.values(msg).forEach((m: any) => f.showMsg(m.toString(), 'error', false))
+      const messages: string[] = Array.isArray(msg) ? msg.map(String) : [String(msg)];
+      messages.forEach((m) => f.showMsg(m, 'error', false));
     }
 
     if (data) {
@@ -23,6 +28,12 @@ const checkJSON = (data: string) => {
   }
 };
 
+/**
+ * Extract filename from response headers.
+ * Supports `content-disposition: filename="..."` and custom `filename` header.
+ * @param {Response} data Fetch response.
+ * @returns {string} Filename.
+ */
 const getFilename = (data: any) => {
   let filename = data.headers.get('content-disposition');
 
@@ -33,6 +44,12 @@ const getFilename = (data: any) => {
 
   return filename || data.headers.get('filename') || 'document.pdf';
 }
+
+/**
+ * Download streamed response body into a Blob and attach filename.
+ * @param {Response} data Fetch response (must have readable `body`).
+ * @returns {Promise<Blob & {filename:string; fileName:string}>} File blob.
+ */
 const downloadBody = async (data: any) => {
   const filename = getFilename(data),
         reader   = data.body.getReader();
@@ -51,17 +68,33 @@ const downloadBody = async (data: any) => {
   }
   return Object.assign(new Blob(chunks), {filename, fileName: filename});
 }
+
+/**
+ * Rewrites cookie keys/values that contain Cyrillic chars into translit.
+ * Returns current cookie string (after potential rewrite).
+ * @returns {string}
+ */
 const translateCookie = (): string => {
   document.cookie.split(';').forEach((p: string) => {
     if (/[а-я]/i.test(p)) {
       const [key, value] = p.trim().split('=');
-      document.cookie = `${f.transLit(key)}=${f.transLit(value)}`;
+      document.cookie = `${f.transLit(key ?? '')}=${f.transLit(value ?? '')}`;
     }
   });
 
   return document.cookie;
 }
 
+/**
+ * Internal fetch wrapper (always POST) with automatic body FormData conversion.
+ * - `type='json'`: parses via `checkJSON(res.text())`
+ * - `type='file'|'body'`: reads stream into Blob via `downloadBody(res)`
+ * - other values: calls `res[type]()` (e.g. 'text', 'blob', 'arrayBuffer')
+ * @param {string} url
+ * @param {BodyInit|null} body
+ * @param {string?} type
+ * @returns {Promise<any>}
+ */
 const query = (url: string, body: BodyInit | null, type = 'json') => {
   const headers = {'Cookie': translateCookie()};
 
@@ -91,19 +124,17 @@ const query = (url: string, body: BodyInit | null, type = 'json') => {
 };
 
 /**
- * Query namespace
- * @const
- * @type {{Post: function, Get: function}}
- * @function Post({url: String, data, type})
+ * Query namespace.
+ * Simple wrappers for GET/POST requests to `f.MAIN_PHP_PATH` using `query()`.
  */
 export default {
 
   /**
-   * Fetch Get
+   * Fetch Get.
    * @param {object} obj
-   * @param {string?|any?: c.MAIN_PHP_PATH} obj.url - link to index.php.
+   * @param {string|any?} obj.url - link to index.php.
    * @param {string} obj.data - get params as string.
-   * @param {string?: 'json'} obj.type - return type.
+   * @param {string?} obj.type - return type.
    * @return {Promise<Response>}
    * @constructor
    */
@@ -111,13 +142,13 @@ export default {
     query(url + '?' + (typeof data === 'string' ? data : (new URLSearchParams(data)).toString()), null, type),
 
   /**
-   * Fetch Post
+   * Fetch Post.
    * @param {object} obj
-   * @param {string?|any?: c.MAIN_PHP_PATH} obj.url - link to index.php.
+   * @param {string|any?} obj.url - link to index.php.
    * @param {BodyInit} obj.data -
-   * Any body that you want to add to your request object.
+   * Anybody that you want to add to your request object.
    * Note that a request using the GET or HEAD method cannot have a body.
-   * @param {string?: 'json'} obj.type - return type.
+   * @param {string?} obj.type - return type.
    * @return {Promise<Response>}
    */
   Post: ({url = f.MAIN_PHP_PATH, data, type = 'json'}: {url: string, data: BodyInit, type?: string}) => query(url, data, type),

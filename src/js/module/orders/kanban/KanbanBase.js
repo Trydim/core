@@ -160,6 +160,8 @@ export default class {
 
     if (data.length > 4) {
       this.kanbanObj.width = (data.length * 320).toString() + 'px';
+    } else {
+      this.kanbanObj.width = (data.length * 500).toString() + 'px';
     }
     // Filter status
     this.filterNode.innerHTML = ['All'].concat(Object.keys(this.statusList)).map((item) => {

@@ -50,12 +50,12 @@ switch ($cmsAction) {
 
         // Save user
         $columns = $db->getColumnsTable('users');
-        $result = $db->insert($columns, 'users', $param, true);
+        $result  = $db->insert($columns, 'users', $param, true);
 
         // Set new User Params
         if (empty($result['error'])) {
           $_SESSION['login'] = $user['login'];
-          $_SESSION['name'] = $userName;
+          $_SESSION['name']  = $userName;
           isset($param[$usersId]['hash']) && $_SESSION['hash'] = $param[$usersId]['hash'];
         }
       }
@@ -73,7 +73,7 @@ switch ($cmsAction) {
           $id = $permission['id'];
 
           if (isset($permission['delete'])) {
-            $result['error']['del'] = $db->deleteItem('permission', [$id]);
+            $result['permDelete']['error'] = $db->deleteItem('permission', [$id]) ? '' : 'ERROR: Delete permission failed';
             continue;
           }
 
@@ -88,8 +88,8 @@ switch ($cmsAction) {
         }
 
         $columns = $db->getColumnsTable('permission');
-        $result = $db->insert($columns, 'permission', $param['new']);
-        $result = $db->insert($columns, 'permission', $param['change'], true);
+        $result['permAdd'] = $db->insert($columns, 'permission', $param['new']);
+        $result['permChange'] = $db->insert($columns, 'permission', $param['change'], true);
       }
       unset($permissions);
 
@@ -105,7 +105,7 @@ switch ($cmsAction) {
           $id = $status['ID'];
 
           if (isset($status['delete'])) {
-            $result['statusDel']['error'] = $db->deleteItem('order_status', [$id]);
+            $result['statusDelete']['error'] = $db->deleteItem('order_status', [$id]) ? '' : 'ERROR: Delete order status failed';
             continue;
           }
 
@@ -126,8 +126,8 @@ switch ($cmsAction) {
         }
 
         $columns = $db->getColumnsTable('order_status');
-        $result['statusAdd']['error'] = $db->insert($columns, 'order_status', $param['new']);
-        $result['statusChange']['error'] = $db->insert($columns, 'order_status', $param['change'], true);
+        if (count($param['new'])) $result['statusAdd'] = $db->insert($columns, 'order_status', $param['new']);
+        if (count($param['change'])) $result['statusChange'] = $db->insert($columns, 'order_status', $param['change'], true);
         $result['statusList'] = $db->loadOrderStatus();
       }
 
@@ -135,8 +135,8 @@ switch ($cmsAction) {
       $rate = json_decode($rate ?? '[]', true);
       if (count($rate)) {
         // Auto update
-        $main->setSettings(VC::AUTO_REFRESH, $rate[VC::AUTO_REFRESH]);
-        $main->setSettings(VC::SERVER_REFRESH, $rate[VC::SERVER_REFRESH]);
+        $main->setSettings(VC::RATE_AUTO_REFRESH, $rate[VC::RATE_AUTO_REFRESH]);
+        $main->setSettings(VC::RATE_SERVER_REFRESH, $rate[VC::RATE_SERVER_REFRESH]);
 
         $rate = $rate['data'];
         $param = [

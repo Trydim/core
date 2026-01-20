@@ -35,6 +35,10 @@ const toast = new f.Toast();
 
 export default {
   props: {
+    statusList: {
+      required: true,
+      type: Object,
+    },
     propStatusDef: {
       required: true,
       type: Number,
@@ -45,12 +49,19 @@ export default {
     status: {},
     statusDef: undefined,
   }),
-
+  watch: {
+    statusList() {
+      if (Object.values(this.statusList).length) this.setList(this.statusList);
+    },
+  },
   methods: {
+    setList(list) {
+      this.status = Object.values(list);
+    },
     loadData() {
       const node = f.qS('#dataOrdersStatus');
 
-      this.status = node && node.value ? JSON.parse(node.value) : false;
+      if (node && node.value) this.setList(JSON.parse(node.value));
       if (!this.statusDef) this.statusDef = this.status[0].ID;
 
       node.remove();
@@ -65,7 +76,7 @@ export default {
 
     addStatus() {
       this.status.push({
-        ID: f.random(1e3, 1e4),
+        ID  : Math.random(),
         code: 'status',
         name: 'Новый статус',
         sort: 50,

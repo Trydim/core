@@ -1,5 +1,3 @@
-"use strict";
-
 const MENU_CLASS = 'menu-toggle';
 const storage = new f.LocalStorage();
 

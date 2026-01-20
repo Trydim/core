@@ -2,7 +2,8 @@
 
 class VC {
   /** Cms Const */
-  const PUBLIC_PAGE     = 'PUBLIC_PAGE',
+  const PROJECT_TITLE   = 'projectTitle',
+        DEBUG           = 'DEBUG',
         ACCESS_MENU     = 'accessMenu',
         USE_DATABASE    = 'USE_DATABASE',
         CHANGE_DATABASE = 'CHANGE_DATABASE',
@@ -12,14 +13,15 @@ class VC {
         USE_DEAL_SUBDOMAIN = 'useDealSubdomain';
 
   /** cmsParams */
-  const PROJECT_TITLE = 'projectTitle',
-        ENCRYPT_ALGO  = 'encryptAlgo',
+  const ENCRYPT_ALGO  = 'encryptAlgo',
         ENCRYPT_KEY   = 'encryptKey',
         DB_CONFIG     = 'dbConfig',
         IS_DEALER     = 'isDealer',
         DEALER_ID     = 'dealerId',
         DEALER_LINK   = 'dealerLink',
         ONLY_LOGIN    = 'onlyLogin',
+        PUBLIC_PAGE   = 'PUBLIC_PAGE',
+        ORDERS_KANBAN = 'ordersKanban',
         CSV_MAIN_PATH = 'csvMain',
         CSV_PATH      = 'csvPath',
         CSV_HISTORY_PATH = 'csvHistoryPath',
@@ -67,13 +69,13 @@ class VC {
         MAIL_SUBJECT     = 'mailSubject',
         MAIL_FROM_NAME   = 'mailFromName',
 
-        MANAGER_FIELDS = 'managerFields',
-        STATUS_DEFAULT = 'statusDefault',
+        MANAGER_FIELDS    = 'managerFields',
+        STATUS_DEFAULT    = 'statusDefault',
         PHONE_MASK_GLOBAL = 'phoneMaskGlobal',
         CATALOG_IMAGE_SIZE = 'catalogImageSize',
 
-        AUTO_REFRESH   = 'autoRefresh',
-        SERVER_REFRESH = 'serverRefresh',
+        RATE_AUTO_REFRESH   = 'rateAutoRefresh',
+        RATE_SERVER_REFRESH = 'rateServerRefresh',
 
         OPTION_PROPERTIES = 'optionProperties',
         DEALER_PROPERTIES = 'dealersProperties',

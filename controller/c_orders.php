@@ -9,7 +9,7 @@ $param = [
 ];
 
 $field = [
-  VC::BASE_PAGE_TITLE => 'Заказы',
+  VC::BASE_PAGE_TITLE => gTxt('Orders'),
   VC::BASE_CSS_LINKS => [CORE_CSS . 'module/orders.css?ver=1'],
   VC::BASE_JS_LINKS  => [CORE_JS . 'module/orders.js?ver=9d335261f8'],
   VC::BASE_FOOTER_CONTENT => $main->getFrontContent('dataUser', $main->getLogin('all')),

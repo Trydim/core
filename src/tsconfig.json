@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "bundler/tsconfig.node.json"},
+    { "path": "bundler/tsconfig.app.json"}
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./js/*"]
+    }
+  }
+}

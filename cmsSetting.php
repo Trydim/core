@@ -4,12 +4,8 @@
  * @var array $publicConfig - config from public
  */
 
-date_default_timezone_set('Europe/Moscow');
-
-require ABS_SITE_PATH . 'config.php';
 require __DIR__ . '/model/func.php';
-
-spl_autoload_register('cmsAutoloader');
+require ABS_SITE_PATH . 'config.php';
 
 const CORE          = __DIR__ . '/',
       SHARE_PATH    = 'shared/',
@@ -53,15 +49,14 @@ if ($main->isDealer() && $main->db->setDealerLink()) {
        ->setCmsParam(VC::DEAL_URI_JS, $url->getUri(true) . ($publicConfig['PATH_JS'] ?? 'public/js/'));
 }
 
-$publicPage = $publicConfig[VC::PUBLIC_PAGE] ?? null;
-$main->setCmsParam(VC::ONLY_LOGIN, !boolValue($publicPage) || boolValue($publicConfig['ONLY_LOGIN'] ?? false))
-     ->setCmsParam(VC::LEGEND_PATH, $url->getPath(true) . ($publicConfig['PATH_LEGEND'] ?? 'public/views/legend.php'));
-
 define('URI_IMG', $main->getCmsParam(VC::URI_IMG));
-define('PUBLIC_PAGE', $publicPage);
-define('USE_CONTENT_EDITOR', $publicConfig['USE_CONTENT_EDITOR'] ?? false);
+define('PUBLIC_PAGE', $publicConfig[VC::PUBLIC_PAGE] ?? null);
+define('USE_CONTENT_EDITOR', $publicConfig[VC::USE_CONTENT_EDITOR] ?? false);
+
+$main->setCmsParam(VC::ONLY_LOGIN, !boolValue(PUBLIC_PAGE) || boolValue($publicConfig['ONLY_LOGIN'] ?? false))
+     ->setCmsParam(VC::LEGEND_PATH, $url->getPath(true) . ($publicConfig['PATH_LEGEND'] ?? 'public/views/legend.php'));
 
 !defined('OUTSIDE') && define('OUTSIDE', array_key_exists('outside', $_GET));
 
 $main->afterConstDefine();
-unset($url, $publicConfig, $publicPage, $dealConfig, $dbConfig);
+unset($url, $publicConfig, $dealConfig, $dbConfig);

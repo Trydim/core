@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Global variables and simple functions
  */

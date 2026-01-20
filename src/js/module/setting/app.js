@@ -27,12 +27,13 @@ export default {
   components: {},
   data: () => {
     const d = {
-      isAdmin: false,
+      isAdmin   : false,
       userChange: false,
 
       mail: {},
       user: {},
       rate: {},
+      status: {},
 
       queryParam: {
         mode: 'setting',
@@ -93,12 +94,14 @@ export default {
 
     saveSetting() {
       this.queryParam.cmsAction = 'saveSetting';
-      this.query().then(s => {
-        if (s.status) {
+      this.query().then(result => {
+        if (result.status) {
           if (this.userChange) {
             this.userChange = false;
             this.user = JSON.parse(this.queryParam.user);
           }
+
+          if (result['statusList']) this.status = result['statusList'];
 
           f.showMsg('Сохранено');
         }
