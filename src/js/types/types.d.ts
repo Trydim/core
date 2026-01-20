@@ -7,7 +7,7 @@ declare interface Hooks {
   afterMoundedApp: Function|null
 }
 
-declare type CMSGlobalObject = {
+export declare interface CMSGlobalObject {
   /** Global debug flag */
   DEBUG: boolean
   /** Yes or not safe editing csv tables */
@@ -37,10 +37,12 @@ declare type CMSGlobalObject = {
   AUTH_STATUS: boolean
   /** app starting as dealer module */
   IS_DEAL: boolean
+  /** app starting on local machine */
+  IS_LOCAL: boolean
 
   ID: {
-    AUTH_BLOCK: string
-    PUBLIC_PAGE: string
+    AUTH_BLOCK : 'authBlock'
+    PUBLIC_PAGE: 'publicPageLink'
   }
 
   INIT_SETTING: Object | false
@@ -160,7 +162,7 @@ declare type CMSGlobalObject = {
    */
   showMsg(message: string,
           type?: 'tip' | 'info' | 'success' | 'ok' | 'warning' | 'error' | 'alert',
-          options?: boolean | object
+          options?: boolean | {animationDuration: number}
   ): void
   /**
    * flatten object
@@ -228,23 +230,25 @@ declare type CMSGlobalObject = {
 
   transLit(value: string): string
 
-  Get(obj: {
+  Get<R>(obj: {
     url?: string,
     data?: any,
     type?: string | 'text' | 'json' | 'blob'
-  }): Promise<Response>
+  }): Promise<R | Record<string, any> & Response>
 
-  Post(obj: {
+  Post<R>(obj: {
     url?: string,
     data: BodyInit | {},
     type?: string | 'text' | 'json' | 'blob'
-  }): Promise<Response>
+  }): Promise<R | Record<string, any> & Response>
 
   LoaderIcon: typeof LoaderIcon
 
   Modal<T = any>(options: SweetAlertOptions|string): SweetAlertResult<Awaited<T>>
   Modal<T = any>(title: string, html?: string, icon?: SweetAlertIcon): SweetAlertResult<Awaited<T>>
   initModal(),
+
+  Toast: typeof ToastClass
 
   searchInit(): Searching
 
@@ -267,10 +271,14 @@ declare type CMSGlobalObject = {
   Valid: typeof Valid
 }
 
-interface Window extends Window {
-  f: CMSGlobalObject
+export declare global {
+  interface Window extends Window {
+    f: CMSGlobalObject
 
-  _(...a: string[]): string
+    _(...a: string[]): string
+  }
+
+  declare const f: CMSGlobalObject;
+
+  declare function _(key: string, ...a): string
 }
-
-declare const f: CMSGlobalObject;

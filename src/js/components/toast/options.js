@@ -1,4 +1,5 @@
 const defaults = {
+  id: 'default',
   maxNotifications: 10,
   animationDuration: 300,
   position: "top-right", // top-left/top-right/bottom-left/bottom-right
@@ -77,6 +78,8 @@ const defaults = {
   },
 }
 export default class Options {
+  id = ''
+
   constructor(options = {}, global = defaults) {
     Object.assign(this, this.defaultsDeep(global, options))
   }

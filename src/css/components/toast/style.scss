@@ -1,7 +1,7 @@
-@import "variables";
-@import "animations";
-@import "popups";
-@import "toasts";
+@use "variables";
+@use "animations";
+@use "popups";
+@use "toasts";
 
 [class^="awn-"] {
   box-sizing: border-box;

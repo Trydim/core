@@ -122,8 +122,8 @@ final class Main {
     // Remove access menu for dealer
     $filter = $this::DEALER_MENU;
 
-    $this->setCmsParam('ACCESS_MENU',
-      array_filter($this->getCmsParam('ACCESS_MENU'),
+    $this->setCmsParam(VC::ACCESS_MENU,
+      array_filter($this->getCmsParam(VC::ACCESS_MENU),
         function ($item) use ($filter) {
           if (is_array($item)) $item = $item['link'];
 

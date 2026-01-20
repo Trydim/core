@@ -22,10 +22,7 @@ $dbTables = $main->getBaseTable();
 $route    = $main->url->getRoute();
 $siteLink = $main->url->getUri();
 
-$usersTags = $main->getLogin('permission')['tags'];
 $skipSubMenu = [];
-if (includes($usersTags, 'alumodoor')) $skipSubMenu = ['price2'];
-else if (includes($usersTags, 'dp')) $skipSubMenu = ['price'];
 
 if (is_array($dbTables)) {
 

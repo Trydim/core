@@ -106,3 +106,38 @@ declare class Valid {
     classPrefix?: string,
   })
 }
+
+declare interface IToastOptions {
+  prefix?: string,
+  position?: 'topLeft' | 'topCenter' | 'topRight' | 'left' | 'center' | 'right' | 'bottomLeft' | 'bottom' | 'bottomRight',
+  maxNotifications?: number,
+
+  durations?: {
+    global? : number,
+    success?: number,
+    info?   : number,
+    tip?    : number,
+    warning?: number,
+    alert?  : number,
+  },
+  wrapClass?: string,
+  wrapIndex?: number,
+}
+declare class ToastClass {
+  constructor(options: {id?: string} & IToastOptions)
+
+  container: HTMLElement | null
+
+  tip(msg: string, options?: IToastOptions)
+  info(msg: string, options?: IToastOptions)
+  success(msg: string, options?: IToastOptions)
+  warning(msg: string, options?: IToastOptions)
+  alert(msg: string, options?: IToastOptions)
+
+  async(promise: Promise<any>, onResolve: Function, onReject: Function, msg: string, options?: IToastOptions)
+  asyncBlock(promise: Promise<any>, onResolve: Function, onReject: Function, msg: string, options?: IToastOptions)
+
+  confirm(msg: string, onOk: Function, onCancel: Function, options?: IToastOptions)
+
+  closeToasts(): void
+}
