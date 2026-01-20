@@ -940,15 +940,15 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $result['report'] = $main->dealer->updateDatabase($selectedDealer ?? [], $sqlText ?? '');
       break;
 
-    case 'getCsvHistoryTree':
-      $csvHistory = new CsvHistory(
+      // History
+    case 'loadHistoryTree':
+      $history = new CsvHistory(
         $main->getCmsParam(VC::CSV_PATH),
         $main->getCmsParam(VC::CSV_HISTORY_PATH)
       );
-      $result['historyTree'] = $csvHistory->getHistoryTree();
+      $result['historyTree'] = $history->getHistoryTree();
       break;
-
-    case 'getCsvBackupForDiff':
+    case 'loadHistoryBackup':
       if (!isset($relativePath)) {
         $result['error'] = 'Missing relativePath parameter';
         break;
@@ -958,31 +958,30 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         break;
       }
 
-      $csvHistory = new CsvHistory(
+      $history = new CsvHistory(
         $main->getCmsParam(VC::CSV_PATH),
         $main->getCmsParam(VC::CSV_HISTORY_PATH)
       );
 
       try {
-        $result['diff'] = $csvHistory->getBackupsForDiff($relativePath, $backupId);
+        $result['diff'] = $history->getBackupsForDiff($relativePath, $backupId);
       } catch (\Throwable $e) {
         $result['error'] = $e->getMessage();
       }
       break;
-
-    case 'getCsvHistory':
+    case 'loadHistory':
       if (!isset($relativePath)) {
         $result['error'] = 'Missing relativePath parameter';
         break;
       }
 
-      $csvHistory = new CsvHistory(
+      $history = new CsvHistory(
         $main->getCmsParam(VC::CSV_PATH),
         $main->getCmsParam(VC::CSV_HISTORY_PATH)
       );
 
       try {
-        $result['history'] = $csvHistory->getHistoryList($relativePath);
+        $result['history'] = $history->getHistoryList($relativePath);
       } catch (RuntimeException $e) {
         $result['error'] = $e->getMessage();
       }

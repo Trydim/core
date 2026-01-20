@@ -614,8 +614,9 @@ trait DbCsv
    */
   public function saveCsv(array $csvData)
   {
-    $csvPath = $this->main->getCmsParam(VC::CSV_PATH);
-    $csvHistoryPath = $this->main->getCmsParam(VC::CSV_HISTORY_PATH);
+    $main = $this->main;
+    $csvPath = $main->getCmsParam(VC::CSV_PATH);
+    $csvHistoryPath = $main->getCmsParam(VC::CSV_HISTORY_PATH);
 
     if (file_exists($csvPath . $this->csvTable)) {
       $fileContent = '';
@@ -624,14 +625,16 @@ trait DbCsv
         $fileContent .= implode(CSV_DELIMITER, $v) . PHP_EOL;
       }
 
-      $history = new CsvHistory($csvPath, $csvHistoryPath);
-      $metaFields = [
-        'userId'    => (int)$this->main->getLogin('id'),
-        'userName'  => $this->main->getLogin('name'),
-        'userLogin' => $this->main->getLogin(),
-      ];
+      if ($main->getCmsParam(VC::SAVE_CHANGE_HISTORY)) {
+        $history = new CsvHistory($csvPath, $csvHistoryPath);
+        $metaFields = [
+          'userId'    => (int)$main->getLogin('id'),
+          'userName'  => $main->getLogin('name'),
+          'userLogin' => $main->getLogin(),
+        ];
 
-      $history->saveBackup($this->csvTable, $fileContent, $metaFields);
+        $history->saveBackup($this->csvTable, $fileContent, $metaFields);
+      }
 
       file_put_contents($csvPath . $this->csvTable, $fileContent);
       $this->main->deleteCsvCache();

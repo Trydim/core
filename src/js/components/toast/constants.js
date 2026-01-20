@@ -1,49 +1,49 @@
-const libName = "awn"
-const prefix = {
-  popup: `${libName}-popup`,
-  toast: `${libName}-toast`,
-  btn: `${libName}-btn`,
-  confirm: `${libName}-confirm`
+const LIBNAME = 'awn'
+const PREFIX = {
+  popup: `${LIBNAME}-popup`,
+  toast: `${LIBNAME}-toast`,
+  btn: `${LIBNAME}-btn`,
+  confirm: `${LIBNAME}-confirm`
 }
 
 // Constants for toasts
 export const tConsts = {
-  prefix: prefix.toast,
+  prefix: PREFIX.toast,
   klass: {
-    label: `${prefix.toast}-label`,
-    content: `${prefix.toast}-content`,
-    icon: `${prefix.toast}-icon`,
-    progressBar: `${prefix.toast}-progress-bar`,
-    progressBarPause: `${prefix.toast}-progress-bar-paused`
+    label: `${PREFIX.toast}-label`,
+    content: `${PREFIX.toast}-content`,
+    icon: `${PREFIX.toast}-icon`,
+    progressBar: `${PREFIX.toast}-progress-bar`,
+    progressBarPause: `${PREFIX.toast}-progress-bar-paused`
   },
   ids: {
-    container: `${prefix.toast}-container`
+    container: `${PREFIX.toast}-container`
   }
 }
 
 // Constants for popups
 export const mConsts = {
-  prefix: prefix.popup,
+  prefix: PREFIX.popup,
   klass: {
-    buttons: `${libName}-buttons`,
-    button: prefix.btn,
-    successBtn: `${prefix.btn}-success`,
-    cancelBtn: `${prefix.btn}-cancel`,
-    title: `${prefix.popup}-title`,
-    body: `${prefix.popup}-body`,
-    content: `${prefix.popup}-content`,
-    dotAnimation: `${prefix.popup}-loading-dots`
+    buttons: `${LIBNAME}-buttons`,
+    button: PREFIX.btn,
+    successBtn: `${PREFIX.btn}-success`,
+    cancelBtn: `${PREFIX.btn}-cancel`,
+    title: `${PREFIX.popup}-title`,
+    body: `${PREFIX.popup}-body`,
+    content: `${PREFIX.popup}-content`,
+    dotAnimation: `${PREFIX.popup}-loading-dots`
   },
   ids: {
-    wrapper: `${prefix.popup}-wrapper`,
-    confirmOk: `${prefix.confirm}-ok`,
-    confirmCancel: `${prefix.confirm}-cancel`
+    wrapper: `${PREFIX.popup}-wrapper`,
+    confirmOk: `${PREFIX.confirm}-ok`,
+    confirmCancel: `${PREFIX.confirm}-cancel`
   }
 }
 
 export const eConsts = {
   klass: {
-    hiding: `${libName}-hiding`
+    hiding: `${LIBNAME}-hiding`
   },
-  lib: libName
+  lib: LIBNAME
 }

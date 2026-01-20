@@ -84,6 +84,8 @@ switch ($cmsAction) {
     break;
   case 'mail':
     $docType && $docsPath = $docs->getDocs('save');
+    !empty($mailTarget) && $main->setSettings('mailTarget', $mailTarget);
+
     $mail = new Mail($main, $mailTpl ?? 'mailTpl');
     $param = [
       'name'  => $name ?? '',

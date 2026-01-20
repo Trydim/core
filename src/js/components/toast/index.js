@@ -93,11 +93,11 @@ export class ToastClass {
   }
 
   _createContainer() {
-    return new Elem(document.body, tConsts.ids.container, `awn-${this.options.position}`).insert().el
+    return new Elem(document.body, `${tConsts.ids.container}-${this.options.id}`, `awn-${this.options.position}`).insert().el
   }
 
   get container() {
-    return document.getElementById(tConsts.ids.container) || this._createContainer()
+    return document.getElementById(`${tConsts.ids.container}-${this.options.id}`) || this._createContainer()
   }
 }
 

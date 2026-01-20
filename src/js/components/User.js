@@ -2,18 +2,16 @@
 
 export default class User {
   constructor(selector = '#dataUser') {
-    if (!selector) return {};
-
-    let node = typeof selector === 'string' ? f.qS(selector) : selector,
-        data;
-
     if (typeof User.instance === 'object') return User.instance;
+    if (!selector) return;
+
+    const node = typeof selector === 'string' ? f.qS(selector) : selector;
+
     if (!node || !node.value) {
-      console.warn('class User node or value not found!');
-      return {};
+      console.warn('class User node or value not found!'); return;
     }
 
-    data = JSON.parse(node.value);
+    const data = JSON.parse(node.value);
     data.fields = JSON.parse(data.fields || '{}');
     data.permission = data.permission || {tags: ''};
 

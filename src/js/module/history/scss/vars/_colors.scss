@@ -1,0 +1,39 @@
+// Основные цвета интерфейса
+$color-primary: #42b983;
+$color-primary-hover: #3aa876;
+$color-primary-light: #e0f7e9;
+$color-primary-border: #cce9da;
+$color-primary-text: #2c8a5e;
+
+// Фоны
+$bg-main: #fff;
+$bg-panel: #f5f5f5;
+$bg-hover: #f0f0f0;
+$bg-hover-light: #e6e6e6;
+$bg-active: #e0f7e9;
+$bg-empty: #f7f7f7;
+$bg-separator: #fdfdfd;
+
+// Границы
+$border-main: #ddd;
+$border-light: #eee;
+$border-dash: #ddd;
+
+// Текст
+$text-primary: #333;
+$text-title: #444;
+$text-secondary: #666;
+$text-muted: #888;
+$text-disabled: #999;
+
+// Diff цвета (если CSS vars не заданы)
+$diff-inserted-bg: #e6ffec;
+$diff-deleted-bg: #ffebe9;
+$diff-changed-bg: #edfeff;
+$diff-normal-color: #999;
+$diff-chunk-add-bg: #abf2bc;
+$diff-chunk-del-bg: #ffc0c0;
+
+// Тени
+$shadow-modal: 0 4px 20px rgba(0, 0, 0, 0.15);
+$shadow-btn-external: 0 2px 8px rgba(0, 0, 0, 0.2);

@@ -7,11 +7,9 @@ declare interface Hooks {
   afterMoundedApp: Function|null
 }
 
-declare type CMSGlobalObject = {
+export declare interface CMSGlobalObject {
   /** Global debug flag */
   DEBUG: boolean
-  /** Global debug flag */
-  IS_LOCAL: boolean
   /** Yes or not safe editing csv tables */
   CSV_DEVELOP: boolean
   /** app starting as external module */
@@ -39,10 +37,12 @@ declare type CMSGlobalObject = {
   AUTH_STATUS: boolean
   /** app starting as dealer module */
   IS_DEAL: boolean
+  /** app starting on local machine */
+  IS_LOCAL: boolean
 
   ID: {
-    AUTH_BLOCK: string
-    PUBLIC_PAGE: string
+    AUTH_BLOCK : 'authBlock'
+    PUBLIC_PAGE: 'publicPageLink'
   }
 
   INIT_SETTING: Object | false
@@ -162,7 +162,7 @@ declare type CMSGlobalObject = {
    */
   showMsg(message: string,
           type?: 'tip' | 'info' | 'success' | 'ok' | 'warning' | 'error' | 'alert',
-          options?: boolean | object
+          options?: boolean | {animationDuration: number}
   ): void
   /**
    * flatten object
@@ -198,7 +198,7 @@ declare type CMSGlobalObject = {
   /**
    * Set loading spinner icon
    */
-  setLoading(node: HTMLElement, isLight?: boolean): void
+  setLoading(node: HTMLElement, isLight?: false): void
   /**
    * Remove loading spinner icon
    */
@@ -230,17 +230,17 @@ declare type CMSGlobalObject = {
 
   transLit(value: string): string
 
-  Get(obj: {
+  Get<R>(obj: {
     url?: string,
     data?: any,
     type?: string | 'text' | 'json' | 'blob'
-  }): Promise<Response>
+  }): Promise<R | Record<string, any> & Response>
 
-  Post(obj: {
+  Post<R>(obj: {
     url?: string,
     data: BodyInit | {},
     type?: string | 'text' | 'json' | 'blob'
-  }): Promise<Response>
+  }): Promise<R | Record<string, any> & Response>
 
   LoaderIcon: typeof LoaderIcon
 
@@ -248,12 +248,13 @@ declare type CMSGlobalObject = {
   Modal<T = any>(title: string, html?: string, icon?: SweetAlertIcon): SweetAlertResult<Awaited<T>>
   initModal(),
 
+  Toast: typeof ToastClass
+
   searchInit(): Searching
 
   Pagination: typeof Pagination
   SelectedRow: typeof SelectedRow
   SortColumns: typeof SortColumns
-  Toast: typeof ToastClass
   User: typeof User
 
   oneTimeFunction: {
@@ -265,17 +266,19 @@ declare type CMSGlobalObject = {
   /** Without description */
   createLink(filename: string): HTMLAnchorElement
 
-  getSetting(key: string | undefined = undefined)
+  getSetting(key: string)
 
   Valid: typeof Valid
 }
 
-declare global {
-  interface Window {
+export declare global {
+  interface Window extends Window {
     f: CMSGlobalObject
 
     _(...a: string[]): string
   }
-}
 
-declare const f: CMSGlobalObject;
+  declare const f: CMSGlobalObject;
+
+  declare function _(key: string, ...a): string
+}

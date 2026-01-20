@@ -1,4 +1,5 @@
-#awn-toast-container {
+@use "variables" as *;
+[id^="awn-toast-container"] {
   position: fixed;
   z-index: $awn-container-z-index;
   bottom: $awn-container-padding;

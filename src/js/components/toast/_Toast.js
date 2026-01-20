@@ -1,20 +1,19 @@
 
 // Всплывающее сообщение
 export class ToastClass {
+  instance = {};
   toastIndex = 0;
   toasts = {};
   count = 0;
-  newToast = undefined;
 
-  constructor(param = {default: 'default'}) {
-    f.toastInstance = f.toastInstance || {};
-    if (f.toastInstance['default']) return f.toastInstance['default'];
+  constructor(param = {id: 'default'}) {
+    if (this.instance[param.id]) return this.instance[param.id];
 
     this.setParam(param);
     this.createWrap();
     this.createToast(param);
 
-    f.toastInstance[param.default || f.random] = this;
+    this.instance[param.id] = this;
   }
 
   setParam(param) {

@@ -53,7 +53,7 @@ final class Main {
   public $frontSettingInit = false;
 
   /**
-   * @var DbMain
+   * @var DbProxy
    */
   public $db;
 
@@ -87,7 +87,7 @@ final class Main {
     $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
 
-    $this->db       = new DbMain($this);
+    $this->db       = new DbProxy(new DbMain($this));
     $this->url      = new UrlGenerator($this, 'core/');
     $this->response = new Response($this);
     $this->dealer   = new Dealer($this);
@@ -122,8 +122,8 @@ final class Main {
     // Remove access menu for dealer
     $filter = $this::DEALER_MENU;
 
-    $this->setCmsParam('ACCESS_MENU',
-      array_filter($this->getCmsParam('ACCESS_MENU'),
+    $this->setCmsParam(VC::ACCESS_MENU,
+      array_filter($this->getCmsParam(VC::ACCESS_MENU),
         function ($item) use ($filter) {
           if (is_array($item)) $item = $item['link'];
 
@@ -146,9 +146,11 @@ final class Main {
    */
   public function setCmsParam($param, $value = null): Main {
     if (is_array($param)) {
-      array_walk($param, function ($item, $key) {
-        if ($key === VC::CSV_PATH) $item = ABS_SITE_PATH . $item;
+      $refVC = new ReflectionClass(VC::class);
 
+      array_walk($param, function ($item, $key) use ($refVC) {
+        if ($key === VC::CSV_PATH) $item = ABS_SITE_PATH . $item;
+        if ($refVC->hasConstant($key)) $key = $refVC->getConstant($key);
         $this->cmsParam[$key] = $item;
       });
     }
@@ -378,10 +380,20 @@ final class Main {
     return $this;
   }
 
+  /**
+   * @return array
+   */
   public function getBaseTable(): array { return $this->dbTables; }
 
-  public function getDB(): DbMain { return $this->db; }
+  /**
+   * @return DbProxy
+   */
+  public function getDB(): DbProxy { return $this->db; }
 
+  /**
+   * @param string $target
+   * @return void
+   */
   public function reDirect(string $target = '') {
     if ($target === '') {
       $target = $_SESSION['target'] ?? '';

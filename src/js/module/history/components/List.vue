@@ -1,53 +1,32 @@
 <template>
-  <div v-if="!filePath" class="empty-message">{{ $t('Выберите файл, чтобы посмотреть историю.') }}</div>
-  <div v-else class="history-list">
-    <h3>{{ $t('История изменений')}}</h3>
-    <ul v-if="history.length">
-      <li
-        v-for="entry in history"
-        :key="entry.backupId"
-        class="history-item"
-        :class="{ 'active': selectedEntry?.backupId === entry.backupId }"
-        @click="selectEntry(entry)"
-      >
-        <div class="date">{{ entry.createdAt }}</div>
-        <div class="user"><strong>{{ entry.userLogin || $t('Система') }}</strong></div>
-        <div v-if="entry.note" class="note">{{ $t(entry.note) }}</div>
-      </li>
-    </ul>
-    <div v-else class="empty-message">{{ $t('История пуста') }}</div>
+  <div v-if="!filePath" class="empty-message">{{ $t('Select a file to view history') }}</div>
+  <div v-else class="history-list-wrapper">
+    <div class="list-header">
+      <h3>{{ $t('Change history') }}</h3>
+    </div>
+    <div class="list-content">
+      <ul v-if="history.length">
+        <li
+          v-for="entry in history"
+          :key="entry.backupId"
+          class="history-item"
+          :class="{ 'active': selectedEntry?.backupId === entry.backupId }"
+          @click="selectEntry(entry)"
+        >
+          <div class="item-main">
+            <span class="date">{{ entry.createdAt }}</span>
+            <span class="user">{{ entry.userLogin || $t('System') }}</span>
+          </div>
+          <div v-if="entry.note" class="note">{{ $t(entry.note) }}</div>
+        </li>
+      </ul>
+      <div v-else class="empty-message">{{ $t('History is empty') }}</div>
+    </div>
   </div>
 </template>
 
 <script>
-/**
- * @typedef {Object} BackupMeta
- * @property {string} backupId - Идентификатор бэкапа (формат: YYYYMMDD_HHMMSS_SSSSSS)
- * @property {string} file - Путь к файлу
- * @property {string} fileMd5 - MD5 хеш содержимого файла
- * @property {string} createdAt - Дата создания в формате DD.MM.YYYY HH:mm:ss
- * @property {number} timestamp - UNIX timestamp создания
- * @property {number} userId - ID пользователя
- * @property {string} userName - Полное имя пользователя
- * @property {string} userLogin - Логин пользователя
- * @property {string} prevBackupId - Идентификатор предыдущего бэкапа
- */
-
-/**
- * @typedef {Object} DiffObject
- * @property {string} currentContent - Текущее содержимое CSV файла
- * @property {BackupMeta} currentMeta - Метаданные текущей версии
- * @property {string} previousContent - Предыдущее содержимое CSV файла
- * @property {BackupMeta} previousMeta - Метаданные предыдущей версии
- */
-
-/**
- * @typedef {Object} DiffApiResponse
- * @property {boolean} status - Статус выполнения запроса
- * @property {DiffObject} [diff] - Объект с данными для сравнения версий
- */
-
-import {csvDiff} from '../utils/csvDiff.js';
+import { loadHistory, loadHistoryBackup } from '../api/historyApi.js';
 
 export default {
   name: 'List',
@@ -58,7 +37,6 @@ export default {
   data() {
     return {
       history: [],
-      diff: null,
       selectedEntry: null
     };
   },
@@ -67,7 +45,6 @@ export default {
       immediate: true,
       handler(newPath) {
         if (newPath) {
-          this.diff = null;
           this.selectedEntry = null;
           this.fetchHistory(newPath);
         }
@@ -76,111 +53,150 @@ export default {
   },
   methods: {
     async fetchHistory(path) {
-      const data = new FormData();
-      data.set('mode', 'DB');
-      data.set('dbAction', 'getCsvHistory');
-      data.set('relativePath', path);
-
-
-      const response = await f.Post({data});
-      if (response.status) {
-        this.history = response.history;
-      } else {
-        this.history = [];
+      this.history = [];
+      try {
+        const response = await loadHistory(path);
+        if (response.status && Array.isArray(response.history)) {
+          this.history = response.history;
+        }
+      } catch (e) {
+        console.error("Failed to load history list:", e);
       }
-
     },
 
     async selectEntry(entry) {
+      if (this.selectedEntry?.backupId === entry.backupId) return;
+
       this.selectedEntry = entry;
       await this.fetchDiff(entry);
-      this.$emit('entrySelected', this.diff);
     },
 
     async fetchDiff(entry) {
-      const data = new FormData();
-      data.set('mode', 'DB');
-      data.set('dbAction', 'getCsvBackupForDiff');
-      data.set('backupId', entry.backupId);
-      data.set('relativePath', this.filePath);
+      try {
+        const response = await loadHistoryBackup(entry.backupId, this.filePath);
 
-      const response = /** @type {DiffApiResponse} */ await f.Post({data});
+        if (response.status && response.diff) {
+          const { previousContent, currentContent, currentMeta, previousMeta } = response.diff;
 
-      if (response?.diff?.previousContent && response?.diff?.currentContent) {
-
-        this.diff = {
-          ...csvDiff(response.diff.previousContent, response.diff.currentContent),
-          currentMeta: response.diff?.currentMeta ?? {},
-          previousMeta: response.diff?.previousMeta ?? {}
+          this.$emit('entrySelected', {
+            previousContent: previousContent ?? '',
+            currentContent: currentContent ?? '',
+            currentMeta: currentMeta ?? {},
+            previousMeta: previousMeta ?? {}
+          });
         }
-      } else {
-        this.diff = null;
+      } catch (e) {
+        console.error("Failed to load diff:", e);
       }
     }
   }
 };
+
 </script>
 
 <style lang="scss" scoped>
-@import "./../index.scss";
+@use './../scss/mixin/functions' as *;
+@use './../scss/vars/colors' as *;
 
-.history-list {
-  width: 100%;
-  max-width: rem(550);
-  padding: rem(10);
+.history-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-h3 {
-  margin-bottom: rem(10);
-  font-size: rem(18);
-  color: #333;
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  padding: rem(8) rem(12);
+
+  background: $bg-panel;
+  border-bottom: rem(1) solid $border-main;
+
+  h3 {
+    margin: 0;
+    font-size: rem(13);
+    font-weight: 600;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: rem(0.5);
+  }
+}
+
+.list-content {
+  flex: 1;
+  overflow-y: auto;
 }
 
 ul {
   list-style: none;
   padding: 0;
-  margin-bottom: rem(20);
+  margin: 0;
 }
 
 .history-item {
-  padding: rem(8);
-  margin-bottom: rem(6);
-  background: #f9f9f9;
-  border-radius: 6px;
-  border-left: rem(4) solid #42b983;
+  padding: rem(8) rem(12);
   cursor: pointer;
-  transition: all 0.2s;
+  background-color: transparent;
+  border-bottom: rem(1) solid $border-light;
+  border-left: rem(3) solid transparent;
+  transition: background-color 0.1s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: $bg-hover;
+  }
+
+  &.active {
+    background-color: $bg-active;
+    border-left-color: $color-primary;
+
+    .date {
+      color: #000;
+      font-weight: 500;
+    }
+  }
 }
 
-.history-item:hover {
-  background-color: #eefaf3;
-}
-
-.history-item.active {
-  background-color: #e0f7e9;
-  border-left: 4px solid #2c8a5e;
-  box-shadow: 0 rem(2) rem(4) rgba(0, 0, 0, 0.1);
+.item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: rem(2);
 }
 
 .date {
-  font-size: rem(14);
-  color: #555;
+  font-size: rem(13);
+  color: $text-primary;
 }
 
 .user {
-  font-size: rem(16);
-  color: #222;
+  font-size: rem(12);
+  font-weight: 600;
+  color: $text-secondary;
+  background: $bg-hover;
+  padding: rem(1) rem(6);
+  border-radius: rem(3);
 }
 
 .note {
-  font-size: rem(13);
-  color: #888;
-  margin-top: rem(4);
+  font-size: rem(12);
+  color: $text-muted;
+  margin-top: rem(2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .empty-message {
   padding: rem(20);
-  color: #888;
+  color: $text-disabled;
+  font-size: rem(13);
   font-style: italic;
+  text-align: center;
 }
 </style>

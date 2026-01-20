@@ -1,31 +1,33 @@
 <template>
-  <teleport to="body">
-    <div v-if="visible" class="modal-history-overlay" @click.self="close">
-      <button class="close-btn" @click="close">×</button>
+  <div>
+    <Modal :visible="visible" variant="widget" @close="close">
 
-      <div class="modal-content">
+      <HistoryLayout :currentDiff="currentDiff">
 
-          <div class="history-widget">
-            <div class="list-container">
-              <List :filePath="filePath" @entrySelected="handleEntrySelected"/>
-            </div>
-            <div class="diff-container">
-              <TableDiff v-if="currentDiff" :diff="currentDiff"/>
-            </div>
+        <template #sidebar="{ collapse }">
+          <div class="widget-sidebar">
+            <List
+              :filePath="filePath"
+              @entrySelected="handleEntrySelected"
+              @collapse="collapse"
+            />
           </div>
+        </template>
 
-      </div>
-    </div>
-  </teleport>
+      </HistoryLayout>
+
+    </Modal>
+  </div>
 </template>
 
 <script>
+import Modal from './components/ui/Modal.vue';
+import HistoryLayout from './components/HistoryLayout.vue';
 import List from './components/List.vue';
-import TableDiff from './components/TableDiff.vue';
 
 export default {
   name: 'HistoryWidget',
-  components: {List, TableDiff},
+  components: { Modal, HistoryLayout, List },
   data() {
     return {
       visible: false,
@@ -69,74 +71,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "index";
+@use './scss/mixin/functions' as *;
 
-.history-widget {
-  display: grid;
-  grid-template-columns: rem(360) 1fr;
-  grid-template-rows: 1fr;
-  gap: rem(20);
+.widget-sidebar {
   height: 100%;
-  padding: rem(20);
-}
-
-.list-container {
-  grid-column: 1;
-  overflow-y: auto;
-  border: 1px solid #eee;
-  border-radius: rem(8);
-  padding: rem(10);
-  height: 100%;
-}
-
-.diff-container {
-  grid-column: 2;
+  border: 1px solid #ddd;
+  border-radius: rem(4);
+  background: #fff;
   overflow: hidden;
-  border: 1px solid #eee;
-  border-radius: rem(8);
-  padding: rem(10);
-  height: 100%;
 }
-
-.modal-history-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.modal-content {
-  background: white;
-  border-radius: rem(8);
-  height: 96vh;
-  width: 96vw;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  padding: 0;
-}
-
-.close-btn {
-  position: absolute;
-  top: rem(12);
-  right: rem(12);
-  font-size: rem(20);
-  background: white;
-  border: none;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: rem(30);
-  height: rem(30);
-  border-radius: 50%;
-}
-
 </style>

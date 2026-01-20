@@ -1,131 +1,148 @@
 <template>
   <div class="diff-wrapper">
-    <div class="toggle-row">
-      <label>
-        <input type="checkbox" v-model="showOnlyChanges" />
-        {{ $t('Показать только измененные строки') }}
-      </label>
-      <label style="margin-left: 20px;">
-        <input type="checkbox" v-model="showOnlyChangedColumns" />
-        {{ $t('Показать только изменённые столбцы') }}
-      </label>
+
+    <DiffToolbar
+      v-model:showOnlyChanges="showOnlyChanges"
+      v-model:syncScroll="syncScroll"
+      v-model:isVertical="isVertical"
+      :isSidebarCollapsed="isSidebarCollapsed"
+      @toggle-sidebar="$emit('toggle-sidebar', $event)"
+      @open-settings="$emit('open-settings')"
+    />
+
+    <div class="diff-container" :class="{ 'vertical-layout': isVertical }">
+      <TableSide
+        ref="leftSide"
+        side="left"
+        :rows="processedRows"
+        :content="diff?.previousContent"
+        :title="$t('Previous version')"
+        :meta="diff?.previousMeta"
+        @scroll="onSyncScroll($event, 'left')"
+        @request-details="onShowDetails"
+      />
+
+      <TableSide
+        ref="rightSide"
+        side="right"
+        :rows="processedRows"
+        :content="diff?.currentContent"
+        :title="$t('Current version')"
+        :meta="diff?.currentMeta"
+        @scroll="onSyncScroll($event, 'right')"
+        @request-details="onShowDetails"
+      />
     </div>
 
-    <div class="tables-row">
-      <TableSide
-        :columns="filteredColumns"
-        :rows="filteredFilteredRows"
-        side="left"
-        :sideLabel="$t('Предыдущая версия таблицы')"
-        :meta="diff?.previousMeta"
-      />
-      <TableSide
-        :columns="filteredColumns"
-        :rows="filteredFilteredRows"
-        side="right"
-        :sideLabel="$t('Новая версия таблицы')"
-        :meta="diff?.currentMeta"
-      />
-    </div>
+    <!-- Слой попапов, управляется через ref -->
+    <PopupLayer ref="popupLayer"/>
+
   </div>
 </template>
 
 <script>
+import {generateTextDiff} from '../utils/csvDiff.js';
+import {getProcessedRows} from '../utils/diffProcessor.js';
 import TableSide from './TableSide.vue';
+import DiffToolbar from './DiffToolbar.vue';
+import PopupLayer from './PopupLayer.vue';
 
 export default {
-  components: { TableSide },
+  name: 'TableDiff',
+  components: {TableSide, DiffToolbar, PopupLayer},
+  emits: ['toggle-sidebar', 'open-settings'],
   props: {
     diff: {
       type: Object,
       required: true
+    },
+    isSidebarCollapsed: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       showOnlyChanges: false,
-      showOnlyChangedColumns: false,
-      normalStatuses: new Set(['normal', 'empty', 'line-number']),
+      syncScroll: true,
+      isVertical: false,
+      contextLines: 3,
+      isScrolling: false,
     };
   },
   computed: {
-    filteredRows() {
-      if (!this.showOnlyChanges) return this.diff.rows;
-
-      return this.diff.rows.filter(row =>
-        row.left.some(cell => !this.normalStatuses.has(cell.status)) ||
-        row.right.some(cell => !this.normalStatuses.has(cell.status))
-      );
+    rawRows() {
+      if (!this.diff?.previousContent || !this.diff?.currentContent) return [];
+      return generateTextDiff(this.diff.previousContent, this.diff.currentContent);
     },
-    visibleColumnIndexes() {
-      if (!this.showOnlyChangedColumns) {
-        // Показываем все индексы
-        return this.diff.columns.map((_, i) => i);
-      }
-
-      const colCount = this.diff.columns.length;
-      const columnsHasChanges = new Array(colCount).fill(false);
-
-      for (const row of this.filteredRows) {
-        for (let c = 1; c < colCount; c++) { // начиная с 1, чтобы не трогать первый столбец
-          if (
-            !this.normalStatuses.has(row.left[c]?.status) ||
-            !this.normalStatuses.has(row.right[c]?.status)
-          ) {
-            columnsHasChanges[c] = true;
-          }
-        }
-      }
-
-      // Всегда добавляем 0-й столбец — номер строки
-      const visible = columnsHasChanges
-        .map((hasChange, idx) => (hasChange ? idx : -1))
-        .filter(idx => idx !== -1);
-      if (!visible.includes(0)) visible.unshift(0);
-
-      return visible;
-    },
-    filteredColumns() {
-      return this.visibleColumnIndexes.map(i => this.diff.columns[i]);
-    },
-    filteredFilteredRows() {
-      return this.filteredRows.map(row => ({
-        left: this.filterRowByColumns(row.left),
-        right: this.filterRowByColumns(row.right)
-      }));
+    processedRows() {
+      return getProcessedRows(this.rawRows, this.showOnlyChanges, this.contextLines);
+    }
+  },
+  watch: {
+    // Очищаем попапы при смене diff (выборе другого файла/версии)
+    diff() {
+      this.$refs.popupLayer?.clearAll();
     }
   },
   methods: {
-    filterRowByColumns(rowCells) {
-      return this.visibleColumnIndexes.map(idx => rowCells[idx]);
+    onSyncScroll(pos, source) {
+      if (!this.syncScroll) return;
+      if (this.isScrolling) return;
+
+      this.isScrolling = true;
+
+      const targetRef = source === 'left' ? this.$refs.rightSide : this.$refs.leftSide;
+      if (targetRef) {
+        targetRef.setScrollPosition(pos.top, pos.left);
+      }
+
+      setTimeout(() => {
+        this.isScrolling = false;
+      }, 10);
+    },
+
+    // Обработчик события из TableSide
+    onShowDetails(payload) {
+      this.$refs.popupLayer.show(payload);
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-@import "./../index.scss";
+@use './../scss/mixin/functions' as *;
+@use './../scss/vars/colors' as *;
 
 .diff-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: $bg-main;
   padding: rem(10);
-  overflow: visible;
 }
 
-.toggle-row {
-  margin-bottom: rem(10);
+.diff-container {
   display: flex;
-  align-items: center;
+  flex: 1;
+  background: $bg-main;
+  border: rem(1) solid $border-main;
+  overflow: hidden;
+  transition: all 0.3s ease;
 
-  label {
-    user-select: none;
+  flex-direction: row;
+
+  &.vertical-layout {
+    flex-direction: column;
+
+    :deep(.side-wrapper) {
+      border-right: none;
+      border-bottom: rem(1) solid $border-main;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
   }
-}
-
-
-.tables-row {
-  display: flex;
-  gap: rem(20);
-  height: calc(100vh - 150px);
-  align-items: flex-start;
 }
 </style>

@@ -125,7 +125,6 @@ const startPreloader = () => {
   f.show(f.gI('preloader'));
   f.gI('mainWrapper').classList?.remove('show');
 }
-
 const stopPreloader = (short = true) => {
   if (f.OUTSIDE) return;
   f.hide(f.gI('preloader'));
@@ -155,33 +154,42 @@ const themeToggle = () => {
 }
 
 const langChange = (target: HTMLSelectElement) => {
-  target.onchange = () => {
-    startPreloader();
+  startPreloader();
 
-    f.Post({data: {
+  f.Post({data: {
       mode     : 'dictionary',
       cmsAction: 'changeLang',
       lang     : target.value,
-    }}).then(data => {
-      if (data.status) {
-        f.cookieSet('lang', target.value);
-        location.reload()
-      }
-    });
-  };
+    }}).then((data: any) => {
+    if (data.status) {
+      f.cookieSet('lang', target.value);
+      location.reload()
+    } else {
+      f.showMsg(_('Change lang error'), 'error');
+      stopPreloader();
+    }
+  });
 }
 
-const cmsEvent = function() {
+const cmsEventClick = function() {
   let action = this.dataset.actionCms;
 
   let select = {
     menuToggle, themeToggle,
-    langChange,
     exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };
   // @ts-ignore
   select[action] && select[action](this);
-};
+}
+const cmsEventChange = function() {
+  let action = this.dataset.actionCms;
+
+  let select = {
+    langChange,
+  };
+  // @ts-ignore
+  select[action] && select[action](this);
+}
 
 const sideMenuExpanded = function(e: Event) {
   e.preventDefault();
@@ -210,12 +218,13 @@ const onEvent = () => {
   // Authorization block
   let node = f.gI(f.ID.AUTH_BLOCK);
   node && node.querySelectorAll('[data-action]')
-              .forEach((n: HTMLElement) => n.addEventListener('click', cmsEvent));
+              .forEach((n: HTMLElement) => n.addEventListener('click', cmsEventClick));
 
   // Menu Action
   f.qA('#sideMenu [role="button"]', 'click', sideMenuExpanded);
 
-  f.qA('[data-action-cms]', 'click', cmsEvent);
+  f.qA('[data-action-cms]', 'click', cmsEventClick);
+  f.qA('[data-action-cms]', 'change', cmsEventChange);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -224,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelFormSubmit();
   loadLangList();
   dictionaryInit();
-  f.getSetting();
+  f.getSetting('');
   f.relatedOption();
   storageLoad();
   onEvent();
