@@ -322,7 +322,7 @@ export class Pagination {
     this.query       = query;
     this.dbAction    = dbAction;
     this.sortParam   = sortParam;
-    this.activeClass = f.CLASS_NAME.ACTIVE;
+    this.activeClass = 'active';
 
     this.setParam();
   }
@@ -466,7 +466,7 @@ export class SortColumns {
 
     if (!thead || !query || !sortParam) return;
 
-    let activeClass = f.CLASS_NAME.SORT_BTN_CLASS;
+    let activeClass = 'btn-light';
     this.thead = thead;
     this.query = query;
     this.dbAction = dbAction || '';
@@ -493,7 +493,7 @@ export class SortColumns {
   sortRows(e) { /*↑↓*/
     let input = e.target,
         colSort = input.dataset.column,
-        activeClass = f.CLASS_NAME.SORT_BTN_CLASS,
+        activeClass = 'btn-light',
         {notActive, arrowDown, arrowUp} = this.arrow,
         arrowReg = new RegExp(`${notActive}|${arrowDown}|${arrowUp}`);
 

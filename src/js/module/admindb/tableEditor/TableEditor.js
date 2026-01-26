@@ -1,6 +1,6 @@
 "use strict";
 
-import * as Vue from 'vue';
+import {createApp} from 'vue';
 
 import {Main} from '../Main.js';
 
@@ -27,12 +27,12 @@ export class TableEditor extends Main {
     this.contentConfig     = this.queryResult['configValues'];
     this.contentProperties = this.queryResult['configProperties'];
 
-    this.setVueConfig();
-    this.vueInit();
+    this.setConfig();
+    this.init();
     this.loaderTable.stop();
   }
 
-  setVueConfig() {
+  setConfig() {
     this.directives = {};
     this.component = {};
 
@@ -40,28 +40,28 @@ export class TableEditor extends Main {
       install: app => app.config.globalProperties.$db = this,
     };
   }
-  vueInit() {
-    const vue = Vue.createApp(App);
+  init() {
+    const app = createApp(App);
 
     Object.entries(this.directives).forEach(([dName, param]) => {
-      vue.directive(dName, param);
+      app.directive(dName, param);
     });
     Object.entries(this.component).forEach(([component, param]) => {
-      vue.component(component, param);
+      app.component(component, param);
     });
 
-    vue.config.errorHandler = (err, vm, info) => {
+    app.config.errorHandler = (err, vm, info) => {
       debugger
       console.log(err);
       f.showMsg(err, 'error', false);
       // обработка ошибки
-      // `info` — специфическая для Vue информация об ошибке,
+      // `info` — специфическая информация об ошибке,
       // например, в каком хуке жизненного цикла была найдена ошибка
     }
 
-    vue.use(this.self);
-    vue.mount(this.mainNode);
-    this.vueApp = vue;
+    app.use(this.self);
+    app.mount(this.mainNode);
+    this.vueApp = app;
   }
 
   destroy() {

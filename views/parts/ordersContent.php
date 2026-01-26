@@ -84,7 +84,7 @@
       <div class="kanban-fz-12"><?= gTxt('Sort By') ?></div>
       <select id="sortField" class="form-select kanban-fz-12">
         <option value="Id"><?= gTxt('By id') ?></option>
-        <option value="lastEditDate" selected><?= gTxt('By edit date') ?></option>
+        <option value="edited" selected><?= gTxt('By edit date') ?></option>
       </select>
     </div>
     <div class="kanban-column align-self-end">

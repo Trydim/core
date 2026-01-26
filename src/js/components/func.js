@@ -145,7 +145,7 @@ export default {
   show: (...collection) => { collection.map(nodes => {
     if (!nodes) return;
     if (!nodes.forEach) nodes = [nodes];
-    nodes.forEach(n => n.classList.remove(f.CLASS_NAME.HIDDEN_NODE));
+    nodes.forEach(n => n.classList.remove('d-none'));
   }) },
 
   /**
@@ -155,7 +155,7 @@ export default {
   hide: (...collection) => { collection.map(nodes => {
     if (!nodes) return;
     if (!nodes.forEach) nodes = [nodes];
-    nodes.forEach(n => n.classList.add(f.CLASS_NAME.HIDDEN_NODE));
+    nodes.forEach(n => n.classList.add('d-none'));
   }) },
 
   /**
@@ -293,7 +293,7 @@ export default {
     collection.map(nodes => {
       if (!nodes.forEach) nodes = [nodes];
       nodes.forEach(n => {
-        n.classList.remove(f.CLASS_NAME.DISABLED_NODE);
+        n.classList.remove('disabled');
         n.removeAttribute('disabled');
       });
     });
@@ -305,9 +305,9 @@ export default {
    */
   disable: (...collection) => {
     collection.map(nodes => {
-      if(!nodes.forEach) nodes = [nodes];
+      if (!nodes.forEach) nodes = [nodes];
       nodes.forEach(n => {
-        n.classList.add(f.CLASS_NAME.DISABLED_NODE);
+        n.classList.add('disabled');
         n.setAttribute('disabled', 'disabled');
       });
     });

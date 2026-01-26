@@ -231,12 +231,12 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'changeOrders':
-      $ordersIds = json_decode($ordersIds ?? '[]');
-      if (!is_array($ordersIds)) $ordersIds = [$ordersIds];
+      $orderIds = json_decode($orderIds ?? '[]');
+      if (!is_array($orderIds)) $orderIds = [$orderIds];
 
-      if (count($ordersIds)) {
+      if (count($orderIds)) {
         $param = [];
-        //$single = count($ordersIds) === 1;
+        //$single = count($orderIds) === 1;
 
         $statusId = $statusId ?? false;
         if (isset($statusCode)) {
@@ -244,7 +244,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
           if (count($status)) $statusId = $status[0]['ID'];
         }
 
-        foreach ($ordersIds as $id) {
+        foreach ($orderIds as $id) {
           isset($userId)         && $param[$id]['user_id']     = $userId;
           isset($customerId)     && $param[$id]['customer_id'] = $customerId;
           isset($orderTotal)     && $param[$id]['total']       = $orderTotal;

@@ -147,6 +147,14 @@
   'Customer orders' => 'Предварительные расчеты',
   'Selected orders' => 'Выбранные заказы',
   'Saved! Change will be visible after reload page' => 'Сохранено! Изменения будут видны после перезагрузки страницы',
+  // Orders - kanban
+  'Searching' => 'Поиск',
+  'Enter search text' => 'Номер заказа, ФИО или номер клиента',
+  'Status' => 'Статус',
+  'All' => 'Все',
+  'Sort By' => 'Сортировать',
+  'By id' => 'по номеру заказа (id)',
+  'By edit date' => 'по дате редактирования',
   // Other
   'Other'      => 'Прочее',
   'Phone mask' => 'Шаблон номера телефона',

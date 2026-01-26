@@ -27,10 +27,6 @@ export default class {
   orders = {};
   filter = {};
 
-  constructor() {
-    this.setParam();
-  }
-
   setParam() {
     this.M = new f.initModal();
 
@@ -63,6 +59,8 @@ export default class {
   }
 
   init() {
+    this.setParam();
+
     this.p = new f.Pagination( '#paginator', {
       dbAction : this.mainAction,
       sortParam: this.queryParam,

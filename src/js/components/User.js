@@ -1,6 +1,8 @@
 'use strict';
 
 export default class User {
+  data = {}
+
   constructor(selector = '#dataUser') {
     if (typeof User.instance === 'object') return User.instance;
     if (!selector) return;
@@ -55,6 +57,10 @@ export default class User {
     return this.data[key] || defValue;
   }
 
+  /**
+   * @param {string} prop
+   * @returns {*|boolean}
+   */
   getDealerSettings(prop) {
     if (!f.IS_DEAL) return false;
 

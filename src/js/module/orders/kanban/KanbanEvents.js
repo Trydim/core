@@ -1,5 +1,8 @@
-import { Query } from '@syncfusion/ej2-data';
-import { DropDownList, SelectEventArgs, ChangeEventArgs as DropDownChangeArgs } from '@syncfusion/ej2-dropdowns';
+//import { Query } from '@syncfusion/ej2-data';
+//import { DropDownList } from '@syncfusion/ej2-dropdowns';
+
+import {Query}        from './data/ej2-data.es2015.js';
+import {DropDownList} from './data/ej2-dropdowns.es2015.js';
 
 import KanbanBase from './KanbanBase';
 
@@ -40,7 +43,7 @@ export default class extends KanbanBase {
 
     //this.queryParam.currentStatusId = this.orders[this.selected.getSelected()[0]].statusId;
     this.queryParam.statusId = this.statusList[order.Status];
-    this.queryParam.ordersIds = [order.ID];
+    this.queryParam.orderIds = [order.ID];
     void this.query('changeOrders');
   }
 
@@ -51,9 +54,10 @@ export default class extends KanbanBase {
   }
 
   onActionComplete(args) {
-    if (args['requestType'] === "cardChanged") {
+    console.log('[onActionComplete]: ' + args['requestType']);
+    /*if (args['requestType'] === "cardChanged") {
       this.changeStatus(args['changedRecords'][0]);
-    }
+    }*/
   }
 
   itemOpen(args) {
@@ -106,12 +110,9 @@ export default class extends KanbanBase {
   onDragStop(args) {
     const order = args.data[0];
 
-    if (order.Status === order.status) {
-      this.applySort();
-      return;
-    }
+    if (order.Status === order.status) { this.applySort(); return; }
 
-    this.changeStatus(args.data[0])
+    this.changeStatus(args.data[0]);
   }
 
   // Edit dialog -------------------------------------------------------------------------------------------------------

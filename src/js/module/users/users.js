@@ -13,7 +13,7 @@ const tmp  = {
 const data = {
   usersList: new Map(),
   managerField: {},
-  usersLogin: [], // Не безопастно
+  usersLogin: [], // Не безопасно
   currentLogin: '',
 }
 

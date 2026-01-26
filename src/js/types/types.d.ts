@@ -53,9 +53,7 @@ export declare interface CMSGlobalObject {
   /** same INIT_SETTING */
   CMS_SETTING: Object
 
-  CLASS_NAME: {
-    SORT_BTN_CLASS: string,
-  }
+  CLASS_NAME: {}
 
   /**
    * @param {string} msg
@@ -144,7 +142,12 @@ export declare interface CMSGlobalObject {
   relatedOption(node?: HTMLElement)
 
   toNumber(v: any): number
+  /**
+   * @deprecated use toNumber
+   * @param v
+   */
   parseNumber(v: any): number
+  toBool(v: any): boolean,
 
   /**
    * Generate random number from min to max
@@ -229,6 +232,7 @@ export declare interface CMSGlobalObject {
   LocalStorage
 
   transLit(value: string): string
+  unique(value: number): string,
 
   Get<R>(obj: {
     url?: string,

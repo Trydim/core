@@ -49,7 +49,7 @@ module.exports = env => {
       extensions: ['.ts', '.js', '.vue'],
       alias: {
         vue: dev ? 'vue/dist/vue.esm-bundler.js' : 'vue/dist/vue.esm-browser.prod.js',
-      }
+      },
     },
 
     devtool: dev ? 'source-map' : false, //source mapping

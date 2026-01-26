@@ -38,7 +38,7 @@ export function generateData() {
   ];
 
   const assignee = ['Andrew Fuller', 'Janet Leverling', 'Steven walker', 'Robert King', 'Margaret hamilt', 'Nancy Davloio', 'Margaret Buchanan', 'Laura Bergs', 'Anton Fleet', 'Jack Kathryn', 'Martin Davolio', 'Fleet Jack'];
-  const status = ['Новый', 'Готов к запуску', ''];
+  const status = ['Заказ оформлен', 'Оплачен', 'Отправлен'];
 
   const types = ['Epic', 'Bug', 'Story' ];
   const count = 100000;

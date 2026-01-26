@@ -12,12 +12,12 @@
       <div class="mb-3" style="max-height: 140px; overflow-y: auto">
         <template v-for="(item, index) of status" :key="item.ID">
           <div v-if="!item.delete" class="input-group mb-1">
-            <p-input-text v-tooltip.bottom="$t('Code (optional)')" class="form-control"
-                          :disabled="!!+item.required" v-model="item.code" />
-            <p-input-text v-model="item.name" class="form-control w-50" @blur="checkNames" />
-            <p-input-text v-tooltip.bottom="$t('Sorting')" v-model="item.sort" class="form-control" />
+            <p-input-text class="form-control" v-tooltip.bottom="$t('Code (optional)')"
+                          :disabled="!!+item.required" v-model.trim="item.code" />
+            <p-input-text class="form-control w-50" v-model.trim="item.name" @blur="checkNames" />
+            <p-input-text class="form-control" v-tooltip.bottom="$t('Sorting')" v-model="item.sort" />
             <div class="input-group-text">
-              <p-radiobutton v-tooltip.bottom="$t('Default')" v-model="statusDef" :value="item.ID" />
+              <p-radiobutton v-tooltip.bottom="$t('Default')" :value="item.ID" v-model="statusDef" />
             </div>
             <p-button v-tooltip.bottom="$t('Delete')" icon="pi pi-times" class="p-button-danger"
                       :disabled="!!+item.required"

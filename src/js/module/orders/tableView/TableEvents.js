@@ -5,10 +5,11 @@ import TableBase from "./TableBase";
 let searchInProgress = false;
 
 export default class extends TableBase {
-  constructor() {
-    super();
+  init() {
+    super.init();
     this.onEvent();
   }
+
   /**
    * @param node
    * @param func

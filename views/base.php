@@ -26,10 +26,10 @@ $jsGlobalConst = json_encode([
   'URI_SHARED'    => $main->url->getBaseUri() . $main->getCmsParam('SHARE_PATH'),
   'AUTH_STATUS'   => $isAuth,
   'IS_DEAL'       => $main->isDealer(),
-  'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG),
-  'DEAL_URI_SHARED' => $main->url->getUri(true) . $main->getCmsParam('SHARE_PATH'),
+  'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG, $main->getCmsParam(VC::URI_IMG)),
+  'DEAL_URI_SHARED' => $main->url->getUri(true) . SHARE_PATH,
   'INIT_SETTING'  => $main->frontSettingInit,
-  'BASE_LANG'     => $main::$BASE_LANG,
+  'BASE_LANG'     => Main::$BASE_LANG,
 ]);
 
 ?>

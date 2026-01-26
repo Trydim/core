@@ -42,17 +42,6 @@ export default {
     PUBLIC_PAGE: 'publicPageLink'
   },
 
-  CLASS_NAME: {
-    // css класс, который добавляется активным элементам
-    ACTIVE: 'active',
-    // css класс, который добавляется кнопкам сортировки
-    SORT_BTN_CLASS: 'btn-light',
-    // css класс, который добавляется скрытым элементам
-    HIDDEN_NODE: 'd-none',
-    // css класс, который добавляется неактивным элементам
-    DISABLED_NODE: 'disabled',
-  },
-
   HOOKS: {},
   CMS_SETTING: {},
 };

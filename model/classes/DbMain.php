@@ -729,7 +729,7 @@ class DbMain extends R {
    */
   public function openOptions(string $elementID): ?array {
     $sql = "SELECT O.ID AS 'id',
-                   MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId', 
+                   MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId',
                    MO.short_name as 'moneyOutputName', MO.ID AS 'moneyOutputId',
                    images_ids AS 'images', properties,
                    O.name AS 'name', U.ID AS 'unitId', U.name AS 'unitName', O.last_edit_date AS 'lastEditDate', O.activity AS 'activity', sort,
@@ -1150,7 +1150,13 @@ class DbMain extends R {
     return $result;
   }
 
-  public function loadDealerById(string $id = null): array {
+  /**
+   * Load dealer by id
+   * @param string|null $id
+   * @param bool $parseSettings
+   * @return array
+   */
+  public function loadDealerById(string $id = null, bool $parseSettings = true): array {
     $id = $id ?? $this->main->getCmsParam('dealerId');
 
     $sql = "SELECT ID AS 'id', name, contacts,
@@ -1161,6 +1167,6 @@ class DbMain extends R {
 
     $dealer = $this->jsonParseField(self::getRow($sql, [':id' => $id]));
 
-    return $this->parseDealerSettings([$dealer])[0];
+    return $parseSettings ? $this->parseDealerSettings([$dealer])[0] : $dealer;
   }
 }

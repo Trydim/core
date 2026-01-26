@@ -1,15 +1,19 @@
 import '../../../../css/module/orders/orders.scss';
 
-import {Kanban} from '@syncfusion/ej2-kanban';
+//import {Kanban} from '@syncfusion/ej2-kanban';
+//import { L10n } from '@syncfusion/ej2-base';
+//import { Query } from '@syncfusion/ej2-data';
 
-import * as Locale from './locale/ru.json';
-import { L10n } from '@syncfusion/ej2-base';
-import { Query } from '@syncfusion/ej2-data';
+
+import {Kanban} from './data/ej2-kanban.es2015.js';
+import {L10n}   from './data/ej2-base';
+import {Query}  from './data/ej2-data.es2015.js';
 
 //import { CheckBox } from '@syncfusion/ej2-buttons';
 //import { NumericTextBox, TextBox } from '@syncfusion/ej2-inputs';
 //import { DropDownList, SelectEventArgs } from '@syncfusion/ej2-dropdowns';
 
+import * as Locale from './locale/ru.json';
 //import {generateData}  from "./data/getData";
 //import * as dataSource from './data/datasource.json';
 
@@ -68,6 +72,11 @@ export default class {
        addClass([args.element], val);
       },*/
 
+      fields: {
+        //content: "Summary",
+        primaryKey: "Id"
+      },
+
       dialogSettings: {
         template: '#dialogTemplate',
       },
@@ -111,7 +120,7 @@ export default class {
   ordersPrepare(data) {
     return data.map(item => {
       // Обязательный поля для библиотеки
-      item.Id     = item['ID'];
+      item.Id     = +item['ID'];
       item.Status = item.status;
       item.Summary = '';
 
@@ -147,14 +156,15 @@ export default class {
   // Заполнить статусы
   fillSelectStatus(data) {
     data.forEach((s, index) => {
-      this.statusList[s.name] = s.ID;
+      const name = s.name.trim();
+      this.statusList[name] = s.ID;
 
       this.kanbanObj.addColumn({
         template: '#headerTemplate',
         allowToggle  : true,
         showItemCount: true,
-        headerText   : s.name,
-        keyField     : s.name,
+        headerText   : name,
+        keyField     : name,
       }, index);
     });
 
@@ -174,8 +184,8 @@ export default class {
 
     const colors = ['#07A5D066', '#28AD004D', '#FFCC004D', '#FF00004D'];
 
-    styleNode.innerHTML = Object.keys(this.statusList).map((s) => {
-      const cI = f.random(0, 3);
+    styleNode.innerHTML = Object.keys(this.statusList).map((s, i) => {
+      const cI = i % 4;
 
       return `
         th[data-role="kanban-column"][data-key="${s}"] { background: ${colors[cI]} !important; }
