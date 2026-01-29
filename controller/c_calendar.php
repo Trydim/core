@@ -16,10 +16,10 @@ $orders = $main->db->loadOrders(['countPerPage' => PHP_INT_MAX], $dateRange);
 
 $field = [
   VC::BASE_PAGE_TITLE => 'Календарь',
-  VC::BASE_CSS_LINKS  => [CORE_CSS . 'module/calendar.css?ver=1dbd460d5c'],
+  VC::BASE_CSS_LINKS  => [$main->url->getUrl(VC::CORE_CSS) . 'module/calendar.css?ver=1dbd460d5c'],
   VC::BASE_JS_LINKS   => [
-    CORE_JS . 'libs/fullCalendar.min.js?ver=960857bb87',
-    CORE_JS . 'module/calendar.js?ver=960857bb87',
+    $main->url->getUrl(VC::CORE_JS) . 'libs/fullCalendar.min.js?ver=960857bb87',
+    $main->url->getUrl(VC::CORE_JS) . 'module/calendar.js?ver=960857bb87',
   ],
   VC::BASE_FOOTER_CONTENT => '',
 ];

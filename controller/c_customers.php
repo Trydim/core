@@ -7,7 +7,7 @@
 $param = [];
 $field = [
   'pageTitle' => 'Клиенты',
-  'jsLinks'   => [CORE_JS . 'module/customers.js?ver=6347eef0e2'],
+  'jsLinks'   => [$main->url->getUrl(VC::CORE_JS) . 'module/customers.js?ver=6347eef0e2'],
   'footerContent' => $main->getSettings('json', true),
 ];
 

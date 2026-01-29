@@ -7,8 +7,8 @@
 $field = [
   'pageTitle' => 'Настройки',
   'footerContent' => $main->initDictionary(),
-  'cssLinks'   => [CORE_CSS . 'module/setting.css?ver=096616aa6f'],
-  'jsLinks'    => [CORE_JS . 'module/setting.js?ver=2239ad0927'],
+  'cssLinks'   => [$main->url->getUrl(VC::CORE_CSS) . 'module/setting.css?ver=096616aa6f'],
+  'jsLinks'    => [$main->url->getUrl(VC::CORE_JS) . 'module/setting.js?ver=2239ad0927'],
 ];
 
 $field['footerContent'] .= $main->getFrontContent('dataUser', $main->getLogin('all'))

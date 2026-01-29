@@ -19,8 +19,8 @@ $field = [
   'sideRight'     => '',
   'pageFooter'    => '',
   'footerContent' => '',
-  'cssLinks'  => [CORE_CSS . 'module/catalog.css?ver=8cdf94ab40'],
-  'jsLinks'   => [CORE_JS . 'module/catalog.js?ver=73262afc8e'],
+  'cssLinks'  => [$main->url->getUrl(VC::CORE_CSS) . 'module/catalog.css?ver=8cdf94ab40'],
+  'jsLinks'   => [$main->url->getUrl(VC::CORE_JS) . 'module/catalog.js?ver=73262afc8e'],
 ];
 
 // Загрузка настройки столбцов

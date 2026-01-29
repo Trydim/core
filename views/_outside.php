@@ -13,7 +13,12 @@ $footerContent = $footerContent ?? '';
 $cssLinksArr = $cssLinks ?? [];
 $cssLinksRes = $inline ? '' : [];
 
-$jsLinksArr = array_merge([CORE_JS . 'src.js', CORE_JS . 'main.js'], $jsLinks ?? []);
+$jsLinksArr = array_merge([
+    $main->url->getUrl(VC::CORE_JS) . 'src.js',
+    $main->url->getUrl(VC::CORE_JS) . 'main.js'
+  ],
+  $jsLinks ?? []
+);
 //$jsLinksRes = $inline ? '' : [];
 
 $jsGlobalConst = json_encode([

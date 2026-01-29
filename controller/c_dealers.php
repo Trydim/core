@@ -34,8 +34,8 @@ $field = [
   'pageTitle'     => gTxt('Dealers'),
   'sideRight'     => '',
   'footerContent' => $main->initDictionary(),
-  'cssLinks'  => [CORE_CSS . 'module/dealers.css?ver=8cdf94ab40'],
-  'jsLinks'   => [CORE_JS . 'module/dealers.js?ver=73262afc8e'],
+  'cssLinks'  => [$main->url->getUrl(VC::CORE_CSS) . 'module/dealers.css?ver=8cdf94ab40'],
+  'jsLinks'   => [$main->url->getUrl(VC::CORE_JS) . 'module/dealers.js?ver=73262afc8e'],
 ];
 
 $dealerProps = [];
@@ -72,7 +72,7 @@ $field['footerContent'] .= $main->getFrontContent('dataProperties', $dealerProps
 // If user have table property, add libs
 $haveTable = array_find($dealerProps, function ($prop) { return $prop['type'] === 'table'; });
 if (!empty($haveTable)) {
-  array_unshift($field['jsLinks'], CORE_JS . 'libs/handsontable.full.min.js?ver=f3bb2b6859');
+  array_unshift($field['jsLinks'], $main->url->getUrl(VC::CORE_JS) . 'libs/handsontable.full.min.js?ver=f3bb2b6859');
 }
 unset($values, $dealerProps, $haveTable);
 

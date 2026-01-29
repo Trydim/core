@@ -22,7 +22,7 @@ class Orders {
       storage.set('orderView', this.selectedView);
     }
 
-    this.onEvent();
+    this.onEvent(); // тоже нужна задержка для хуков
   }
 
   switchView() {

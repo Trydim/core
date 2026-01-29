@@ -63,8 +63,8 @@ checkFiles.forEach(pathF => {
   let publicFileContent = fs.readFileSync(publicFilePath, {encoding: 'utf8'}),
       publicFileRow = publicFileContent.split('\n');
 
-  publicFileRow = publicFileRow.map((row, i) => {
-    if (row.includes('CORE_CSS') || row.includes('CORE_JS')) {
+  publicFileRow = publicFileRow.map((row) => {
+    if (row.includes('url->getUrl')) {
       return setVersion(row);
     }
     return row;

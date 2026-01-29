@@ -20,11 +20,8 @@ define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig[VC::CHANGE_DATABASE] ?? 
 define('CSV_DELIMITER', $publicConfig['CSV_DELIMITER'] ?? ';');
 define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);
 
-$GLOBALS['main'] = $main = new Main($publicConfig, $dbConfig ?? []);
+$GLOBALS['main'] = $main = Main::getInstance($publicConfig, $dbConfig ?? []);
 $url = $main->url;
-
-define('CORE_CSS', $url->getCoreUri() . 'assets/css/');
-define('CORE_JS', $url->getCoreUri() . 'assets/js/');
 
 $main->setCmsParam(VC::CSV_PATH, $url->getBasePath(true) . SHARE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
      ->setCmsParam(VC::CSV_HISTORY_PATH, $url->getBasePath(true) . STORAGE_PATH . ($publicConfig['PATH_CSV'] ?? 'csv/'))
@@ -53,7 +50,7 @@ define('URI_IMG', $main->getCmsParam(VC::URI_IMG));
 define('PUBLIC_PAGE', $publicConfig[VC::PUBLIC_PAGE] ?? null);
 define('USE_CONTENT_EDITOR', $publicConfig[VC::USE_CONTENT_EDITOR] ?? false);
 
-$main->setCmsParam(VC::ONLY_LOGIN, !boolValue(PUBLIC_PAGE) || boolValue($publicConfig['ONLY_LOGIN'] ?? false))
+$main->setCmsParam(VC::ONLY_LOGIN, !boolValue(PUBLIC_PAGE) || boolValue($publicConfig[VC::ONLY_LOGIN] ?? false))
      ->setCmsParam(VC::LEGEND_PATH, $url->getPath(true) . ($publicConfig['PATH_LEGEND'] ?? 'public/views/legend.php'));
 
 !defined('OUTSIDE') && define('OUTSIDE', array_key_exists('outside', $_GET));
