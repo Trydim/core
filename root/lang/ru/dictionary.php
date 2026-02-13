@@ -24,6 +24,7 @@
   'Content' => 'Контент',
   'Key'     => 'Ключ',
   'System'  => 'Система',
+  'history' => 'История изменений',
   'Change history'   => 'История изменений',
   'History is empty' => 'История пуста',
   'Select a file to view history' => 'Выберите файл, для посмотра изменений',
@@ -32,6 +33,14 @@
   'Show only changed rows'    => 'Показать только измененные строки',
   'Show only changed columns' => 'Показать только изменённые столбцы',
   'Synchronize scrolling'     => 'Синхронизировать скроллинг',
+  'Insert row above' => 'Добавить строку выше',
+  'Insert row below' => 'Добавить строку ниже',
+  'Insert column left'  => 'Добавить колонку слева',
+  'Insert column right' => 'Добавить колонку справа',
+  'Remove row'    => 'Удалить строку',
+  'Remove column' => 'Удалить колонку',
+  'Undo' => 'Отменить',
+  'Redo' => 'Вернуть',
 
   // CMS
   'Authorization' => 'Авторизация',
@@ -83,6 +92,7 @@
   'Show all options' => 'Показать все настройки',
   'Full name'        => 'ФИО',
   'Mail'             => 'Почта',
+  'E-Mail'           => 'Почта',
   'Phone'            => 'Телефон',
   'Prevent simultaneous login' => 'Запретить одновременный вход',
   // Permission
@@ -184,5 +194,6 @@
   'email'   => 'почта',
   'address' => 'адрес',
 
+  'Deleted' => 'Удалено',
   'Delete selected clients?' => 'Удалить выбранных?'
 ];
