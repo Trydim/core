@@ -8,7 +8,7 @@
 $login = $login ?? '';
 $password = $password ?? '';
 
-!isset($_SESSION) && session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 switch ($cmsAction) {
   case 'login':
@@ -75,14 +75,15 @@ switch ($cmsAction) {
     break;
 
   case 'exit':
+    session_destroy();
+    session_abort();
+
     if (isset($_SESSION['id'])) {
       $userId = $_SESSION['id'];
-      $dealerId = $_SESSION['dealerId'] ?? false;
-      session_destroy();
-      session_abort();
-
       $main->db->setUserHash($userId, password_hash(uniqid(), PASSWORD_BCRYPT));
-      $main->reDirect($dealerId ? 'dealer/' . $dealerId : '');
     }
+
+    $dealerId = $_SESSION['dealerId'] ?? false;
+    $main->reDirect($dealerId ? 'dealer/' . $dealerId : '');
     break;
 }

@@ -34,7 +34,7 @@ class DbMain extends R {
   /**
    * @var Main
    */
-  private $main;
+  protected $main;
 
   /**
    * @var int

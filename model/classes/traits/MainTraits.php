@@ -120,7 +120,19 @@ trait Authorization {
     // Restore session id (set in auth.php)
     $id = $this->url->request->get('save');
     if ($id) session_id($_COOKIE['PHPSESSID'] = $id);
-    !isset($_SESSION) && session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
+
+    // Сторонняя авторизация для лигрон (только для дилеров)
+    if ($this->isDealer() && $_SESSION['customAuth'] ?? false) {
+      return $this->setLogin([
+        'id'    => 1,
+        'login' => $_SESSION['login'],
+        'name'  => $_SESSION['login'],
+        'contacts' => ['type' => $_SESSION['loginType']],
+        'onlyOne' => false,
+        'isAdmin' => true,
+      ]);
+    }
 
     if ( (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
          ||
