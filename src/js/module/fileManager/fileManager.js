@@ -97,7 +97,7 @@ const fileManager = {
       if (r) {
         fileManager.query({cmsAction: 'createFile', filename: u + r}, function () {
           t(u);
-          let ext = r.substr(r.lastIndexOf(".") + 1);
+          let ext = r.substring(r.lastIndexOf(".") + 1);
           $("#tree div.selected").next("ul")
                                  .append('<li class="ext-file ext-' + ext + '" style="border-right:1px solid red">' + r + "<\/li>")
         })
