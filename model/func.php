@@ -4,8 +4,15 @@
  * @param string $class
  */
 function cmsAutoloader(string $class) {
-  $path = str_replace('\\', DIRECTORY_SEPARATOR, __DIR__ . '/classes/' . $class . '.php');
-  if (file_exists($path)) require_once $path;
+  $path = ABS_SITE_PATH . 'public/model/classes/' . $class . '.php';
+  if (file_exists($path)) {
+    require_once $path;
+  }
+
+  else {
+    $path = __DIR__ . '/classes/' . $class . '.php';
+    if (file_exists($path)) require_once $path;
+  }
 }
 
 /**
