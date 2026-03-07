@@ -6,6 +6,15 @@ use Helpers\HeaderBag;
 
 class UrlGenerator {
   /**
+   * @var string
+   */
+  const LOCAL_IP = '127.0.0.1';
+
+  /**
+   * @var string
+   */
+  const DEV_SUBDOMAIN = 'dev';
+  /**
    * @var Main
    */
   private $main;
@@ -64,7 +73,7 @@ class UrlGenerator {
   /**
    * @var string
    */
-  private $coreUri;
+  private $coreUrl;
 
   /**
    * @var string
@@ -86,24 +95,24 @@ class UrlGenerator {
   /**
    * UrlGenerator constructor.
    * @param Main $main
-   * @param string $corePath
+   * @param string $publicConfig
    */
-  public function __construct(Main $main, string $corePath) {
+  public function __construct(Main $main, array $publicConfig) {
     $this->main = $main;
     $this->request = new InputBag($_REQUEST);
     $this->server  = new ServerBag($_SERVER);
     $this->headers = new HeaderBag($this->server->getHeaders());
 
     $this->absolutePath = str_replace('\\', '/', ABS_SITE_PATH);
-    $this->corePath = str_replace('\\', '/', $corePath);
+    $this->corePath = str_replace('\\', '/', 'core/');
     $this->method = $this->server->get('REQUEST_METHOD');
 
     $this->setScheme();
     $this->setSubDomain($this->setHost());
     $this->setBaseSitePath();
-    $this->setMode();
-    $this->setCoreUri();
+    $this->setCoreUrl();
     $this->checkDealer();
+    $this->setMode();
   }
 
   private function setScheme() {
@@ -122,12 +131,13 @@ class UrlGenerator {
     return $host;
   }
   private function setSubDomain(string $host) {
-    $count = $this->server->get('REMOTE_ADDR') === '127.0.0.1' ? 1 : 2;
+    if ($this->server->get('REMOTE_ADDR') === self::LOCAL_IP) return;
+
     $host = explode('.', $host);
     $subDomain  = $host[0];
-    $mainDomain = count($host) > $count ? $host[1] : $host[0];
+    $mainDomain = count($host) > 2 ? $host[1] : $host[0];
 
-    if ($subDomain !== $mainDomain && $subDomain !== 'dev') {
+    if ($subDomain !== $mainDomain && $subDomain !== self::DEV_SUBDOMAIN) {
       $this->subDomain = $subDomain;
     }
   }
@@ -196,10 +206,6 @@ class UrlGenerator {
     return null;
   }*/
   private function setBaseUri(): string {
-    /*$subdomain = $this->getSubDomain();
-    if (!empty($subdomain)) $subdomain = str_replace("$subdomain.", '', $this->getHost());
-
-    return $subdomain . $this->getBasePath();*/
     return $this->getHost() . $this->getBasePath();
   }
   private function setRequestUri() {
@@ -296,15 +302,15 @@ class UrlGenerator {
 
     return $view . '404.php';
   }
-  private function setCoreUri() {
+  private function setCoreUrl() {
     // Определять автоматом.
     /*$sitePath = trim(str_replace('/', ' ', $this->sitePath));
     $siteLevel = count(explode(' ', $sitePath));
     //$corePath = trim(str_replace($_SERVER['DOCUMENT_ROOT'] . '/', ' ', $this->corePath));
     //$coreLevel = count(explode(' ', $corePath));*/
-    //$coreUri = str_repeat('../', $siteLevel) . 'core/';
+    //$coreUrl = str_repeat('../', $siteLevel) . 'core/';
 
-    $this->coreUri = $this->getBaseUri() . $this->corePath;
+    $this->coreUrl = $this->getBaseUri() . $this->corePath;
   }
 
   private function checkDealer() {
@@ -353,7 +359,7 @@ class UrlGenerator {
   public function getCorePath(bool $absolute = false): string {
     return ($absolute ? $this->absolutePath : '') . $this->corePath;
   }
-  public function getCoreUri(): string { return $this->coreUri; }
+  public function getCoreUri(): string { return $this->coreUrl; }
 
   public function getBasePath(bool $absolute = false): string {
     return $absolute ? $this->absolutePath : $this->baseSitePath;

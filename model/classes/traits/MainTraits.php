@@ -120,7 +120,7 @@ trait Authorization {
     // Restore session id (set in auth.php)
     $id = $this->url->request->get('save');
     if ($id) session_id($_COOKIE['PHPSESSID'] = $id);
-    !isset($_SESSION) && session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
 
     if ( (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
          ||

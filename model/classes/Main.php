@@ -27,6 +27,9 @@ final class Main {
 
   const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';
 
+
+  private static ?self $instance = null;
+
   /**
    * @var array
    */
@@ -78,19 +81,38 @@ final class Main {
   public $publicDealer = true;
 
   /**
+   * Cloning is not available for singleton
+   * @return void
+   */
+  private function __clone() {}
+
+  /**
    * Main constructor.
-   * @param array $cmsParam
+   * @param array $publicConfig
    * @param array $dbConfig
    * @throws RedException
    */
-  public function __construct(array $cmsParam, array $dbConfig) {
-    $this->setCmsParam(array_merge($this::CMS_PARAM, $cmsParam));
+  private function __construct(array $publicConfig, array $dbConfig) {
+    $this->setCmsParam(array_merge(self::CMS_PARAM, $publicConfig));
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
 
     $this->db       = new DbProxy(new DbMain($this));
-    $this->url      = new UrlGenerator($this, 'core/');
+    $this->url      = new UrlGenerator($this, $publicConfig);
     $this->response = new Response($this);
     $this->dealer   = new Dealer($this);
+  }
+
+  /**
+   * @param array $cmsParam
+   * @param array $dbConfig
+   * @return Main
+   * @throws RedException
+   */
+  public static function getInstance(array $cmsParam, array $dbConfig): self {
+    if (self::$instance === null) {
+      self::$instance = new self($cmsParam, $dbConfig);
+    }
+    return self::$instance;
   }
 
   public function afterConstDefine() {

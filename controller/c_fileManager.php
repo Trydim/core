@@ -46,11 +46,11 @@ function tree($path) {
 }
 
 $field = [
-	'pageTitle' => 'File manager',
+  VC::BASE_PAGE_TITLE => 'File manager',
 ];
 
-$field['cssLinks'] = [CORE_CSS . 'module/fileManager.css?ver=fda1c25660'];
-$field['jsLinks'] = [CORE_JS . 'module/fileManager.js?ver=45223fc11b'];
+$field[VC::BASE_CSS_LINKS] = [CORE_CSS . 'module/fileManager.css?ver=fda1c25660'];
+$field[VC::BASE_JS_LINKS]  = [CORE_JS . 'module/fileManager.js?ver=45223fc11b'];
 
 $main->setControllerField($field)->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main);
 ob_start();
