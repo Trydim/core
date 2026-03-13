@@ -25,11 +25,6 @@ class Dealer {
   private $prefix;
 
   /**
-   * @var string
-   */
-  //private $dbType;
-
-  /**
    * @var MigrateDb;
    */
   private $migrateDb;
@@ -161,14 +156,23 @@ class Dealer {
     return $id;
   }
 
-  public function drop(string $id, string $prefix) {
-    removeFolder($this::FOLDER . $id);
+  public function drop(string $id, string $prefix): int {
+    if (is_dir($path = $this::FOLDER . $id)) {
+      removeFolder($path);
+    }
 
-    $this->migrateDb = new MigrateDb($this->main, $prefix);
     // Drop all tables with prefix
-    $this->migrateDb->drop($prefix);
-    // Remove dealer
-    return $this->main->db->deleteItem('dealers', [$id]);
+    if ($prefix !== '') {
+      $prefix = str_replace('_', '\_', $prefix);
+
+      $this->migrateDb = new MigrateDb($this->main, $prefix);
+      $this->migrateDb->drop($prefix);
+
+      // Remove dealer
+      return $this->main->db->deleteItem('dealers', [$id]);
+    }
+
+    return 0;
   }
 
   //

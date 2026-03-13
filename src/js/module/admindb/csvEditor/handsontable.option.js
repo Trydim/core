@@ -108,7 +108,7 @@ export const handson = {
         const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
         if (important) {
           f.showMsg('Ключевые значения нельзя удалить', 'error');
-          throw new Error('try to delete important values!');
+          throw new Error('[handsontable.option.js:beforeRemoveCol]: Try to delete important values!');
         }
       }
     },
@@ -117,7 +117,7 @@ export const handson = {
         const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
         if (important) {
           f.showMsg('Ключевые значения нельзя удалить', 'error');
-          throw new Error('try to delete important values!');
+          throw new Error('[handsontable.option.js:beforeRemoveCol]: Try to delete important values!');
         }
       }
     },

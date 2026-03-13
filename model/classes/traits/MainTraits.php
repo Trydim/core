@@ -37,21 +37,35 @@ trait Authorization {
    */
   private $user = [];
 
+  private function setUser(string $key, $value, $default = null): Main
+  {
+    if (empty($value) && $default === null) {
+      unset($this->user[$key]);
+    } else {
+      $this->user[$key] = $value;
+    }
+
+    return $this;
+  }
+
   /**
    * @param array $user
    * @return $this|Main
    */
   public function setLogin(array $user): Main
   {
-    $this->user['id']    = $user['id'];
-    $this->user['login'] = $user['login'];
-    $this->user['name']  = $user['name'];
-    $this->user['contacts'] = $user['contacts'] ?? [];
-    $this->user['onlyOne']  = $user['onlyOne'];
-    $this->user['permission']    = $user['permissionValue'] ?? [];
-    $this->user['customization'] = $user['customization'] ?? [];
+    foreach (['id', 'login', 'name', 'onlyOne'] as $key) {
+      $this->setUser($key, $user[$key]);
+    }
 
-    $this->user['isAdmin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
+    $this->setUser('contacts', $user['contacts'] ?? [])
+         ->setUser('permission', $user['permission'] ?? [])
+         ->setUser('customization', $user['customization'] ?? []);
+
+    $this->setUser('isAdmin',
+      stripos($this->user['permission']['tags'] ?? '', 'admin') !== false
+    );
+
     $this->setLoginStatus('ok');
     return $this;
   }
@@ -123,7 +137,7 @@ trait Authorization {
     if (session_status() === PHP_SESSION_NONE) session_start();
 
     // Сторонняя авторизация для лигрон (только для дилеров)
-    if ($this->isDealer() && $_SESSION['customAuth'] ?? false) {
+    if ($this->isDealer() && isset($_SESSION['customAuth'])) {
       return $this->setLogin([
         'id'    => 1,
         'login' => $_SESSION['login'],
@@ -593,7 +607,10 @@ trait Dictionary
    */
   public function getTargetLang(): string
   {
-    $this->loadDictionary();
+    if ($this->targetLocale === '') {
+      $this->loadDictionary();
+    }
+
     return $this->targetLocale;
   }
 

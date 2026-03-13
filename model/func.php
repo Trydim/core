@@ -4,13 +4,17 @@
  * @param string $class
  */
 function cmsAutoloader(string $class) {
+  // Public classes
   $path = ABS_SITE_PATH . 'public/model/classes/' . $class . '.php';
+  $path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
   if (file_exists($path)) {
     require_once $path;
   }
 
+  // Core classes
   else {
     $path = __DIR__ . '/classes/' . $class . '.php';
+    $path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
     if (file_exists($path)) require_once $path;
   }
 }
@@ -151,15 +155,17 @@ if (!function_exists('def')) {
 /**
  * @param string[]|string $hayStack
  * @param string $search
+ * @param bool $strict
  * @return bool
  */
-function includes($hayStack, string $search): bool {
+function includes($hayStack, string $search, bool $strict = false): bool {
   if (is_array($hayStack)) {
     foreach ($hayStack as $item) {
-      if (includes($item, $search)) return true;
+      if (includes($item, $search, $strict)) return true;
     }
   } else {
-    return stripos($hayStack, $search) !== false;
+    return $strict ? $hayStack === $search
+                   : stripos($hayStack, $search) !== false;
   }
   return false;
 }

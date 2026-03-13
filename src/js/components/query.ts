@@ -112,7 +112,7 @@ const query = (url: string, body: BodyInit | null, type = 'json') => {
   }
 
   type === 'file' && (type = 'body');
-  return fetch(url, {method: 'post', headers, credentials: "same-origin", body})
+  return fetch(url, {method: body === null ? 'GET' : 'POST', headers, credentials: "same-origin", body})
     .then((res: Response | Promise<string> | any) => type === 'json' ? res.text() : res).then(
       data => {
         if (type === 'json') return checkJSON(data);
