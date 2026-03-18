@@ -530,11 +530,13 @@ export default {
     }
 
     if (window.getComputedStyle(node).position === 'fixed') {
-      f.gI('cmsLoaderWrapper').remove();
+      node = f.gI('cmsLoaderWrapper');
+      node && node.remove();
     }
     if (['INPUT', 'HR', 'IMG'].includes(node.tagName)) {
       node.parentNode['after'](node);
-      f.gI('cmsLoaderWrapper').remove();
+      node = f.gI('cmsLoaderWrapper');
+      node && node.remove();
     } else {
       node.classList.remove('loading-st1', 'loading-st1-sm', 'loading-st1-big', 'loading-st1-light');
     }

@@ -68,6 +68,11 @@ trait DbOrders
         $to   = $this->getDbDateString($filters['dateEditedTo'] ?? self::DB_DATE_TO);
         $sql .= "O.last_edit_date BETWEEN '$from' AND '$to'\n";
       }
+
+      // Status
+      if (isset($filters['statusId']) && is_finite($filters['statusId'])) {
+        $sql .= "O.status_id = '$filters[statusId]'\n";
+      }
     }
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
@@ -81,25 +86,34 @@ trait DbOrders
    * @param string|int|string[]|int[] $ids
    * @param bool $oneOrder - if true, return one order and $ids must have one value.
    *
-   * @return array|boolean rows
+   * @return array rows
+   * @throws InvalidArgumentException
    */
-  public function loadOrdersById($ids, bool $oneOrder = false)
+  public function loadOrdersById($ids, bool $oneOrder = false): array
   {
     $sql = $this->getBaseOrdersQuery(true) . "\n WHERE ";
 
+    if ($oneOrder && is_array($ids)) {
+      $ids = array_values($ids)[0];
+
+      if (!is_string($ids)) {
+        throw new InvalidArgumentException(
+          '[DbTraits:loadOrdersById]: First argument must be single-level array or string'
+        );
+      }
+    }
+
     if (is_array($ids)) {
-      $one = false;
       $sql .= " O.ID = " . implode(' OR O.ID = ', $ids) . "\n";
       $res = self::getAll($sql);
     } else {
-      $one = true;
       $sql .= "O.ID = :id";
-      $res = self::getAll($sql, [':id' => $ids]);
+      $res = [self::getRow($sql, [':id' => $ids])];
     }
 
     $res = array_map(function ($row) { return $this->jsonParseField($row); }, $res);
 
-    return $oneOrder ? ($one && count($res) === 1 ? $res[0] : false) : $res;
+    return $oneOrder ? $res[0] : $res;
   }
 
   /**
@@ -161,6 +175,11 @@ trait DbOrders
     if (isset($filters['userId'])) {
       $userId = $filters['userId'];
       $sql .= 'AND (O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]) . ') ';
+    }
+
+    // Status
+    if (isset($filters['statusId']) && is_finite($filters['statusId'])) {
+      $sql .= "\nAND O.status_id = '$filters[statusId]'\n";
     }
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
@@ -476,10 +495,10 @@ trait DbUsers
       $user['onlyOne'] = $user['customization']['onlyOne'] ?? false;
     } else {
       try {
-        if (!file_exists(SYSTEM_PATH)) throw new ErrorException('error');
+        if (!file_exists(SYSTEM_PATH)) throw new ErrorException('[DbTraits:checkUserHash]: User file not found');
         $value = file(SYSTEM_PATH);
         $value && $value = explode('|||', $value[0]);
-        if (count($value) < 2) throw new ErrorException('error');
+        if (count($value) < 2) throw new ErrorException('[DbTraits:checkUserHash]: User file contains errors');
       } catch (ErrorException $e) {
         file_put_contents(SYSTEM_PATH, 'admin|||123|||');
         return false;
