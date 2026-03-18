@@ -42,11 +42,13 @@ trait DbOrders
 
   /**
    * @param array $pageParam [int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
-   * @param ?array $filters <br>
-   * $filters['dateCreateFrom'] - date<br>
-   * $filters['dateCreateTo']   - date<br>
-   * $filters['dateEditedFrom'] - date<br>
-   * $filters['dateEditedTo']   - date<br>
+   * @param ?array $filters (<br> $filters['dateCreateFrom'], $filters['dateCreateTo'] - date
+   * or<br>
+   * $filters['dateEditedFrom'], $filters['dateEditedTo'] - date<br>
+   * ) and<br>
+   * $filters['userId']     - int|string<br>
+   * $filters['customerId'] - int|string<br>
+   * $filters['statusId']   - string|int|string[]|int[]$ids
    *
    * @return array
    */
@@ -56,27 +58,44 @@ trait DbOrders
 
     if (count($filters)) {
       $sql .= 'WHERE ';
+      $connect = '';
 
       // Date range
       if (isset($filters['dateCreateFrom']) || isset($filters['dateCreateTo'])) {
         $from = $this->getDbDateString($filters['dateCreateFrom'] ?? self::DB_DATE_FROM);
         $to   = $this->getDbDateString($filters['dateCreateTo'] ?? self::DB_DATE_TO);
-        $sql .= "O.create_date BETWEEN '$from' AND '$to'\n";
+        $sql .= "(O.create_date BETWEEN '$from' AND '$to')\n";
+        $connect = ' AND ';
       }
       else if (isset($filters['dateEditedFrom']) || isset($filters['dateEditedTo'])) {
         $from = $this->getDbDateString($filters['dateEditedFrom'] ?? self::DB_DATE_FROM);
         $to   = $this->getDbDateString($filters['dateEditedTo'] ?? self::DB_DATE_TO);
-        $sql .= "O.last_edit_date BETWEEN '$from' AND '$to'\n";
+        $sql .= "(O.last_edit_date BETWEEN '$from' AND '$to')\n";
+        $connect = ' AND ';
+      }
+
+      if (isset($filters['userId'])) {
+        $userId = $filters['userId'];
+        $sql .= 'O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]);
+        $connect = ' AND ';
+      }
+
+      if (isset($filters['customerId'])) {
+        $sql .= $connect . "O.customer_id = '" . $filters['customerId'] . "'";
+        $connect = ' AND ';
       }
 
       // Status
       if (isset($filters['statusId']) && is_finite($filters['statusId'])) {
-        $sql .= "O.status_id = '$filters[statusId]'\n";
+        $ids = $filters['statusId'];
+        if (!is_array($ids)) $ids = [$ids];
+
+        $sql .= $connect . "O.status_id = " . implode(' OR O.status_id = ', $ids) . "\n";
       }
     }
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
-    $sql .= $this->getPaginatorQuery($pageParam);
+    $sql .= ' ' . $this->getPaginatorQuery($pageParam);
 
     return $this->jsonParseField(self::getAll($sql));
   }
@@ -114,44 +133,6 @@ trait DbOrders
     $res = array_map(function ($row) { return $this->jsonParseField($row); }, $res);
 
     return $oneOrder ? $res[0] : $res;
-  }
-
-  /**
-   * @param array $pageParam [int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
-   * @param ?array $filters <br>
-   * $filters['userId']     - int|string<br>
-   * $filters['customerId'] - int|string<br>
-   * $filters['statusId']   - string|int|string[]|int[]$ids
-   *
-   * @return array
-   */
-  public function loadOrdersByRelatedKey(array $pageParam, array $filters = []): array
-  {
-    $sql = $this->getBaseOrdersQuery() . 'WHERE ';
-    $connect = '';
-
-    if (isset($filters['userId'])) {
-      $userId = $filters['userId'];
-      $sql .= 'O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]);
-      $connect = ' AND ';
-    }
-
-    if (isset($filters['customerId'])) {
-      $sql .= $connect . "O.customer_id = '" . $filters['customerId'] . "'";
-      $connect = ' AND ';
-    }
-
-    if (isset($filters['statusId'])) {
-      $ids = $filters['statusId'];
-      if (!is_array($ids)) $ids = [$ids];
-
-      $sql .= $connect . "O.status_id = " . implode(' OR O.status_id = ', $ids) . "\n";
-    }
-
-    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn']);
-    $sql .= ' ' . $this->getPaginatorQuery($pageParam);
-
-    return $this->jsonParseField(self::getAll($sql));
   }
 
   /**
