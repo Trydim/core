@@ -270,27 +270,36 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $result['orders'] = $db->loadOrders($pagerParam, $ordersFilter);
 
         // Date range
+        $filter = '';
+        $connect = '';
         if (isset($ordersFilter['dateCreateFrom']) || isset($ordersFilter['dateCreateTo'])) {
           $from = $db->getDbDateString($ordersFilter['dateCreateFrom'] ?? $db::DB_DATE_FROM);
           $to   = $db->getDbDateString($ordersFilter['dateCreateTo'] ?? $db::DB_DATE_TO);
-          $ordersFilter = "(create_date BETWEEN '$from' AND '$to')\n";
+          $filter .= "(create_date BETWEEN '$from' AND '$to')\n";
+          $connect = ' AND ';
         }
         else if (isset($ordersFilter['dateEditedFrom']) || isset($ordersFilter['dateEditedTo'])) {
           $from = $db->getDbDateString($ordersFilter['dateEditedFrom'] ?? $db::DB_DATE_FROM);
           $to   = $db->getDbDateString($ordersFilter['dateEditedTo'] ?? $db::DB_DATE_TO);
-          $ordersFilter = "(last_edit_date BETWEEN '$from' AND '$to')\n";
+          $filter .= $connect . "(last_edit_date BETWEEN '$from' AND '$to')\n";
+          $connect = ' AND ';
         }
         if (isset($ordersFilter['userId'])) {
           $userId = $ordersFilter['userId'];
-          $ordersFilter = 'user_id = ' . implode(' or user_id = ', is_array($userId) ? $userId : [$userId]);
-        } else if (isset($ordersFilter['customerId'])) {
-          $ordersFilter = 'customer_id = ' . $ordersFilter['customerId'];
-        } else if (isset($ordersFilter['statusId'])) {
+          $filter .= $connect . 'user_id = ' . implode(' or user_id = ', is_array($userId) ? $userId : [$userId]);
+          $connect = ' AND ';
+        }
+        if (isset($ordersFilter['customerId'])) {
+          $filter .= $connect . 'customer_id = ' . $ordersFilter['customerId'];
+          $connect = ' AND ';
+        }
+        if (isset($ordersFilter['statusId'])) {
           $statusId = $ordersFilter['statusId'];
-          $ordersFilter = 'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
+          $filter .= $connect .'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
+          $connect = ' AND ';
         }
 
-        $result['countRows'] = $db->getCountRows('orders', $ordersFilter);
+        $result['countRows'] = $db->getCountRows('orders', $filter);
       } else {
         $dateRange = json_decode($dateRange ?? '[]', true);
         $result['orders'] = $db->loadOrders($pagerParam, $dateRange);

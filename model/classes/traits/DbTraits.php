@@ -76,7 +76,7 @@ trait DbOrders
 
       if (isset($filters['userId'])) {
         $userId = $filters['userId'];
-        $sql .= 'O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]);
+        $sql .= $connect . 'O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]);
         $connect = ' AND ';
       }
 
@@ -151,7 +151,19 @@ trait DbOrders
     $sql .= "OR O.important_value like '$searchValue' ";
     $sql .= "OR C.contacts like '$searchValue' ";
     $sql .= "OR U.name like '$searchValue' ";
-    $sql .= "OR C.name like '$searchValue') ";
+    $sql .= "OR C.name like '$searchValue')\n";
+
+    // Date range
+    if (isset($filters['dateCreateFrom']) || isset($filters['dateCreateTo'])) {
+      $from = $this->getDbDateString($filters['dateCreateFrom'] ?? self::DB_DATE_FROM);
+      $to   = $this->getDbDateString($filters['dateCreateTo'] ?? self::DB_DATE_TO);
+      $sql .= "AND (O.create_date BETWEEN '$from' AND '$to')\n";
+    }
+    else if (isset($filters['dateEditedFrom']) || isset($filters['dateEditedTo'])) {
+      $from = $this->getDbDateString($filters['dateEditedFrom'] ?? self::DB_DATE_FROM);
+      $to   = $this->getDbDateString($filters['dateEditedTo'] ?? self::DB_DATE_TO);
+      $sql .= "AND (O.last_edit_date BETWEEN '$from' AND '$to')\n";
+    }
 
     if (isset($filters['userId'])) {
       $userId = $filters['userId'];
