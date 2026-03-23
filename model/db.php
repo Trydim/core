@@ -273,14 +273,14 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $filter = '';
         $connect = '';
         if (isset($ordersFilter['dateCreateFrom']) || isset($ordersFilter['dateCreateTo'])) {
-          $from = $db->getDbDateString($ordersFilter['dateCreateFrom'] ?? $db::DB_DATE_FROM);
-          $to   = $db->getDbDateString($ordersFilter['dateCreateTo'] ?? $db::DB_DATE_TO);
+          $from = $db->getDbDateString($ordersFilter['dateCreateFrom'] ?? '2000-01-01 00:00:00');
+          $to   = $db->getDbDateString($ordersFilter['dateCreateTo'] ?? '2100-01-01 00:00:00');
           $filter .= "(create_date BETWEEN '$from' AND '$to')\n";
           $connect = ' AND ';
         }
         else if (isset($ordersFilter['dateEditedFrom']) || isset($ordersFilter['dateEditedTo'])) {
-          $from = $db->getDbDateString($ordersFilter['dateEditedFrom'] ?? $db::DB_DATE_FROM);
-          $to   = $db->getDbDateString($ordersFilter['dateEditedTo'] ?? $db::DB_DATE_TO);
+          $from = $db->getDbDateString($ordersFilter['dateEditedFrom'] ?? '2000-01-01 00:00:00');
+          $to   = $db->getDbDateString($ordersFilter['dateEditedTo'] ?? '2100-01-01 00:00:00');
           $filter .= $connect . "(last_edit_date BETWEEN '$from' AND '$to')\n";
           $connect = ' AND ';
         }

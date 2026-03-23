@@ -2,7 +2,8 @@
 
 import TableBase from "./TableBase";
 
-let searchInProgress = false;
+let searchInProgress = false,
+    searchDelay = false;
 
 export default class extends TableBase {
   init() {
@@ -60,7 +61,12 @@ export default class extends TableBase {
       this.queryParam.searchValue = value;
     }
 
-    this.query().then(() => loader.stop())
+    if (searchDelay) return;
+
+    searchDelay = setTimeout(() => {
+      searchDelay = false;
+      this.query().then(() => loader.stop())
+    }, 300);
   }
 
   actionBtn(e) {

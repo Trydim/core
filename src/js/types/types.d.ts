@@ -281,6 +281,8 @@ export declare global {
     f: CMSGlobalObject
 
     _(...a: string[]): string
+
+    OrdersInstance: Orders
   }
 
   declare const f: CMSGlobalObject;
