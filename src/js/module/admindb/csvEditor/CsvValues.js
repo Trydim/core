@@ -99,8 +99,9 @@ export class CsvValues extends Main {
     this.mainNode.append(div);
 
     columns.map(col => {
-      Object.entries(col).map(([k, v]) => col[k] = _(v));
-      colHeaders.push(f.replaceTemplate(columnValueTmp, col));
+      const prepareCol = {};
+      Object.entries(col).map(([k, v]) => prepareCol[k] = _(v));
+      colHeaders.push(f.replaceTemplate(columnValueTmp, prepareCol));
     });
 
     // Table empty
@@ -123,7 +124,7 @@ export class CsvValues extends Main {
       }
     }));
 
-    this.handsontable.updateSettings(handson.contextDb);
+    this.handsontable['updateSettings'](handson.contextDb());
     this.handsontable.admindb = this;
   }
   showCsvTable() {
@@ -135,12 +136,12 @@ export class CsvValues extends Main {
       colHeaders: this.queryResult['csvValues'][0].map(h => _(h)),
     }));
 
-    this.handsontable.updateSettings(handson.contextCsv);
+    this.handsontable['updateSettings'](handson.contextCsv());
     this.handsontable.admindb = this;
   }
 
   destroy() {
-    this.handsontable && this.handsontable.destroyEditor();
+    this.handsontable && this.handsontable['destroyEditor']();
     this.btnSave.onclick = undefined;
   }
 

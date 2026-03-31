@@ -15,6 +15,20 @@ class Orders {
    */
   viewInstance = {init() {}, unmounted() {}};
 
+  /**
+   * Over set viewInstance methods after switch views
+   * @type {function}
+   * @param {Table | Kanban} viewInstance
+   */
+  overSetViewMethods = (viewInstance) => viewInstance;
+
+  /**
+   * @type {function}
+   * @param {Table | Kanban} viewInstance
+   */
+  onMountedView(viewInstance) {};
+
+
   constructor() {
     if (storage.has('orderView')) {
       this.selectedView = storage.get('orderView');
@@ -36,8 +50,13 @@ class Orders {
         this.viewInstance = new Kanban();
         break;
     }
+    // Delay for hooks
+    setTimeout(() => {
+      if (this.overSetViewMethods) this.overSetViewMethods(this.viewInstance);
 
-    setTimeout(() => this.viewInstance.init(), 0); // Delay for hooks
+      this.viewInstance.init();
+      this.onMountedView(this.viewInstance);
+    }, 0);
   }
 
   onEvent() {

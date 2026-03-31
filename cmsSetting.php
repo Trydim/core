@@ -47,7 +47,7 @@ if ($main->isDealer() && $main->db->setDealerLink()) {
 }
 
 define('URI_IMG', $main->getCmsParam(VC::URI_IMG));
-define('PUBLIC_PAGE', $publicConfig[VC::PUBLIC_PAGE] ?? null);
+define('PUBLIC_PAGE', $publicConfig[VC::PUBLIC_PAGE] ?? '');
 define('USE_CONTENT_EDITOR', $publicConfig[VC::USE_CONTENT_EDITOR] ?? false);
 
 $main->setCmsParam(VC::ONLY_LOGIN, !boolValue(PUBLIC_PAGE) || boolValue($publicConfig[VC::ONLY_LOGIN] ?? false))

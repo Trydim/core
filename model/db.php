@@ -267,19 +267,39 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $result['orders'] = $db->loadOrdersById($orderIds);
       } else if (isset($ordersFilter)) { // Загрузка по менеджеру, клиенту и/или статусу
         $ordersFilter = json_decode($ordersFilter, true);
-        $result['orders'] = $db->loadOrdersByRelatedKey($pagerParam, $ordersFilter);
+        $result['orders'] = $db->loadOrders($pagerParam, $ordersFilter);
 
+        // Date range
+        $filter = '';
+        $connect = '';
+        if (isset($ordersFilter['dateCreateFrom']) || isset($ordersFilter['dateCreateTo'])) {
+          $from = $db->getDbDateString($ordersFilter['dateCreateFrom'] ?? '2000-01-01 00:00:00');
+          $to   = $db->getDbDateString($ordersFilter['dateCreateTo'] ?? '2100-01-01 00:00:00');
+          $filter .= "(create_date BETWEEN '$from' AND '$to')\n";
+          $connect = ' AND ';
+        }
+        else if (isset($ordersFilter['dateEditedFrom']) || isset($ordersFilter['dateEditedTo'])) {
+          $from = $db->getDbDateString($ordersFilter['dateEditedFrom'] ?? '2000-01-01 00:00:00');
+          $to   = $db->getDbDateString($ordersFilter['dateEditedTo'] ?? '2100-01-01 00:00:00');
+          $filter .= $connect . "(last_edit_date BETWEEN '$from' AND '$to')\n";
+          $connect = ' AND ';
+        }
         if (isset($ordersFilter['userId'])) {
           $userId = $ordersFilter['userId'];
-          $ordersFilter = 'user_id = ' . implode(' or user_id = ', is_array($userId) ? $userId : [$userId]);
-        } else if (isset($ordersFilter['customerId'])) {
-          $ordersFilter = 'customer_id = ' . $ordersFilter['customerId'];
-        } else if (isset($ordersFilter['statusId'])) {
+          $filter .= $connect . 'user_id = ' . implode(' or user_id = ', is_array($userId) ? $userId : [$userId]);
+          $connect = ' AND ';
+        }
+        if (isset($ordersFilter['customerId'])) {
+          $filter .= $connect . 'customer_id = ' . $ordersFilter['customerId'];
+          $connect = ' AND ';
+        }
+        if (isset($ordersFilter['statusId'])) {
           $statusId = $ordersFilter['statusId'];
-          $ordersFilter = 'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
+          $filter .= $connect .'status_id = ' . implode(' or status_id = ', is_array($statusId) ? $statusId : [$statusId]);
+          $connect = ' AND ';
         }
 
-        $result['countRows'] = $db->getCountRows('orders', $ordersFilter);
+        $result['countRows'] = $db->getCountRows('orders', $filter);
       } else {
         $dateRange = json_decode($dateRange ?? '[]', true);
         $result['orders'] = $db->loadOrders($pagerParam, $dateRange);
@@ -857,7 +877,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $id = $db->getLastID('dealers', ['name' => 'tmp']);
         $param = [
           'name'      => $dealerName,
-          'cms_param' => json_encode(['urlPrefix' => $urlPrefix, 'dbPrefix' => $dbPrefix]),
+          'cms_param' => json_encode(['urlPrefix' => $urlPrefix, 'prefix' => $dbPrefix]),
           'contacts'  => json_encode($dealer['contacts']),
           'activity'  => intval(boolValue($dealer['activity'] ?? true)),
           'settings'  => gzcompress(json_encode($dealer['settings']), 9),
@@ -982,6 +1002,54 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
       try {
         $result['history'] = $history->getHistoryList($relativePath);
+      } catch (RuntimeException $e) {
+        $result['error'] = $e->getMessage();
+      }
+      break;
+
+    case 'getCsvHistoryTree':
+      $csvHistory = new CsvHistory(
+        $main->getCmsParam(VC::CSV_PATH),
+        $main->getCmsParam(VC::CSV_HISTORY_PATH)
+      );
+      $result['historyTree'] = $csvHistory->getHistoryTree();
+      break;
+
+    case 'getCsvBackupForDiff':
+      if (!isset($relativePath)) {
+        $result['error'] = 'Missing relativePath parameter';
+        break;
+      }
+      if (!isset($backupId)) {
+        $result['error'] = 'Missing backupId parameter';
+        break;
+      }
+
+      $csvHistory = new CsvHistory(
+        $main->getCmsParam(VC::CSV_PATH),
+        $main->getCmsParam(VC::CSV_HISTORY_PATH)
+      );
+
+      try {
+        $result['diff'] = $csvHistory->getBackupsForDiff($relativePath, $backupId);
+      } catch (\Throwable $e) {
+        $result['error'] = $e->getMessage();
+      }
+      break;
+
+    case 'getCsvHistory':
+      if (!isset($relativePath)) {
+        $result['error'] = 'Missing relativePath parameter';
+        break;
+      }
+
+      $csvHistory = new CsvHistory(
+        $main->getCmsParam(VC::CSV_PATH),
+        $main->getCmsParam(VC::CSV_HISTORY_PATH)
+      );
+
+      try {
+        $result['history'] = $csvHistory->getHistoryList($relativePath);
       } catch (RuntimeException $e) {
         $result['error'] = $e->getMessage();
       }

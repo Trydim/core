@@ -1,3 +1,6 @@
+const STORAGE_KEY = {
+  sidebarToggle: 'sidebarToggle',
+};
 const MENU_CLASS = 'menu-toggle';
 const storage = new f.LocalStorage();
 
@@ -62,11 +65,11 @@ const dictionaryInit = () => {
 const storageLoad = () => {
   if (!storage.length) return;
   // Mobile check
-  if (f.isMobile()) storage.set('menuToggle', 'true');
+  if (f.isMobile()) storage.set(STORAGE_KEY.sidebarToggle, 'true');
 
-  // Set Menu Toggle
+  // Set Sidebar Toggle
   let node = f.gI('mainWrapper');
-  if (node && storage.get('menuToggle') === 'true') node.classList.add(MENU_CLASS);
+  if (node && storage.get(STORAGE_KEY.sidebarToggle) === 'true') node.classList.add(MENU_CLASS);
 
   // Set theme
   if (storage.get('themeToggle') === 'true') {
@@ -131,11 +134,11 @@ const stopPreloader = (short = true) => {
 
 // Event function
 // ---------------------------------------------------------------------------------------------------------------------
-const menuToggle = () => {
+const sidebarToggle = () => {
   let node = f.gI('mainWrapper'), isShort: boolean;
   node.classList.toggle(MENU_CLASS);
   isShort = node.classList.contains(MENU_CLASS);
-  storage.set('menuToggle', isShort);
+  storage.set(STORAGE_KEY.sidebarToggle, isShort);
 
   setTimeout(() => {
     window.dispatchEvent(new Event('resize'));
@@ -149,6 +152,32 @@ const themeToggle = () => {
   const isLight = document.body.dataset.themeVersion === 'light';
   document.body.dataset.themeVersion = isLight ? 'dark': 'light';
   storage.set('themeToggle', isLight);
+}
+
+const dropdownToggle = (e: HTMLElement) => {
+  const menuTarget  = e.dataset.target,
+        currentMenu = menuTarget && document.querySelector(`[data-relation=${menuTarget}]`);
+
+  if (!menuTarget || !currentMenu) {
+    console.warn('[dropdownToggle]: menu not found');
+    return;
+  }
+
+  document.querySelectorAll('.dropdown-menu.d-block').forEach(menu => {
+    if (menu !== currentMenu) menu.classList.remove('d-block');
+  });
+
+  if (!currentMenu.classList.contains('d-block')) {
+    currentMenu.classList.add('d-block');
+
+    setTimeout(() => {
+      document.addEventListener('click', (e: Event) => {
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        currentMenu.classList.remove('d-block');
+      }, {once: true});
+    }, 100);
+  }
 }
 
 const langChange = (target: HTMLSelectElement) => {
@@ -173,7 +202,9 @@ const cmsEventClick = function() {
   let action = this.dataset.actionCms;
 
   let select = {
-    menuToggle, themeToggle,
+    sidebarToggle,
+    themeToggle,
+    dropdownToggle,
     exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };
   // @ts-ignore

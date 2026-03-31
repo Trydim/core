@@ -103,7 +103,7 @@ export default {
 
           if (result['statusList']) this.status = result['statusList'];
 
-          f.showMsg('Сохранено');
+          f.showMsg(_('Saved'));
         }
       });
     },

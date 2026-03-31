@@ -144,36 +144,36 @@ export const handson = {
     },
   })(),
 
-  contextDb: {
+  contextDb: () => ({
     contextMenu: {
       items: {
-        "row_above" : {name: 'Добавить строку выше'},
-        "row_below" : {name: 'Добавить строку ниже'},
+        "row_above" : {name: _('Insert row above')},
+        "row_below" : {name: _('Insert row below')},
         "hsep1"     : "---------",
-        "remove_row": {name: 'Удалить строку'},
+        "remove_row": {name: _('Remove row')},
         "hsep3"     : "---------",
-        "undo"      : {name: 'Отменить'},
-        "redo"      : {name: 'Вернуть'},
+        "undo"      : {name: _('Undo')},
+        "redo"      : {name: _('Redo')},
       },
     },
-  },
-  contextCsv: {
+  }),
+  contextCsv: () => ({
     contextMenu: {
       items: {
-        "row_above" : {name: 'Добавить строку выше'},
-        "row_below" : {name: 'Добавить строку ниже'},
+        "row_above" : {name: _('Insert row above')},
+        "row_below" : {name: _('Insert row below')},
         "hsep1"     : "---------",
-        "col_left"  : {name: 'Добавить колонку слева'},
-        "col_right" : {name: 'Добавить колонку справа'},
+        "col_left"  : {name: _('Insert column left')},
+        "col_right" : {name: _('Insert column right')},
         "hsep2"     : "---------",
-        "remove_row": {name: 'Удалить строку'},
-        "remove_col": {name: 'Удалить колонку'},
+        "remove_row": {name: _('Remove row')},
+        "remove_col": {name: _('Remove column')},
         "hsep3"     : "---------",
-        "undo"      : {name: 'Отменить'},
-        "redo"      : {name: 'Вернуть'}
+        "undo"      : {name: _('Undo')},
+        "redo"      : {name: _('Redo')}
       },
     },
-  },
+  }),
 
   removeSlashesData(data) {
     data.length && (data = data.map(row => row.map(cell => cell && removeSlashes(cell))));

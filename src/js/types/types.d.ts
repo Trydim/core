@@ -179,13 +179,14 @@ export declare interface CMSGlobalObject {
 
   /**
    * Save file from browser
+   * @param {{name}} data
    *
    * @example for PDF:
    * {name: 'file.pdf',
    * type: 'base64',
    * blob: 'data:application/pdf;base64,' + data['pdfBody']}
    */
-  saveFile(data: {name: string, type: undefined | string  | 'json' | 'base64', blob: string}): void
+  saveFile(data: {name: string, type?: string | 'json' | 'base64', blob: string}): void
   /**
    * Replace latin to cyrillic symbol
    */
@@ -280,6 +281,8 @@ export declare global {
     f: CMSGlobalObject
 
     _(...a: string[]): string
+
+    OrdersInstance: Orders
   }
 
   declare const f: CMSGlobalObject;

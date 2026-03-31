@@ -1,0 +1,24 @@
+# Исключить папки из экспорта
+root/ export-ignore
+src/ export-ignore
+
+# Нормализация перевода строк
+* text=auto
+
+# Бинарные файлы
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Markdown и JSON диффы
+*.md diff=markdown
+*.json diff=json
+
+# Игнорировать документацию в статистике GitHub
+docs/* linguist-documentation

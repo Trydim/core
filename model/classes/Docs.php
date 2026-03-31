@@ -249,9 +249,9 @@ class Docs {
         ];
 
       case 'save': case 'savePath':
-        file_put_contents($path . $filename, $this->docs->output());
+      file_put_contents($path . $filename, $this->docs->output());
 
-        return $path . $filename;
+      return $path . $filename;
 
       case 'saveUrl':
         file_put_contents($path . $filename, $this->docs->output());
@@ -328,7 +328,7 @@ class Docs {
   <p>Use "$this->data" for all data</p>
   <p>Use "$this->imgPath" for link to image</p>
   <p>Use $this->numFormat(\'1000\') for result "1 000"</p>
-  
+
 </div>';
   }
 
@@ -419,8 +419,8 @@ class Docs {
 
     switch ($position) {
       default: case 'left':
-        $x = $getX(3);  $y = $getY(90);
-        break;
+      $x = $getX(3);  $y = $getY(90);
+      break;
       case 'right':
         $x = $getX(97); $y = $getY(90);
         break;

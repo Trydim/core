@@ -19,9 +19,8 @@ $field = [
 $setting = $main->getLogin('customization');
 $setting = $setting ?: [];
 
-// Все доступные поля для заказов
-$columns = $main->db->getBaseOrdersQueryColumns();
-$param['orderColumns'] = $columns;
+// Все доступные для сортировки колонки
+$param['orderColumns'] = $columns = $main->db->getBaseOrdersQueryColumns();
 $field[VC::BASE_FOOTER_CONTENT] .= $main->getFrontContent('dataOrdersAllColumn', $columns);
 // Колонки, которые отображаются.
 $columns = $setting['ordersShowColumns'] ?? ['ID', 'createDate', 'lastEditDate', 'userName', 'customerName', 'status', 'total'];
