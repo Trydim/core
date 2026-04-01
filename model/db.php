@@ -951,7 +951,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if (empty($id) || empty($dealerPrefix)) { $result['error'] = 'Dealers id or prefix is empty!'; break; }
 
         $result = $main->dealer->drop($id, $dealerPrefix);
-        if ($result === 1) $result['dealerId'] = strval($id);
+        if ($result === 1) $result = ['dealerId' => strval($id)];
       }
       break;
     case 'dealersDatabaseEdit':

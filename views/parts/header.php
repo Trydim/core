@@ -56,6 +56,8 @@ if ($main->checkStatus()) {
       </div>
     <?php } ?>
 
+    <div class="header-field ms-auto me-3"></div>
+
     <nav class="navbar navbar-expand">
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav">

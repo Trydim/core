@@ -7,12 +7,12 @@ class MigrateDb {
   /**
    * @var string
    */
-  private $prefix = '';
+  private $prefix;
 
-  /**
+  /*
    * @var string
    */
-  private $charset = 'utf8mb4';
+  //private $charset = 'utf8mb4';
 
   /**
    * Resources dump files list
@@ -68,7 +68,7 @@ class MigrateDb {
   public function __construct(Main $main, string $prefix) {
     $this->main = $main;
 
-    $this->prefix = $this->preparePrefix($prefix ?? $this->prefix);
+    $this->prefix = $this->preparePrefix($prefix);
     $this->db     = $main->db;
   }
 
@@ -386,9 +386,9 @@ class MigrateDb {
 
     $bean = $this->db::xdispense($this->pf('users'));
     $bean->permission_id = $permId;
-    $bean->login         = $login ?? $this::DEAL_LOGIN;
-    $bean->password      = $pass ?? $this::DEAL_PASS;
-    $bean->name          = $login ?? $this::DEAL_LOGIN;
+    $bean->login         = $login;
+    $bean->password      = $pass;
+    $bean->name          = $login;
     $this->db->store($bean);
   }
 
@@ -400,8 +400,8 @@ class MigrateDb {
 
     $bean = $this->db::xdispense($this->pf('users'));
     $bean->id       = '1';
-    $bean->login    = $login ?? $this::DEAL_LOGIN;
-    $bean->password = $pass ?? $this::DEAL_PASS;
+    $bean->login    = $login;
+    $bean->password = $pass;
     $this->db->store($bean);
   }
   public function addStatus(array $rows) {
@@ -454,11 +454,13 @@ class MigrateDb {
     }
   }
 
-  public function drop($prefix, int $deep = 0) {
-    if ($deep === 3) return;
+  public function drop(string $prefix, int $deep = 0) {
+    if (strlen($prefix) < 4 || $deep === 3) return;
 
     $error = [];
     $tables = $this->db->getTables($prefix);
+    // Safe condition
+    if (count($tables) > 8) return;
 
     foreach ($tables as $prop) {
       $table = $prop['dbTable'];

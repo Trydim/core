@@ -29,7 +29,7 @@ $jsGlobalConst = json_encode([
   'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG, $main->getCmsParam(VC::URI_IMG)),
   'DEAL_URI_SHARED' => $main->url->getUri(true) . SHARE_PATH,
   'INIT_SETTING'  => $main->frontSettingInit,
-  'BASE_LANG'     => Main::$BASE_LANG,
+  'BASE_LANG'     => $main->getCmsParam(VC::LOCALES_BASE_LANG, Main::$BASE_LANG),
 ]);
 
 $coreUrlCss = CORE_CSS; //$main->url->getUrl(VC::CORE_CSS);
