@@ -37,9 +37,14 @@ trait Authorization {
    */
   private $user = [];
 
-  private function setUser(string $key, $value, $default = null): Main
+  /**
+   * @param string $key
+   * @param $value
+   * @return Main
+   */
+  private function setUser(string $key, $value): Main
   {
-    if (empty($value) && $default === null) {
+    if ($value === null) {
       unset($this->user[$key]);
     } else {
       $this->user[$key] = $value;
@@ -59,7 +64,7 @@ trait Authorization {
     }
 
     $this->setUser('contacts', $user['contacts'] ?? [])
-         ->setUser('permission', $user['permission'] ?? [])
+         ->setUser('permission', $user['permissionValue'] ?? [])
          ->setUser('customization', $user['customization'] ?? []);
 
     $this->setUser('isAdmin',
@@ -138,6 +143,15 @@ trait Authorization {
 
     // Сторонняя авторизация для лигрон (только для дилеров)
     if ($this->isDealer() && isset($_SESSION['customAuth'])) {
+      if (empty($this->user['dealer'])) $this->setDealerParam();
+      $dealer = $this->user['dealer'];
+
+      if ($dealer['settings']['tin'] !== $_SESSION['dealerTin']) {
+        session_destroy();
+        session_abort();
+        return $this;
+      }
+
       return $this->setLogin([
         'id'    => 1,
         'login' => $_SESSION['login'],

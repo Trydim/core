@@ -75,15 +75,15 @@ switch ($cmsAction) {
     break;
 
   case 'exit':
-    session_destroy();
-    session_abort();
+    $dealerId = $_SESSION['dealerId'] ?? false;
 
     if (isset($_SESSION['id'])) {
       $userId = $_SESSION['id'];
       $main->db->setUserHash($userId, password_hash(uniqid(), PASSWORD_BCRYPT));
     }
 
-    $dealerId = $_SESSION['dealerId'] ?? false;
+    session_destroy();
+    session_abort();
     $main->reDirect($dealerId ? 'dealer/' . $dealerId : '');
     break;
 }
