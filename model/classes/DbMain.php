@@ -34,7 +34,7 @@ class DbMain extends R {
   /**
    * @var Main
    */
-  private $main;
+  protected $main;
 
   /**
    * @var int
@@ -608,6 +608,7 @@ class DbMain extends R {
     return self::getAll('SELECT * FROM locales');
   }
 
+
   // Files
   //------------------------------------------------------------------------------------------------------------------
 
@@ -652,6 +653,7 @@ class DbMain extends R {
     return $files;
   }
 
+
   // Elements
   //------------------------------------------------------------------------------------------------------------------
 
@@ -690,6 +692,7 @@ class DbMain extends R {
       'countRowsElements' => count($res)
     ];
   }
+
 
   // Options
   //------------------------------------------------------------------------------------------------------------------

@@ -20,8 +20,7 @@ const adminDb = {
     return this;
   },
   setTableMode() {
-    let mode = storage.get('tableMode');
-    if (mode === 'content') mode = 'table';
+    const mode = storage.get('tableMode');
 
     setTimeout(() => {
       if (mode) f.qS(`input[value="${mode}"]`).click();
@@ -44,7 +43,7 @@ const adminDb = {
     select[action] && select[action]();
   },
   switchAdminType(value) {
-    if (value !== 'content') storage.set('tableMode', value);
+    storage.set('tableMode', value);
     this.adminType && this.adminType.destroy();
 
     switch (value) {

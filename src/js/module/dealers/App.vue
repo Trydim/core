@@ -359,7 +359,7 @@ export default {
     },
     changeDealer(id) {
       if (typeof id === 'number') this.selected = this.dealers.find(d => +d.id === id);
-      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+      if (!this.selected || !this.selected.id) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
       this.queryParam.dbAction = 'changeDealer';
       this.dealer = cloneDeep(this.selected);
@@ -372,7 +372,7 @@ export default {
       this.reloadFn = this.reload;
     },
     changeDealerUser() {
-      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+      if (!this.selected || !this.selected.id) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
       f.Get({data: {
         mode: 'DB',
@@ -393,7 +393,7 @@ export default {
     },
     refreshProperties() { this.dealer.settings = {} },
     deleteDealer() {
-      if (!this.selected || !this.selected.name) { f.showMsg('Ничего не выбрано', 'error'); return; }
+      if (!this.selected || !this.selected.id) { f.showMsg('Ничего не выбрано', 'error'); return; }
 
       this.queryParam.dbAction = 'deleteDealer';
       this.dealer = cloneDeep(this.selected);

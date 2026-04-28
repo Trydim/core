@@ -38,20 +38,39 @@ trait Authorization {
   private $user = [];
 
   /**
+   * @param string $key
+   * @param $value
+   * @return Main
+   */
+  private function setUser(string $key, $value): Main
+  {
+    if ($value === null) {
+      unset($this->user[$key]);
+    } else {
+      $this->user[$key] = $value;
+    }
+
+    return $this;
+  }
+
+  /**
    * @param array $user
    * @return $this|Main
    */
   public function setLogin(array $user): Main
   {
-    $this->user['id']    = $user['id'];
-    $this->user['login'] = $user['login'];
-    $this->user['name']  = $user['name'];
-    $this->user['contacts'] = $user['contacts'] ?? [];
-    $this->user['onlyOne']  = $user['onlyOne'];
-    $this->user['permission']    = $user['permissionValue'] ?? [];
-    $this->user['customization'] = $user['customization'] ?? [];
+    foreach (['id', 'login', 'name', 'onlyOne'] as $key) {
+      $this->setUser($key, $user[$key]);
+    }
 
-    $this->user['isAdmin'] = stripos($this->user['permission']['tags'] ?? '', 'admin') !== false;
+    $this->setUser('contacts', $user['contacts'] ?? [])
+         ->setUser('permission', $user['permissionValue'] ?? [])
+         ->setUser('customization', $user['customization'] ?? []);
+
+    $this->setUser('isAdmin',
+      stripos($this->user['permission']['tags'] ?? '', 'admin') !== false
+    );
+
     $this->setLoginStatus('ok');
     return $this;
   }
@@ -581,7 +600,10 @@ trait Dictionary
    */
   public function getTargetLang(): string
   {
-    $this->loadDictionary();
+    if ($this->targetLocale === '') {
+      $this->loadDictionary();
+    }
+
     return $this->targetLocale;
   }
 

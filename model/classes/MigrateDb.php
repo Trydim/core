@@ -26,7 +26,7 @@ class MigrateDb {
   private $main;
 
   /**
-   * @var Db
+   * @var DbProxy
    */
   private $db;
 
