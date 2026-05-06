@@ -93,6 +93,11 @@ class UrlGenerator {
   private $baseUri;
 
   /**
+   * @var ?bool
+   */
+  private $isLocal = null;
+
+  /**
    * UrlGenerator constructor.
    * @param Main $main
    * @param string $publicConfig
@@ -338,8 +343,16 @@ class UrlGenerator {
     $this->main->setCmsParam(VC::IS_DEALER, $isDealer);
   }
   // Попытка сделать одну папку ресурсов для разработки дилеров
+  public function isLocalQuery(): bool
+  {
+    if ($this->isLocal === null) {
+      $this->isLocal = $this->server->get('REMOTE_ADDR') === '127.0.0.1';
+    }
+
+    return $this->isLocal;
+  }
   public function isLocalDealer(string $id): bool {
-    return false && $this->server->get('REMOTE_ADDR') === '127.0.0.1' && $id === '1';
+    return false;// && $this->isLocalQuery() && $id === '1';
   }
 
   public function getScheme(): string {
