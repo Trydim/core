@@ -25,11 +25,6 @@ class Dealer {
   private $prefix;
 
   /**
-   * @var string
-   */
-  //private $dbType;
-
-  /**
    * @var MigrateDb;
    */
   private $migrateDb;

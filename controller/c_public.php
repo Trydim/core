@@ -22,37 +22,35 @@ define('PATH_CSS' , $publicCss);
 define('PATH_JS' , $publicJs);
 
 // Если загрузка
-if ($authStatus && isset($_GET['orderId'])) {
-  $orderId = $_GET['orderId'];
+if (
+  $authStatus && is_numeric($orderId = $main->url->request->get('orderId'))
+  &&
+  $order = $main->db->loadOrdersById($orderId, true)
+) {
+  // Старые заказы всегда сохраняются на русском
+  $defLocale = '';
+  if ($main->isDealer()) {
+    $dealerSetting = $main->getLogin('dealer')['settings'];
+    $defLocale = $dealerSetting['locales'][0]['code']  ?? '';
+  }
 
-  if (is_numeric($orderId)) {
-    $order = $main->db->loadOrdersById($orderId, true);
+  $main->setLocale($order['importantValue']['locale'] ?? $defLocale);
 
-    if ($order) {
-      // Сохранять тип языка принудительно при сохранении заказа если доступны разные языки (или нет. нет)
-      // Старые заказы всегда сохраняются на русском
-      $main->setLocale($order['importantValue']['locale'] ?? '');
+  $dbContent .= $main->getFrontContent('dataOrder', $order);
 
-      $dbContent .= $main->getFrontContent('dataOrder', $order);
-
-      $customer = $main->db->loadCustomerByOrderId($order['ID']);
-      if ($customer) {
-        $dbContent .= $main->getFrontContent('dataCustomer', $customer);
-      }
-    }
+  if ($customer = $main->db->loadCustomerByOrderId($order['ID'])) {
+    $dbContent .= $main->getFrontContent('dataCustomer', $customer);
   }
 
   unset($orderId, $order, $customer);
 }
 
-else if ($authStatus && isset($_GET['orderVisitorId'])) {
-  $orderId = $_GET['orderVisitorId'];
-
-  if (is_finite($orderId)) {
-    $order = $main->db->loadVisitorOrderById($orderId);
-
-    if (count($order)) $dbContent .= $main->getFrontContent('dataVisitorOrder', $order);
-  }
+else if (
+  $authStatus && is_numeric($orderId = $main->url->request->get('orderVisitorId'))
+  &&
+  count($order = $main->db->loadVisitorOrderById($orderId))
+) {
+  $dbContent .= $main->getFrontContent('dataVisitorOrder', $order);
 
   unset($order, $orderId);
 }
