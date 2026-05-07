@@ -15,7 +15,7 @@ final class DbProxy {
   /**
    * @var DbMain
    */
-  private static $staticDb;
+  public static $staticDb;
 
   /**
    * @param DbMain $db
@@ -42,6 +42,8 @@ final class DbProxy {
    * @return mixed
    */
   public static function __callStatic(string $method, $args) {
-    return forward_static_call_array([self::$staticDb, $method], $args);
+    return self::$staticDb::$method(...$args);
+
+    //return forward_static_call_array([self::$staticDb, $method], $args);
   }
 }
