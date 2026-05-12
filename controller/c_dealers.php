@@ -55,7 +55,7 @@ if ($main->getCmsParam(VC::LOCALES)) {
 // All dealers properties
 $dealerProps = array_merge($dealerProps, $main->getSettings(VC::DEALER_PROPERTIES));
 foreach ($main->db->getTables('prop') as $table) {
-  // Param saved in json
+  // Param saved in JSON
   $prop = $dealerProps[$table['dbTable']] ?? [];
 
   $dealerProps[$table['dbTable']] = [

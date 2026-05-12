@@ -5,104 +5,52 @@ use Helpers\ServerBag;
 use Helpers\HeaderBag;
 
 class UrlGenerator {
-  /**
-   * @var string
-   */
   const LOCAL_IP = '127.0.0.1';
-
-  /**
-   * @var string
-   */
   const DEV_SUBDOMAIN = 'dev';
-  /**
-   * @var Main
-   */
-  private $main;
-  /**
-   * @var InputBag
-   */
-  public $request;
-  /**
-   * @var ServerBag
-   */
-  public $server;
-  /**
-   * @var HeaderBag
-   */
-  public $headers;
-  /**
-   * @var string
-   */
-  private $method;
+
+  private Main $main;
+  public InputBag $request;
+  public ServerBag $server;
+  public HeaderBag $headers;
+
+  private string $method;
 
   /**
-   * absolute path set in index.php
-   * @var string
+   * Absolute path set in index.php
    */
-  private $absolutePath;
+  private string $absolutePath;
 
   /**
-   * http or https
-   * @var string
+   * @var 'http'|'https'
    */
-  private $scheme;
-  /**
-   * @var string
-   */
-  private $host;
-  /**
-   * @var string
-   */
-  private $subDomain = '';
+  private string $scheme;
+  private string $host;
+  private string $subDomain = '';
+
   /**
    * relative path from "Document Root"
-   * @var string
    */
-  private $baseSitePath;
+  private string $baseSitePath;
+
   /**
    * relative path from "Document Root"
-   * @var string
    */
-  private $sitePath;
+  private string $sitePath;
 
   /**
    * absolute core path
-   * @var string
    */
-  private $corePath;
-  /**
-   * @var string
-   */
-  private $coreUrl;
+  private string $corePath;
 
-  /**
-   * @var string
-   */
-  private $route;
-  /**
-   * @var string
-   */
-  private $routePath;
-  /**
-   * @var string
-   */
-  private $requestUri;
-  /**
-   * @var string
-   */
-  private $baseUri;
+  private string $coreUrl;
+  private string $route;
+  private string $routePath;
+  private string $requestUri;
+  private string $baseUri;
 
-  /**
-   * @var ?bool
-   */
-  private $isLocal = null;
+  private bool|null $isLocal = null;
 
-  /**
-   * UrlGenerator constructor.
-   * @param Main $main
-   * @param string $publicConfig
-   */
-  public function __construct(Main $main, array $publicConfig) {
+  public function __construct(Main $main) {
     $this->main = $main;
     $this->request = new InputBag($_REQUEST);
     $this->server  = new ServerBag($_SERVER);
@@ -120,7 +68,8 @@ class UrlGenerator {
     $this->setMode();
   }
 
-  private function setScheme() {
+  private function setScheme(): void
+  {
     $https = $this->server->get('HTTPS') ?? false;
     $this->scheme = ($https ? 'https' : 'http') . '://';
   }
@@ -135,7 +84,8 @@ class UrlGenerator {
 
     return $host;
   }
-  private function setSubDomain(string $host) {
+  private function setSubDomain(string $host): void
+  {
     if ($this->server->get('REMOTE_ADDR') === self::LOCAL_IP) return;
 
     $host = explode('.', $host);
@@ -146,7 +96,8 @@ class UrlGenerator {
       $this->subDomain = $subDomain;
     }
   }
-  private function setBaseSitePath() {
+  private function setBaseSitePath(): void
+  {
     $filename = basename($this->server->get('SCRIPT_FILENAME', ''));
 
     if (defined('OUTSIDE')) {
@@ -193,9 +144,6 @@ class UrlGenerator {
   /*
    * Returns the prefix as encoded in the string when the string starts with
    * the given prefix, null otherwise.
-   * @param string $string
-   * @param string $prefix
-   * @return string|null
    */
   /*private function getUrlencodedPrefix(string $string, string $prefix): ?string {
     if (!str_starts_with(rawurldecode($string), $prefix)) {
@@ -307,7 +255,8 @@ class UrlGenerator {
 
     return $view . '404.php';
   }
-  private function setCoreUrls() {
+  private function setCoreUrls(): void
+  {
     // Определять автоматом.
     /*$sitePath = trim(str_replace('/', ' ', $this->sitePath));
     $siteLevel = count(explode(' ', $sitePath));
@@ -318,7 +267,8 @@ class UrlGenerator {
     $this->coreUrl = $this->getBaseUri() . $this->corePath;
   }
 
-  private function checkDealer() {
+  private function checkDealer(): void
+  {
     $requestUri = $this->getRequestUri();
     $isDealer = includes($requestUri, DEALERS_PATH . '/');
 
@@ -345,7 +295,7 @@ class UrlGenerator {
   // Попытка сделать одну папку ресурсов для разработки дилеров
   public function isLocalQuery(): bool
   {
-    if ($this->isLocal === null) {
+    if (!isset($this->isLocal)) {
       $this->isLocal = $this->server->get('REMOTE_ADDR') === '127.0.0.1';
     }
 
@@ -361,7 +311,7 @@ class UrlGenerator {
   public function getHost(): string { return $this->host; }
   public function getSubDomain(): string { return $this->subDomain; }
   public function getBaseUri(): string {
-    if ($this->baseUri === null) $this->baseUri = $this->setBaseUri();
+    if (!isset($this->baseUri)) $this->baseUri = $this->setBaseUri();
 
     return $this->baseUri;
   }
@@ -373,17 +323,12 @@ class UrlGenerator {
     return ($absolute ? $this->absolutePath : '') . $this->corePath;
   }
 
-  /**
-   * @param string $type
-   * @return string
-   */
   public function getUrl(string $type): string {
-    switch ($type) {
-      case VC::CORE_CSS: return $this->coreUrl . 'assets/css/';
-      case VC::CORE_JS: return $this->coreUrl . 'assets/js/';
-    }
-
-    return $this->coreUrl;
+    return match ($type) {
+      VC::CORE_CSS => $this->coreUrl . 'assets/css/',
+      VC::CORE_JS => $this->coreUrl . 'assets/js/',
+      default => $this->coreUrl,
+    };
   }
 
   public function getBasePath(bool $absolute = false): string {
@@ -392,7 +337,7 @@ class UrlGenerator {
   public function getPath(bool $absolute = false): string {
     $absolutePath = $absolute ? $this->absolutePath : '';
 
-    if ($this->sitePath === null) $this->sitePath = $this->setSitePath();
+    if (!isset($this->sitePath)) $this->sitePath = $this->setSitePath();
 
     if ($absolute) {
       if ($this->baseSitePath !== '/') $absolutePath = str_replace($this->baseSitePath, '', $this->absolutePath);
@@ -418,18 +363,18 @@ class UrlGenerator {
    * @return string The raw URI (i.e. not URI decoded)
    */
   public function getRequestUri(): string {
-    if ($this->requestUri === null) $this->requestUri = $this->setRequestUri();
+    if (!isset($this->requestUri)) $this->requestUri = $this->setRequestUri();
 
     return $this->requestUri;
   }
 
   public function getRoute(): string {
-    if ($this->route === null) $this->route = $this->setRoute();
+    if (!isset($this->route)) $this->route = $this->setRoute();
 
     return $this->route;
   }
   public function getRoutePath(): string {
-    if ($this->routePath === null) $this->routePath = $this->setRoutePath();
+    if (!isset($this->routePath)) $this->routePath = $this->setRoutePath();
 
     return $this->routePath;
   }

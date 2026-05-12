@@ -16,9 +16,9 @@ class ResponseHeaderBag extends HeaderBag {
   const DISPOSITION_ATTACHMENT = 'attachment';
   const DISPOSITION_INLINE     = 'inline';
 
-  protected $computedCacheControl = [];
-  protected $cookies              = [];
-  protected $headerNames          = [];
+  protected array $computedCacheControl = [];
+  protected array $cookies              = [];
+  protected array $headerNames          = [];
 
   public function __construct(array $headers = []) {
     parent::__construct($headers);
@@ -34,7 +34,7 @@ class ResponseHeaderBag extends HeaderBag {
   }
 
   /**
-   * Returns the headers, with original capitalizations.
+   * Returns the headers, with original capitalization.
    *
    * @return array An array of headers
    */
@@ -60,7 +60,8 @@ class ResponseHeaderBag extends HeaderBag {
   /**
    * {@inheritdoc}
    */
-  public function replace(array $headers = []) {
+  public function replace(array $headers = []): void
+  {
     $this->headerNames = [];
 
     parent::replace($headers);
@@ -77,7 +78,7 @@ class ResponseHeaderBag extends HeaderBag {
   /**
    * {@inheritdoc}
    */
-  public function all(string $key = null): array {
+  public function all(?string $key = null): array {
     $headers = parent::all($key);
     foreach ($this->getCookies() as $cookie) {
       $headers['set-cookie'][] = (string)$cookie;
@@ -89,7 +90,8 @@ class ResponseHeaderBag extends HeaderBag {
   /**
    * {@inheritdoc}
    */
-  public function set($key, $values, $replace = true) {
+  public function set($key, array|string $values, $replace = true): void
+  {
     $uniqueKey = str_replace('_', '-', strtolower($key));
 
     if ('set-cookie' === $uniqueKey) {
@@ -120,7 +122,8 @@ class ResponseHeaderBag extends HeaderBag {
   /**
    * {@inheritdoc}
    */
-  public function remove($key) {
+  public function remove($key): void
+  {
     $uniqueKey = str_replace('_', '-', strtolower($key));
     unset($this->headerNames[$uniqueKey]);
 
@@ -155,19 +158,17 @@ class ResponseHeaderBag extends HeaderBag {
     return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
   }
 
-  public function setCookie(Cookie $cookie) {
+  public function setCookie(Cookie $cookie): void
+  {
     $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
     $this->headerNames['set-cookie'] = 'Set-Cookie';
   }
 
   /**
    * Removes a cookie from the array, but does not unset it in the browser.
-   *
-   * @param string      $name
-   * @param string      $path
-   * @param string|null $domain
    */
-  public function removeCookie(string $name, string $path = '/', string $domain = null) {
+  public function removeCookie(string $name, string $path = '/', ?string $domain = null): void
+  {
     if (null === $path) {
       $path = '/';
     }
@@ -189,10 +190,6 @@ class ResponseHeaderBag extends HeaderBag {
 
   /**
    * Returns an array with all cookies.
-   *
-   * @param string $format
-   *
-   * @return Cookie[]
    *
    * @throws InvalidArgumentException When the $format is invalid
    */
@@ -219,15 +216,9 @@ class ResponseHeaderBag extends HeaderBag {
 
   /**
    * Clears a cookie in the browser.
-   *
-   * @param string      $name
-   * @param string      $path
-   * @param string|null $domain
-   * @param bool        $secure
-   * @param bool        $httpOnly
-   //* @param string      $sameSite
    */
-  public function clearCookie(string $name, string $path = '/', string $domain = null, $secure = false, bool $httpOnly = true/*, $sameSite = null*/) {
+  public function clearCookie(string $name, string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true/*, $sameSite = null*/): void
+  {
     $sameSite = func_num_args() > 5 ? func_get_arg(5) : null;
 
     $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly, false, $sameSite));
@@ -286,8 +277,6 @@ class ResponseHeaderBag extends HeaderBag {
    *
    * This considers several other headers and calculates or modifies the
    * cache-control header to a sensible, conservative value.
-   *
-   * @return string
    */
   protected function computeCacheControlValue(): string {
     if (!$this->cacheControl) {
@@ -312,7 +301,8 @@ class ResponseHeaderBag extends HeaderBag {
     return $header;
   }
 
-  private function initDate() {
+  private function initDate(): void
+  {
     $now = DateTime::createFromFormat('U', time());
     $now->setTimezone(new DateTimeZone('UTC'));
     $this->set('Date', $now->format('D, d M Y H:i:s') . ' GMT');

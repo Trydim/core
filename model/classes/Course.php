@@ -1,39 +1,24 @@
 <?php
 
+#[AllowDynamicProperties]
 class Course {
-  const COURSE_CACHE = ABS_SITE_PATH . SHARE_PATH . 'courseCache.bin';
+  const COURSE_CACHE     = ABS_SITE_PATH . SHARE_PATH . 'courseCache.bin';
   const REFRESH_INTERVAL = 36000;
-  const LINK_PARAM = '';
+  const LINK_PARAM       = '';
   const DEFAULT_CURRENCY = 'RUS'; // Определить валюту по умолчанию по домену
 
-  /**
-   * @var string[]
-   */
-  private $source = [
+  private array $source = [
     'RUS' => "https://www.cbr.ru/scripts/XML_daily.asp",
     'BYN' => "https://www.nbrb.by/services/xmlexrates.aspx",
   ];
 
-  /**
-   * @var DbProxy
-   */
-  private $db;
+  private DbProxy $db;
 
   private $xml;
-  private $dataFile;
-  private $sourceKey;
+  private string $dataFile;
+  private mixed $sourceKey;
+  public array $rate;
 
-
-  /**
-   * @var array
-   */
-  public $rate;
-
-  /**
-   * @param        $db
-   * @param array  $refreshParam
-   * @param string $dataFile
-   */
   public function __construct(array $refreshParam, &$db,  string $dataFile = '') {
     $dataFile = empty($dataFile) ? $this::COURSE_CACHE : $dataFile;
     $this->sourceKey = $refreshParam[VC::RATE_SERVER_REFRESH] ?: $this::DEFAULT_CURRENCY;
@@ -44,23 +29,20 @@ class Course {
     if ($refreshParam[VC::RATE_AUTO_REFRESH] ?? true) $this->refresh();
   }
 
-  private function checkTableMoney() {
+  private function checkTableMoney(): void {
     // проверить есть ли в Таблице базовая валюта
   }
 
   /** Не нужна, наверное */
-  private function getMainCurrency() {
+  private function getMainCurrency(): mixed {
     $res = array_filter($this->rate, function ($c) { return boolval($c['main']); });
     if (count($res)) return array_values($res)[0];
 
     return $this->rate[self::DEFAULT_CURRENCY] ?? array_values($this->rate)[0];
   }
 
-  /**
-   * @param string $code
-   * @return array|false
-   */
-  private function searchRate(string $code) {
+  private function searchRate(string $code): false|array
+  {
     foreach ($this->xml as $c) {
       if (strval($c->CharCode) === $code) {
         $scale = strval($c->Scale ? $c->Scale : $c->Nominal);
@@ -82,13 +64,15 @@ class Course {
     return true;
   }
 
-  private function getRateFromDb($db) {
+  private function getRateFromDb(DbProxy $db): void
+  {
     $this->db = $db;
     if (DEBUG) $this->checkTableMoney();
     $this->rate = $db->getMoney();
   }
 
-  private function getRateFromFile($dataFile) {
+  private function getRateFromFile(string $dataFile): void
+  {
     $this->dataFile = $dataFile;
     if (file_exists($dataFile)) {
       $data = unserialize(file_get_contents($dataFile));
@@ -97,11 +81,16 @@ class Course {
     }
   }
 
-  private function setRateToDb() {
+  /**
+   * @throws \RedBeanPHP\RedException\SQL
+   */
+  private function setRateToDb(): void
+  {
     $this->db->setMoney($this->rate);
   }
 
-  private function setRateToFile() {
+  private function setRateToFile(): void
+  {
     file_put_contents($this->dataFile,
       serialize(["refresh_time" => time(), 'curs' => $this->rate]));
   }

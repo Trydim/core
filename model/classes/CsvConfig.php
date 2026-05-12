@@ -7,11 +7,8 @@ class CsvConfig {
     return '{}';
   }
 
-  /**
-   * @param string $configPath
-   * @param string $csvPath
-   */
-  static function createStartConfig(string $configPath, string $csvPath) {
+  static function createStartConfig(string $configPath, string $csvPath): void
+  {
     $link = ABS_SITE_PATH . SHARE_PATH;
     foreach (explode('/', dirname(self::CSV_CONFIG . $csvPath)) as $dir) {
       $link .= $dir . '/';
@@ -21,11 +18,6 @@ class CsvConfig {
     if (!file_exists($configPath)) file_put_contents($configPath, self::getXMLTemplate());
   }
 
-  /**
-   * @param string $configPath
-   * @param string $csvPath
-   * @return array
-   */
   static function updateConfig(string $configPath, string $csvPath): array {
     $csv = loadCSV([], $csvPath);
     if (count($csv) === 0) return ['error' => gTxt('Csv table is empty!')];
@@ -96,10 +88,6 @@ class CsvConfig {
     return $cfg;
   }
 
-  /**
-   * @param string $csvPath
-   * @return array
-   */
   static function syncFile(string $csvPath): array {
     $csvPath = substr($csvPath, 1);
     $configPath = ABS_SITE_PATH . SHARE_PATH . self::CSV_CONFIG . str_replace('.csv', '.json', $csvPath);
@@ -110,12 +98,8 @@ class CsvConfig {
     return self::updateConfig($configPath, $csvPath);
   }
 
-  /**
-   * @param string $csvPath
-   * @param string $data
-   * @return false|string
-   */
-  static function saveConfig(string $csvPath, string $data) {
+  static function saveConfig(string $csvPath, string $data): false|string
+  {
     $xmlPath = ABS_SITE_PATH . SHARE_PATH . self::CSV_CONFIG . str_replace('.csv', '.json', $csvPath);
 
     try {

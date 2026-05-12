@@ -9,7 +9,8 @@
   'extensions_for_editor' => array('ab', 'txt', 'php', 'js', 'tpl', 'html', 'htm', 'css', 'text', 'json', 'lng', 'xml', 'ini', 'sql')
 ];*/
 
-function tree($path) {
+function tree($path): void
+{
   if (stream_resolve_include_path($path)) {
 
     $files = scandir($path);

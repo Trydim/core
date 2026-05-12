@@ -3,43 +3,24 @@
 use Helpers\ResponseHeaderBag;
 
 class Response {
-  /**
-   * @var Main
-   */
-  private $main;
+  private Main $main;
 
-  /**
-   * @var int
-   */
-  protected $statusCode;
+  protected int $statusCode;
+  protected string $statusText;
 
-  /**
-   * @var string
-   */
-  protected $statusText;
-
-  /**
-   * @var string
-   */
-  protected $charset = 'UTF-8';
+  protected string $charset = 'UTF-8';
 
   /**
    * The original content of the response.
-   *
-   * @var mixed
    */
-  public $original;
+  public mixed $original;
 
   /**
    * The content of the response after checked errors
-   *
-   * @var string
    */
-  private $content = '';
-  /**
-   * @var ResponseHeaderBag
-   */
-  private $headers;
+  private string $content = "";
+
+  private ResponseHeaderBag $headers;
 
   /**
    * @param Main  $main The response content, see setContent()
@@ -76,10 +57,6 @@ class Response {
   /**
    * Check if there is an error
    * Deep search for all error messages and return as an array
-   *
-   * @param array $result
-   * @param array|null $error
-   * @param bool $insideError
    */
   private function checkError(array &$result, ?array &$error = [], ?bool $insideError = false): void {
     $error = $error ?? [];
@@ -98,13 +75,8 @@ class Response {
 
   /**
    * Set a header on the Response.
-   *
-   * @param string        $key
-   * @param  array|string $values
-   * @param bool          $replace
-   * @return $this
    */
-  public function header(string $key, $values, bool $replace = true): Response {
+  public function header(string $key, array|string $values, bool $replace = true): Response {
     $this->headers->set($key, $values, $replace);
 
     return $this;
@@ -116,14 +88,12 @@ class Response {
    * If the status text is null it will be automatically populated for the known
    * status codes and left empty otherwise.
    *
-   * @param int   $code HTTP status code
-   * @param mixed $text HTTP status text
-   *
-   * @return $this
+   * @param int        $code HTTP status code
+   * @param mixed|null $text HTTP status text
    *
    * @throws InvalidArgumentException When the HTTP status code is not valid
    */
-  public function setStatusCode(int $code, $text = null): Response {
+  public function setStatusCode(int $code, mixed $text = null): Response {
     $this->statusCode = $code = (int)$code;
     if ($this->isInvalid()) {
       throw new InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
@@ -148,8 +118,6 @@ class Response {
 
   /**
    * Retrieves the status code for the current web response.
-   *
-   * @return int Status code
    */
   public function getStatusCode(): int {
     return $this->statusCode;
@@ -159,8 +127,6 @@ class Response {
    * Marks the response as "private".
    *
    * It makes the response ineligible for serving other clients.
-   *
-   * @return $this
    */
   public function setPrivate(): Response {
     $this->headers->removeCacheControlDirective('public');
@@ -173,8 +139,6 @@ class Response {
    * Marks the response as "public".
    *
    * It makes the response eligible for serving other clients.
-   *
-   * @return $this
    */
   public function setPublic(): Response {
     $this->headers->addCacheControlDirective('public');
@@ -187,8 +151,6 @@ class Response {
    * Marks the response as "immutable".
    *
    * @param bool $immutable enables or disables the immutable directive
-   *
-   * @return $this
    */
   public function setImmutable(bool $immutable = true): Response {
     if ($immutable) {
@@ -210,11 +172,8 @@ class Response {
 
   /**
    * Set the content on the response.
-   *
-   * @param mixed $content
-   * @return $this
    */
-  public function setContent($content): Response {
+  public function setContent(mixed $content): Response {
     if ($content !== null && !is_string($content) && !is_array($content) && !is_object($content) && !is_callable([$content, '__toString'])) {
       die(sprintf('The Response content must be a string or object implementing __toString(), "%s" given.', gettype($content)));
     }
@@ -246,7 +205,7 @@ class Response {
   /**
    * Gets the current response content.
    */
-  public function getContent() {
+  public function getContent(): string|array {
     $content = json_decode($this->content, true);
 
     return json_last_error() === JSON_ERROR_NONE ? $content : $this->content;
@@ -254,10 +213,8 @@ class Response {
 
   /**
    * Get the original response content.
-   *
-   * @return mixed
    */
-  public function getOriginalContent()
+  public function getOriginalContent(): mixed
   {
     $original = $this->original;
 
@@ -266,8 +223,6 @@ class Response {
 
   /**
    * Sends HTTP headers.
-   *
-   * @return $this
    */
   public function sendHeaders(): Response {
     // headers have already been sent by the developer
@@ -296,8 +251,6 @@ class Response {
 
   /**
    * Sends content for the current web response.
-   *
-   * @return $this
    */
   public function sendContent(): Response {
     echo $this->content;
@@ -307,8 +260,6 @@ class Response {
 
   /**
    * Sends HTTP headers and content.
-   *
-   * @return $this
    */
   public function send(): Response {
     $this->sendHeaders();
@@ -334,10 +285,8 @@ class Response {
    * (last updated 2016-03-01).
    *
    * Unless otherwise noted, the status code is defined in RFC2616.
-   *
-   * @var array
    */
-  public static $statusTexts = [
+  public static array $statusTexts = [
     100 => 'Continue',
     101 => 'Switching Protocols',
     102 => 'Processing',            // RFC2518
@@ -436,8 +385,6 @@ class Response {
    * the response with the origin server using a conditional GET request.
    *
    * @return bool true if the response is validateable, false otherwise
-   *
-
    */
   public function isValidateable(): bool {
     return $this->headers->has('Last-Modified') || $this->headers->has('ETag');
@@ -450,8 +397,6 @@ class Response {
    * indicator or Expires header and the calculated age is less than the freshness lifetime.
    *
    * @return bool true if the response is fresh, false otherwise
-   *
-
    */
   public function isFresh(): bool {
     return $this->getTtl() > 0;
@@ -477,11 +422,9 @@ class Response {
   /**
    * Sets the number of seconds after which the response should no longer be considered fresh.
    *
-   * This methods sets the Cache-Control max-age directive.
+   * These methods set the Cache-Control max-age directive.
    *
    * @param int $value Number of seconds
-   *
-   * @return $this
    */
   public function setMaxAge(int $value): Response {
     $this->headers->addCacheControlDirective('max-age', $value);
@@ -525,10 +468,8 @@ class Response {
    * @param mixed $content The response content, see setContent()
    * @param int   $status The response status code
    * @param array $headers An array of response headers
-   *
-   * @return static
    */
-  public static function create($content = '', int $status = 200, array $headers = []): Response {
+  public static function create(mixed $content = '', int $status = 200, array $headers = []): Response {
     return new static($content, $status, $headers);
   }
 
@@ -561,8 +502,6 @@ class Response {
 
   /**
    * Sets the Date header.
-   *
-   * @return $this
    */
   public function setDate(DateTime $date): Response {
     $date->setTimezone(new DateTimeZone('UTC'));
@@ -584,8 +523,6 @@ class Response {
 
   /**
    * Marks the response stale by setting the Age header to be equal to the maximum age of the response.
-   *
-   * @return $this
    */
   public function expire(): Response {
     if ($this->isFresh()) {
@@ -616,10 +553,8 @@ class Response {
    * Passing null as value will remove the header.
    *
    * @param DateTime|null $date A \DateTime instance or null to remove the header
-   *
-   * @return $this
    */
-  public function setExpires(DateTime $date = null): Response {
+  public function setExpires(?DateTime $date = null): Response {
     if (null === $date) {
       $this->headers->remove('Expires');
     } else {
@@ -634,11 +569,9 @@ class Response {
   /**
    * Sets the number of seconds after which the response should no longer be considered fresh by shared caches.
    *
-   * This methods sets the Cache-Control s-maxage directive.
+   * These methods set the Cache-Control s-maxage directive.
    *
    * @param int $value Number of seconds
-   *
-   * @return $this
    */
   public function setSharedMaxAge(int $value): Response {
     $this->setPublic();
@@ -651,10 +584,6 @@ class Response {
    * Sets the response's time-to-live for shared caches.
    *
    * This method adjusts the Cache-Control/s-maxage directive.
-   *
-   * @param int $seconds Number of seconds
-   *
-   * @return $this
    */
   public function setTtl(int $seconds): Response {
     $this->setSharedMaxAge($this->getAge() + $seconds);
@@ -666,10 +595,6 @@ class Response {
    * Sets the response's time-to-live for private/client caches.
    *
    * This method adjusts the Cache-Control/max-age directive.
-   *
-   * @param int $seconds Number of seconds
-   *
-   * @return $this
    */
   public function setClientTtl(int $seconds): Response {
     $this->setMaxAge($this->getAge() + $seconds);
@@ -694,10 +619,8 @@ class Response {
    * Passing null as value will remove the header.
    *
    * @param DateTime|null $date A \DateTime instance or null to remove the header
-   *
-   * @return $this
    */
-  public function setLastModified(DateTime $date = null): Response {
+  public function setLastModified(?DateTime $date = null): Response {
     if (null === $date) {
       $this->headers->remove('Last-Modified');
     } else {
@@ -723,14 +646,12 @@ class Response {
    *
    * @param string|null $etag The ETag unique identifier or null to remove the header
    * @param bool        $weak Whether you want a weak ETag or not
-   *
-   * @return $this
    */
-  public function setEtag(string $etag = null, bool $weak = false): Response {
+  public function setEtag(?string $etag = null, bool $weak = false): Response {
     if (null === $etag) {
       $this->headers->remove('Etag');
     } else {
-      if (0 !== strpos($etag, '"')) {
+      if (!str_starts_with($etag, '"')) {
         $etag = '"' . $etag . '"';
       }
 
@@ -747,7 +668,6 @@ class Response {
    *
    * @param array $options An array of cache options
    *
-   * @return $this
    * @throws InvalidArgumentException
    */
   public function setCache(array $options): Response {
@@ -800,7 +720,6 @@ class Response {
    * This sets the status, removes the body, and discards any headers
    * that MUST NOT be included in 304 responses.
    *
-   * @return $this
    * @throws Exception
    */
   public function setNotModified(): Response {
@@ -817,8 +736,6 @@ class Response {
 
   /**
    * Is response invalid?
-   *
-   * @return bool
    */
   public function isInvalid(): bool {
     return $this->statusCode < 100 || $this->statusCode >= 600;
@@ -826,8 +743,6 @@ class Response {
 
   /**
    * Is response informative?
-   *
-   * @return bool
    */
   public function isInformational(): bool {
     return $this->statusCode >= 100 && $this->statusCode < 200;
@@ -835,8 +750,6 @@ class Response {
 
   /**
    * Is response successful?
-   *
-   * @return bool
    */
   public function isSuccessful(): bool {
     return $this->statusCode >= 200 && $this->statusCode < 300;
@@ -844,8 +757,6 @@ class Response {
 
   /**
    * Is the response a redirect?
-   *
-   * @return bool
    */
   public function isRedirection(): bool {
     return $this->statusCode >= 300 && $this->statusCode < 400;
@@ -853,8 +764,6 @@ class Response {
 
   /**
    * Is there a client error?
-   *
-   * @return bool
    */
   public function isClientError(): bool {
     return $this->statusCode >= 400 && $this->statusCode < 500;
@@ -862,8 +771,6 @@ class Response {
 
   /**
    * Was there a server side error?
-   *
-   * @return bool
    */
   public function isServerError(): bool {
     return $this->statusCode >= 500 && $this->statusCode < 600;
@@ -871,8 +778,6 @@ class Response {
 
   /**
    * Is the response OK?
-   *
-   * @return bool
    */
   public function isOk(): bool {
     return $this->statusCode === 200;
@@ -880,8 +785,6 @@ class Response {
 
   /**
    * Is the response forbidden?
-   *
-   * @return bool
    */
   public function isForbidden(): bool {
     return 403 === $this->statusCode;
@@ -889,8 +792,6 @@ class Response {
 
   /**
    * Is the response a not found error?
-   *
-   * @return bool
    */
   public function isNotFound(): bool {
     return 404 === $this->statusCode;
@@ -898,19 +799,13 @@ class Response {
 
   /**
    * Is the response a redirect of some form?
-   *
-   * @param string|null $location
-   *
-   * @return bool
    */
-  public function isRedirect(string $location = null): bool {
+  public function isRedirect(?string $location = null): bool {
     return in_array($this->statusCode, [201, 301, 302, 303, 307, 308]) && (null === $location || $location == $this->headers->get('Location'));
   }
 
   /**
    * Is the response empty?
-   *
-   * @return bool
    */
   public function isEmpty(): bool {
     return in_array($this->statusCode, [204, 304]);
@@ -924,7 +819,8 @@ class Response {
    * @param int  $targetLevel The target output buffering level
    * @param bool $flush Whether to flush or clean the buffers
    */
-  public static function closeOutputBuffers(int $targetLevel, bool $flush) {
+  public static function closeOutputBuffers(int $targetLevel, bool $flush): void
+  {
     $status = ob_get_status(true);
     $level = count($status);
     // PHP_OUTPUT_HANDLER_* are not defined on HHVM 3.3
@@ -942,8 +838,6 @@ class Response {
    * This method tweaks the Response to ensure that it is
    * compliant with RFC 2616. Most of the changes are based on
    * the Request that is "associated" with this Response.
-   *
-   * @return $this
    *!/
   public function prepare(Request $request) {
     $headers = $this->headers;

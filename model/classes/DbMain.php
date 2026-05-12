@@ -31,38 +31,16 @@ class DbMain extends R {
 
   const DB_BLOB_FIELDS = ['reportValue', 'settings'];
 
-  /**
-   * @var Main
-   */
-  protected $main;
+  protected Main $main;
+
+  private int $currentUserID = 2;
+
+  private bool $usePrefix = true;
+  private string $prefix;
+  private string $dbName;
+  private string $login;
 
   /**
-   * @var int
-   */
-  private $currentUserID = 2;
-
-  /**
-   * @var boolean
-   */
-  private $usePrefix = true;
-
-  /**
-   * @var string
-   */
-  private $prefix;
-
-  /**
-   * @var string
-   */
-  private $dbName;
-
-  /**
-   * @var string
-   */
-  private $login;
-
-  /**
-   * @param Main $main
    * @throws RedException
    */
   public function __construct(Main $main) {
@@ -73,7 +51,8 @@ class DbMain extends R {
     }
   }
 
-  public function connect() {
+  public function connect(): void
+  {
     if (!USE_DATABASE) return;
 
     if (!self::testConnection()) {
@@ -107,19 +86,17 @@ class DbMain extends R {
 
   /**
    * Plugin readBean for special name
-   * @param $type
-   * @param $count
-   *
-   * @return array|OODBBean|null
    */
-  private function dis($type, $count) {
+  private function dis($type, $count): array|OODBBean|null
+  {
     return self::getRedBean()->dispense($type, $count);
   }
 
   /**
    * @throws RedException
    */
-  private function setting() {
+  private function setting(): void
+  {
     self::ext('xdispense', function ($type, $count = 1) {
       return $this->dis($type, $count);
     });
@@ -127,8 +104,6 @@ class DbMain extends R {
 
   /**
    * get Table with Prefix
-   * @param string $table
-   * @return string
    */
   private function pf(string $table): string {
     return $this->usePrefix ? $this->prefix . str_replace($this->prefix, '', $table) : $table;
@@ -146,10 +121,6 @@ class DbMain extends R {
     return "ORDER BY $sortColumn " . $sortDirect . " LIMIT $countPerPage OFFSET $pageNumber";
   }
 
-  /**
-   * @param array $arr
-   * @return array
-   */
   public function jsonParseField(array $arr): array {
     $result = [];
     //$arr = array_flatten($arr);
@@ -179,10 +150,6 @@ class DbMain extends R {
     return $arr;
   }
 
-  /**
-   * @param array $arr
-   * @return array
-   */
   public function jsonEncodeField(array $arr): array {
     $result = [];
 
@@ -199,11 +166,6 @@ class DbMain extends R {
 
   /**
    * Multiple databases
-   * @param string $key
-   * @param array $dbConfig
-   * @param bool $freeze
-   * @return $this
-   * @throws RedException
    */
   public function addDb(string $key, array $dbConfig, bool $freeze = true): DbMain {
     self::addDatabase(
@@ -218,9 +180,7 @@ class DbMain extends R {
   }
 
   /**
-   * Select a database,
-   * @param string $key
-   * @return $this
+   * Select a database
    * @throws RedException
    */
   public function selectDb(string $key): DbMain {
@@ -231,18 +191,13 @@ class DbMain extends R {
 
   /**
    * What does this function do?
-   * @param $varName
-   * @return string
    */
-  public function setQueryAs($varName): string {
+  public function setQueryAs(string $varName): string {
     return AQueryWriter::camelsSnake($varName) . " AS '$varName'";
   }
 
-  /**
-   * @param string|integer $date
-   * @return false|string|null
-   */
-  public function getDbDateString($date) {
+  public function getDbDateString(int|string $date): bool|string|null
+  {
     $date = trim($date, '"\'');
 
     if (empty($date)) return null;
@@ -253,11 +208,10 @@ class DbMain extends R {
     return $date ? $date->format($this::DB_DATE_FORMAT) : null;
   }
 
-  public function setPrefix(string $prefix) { $this->prefix = $prefix; }
+  public function setPrefix(string $prefix): void { $this->prefix = $prefix; }
 
   /**
    * Use or not prefix
-   * @return boolean
    */
   public function togglePrefix(): bool {
     return $this->usePrefix = !$this->usePrefix;
@@ -267,10 +221,6 @@ class DbMain extends R {
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
 
-  /**
-   * @param string $type
-   * @return Closure
-   */
   private function getConvertDbType(string $type): Closure {
     if (stripos($type, 'int') === 0) {
       return function ($v) { return intval($v); };
@@ -284,14 +234,9 @@ class DbMain extends R {
       return $v;
     };
   }
+
   /**
    * Проверка таблицы перед добавлениями/изменениями
-   *
-   * @param $curTable
-   * @param string $dbTable
-   * @param $param - link
-   * @param boolean $change - link
-   * @return array
    */
   private function checkTableBefore($curTable, string $dbTable, &$param, bool $change): array {
     $result = [];
@@ -360,10 +305,8 @@ class DbMain extends R {
    * @param string $dbTable name of table
    * @param array|string $columns of columns, if size of array is 1 (except all column "*") return simple array,
    * @param $filters string filter
-   *
-   * @return array
    */
-  public function selectQuery(string $dbTable, $columns = '*', string $filters = ''): array {
+  public function selectQuery(string $dbTable, array|string $columns = '*', string $filters = ''): array {
     $simple = false;
     if (!is_array($columns)) {
       $simple = $columns !== '*';
@@ -378,11 +321,7 @@ class DbMain extends R {
   }
 
   /**
-   * select all (*)
-   * @param string $dbTable
-   * @param bool $typed
-   *
-   * @return array|null
+   * Select all (*)
    */
   public function loadTable(string $dbTable, bool $typed = false): ?array {
     $result = self::getAll('SELECT * FROM ' . $this->pf($dbTable));
@@ -402,25 +341,11 @@ class DbMain extends R {
     return $result;
   }
 
-  /**
-   * @param $dbTable
-   * @param $columnName
-   * @param $value
-   *
-   * @return integer
-   */
-  public function checkHaveRows($dbTable, $columnName, $value): int {
+  public function checkHaveRows(string $dbTable, string $columnName, mixed $value): int {
     return intval(self::getCell("SELECT count(*) FROM " . $this->pf($dbTable) .
                                     " WHERE $columnName = :value", [':value' => $value]));
   }
 
-  /**
-   * @param string $dbTable
-   * @param array $ids
-   * @param string $primaryKey
-   *
-   * @return int
-   */
   public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'ID'): int {
     $dbTable = $this->pf($dbTable);
     $count = 0;
@@ -448,12 +373,10 @@ class DbMain extends R {
   }
 
   /**
-   * @param string $dbTable
-   * @param array $requireParam
-   * @return mixed
    * @throws RedException\SQL
    */
-  public function getLastID(string $dbTable, array $requireParam = []) {
+  public function getLastID(string $dbTable, array $requireParam = []): mixed
+  {
     $bean = self::xdispense($this->pf($dbTable));
     foreach ($requireParam as $field => $value) $bean->$field = $value;
     self::store($bean);
@@ -461,11 +384,8 @@ class DbMain extends R {
     return $bean->getID();
   }
 
-  /**
-   * @param string $like
-   * @return mixed|null
-   */
-  public function getTables(string $like = '') {
+  public function getTables(string $like = ''): mixed
+  {
     $like = $this->pf($like);
     $sql = "SHOW TABLES
             FROM `$this->dbName`
@@ -480,13 +400,7 @@ class DbMain extends R {
     }, []);
   }
 
-  /**
-   * get columns table
-   * @param $dbTable
-   *
-   * @return array|null
-   */
-  public function getColumnsTable($dbTable): ?array {
+  public function getColumnsTable(string $dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME AS "columnName", COLUMN_TYPE AS "type",
                                     COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE AS "null"
                              FROM information_schema.COLUMNS
@@ -495,13 +409,7 @@ class DbMain extends R {
        ':dbTable' => $this->pf($dbTable)]);
   }
 
-  /**
-   * @param $dbTable
-   * @param string $filters
-   *
-   * @return integer
-   */
-  public function getCountRows($dbTable, string $filters = ''): int {
+  public function getCountRows(string $dbTable, string $filters = ''): int {
     $sql = "SELECT COUNT(*) AS 'count' from " . $this->pf($dbTable);
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
@@ -512,16 +420,6 @@ class DbMain extends R {
     return 0;
   }
 
-  /**
-   * insert or change rows
-   *
-   * @param array $curTable
-   * @param string $dbTable
-   * @param array $param
-   * @param bool $change
-   *
-   * @return array
-   */
   public function insert(array $curTable, string $dbTable, array $param, bool $change = false): array {
     if (count($param) === 0) return [];
     $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
@@ -539,9 +437,10 @@ class DbMain extends R {
     if (strtolower($idColName) !== 'id') {
       if ($change) {
         foreach ($param as $id => $item) {
-          $sql = "UPDATE `$dbTable` SET ";
-          foreach ($item as $k => $v) $sql .= "`$k` = '$v' ";
-          $sql .= "WHERE `$idColName` LIKE '$id'";
+          $updates = [];
+          foreach ($item as $k => $v) $updates[] = "`$k` = '$v'";
+
+          $sql = "UPDATE `$dbTable` SET " . implode(', ', $updates) . " WHERE `$idColName` LIKE '$id'";
           self::exec($sql);
         }
       } else {
@@ -614,19 +513,13 @@ class DbMain extends R {
 
   /**
    * @param mixed $ids - if sting use delimiter ","
-   *
-   * @return array
    */
-  public function getFiles($ids = false): array {
+  public function getFiles(mixed $ids = false): array {
     if (is_string($ids) && !empty($ids)) $ids = explode(',', $ids);
     $filters = $ids ? ' ID = ' . implode(' or ID = ', $ids) : '';
     return $this->selectQuery('files', '*', $filters);
   }
 
-  /**
-   * @param object $file
-   * @return array
-   */
   public function setFiles(object $file): array {
     $files = ['id' => ''];
 
@@ -657,7 +550,7 @@ class DbMain extends R {
   // Elements
   //------------------------------------------------------------------------------------------------------------------
 
-  public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): ?array {
+  public function loadElements(int $sectionID, int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'C.name', bool $sortDirect = false): ?array {
     $pageNumber *= $countPerPage;
 
     $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
@@ -672,7 +565,7 @@ class DbMain extends R {
     return self::getAll($sql);
   }
 
-  public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): array {
+  public function searchElements(string $searchValue, int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'C.name', bool $sortDirect = false): array {
     $pageNumber *= $countPerPage;
     $searchValue = str_replace(' ', '%', $searchValue);
 
@@ -726,9 +619,7 @@ class DbMain extends R {
   }
 
   /**
-   * Для страницы Catalog
-   * @param string $elementID
-   * @return array|null
+   * For catalog page
    */
   public function openOptions(string $elementID): ?array {
     $sql = "SELECT O.ID AS 'id',
@@ -756,10 +647,6 @@ class DbMain extends R {
 
   /**
    * Load for calculator
-   * @param array  $filter
-   * @param int    $pageNumber
-   * @param int    $countPerPage
-   * @return array
    */
   public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
     $sql = "SELECT O.ID AS 'id', element_id AS 'elementId', 
@@ -825,7 +712,8 @@ class DbMain extends R {
   // Settings/Dealers Properties only main cms
   //------------------------------------------------------------------------------------------------------------------
 
-  private function parseSimpleProperty($type, $value) {
+  private function parseSimpleProperty(string $type, mixed $value): string|bool|float
+  {
     switch ($type) {
       default:
       case 'text':
@@ -850,7 +738,7 @@ class DbMain extends R {
       case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
     }
   }
-  private function getPropertyTable($propValue, $propName) {
+  private function getPropertyTable(mixed $propValue, string $propName): mixed {
     static $propTables, $props;
 
     if (!$propTables) {
@@ -878,7 +766,8 @@ class DbMain extends R {
     return ['name' => "Prop item: $propValue in $propName - not found!"];
   }
 
-  public function createPropertyTable(string $dbTable, array $params) {
+  public function createPropertyTable(string $dbTable, array $params): \RedBeanPHP\Cursor|int|array|null
+  {
     //$dbTable = $this->pf($dbTable);
 
     $sql = "CREATE TABLE $dbTable (
@@ -898,11 +787,6 @@ class DbMain extends R {
     return $error;
   }
 
-  /**
-   * @param string $dbTable
-   * @param array $params
-   * @return array
-   */
   public function changePropertyTable(string $dbTable, array $params): array {
     $error = [];
     $query = [];
@@ -936,16 +820,12 @@ class DbMain extends R {
     return $error;
   }
 
-  /**
-   * @param string $dbTable
-   * @param array $ids
-   * @return array
-   */
   public function loadPropertyTable(string $dbTable, array $ids): array {
     return self::getAll("SELECT * FROM $dbTable WHERE ID IN (" . self::genSlots($ids) . ' )', $ids);
   }
 
-  public function delPropertyTable($dbTables) {
+  public function delPropertyTable(string $dbTables): void
+  {
     $propTables = $this->getTables('prop');
 
     foreach ($propTables as $prop) {
@@ -961,10 +841,7 @@ class DbMain extends R {
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
-   * @param array $pageParam[int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
-   * @param array $ids
-   *
-   * @return string[][]
+   * @param array{pageNumber: int, countPerPage: int, sortColumn: string, sortDirect: bool} $pageParam
    */
   public function loadCustomers(array $pageParam, array $ids = []): array {
     $sql = "SELECT C.ID as 'id', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
@@ -984,7 +861,7 @@ class DbMain extends R {
     return self::getAll($sql);
   }
 
-  public function loadCustomerByOrderId($orderId): array {
+  public function loadCustomerByOrderId(int $orderId): array {
     $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts
       FROM " . $this->pf('orders') . " O 
       LEFT JOIN " . $this->pf('customers') . " C ON C.ID = O.customer_id
@@ -1018,7 +895,8 @@ class DbMain extends R {
   /**
    * @throws RedException\SQL
    */
-  public function setMoney($rate) {
+  public function setMoney(array $rate): void
+  {
     $beans = self::xdispense($this->pf('money'), 1);
     $date = date($this::DB_DATE_FORMAT);
 
@@ -1109,8 +987,6 @@ class DbMain extends R {
 
   /**
    * Load all users by all dealers
-   * @param string $login
-   * @return array
    */
   public function loadDealersUsers(string $login = ''): array {
     $result = [];
@@ -1153,13 +1029,7 @@ class DbMain extends R {
     return $result;
   }
 
-  /**
-   * Load dealer by id
-   * @param string|null $id
-   * @param bool $parseSettings
-   * @return array
-   */
-  public function loadDealerById(string $id = null, bool $parseSettings = true): array {
+  public function loadDealerById(?string $id = null, bool $parseSettings = true): array {
     $id = $id ?? $this->main->getCmsParam('dealerId');
 
     $sql = "SELECT ID AS 'id', name, contacts,

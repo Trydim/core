@@ -5,6 +5,7 @@ declare(strict_types=1);
 class CsvHistory
 {
   const EXTERNAL_USER_ID = 0;
+
   private string $basePath;
   private string $historyPath;
   private int $maxDays;
@@ -14,7 +15,6 @@ class CsvHistory
    * @param string $basePath путь до общей директории с исходными файлами
    * @param string $historyPath путь до общей директории бэкапами
    * @param int $maxDays максимальное количество дней хранения истории
-   * @param int $minKeepVersions
    */
   public function __construct(string $basePath, string $historyPath, int $maxDays = 90, int $minKeepVersions = 20)
   {
@@ -29,7 +29,6 @@ class CsvHistory
    * @param string $relativeFilePath Относительный путь к файлу
    * @param string $fileContent Содержимое файла
    * @param array $metaFields Дополнительные  бэкапа
-   * @return string backupId
    */
   public function saveBackup(string $relativeFilePath, string $fileContent, array $metaFields = []): string
   {
@@ -47,8 +46,6 @@ class CsvHistory
 
   /**
    * Создает начальный бэкап существующего файла, если нет истории
-   * @param string $relativeFilePath
-   * @return array
    * @throws RuntimeException
    */
   private function createInitialBackup(string $relativeFilePath): array
@@ -56,19 +53,19 @@ class CsvHistory
     $historyDir = $this->getHistoryDir($relativeFilePath);
 
     if (!is_dir($historyDir) && !mkdir($historyDir, 0777, true)) {
-      throw new \RuntimeException("Failed to create the history directory: {$historyDir}");
+      throw new \RuntimeException("Failed to create the history directory: $historyDir");
     }
 
     $filePath = $this->basePath . $relativeFilePath;
 
     if (!is_readable($filePath)) {
-      throw new \RuntimeException("File not found or not readable: {$relativeFilePath}");
+      throw new \RuntimeException("File not found or not readable: $relativeFilePath");
     }
 
     $oldContent = file_get_contents($filePath);
 
     if ($oldContent === false) {
-      throw new \RuntimeException("Failed to read the source file: {$relativeFilePath}");
+      throw new \RuntimeException("Failed to read the source file: $relativeFilePath");
     }
 
     return $this->createBackup($relativeFilePath, $oldContent, [
@@ -96,7 +93,7 @@ class CsvHistory
     $files = glob($historyDir . '*.json');
 
     foreach ($files as $file) {
-      if (substr($file, -5) === '.json') {
+      if (str_ends_with($file, '.json')) {
         $meta = json_decode(file_get_contents($file), true);
 
         if ($meta) {
@@ -223,7 +220,7 @@ class CsvHistory
     $currentContent = $this->getBackupContent($relativeFilePath, $backupId);
 
     if (!$currentMeta || !$currentContent) {
-      throw new \RuntimeException("Current backup not found or unreadable: {$backupId}");
+      throw new \RuntimeException("Current backup not found or unreadable: $backupId");
     }
 
     $prevBackupId = $currentMeta['prevBackupId'] ?? null;
@@ -231,7 +228,7 @@ class CsvHistory
     $prevContent = $prevBackupId ? $this->getBackupContent($relativeFilePath, $prevBackupId) : null;
 
     if (!$prevMeta || !$prevContent) {
-      throw new \RuntimeException("Previous backup not found or unreadable: {$prevBackupId}");
+      throw new \RuntimeException("Previous backup not found or unreadable: $prevBackupId");
     }
 
     return [
@@ -257,7 +254,7 @@ class CsvHistory
       return null;
     }
 
-    $content = file_get_contents("compress.zlib://{$backupFilePath}");
+    $content = file_get_contents("compress.zlib://$backupFilePath");
     return $content !== false ? $content : null;
   }
 
@@ -334,7 +331,7 @@ class CsvHistory
         $found = false;
 
         // Обработка CSV директорий (истории изменений)
-        if ($isLast && substr($part, -4) === '.csv') {
+        if ($isLast && str_ends_with($part, '.csv')) {
           $node[] = [
             'name' => substr($part, 0, -4), // Удаляем .csv из имени
             'path' => $currentPath,         // Полный относительный путь

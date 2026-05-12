@@ -1,69 +1,51 @@
 <?php
 
 class MigrateDb {
-  const DEAL_LOGIN = 'deal';
-  const DEAL_PASS = '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS';
+  const DEAL_LOGIN   = 'deal';
+  const DEAL_PASS    = '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS';
   const ORDER_STATUS = 'Order created';
-  /**
-   * @var string
-   */
-  private $prefix;
 
-  /*
-   * @var string
-   */
-  //private $charset = 'utf8mb4';
+  private string $prefix;
+
+  //private string $charset = 'utf8mb4';
 
   /**
    * Resources dump files list
    * @var string[]
    */
-  private $resourceDumps = [];
+  private array $resourceDumps = [];
 
-  /**
-   * @var Main
-   */
-  private $main;
+  private Main $main;
 
-  /**
-   * @var DbProxy
-   */
-  private $db;
+  private DbProxy $db;
 
 
-  /**
-   * @param string $prefix
-   * @return string
-   */
   private function preparePrefix(string $prefix): string {
     return str_replace('_', '', $prefix) . '_';
   }
   /**
-   * set Table with Prefix
-   * @param string $table
-   * @return string
+   * Set table with Prefix
    */
   private function pf(string $table): string {
     return $this->prefix . str_replace($this->prefix, '', $table);
   }
 
-  private function alterPrimaryKey(string $table, string $column = 'ID') {
+  private function alterPrimaryKey(string $table, string $column = 'ID'): int
+  {
     return $this->db->exec("ALTER TABLE `$table` ADD PRIMARY KEY (`$column`)");
   }
-  private function alterKey(string $table, string $column = 'ID') {
+  private function alterKey(string $table, string $column = 'ID'): int
+  {
     return $this->db->exec("ALTER TABLE `$table` ADD KEY `$column` (`$column`)");
   }
-  private function alterUnique(string $table, string $column) {
+  private function alterUnique(string $table, string $column): int
+  {
     return $this->db->exec("ALTER TABLE `$table` ADD UNIQUE(`$column`)");
   }
-  private function alterPrimaryAi(string $table, string $column = 'ID') {
+  private function alterPrimaryAi(string $table, string $column = 'ID'): int {
     return $this->db->exec("ALTER TABLE `$table` MODIFY `$column` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
   }
 
-  /**
-   * @param Main $main
-   * @param string $prefix
-   */
   public function __construct(Main $main, string $prefix) {
     $this->main = $main;
 
@@ -74,7 +56,8 @@ class MigrateDb {
   //  CATALOG
   //--------------------------------------------------------------------------------------------------------------------
 
-  public function createCodes() {
+  public function createCodes(): int
+  {
     $table = $this->pf('codes');
     $sql = "CREATE TABLE $table (
       `symbol_code` varchar(255) NOT NULL,
@@ -86,7 +69,8 @@ class MigrateDb {
     !$error && $error = $this->alterUnique($table, 'symbol_code');
     return $error;
   }
-  public function createSection() {
+  public function createSection(): int
+  {
     $table = $this->pf('section');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -102,7 +86,8 @@ class MigrateDb {
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }
-  public function createElements() {
+  public function createElements(): int
+  {
     $table = $this->pf('elements');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -130,7 +115,8 @@ class MigrateDb {
 
     return $error;
   }
-  public function createMoney() {
+  public function createMoney(): int
+  {
     $table = $this->pf('money');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -148,7 +134,8 @@ class MigrateDb {
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }
-  public function createUnits() {
+  public function createUnits(): int
+  {
     $table = $this->pf('units');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -162,7 +149,8 @@ class MigrateDb {
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }
-  public function createOptionsElements() {
+  public function createOptionsElements(): int
+  {
     $table = $this->pf('options_elements');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -206,7 +194,8 @@ class MigrateDb {
   // USERS + ORDERS
   //--------------------------------------------------------------------------------------------------------------------
 
-  public function createPermission() {
+  public function createPermission(): int
+  {
     $table = $this->pf('permission');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -220,7 +209,8 @@ class MigrateDb {
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }
-  public function createUsers() {
+  public function createUsers(): int
+  {
     $table = $this->pf('users');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -250,7 +240,8 @@ class MigrateDb {
 
     return $error;
   }
-  public function createCustomers() {
+  public function createCustomers(): int
+  {
     $table = $this->pf('customers');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -264,7 +255,8 @@ class MigrateDb {
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }
-  public function createOrderStatus() {
+  public function createOrderStatus(): int
+  {
     $table = $this->pf('order_status');
     $sql = "CREATE TABLE $table (
       `ID` int(2) UNSIGNED NOT NULL,
@@ -279,7 +271,8 @@ class MigrateDb {
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }
-  public function createOrders() {
+  public function createOrders(): int
+  {
     $table = $this->pf('orders');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -320,7 +313,8 @@ class MigrateDb {
   // OTHERS
   //--------------------------------------------------------------------------------------------------------------------
 
-  public function createClientOrders() {
+  public function createClientOrders(): int
+  {
     $table = $this->pf('client_orders');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -336,7 +330,8 @@ class MigrateDb {
     !$error && $error = $this->alterPrimaryAi($table);
     return $error;
   }
-  public function createFiles() {
+  public function createFiles(): int
+  {
     $table = $this->pf('files');
     $sql = "CREATE TABLE $table (
       `ID` int(10) UNSIGNED NOT NULL,
@@ -366,7 +361,8 @@ class MigrateDb {
 
     return count($this->resourceDumps) > 0;
   }
-  public function seedingResourceDump() {
+  public function seedingResourceDump(): void
+  {
     foreach ($this->resourceDumps AS $path) {
       $sql = file_get_contents($path);
       $sql = str_replace('$prefix', $this->prefix, $sql);
@@ -374,7 +370,8 @@ class MigrateDb {
     }
   }
 
-  public function addAdmin(string $login, string $pass) {
+  public function addAdmin(string $login, string $pass): void
+  {
     $bean = $this->db::xdispense($this->pf('permission'));
     $bean->name = 'Администратор';
     $bean->properties = '{"menu":"","tags":"guard admin"}';
@@ -393,7 +390,8 @@ class MigrateDb {
   /**
    * Update login after user migrate DB
    */
-  public function updateAdmin(string $login, string $pass) {
+  public function updateAdmin(string $login, string $pass): void
+  {
     if ($login === '' || $pass === '') return;
 
     $bean = $this->db::xdispense($this->pf('users'));
@@ -402,7 +400,8 @@ class MigrateDb {
     $bean->password = $pass;
     $this->db->store($bean);
   }
-  public function addStatus(array $rows) {
+  public function addStatus(array $rows): void
+  {
     $bean = $this->db::xdispense($this->pf('order_status'));
 
     if (count($rows)) {
@@ -417,7 +416,8 @@ class MigrateDb {
     $bean->name = $this::ORDER_STATUS;
     $this->db->store($bean);
   }
-  public function addMoneyRate() {
+  public function addMoneyRate(): void
+  {
     $rows = [
       [
         'code' => 'USD',
@@ -452,7 +452,8 @@ class MigrateDb {
     }
   }
 
-  public function drop(string $prefix, int $deep = 0) {
+  public function drop(string $prefix, int $deep = 0): void
+  {
     if (strlen($prefix) < 4 || $deep === 3) return;
 
     $error = [];

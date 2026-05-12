@@ -28,13 +28,9 @@ final class InputBag extends ParameterBag {
 
   /**
    * Returns a scalar input value by name.
-   *
-   * @param string $key
-   * @param string|int|float|bool|null $default The default value if the input key does not exist
-   *
-   * @return string|int|float|bool|null
    */
-  public function get(string $key, $default = null) {
+  public function get(string $key, mixed $default = null): mixed
+  {
     if (null !== $default && !is_scalar($default) && !(is_object($default) && method_exists($default, '__toString'))) {
       trigger_deprecation('symfony/http-foundation', '5.1', 'Passing a non-scalar value as 2nd argument to "%s()" is deprecated, pass a scalar or null instead.', __METHOD__);
     }
@@ -51,37 +47,34 @@ final class InputBag extends ParameterBag {
   /**
    * {@inheritdoc}
    */
-  public function all(string $key = null): array {
+  public function all(?string $key = null): array {
     return parent::all($key);
   }
 
   /**
    * Replaces the current input values by a new set.
-   * @param array $inputs
    */
-  public function replace(array $inputs = []) {
+  public function replace(array $parameters = []): void
+  {
     $this->parameters = [];
-    $this->add($inputs);
+    $this->add($parameters);
   }
 
   /**
    * Adds input values.
-   *
-   * @param array $inputs
    */
-  public function add(array $inputs = []) {
-    foreach ($inputs as $input => $value) {
+  public function add(array $parameters = []): void
+  {
+    foreach ($parameters as $input => $value) {
       $this->set($input, $value);
     }
   }
 
   /**
    * Sets an input by name.
-   *
-   * @param string $key
-   * @param string|int|float|bool|array|null $value
    */
-  public function set(string $key, $value) {
+  public function set(string $key, mixed $value): void
+  {
     if (null !== $value && !is_scalar($value) && !is_array($value) && !method_exists($value, '__toString')) {
       trigger_deprecation('symfony/http-foundation', '5.1', 'Passing "%s" as a 2nd Argument to "%s()" is deprecated, pass a scalar, array, or null instead.', get_debug_type($value), __METHOD__);
     }
@@ -92,7 +85,8 @@ final class InputBag extends ParameterBag {
   /**
    * {@inheritdoc}
    */
-  public function filter(string $key, $default = null, int $filter = FILTER_DEFAULT, $options = []) {
+  public function filter(string $key, mixed $default = null, int $filter = FILTER_DEFAULT, mixed $options = []): mixed
+  {
     $value = $this->has($key) ? $this->all()[$key] : $default;
 
     // Always turn $options into an array - this allows filter_var option shortcuts.

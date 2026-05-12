@@ -38,7 +38,7 @@ class VC {
         DEAL_URI_JS   = 'dealUriJs';
 
   /** userField */
-  const USER_ID = 'id',
+  const USER_ID  = 'id',
         USER_IS_ADMIN   = 'admin',
         USER_LOGIN      = 'login',
         USER_NAME       = 'name',
@@ -48,7 +48,7 @@ class VC {
         USER_DEALER     = 'dealer';
 
   /** Base views field */
-  const BASE_IS_GLOBAL        = 'isGlobal',
+  const BASE_IS_GLOBAL = 'isGlobal',
         BASE_GLOBAL           = 'global',
         BASE_PAGE_TITLE       = 'pageTitle',
         BASE_HEAD_CONTENT     = 'headContent',
@@ -63,7 +63,7 @@ class VC {
         BASE_JS_LINKS         = 'jsLinks';
 
   const CONTROLLER_FIELD_POSITION_BEFORE = 'before',
-        CONTROLLER_FIELD_POSITION_AFTER = 'after';
+        CONTROLLER_FIELD_POSITION_AFTER  = 'after';
 
   /** Setting */
   const MAIL_TARGET      = 'mailTarget',

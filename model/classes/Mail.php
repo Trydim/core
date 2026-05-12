@@ -24,29 +24,22 @@ define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'mail.common@list.ru');
 define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'eBsv3cj7LtofBLULy6ni');
 
 class Mail {
-  /**
-   * @var Main
-   */
-  private $main;
+  private Main $main;
 
-  private $mailTpl, $body = '', $docPath = [], $pdfFilename = [];
-  private $mailTarget;
-  private $subject, $fromName;
-  private $otherMail       = [];
-  private $attachmentFiles = [];
+  private string $body = '';
+  private array $pdfFilename = [];
+  private array $docPath = [];
+  private string $mailTpl;
+  private string $mailTarget;
+  private string $subject;
+  private string $fromName;
+  private array $otherMail       = [];
+  private array $attachmentFiles = [];
 
-  /*
-   * @param string $filename
-   * @return string
-   */
   /*private function findFile(string $filename): string {
     return __DIR__ . '/template/mailTpl.php';
   }*/
 
-  /**
-   * @param Main $main
-   * @param string $mailTpl
-   */
   public function __construct(Main $main, string $mailTpl) {
     $this->main = $main;
     $this->mailTpl = $mailTpl;
@@ -61,9 +54,6 @@ class Mail {
     }
   }
 
-  /**
-   * @param array $array
-   */
   public function prepareMail(array $array = []): void {
     $path = "public/views/docs/$this->mailTpl.php";
 
@@ -88,32 +78,24 @@ class Mail {
     $this->body = ob_get_clean();
   }
 
-  /**
-   * @param string $str
-   */
   public function setSubject(string $str): void {
     !empty($str) && $this->subject = $str;
   }
 
-  /**
-   * @param string|array $emails
-   */
-  public function addMail($emails): void {
+  public function addMail(array|string $emails): void {
     if (is_string($emails)) $this->otherMail[] = $emails;
     else if (!empty($emails)) $this->otherMail = array_merge($this->otherMail, $emails);
   }
 
-  /**
-   * @param string $docPath
-   * @param string $filename
-   */
-  public function addFile(string $docPath, string $filename = '') {
+  public function addFile(string $docPath, string $filename = ''): void
+  {
     $filename = !empty($filename) ? $filename : basename($docPath);
     $this->docPath[] = $docPath;
     $this->pdfFilename[] = empty($filename) ? uniqid() . '.pdf' : $filename;
   }
 
-  public function addOtherFile($files) {
+  public function addOtherFile($files): void
+  {
     $that = $this;
     array_map(function ($file) use (&$that) {
       if (!is_file($file['tmp_name'])) return;
@@ -126,7 +108,8 @@ class Mail {
     }, $files);
   }
 
-  public function send() {
+  public function send(): true|string
+  {
     require_once CORE . 'libs/vendor/autoload.php';
     $mail = new PHPMailer();
     $mail->SMTPDebug = DEBUG;                    // Enable verbose debug output
@@ -215,9 +198,6 @@ private function createImg($img) {
   return $arrResource;
 }*/
 
-  /**
-   * @return string
-   */
   private function getDefaultTemplate(): string {
     $htmlTemplate = 'Default Template<br>';
     foreach ($_REQUEST as $k => $v) {

@@ -1,45 +1,47 @@
 <?php
 
 class Dealer {
-  const FOLDER = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR;
+  const FOLDER    = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR;
   const RESOURCES = Dealer::FOLDER . 'resource' . DIRECTORY_SEPARATOR;
 
   /**
    * @var Main
    */
-  private $main;
+  private Main $main;
 
   /**
    * @var string
    */
-  private $dealerDir;
+  private string $dealerDir;
 
   /**
    * @var string
    */
-  private $dealerPath;
+  private string $dealerPath;
 
   /**
    * @var string
    */
-  private $prefix;
+  private string $prefix;
 
   /**
    * @var MigrateDb;
    */
-  private $migrateDb;
+  private MigrateDb $migrateDb;
 
   public function __construct($main) {
     $this->main = $main;
   }
 
-  private function setParam(string $id, string $dbPrefix) {
+  private function setParam(string $id, string $dbPrefix): void
+  {
     $this->dealerDir  = $this::FOLDER . $id;
     $this->dealerPath = $this->dealerDir . DIRECTORY_SEPARATOR;
 
     $this->prefix     = $dbPrefix;
   }
-  private function createFolderDealers() {
+  private function createFolderDealers(): void
+  {
     if (!is_dir($this::FOLDER)) {
       try {
         mkdir($this::FOLDER);
@@ -48,7 +50,8 @@ class Dealer {
       }
     }
   }
-  private function createFolder() {
+  private function createFolder(): void
+  {
     if (is_dir($this->dealerDir)) die('Dealer folder exist!');
 
     try {
@@ -62,7 +65,8 @@ class Dealer {
 
     return true;
   }
-  private function copy(string $src, string $dst) {
+  private function copy(string $src, string $dst): void
+  {
     $sep = DIRECTORY_SEPARATOR;
     $dir = opendir($src);
 
@@ -78,7 +82,8 @@ class Dealer {
     }
     closedir($dir);
   }
-  private function copyFiles(array $folders = ['lang', 'public', 'shared']) {
+  private function copyFiles(array $folders = ['lang', 'public', 'shared']): void
+  {
     try {
       foreach ($folders as $dir) {
         $this->copy($this::RESOURCES . $dir, $this->dealerPath . $dir);
@@ -87,7 +92,8 @@ class Dealer {
       die('Error copying resources');
     }
   }
-  private function createConfig(array $params) {
+  private function createConfig(array $params): void
+  {
     $config = file_get_contents($this::RESOURCES . 'config.php');
     if (!$config) die('Dealer configuration file does not exist!');
 
@@ -106,7 +112,8 @@ class Dealer {
     file_put_contents($this->dealerPath . 'config.php', $config);
   }
 
-  private function updateDb(array $param) {
+  private function updateDb(array $param): void
+  {
     $this->migrateDb = new MigrateDb($this->main, $param['prefix']);
 
     $this->migrateDb->createMoney();
@@ -129,12 +136,8 @@ class Dealer {
     }
   }
 
-  /**
-   * @param int|string $id
-   * @param array $configParam
-   * @param array $dbParam
-   */
-  public function create($id, array $configParam, array $dbParam) {
+  public function create(int|string $id, array $configParam, array $dbParam): void
+  {
     $this->main->fireHook(VC::HOOKS_DEALERS_BEFORE_CREATE, $this, $configParam, $dbParam);
 
     $this->setParam($id, $dbParam['prefix']);
@@ -197,7 +200,7 @@ class Dealer {
         $result = $this->main->db->execQuery($sql);
       }
 
-      if (is_finite($result)) $report['complete'][] = "Complete for dealer " . $dealer['id'] . ": " . $prefix;
+      if (isset($result) && is_finite($result)) $report['complete'][] = "Complete for dealer " . $dealer['id'] . ": " . $prefix;
     }
 
     return $report;

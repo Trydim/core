@@ -10,11 +10,9 @@ class Properties {
   const PROP_CMS_SETTINGS = [
     'prop_locales' => ['table' => 'locales', 'type' => 'multiselect'],
   ];
-  /**
-   * @var Main
-   */
-  private $main;
-  private $propSetting;
+
+  private Main $main;
+  private mixed $propSetting;
 
   //private $data = []; Хранить всю таблицу свойства
 
@@ -23,9 +21,6 @@ class Properties {
     $this->propSetting = $main->getSettings($this->getSettingField($table));
   }
 
-  /**
-   * @param string $table - option/dealer
-   */
   private function getSettingField(string $table): string {
     switch ($table) {
       default: case 'option': return VC::OPTION_PROPERTIES;
@@ -33,19 +28,10 @@ class Properties {
     }
   }
 
-  /**
-   * @param $prop
-   * @return string
-   */
   private function getPropertyName($prop): string {
     return str_replace('prop_', '', $prop);
   }
 
-  /**
-   * @param $prop
-   * @param $value
-   * @return array
-   */
   public function getValue($prop, $value): array {
     $cmsParam  = $this::PROP_CMS_SETTINGS[$prop] ?? null;
     $propParam = $cmsParam ?: $this->propSetting[$prop] ?? null;
