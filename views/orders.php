@@ -2,7 +2,7 @@
 
 /**
  * @var Main $main - global
- * @var $param - from controller c_orders.php
+ * @var array $param - from controller c_orders.php
  */
 
 $field['content'] = template('parts/ordersContent', $param);

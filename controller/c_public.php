@@ -17,10 +17,6 @@ $field = [
 $publicCss = $main->getCmsParam(VC::URI_CSS);
 $publicJs = $main->getCmsParam(VC::URI_JS);
 
-/** Для совместимости */
-define('PATH_CSS' , $publicCss);
-define('PATH_JS' , $publicJs);
-
 // Если загрузка
 if (
   $authStatus && is_numeric($orderId = $main->url->request->get('orderId'))

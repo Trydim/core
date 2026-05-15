@@ -1,5 +1,9 @@
 <?php
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 !defined('PATH_IMG') && define('PATH_IMG', $_SERVER['DOCUMENT_ROOT'] . '/images/');
 
 class Docs {
@@ -30,7 +34,8 @@ class Docs {
 
   private array $domFooter = [];
 
-  private object $docs;
+  private \Dompdf\Dompdf|XLSXWriter|Spreadsheet $docs;
+  private Worksheet $sheet;
 
   /**
    * If true, then use default template
@@ -48,7 +53,7 @@ class Docs {
   public string $fileName;
 
   /**
-   * @param array{library: string, orientation: string, docType: string} $param
+   * @param array{docType: 'pdf'|'print'|'excel'|'excelNew', orientation?: 'P'|'L'} $param
    */
   public function __construct(Main $main, array $param, array $data, string $fileTpl = 'default') {
     $this->main = $main;
@@ -71,6 +76,10 @@ class Docs {
         break;
       case 'excel':
         $this->initExcel();
+        $this->setExcelData();
+        break;
+      case 'excelNew':
+        $this->initExcelNew();
         $this->setExcelData();
         break;
     }
@@ -172,6 +181,14 @@ class Docs {
   {
     require_once __DIR__ . '/Xlsxwriter.php';
     $this->docs = new XLSXWriter();
+  }
+
+  private function initExcelNew(): void
+  {
+    require_once CORE . 'libs/vendor/autoload.php';
+
+    $this->docs = new Spreadsheet();
+    $this->sheet = $this->docs->getActiveSheet();
   }
 
   /**
@@ -287,7 +304,29 @@ class Docs {
         $this->docs->writeToFile($path . $filename);
 
         return $path . $filename;
+    }
+  }
 
+  private function getExcelNew(string $path, string $dest): array|string
+  {
+    $filename = $this->fileName ?? $this->filename;
+    $filePath = $path . $filename;
+    $writer = new Xlsx($this->docs);
+    $writer->save($filePath);
+
+    switch ($dest) {
+      default:
+        $excelBody = base64_encode(file_get_contents($filePath));
+        unlink($filePath);
+
+        return [
+          'name'      => $filename,
+          'filename'  => $filename,
+          'excelBody' => $excelBody,
+        ];
+
+      case 'save':
+        return $filePath;
     }
   }
 
@@ -412,6 +451,7 @@ class Docs {
       case 'pdf': $result = $this->getPdf($path, $dest); break;
       case 'print': $result = $this->getPrint($path, $dest); break;
       case 'excel': $result = $this->getExcel($path, $dest); break;
+      case 'excelNew': $result = $this->getExcelNew($path, $dest); break;
     }
 
     $this->unlinkTmpFiles();

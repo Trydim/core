@@ -70,13 +70,6 @@ const storageLoad = () => {
   // Set Sidebar Toggle
   let node = f.gI('mainWrapper');
   if (node && storage.get(STORAGE_KEY.sidebarToggle) === 'true') node.classList.add(MENU_CLASS);
-
-  // Set theme
-  if (storage.get('themeToggle') === 'true') {
-    let node = f.qS('[data-action-cms="themeToggle"]');
-    node && (node.checked = true);
-    document.body.dataset.themeVersion = 'dark';
-  }
 }
 
 const setParentHeight = (target: HTMLElement, height: number) => {
@@ -148,12 +141,6 @@ const sidebarToggle = () => {
   }, 500);
 }
 
-const themeToggle = () => {
-  const isLight = document.body.dataset.themeVersion === 'light';
-  document.body.dataset.themeVersion = isLight ? 'dark': 'light';
-  storage.set('themeToggle', isLight);
-}
-
 const dropdownToggle = (e: HTMLElement) => {
   const menuTarget  = e.dataset.target,
         currentMenu = menuTarget && document.querySelector(`[data-relation=${menuTarget}]`);
@@ -203,7 +190,6 @@ const cmsEventClick = function() {
 
   let select = {
     sidebarToggle,
-    themeToggle,
     dropdownToggle,
     exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };

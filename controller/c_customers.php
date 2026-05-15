@@ -4,17 +4,18 @@
  * @var Main $main
  */
 
+$main->addAssets('module/customers.js');
+
+// Used in views/customers.php
 $param = [];
 $field = [
   'pageTitle' => 'Клиенты',
-  'jsLinks'   => [$main->url->getUrl(VC::CORE_JS) . 'module/customers.js?ver=6347eef0e2'],
   'footerContent' => $main->getSettings('json', true),
 ];
 
 // получить конфиг текущего пользователя
 $setting = $main->getLogin('customization');
 $setting = $setting ?: [];
-
 
 $columns = $setting['customersShowColumns'] ?? ['ID', 'name', 'contacts',  'ITN', 'orders'];
 $param['columns'] = array_map(function ($item) {
@@ -24,6 +25,6 @@ $param['columns'] = array_map(function ($item) {
   ];
 }, $columns);
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_CUSTOMERS_TEMPLATE, $main);
+$main->fireHook(VC::HOOKS_CUSTOMERS_TEMPLATE, $main);
 require $main->url->getRoutePath();
 $main->response->setContent(template('base', $field));

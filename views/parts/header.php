@@ -26,16 +26,14 @@ if ($main->checkStatus()) {
     <span class="brand-title"><?= $main->getCmsParam(VC::PROJECT_TITLE) ?></span>
   </a>
 
-  <div class="nav-control" role="button" data-action-cms="menuToggle">
+  <div class="nav-control" role="button" data-action-cms="sidebarToggle">
     <i class="pi pi-caret-left"></i>
   </div>
 </div>
 
 <div class="header">
   <div class="header-content position-relative">
-    <div class="d-flex align-items-center form-check form-switch">
-      <input class="form-check-input" type="checkbox" data-action-cms="themeToggle">
-    </div>
+    <div id="headerLeftField" class="d-flex align-items-center"></div>
 
     <?php if ($main->url->getRoute() === 'orders' && $main->getCmsParam(VC::ORDERS_KANBAN)) { ?>
       <div class="ms-2 me-auto align-self-center">

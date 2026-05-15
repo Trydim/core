@@ -10,8 +10,6 @@ $param = [
 
 $field = [
   VC::BASE_PAGE_TITLE => gTxt('Orders'),
-  VC::BASE_CSS_LINKS => [$main->url->getUrl(VC::CORE_CSS) . 'module/orders.css?ver=1'],
-  VC::BASE_JS_LINKS  => [$main->url->getUrl(VC::CORE_JS) . 'module/orders.js?ver=9d335261f8'],
   VC::BASE_FOOTER_CONTENT => $main->getFrontContent('dataUser', $main->getLogin('all')),
 ];
 
@@ -45,6 +43,11 @@ $field[VC::BASE_FOOTER_CONTENT] .= $main->getFrontContent('dataOrdersVisitColumn
 
 if ($param['showFilter']) $param['filterOptions'] = $main->db->selectQuery($param['showFilter'], ['id', 'name']);
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);
-require $main->url->getRoutePath();
+$main->setControllerField($field)
+     ->addAssets(['module/orders.css', 'module/orders.js'])
+     ->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);
+
+$field[VC::BASE_CONTENT] = template('orders', ['param' => $param]);
+$field[VC::BASE_FOOTER_CONTENT] .= template('parts/ordersFooterContent', $param);
+
 $main->response->setContent(template('base', $field));

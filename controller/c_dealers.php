@@ -34,8 +34,6 @@ $field = [
   'pageTitle'     => gTxt('Dealers'),
   'sideRight'     => '',
   'footerContent' => $main->initDictionary(),
-  'cssLinks'  => [$main->url->getUrl(VC::CORE_CSS) . 'module/dealers.css?ver=8cdf94ab40'],
-  'jsLinks'   => [$main->url->getUrl(VC::CORE_JS) . 'module/dealers.js?ver=73262afc8e'],
 ];
 
 $dealerProps = [];
@@ -71,13 +69,16 @@ $field['footerContent'] .= $main->getFrontContent('dataProperties', $dealerProps
 
 // If user have table property, add libs
 $haveTable = array_find($dealerProps, function ($prop) { return $prop['type'] === 'table'; });
-if (!empty($haveTable)) {
-  array_unshift($field['jsLinks'], $main->url->getUrl(VC::CORE_JS) . 'libs/handsontable.full.min.js?ver=f3bb2b6859');
-}
+
+$main->setControllerField($field)
+     ->addAssets(['module/dealers.css', 'module/dealers.js']);
+
+if (!empty($haveTable)) $main->addAssets('libs/handsontable.full.min.js', 'before');
+
 unset($values, $dealerProps, $haveTable);
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_DEALERS_TEMPLATE, $main);
-ob_start();
-include $main->url->getRoutePath();
-$field['content'] = ob_get_clean();
+$main->fireHook(VC::HOOKS_DEALERS_TEMPLATE, $main);
+
+$field[VC::BASE_CONTENT] = template('dealers', ['param' => $param ?? []]);
+
 $main->response->setContent(template('base', $field));

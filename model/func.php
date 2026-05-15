@@ -24,42 +24,6 @@ function addCpNumber($number, string $importantValue): bool|string
 }
 
 /**
- * alias for $main->addControllerField('cssLinks')
- *
- * @param string $cssLink - from index.php directory
- * @return Main|bool - false or Main object
- */
-function addCssLink(string $cssLink): bool|Main
-{
-  global $main;
-
-  if ($main instanceof Main) {
-    $cssLink = $main->url->getUri(true) . ltrim($cssLink, '/');
-    return $main->addControllerField(VC::BASE_CSS_LINKS, $cssLink);
-  }
-
-  return false;
-}
-
-/**
- * Alias for Main::addControllerField('jsLinks')
- *
- * @param string $jsLink Path from index.php directory
- * @param 'before'|'after'|string $position
- * 'before' - prepend to the beginning; 'after' - append to the end
- */
-function addJsLink(string $jsLink, string $position = 'after'): bool|Main {
-  global $main;
-
-  if ($main instanceof Main) {
-    $jsLink = $main->url->getUri(true) . ltrim($jsLink, '/');
-    return $main->addControllerField(VC::BASE_JS_LINKS, $jsLink, $position);
-  }
-
-  return false;
-}
-
-/**
  * Alias for $main->addHook();
  */
 function addHook(string $hookName, callable $callable): void
@@ -219,29 +183,7 @@ function findWord(string $input, array $row, bool $index = false, bool $strict =
 }
 
 /**
- * Find key
- *
- * @param string[] $cell - when searching?
- * @param array $input - what search? array of keys
- *
- * @return string|bool - keys or false
- */
-function findKey(array $cell, array $input) {
-  $count = count($input); // now forever 1
-  $input = '/(' . implode('|', $input) . ')/i';
-  foreach ($cell as $key => $item) {
-    if (preg_match_all($input, $key) === $count) {
-      return $key;
-    }
-  }
-
-  return false;
-}
-
-/**
  * Find csv file
- * @param string $filename
- * @return string
  */
 function findCsvFile(string $filename): string {
   global $main;
@@ -257,10 +199,6 @@ function findCsvFile(string $filename): string {
 
 /**
  * Determines whether a string can be considered JSON or not.
- *
- * @param string $value value to determine json of.
- *
- * @return boolean
  */
 function isJSON(string $value): bool {
   return (
@@ -276,10 +214,9 @@ function isJSON(string $value): bool {
  * @param string $filename - csv filename with path
  * @param bool   $oneRang  - if true that return one rang array
  * @param bool   $strict   - strict checking of column names
- *
- * @return array|string
  */
-function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $strict = false) {
+function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $strict = false): array|string
+{
   $filename = findCsvFile($filename);
   $result = [];
 
@@ -326,10 +263,6 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
   return $result;
 }
 
-/**
- * @param string $path
- * @return array
- */
 function loadFullCSV(string $path): array {
   if ($path !== '' && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
@@ -347,14 +280,8 @@ function loadFullCSV(string $path): array {
 
 /**
  * Remove folder recursive
- * @param string $dir
- * @return bool
  */
 if (!function_exists('removeFolder')) {
-  /**
-   * @param string $dir
-   * @return bool
-   */
   function removeFolder(string $dir): bool {
     if (!is_dir($dir)) return false;
 
@@ -369,44 +296,23 @@ if (!function_exists('removeFolder')) {
   }
 }
 
-/**
- * @param string $lang
- */
 function setUserLocale(string $lang = 'ru_RU') {
-  /*switch ($lang) {
-    case 'ru_RU':
-      putenv('LANG=ru_RU.UTF8');
-      putenv('LANGUAGE=ru_RU.UTF8');
-      setlocale (LC_ALL, $lang . '.UTF8');
-      break;
-    default:
-      putenv('LC_ALL=' . $lang);
-      putenv('LANG=' . $lang);
-      putenv('LANGUAGE=' . $lang);
-      setlocale (LC_ALL,"English", "en", "en_US.UTF8");
-  }*/
-
   putenv('LANG=ru_RU.UTF8');
   putenv('LANGUAGE=ru_RU.UTF8');
   setlocale(LC_ALL, $lang . '.UTF8');
-
-  //putenv('LC_MESSAGES='.$locale);
-  //setlocale(LC_MESSAGES, $locale);
 
   bindtextdomain($lang, './lang');
   textdomain($lang);
 }
 
 /**
- * get template from directory view
- * @param string $path whit out
- * @param array  $vars
- *
- * @return string
+ * Get template from view directory
  */
 function template(string $path = 'base', array $vars = []): string {
   global $main;
   $path .= '.php';
+
+  extract($main->getControllerField());
   extract($vars);
   ob_start();
 
@@ -418,10 +324,6 @@ function template(string $path = 'base', array $vars = []): string {
   return ob_get_clean();
 }
 
-/**
- * @param string $value
- * @return string
- */
 function translit(string $value): string {
   $converter = [
     'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
@@ -437,12 +339,10 @@ function translit(string $value): string {
 }
 
 /**
- * @param string $url
  * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'login', 'password', 'contentType', 'timeout'
- * @param string|array<string, string> $params - assoc array
- * @return string|array
  */
-function httpRequest(string $url, array $config = [], $params = []) {
+function httpRequest(string $url, array $config = [], array $params = []): array|string
+{
   $myCurl = curl_init();
 
   $curlConfig = [

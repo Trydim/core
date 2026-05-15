@@ -267,26 +267,33 @@ class UrlGenerator {
     $this->coreUrl = $this->getBaseUri() . $this->corePath;
   }
 
+  private function getDealerFromUri(string $uri): array
+  {
+    $path = parse_url($uri, PHP_URL_PATH) ?? '';
+    $path = str_replace(basename($this->server->get('SCRIPT_FILENAME', '')), '', $path);
+
+    if (!includes($path, DEALERS_PATH . '/')) return [false, null];
+
+    preg_match('#(?:^|/)' . preg_quote(DEALERS_PATH, '#') . '/([^/]+)(?:/|$)#', $path, $match);
+
+    return [true, $match[1] ?? null];
+  }
   private function checkDealer(): void
   {
-    $requestUri = $this->getRequestUri();
-    $isDealer = includes($requestUri, DEALERS_PATH . '/');
+    [$isDealer, $dealerId] = $this->getDealerFromUri($this->getRequestUri());
 
     if (!$isDealer) {
-      $httpOrigin = $this->server->get('HTTP_ORIGIN'); // ver 8 null, HTTP_REFERER too
-      if ($httpOrigin) $requestUri = str_replace($httpOrigin, '', $this->server->get('HTTP_REFERER'));
-      $isDealer = includes($requestUri, DEALERS_PATH . '/');
+      $referer = $this->server->get('HTTP_REFERER', '');
+      if ($referer) [$isDealer, $dealerId] = $this->getDealerFromUri($referer);
     }
 
     if ($isDealer) {
-      preg_match('/' . DEALERS_PATH . '\/(.+?)\//', $requestUri, $match); // получить ID дилера
-
-      if (!isset($match[1])) die('Dealer id not found!');
-      if (is_numeric($match[1])) {
-        if (!$this->isLocalDealer($match[1]) && !is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $match[1])) $isDealer = false;
-        else $this->main->setCmsParam(VC::DEALER_ID, $match[1]);
+      if (!isset($dealerId)) die('Dealer id not found!');
+      if (is_numeric($dealerId)) {
+        if (!$this->isLocalDealer($dealerId) && !is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $dealerId)) $isDealer = false;
+        else $this->main->setCmsParam(VC::DEALER_ID, $dealerId);
       } else {
-        $this->main->setCmsParam(VC::DEALER_LINK, $match[1]);
+        $this->main->setCmsParam(VC::DEALER_LINK, $dealerId);
       }
     }
 

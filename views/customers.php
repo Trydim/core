@@ -2,7 +2,7 @@
 
 /**
  * @var Main $main - global
- * @var array $param
+ * @var array $param - from c_customers.php
  */
 
 $field['content'] = template('parts/customersContent', $param);

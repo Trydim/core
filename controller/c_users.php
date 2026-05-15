@@ -6,9 +6,11 @@
 
 $field = [
   'pageTitle' => 'Пользователи',
-  'jsLinks'   => [$main->url->getUrl(VC::CORE_JS) . 'module/users.js?ver=0151a08ae3'],
   'footerContent' => $main->getSettings('json', true),
 ];
+
+$main->addAssets('module/users.js');
+
 $param = [];
 
 if (!isset($setting)) {
@@ -30,6 +32,6 @@ $param['permission'] = implode('', $param['permission']);
 
 $param['managerField'] = $main->getSettings(VC::MANAGER_FIELDS) ?? [];
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_USERS_TEMPLATE, $main);
+$main->fireHook(VC::HOOKS_USERS_TEMPLATE, $main);
 require $main->url->getRoutePath();
 $main->response->setContent(template('base', $field));

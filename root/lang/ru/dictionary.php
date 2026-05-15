@@ -1,10 +1,7 @@
 <?php return [
   // Menus
   'calculator'  => 'Калькулятор',
-  'calendar'    => 'Календарь',
-  'statistic'   => 'Статистика',
   'orders'      => 'Заказы',
-  'catalog'     => 'Каталог',
   'fileManager' => 'Файловый менеджер',
   'adminDB'     => 'Администрирование',
   'customers'   => 'Клиенты',

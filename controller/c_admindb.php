@@ -4,14 +4,13 @@
  * @var Main $main - global
  */
 
-$field = ['pageTitle' => 'Администрирование'];
+$main->addControllerField(VC::BASE_PAGE_TITLE, 'Администрирование');
 
-$field[VC::BASE_CSS_LINKS] = [$main->url->getUrl(VC::CORE_CSS) . 'module/admindb.css?ver=3f0d36561c'];
-
-$field[VC::BASE_JS_LINKS] = [
-  $main->url->getUrl(VC::CORE_JS) . 'libs/handsontable.full.min.js?ver=f3bb2b6859',
-  $main->url->getUrl(VC::CORE_JS) . 'module/admindb.js?ver=f3b1b2b65119',
-];
+$main->addAssets([
+  'module/admindb.css',
+  'libs/handsontable.full.min.js',
+  'module/admindb.js',
+]);
 
 if ($main->url->request->has('tableName')) $tableActive = $main->url->request->get('tableName');
 else {
@@ -22,6 +21,6 @@ $pathLegend = $main->getCmsParam(VC::LEGEND_PATH);
 if ($pathLegend && file_exists($pathLegend)) require $pathLegend;
 unset($pathLegend);
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_ADMIN_DB_TEMPLATE, $main);
+$main->fireHook(VC::HOOKS_ADMIN_DB_TEMPLATE, $main);
 require $main->url->getRoutePath();
-$main->response->setContent(template('base', $field));
+$main->response->setContent(template());

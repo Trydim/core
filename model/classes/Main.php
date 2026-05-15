@@ -4,11 +4,12 @@ use JetBrains\PhpStorm\NoReturn;
 use RedBeanPHP\RedException;
 
 require __DIR__ . '/traits/MainTraits.php';
+require __DIR__ . '/traits/MainAssets.php';
 
 final class Main {
   use Authorization;
+  use Assets;
   use Dictionary;
-  use Cache;
   use Hooks;
   use Utilities;
 
@@ -140,7 +141,7 @@ final class Main {
     $this->setCmsParam(VC::ACCESS_MENU,
       array_filter($this->getCmsParam(VC::ACCESS_MENU),
         function ($item) use ($filter) {
-          if (is_array($item)) $item = $item['link'];
+          if (is_array($item)) $item = $item['link'] ?? $item[0];
 
           return !includes($filter, $item);
         }
@@ -260,13 +261,20 @@ final class Main {
   }
 
   public function setControllerField(mixed &$field): Main {
-/*    if (!empty($this->controllerField)) {
-      foreach ($this->controllerField as $k => $v) {
-        $field[$k] = $v;
+    foreach ($field as $key => $value) {
+      $current = $this->controllerField[$key] ?? null;
+
+      if (isset($current)) {
+        if (is_array($current) && is_array($value)) {
+          $this->controllerField[$key] = array_merge($current, $value);
+        } else {
+          $this->controllerField[$key] .= $value;
+        }
+      } else {
+        $this->controllerField[$key] = $value;
       }
     }
-*/
-    $this->controllerField =& $field;
+
     return $this;
   }
 
@@ -294,21 +302,6 @@ final class Main {
     }
     return $this;
   }
-
-  /* public function addControllerField(string $key, $value): Main {
-    if (!isset($this->controllerParam['field'])) $this->controllerParam['field'] = [];
-
-    if (isset($this->controllerParam['field'][$key])) {
-      $field =& $this->controllerParam['field'][$key];
-
-      if (is_array($field)) $field[] = $value;
-      else if (is_object($field)) $field->$key = $value;
-
-    } else {
-      $this->controllerParam['field'][$key] = $value;
-    }
-    return $this;
-  }*/
 
   public function getControllerField($key = '', $default = null): mixed {
     return empty($key) ? $this->controllerField : ($this->controllerField[$key] ?? $default);

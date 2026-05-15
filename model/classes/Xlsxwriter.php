@@ -77,12 +77,12 @@ class XLSXWriter {
   const EXCEL_2007_MAX_ROW = 1048576;
   const EXCEL_2007_MAX_COL = 16384;
 
-  protected string $title;
-  protected string $subject;
-  protected string $author;
-  protected bool $isRightToLeft;
-  protected string $company;
-  protected string $description;
+  protected string $title = '';
+  protected string $subject = '';
+  protected string $author = '';
+  protected bool $isRightToLeft = false;
+  protected string $company = '';
+  protected string $description = '';
   protected array $keywords = [];
   protected string $tempdir;
 
@@ -103,7 +103,7 @@ class XLSXWriter {
     date_default_timezone_get() or date_default_timezone_set('UTC');//php.ini missing tz, avoid warning
     is_writeable($this->tempFilename()) or self::log("Warning: tempdir " . sys_get_temp_dir() . " not writeable, use ->setTempDir()");
     class_exists('ZipArchive') or self::log("Error: ZipArchive class does not exist");
-    $this->addCellStyle('GENERAL', null);
+    $this->addCellStyle('GENERAL', '');
   }
 
   public function setTitle(string $title = ''): void { $this->title = $title; }
@@ -307,7 +307,7 @@ class XLSXWriter {
     foreach ($header_types as $v) {
       $number_format = self::numberFormatStandardized($v);
       $number_format_type = self::determineNumberFormatType($number_format);
-      $cell_style_idx = $this->addCellStyle($number_format, null);
+      $cell_style_idx = $this->addCellStyle($number_format, '');
       $column_types[] = array('number_format'      => $number_format,//contains Excel format like 'YYYY-MM-DD HH:MM:SS'
                               'number_format_type' => $number_format_type, //contains friendly format like 'datetime'
                               'default_cell_style' => $cell_style_idx,

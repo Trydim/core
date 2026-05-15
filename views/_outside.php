@@ -19,7 +19,6 @@ $jsLinksArr = array_merge([
   ],
   $jsLinks ?? []
 );
-//$jsLinksRes = $inline ? '' : [];
 
 $jsGlobalConst = json_encode([
   'DEBUG'         => DEBUG,
@@ -28,7 +27,7 @@ $jsGlobalConst = json_encode([
   'SITE_PATH'     => $main->url->getPath(),
   'MAIN_PHP_PATH' => $main->url->getHost() . $main->url->getPath() . 'outside.php',
   'PUBLIC_PAGE'   => PUBLIC_PAGE,
-  'URI_IMG'       => URI_IMG,
+  'URI_IMG'       => $main->getCmsParam(VC::URI_IMG),
   'URI_SHARE'     => $main->url->getBaseUri() . $main->getCmsParam('SHARE_PATH'),
   'AUTH_STATUS'   => $main->checkStatus(),
   'IS_DEAL'       => $main->isDealer(),

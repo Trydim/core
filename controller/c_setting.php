@@ -7,9 +7,9 @@
 $field = [
   'pageTitle' => 'Настройки',
   'footerContent' => $main->initDictionary(),
-  'cssLinks'   => [$main->url->getUrl(VC::CORE_CSS) . 'module/setting.css?ver=096616aa6f'],
-  'jsLinks'    => [$main->url->getUrl(VC::CORE_JS) . 'module/setting.js?ver=2239ad0927'],
 ];
+
+$main->addAssets(['module/setting.css', 'module/setting.js'])
 
 $field['footerContent'] .= $main->getFrontContent('dataUser', $main->getLogin('all'))
                            . $main->getSettings('json', true);

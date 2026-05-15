@@ -18,9 +18,9 @@ $publicConfig = [
   //'MAIL_PASSWORD' => 'eBsv3cj7LtofBLULy6ni';
 
   /** Раскомментировать, если требуется изменить путь */
-  //'PATH_CSS' => 'public/css/',
-  //'PATH_IMG' => 'public/images/',
-  //'PATH_JS'  => 'public/js/',
+  //'URI_IMG' => 'public/images/',
+  //'URI_CSS' => 'public/css/',
+  //'URI_JS'  => 'public/js/',
 
   /** Использовать БД для авторизации */
   //VC::USE_DATABASE => true,
@@ -56,18 +56,16 @@ $publicConfig = [
    */
   VC::PUBLIC_PAGE => 'calculator',
 
-  /** Какую библиотеку использовать (добавить в настройки) mpdf, html2pdf */
-  // внутри битрикс не доступно mpdf
-  //'PDF_LIBRARY' => 'mpdf',
-  /** PDF альбомный/портретный */
-  //'PDF_ORIENTATION' => 'L',
-
   /** Пункты меню какие показывать и последовательность (по умолчанию все страницы)
-  'admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'fileManager', 'statistic', 'users'
-  админ-ние   календарь   каталог    клиенты      дилеры     заказы    ФМ             статистика   мен-ры
+  'admindb', 'customers', 'dealers', 'orders', 'fileManager', 'users'
+  админ-ние   клиенты      дилеры     заказы    ФМ            мен-ры
   hr - черта в меню
   */
-  VC::ACCESS_MENU => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'orders', 'users', 'customPage'],
+  VC::ACCESS_MENU => [
+    'admindb', 'customers', 'dealers', 'orders', 'users', 'customPage',
+    ['customPage', 'pi-customIcon'],
+    ['link' => 'customPage', 'icon' => 'pi-customIcon'],
+  ],
 
   /**
    * Фильтр заказов
@@ -78,27 +76,16 @@ $publicConfig = [
   'FILTER_ORDERS' => false,
 
   /** Папка по умолчанию для файлового менеджера */
-  // 'SHARE_PATH' => 'public/images/',
+  //'SHARE_PATH' => 'public/images/',
 
   /** Контент редактор */
-  // VC::USE_CONTENT_EDITOR => true,
+  //VC::USE_CONTENT_EDITOR => true,
 
   /** Поддомены для дилеров */
   //'USE_DEAL_SUBDOMAIN' => true,
 
-  /** если базовый язык не совпадает с целевым, то будут загружать словари в из подпаки /lang/{TARGET_LANG}/dictionary.php */
-  /*'LOCALES' => [
-    'BASE_LANG' => 'ru',
-    'TARGET_LANG' => 'ru', //en, pl, ..
-    'ALL_LANGUAGES' => [
-      ['name' => 'Русский', 'code' => 'ru'],
-      ['name' => 'English', 'code' => 'en']
-    ],
-    'CSV_FILES' => [
-       'locales/common_phrases.csv',
-      'locales/user_fields.csv',
-    ]
-  ]*/
+  /** Доступны ли различные языки, по умолчанию нет */
+  //VC::LOCALES => true,
 ];
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.5
+-- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Фев 09 2022 г., 16:01
--- Версия сервера: 10.3.13-MariaDB-log
--- Версия PHP: 7.3.2
+-- Время создания: Июл 27 2021 г., 10:45
+-- Версия сервера: 10.4.12-MariaDB
+-- Версия PHP: 7.3.17
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -17,6 +16,26 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
+
+--
+-- Структура таблицы `client_orders`
+--
+
+CREATE TABLE `client_orders` (
+  `ID` int(10) UNSIGNED NOT NULL,
+  `create_date` timestamp NULL DEFAULT current_timestamp(),
+  `save_value` varchar(500) DEFAULT '{}',
+  `important_value` varchar(255) DEFAULT '{}',
+  `report_value` mediumblob DEFAULT NULL,
+  `total` float DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `client_orders`
+--
+
+INSERT INTO `client_orders` (`ID`, `save_value`, `important_value`, `total`) VALUES
+(1, '{}', '{}', 1);
 
 --
 -- Структура таблицы `customers`
@@ -35,6 +54,26 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`ID`, `name`, `ITN`, `contacts`) VALUES
 (1, 'Петя', '', '{\"phone\":\"+7 (123) 456 78 97\",\"email\":\"as@as.by\",\"address\":\"test\"}');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `files`
+--
+
+CREATE TABLE `files` (
+  `ID` int(10) UNSIGNED NOT NULL,
+  `name` varchar(255) DEFAULT 'noName',
+  `path` varchar(255) NOT NULL,
+  `format` varchar(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `files`
+--
+
+INSERT INTO `files` (`ID`, `name`, `path`, `format`) VALUES
+(1, 'file', 'file.jpg', 'jpg');
 
 -- --------------------------------------------------------
 
@@ -59,8 +98,8 @@ CREATE TABLE `money` (
 
 INSERT INTO `money` (`ID`, `code`, `name`, `short_name`, `main`) VALUES
 (1, 'USD', 'United State Dollar', '$', 1),
-(2, 'RUB', 'Российский рубль', 'руб.', 0),
-(3, 'BYN', 'рубль', 'руб.', 0);
+(2, 'RUB', 'Российский рубль', 'руб.', null),
+(3, 'BYN', 'Белорусский рубль', 'руб.', null);
 
 -- --------------------------------------------------------
 
@@ -101,7 +140,7 @@ CREATE TABLE `order_status` (
 
 INSERT INTO `order_status` (`ID`, `name`) VALUES
 (1, 'Заказ оформлен'),
-(2, 'Заказ сформирован');
+(2, 'Заказ оплачен');
 
 -- --------------------------------------------------------
 
@@ -146,28 +185,8 @@ CREATE TABLE `users` (
 -- Дамп данных таблицы `users`
 --
 
-INSERT INTO `users` (`ID`, `permission_id`, `login`, `password`, `name`, `contacts`, `register_date`, `activity`, `customization`, `hash`) VALUES
-(1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'Админ', '{\"64660\":5,\"71610\":5,\"permissionId\":\"3\",\"phone\":\"\",\"email\":\"\",\"activity\":\"on\"}', '2020-07-28 21:00:00', 1, '{}', '$2y$10$Qk8mMRsCrBmVBbyROARRLO4nSr3q8YdLr6vHA35CZfRREhz/h.zz.');
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `files`
---
-
-CREATE TABLE `files` (
-  `ID` int(10) UNSIGNED NOT NULL,
-  `name` varchar(255) DEFAULT 'noName',
-  `path` varchar(255) NOT NULL,
-  `format` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Дамп данных таблицы `files`
---
-
-INSERT INTO `files` (`ID`, `name`, `path`, `format`) VALUES
-    (1, 'file', 'file.jpg', 'jpg');
+INSERT INTO `users` (`ID`, `permission_id`, `login`, `password`, `name`) VALUES
+(1, 1, 'admin', '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS', 'admin');
 
 -- --------------------------------------------------------
 
@@ -191,9 +210,28 @@ CREATE TABLE `dealers` (
 --
 
 --
+-- Индексы таблицы `client_orders`
+--
+ALTER TABLE `client_orders`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Индексы таблицы `codes`
+--
+ALTER TABLE `codes`
+  ADD PRIMARY KEY (`symbol_code`),
+  ADD UNIQUE KEY `codes_symbol_code_uindex` (`symbol_code`);
+
+--
 -- Индексы таблицы `customers`
 --
 ALTER TABLE `customers`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Индексы таблицы `files`
+--
+ALTER TABLE `files`
   ADD PRIMARY KEY (`ID`);
 
 --
@@ -232,12 +270,6 @@ ALTER TABLE `users`
   ADD KEY `permission_id` (`permission_id`);
 
 --
--- Индексы таблицы `files`
---
-ALTER TABLE `files`
-    ADD PRIMARY KEY (`ID`);
-
---
 -- Индексы таблицы `dealers`
 --
 ALTER TABLE `dealers`
@@ -249,10 +281,22 @@ ALTER TABLE `dealers`
 --
 
 --
+-- AUTO_INCREMENT для таблицы `client_orders`
+--
+ALTER TABLE `client_orders`
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT для таблицы `customers`
 --
 ALTER TABLE `customers`
   MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `files`
+--
+ALTER TABLE `files`
+    MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `money`
@@ -285,17 +329,10 @@ ALTER TABLE `users`
   MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT для таблицы `files`
---
-ALTER TABLE `files`
-    MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT для таблицы `dealers`
 --
 ALTER TABLE `dealers`
     MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

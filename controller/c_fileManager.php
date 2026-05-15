@@ -50,11 +50,10 @@ $field = [
   VC::BASE_PAGE_TITLE => 'File manager',
 ];
 
-$field[VC::BASE_CSS_LINKS] = [$main->url->getUrl(VC::CORE_CSS) . 'module/fileManager.css?ver=fda1c25660'];
-$field[VC::BASE_JS_LINKS] = [$main->url->getUrl(VC::CORE_JS) . 'module/fileManager.js?ver=45223fc11b'];
+$main->setControllerField($field)
+     ->addAssets(['module/fileManager.css', 'module/fileManager.js'])
+     ->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main);
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main);
-ob_start();
-include $main->url->getRoutePath();
-$field['content'] = ob_get_clean();
+$field[VC::BASE_CONTENT] = template('fileManager');
+
 $main->response->setContent(template('base', $field));
