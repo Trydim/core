@@ -253,7 +253,7 @@ trait Authorization {
   /**
    * Get array of pages
    */
-  public function getSideMenu(bool $first = false, bool $withParam = false): array
+  public function getSideMenu(bool $first = false, bool $withParam = false): string|array
   {
     $sideMenu = $withParam ? $this->sideMenu : $this->getSideLinkMenu();
 

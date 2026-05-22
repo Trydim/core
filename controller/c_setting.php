@@ -9,7 +9,7 @@ $field = [
   'footerContent' => $main->initDictionary(),
 ];
 
-$main->addAssets(['module/setting.css', 'module/setting.js'])
+$main->addAssets(['module/setting.css', 'module/setting.js']);
 
 $field['footerContent'] .= $main->getFrontContent('dataUser', $main->getLogin('all'))
                            . $main->getSettings('json', true);
@@ -18,10 +18,10 @@ if (USE_DATABASE && $main->getLogin('isAdmin')) {
   $permissions['permissions'] = $main->db->loadTable('permission');
 
   $permissions['permissions'] = array_map(function ($row) {
-    $row['id'] = intval($row['ID']);
+    $row['id'] = intval($row['id']);
     $row['name'] = gTxt($row['name']);
     $row['properties'] = json_decode($row['properties'], true);
-    unset($row['ID']);
+    unset($row['id']);
     return $row;
   }, $permissions['permissions']);
 

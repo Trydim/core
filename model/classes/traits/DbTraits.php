@@ -8,33 +8,33 @@ trait DbOrders
   {
     switch ($field) {
       default: return $field;
-      case 'id': case 'ID': return 'O.ID';
+      case 'id': return 'O.id';
       case 'userName': return 'U.name';
       case 'customerName': return 'C.name';
-      case 'statusId': return 'S.ID';
+      case 'statusId': return 'S.id';
       case 'status': return 'S.name';
     }
   }
 
   private function getBaseOrdersQuery(bool $includeValues = false): string
   {
-    return "SELECT O.ID AS 'ID',
+    return "SELECT O.id AS 'id',
             create_date AS 'createDate', last_edit_date AS 'lastEditDate',
-            U.ID AS 'userId', U.name AS 'userName',
-            C.ID AS 'customerId', C.name AS 'customerName', C.contacts AS 'customerContacts',
-            S.ID AS 'statusId', S.name AS 'status', total,
+            U.id AS 'userId', U.name AS 'userName',
+            C.id AS 'customerId', C.name AS 'customerName', C.contacts AS 'customerContacts',
+            S.id AS 'statusId', S.name AS 'status', total,
             important_value AS 'importantValue'"
       . ($includeValues ? ", save_value AS 'saveValue', report_value AS 'reportValue'" : "\n") .
       "FROM " . $this->pf('orders') . " O
-      LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.ID
-      LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.ID
-      JOIN " . $this->pf('order_status') . " S ON O.status_id = S.ID\n";
+      LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.id
+      LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.id
+      JOIN " . $this->pf('order_status') . " S ON O.status_id = S.id\n";
   }
 
   public function getBaseOrdersQueryColumns(): array
   {
     return [
-      'ID', 'createDate', 'lastEditDate',
+      'id', 'createDate', 'lastEditDate',
       'userName',
       'customerId', 'customerName', 'customerContacts',
       'statusId', 'status',
@@ -97,7 +97,7 @@ trait DbOrders
       }
     }
 
-    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'id');
     $sql .= ' ' . $this->getPaginatorQuery($pageParam);
 
     return $this->jsonParseField(self::getAll($sql));
@@ -116,7 +116,7 @@ trait DbOrders
     if ($oneOrder && is_array($ids)) {
       $ids = array_values($ids)[0];
 
-      if (!is_string($ids)) {
+      if (is_array($ids)) {
         throw new InvalidArgumentException(
           '[DbTraits:loadOrdersById]: First argument must be single-level array or string'
         );
@@ -124,10 +124,10 @@ trait DbOrders
     }
 
     if (is_array($ids)) {
-      $sql .= " O.ID = " . implode(' OR O.ID = ', $ids) . "\n";
+      $sql .= " O.id = " . implode(' OR O.id = ', $ids) . "\n";
       $res = self::getAll($sql);
     } else {
-      $sql .= "O.ID = :id";
+      $sql .= "O.id = :id";
       $res = [self::getRow($sql, [':id' => $ids])];
     }
 
@@ -141,7 +141,7 @@ trait DbOrders
     $searchValue = '%' . $searchValue . '%';
 
     $sql = $this->getBaseOrdersQuery($includeValues);
-    $sql .= "WHERE (O.ID like '$searchValue' ";
+    $sql .= "WHERE (O.id like '$searchValue' ";
     $sql .= "OR O.important_value like '$searchValue' ";
     $sql .= "OR C.contacts like '$searchValue' ";
     $sql .= "OR U.name like '$searchValue' ";
@@ -169,7 +169,7 @@ trait DbOrders
       $sql .= "\nAND O.status_id = '$filters[statusId]'\n";
     }
 
-    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'id');
     $sql .= $this->getPaginatorQuery($pageParam);
 
     return $this->jsonParseField(self::getAll($sql));
@@ -209,7 +209,7 @@ trait DbOrders
    */
   public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []): ?array
   {
-    $sql = "SELECT ID, create_date AS 'createDate',
+    $sql = "SELECT id, create_date AS 'createDate',
             save_value AS 'saveValue',
             important_value AS 'importantValue',
             total
@@ -217,9 +217,9 @@ trait DbOrders
 
     if (count($dateRange)) $sql .= "WHERE create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
     if (count($ids)) {
-      $sql .= "WHERE ID = ";
+      $sql .= "WHERE id = ";
       if (count($ids) === 1) $sql .= $ids[0] . " ";
-      else $sql .= implode(' OR ID = ', $ids) . " ";
+      else $sql .= implode(' OR id = ', $ids) . " ";
     }
 
     $sql .= $this->getPaginatorQuery($pageParam);
@@ -229,13 +229,13 @@ trait DbOrders
 
   public function loadVisitorOrderById(string $id): array
   {
-    $sql = "SELECT ID, create_date AS 'createDate',
+    $sql = "SELECT id, create_date AS 'createDate',
             save_value AS 'saveValue',
             important_value AS 'importantValue',
             report_value AS 'reportValue',
             total
             FROM " . $this->pf('client_orders') . "\n
-            WHERE ID = :id";
+            WHERE id = :id";
 
     return $this->jsonParseField(self::getRow($sql, [':id' => $id]));
   }
@@ -244,15 +244,15 @@ trait DbOrders
   {
     $searchValue = '%' . $searchValue . '%';
 
-    $sql = "SELECT ID, create_date AS 'createDate',
+    $sql = "SELECT id, create_date AS 'createDate',
             save_value AS 'saveValue',
             important_value AS 'importantValue',
             total
             FROM " . $this->pf('client_orders') . "\n
-            WHERE ID like '$searchValue'
+            WHERE id like '$searchValue'
             OR importantValue like '$searchValue'";
 
-    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'ID');
+    $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'id');
     $sql .= $this->getPaginatorQuery($pageParam);
 
     return $this->jsonParseField(self::getAll($sql));
@@ -267,7 +267,7 @@ trait DbOrders
 
     if (strlen($filters)) $sql .= 'WHERE ' . $filters . "\n ";
 
-    $sql .= "ORDER BY sort, ID";
+    $sql .= "ORDER BY sort, id";
 
     return self::getAll($sql);
   }
@@ -279,7 +279,7 @@ trait DbUsers
   {
     switch ($field) {
       default: return $field;
-      case 'id': case 'ID': return 'U.ID';
+      case 'id': return 'U.id';
       case 'name': return 'U.name';
       case 'permissionName': return 'P.name';
     }
@@ -306,7 +306,7 @@ trait DbUsers
     }
   }
 
-  public function getUser(string $login, string $column = 'ID'): ?array
+  public function getUser(string $login, string $column = 'id'): ?array
   {
     $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
       [':login' => $login]
@@ -319,22 +319,22 @@ trait DbUsers
   public function getUserById(int $userId): ?array
   {
     return $this->jsonParseField(self::getRow(
-      "SELECT U.ID AS 'id', U.name AS 'name', U.contacts AS 'contacts',
-                  P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
+      "SELECT U.id AS 'id', U.name AS 'name', U.contacts AS 'contacts',
+                  P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
        FROM " . $this->pf('users') . " U
-       JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
-       WHERE U.ID = :id",
+       JOIN " . $this->pf('permission') . " P on U.permission_id = P.id
+       WHERE U.id = :id",
       [':id' => $userId]
     ));
   }
 
   public function getUserByLogin(string $login): ?array
   {
-    $sql = "SELECT U.ID AS 'id', login,  password, hash,
+    $sql = "SELECT U.id AS 'id', login,  password, hash,
                    U.name AS 'name', contacts, customization, activity,
-                   P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
+                   P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
             FROM " . $this->pf('users') . " U
-            JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
+            JOIN " . $this->pf('permission') . " P on U.permission_id = P.id
             WHERE login = :login";
 
     return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
@@ -343,22 +343,22 @@ trait DbUsers
   public function getUserByOrderId(int|string $orderId): ?array
   {
     return $this->jsonParseField(self::getRow(
-      "SELECT U.ID AS 'id', U.name AS 'name', U.contacts AS 'contacts',
-                  P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
+      "SELECT U.id AS 'id', U.name AS 'name', U.contacts AS 'contacts',
+                  P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
        FROM " . $this->pf('users') . " U
-       JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
-       JOIN " . $this->pf('orders') . " O ON U.ID = O.user_id
-       WHERE O.ID = :id", [':id' => $orderId]
+       JOIN " . $this->pf('permission') . " P on U.permission_id = P.id
+       JOIN " . $this->pf('orders') . " O ON U.id = O.user_id
+       WHERE O.id = :id", [':id' => $orderId]
     ));
   }
 
   public function checkPassword(string $login, string $password): array|bool
   {
     if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
-      $sql = "SELECT ID as 'id', name, login, password FROM " . $this->pf('users') . " WHERE ID = :id";
+      $sql = "SELECT id, name, login, password FROM " . $this->pf('users') . " WHERE id = :id";
       return self::getRow($sql, [':id' => 1]);
     } else if (USE_DATABASE) {
-      $sql = "SELECT ID as 'id', name, login, password
+      $sql = "SELECT id, name, login, password
               FROM " . $this->pf('users') . " WHERE login = :login and activity = 1";
       $user = self::getRow($sql, [':login' => $login]);
     } else {
@@ -384,7 +384,7 @@ trait DbUsers
 
   public function findToken(string $token): array
   {
-    $sql = "SELECT ID as 'id', name, login, password
+    $sql = "SELECT id, name, login, password
             FROM " . $this->pf('users') . " WHERE contacts LIKE :contacts and activity = 1";
     return self::getRow($sql, [':contacts' => "%$token%"]);
   }
@@ -395,7 +395,7 @@ trait DbUsers
   public function changeUser(int|string $loginId, array $param): void
   {
     $user = self::xdispense($this->pf('users'));
-    $user->ID = $loginId;
+    $user->id = $loginId;
     foreach ($param as $key => $value) {
       $user->$key = $value;
     }
@@ -407,11 +407,11 @@ trait DbUsers
    */
   public function loadUsers(array $pageParam): array
   {
-    $sql = "SELECT U.ID AS 'ID', login, U.name AS 'name', contacts,
+    $sql = "SELECT U.id AS 'id', login, U.name AS 'name', contacts,
                    permission_id AS 'permissionId', P.name AS 'permissionName',
                    register_date AS 'registerDate', activity
             FROM " . $this->pf('users') . " U
-            LEFT JOIN " . $this->pf('permission') . " P ON U.permission_id = P.ID\n";
+            LEFT JOIN " . $this->pf('permission') . " P ON U.permission_id = P.id\n";
 
     $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn']);
 
@@ -424,7 +424,7 @@ trait DbUsers
   {
     if (USE_DATABASE) {
       $user = self::xdispense($this->pf('users'));
-      $user->ID = $loginId;
+      $user->id = $loginId;
       $user->hash = $hash;
       self::store($user);
     } else {

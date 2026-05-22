@@ -344,9 +344,6 @@ final class Main {
 
     $this->setControllerField($field)->fireHook($target . 'Template', $field);
     $this->setControllerViewField($this->url->getRoutePath());
-    // Can be set to view component
-    if ($this->getControllerField(VC::BASE_IS_GLOBAL)) $field[VC::BASE_GLOBAL] = $field[VC::BASE_CONTENT];
-
     $this->response->setContent(template(OUTSIDE ? '_outside' : 'base',  $this->getControllerField()));
     return $this;
   }

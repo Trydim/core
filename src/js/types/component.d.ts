@@ -15,7 +15,7 @@ declare class LoaderIcon {
 }
 
 declare class Observer {
-  addArgument(): void
+  addArgument(name: string, object: object): void
   remove(): void
   getListPublisher(): {}
   searchPublisherKey(searchKey: string): string

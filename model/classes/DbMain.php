@@ -115,7 +115,6 @@ class DbMain extends R {
     $sortColumn = AQueryWriter::camelsSnake($pageParam['sortColumn'] ?? 'id');
     $sortDirect = boolValue($pageParam['sortDirect'] ?? false) ? 'DESC' : '';
 
-    if (includes($sortColumn, 'id')) $sortColumn = strtoupper($sortColumn);// Todo у всех таблиц убрать верхний регистр ID
     if (includes($sortColumn, '.')) $sortColumn = ucfirst($sortColumn);
     $pageNumber *= $countPerPage;
     return "ORDER BY $sortColumn " . $sortDirect . " LIMIT $countPerPage OFFSET $pageNumber";
@@ -123,7 +122,6 @@ class DbMain extends R {
 
   public function jsonParseField(array $arr): array {
     $result = [];
-    //$arr = array_flatten($arr);
 
     foreach ($arr as $key => $value) {
       if (is_array($value)) {
@@ -216,7 +214,6 @@ class DbMain extends R {
   public function togglePrefix(): bool {
     return $this->usePrefix = !$this->usePrefix;
   }
-
 
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
@@ -346,10 +343,10 @@ class DbMain extends R {
                                     " WHERE $columnName = :value", [':value' => $value]));
   }
 
-  public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'ID'): int {
+  public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'id'): int {
     $dbTable = $this->pf($dbTable);
     $count = 0;
-    if ($primaryKey !== 'ID') {
+    if ($primaryKey !== 'id') {
       foreach ($ids as $id) {
         $count += self::exec("DELETE FROM $dbTable WHERE $primaryKey = '$id'");
       }
@@ -516,7 +513,7 @@ class DbMain extends R {
    */
   public function getFiles(mixed $ids = false): array {
     if (is_string($ids) && !empty($ids)) $ids = explode(',', $ids);
-    $filters = $ids ? ' ID = ' . implode(' or ID = ', $ids) : '';
+    $filters = $ids ? ' id = ' . implode(' or id = ', $ids) : '';
     return $this->selectQuery('files', '*', $filters);
   }
 
@@ -545,169 +542,6 @@ class DbMain extends R {
 
     return $files;
   }
-
-
-  // Elements
-  //------------------------------------------------------------------------------------------------------------------
-
-  public function loadElements(int $sectionID, int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'C.name', bool $sortDirect = false): ?array {
-    $pageNumber *= $countPerPage;
-
-    $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
-            FROM " . $this->pf('elements') . " E
-            JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
-            JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
-            WHERE E.section_parent_id = $sectionID
-            GROUP BY E.ID
-            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
-
-    return self::getAll($sql);
-  }
-
-  public function searchElements(string $searchValue, int $pageNumber = 0, int $countPerPage = 20, string $sortColumn = 'C.name', bool $sortDirect = false): array {
-    $pageNumber *= $countPerPage;
-    $searchValue = str_replace(' ', '%', $searchValue);
-
-    $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
-            FROM " . $this->pf('elements') . " E
-            JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
-            JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
-            WHERE E.name LIKE '%$searchValue%'
-            GROUP BY E.ID
-            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
-
-    $res = self::getAll($sql);
-
-    return [
-      'elements'          => array_slice($res, $pageNumber, $countPerPage),
-      'countRowsElements' => count($res)
-    ];
-  }
-
-
-  // Options
-  //------------------------------------------------------------------------------------------------------------------
-
-  private function setImages(string $imagesIds = ''): array {
-    $images = $this->getFiles($imagesIds);
-
-    return array_map(function ($item) {
-      $path = FS::findingFile($item['path']);
-      $item['id'] = $item['ID'];
-      $item['path'] = $item['src'] = $path
-        ? $this->main->url->getUri(true) . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)
-        : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
-
-      unset($item['ID']);
-      return $item;
-    }, $images);
-  }
-  private function getAlias(string $table): string {
-    $tables = ['codes.', 'money.', 'options_elements.', 'elements.', 'units.'];
-    $alias = ['C.', 'M.', 'O.', 'E.', 'U.'];
-    $table = str_replace($tables, $alias, $table);
-
-    $cols = ['.id', '.type', '.unit', '.lastDate'];
-    $alias = ['.ID', '.element_type_code', '.short_name', '.last_edit_date'];
-    return str_replace($cols, $alias, $table);
-  }
-
-  public function loadFiles(): array {
-    return $this->setImages();
-  }
-
-  /**
-   * For catalog page
-   */
-  public function openOptions(string $elementID): ?array {
-    $sql = "SELECT O.ID AS 'id',
-                   MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId',
-                   MO.short_name as 'moneyOutputName', MO.ID AS 'moneyOutputId',
-                   images_ids AS 'images', properties,
-                   O.name AS 'name', U.ID AS 'unitId', U.name AS 'unitName', O.last_edit_date AS 'lastEditDate', O.activity AS 'activity', sort,
-                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
-            FROM " . $this->pf('options_elements') . " O
-            JOIN " . $this->pf('money') . " MI on MI.ID = O.money_input_id
-            JOIN " . $this->pf('money') . " MO on MO.ID = O.money_output_id
-            JOIN " . $this->pf('units') . " U on U.ID = O.unit_id
-            WHERE element_id = $elementID";
-
-    return array_map(function ($option) {
-      // set images
-      $option['images'] = strlen($option['images']) ? $this->setImages($option['images']) : [];
-
-      // set property
-      $option['properties'] = json_decode($option['properties'] ?: '[]');
-
-      return $option;
-    }, self::getAll($sql));
-  }
-
-  /**
-   * Load for calculator
-   */
-  public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
-    $sql = "SELECT O.ID AS 'id', element_id AS 'elementId', 
-                   E.element_type_code AS 'type', E.sort AS 'elementSort',
-                   O.name AS 'name', U.short_name AS 'unit', O.activity AS 'activity',
-                   O.sort AS 'sort', O.last_edit_date AS 'lastDate', properties, images_ids AS 'images',
-                   MI.code AS 'moneyInput', MO.code AS 'moneyOutput',
-                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
-            FROM " . $this->pf('options_elements') . " O
-            JOIN " . $this->pf('elements') . " E ON E.ID = O.element_id
-            JOIN section S ON S.ID = E.section_parent_id
-            JOIN " . $this->pf('money') . " MI ON MI.ID = O.money_input_id
-            JOIN " . $this->pf('money') . " MO ON MO.ID = O.money_output_id
-            JOIN " . $this->pf('units') . " U ON U.ID = O.unit_id
-            WHERE S.active <> 0 AND E.activity <> 0 AND O.activity <> 0";
-
-    // Filter
-    if (count($filter)) {
-      $filterArr = [];
-      foreach ($filter as $k => $values) {
-        $k = $this->getAlias(AQueryWriter::camelsSnake($k));
-        $values = convertToArray($values);
-        $str = '(';
-        foreach($values as $index => $v) {
-          $index > 0 && $str .= " OR ";
-          $str .= "$k LIKE '$v'";
-        }
-        $filterArr[] = $str . ')';
-      }
-
-      $sql .= ' AND ' . implode(' AND ', $filterArr);
-      unset($filterArr, $filter, $k, $v, $values, $str, $index);
-    }
-    // Sorting
-    $sql .= ' ORDER BY E.sort, O.sort';
-    // Paginate
-    if ($countPerPage !== -1) {
-      $pageNumber *= $countPerPage;
-      $sql .= " LIMIT $countPerPage OFFSET $pageNumber";
-    }
-
-    $options = self::getAll($sql);
-
-    return array_map(function ($option) {
-      // Set images
-      if (strlen($option['images'])) {
-        $option['images'] = $this->setImages($option['images']);
-      }
-
-      // Set property
-      $properties = json_decode($option['properties'] ?: '[]', true);
-      $option['properties'] = [];
-      foreach ($properties as $property => $id) {
-        $propName = str_replace('prop_', '', $property);
-        $option['properties'][$propName] = $this->getPropertyTable($id, $property);
-      }
-
-      return $option;
-    }, $options);
-  }
-
 
   // Settings/Dealers Properties only main cms
   //------------------------------------------------------------------------------------------------------------------
@@ -762,7 +596,7 @@ class DbMain extends R {
     $prop = $props[$propName];
 
     if (isset($prop['simple'])) return $this->parseSimpleProperty($prop['type'], $propValue);
-    foreach ($props[$propName] as $item) if ($item['ID'] === $propValue) return $item;
+    foreach ($props[$propName] as $item) if ($item['id'] === $propValue) return $item;
     return ['name' => "Prop item: $propValue in $propName - not found!"];
   }
 
@@ -771,7 +605,7 @@ class DbMain extends R {
     //$dbTable = $this->pf($dbTable);
 
     $sql = "CREATE TABLE $dbTable (
-            `ID` int(10) UNSIGNED NOT NULL,
+            `id` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
 
     if (count($params)) {
@@ -781,8 +615,8 @@ class DbMain extends R {
     }
 
     $error = self::exec($sql . ')');
-    !$error && $error = self::exec("ALTER TABLE `$dbTable` ADD PRIMARY KEY (`ID`)");
-    !$error && $error = self::exec("ALTER TABLE `$dbTable` MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
+    !$error && $error = self::exec("ALTER TABLE `$dbTable` ADD PRIMARY KEY (`id`)");
+    !$error && $error = self::exec("ALTER TABLE `$dbTable` MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
 
     return $error;
   }
@@ -821,7 +655,7 @@ class DbMain extends R {
   }
 
   public function loadPropertyTable(string $dbTable, array $ids): array {
-    return self::getAll("SELECT * FROM $dbTable WHERE ID IN (" . self::genSlots($ids) . ' )', $ids);
+    return self::getAll("SELECT * FROM $dbTable WHERE id IN (" . self::genSlots($ids) . ' )', $ids);
   }
 
   public function delPropertyTable(string $dbTables): void
@@ -844,32 +678,31 @@ class DbMain extends R {
    * @param array{pageNumber: int, countPerPage: int, sortColumn: string, sortDirect: bool} $pageParam
    */
   public function loadCustomers(array $pageParam, array $ids = []): array {
-    $sql = "SELECT C.ID as 'id', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
+    $sql = "SELECT C.id as 'id', name, ITN, contacts, GROUP_CONCAT(O.id) as 'orders'
       FROM " . $this->pf('customers') . " C
-      LEFT JOIN " . $this->pf('orders') . " O on C.ID = O.customer_id\n";
+      LEFT JOIN " . $this->pf('orders') . " O on C.id = O.customer_id\n";
 
     if (count($ids)) {
-      $sql .= "WHERE C.ID = ";
+      $sql .= "WHERE C.id = ";
       if (count($ids) === 1) $sql .= $ids[0] . " ";
-      else $sql .= implode(' OR C.ID = ', $ids) . " ";
+      else $sql .= implode(' OR C.id = ', $ids) . " ";
     }
 
-    $sql .= "GROUP BY C.ID\n";
+    $sql .= "GROUP BY C.id\n";
 
     if (intval($pageParam['countPerPage']) < 1000) $sql .= $this->getPaginatorQuery($pageParam);
 
     return self::getAll($sql);
   }
 
-  public function loadCustomerByOrderId(int $orderId): array {
-    $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts
+  public function loadCustomerByOrderId(int|string $orderId): array {
+    $sql = "SELECT C.id as 'id', C.name as 'name', ITN, contacts
       FROM " . $this->pf('orders') . " O 
-      LEFT JOIN " . $this->pf('customers') . " C ON C.ID = O.customer_id
-      WHERE O.ID = :id";
+      LEFT JOIN " . $this->pf('customers') . " C ON C.id = O.customer_id
+      WHERE O.id = :id";
 
     return self::getRow($sql, [':id' => $orderId]);
   }
-
 
   // Money
   //--------------------------------------------------------------------------------------------------------------------
@@ -901,7 +734,7 @@ class DbMain extends R {
     $date = date($this::DB_DATE_FORMAT);
 
     foreach ($rate as $currency) {
-      $beans->id = $currency['ID'];
+      $beans->id = $currency['id'];
       $beans->scale = $currency['scale'];
       $beans->rate = $currency['rate'];
       $beans->lastEditDate = $date;
@@ -940,7 +773,7 @@ class DbMain extends R {
     $sqlValue = $m->url->getSubDomain();
     if (($sqlValue === '' || $sqlValue === 'dev') && !$m->isDealer()) return false;
 
-    $sql = "SELECT ID as 'id', name, cms_param AS 'cmsParam' FROM dealers";
+    $sql = "SELECT id, name, cms_param AS 'cmsParam' FROM dealers";
 
     // Check by subdomain
     if ($sqlValue && $sqlValue !== 'dev') {
@@ -950,7 +783,7 @@ class DbMain extends R {
       $sqlValue = $m->getCmsParam(VC::DEALER_ID);
       // Check by dealer id
       if ($sqlValue) {
-        $sql .= " WHERE ID = :value";
+        $sql .= " WHERE id = :value";
       }
       // Check by dealer link
       else {
@@ -963,8 +796,6 @@ class DbMain extends R {
     $dealer = $this->jsonParseField(self::getRow($sql, [':value' => $sqlValue]));
 
     if (isset($dealer['id']) && is_dir(ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $dealer['id'])) {
-      $this->prefix = $dealer['cmsParam']['dbPrefix'] ?? $dealer['cmsParam']['prefix']; // Support old name
-
       $m->setCmsParam(VC::IS_DEALER, true)
         ->setCmsParam(VC::DEALER_ID, $dealer['id'])
         ->setCmsParam(VC::PROJECT_TITLE, $dealer['name']);
@@ -976,7 +807,7 @@ class DbMain extends R {
   }
 
   public function loadDealers(bool $activity = false, bool $parseSettings = true): array {
-    $sql = "SELECT ID AS 'id', cms_param AS 'cmsParam', name, contacts, register_date AS 'registerDate', activity, settings
+    $sql = "SELECT id AS 'id', cms_param AS 'cmsParam', name, contacts, register_date AS 'registerDate', activity, settings
             FROM dealers";
 
     if ($activity) $sql .= " WHERE activity <> 0";
@@ -1012,7 +843,7 @@ class DbMain extends R {
         if ($index >= $countDealers) break;
 
         $dealer = $dealers[$index];
-        $sql .= " UNION SELECT ID as 'id', name, login, password, "
+        $sql .= " UNION SELECT id, name, login, password, "
               . "'$dealer[id]' as dealerId, "
               . "'$dealer[urlPrefix]' as urlPrefix, "
               . "'$dealer[dbPrefix]' as dbPrefix "
@@ -1029,17 +860,33 @@ class DbMain extends R {
     return $result;
   }
 
-  public function loadDealerById(?string $id = null, bool $parseSettings = true): array {
-    $id = $id ?? $this->main->getCmsParam('dealerId');
+  public function loadDealerByIds(array $ids, bool $parseSettings = true): array {
+    if (count($ids) === 0) return [];
 
-    $sql = "SELECT ID AS 'id', name, contacts,
+    $params = [];
+    $placeholders = [];
+    foreach (array_values($ids) as $index => $id) {
+      $placeholder = ":id$index";
+      $placeholders[] = $placeholder;
+      $params[$placeholder] = $id;
+    }
+
+    $sql = "SELECT id, name, contacts,
                    cms_param AS 'cmsParam',
                    register_date AS 'registerDate', activity, settings
             FROM dealers
-            WHERE ID = :id";
+            WHERE id IN (" . implode(', ', $placeholders) . ")";
 
-    $dealer = $this->jsonParseField(self::getRow($sql, [':id' => $id]));
+    $dealers = $this->jsonParseField(self::getAll($sql, $params));
 
-    return $parseSettings ? $this->parseDealerSettings([$dealer])[0] : $dealer;
+    return $parseSettings ? $this->parseDealerSettings($dealers) : $dealers;
+  }
+
+  public function loadDealerById(?string $id = null, bool $parseSettings = true): array {
+    $id = $id ?? $this->main->getCmsParam('dealerId');
+
+    $dealers = $this->loadDealerByIds([$id], $parseSettings);
+
+    return $dealers[0] ?? [];
   }
 }

@@ -274,6 +274,8 @@ export declare interface CMSGlobalObject {
   getSetting(key: string)
 
   Valid: typeof Valid
+
+  observer: Observer
 }
 
 export declare global {
