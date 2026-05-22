@@ -171,7 +171,7 @@ trait Authorization {
   {
     if (count($this->sideLinkMenu) === 0) {
       $this->sideLinkMenu = array_map(function ($item) {
-        return is_array($item) ? $item['link'] : $item;
+        return is_array($item) ? ($item['label'] ?? $item['link'] ?? $item[0]) : $item;
       }, $this->sideMenu);
     }
 

@@ -1,3 +1,5 @@
+@include font('nbrb')
+
 .main-wrapper {
   --theme-sidebar-width: #{$theme-sidebar-width};
   opacity: 0;

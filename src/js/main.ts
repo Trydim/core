@@ -119,10 +119,10 @@ const startPreloader = () => {
   f.show(f.gI('preloader'));
   f.gI('mainWrapper').classList?.remove('show');
 }
-const stopPreloader = (short = true) => {
+const stopPreloader = () => {
   if (f.OUTSIDE) return;
   f.hide(f.gI('preloader'));
-  short && f.gI('mainWrapper').classList?.add('show');
+  f.gI('mainWrapper').classList?.add('show');
 }
 
 // Event function
@@ -243,7 +243,7 @@ const onEvent = () => {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (f.gI('authForm')) { stopPreloader(false); return; }
+  if (f.gI('authForm')) { stopPreloader(); return; }
 
   cancelFormSubmit();
   loadLangList();
