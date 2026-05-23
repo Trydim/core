@@ -17,7 +17,6 @@ $publicConfig = [
 // DB connect/config
 
 $dbConfig = [
-  'dbPrefix'   => '$prefix',
   'dbHost'     => '$dbHost',
   'dbName'     => '$dbName',
   'dbUsername' => '$dbUsername',

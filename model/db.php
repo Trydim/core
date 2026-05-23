@@ -955,9 +955,10 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'dealersDatabaseEdit':
-      //if (password_verify($safeKey ?? '', '')) return;
-
-      $result['report'] = $main->dealer->updateDatabase($selectedDealer ?? [], $sqlText ?? '');
+      /**
+       * @deprecated
+       */
+      $result['report'] = 'dealersDatabaseEdit: deprecated';
       break;
 
       // History

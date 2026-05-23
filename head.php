@@ -14,7 +14,7 @@ require __DIR__ . '/cmsSetting.php';
 
 if ($mode = $main->getCmsParam('mode')) {
   $componentPath = __DIR__ . '/model/';
-  extract($_REQUEST);
+  extract($main->url->request->all());
   $cmsAction = $dbAction ?? $cmsAction ?? 'noAction';
 
   if (DEBUG || in_array($mode, ['auth', 'tBot', 'docs']) || $main->checkAction($cmsAction)) {

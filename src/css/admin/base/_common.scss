@@ -1,4 +1,10 @@
-@include font('nbrb')
+@font-face {
+  font-family: nbrb;
+  font-display: swap;
+  src: url("../../fonts/nbrb.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
 
 .main-wrapper {
   --theme-sidebar-width: #{$theme-sidebar-width};

@@ -211,8 +211,8 @@ class UrlGenerator {
     return $requestUri;
   }
   private function setMode(): void {
-    if (isset($_REQUEST['mode'])) {
-      $this->main->setCmsParam('mode', $_REQUEST['mode']);
+    if ($this->request->has('mode')) {
+      $this->main->setCmsParam('mode', $this->request->get('mode'));
       $this->route = false;
     }
   }
@@ -257,13 +257,6 @@ class UrlGenerator {
   }
   private function setCoreUrls(): void
   {
-    // Определять автоматом.
-    /*$sitePath = trim(str_replace('/', ' ', $this->sitePath));
-    $siteLevel = count(explode(' ', $sitePath));
-    //$corePath = trim(str_replace($_SERVER['DOCUMENT_ROOT'] . '/', ' ', $this->corePath));
-    //$coreLevel = count(explode(' ', $corePath));*/
-    //$coreUrl = str_repeat('../', $siteLevel) . 'core/';
-
     $this->coreUrl = $this->getBaseUri() . $this->corePath;
   }
 

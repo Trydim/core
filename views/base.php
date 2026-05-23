@@ -7,7 +7,7 @@
 
 $isAuth = $main->checkStatus();
 
-if (!isset($global)) {
+if (!$main->getControllerField(VC::BASE_IS_GLOBAL)) {
   $pageHeader = $pageHeader ?? template('parts/header');
   $pageFooter = $pageFooter ?? ($isAuth ? template('parts/footer'): '');
   $sideLeft = $sideLeft ?? ($isAuth ? template('parts/sidemenu') : '');
@@ -81,7 +81,7 @@ $coreUrlJs = $main->url->getUrl(VC::CORE_JS);
   </div>
 </div>
 
-<?php if (!isset($global)) { ?>
+<?php if (!$main->getControllerField(VC::BASE_IS_GLOBAL)) { ?>
   <main class="main-wrapper mx-auto" id="mainWrapper">
     <?= $pageHeader; ?>
 
@@ -101,7 +101,7 @@ $coreUrlJs = $main->url->getUrl(VC::CORE_JS);
       <a href="<?= $main->url->getBaseUri() ?>" class="d-block position-fixed start-0 bottom-0 m-3" style="width: 2rem; height: 2rem; z-index: 11"></a>
     <?php } ?>
   </main>
-<?php } else echo $global; ?>
+<?php } else echo $main->getControllerField(VC::BASE_CONTENT); ?>
 
 <script defer type="module" src="<?= $coreUrlJs ?>src.js?ver=1.2"></script>
 <script defer type="module" src="<?= $coreUrlJs ?>main.js?ver=1.2"></script>

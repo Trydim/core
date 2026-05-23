@@ -749,7 +749,6 @@ class DbMain extends R {
   public function parseDealerSettings(array $dealers): array {
     $properties = new Properties($this->main, 'dealer');
 
-    $this->togglePrefix();
     foreach ($dealers as &$dealer) {
       $settings = [];
       $dealer['settings'] = $dealer['settings'] ?? [];
@@ -761,7 +760,6 @@ class DbMain extends R {
 
       $dealer['settings'] = $settings;
     }
-    $this->togglePrefix();
 
     return $dealers;
   }

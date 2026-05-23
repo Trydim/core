@@ -7,7 +7,7 @@
 $isFetch = preg_match('/outside\.php/', $_SERVER['REQUEST_URI']) && isset($_GET['osd']);
 $inline = strtolower(OUTSIDE);
 
-$content = $global ?? $content ?? '';
+$content = $content ?? $main->getControllerField(VC::BASE_CONTENT);
 $footerContent = $footerContent ?? '';
 
 $cssLinksArr = $cssLinks ?? [];

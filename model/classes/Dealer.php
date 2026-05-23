@@ -4,41 +4,21 @@ class Dealer {
   const FOLDER    = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR;
   const RESOURCES = Dealer::FOLDER . 'resource' . DIRECTORY_SEPARATOR;
 
-  /**
-   * @var Main
-   */
   private Main $main;
 
-  /**
-   * @var string
-   */
   private string $dealerDir;
-
-  /**
-   * @var string
-   */
   private string $dealerPath;
 
-  /**
-   * @var string
-   */
-  private string $prefix;
-
-  /**
-   * @var MigrateDb;
-   */
   private MigrateDb $migrateDb;
 
   public function __construct($main) {
     $this->main = $main;
   }
 
-  private function setParam(string $id, string $dbPrefix): void
+  private function setParam(string $id): void
   {
     $this->dealerDir  = $this::FOLDER . $id;
     $this->dealerPath = $this->dealerDir . DIRECTORY_SEPARATOR;
-
-    $this->prefix     = $dbPrefix;
   }
   private function createFolderDealers(): void
   {
@@ -103,7 +83,6 @@ class Dealer {
     };
 
     $setParam('dealerName', $params);
-    $setParam('prefix', $this->prefix);
 
     foreach (['dbHost', 'dbName', 'dbUsername', 'dbPass'] as $key) {
       $setParam($key, $params[VC::DB_CONFIG]);
@@ -114,25 +93,13 @@ class Dealer {
 
   private function updateDb(array $param): void
   {
-    $this->migrateDb = new MigrateDb($this->main, $param['prefix']);
-
-    $this->migrateDb->createMoney();
-    $this->migrateDb->createFiles();
-
-    $this->migrateDb->createCustomers();
-    $this->migrateDb->createPermission();
-    $this->migrateDb->createUsers();
-    $this->migrateDb->createOrderStatus();
-    $this->migrateDb->createOrders();
-    $this->migrateDb->createClientOrders();
+    $this->migrateDb = new MigrateDb($this->main);
 
     if ($this->migrateDb->checkResourceDump()) {
       $this->migrateDb->seedingResourceDump();
       $this->migrateDb->updateAdmin($param['login'], $param['pass']);
     } else {
       $this->migrateDb->addAdmin($param['login'], $param['pass']);
-      $this->migrateDb->addStatus($param['status'] ?? []);
-      $this->migrateDb->addMoneyRate($param['money'] ?? []);
     }
   }
 
@@ -140,7 +107,7 @@ class Dealer {
   {
     $this->main->fireHook(VC::HOOKS_DEALERS_BEFORE_CREATE, $this, $configParam, $dbParam);
 
-    $this->setParam($id, $dbParam['prefix']);
+    $this->setParam($id);
     $this->createFolderDealers();
     $this->createFolder();
     $this->copyFiles();
@@ -159,50 +126,12 @@ class Dealer {
     return $id;
   }
 
-  public function drop(string $id, string $prefix): int {
+  public function drop(string $id): int {
     if (is_dir($path = $this::FOLDER . $id)) {
       removeFolder($path);
     }
 
-    // Drop all tables with prefix
-    if ($prefix !== '') {
-      $prefix = str_replace('_', '\_', $prefix);
-
-      $this->migrateDb = new MigrateDb($this->main, $prefix);
-      $this->migrateDb->drop($prefix);
-
-      // Remove dealer
-      return $this->main->db->deleteItem('dealers', [$id]);
-    }
-
-    return 0;
-  }
-
-  //
-  //--------------------------------------------------------------------------------------------------------------------
-
-  public function updateDatabase(array $selectedDealer, string $sqlText): array {
-    $report = [
-      'error' => [],
-      'complete' => [],
-    ];
-    $sqlQueryList = explode('###', $sqlText);
-
-    foreach ($this->main->db->loadDealers(false, false) as $dealer) {
-      if (count($selectedDealer) && !in_array($dealer['id'], $selectedDealer)) continue;
-
-      $prefix = $dealer['cmsParam']['prefix'];
-
-      if (empty($prefix)) { $report['error'][] = "Error: prefix doesn't exist - " . $dealer['id']; continue; }
-
-      foreach ($sqlQueryList as $sql) {
-        $sql = str_replace('$prefix', $prefix, $sql);
-        $result = $this->main->db->execQuery($sql);
-      }
-
-      if (isset($result) && is_finite($result)) $report['complete'][] = "Complete for dealer " . $dealer['id'] . ": " . $prefix;
-    }
-
-    return $report;
+    // Remove dealer
+    return $this->main->db->deleteItem('dealers', [$id]);
   }
 }

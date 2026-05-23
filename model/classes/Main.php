@@ -188,7 +188,8 @@ final class Main {
   /**
    * Load setting from file
    */
-  private function loadSetting(): Main {
+  private function loadSetting(): Main
+  {
     $setting = [];
     $settingPath = $this->url->getPath(true) . self::SETTINGS_PATH;
 

