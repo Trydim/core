@@ -6,7 +6,7 @@
  */
 trait Authorization {
   static array $AVAILABLE_ACTION = [
-    'loadTable', 'saveVisitorOrder', 'openElement', 'loadOptions', 'loadProperties', 'loadProperty', 'loadFiles', 'loadDealersProperties'
+    'saveVisitorOrder', 'loadProperties', 'loadProperty', 'loadFiles', 'loadDealersProperties'
   ];
   /**
    * Anytime and anyone available pages
@@ -72,6 +72,7 @@ trait Authorization {
   /**
    * @param 'id'|'login'|'name'|'contacts'|'onlyOne'|'isAdmin'|'permission'|'customization'|string $field
    * @return mixed
+   * @throws ReflectionException
    */
   public function getLogin(string $field = 'login'): mixed
   {
@@ -100,6 +101,7 @@ trait Authorization {
 
   /**
    * Проверка пароля
+   * @throws ReflectionException
    */
   private function checkAuth(): Main
   {
@@ -107,27 +109,6 @@ trait Authorization {
     $id = $this->url->request->get('save');
     if ($id) session_id($_COOKIE['PHPSESSID'] = $id);
     if (session_status() === PHP_SESSION_NONE) session_start();
-
-    // Сторонняя авторизация для лигрон (только для дилеров)
-    if ($this->isDealer() && isset($_SESSION['customAuth'])) {
-      if (empty($this->user['dealer'])) $this->setDealerParam();
-      $dealer = $this->user['dealer'];
-
-      if ($dealer['settings']['tin'] !== $_SESSION['dealerTin']) {
-        session_destroy();
-        session_abort();
-        return $this;
-      }
-
-      return $this->setLogin([
-        'id'    => 1,
-        'login' => $_SESSION['login'],
-        'name'  => $_SESSION['login'],
-        'contacts' => ['type' => $_SESSION['loginType']],
-        'onlyOne' => false,
-        'isAdmin' => true,
-      ]);
-    }
 
     if ( (isset($_SESSION['hash']) && ($_SESSION['PHPSESSID'] ?? '') === $_COOKIE['PHPSESSID'])
          ||
@@ -266,11 +247,6 @@ trait Authorization {
   public function availablePage(string $page): bool
   {
     return in_array($page, $this::$AVAILABLE_PAGE) || in_array($page, $this->getSideMenu());
-  }
-
-  public function isDealer(): bool
-  {
-    return $this->getCmsParam(VC::IS_DEALER);
   }
 }
 
@@ -580,8 +556,8 @@ trait Dictionary
   }
 
   /**
-   * Надо 3 вараинта:
-   * Когда управляем доступными языками через старницу управляения языками (страницы пока нет) загружаем все доступные.
+   * Надо 3 варианта:
+   * Когда управляем доступными языками через страницу управления языками (страницы пока нет) загружаем все доступные.
    * Когда управляем доступными языками для дилера через страницу дилеры, загружаем также все?
    * Когда вход под дилером, загружать только доступные ему
    *
@@ -594,12 +570,12 @@ trait Dictionary
 
     if ($this->isDealer()) {
       $dealer = $this->setDealerParam()->getLogin(VC::USER_DEALER);
-      $dealerLocales = array_column($dealer['settings']['locales'] ?? [], 'ID');
+      $dealerLocales = array_column($dealer['settings']['locales'] ?? [], 'id');
 
       // If dealer locales empty then available all locales
       if (count($dealerLocales)) {
         $result = array_filter($result, function ($item) use ($dealerLocales) {
-          return in_array($item['ID'], $dealerLocales);
+          return in_array($item['id'], $dealerLocales);
         });
       }
     }

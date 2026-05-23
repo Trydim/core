@@ -19,6 +19,8 @@ class DbMain extends R {
         DB_DATE_TO     = '2100-01-01 00:00:00',
         SHOW_DATE_FORMAT = 'H:i d-m-Y';
 
+  const DB_MAIN_TABLES = ['customers', 'orders', 'users', 'money', 'order_status', 'permission'];
+
   const DB_JSON_FIELDS = [
     'inputValue', 'saveValue', 'importantValue',
     'contacts', 'customerContacts', 'customization',
@@ -31,23 +33,17 @@ class DbMain extends R {
 
   const DB_BLOB_FIELDS = ['reportValue', 'settings'];
 
-  protected Main $main;
 
-  private int $currentUserID = 2;
-
-  private bool $usePrefix = true;
-  private string $prefix;
+  private ?string $dealerId;
   private string $dbName;
   private string $login;
 
   /**
    * @throws RedException
    */
-  public function __construct(Main $main) {
-    $this->main = $main;
-
-    if (USE_DATABASE) {
-      $this->setting();
+  public function __construct(protected Main $main) {
+    if (defined('USE_DATABASE') && USE_DATABASE) {
+      self::ext('xdispense', fn($type, $count = 1) => $this->dis($type, $count));
     }
   }
 
@@ -69,7 +65,6 @@ class DbMain extends R {
       }
 
       $this->dbName = $dbConfig['dbName'];
-      $this->setPrefix($dbConfig['dbPrefix'] ?? '');
 
       self::setup(
         'mysql:host=' . $dbConfig['dbHost'] . ';dbname=' . $dbConfig['dbName'],
@@ -92,21 +87,9 @@ class DbMain extends R {
     return self::getRedBean()->dispense($type, $count);
   }
 
-  /**
-   * @throws RedException
-   */
-  private function setting(): void
+  private function getDealerId(): int|string
   {
-    self::ext('xdispense', function ($type, $count = 1) {
-      return $this->dis($type, $count);
-    });
-  }
-
-  /**
-   * get Table with Prefix
-   */
-  private function pf(string $table): string {
-    return $this->usePrefix ? $this->prefix . str_replace($this->prefix, '', $table) : $table;
+    return $this->dealerId ??= $this->main->getDealerId();
   }
 
   private function getPaginatorQuery(array $pageParam): string {
@@ -206,14 +189,15 @@ class DbMain extends R {
     return $date ? $date->format($this::DB_DATE_FORMAT) : null;
   }
 
-  public function setPrefix(string $prefix): void { $this->prefix = $prefix; }
+  /**
+   * @deprecated
+   */
+  public function setPrefix(): void {}
 
   /**
-   * Use or not prefix
+   * @deprecated
    */
-  public function togglePrefix(): bool {
-    return $this->usePrefix = !$this->usePrefix;
-  }
+  public function togglePrefix(): void {}
 
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
@@ -311,8 +295,18 @@ class DbMain extends R {
     }
 
     $columns[0] !== '*' && $columns = array_map(function ($item) { return $this->setQueryAs($item); }, $columns);
-    $sql = 'SELECT ' . implode(', ',  $columns) . ' FROM ' . $this->pf($dbTable);
-    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
+    $sql = 'SELECT ' . implode(', ',  $columns) . " FROM $dbTable\n";
+
+    $hasWhere = false;
+    if (in_array($dbTable, self::DB_MAIN_TABLES)) {
+      $hasWhere = true;
+      $sql .= ' WHERE dealer_id = ' . $this->getDealerId();
+    }
+
+    if (strlen($filters)) {
+      if ($hasWhere) $sql .= ' AND ' . $filters;
+      else $sql .= ' WHERE ' . $filters;
+    }
 
     return $simple ? self::getCol($sql) : self::getAll($sql);
   }
@@ -321,7 +315,7 @@ class DbMain extends R {
    * Select all (*)
    */
   public function loadTable(string $dbTable, bool $typed = false): ?array {
-    $result = self::getAll('SELECT * FROM ' . $this->pf($dbTable));
+    $result = self::getAll("SELECT * FROM $dbTable");
 
     if ($typed) {
       $columns = [];
@@ -339,12 +333,11 @@ class DbMain extends R {
   }
 
   public function checkHaveRows(string $dbTable, string $columnName, mixed $value): int {
-    return intval(self::getCell("SELECT count(*) FROM " . $this->pf($dbTable) .
-                                    " WHERE $columnName = :value", [':value' => $value]));
+    return intval(self::getCell("SELECT count(*) FROM $dbTable
+                                     WHERE $columnName = :value", [':value' => $value]));
   }
 
   public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'id'): int {
-    $dbTable = $this->pf($dbTable);
     $count = 0;
     if ($primaryKey !== 'id') {
       foreach ($ids as $id) {
@@ -374,8 +367,13 @@ class DbMain extends R {
    */
   public function getLastID(string $dbTable, array $requireParam = []): mixed
   {
-    $bean = self::xdispense($this->pf($dbTable));
-    foreach ($requireParam as $field => $value) $bean->$field = $value;
+    $bean = self::xdispense($dbTable);
+    foreach ($requireParam as $field => $value) {
+      $bean->$field = $value;
+    }
+    if (in_array($dbTable, self::DB_MAIN_TABLES)) {
+      $bean->dealerId = $this->getDealerId();
+    }
     self::store($bean);
 
     return $bean->getID();
@@ -383,7 +381,6 @@ class DbMain extends R {
 
   public function getTables(string $like = ''): mixed
   {
-    $like = $this->pf($like);
     $sql = "SHOW TABLES
             FROM `$this->dbName`
             WHERE `Tables_in_$this->dbName` LIKE '%$like%'";
@@ -402,14 +399,22 @@ class DbMain extends R {
                                     COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE AS "null"
                              FROM information_schema.COLUMNS
                              WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
-      [':dbName'  => $this->dbName,
-       ':dbTable' => $this->pf($dbTable)]);
+      [':dbName'  => $this->dbName, ':dbTable' => $dbTable]);
   }
 
   public function getCountRows(string $dbTable, string $filters = ''): int {
-    $sql = "SELECT COUNT(*) AS 'count' from " . $this->pf($dbTable);
+    $hasWhere = false;
+    $sql = "SELECT COUNT(*) AS 'count' from $dbTable\n";
 
-    if (strlen($filters)) $sql .= ' WHERE ' . $filters;
+    if (in_array($dbTable, self::DB_MAIN_TABLES)) {
+      $hasWhere = true;
+      $sql .= "WHERE dealer_id = '" . $this->getDealerId() . "'";
+    }
+
+    if (strlen($filters)) {
+      if ($hasWhere) $sql .= " AND $filters";
+      else $sql .= " WHERE $filters";
+    }
 
     $result = self::getRow($sql);
 
@@ -421,7 +426,8 @@ class DbMain extends R {
     if (count($param) === 0) return [];
     $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
 
-    $beans = self::xdispense($this->pf($dbTable), count($param));
+    $addDealerId = in_array($dbTable, self::DB_MAIN_TABLES);
+    $beans = self::xdispense($dbTable, count($param));
 
     $idColName = 'id';
     foreach ($curTable as $col) {
@@ -453,6 +459,8 @@ class DbMain extends R {
 
     try {
       if (count($param) === 1) {
+        if ($addDealerId) $beans->dealerId = $this->getDealerId();
+
         foreach ($param as $id => $item) {
           $change && $beans->id = $id;
 
@@ -468,6 +476,7 @@ class DbMain extends R {
 
         $i = 0;
         foreach ($param as $id => $item) {
+          if ($addDealerId) $beans[$i]->dealerId = $this->getDealerId();
           $change && $beans[$i]->id = $id;
 
           foreach ($item as $k => $v) {
@@ -501,7 +510,7 @@ class DbMain extends R {
   //------------------------------------------------------------------------------------------------------------------
 
   public function loadLocales(): array {
-    return self::getAll('SELECT * FROM locales');
+    return self::getAll('SELECT id, name, code, active FROM locales');
   }
 
 
@@ -542,6 +551,7 @@ class DbMain extends R {
 
     return $files;
   }
+
 
   // Settings/Dealers Properties only main cms
   //------------------------------------------------------------------------------------------------------------------
@@ -602,8 +612,6 @@ class DbMain extends R {
 
   public function createPropertyTable(string $dbTable, array $params): \RedBeanPHP\Cursor|int|array|null
   {
-    //$dbTable = $this->pf($dbTable);
-
     $sql = "CREATE TABLE $dbTable (
             `id` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
@@ -624,7 +632,7 @@ class DbMain extends R {
   public function changePropertyTable(string $dbTable, array $params): array {
     $error = [];
     $query = [];
-    $sSql = "ALTER TABLE " . $this->pf($dbTable);
+    $sSql = "ALTER TABLE " . $dbTable;
 
     if (count($params)) {
       $haveColumns = array_map(function ($column) {return $column['columnName'];}, $this->getColumnsTable($dbTable));
@@ -679,46 +687,52 @@ class DbMain extends R {
    */
   public function loadCustomers(array $pageParam, array $ids = []): array {
     $sql = "SELECT C.id as 'id', name, ITN, contacts, GROUP_CONCAT(O.id) as 'orders'
-      FROM " . $this->pf('customers') . " C
-      LEFT JOIN " . $this->pf('orders') . " O on C.id = O.customer_id\n";
+            FROM customers C
+            LEFT JOIN orders O on C.id = O.customer_id
+            WHERE C.dealer_id = ?\n";
+    $params = [$this->getDealerId()];
 
     if (count($ids)) {
-      $sql .= "WHERE C.id = ";
-      if (count($ids) === 1) $sql .= $ids[0] . " ";
-      else $sql .= implode(' OR C.id = ', $ids) . " ";
+      $sql .= ' AND C.id IN (' . self::genSlots($ids) . ")\n";
+      $params = array_merge($params, $ids);
     }
-
     $sql .= "GROUP BY C.id\n";
 
     if (intval($pageParam['countPerPage']) < 1000) $sql .= $this->getPaginatorQuery($pageParam);
 
-    return self::getAll($sql);
+    return self::getAll($sql, $params);
   }
 
   public function loadCustomerByOrderId(int|string $orderId): array {
     $sql = "SELECT C.id as 'id', C.name as 'name', ITN, contacts
-      FROM " . $this->pf('orders') . " O 
-      LEFT JOIN " . $this->pf('customers') . " C ON C.id = O.customer_id
-      WHERE O.id = :id";
+            FROM orders O 
+            LEFT JOIN customers C ON C.id = O.customer_id
+            WHERE O.id = :id AND O.dealer_id = :dealer_id";
 
-    return self::getRow($sql, [':id' => $orderId]);
+    return self::getRow($sql, [':id' => $orderId, ':dealer_id' => $this->getDealerId()]);
   }
+
 
   // Money
   //--------------------------------------------------------------------------------------------------------------------
 
   public function getMoney(): array {
-    $queryRes = $this->selectQuery('money');
+    $sqlMain = "SELECT id, dealer_id AS 'dealerId',
+                       code, name, short_name AS 'shortName',
+                       last_edit_date AS 'lastEditDate',
+                       scale + 0 AS 'scale', rate + 0 AS 'rate', main
+                FROM money
+                WHERE dealer_id";
+    $sql = $sqlMain . " = :dealerId";
+    $queryRes = self::getAll($sql, [':dealerId' => $this->getDealerId()]);
+
+    if (!count($queryRes)) {
+      $sql = $sqlMain . " IS NULL";
+      $queryRes = self::getAll($sql);
+    }
 
     $res = [];
     foreach ($queryRes as $item) {
-      $item['shortName'] = $item['short_name'];
-      unset($item['short_name']);
-      $item['lastEditDate'] = $item['last_edit_date'];
-      unset($item['last_edit_date']);
-      $item['scale'] = floatval($item['scale']);
-      $item['rate'] = floatval($item['rate']);
-
       $res[$item['code']] = $item;
     }
 
@@ -730,7 +744,7 @@ class DbMain extends R {
    */
   public function setMoney(array $rate): void
   {
-    $beans = self::xdispense($this->pf('money'), 1);
+    $beans = self::xdispense('money', 1);
     $date = date($this::DB_DATE_FORMAT);
 
     foreach ($rate as $currency) {
@@ -814,50 +828,6 @@ class DbMain extends R {
     return $parseSettings ? $this->parseDealerSettings($dealers) : $dealers;
   }
 
-  /**
-   * Load all users by all dealers
-   */
-  public function loadDealersUsers(string $login = ''): array {
-    $result = [];
-    $dealers = $this->loadDealers(true, false);
-    $dealers = array_map(function ($dealer) {
-      return [
-        'id'     => $dealer['id'],
-        'urlPrefix' => $dealer['cmsParam']['urlPrefix'] ?? '',
-        'dbPrefix'  => $dealer['cmsParam']['dbPrefix'] ?? $dealer['cmsParam']['prefix'], // Support old name
-      ];
-    }, $dealers);
-
-    $countPerPart = 20;
-    $countDealers = count($dealers);
-    $countPart = ceil($countDealers / $countPerPart);
-
-    for ($i = 0; $i < $countPart; $i++) {
-      $sql = '';
-      if ($login) $result = [];
-
-      for ($j = 0; $j < $countPerPart; $j++) {
-        $index = $i * $countPerPart + $j;
-        if ($index >= $countDealers) break;
-
-        $dealer = $dealers[$index];
-        $sql .= " UNION SELECT id, name, login, password, "
-              . "'$dealer[id]' as dealerId, "
-              . "'$dealer[urlPrefix]' as urlPrefix, "
-              . "'$dealer[dbPrefix]' as dbPrefix "
-              . "FROM $dealer[dbPrefix]users "
-              . ' WHERE activity = 1';
-
-        if ($login) $sql .= ' AND login = "' . $login . '"';
-      }
-
-      $result = array_merge($result, self::getAll(substr($sql, 7)));
-      if ($login && count($result)) return $result;
-    }
-
-    return $result;
-  }
-
   public function loadDealerByIds(array $ids, bool $parseSettings = true): array {
     if (count($ids) === 0) return [];
 
@@ -881,7 +851,7 @@ class DbMain extends R {
   }
 
   public function loadDealerById(?string $id = null, bool $parseSettings = true): array {
-    $id = $id ?? $this->main->getCmsParam('dealerId');
+    $id = $id ?? $this->main->getDealerId();
 
     $dealers = $this->loadDealerByIds([$id], $parseSettings);
 

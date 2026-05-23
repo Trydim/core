@@ -5,17 +5,12 @@
  */
 
 $authStatus = $main->checkStatus();
-$isDealer = $main->isDealer();
 $dbContent = "";
 $field = [
   'pageTitle' => $main->getCmsParam(VC::PROJECT_TITLE),
   'headContent' => '<meta name="Public"><meta name="description" content="Public">',
-  'cssLinks' => [],
-  'jsLinks'  => [],
   'sideLeft' => $authStatus ? null : '',
 ];
-$publicCss = $main->getCmsParam(VC::URI_CSS);
-$publicJs = $main->getCmsParam(VC::URI_JS);
 
 // Если загрузка
 if (
@@ -34,7 +29,7 @@ if (
 
   $dbContent .= $main->getFrontContent('dataOrder', $order);
 
-  if ($customer = $main->db->loadCustomerByOrderId($order['ID'])) {
+  if ($customer = $main->db->loadCustomerByOrderId($order['id'])) {
     $dbContent .= $main->getFrontContent('dataCustomer', $customer);
   }
 
@@ -55,24 +50,22 @@ $main->setControllerField($field)->fireHook(VC::HOOKS_PUBLIC_TEMPLATE, $main);
 
 $main->publicMain();
 require ABS_SITE_PATH . 'public/public.php';
-if ($isDealer) {
+if ($main->isDealer()) {
   $main->publicDealer();
   $path = $main->url->getPath(true) . 'public/public.php';
 
   if (file_exists($path)) {
-    $publicCss = $main->getCmsParam(VC::DEAL_URI_CSS);
-    $publicJs = $main->getCmsParam(VC::DEAL_URI_JS);
     require $path;
   }
 }
 
 $main->publicMain()
      ->setControllerViewField(ABS_SITE_PATH . 'public/views/' . PUBLIC_PAGE . '.php');
-if ($isDealer) {
+if ($main->isDealer()) {
   $main->publicDealer()
        ->setControllerViewField($main->url->getPath(true) . 'public/views/' . PUBLIC_PAGE . '.php');
 }
 
-$main->response->setContent(template(OUTSIDE ? '_outside' : 'base', $main->getControllerField()));
+$main->response->setContent(template(OUTSIDE ? '_outside' : 'base'));
 
 unset($path);

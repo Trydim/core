@@ -102,7 +102,7 @@ export default class {
     this.headRendered = true;
   }
   ordersGetTableCellTemplate() {
-    let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${ID}"></td>';
+    let tmp = '<tr><td><input type="checkbox" class="checkbox" data-id="${id}"></td>';
 
     tmp += this.config[this.getTypeConfig()].reduce((r, column) => {
       r += '<td>${' + column['dbName'] + '}</td>';
@@ -132,7 +132,7 @@ export default class {
         item.importantValue = f.replaceTemplate(this.contValue, value);
       }
 
-      this.orders[item['ID']] = item;
+      this.orders[item['id']] = item;
       return item;
     });
   }
@@ -199,7 +199,7 @@ export default class {
 
     html.innerHTML = f.replaceTemplate(tmp, data['order']);
 
-    this.M.show('Заказ ' + data['order']['ID'], html);
+    this.M.show('Заказ ' + data['order']['id'], html);
   }
 
   toggleDisableBtn(id) {

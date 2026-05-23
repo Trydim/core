@@ -134,10 +134,10 @@
                           on-label="Да" off-label="Нет"
                           v-model="dealer.settings[key]" />
             <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]" />
-            <Dropdown v-else-if="prop.type === 'select'" option-label="name" option-value="ID"
+            <Dropdown v-else-if="prop.type === 'select'" option-label="name" option-value="id"
                       :options="Object.values(prop.values)"
                       v-model="dealer.settings[key]" />
-            <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="ID"
+            <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="id"
                          :options="Object.values(prop.values)"
                          v-model="dealer.settings[key]" />
           </InputGroup>

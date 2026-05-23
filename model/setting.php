@@ -95,7 +95,6 @@ switch ($cmsAction) {
 
       // Статусы
       if (isset($orderStatus)) {
-        //$currentTable = $db->loadTable('order_status');
         $param = [
           'new'    => [],
           'change' => [],

@@ -21,7 +21,6 @@ if ($mode = $main->getCmsParam('mode')) {
     try {
       switch ($mode) {
         case 'auth': require $componentPath . 'auth.php'; break;
-        case 'load':
         case 'DB':      require $componentPath . 'db.php'; break;
         case 'docs':    require $componentPath . 'docs.php'; break;
         case 'dictionary': require $componentPath . 'dictionary.php'; break;

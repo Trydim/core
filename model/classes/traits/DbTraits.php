@@ -4,6 +4,8 @@ use RedBeanPHP\RedException\SQL;
 
 trait DbOrders
 {
+  abstract protected function getDealerId(): int|string;
+
   private function getOrdersDbColumns(string $field): string
   {
     switch ($field) {
@@ -24,11 +26,12 @@ trait DbOrders
             C.id AS 'customerId', C.name AS 'customerName', C.contacts AS 'customerContacts',
             S.id AS 'statusId', S.name AS 'status', total,
             important_value AS 'importantValue'"
-      . ($includeValues ? ", save_value AS 'saveValue', report_value AS 'reportValue'" : "\n") .
-      "FROM " . $this->pf('orders') . " O
-      LEFT JOIN " . $this->pf('users') . " U ON O.user_id = U.id
-      LEFT JOIN " . $this->pf('customers') . " C ON O.customer_id = C.id
-      JOIN " . $this->pf('order_status') . " S ON O.status_id = S.id\n";
+      . ($includeValues ? ", save_value AS 'saveValue', report_value AS 'reportValue'\n" : "\n") .
+      "FROM orders O
+      LEFT JOIN users U ON O.user_id = U.id
+      LEFT JOIN customers C ON O.customer_id = C.id
+      JOIN order_status S ON O.status_id = S.id
+      WHERE O.dealer_id = " . $this->getDealerId() . "\n";
   }
 
   public function getBaseOrdersQueryColumns(): array
@@ -60,7 +63,7 @@ trait DbOrders
     $sql = $this->getBaseOrdersQuery();
 
     if (count($filters)) {
-      $sql .= 'WHERE ';
+      $sql .= 'AND ';
       $connect = '';
 
       // Date range
@@ -79,7 +82,7 @@ trait DbOrders
 
       if (isset($filters['userId'])) {
         $userId = $filters['userId'];
-        $sql .= $connect . 'O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]);
+        $sql .= $connect . '(O.user_id = ' . implode(' OR O.user_id = ', is_array($userId) ? $userId : [$userId]) . ')';
         $connect = ' AND ';
       }
 
@@ -93,7 +96,7 @@ trait DbOrders
         $ids = $filters['statusId'];
         if (!is_array($ids)) $ids = [$ids];
 
-        $sql .= $connect . "O.status_id = " . implode(' OR O.status_id = ', $ids) . "\n";
+        $sql .= $connect . "(O.status_id = " . implode(' OR O.status_id = ', $ids) . ")\n";
       }
     }
 
@@ -111,7 +114,7 @@ trait DbOrders
    */
   public function loadOrdersById(array|int|string $ids, bool $oneOrder = false): array
   {
-    $sql = $this->getBaseOrdersQuery(true) . "\n WHERE ";
+    $sql = $this->getBaseOrdersQuery(true) . "\n AND ";
 
     if ($oneOrder && is_array($ids)) {
       $ids = array_values($ids)[0];
@@ -124,7 +127,7 @@ trait DbOrders
     }
 
     if (is_array($ids)) {
-      $sql .= " O.id = " . implode(' OR O.id = ', $ids) . "\n";
+      $sql .= "(O.id = " . implode(' OR O.id = ', $ids) . ")\n";
       $res = self::getAll($sql);
     } else {
       $sql .= "O.id = :id";
@@ -141,7 +144,7 @@ trait DbOrders
     $searchValue = '%' . $searchValue . '%';
 
     $sql = $this->getBaseOrdersQuery($includeValues);
-    $sql .= "WHERE (O.id like '$searchValue' ";
+    $sql .= "AND (O.id like '$searchValue' ";
     $sql .= "OR O.important_value like '$searchValue' ";
     $sql .= "OR C.contacts like '$searchValue' ";
     $sql .= "OR U.name like '$searchValue' ";
@@ -181,8 +184,7 @@ trait DbOrders
 
     array_map(function ($id) use (&$param, $status_id) {
       $param[$id] = [
-        'status_id'      => $status_id,
-        'last_edit_date' => date('Y-m-d G:i:s'), //нужен триггер
+        'status_id' => $status_id,
       ];
     }, array_values($commonValues));
     $this->insert($columns, $dbTable, $param, true);
@@ -193,12 +195,13 @@ trait DbOrders
 
   public function saveVisitorOrder(array $param): string|int
   {
-    $bean = self::xdispense($this->pf('client_orders'));
+    $bean = self::xdispense('client_orders');
 
     $bean->create_date = date($this::DB_DATE_FORMAT);
     foreach ($param as $key => $value) {
       $bean->$key = $value;
     }
+    $bean->dealerId = $this->getDealerId();
     self::store($bean);
 
     return $bean->getID();
@@ -213,18 +216,20 @@ trait DbOrders
             save_value AS 'saveValue',
             important_value AS 'importantValue',
             total
-            FROM " . $this->pf('client_orders') . "\n";
+            FROM client_orders
+            WHERE dealer_id = ?";
 
-    if (count($dateRange)) $sql .= "WHERE create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
+    $params = [$this->getDealerId()];
+
+    if (count($dateRange)) $sql .= " AND create_date BETWEEN '$dateRange[0]' AND '$dateRange[1]'\n";
     if (count($ids)) {
-      $sql .= "WHERE id = ";
-      if (count($ids) === 1) $sql .= $ids[0] . " ";
-      else $sql .= implode(' OR id = ', $ids) . " ";
+      $sql .= " id IN (" . self::genSlots($ids) . ")\n";
+      $params = array_merge($params, $ids);
     }
 
     $sql .= $this->getPaginatorQuery($pageParam);
 
-    return $this->jsonParseField(self::getAll($sql));
+    return $this->jsonParseField(self::getAll($sql, $params));
   }
 
   public function loadVisitorOrderById(string $id): array
@@ -234,10 +239,10 @@ trait DbOrders
             important_value AS 'importantValue',
             report_value AS 'reportValue',
             total
-            FROM " . $this->pf('client_orders') . "\n
-            WHERE id = :id";
+            FROM client_orders\n
+            WHERE dealer_id = :dealerId AND id = :id";
 
-    return $this->jsonParseField(self::getRow($sql, [':id' => $id]));
+    return $this->jsonParseField(self::getRow($sql, [':dealerId' => $this->getDealerId(), ':id' => $id]));
   }
 
   public function searchVisitorOrders(array $pageParam, string $searchValue): array
@@ -248,14 +253,13 @@ trait DbOrders
             save_value AS 'saveValue',
             important_value AS 'importantValue',
             total
-            FROM " . $this->pf('client_orders') . "\n
-            WHERE id like '$searchValue'
-            OR importantValue like '$searchValue'";
+            FROM client_orders\n
+            WHERE dealer_id = :dealerId AND (id like '$searchValue' OR importantValue like '$searchValue')";
 
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'id');
     $sql .= $this->getPaginatorQuery($pageParam);
 
-    return $this->jsonParseField(self::getAll($sql));
+    return $this->jsonParseField(self::getAll($sql, [':dealerId' => $this->getDealerId()]));
   }
 
   // Status
@@ -263,18 +267,24 @@ trait DbOrders
 
   public function loadOrderStatus(string $filters = ''): array
   {
-    $sql = "SELECT * FROM " . $this->pf('order_status') . "\n ";
+    $sqlMain = "SELECT id, code, name, sort, required FROM order_status
+                WHERE dealer_id";
+    $sqlFilter = strlen($filters) ? " AND $filters\n" : "\n";
 
-    if (strlen($filters)) $sql .= 'WHERE ' . $filters . "\n ";
+    $sql = $sqlMain . " = :dealerId" . $sqlFilter . "ORDER BY sort, id";
+    $result = self::getAll($sql, [':dealerId' => $this->getDealerId()]);
 
-    $sql .= "ORDER BY sort, id";
+    if (count($result)) return $result;
 
+    $sql = $sqlMain . " IS NULL" . $sqlFilter . "ORDER BY sort, id";
     return self::getAll($sql);
   }
 }
 
 trait DbUsers
 {
+  abstract protected function getDealerId(): int|string;
+
   private function getUserDbColumns(string $field): string
   {
     switch ($field) {
@@ -283,6 +293,17 @@ trait DbUsers
       case 'name': return 'U.name';
       case 'permissionName': return 'P.name';
     }
+  }
+
+  private function getRootUser(string $login): array
+  {
+    $sql = "SELECT id, login, password, 'root' AS 'userType',
+                   name, contacts,
+                   register_date AS 'registerDate', customization, hash
+            FROM root_users
+            WHERE login = :login AND activity = 1 LIMIT 1";
+
+    return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
   }
 
   public function getUserFromFile(string $login = '', string $password = '', bool $status = false): bool|array
@@ -308,7 +329,7 @@ trait DbUsers
 
   public function getUser(string $login, string $column = 'id'): ?array
   {
-    $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
+    $result = self::getRow("SELECT $column FROM users WHERE login = :login",
       [':login' => $login]
     );
 
@@ -316,28 +337,49 @@ trait DbUsers
     return $result;
   }
 
-  public function getUserById(int $userId): ?array
+  public function getUserById(int $userId, bool $allField = false): ?array
   {
-    return $this->jsonParseField(self::getRow(
-      "SELECT U.id AS 'id', U.name AS 'name', U.contacts AS 'contacts',
-                  P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
-       FROM " . $this->pf('users') . " U
-       JOIN " . $this->pf('permission') . " P on U.permission_id = P.id
-       WHERE U.id = :id",
-      [':id' => $userId]
-    ));
+    $sql = "SELECT U.id AS 'id', U.dealer_id AS 'dealerId',
+                  U.name AS 'name', U.contacts AS 'contacts',
+                  U.register_date AS 'registerDate', U.activity as 'activity',"
+                  . ($allField ? "U.login AS 'login', U.password AS 'password'," : "") .
+                  "P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
+       FROM users U
+       JOIN permission P ON U.permission_id = P.id
+       WHERE U.id = :id AND U.dealer_id = :dealerId";
+
+    return $this->jsonParseField(
+      self::getRow($sql, [':id' => $userId, ':dealerId' => $this->getDealerId()])
+    );
   }
 
-  public function getUserByLogin(string $login): ?array
+  private function getFirstAuthUserByDealer(int $dealerId): array
   {
-    $sql = "SELECT U.id AS 'id', login,  password, hash,
+    $sql = "SELECT id, dealer_id as 'dealerId', login, password, 'user' AS 'userType' FROM users
+            WHERE dealer_id = :dealerId AND activity = 1 LIMIT 1";
+
+    return self::getRow($sql, [':dealerId' => $dealerId]);
+  }
+
+  private function getAuthUserByLogin(string $login, int $dealerId): array
+  {
+    $sql = "SELECT id, dealer_id as 'dealerId', login, password, 'user' AS 'userType' FROM users
+            WHERE login = :login AND dealer_id = :dealerId AND activity = 1 LIMIT 1";
+
+    return self::getRow($sql, [':login' => $login, ':dealerId' => $dealerId]);
+  }
+
+  public function getUserByLogin(string $login): array
+  {
+    $sql = "SELECT U.id AS 'id', U.dealer_id AS 'dealerId',
+                   login, password, hash,
                    U.name AS 'name', contacts, customization, activity,
                    P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
-            FROM " . $this->pf('users') . " U
-            JOIN " . $this->pf('permission') . " P on U.permission_id = P.id
-            WHERE login = :login";
+            FROM users U
+            JOIN permission P on U.permission_id = P.id 
+            WHERE login = :login AND U.dealer_id = :dealerId LIMIT 1";
 
-    return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
+    return $this->jsonParseField(self::getRow($sql, [':login' => $login, ':dealerId' => $this->getDealerId()]));
   }
 
   public function getUserByOrderId(int|string $orderId): ?array
@@ -345,41 +387,33 @@ trait DbUsers
     return $this->jsonParseField(self::getRow(
       "SELECT U.id AS 'id', U.name AS 'name', U.contacts AS 'contacts',
                   P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
-       FROM " . $this->pf('users') . " U
-       JOIN " . $this->pf('permission') . " P on U.permission_id = P.id
-       JOIN " . $this->pf('orders') . " O ON U.id = O.user_id
-       WHERE O.id = :id", [':id' => $orderId]
+       FROM users U
+       JOIN permission P on U.permission_id = P.id
+       JOIN orders O ON U.id = O.user_id
+       WHERE O.id = :id AND O.dealer_id = :dealerId",
+      [':id' => $orderId, ':dealerId' => $this->getDealerId()]
     ));
   }
 
   public function checkPassword(string $login, string $password): array|bool
   {
     if (USE_DATABASE) {
+      $dealerId = $this->main->getDealerId();
+      // God mode
       if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
-        $sql = "SELECT id, name, login, password FROM " . $this->pf('users') . " WHERE id = :id";
-        return self::getRow($sql, [':id' => 1]);
+        return $this->getFirstAuthUserByDealer($dealerId);
       }
 
-      $sql = "SELECT id, name, login, password
-              FROM " . $this->pf('users') . " WHERE login = :login and activity = 1";
-      $user = self::getRow($sql, [':login' => $login]);
+      $user = $this->getAuthUserByLogin($login, $dealerId);
     } else {
       return $this->getUserFromFile($login, $password);
     }
 
-    if (count($user) && password_verify($password, $user['password'])) return $user;
-    if ($this->main->isDealer()) return false;
-
-    // User search by dealers
-    $dealersUsers = $this->loadDealersUsers($login);
-    if (count($dealersUsers)) {
-      foreach ($dealersUsers as $user) {
-        if (password_verify($password, $user['password'])) {
-          $this->setPrefix($user['dbPrefix']);
-          return $user;
-        }
-      }
+    if (!$this->main->isDealer() && !count($user)) {
+      $user = $this->getRootUser($login);
     }
+
+    if (count($user) && password_verify($password, $user['password'])) return $user;
 
     return false;
   }
@@ -387,7 +421,7 @@ trait DbUsers
   public function findToken(string $token): array
   {
     $sql = "SELECT id, name, login, password
-            FROM " . $this->pf('users') . " WHERE contacts LIKE :contacts and activity = 1";
+            FROM users WHERE contacts LIKE :contacts and activity = 1";
     return self::getRow($sql, [':contacts' => "%$token%"]);
   }
 
@@ -396,7 +430,7 @@ trait DbUsers
    */
   public function changeUser(int|string $loginId, array $param): void
   {
-    $user = self::xdispense($this->pf('users'));
+    $user = self::xdispense('users');
     $user->id = $loginId;
     foreach ($param as $key => $value) {
       $user->$key = $value;
@@ -405,27 +439,28 @@ trait DbUsers
   }
 
   /**
-   * @param array{pageNumber: int, countPerPage: int, sortColumn: string, sortDirect: bool} $pageParam
+   * @param array{pageNumber?: int, countPerPage?: int, sortColumn?: string, sortDirect?: bool} $pageParam
    */
   public function loadUsers(array $pageParam): array
   {
     $sql = "SELECT U.id AS 'id', login, U.name AS 'name', contacts,
                    permission_id AS 'permissionId', P.name AS 'permissionName',
                    register_date AS 'registerDate', activity
-            FROM " . $this->pf('users') . " U
-            LEFT JOIN " . $this->pf('permission') . " P ON U.permission_id = P.id\n";
+            FROM users U
+            LEFT JOIN permission P ON U.permission_id = P.id
+            WHERE u.dealer_id = :dealerId AND activity = 1\n";
 
-    $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn']);
+    $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn'] ?? 'id');
 
     $sql .= $this->getPaginatorQuery($pageParam);
 
-    return $this->jsonParseField(self::getAll($sql));
+    return $this->jsonParseField(self::getAll($sql, [':dealerId' => $this->getDealerId()]));
   }
 
-  public function setUserHash(int|string $loginId, string $hash): void
+  public function setUserHash(int|string $loginId, string $hash, string $userType = 'user'): void
   {
     if (USE_DATABASE) {
-      $user = self::xdispense($this->pf('users'));
+      $user = self::xdispense($userType === 'root' ? 'root_users' : 'users');
       $user->id = $loginId;
       $user->hash = $hash;
       self::store($user);
@@ -439,7 +474,10 @@ trait DbUsers
   public function checkUserHash(array $session): bool|array
   {
     if (USE_DATABASE) {
-      $user = $this->getUserByLogin($session['login']);
+      $userType = $session['userType'] ?? 'user';
+      $user = $userType === 'root' ? $this->getRootUser($session['login'])
+                                   : $this->getUserById($session['id'], true);
+
       if (!count($user) || !boolValue($user['activity'])) return false;
 
       $user['permissionId'] = intval($user['permissionId']);
@@ -466,9 +504,7 @@ trait DbUsers
       $ok = $session['token'] === $user['contacts']['token'];
     } else {
       $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
-                             : password_verify($session['password'], $user['password'])
-                               ||
-                               md5($session['password']) === '71fa970c7b3a28956dad879a7abc12c4';
+                             : password_verify($session['password'], $user['password']);
     }
 
     return $ok ? $user : false;
@@ -482,7 +518,7 @@ trait DbUsers
     if (!$currentUser) {
       $currentUser = $this->main->getLogin();
     }
-    $result = self::getAssocRow("SELECT $columns from " . $this->pf('users') . " WHERE login = ?", [$currentUser]);
+    $result = self::getAssocRow("SELECT $columns from users WHERE login = ?", [$currentUser]);
 
     if (count($result) === 1) {
       if ($columns === 'customization') return json_decode($result[0]['customization']);
@@ -490,11 +526,25 @@ trait DbUsers
     }
     return json_decode('{}');
   }
+
+  public function loadPermission(): array
+  {
+    $sqlMain = "SELECT id, dealer_id AS 'dealerId', name, properties
+            FROM permission
+            WHERE dealer_id";
+
+    $result = $this->jsonParseField(self::getAll($sqlMain . " = :dealerId", [':dealerId' => $this->getDealerId()]));
+    if (count($result)) return $result;
+
+    return $this->jsonParseField(self::getAll($sqlMain . " IS NULL"));
+  }
 }
 
 trait DbCsv
 {
   private string $csvTable;
+
+  abstract protected function getDealerId(): int|string;
 
   public function setCsvTable(string $path): void
   {
@@ -591,7 +641,6 @@ trait DbCsv
       }
 
       file_put_contents($csvPath . $this->csvTable, $fileContent);
-      $this->main->deleteCsvCache();
     }
 
     return $this;
@@ -603,6 +652,8 @@ trait ContentEditor
   private string $CONTENT_PATH = SHARE_PATH . 'content.json';
   private string $contentData = '{}';
   private mixed $contentLoaded;
+
+  abstract protected function getDealerId(): int|string;
 
   private function contentPath(): string
   {

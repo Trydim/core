@@ -4,18 +4,18 @@
  * @var Main $main - global
  */
 
-$field = [
-  'pageTitle' => 'Настройки',
-  'footerContent' => $main->initDictionary(),
-];
-
+$main->addControllerField(VC::BASE_PAGE_TITLE, 'Настройки');
+$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary());
 $main->addAssets(['module/setting.css', 'module/setting.js']);
 
-$field['footerContent'] .= $main->getFrontContent('dataUser', $main->getLogin('all'))
-                           . $main->getSettings('json', true);
+$main->addControllerField(
+  VC::BASE_FOOTER_CONTENT,
+  $main->getFrontContent('dataUser', $main->getLogin('all'))
+  . $main->getSettings('json', true)
+);
 
 if (USE_DATABASE && $main->getLogin('isAdmin')) {
-  $permissions['permissions'] = $main->db->loadTable('permission');
+  $permissions['permissions'] = $main->db->loadPermission();
 
   $permissions['permissions'] = array_map(function ($row) {
     $row['id'] = intval($row['id']);
@@ -29,15 +29,14 @@ if (USE_DATABASE && $main->getLogin('isAdmin')) {
     return ['id' => $menu, 'name' => gTxt($menu)];
   }, $main->getSideMenu());
 
-  $field['footerContent'] .= $main->getFrontContent('dataPermissions', $permissions);
+  $main->addControllerField( VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataPermissions', $permissions))
 
   // if available orders
   if ($main->availablePage('orders')) {
-    $field['footerContent'] .= $main->getFrontContent('dataOrdersStatus', $main->db->loadOrderStatus());
+    $main->addControllerField( VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataOrdersStatus', $main->db->loadOrderStatus()));
   }
 
-  $field['footerContent'] .= $main->getCourse();
-
+  $main->addControllerField( VC::BASE_FOOTER_CONTENT, $main->getCourse());
   unset($permissions);
 }
 
@@ -45,4 +44,4 @@ $main->setControllerField($field)->fireHook(VC::HOOKS_SETTING_TEMPLATE, $main);
 ob_start();
 require $main->url->getRoutePath();
 $field['content'] = ob_get_clean();
-$main->response->setContent(template('base', $field));
+$main->response->setContent(template());

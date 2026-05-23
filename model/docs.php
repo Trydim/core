@@ -35,7 +35,7 @@ if (isset($addManager)) {
 // ---------------------------------------------------------------------------------------------------------------------
 if (isset($addCustomer)) {
   if (isset($customerId)) {
-    $customerData = $main->db->selectQuery('customers', '*', " ID = $customerId");
+    $customerData = $main->db->selectQuery('customers', '*', " id = $customerId");
   } else if ($orderId) { // Заказчик из сохраненного заказа
     $customerData = $main->db->loadCustomerByOrderId($orderId);
   } else $customerData = $customer ?? [];
@@ -51,8 +51,6 @@ if (isset($addCustomer)) {
 // ---------------------------------------------------------------------------------------------------------------------
 if ($orderId && count($reportValue) === 0) {
   $reportValue = $main->db->loadOrdersById($orderId, true);
-
-  $reportValue['id'] = $reportValue['ID'];
 
   $data['order'] = $reportValue;
   $data['reportValue'] = &$reportValue['reportValue'];

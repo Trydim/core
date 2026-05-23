@@ -81,7 +81,7 @@ class FS {
 
       if ($this->param->size === filesize($filePath)) {
         // Проверить есть файл в БД
-        $id = $this->main->db->selectQuery('files', 'ID', " path = '$name' ");
+        $id = $this->main->db->selectQuery('files', 'id', " path = '$name' ");
 
         if (count($id) === 1) return $id[0]; // если есть вернуть ИД?
       }
@@ -220,7 +220,7 @@ class FS {
   /**
    * @return mixed - error<br>
    * string - error<br>
-   * integer - ID from DB <br>
+   * integer - id from DB <br>
    * object - {name, extension, type}
    */
   public function saveFromRequest(string $key, bool $optimize = false): mixed

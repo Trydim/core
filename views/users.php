@@ -5,7 +5,7 @@
  * @var array $param - ['columns', 'permission', 'managerField']
  */
 
-$field['content'] = template('parts/usersContent', $param);
+$main->addControllerField(VC::BASE_CONTENT, template('parts/usersContent', $param));
 
 // Users/Manager custom field
 $managerFieldHtml = '';
@@ -79,12 +79,12 @@ foreach ($param['managerField'] as $k => $item) {
                        '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
 }
 unset($k, $dK, $dV, $item, $rndId, $data, $o, $row, $input);
+  
+$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataManagerField', $managerField));
 
-$field[VC::BASE_FOOTER_CONTENT] .= $main->getFrontContent('dataManagerField', $managerField);
-
-$field[VC::BASE_FOOTER_CONTENT] .= '
+ob_start(); ?>
 <template id="permission">
-  <option value="${ID}">${name}</option>
+  <option value="${id}">${name}</option>
 </template>
 <template id="tableContactsValue">
   <div class="d-flex align-items-center justify-content-start gap-2"><div>${key}:</div><div>${value}</div></div>
@@ -92,38 +92,38 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
 <template id="userForm">
   <form action="#">
     <div class="form-floating my-3">
-      <input type="text" class="form-control" id="pName" placeholder="' . gTxt('Full name') . '" name="name" required>
-      <label for="pName">' . gTxt('Full name') . '</label>
+      <input type="text" class="form-control" id="pName" placeholder="<?= gTxt('Full name') ?>" name="name" required>
+      <label for="pName"><?= gTxt('Full name') ?></label>
     </div>
 
     <div class="form-floating mb-3">
-      <select class="form-select" id="permissionId" name="permissionId">' . $param['permission'] . '</select>
-      <label for="permissionId">' . gTxt('Permissions') . '</label>
+      <select class="form-select" id="permissionId" name="permissionId"><?= $param['permission'] ?></select>
+      <label for="permissionId"><?= gTxt('Permissions') ?></label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" id="pLogin" placeholder="' . gTxt('Login') . '" name="login">
-      <label for="pLogin">' . gTxt('Login') . '</label>
+      <input type="text" class="form-control" id="pLogin" placeholder="<?= gTxt('Login') ?>" name="login">
+      <label for="pLogin"><?= gTxt('Login') ?></label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" id="pPassword" placeholder="' . gTxt('Password') . '" name="password" required>
-      <label for="pPassword">' . gTxt('Password') . '</label>
+      <input type="password" class="form-control" id="pPassword" placeholder="<?= gTxt('Password') ?>" name="password" required>
+      <label for="pPassword"><?= gTxt('Password') ?></label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="tel" class="form-control" id="pPhone" placeholder="' . gTxt('Phone') . '" name="phone" required>
-      <label for="pPhone">' . gTxt('Phone') . '</label>
+      <input type="tel" class="form-control" id="pPhone" placeholder="<?= gTxt('Phone') ?>" name="phone" required>
+      <label for="pPhone"><?= gTxt('Phone') ?></label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="email" class="form-control" id="pEmail" placeholder="' . gTxt('Email') . '" name="email" required>
-      <label for="pEmail">' . gTxt('Email') . '</label>
-    </div>' .
-    $managerFieldHtml
-    . '<div id="changeField" class="row">
+      <input type="email" class="form-control" id="pEmail" placeholder="<?= gTxt('Email') ?>" name="email" required>
+      <label for="pEmail"><?= gTxt('Email') ?></label>
+    </div>
+    <?= $managerFieldHtml ?>
+    <div id="changeField" class="row">
       <div class="col-12 col-md-6 ps-4">
-        <label class="w-100" for="pActivity" role="button">' . gTxt('Activity') . ':</label>
+        <label class="w-100" for="pActivity" role="button"><?= gTxt('Activity') ?>:</label>
       </div>
       <div class="col-12 col-md-6">
         <div class="form-check form-switch mb-3 text-center">
@@ -138,15 +138,16 @@ $field[VC::BASE_FOOTER_CONTENT] .= '
 <template id="userChangePassForm">
   <form action="#">
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" id="changePassword" placeholder="' . gTxt('New password') . '" name="newPass" required>
-      <label for="changePassword">' . gTxt('New password') . '</label>
+      <input type="password" class="form-control" id="changePassword" placeholder="<?= gTxt('New password') ?>" name="newPass" required>
+      <label for="changePassword"><?= gTxt('New password') ?></label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" id="repeatPassword" placeholder="' . gTxt('Repeat password') . '" name="repeatPass" required>
-      <label for="repeatPassword">' . gTxt('Repeat password') . '</label>
+      <input type="password" class="form-control" id="repeatPassword" placeholder="<?= gTxt('Repeat password') ?>" name="repeatPass" required>
+      <label for="repeatPassword"><?= gTxt('Repeat password') ?></label>
     </div>
   </form>
-</template>';
+</template>
+<?php $main->addControllerField(VC::BASE_FOOTER_CONTENT, ob_get_clean());
 
-$field[VC::BASE_FOOTER_CONTENT] .= $main->initDictionary();
+$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary());

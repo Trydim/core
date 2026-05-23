@@ -23,15 +23,17 @@ final class Main {
     VC::ACCESS_MENU   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
     VC::ENCRYPT_ALGO  => 'aes-256-cbc',
   ];
-
   const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';
-
 
   private static ?self $instance = null;
 
+  private bool $hasDealers = false;
   private array $setting = [];
   private array $cmsParam = [];
-  private array $controllerField;
+  private array $controllerField = [
+    VC::BASE_CSS_LINKS => [],
+    VC::BASE_JS_LINKS => [],
+  ];
 
   public array $dbTables = [];
 
@@ -39,11 +41,10 @@ final class Main {
 
   public \Dotenv\Dotenv $env;
 
-  public DbProxy $db;
-
-  public UrlGenerator $url;
-  public Dealer $dealer;
-  public Response $response;
+  public readonly DbProxy $db;
+  public readonly UrlGenerator $url;
+  public readonly Dealer $dealer;
+  public readonly Response $response;
 
   public bool $publicDealer = true;
 
@@ -57,6 +58,7 @@ final class Main {
    */
   private function __construct(array $publicConfig, array $dbConfig) {
     $this->setCmsParam(array_merge(self::CMS_PARAM, $publicConfig));
+    $this->setDealersMode();
     $this->setSettings(VC::DB_CONFIG, $dbConfig);
 
     $this->db       = new DbProxy(new DbMain($this));
@@ -96,13 +98,6 @@ final class Main {
          ->applyAuth();
   }
 
-
-  // Request
-  //--------------------------------------------------------------------------------------------------------------------
-  /*public function getRequest($key) {
-    $this->url->request->
-  }*/
-
   // Environment variables
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -131,6 +126,21 @@ final class Main {
   // Cms Params
   //--------------------------------------------------------------------------------------------------------------------
 
+  private function setDealersMode(): void
+  {
+    $accessMenu = $this->getCmsParam(VC::ACCESS_MENU, []);
+
+    foreach ($accessMenu as $item) {
+      if (is_array($item)) $item = $item['link'] ?? $item[0] ?? '';
+      if ($item === 'dealers') {
+        $this->hasDealers = true;
+        return;
+      }
+    }
+
+    $this->hasDealers = false;
+  }
+
   /**
    * @throws ReflectionException
    */
@@ -151,6 +161,11 @@ final class Main {
     $this->setDealer($this->db->loadDealerById());
 
     return $this;
+  }
+
+  public function hasDealers(): bool
+  {
+    return $this->hasDealers;
   }
 
   public function setCmsParam(array|string $param, mixed $value = null): Main {
@@ -180,6 +195,16 @@ final class Main {
     } else {
       return $this->cmsParam[$param[0]][$param[1]] ?? $default;
     }
+  }
+
+  public function isDealer(): bool
+  {
+    return $this->getCmsParam(VC::IS_DEALER);
+  }
+
+  public function getDealerId(): int|string
+  {
+    return $this->getCmsParam(VC::DEALER_ID) ?? 1;
   }
 
   // Settings
@@ -321,8 +346,6 @@ final class Main {
     $this->controllerField['content'] = $field['content'] ?? (empty($templateContent) ? $this->url->getRoute() . ' default content.' : $templateContent);
   }
 
-  //public function getControllerParam(string $key) { return $this->controllerParam[$key] ?: false; }
-
   public function initDefaultController(): Main {
     $target = $this->url->getRoute();
 
@@ -330,8 +353,6 @@ final class Main {
       'main'        => $this,
       'pageTitle'   => $this->getCmsParam(VC::PROJECT_TITLE) . ' ' . gTxt(ucfirst($target)),
       'headContent' => '',
-      'cssLinks'    => [],
-      'jsLinks'     => [],
 
       'pageHeader' => null,
       'sideLeft'   => null,
@@ -339,8 +360,6 @@ final class Main {
       'pageFooter' => null,
       'footerContent'     => null,
       'footerContentBase' => null,
-
-      'global'   => null,
     ];
 
     $this->setControllerField($field)->fireHook($target . 'Template', $field);

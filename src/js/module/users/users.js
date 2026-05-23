@@ -65,7 +65,7 @@ const users = {
     this.onEvent();
   },
 
-  setUsers(users) { users.forEach(i => data.usersList.set(i['ID'], i)); },
+  setUsers(users) { users.forEach(i => data.usersList.set(i['id'], i)); },
   fillTable(users) {
     const contactsTmp = tmp.contacts || (tmp.contacts = f.gT('#tableContactsValue'));
 
@@ -105,7 +105,7 @@ const users = {
 
   setPermission(data) {
     this.permissionList = new Map();
-    data.forEach(i => this.permissionList.set(i['ID'], i));
+    data.forEach(i => this.permissionList.set(i['id'], i));
   },
 
   fillPermission(data) {

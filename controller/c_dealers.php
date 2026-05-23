@@ -51,10 +51,14 @@ if ($main->getCmsParam(VC::LOCALES)) {
 }
 
 // All dealers properties
+// If user have table property, add libs
+$hasTableProp = false;
 $dealerProps = array_merge($dealerProps, $main->getSettings(VC::DEALER_PROPERTIES));
 foreach ($main->db->getTables('prop') as $table) {
   // Param saved in JSON
   $prop = $dealerProps[$table['dbTable']] ?? [];
+
+  if ($prop['type'] === 'table') $hasTableProp = true;
 
   $dealerProps[$table['dbTable']] = [
     'name'   => $prop['name'] ?? $table['name'],
@@ -67,18 +71,11 @@ foreach ($main->db->getTables('prop') as $table) {
 }
 $field['footerContent'] .= $main->getFrontContent('dataProperties', $dealerProps);
 
-// If user have table property, add libs
-$haveTable = array_find($dealerProps, function ($prop) { return $prop['type'] === 'table'; });
-
 $main->setControllerField($field)
      ->addAssets(['module/dealers.css', 'module/dealers.js']);
-
-if (!empty($haveTable)) $main->addAssets('libs/handsontable.full.min.js', 'before');
-
-unset($values, $dealerProps, $haveTable);
+if ($hasTableProp) $main->addAssets('libs/handsontable.full.min.js', 'before');
 
 $main->fireHook(VC::HOOKS_DEALERS_TEMPLATE, $main);
-
 $field[VC::BASE_CONTENT] = template('dealers', ['param' => $param ?? []]);
-
 $main->response->setContent(template('base', $field));
+unset($values, $dealerProps, $haveTable);

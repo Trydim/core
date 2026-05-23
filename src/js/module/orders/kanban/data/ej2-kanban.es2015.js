@@ -2330,7 +2330,7 @@ class KanbanDialog {
         let fields = this.parent.dialogSettings.fields;
         if (fields.length === 0) {
             fields = [
-                { text: 'ID', key: this.parent.cardSettings.headerField, type: 'TextBox' },
+                { text: 'id', key: this.parent.cardSettings.headerField, type: 'TextBox' },
                 { key: this.parent.keyField, type: 'DropDown' },
                 { key: this.parent.cardSettings.contentField, type: 'TextArea' }
             ];

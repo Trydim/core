@@ -61,10 +61,6 @@ switch ($action) {
 
     // Найти пользователя у всех дилеров
     foreach ($db->loadDealers(false, false) as $dealer) {
-      $prefix = $dealer['cmsParam']['prefix'] ?? false;
-      if (!$prefix) def($dealer['ID'] . ' not have prefix');
-
-      $db->setPrefix($prefix);
       foreach ($db->loadUsers($pagerParam) as $user) {
         $tgUsername = trim($contacts['telegramUsername'] ?? '');
 
@@ -87,7 +83,7 @@ switch ($action) {
       'dbUsername' => 'dbUser',
       'dbPass'     => 'WHZM4JpunONGycm'
     ];
-    $db->addDb('maker', $dbMakerConfig)->selectDb('maker')->setPrefix('');
+    $db->addDb('maker', $dbMakerConfig)->selectDb('maker');
 
     foreach ($db->loadUsers($pagerParam) as $user) {
       $tgUsername = str_replace('@', '', trim($contacts['telegramUsername'] ?? ''));

@@ -120,7 +120,7 @@ export default class {
   ordersPrepare(data) {
     return data.map(item => {
       // Обязательный поля для библиотеки
-      item.Id     = +item['ID'];
+      item.Id     = +item['id'];
       item.Status = item.status;
       item.Summary = '';
 
@@ -142,7 +142,7 @@ export default class {
 
       item.total = new Intl.NumberFormat("ru-RU").format(item.total)
 
-      this.orders[item['ID']] = item;
+      this.orders[item['id']] = item;
 
       return item;
     });
@@ -157,7 +157,7 @@ export default class {
   fillSelectStatus(data) {
     data.forEach((s, index) => {
       const name = s.name.trim();
-      this.statusList[name] = s.ID;
+      this.statusList[name] = s.id;
 
       this.kanbanObj.addColumn({
         template: '#headerTemplate',

@@ -43,7 +43,7 @@ export default class extends KanbanBase {
 
     //this.queryParam.currentStatusId = this.orders[this.selected.getSelected()[0]].statusId;
     this.queryParam.statusId = this.statusList[order.Status];
-    this.queryParam.orderIds = [order.ID];
+    this.queryParam.orderIds = [order.id];
     void this.query('changeOrders');
   }
 
@@ -62,7 +62,7 @@ export default class extends KanbanBase {
 
   itemOpen(args) {
     const link = f.gI(f.ID.PUBLIC_PAGE),
-          id  = args.data['ID'];
+          id  = args.data['id'];
 
     link.href += '?' + 'orderId=' + id;
     link.click();
@@ -76,7 +76,7 @@ export default class extends KanbanBase {
         mode: 'docs',
         cmsAction: 'pdf',
         addCustomer: true,
-        orderId: args.data['ID'],
+        orderId: args.data['id'],
       },
     }).then(data => {
       f.removeLoading(args.element);

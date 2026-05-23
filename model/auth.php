@@ -19,13 +19,14 @@ switch ($cmsAction) {
       $_SESSION['name']     = $user['name'];
       $_SESSION['login']    = $user['login'];
       $_SESSION['password'] = $password;
+      $_SESSION['userType'] = $user['userType'];
       $_SESSION['PHPSESSID'] = $_COOKIE['PHPSESSID'];
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
-      $main->db->setUserHash($user['id'], $_SESSION['hash']);
+      $main->db->setUserHash($user['id'], $_SESSION['hash'], $_SESSION['userType']);
 
-      if ($main->isDealer() || isset($user['dealerId'])) {
-        $_SESSION['dealerId'] = $user['dealerId'] ?? $main->getCmsParam('dealerId');
+      if ($main->isDealer() || ($main->hasDealers() && isset($user['dealerId']))) {
+        $_SESSION['dealerId'] = $user['dealerId'];
 
         // Subdomain or sub folder
         $target = $main->url->getUri();
@@ -61,10 +62,11 @@ switch ($cmsAction) {
       $_SESSION['name']     = $user['name'];
       $_SESSION['login']    = $user['login'];
       $_SESSION['token']    = $token;
+      $_SESSION['userType'] = $user['userType'] ?? 'user';
       $_SESSION['PHPSESSID'] = $_COOKIE['PHPSESSID'];
 
       $_SESSION['hash'] = password_hash($_COOKIE['PHPSESSID'] . $password, PASSWORD_BCRYPT);
-      $main->db->setUserHash($user['id'], $_SESSION['hash']);
+      $main->db->setUserHash($user['id'], $_SESSION['hash'], $_SESSION['userType']);
 
       foreach (['targetPage', 'mode', 'cmsAction', 'param', 'PHPSESSID'] as $key) {
         unset($requestParams[$key]);
@@ -78,8 +80,7 @@ switch ($cmsAction) {
     $dealerId = $_SESSION['dealerId'] ?? false;
 
     if (isset($_SESSION['id'])) {
-      $userId = $_SESSION['id'];
-      $main->db->setUserHash($userId, password_hash(uniqid(), PASSWORD_BCRYPT));
+      $main->db->setUserHash($_SESSION['id'], password_hash(uniqid(), PASSWORD_BCRYPT), $_SESSION['userType'] ?? 'user');
     }
 
     session_destroy();

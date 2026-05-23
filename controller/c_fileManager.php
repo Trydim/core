@@ -46,14 +46,8 @@ function tree($path): void
   }
 }
 
-$field = [
-  VC::BASE_PAGE_TITLE => 'File manager',
-];
-
-$main->setControllerField($field)
+$main->addControllerField(VC::BASE_PAGE_TITLE, 'Файловый менеджер')
      ->addAssets(['module/fileManager.css', 'module/fileManager.js'])
-     ->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main);
-
-$field[VC::BASE_CONTENT] = template('fileManager');
-
-$main->response->setContent(template('base', $field));
+     ->addControllerField(VC::BASE_CONTENT, template('fileManager'))
+     ->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main)
+     ->response->setContent(template());

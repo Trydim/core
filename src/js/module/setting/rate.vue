@@ -39,7 +39,7 @@
              @cell-edit-complete="onEditComplete"
              style="width: 60vw"
     >
-      <p-t-column field="ID" header="ID" style="width: 5%" />
+      <p-t-column field="id" header="id" style="width: 5%" />
       <p-t-column field="code" :sortable="true" :header="$t('Code')"  style="width: 10%" >
         <template #editor="{data, field}">
           <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
@@ -68,13 +68,13 @@
       <p-t-column field="main" :header="$t('Main')" style="width: 10%">
         <template #body="slotProps">
           <p-checkbox type="radio" class="d-block mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
-                      @click="setMain(slotProps.data.ID)" />
+                      @click="setMain(slotProps.data.id)" />
         </template>
       </p-t-column>
       <p-t-column field="lastEditDate" :header="$t('Delete')">
         <template #body="slotProps">
           <p-button class="d-block mx-auto p-button-rounded p-button-text p-button-sm text-center" icon="pi pi-times"
-                    @click="deleteRate(slotProps.data.ID)" />
+                    @click="deleteRate(slotProps.data.id)" />
         </template>
       </p-t-column>
     </p-table>
@@ -119,9 +119,9 @@ export default {
     rowClass(data) {
       return data.delete ? 'bg-danger' : '';
     },
-    setMain(ID) {
+    setMain(id) {
       this.rate.forEach(rate => {
-        if (rate.ID !== ID) rate.main = false;
+        if (rate.id !== id) rate.main = false;
       });
     },
     onEditComplete(event) {
@@ -157,7 +157,7 @@ export default {
 
     addRate() {
       this.rate.push({
-        ID  : 'new' + f.random(),
+        id  : 'new' + f.random(),
         code: '', name: '', shortName: '',
         scale: 1, rate : 1,
         main: false,
@@ -166,7 +166,7 @@ export default {
     },
     deleteRate(id) {
       this.rate.forEach(i => {
-        if (i.ID === id) i.delete = i.delete !== undefined ? !i.delete : true;
+        if (i.id === id) i.delete = i.delete !== undefined ? !i.delete : true;
       });
     },
     modalHide() {

@@ -38,15 +38,12 @@ ob_start(); ?>
 <div class="position-fixed bottom-0 end-0" style="z-index: 10">
   <input type="button" id="legend" class="btn btn-gray m-2" value="<?= gTxt('Help') ?>">
 </div>
-<?php $field['content'] = ob_get_clean();
+<?php $main->addControllerField(VC::BASE_CONTENT, ob_get_clean());
 
-$legendHtml = '';
-if (isset($legend[$tableActive])) {
-  $legendHtml = "<template id='dataTableLegend'><div>" . $legend[$tableActive] . "</div></template>";
-}
-
-$field['footerContent'] = <<<temp
-$legendHtml
+ob_start();
+if (isset($legend[$tableActive])) { ?>
+  <template id='dataTableLegend'><div><?= $legend[$tableActive] ?></div></template>
+<?php } ?>
 <template id="formViewsTmp">
   <form action="#"></form>
 </template>
@@ -98,6 +95,6 @@ $legendHtml
 <template id="btnDelCancel">
   <input type="button" value="Отменить" class="">
 </template>
-temp;
+<?php $main->addControllerField(VC::BASE_FOOTER_CONTENT, ob_get_clean());
 
-$field['footerContent'] .= $main->initDictionary();
+$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary());

@@ -1,9 +1,11 @@
 @font-face {
   font-family: nbrb;
   font-display: swap;
+  font-stretch: 100%;
   src: url("../../fonts/nbrb.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
+  unicode-range: U+0183
 }
 
 .main-wrapper {

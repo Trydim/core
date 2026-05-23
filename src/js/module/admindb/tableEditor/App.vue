@@ -70,23 +70,6 @@
         <span class="col-6">Ключ</span><input type="text" class="col" v-model="param.id">
       </label>
       <div v-else-if="param.type === 'relationTable'"></div>
-
-      <!--<div class="d-flex justify-content-between">
-        <label>Таблица (файл)</label>
-        <select name="dbTable" data-field="dbTables" data-action="selectDbTables"></select>
-      </div>
-      <div class="d-flex justify-content-between">
-        <label>Поля зависимостей(колонка)</label>
-        <select name="tableCol" data-field="tableCol"></select>
-      </div>
-      <div class="d-flex justify-content-between">
-        <label>Множественный</label>
-        <input type="checkbox" name="multiple" value="true">
-      </div>
-      <div class="d-flex flex-column">
-        <label>Зависимое поле<input type="text" placeholder="ID зависимого поля" name="relTarget"></label>
-        <label>Отображать, если активен<input type="checkbox" checked name="relativeWay"></label>
-      </div>-->
     </Modal>
   </div>
 </template>

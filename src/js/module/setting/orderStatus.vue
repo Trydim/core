@@ -10,14 +10,14 @@
       </div>
 
       <div class="mb-3" style="max-height: 140px; overflow-y: auto">
-        <template v-for="(item, index) of status" :key="item.ID">
+        <template v-for="(item, index) of status" :key="item.id">
           <div v-if="!item.delete" class="input-group mb-1">
             <p-input-text class="form-control" v-tooltip.bottom="$t('Code (optional)')"
                           :disabled="!!+item.required" v-model.trim="item.code" />
             <p-input-text class="form-control w-50" v-model.trim="item.name" @blur="checkNames" />
             <p-input-text class="form-control" v-tooltip.bottom="$t('Sorting')" v-model="item.sort" />
             <div class="input-group-text">
-              <p-radiobutton v-tooltip.bottom="$t('Default')" :value="item.ID" v-model="statusDef" />
+              <p-radiobutton v-tooltip.bottom="$t('Default')" :value="item.id" v-model="statusDef" />
             </div>
             <p-button v-tooltip.bottom="$t('Delete')" icon="pi pi-times" class="p-button-danger"
                       :disabled="!!+item.required"
@@ -62,7 +62,7 @@ export default {
       const node = f.qS('#dataOrdersStatus');
 
       if (node && node.value) this.setList(JSON.parse(node.value));
-      if (!this.statusDef) this.statusDef = this.status[0].ID;
+      if (!this.statusDef) this.statusDef = this.status[0].id;
 
       node.remove();
     },
@@ -76,7 +76,7 @@ export default {
 
     addStatus() {
       this.status.push({
-        ID  : Math.random(),
+        id  : Math.random(),
         code: 'status',
         name: 'Новый статус',
         sort: 50,

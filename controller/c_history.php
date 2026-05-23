@@ -4,9 +4,7 @@
  * @var Main $main - global
  */
 
-$field = [
-  VC::BASE_FOOTER_CONTENT => $main->initDictionary(),
-];
-
-require $main->url->getRoutePath();
-$main->response->setContent(template('base', $field));
+$main->addControllerField(VC::BASE_PAGE_TITLE, 'История изменений')
+     ->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary())
+     ->addControllerField(VC::BASE_CONTENT, '<div class="historyPage" id="h-100"></div>')
+     ->response->setContent(template());

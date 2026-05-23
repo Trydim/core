@@ -5,9 +5,12 @@
  * @var array $param - from controller c_orders.php
  */
 
-$field['content'] = template('parts/ordersContent', $param);
+$main->addControllerField(VC::BASE_CONTENT, template('parts/ordersContent', $param));
 
-$field['footerContent'] .= '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>';
+$main->addControllerField(
+  VC::BASE_FOOTER_CONTENT,
+  '<a id="publicPageLink" href="' . $main->url->getPath() . '" hidden></a>'
+);
 
 $orderColumnsTableTmp = '';
 foreach ($param['orderColumns'] as $column) {
@@ -21,21 +24,19 @@ foreach ($param['orderColumns'] as $column) {
     </div>';
 }
 
-$mail = gTxt('E-Mail');
-
-$field['footerContent'] .= <<<footerContent
+ob_start(); ?>
 <template id="changeStatus">
-  <option value="\${ID}">\${name}</option>
+  <option value="${id}">${name}</option>
 </template>
 <template id="tableHeaderCell">
   <th>
-    <input type="button" class="btn btn-info btn-sm table-th" value="\${name}" data-column="\${dbName}">
+    <input type="button" class="btn btn-info btn-sm table-th" value="${name}" data-column="${dbName}">
   </th>
 </template>
 <template id="sendMailTmp">
   <form class="content-center" action="#" id="authForm">
     <div class="input-group">
-      <span class="input-group-text">$mail:</span>
+      <span class="input-group-text"><?= gTxt('E-Mail') ?>:</span>
       <input type="text" id="email" class="form-control" required name="email">
     </div>
   </form>
@@ -44,26 +45,17 @@ $field['footerContent'] .= <<<footerContent
   <tr><td colspan="15">не найдено</td></tr>
 </template>
 <template id="tableContactsValue">
-  <div>\${key}: \${value}</div>
+  <div>${key}: ${value}</div>
 </template>
-<!--template id="orderOpenForm">
-  <div>
-    <div>Дата создания - \${create_date}</div>
-    <div>Дата редактирования - \${last_edit_date}</div>
-    <div>Заказчик - \${customer}</div>
-    <div>Менеджер - \${name}</div>
-    <div>Статус - \${status}</div>
-    <div>\${important_value}</div>
-    <div>\${report_value}</div>
-    <div>\${total}</div>
-  </div>
-</template-->
 <template id="orderColumnsTableTmp">
   <form action="#" id="columnsSetting">$orderColumnsTableTmp</form>
 </template>
-footerContent;
+<?php $main->addControllerField(VC::BASE_FOOTER_CONTENT, ob_get_clean());
+
 
 $printTpl = template('docs/printTpl');
-if (!includes($printTpl, 'not found')) $field['footerContent'] .= template('docs/printTpl');
+if (!includes($printTpl, 'not found')) {
+  $main->addControllerField(VC::BASE_FOOTER_CONTENT, template('docs/printTpl'));
+}
 
-$field['footerContent'] .= $main->initDictionary();
+$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary());

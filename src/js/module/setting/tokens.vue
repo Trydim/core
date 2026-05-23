@@ -10,14 +10,14 @@
       </div>
 
       <div class="mb-3" style="max-height: 140px; overflow-y: auto">
-        <template v-for="(item, index) of status" :key="item.ID">
+        <template v-for="(item, index) of status" :key="item.id">
           <div v-if="!item.delete" class="input-group mb-1">
             <p-input-text v-tooltip.bottom="'код (необязательно)'" class="form-control"
                           :disabled="+item.required" v-model="item.code" />
             <p-input-text v-model="item.name" class="form-control w-50" />
             <p-input-text v-tooltip.bottom="'сортировка'" v-model="item.sort" class="form-control" />
             <div class="input-group-text">
-              <p-radiobutton v-tooltip.bottom="'По умолчанию'" v-model="statusDef" :value="item.ID" />
+              <p-radiobutton v-tooltip.bottom="'По умолчанию'" v-model="statusDef" :value="item.id" />
             </div>
             <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-times" class="p-button-danger"
                       :disabled="+item.required"
@@ -49,7 +49,7 @@ export default {
       const node = f.qS('#dataOrdersStatus');
 
       this.status = node && node.value ? JSON.parse(node.value) : false;
-      if (!this.statusDef) this.statusDef = this.status[0].ID;
+      if (!this.statusDef) this.statusDef = this.status[0].id;
 
       node.remove();
     },
@@ -63,7 +63,7 @@ export default {
 
     addStatus() {
       this.status.push({
-        ID: Math.random(),
+        id: Math.random(),
         code: 'status',
         name: 'Новый статус',
         sort: 50,
