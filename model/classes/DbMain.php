@@ -333,32 +333,44 @@ class DbMain extends R {
   }
 
   public function checkHaveRows(string $dbTable, string $columnName, mixed $value): int {
-    return intval(self::getCell("SELECT count(*) FROM $dbTable
-                                     WHERE $columnName = :value", [':value' => $value]));
+    $sql = "SELECT count(*) FROM $dbTable WHERE $columnName = :value";
+    $params = [':value' => $value];
+
+    if (in_array($dbTable, self::DB_MAIN_TABLES, true)) {
+      $sql .= " AND dealer_id = :dealerId";
+      $params[':dealerId'] = $this->getDealerId();
+    }
+
+    return intval(self::getCell($sql, $params));
   }
 
   public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'id'): int {
-    $count = 0;
-    if ($primaryKey !== 'id') {
-      foreach ($ids as $id) {
-        $count += self::exec("DELETE FROM $dbTable WHERE $primaryKey = '$id'");
+    $beans = [];
+    $isDealerTable = in_array($dbTable, self::DB_MAIN_TABLES, true);
+
+    foreach ($ids as $id) {
+      if ($primaryKey === 'id' && $isDealerTable === false) {
+        $bean = self::load($dbTable, $id);
+      } else {
+        $where = "`$primaryKey` = ?";
+        $params = [$id];
+
+        if ($isDealerTable) {
+          $where .= ' AND dealer_id = ?';
+          $params[] = $this->getDealerId();
+        }
+
+        $bean = self::findOne($dbTable, $where, $params);
       }
-      return $count;
+
+      if ($bean === null || intval($bean->id) === 0) continue;
+      $beans[] = $bean;
     }
 
-    if (count($ids) === 1) {
-      $bean = self::xdispense($dbTable);
-      $bean->id = $ids[0];
-      $count = self::trash($bean);
-    } else {
-      $beans = self::xdispense($dbTable, count($ids));
+    if (count($beans) === 1) self::trash($beans[0]);
+    else if (count($beans) > 1) self::trashAll($beans);
 
-      for ($i = 0; $i < count($ids); $i++) {
-        $beans[$i]->id = $ids[$i];
-      }
-
-      $count = self::trashAll($beans);
-    }
+    $count = count($beans);
     return count($ids) === $count ? $count : 0;
   }
 
@@ -426,8 +438,8 @@ class DbMain extends R {
     if (count($param) === 0) return [];
     $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
 
-    $addDealerId = in_array($dbTable, self::DB_MAIN_TABLES);
-    $beans = self::xdispense($dbTable, count($param));
+    $addDealerId = in_array($dbTable, self::DB_MAIN_TABLES, true);
+    $dealerId = $this->getDealerId();
 
     $idColName = 'id';
     foreach ($curTable as $col) {
@@ -458,35 +470,39 @@ class DbMain extends R {
     }
 
     try {
-      if (count($param) === 1) {
-        if ($addDealerId) $beans->dealerId = $this->getDealerId();
+      $storedBeans = [];
 
-        foreach ($param as $id => $item) {
-          $change && $beans->id = $id;
+      foreach ($param as $id => $item) {
+        if ($change && $addDealerId) {
+          $bean = self::findOne($dbTable, ' id = ? AND dealer_id = ? ', [$id, $dealerId]);
 
-          foreach ($item as $k => $v) {
-            if (isset($idColName) && $idColName === $k) continue;
-            if (in_array($k, self::DB_JSON_FIELDS) && is_string($v) === false) $v = json_encode($v);
-            $beans->$k = $v;
+          if ($bean === null) {
+            $result['error'][] = [
+              'id'         => $id,
+              'columnName' => 'dealer_id',
+              'cause'      => 'Wrong dealer_id',
+            ];
+            continue;
           }
+        } else {
+          $bean = self::xdispense($dbTable);
+          $change && $bean->id = $id;
         }
-        self::store($beans);
 
-      } else {
-
-        $i = 0;
-        foreach ($param as $id => $item) {
-          if ($addDealerId) $beans[$i]->dealerId = $this->getDealerId();
-          $change && $beans[$i]->id = $id;
-
-          foreach ($item as $k => $v) {
-            if (in_array($k, self::DB_JSON_FIELDS) && is_string($v) === false) $v = json_encode($v);
-            $beans[$i]->$k = $v;
-          }
-          $i++;
+        foreach ($item as $k => $v) {
+          if (isset($idColName) && $idColName === $k) continue;
+          if ($addDealerId && in_array($k, ['dealer_id', 'dealerId'], true)) continue;
+          if (in_array($k, self::DB_JSON_FIELDS) && is_string($v) === false) $v = json_encode($v);
+          $bean->$k = $v;
         }
-        self::storeAll($beans);
+
+        if ($addDealerId) $bean->dealerId = $dealerId;
+
+        $storedBeans[] = $bean;
       }
+
+      if (count($storedBeans) === 1) self::store($storedBeans[0]);
+      else if (count($storedBeans) > 1) self::storeAll($storedBeans);
     } catch (RedException $e) {
       return [
         'result' => $result,
@@ -495,7 +511,7 @@ class DbMain extends R {
     }
 
     if ($change === false && count($param) === 1) {
-      $result[$dbTable . 'Id'] = $beans->getID();
+      $result[$dbTable . 'Id'] = $storedBeans[0]->getID();
     }
 
     return $result;

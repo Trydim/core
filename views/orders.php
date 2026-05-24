@@ -5,7 +5,8 @@
  * @var array $param - from controller c_orders.php
  */
 
-$main->addControllerField(VC::BASE_CONTENT, template('parts/ordersContent', $param));
+$main->addControllerField(VC::BASE_CONTENT, template('parts/ordersContent', $param))
+     ->addAssets(['module/orders.css', 'module/orders.js']);
 
 $main->addControllerField(
   VC::BASE_FOOTER_CONTENT,

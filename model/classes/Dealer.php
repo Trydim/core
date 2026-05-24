@@ -26,22 +26,22 @@ class Dealer {
       try {
         mkdir($this::FOLDER);
       } catch (\ErrorException $e) {
-        die('Dealer folder not created!');
+        throw new \RuntimeException('[Dealer:createFolderDealers]: Dealer folder not created!', 0, $e);
       }
     }
   }
   private function createFolder(): void
   {
-    if (is_dir($this->dealerDir)) die('Dealer folder exist!');
+    if (is_dir($this->dealerDir)) throw new \RuntimeException('[Dealer:createFolder]: Dealer folder exist!');
 
     try {
       mkdir($this->dealerDir);
     } catch (\Exception $e) {
-      die("$this->dealerDir folder not created");
+      throw new \RuntimeException("[Dealer:createFolder]: $this->dealerDir folder not created", 0, $e);
     }
   }
   private function checkFolder(): bool {
-    if (!is_dir($this->dealerDir)) die("$this->dealerDir folder does not exist!");
+    if (!is_dir($this->dealerDir)) throw new \RuntimeException("[Dealer:checkFolder]: $this->dealerDir folder does not exist!");
 
     return true;
   }
@@ -69,13 +69,13 @@ class Dealer {
         $this->copy($this::RESOURCES . $dir, $this->dealerPath . $dir);
       }
     } catch (\Exception $e) {
-      die('Error copying resources');
+      throw new \RuntimeException('[Dealer:copyFiles]: Error copying resources', 0, $e);
     }
   }
   private function createConfig(array $params): void
   {
     $config = file_get_contents($this::RESOURCES . 'config.php');
-    if (!$config) die('Dealer configuration file does not exist!');
+    if (!$config) throw new \RuntimeException('[Dealer:createConfig]: Dealer configuration file does not exist!');
 
     $setParam = function ($paramName, $params) use (&$config) {
       $value = is_array($params) ? $params[$paramName] : $params;

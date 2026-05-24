@@ -41,8 +41,7 @@ $main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataO
 
 if ($param['showFilter']) $param['filterOptions'] = $main->db->selectQuery($param['showFilter'], ['id', 'name']);
 
-$main->addAssets(['module/orders.css', 'module/orders.js'])
-     ->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);
+$main->fireHook(VC::HOOKS_ORDER_TEMPLATE, $main);
 
 require $main->url->getRoutePath();
 $main->addControllerField(VC::BASE_FOOTER_CONTENT, template('parts/ordersFooterContent', $param))

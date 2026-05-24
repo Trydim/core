@@ -4,3 +4,4 @@
 /assets/
 
 /src/test/cypress.json
+/libs/composer.lock

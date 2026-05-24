@@ -190,6 +190,125 @@ trait DbOrders
     $this->insert($columns, $dbTable, $param, true);
   }
 
+  private function getOrderStatusById(int $statusId): array
+  {
+    return self::getRow(
+      'SELECT id, name
+       FROM order_status
+       WHERE id = :id AND (dealer_id = :dealerId OR dealer_id IS NULL)
+       LIMIT 1',
+      [':id' => $statusId, ':dealerId' => $this->getDealerId()]
+    );
+  }
+
+  private function loadOrdersStatusForUpdate(array $orderIds): array
+  {
+    if (!count($orderIds)) return [];
+
+    $sql = "SELECT O.id AS 'id',
+                   O.status_id AS 'statusId',
+                   S.name AS 'status'
+            FROM orders O
+            JOIN order_status S ON O.status_id = S.id
+            WHERE O.dealer_id = ? AND O.id IN (" . self::genSlots($orderIds) . ")
+            FOR UPDATE";
+
+    return self::getAll($sql, array_merge([$this->getDealerId()], $orderIds));
+  }
+
+  private function updateOrdersStatus(array $orderIds, int $statusId): int
+  {
+    $sql = 'UPDATE orders
+            SET status_id = ?
+            WHERE dealer_id = ? AND id IN (' . self::genSlots($orderIds) . ')';
+
+    return self::exec($sql, array_merge([$statusId, $this->getDealerId()], $orderIds));
+  }
+
+  private function saveOrderStatusHistory(array $orders, array $toStatus, array $author = []): int
+  {
+    $count = 0;
+    $authorId = isset($author['id']) && is_numeric($author['id']) ? intval($author['id']) : null;
+    $authorName = strval($author['name'] ?? '');
+    $comment = isset($author['comment']) ? strval($author['comment']) : null;
+
+    $sql = "INSERT INTO order_status_history (
+              dealer_id,
+              order_id,
+              from_status_id,
+              to_status_id,
+              from_status_name,
+              to_status_name,
+              author_id,
+              author_name,
+              comment
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    foreach ($orders as $order) {
+      if (intval($order['statusId']) === intval($toStatus['id'])) continue;
+
+      self::exec($sql, [
+        $this->getDealerId(),
+        intval($order['id']),
+        intval($order['statusId']),
+        intval($toStatus['id']),
+        $order['status'],
+        $toStatus['name'],
+        $authorId,
+        $authorName,
+        $comment,
+      ]);
+
+      $count++;
+    }
+
+    return $count;
+  }
+
+  public function changeOrdersStatus(array $orderIds, int $statusId, int $currentStatusId, array $author = []): array
+  {
+    if (!count($orderIds)) return ['error' => 'order_ids_error'];
+    if ($statusId <= 0) return ['error' => 'status_id_error'];
+    if ($currentStatusId <= 0) return ['error' => 'current_status_id_error'];
+
+    try {
+      self::begin();
+
+      $toStatus = $this->getOrderStatusById($statusId);
+      if (!count($toStatus)) throw new RuntimeException('status_id_error');
+
+      $orders = $this->loadOrdersStatusForUpdate($orderIds);
+      if (count($orders) !== count($orderIds)) throw new RuntimeException('orders_not_found_error');
+
+      foreach ($orders as $order) {
+        if (intval($order['statusId']) !== $currentStatusId) {
+          throw new RuntimeException('current_status_is_not_equal_error');
+        }
+      }
+
+      $changedOrders = array_values(array_filter($orders, function ($order) use ($statusId) {
+        return intval($order['statusId']) !== $statusId;
+      }));
+
+      $changeCount = $this->updateOrdersStatus(
+        array_map(function ($order) { return $order['id']; }, $changedOrders),
+        $statusId
+      );
+      $historyCount = $this->saveOrderStatusHistory($changedOrders, $toStatus, $author);
+
+      self::commit();
+
+      return [
+        'changeCount' => $changeCount,
+        'historyCount' => $historyCount,
+      ];
+    } catch (Throwable $e) {
+      self::rollback();
+
+      return ['error' => $e->getMessage()];
+    }
+  }
+
   // Visitors
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -327,13 +446,20 @@ trait DbUsers
     }
   }
 
-  public function getUser(string $login, string $column = 'id'): ?array
+  public function getUser(string $login, string $column = 'id'): mixed
   {
-    $result = self::getRow("SELECT $column FROM users WHERE login = :login",
-      [':login' => $login]
-    );
+    $user = self::findOne('users', ' login = ? AND dealer_id = ? ', [$login, $this->getDealerId()]);
+    if ($user === null || intval($user->id) === 0) return [];
 
-    if (count($result) === 1 && count(explode(',', $column)) === 1) return $result[$column];
+    $result = [];
+    $columns = array_map('trim', explode(',', $column));
+
+    foreach ($columns as $col) {
+      $beanField = strtolower($col) === 'id' ? 'id' : $col;
+      $result[$col] = $user->$beanField;
+    }
+
+    if (count($result) === 1) return $result[$columns[0]];
     return $result;
   }
 
@@ -430,11 +556,15 @@ trait DbUsers
    */
   public function changeUser(int|string $loginId, array $param): void
   {
-    $user = self::xdispense('users');
-    $user->id = $loginId;
+    $user = self::findOne('users', ' id = ? AND dealer_id = ? ', [$loginId, $this->getDealerId()]);
+    if ($user === null || intval($user->id) === 0) return;
+
     foreach ($param as $key => $value) {
+      if (in_array($key, ['id', 'dealer_id', 'dealerId'], true)) continue;
       $user->$key = $value;
     }
+
+    $user->dealerId = $this->getDealerId();
     self::store($user);
   }
 
@@ -510,21 +640,13 @@ trait DbUsers
     return $ok ? $user : false;
   }
 
-  /**
-   * Get Setting for current user
-   */
-  public function getUserSetting(string $currentUser = '', string $columns = 'customization')
+  public function getUserSetting(string $currentUser = '')
   {
-    if (!$currentUser) {
-      $currentUser = $this->main->getLogin();
-    }
-    $result = self::getAssocRow("SELECT $columns from users WHERE login = ?", [$currentUser]);
+    $currentUser = $currentUser ?: $this->main->getLogin();
+    $user = self::findOne('users', ' login = ? AND dealer_id = ? ', [$currentUser, $this->getDealerId()]);
 
-    if (count($result) === 1) {
-      if ($columns === 'customization') return json_decode($result[0]['customization']);
-      if (count(explode(',', $columns)) === 1) return $result[$columns];
-    }
-    return json_decode('{}');
+    if ($user === null || intval($user->id) === 0) return json_decode('{}');
+    return json_decode($user->customization ?: '{}');
   }
 
   public function loadPermission(): array

@@ -314,18 +314,20 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       break;
     case 'changeStatusOrder':
-      if (isset($orderIds) && isset($statusId) && count($columns)) {
+      if (isset($orderIds) && isset($statusId)) {
         $orderIds = explode(',', $orderIds);
 
-        if (!is_finite($statusId)) { $result['error'] = 'status_id_error'; break; }
+        if (!is_numeric($statusId)) { $result['error'] = 'status_id_error'; break; }
 
         if (!isset($currentStatusId)) { $result['error'] = 'current_status_id_error'; break; }
 
-        foreach ($db->loadOrdersById($orderIds) as $order) {
-          if ($order['statusId'] !== $currentStatusId) { $result['error'] = 'current_status_is_not_equal_error'; break; }
-        }
+        if (!is_numeric($currentStatusId)) { $result['error'] = 'current_status_id_error'; break; }
 
-        $db->changeOrders($columns, $dbTable, $orderIds, $statusId);
+        $result = $db->changeOrdersStatus($orderIds, intval($statusId), intval($currentStatusId), [
+          'id'      => $main->getLogin('id'),
+          'name'    => $main->getLogin('name') ?: $main->getLogin(),
+          'comment' => $statusComment ?? $comment ?? null,
+        ]);
       }
       break;
     case 'delOrders':
