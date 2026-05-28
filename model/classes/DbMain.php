@@ -411,16 +411,6 @@ class DbMain extends R {
     return 0;
   }
 
-  /**
-   * insert or change rows
-   *
-   * @param array $curTable
-   * @param string $dbTable
-   * @param array $param
-   * @param bool $change
-   *
-   * @return array
-   */
   public function insert(array $curTable, string $dbTable, array $param, bool $change = false): array {
     if (count($param) === 0) return [];
     $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
@@ -550,7 +540,8 @@ class DbMain extends R {
   // Settings/Dealers Properties only main cms
   //------------------------------------------------------------------------------------------------------------------
 
-  private function parseSimpleProperty($type, $value) {
+  private function parseSimpleProperty(string $type, mixed $value): string|bool|float
+  {
     switch ($type) {
       default:
       case 'text':
@@ -575,7 +566,7 @@ class DbMain extends R {
       case 'bool': return $str . "int(1) NOT NULL DEFAULT 1";
     }
   }
-  private function getPropertyTable($propValue, $propName) {
+  private function getPropertyTable(mixed $propValue, string $propName): mixed {
     static $propTables, $props;
 
     if (!$propTables) {
@@ -604,8 +595,6 @@ class DbMain extends R {
   }
 
   public function createPropertyTable(string $dbTable, array $params) {
-    //$dbTable = $this->pf($dbTable);
-
     $sql = "CREATE TABLE $dbTable (
             `ID` int(10) UNSIGNED NOT NULL,
             `name` varchar(255) NOT NULL DEFAULT 'NoName'";
@@ -623,11 +612,6 @@ class DbMain extends R {
     return $error;
   }
 
-  /**
-   * @param string $dbTable
-   * @param array $params
-   * @return array
-   */
   public function changePropertyTable(string $dbTable, array $params): array {
     $error = [];
     $query = [];
@@ -661,11 +645,6 @@ class DbMain extends R {
     return $error;
   }
 
-  /**
-   * @param string $dbTable
-   * @param array $ids
-   * @return array
-   */
   public function loadPropertyTable(string $dbTable, array $ids): array {
     return self::getAll("SELECT * FROM $dbTable WHERE ID IN (" . self::genSlots($ids) . ' )', $ids);
   }
@@ -706,7 +685,7 @@ class DbMain extends R {
     return self::getAll($sql);
   }
 
-  public function loadCustomerByOrderId($orderId): array {
+  public function loadCustomerByOrderId(int|string $orderId): array {
     $sql = "SELECT C.ID as 'ID', C.name as 'name', ITN, contacts
       FROM " . $this->pf('orders') . " O 
       LEFT JOIN " . $this->pf('customers') . " C ON C.ID = O.customer_id
@@ -871,7 +850,7 @@ class DbMain extends R {
     return $result;
   }
 
-  public function loadDealerById(string $id = null, bool $parseSettings = true): array {
+  public function loadDealerById(?string $id = null, bool $parseSettings = true): array {
     $id = $id ?? $this->main->getCmsParam('dealerId');
 
     $sql = "SELECT ID AS 'id', name, contacts,

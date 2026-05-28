@@ -284,6 +284,17 @@ trait DbUsers
     }
   }
 
+  private function getRootUser(string $login): array
+  {
+    $sql = "SELECT id, login, password, 'root' AS 'userType',
+                   name, contacts,
+                   register_date AS 'registerDate', customization, hash
+            FROM root_users
+            WHERE login = :login AND activity = 1 LIMIT 1";
+
+    return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
+  }
+
   public function getUserFromFile(string $login = '', string $password = '', bool $status = false): bool|array
   {
     if (file_exists(SYSTEM_PATH)) {
@@ -305,7 +316,7 @@ trait DbUsers
     }
   }
 
-  public function getUser(string $login, string $column = 'id'): mixed
+  public function getUser(string $login, string $column = 'ID'): mixed
   {
     $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
       [':login' => $login]
@@ -329,13 +340,28 @@ trait DbUsers
 
   private function getFirstAuthUserByDealer(int $dealerId): array
   {
+    $sql = "SELECT id, dealer_id as 'dealerId', login, password, 'user' AS 'userType' FROM users
+            WHERE dealer_id = :dealerId AND activity = 1 LIMIT 1";
+
+    return self::getRow($sql, [':dealerId' => $dealerId]);
+  }
+
+  private function getAuthUserByLogin(string $login, int $dealerId): array
+  {
+    $sql = "SELECT id, dealer_id as 'dealerId', login, password, 'user' AS 'userType' FROM users
+            WHERE login = :login AND dealer_id = :dealerId AND activity = 1 LIMIT 1";
+
+    return self::getRow($sql, [':login' => $login, ':dealerId' => $dealerId]);
+  }
+
+  public function getUserByLogin(string $login): array
+  {
     $sql = "SELECT U.ID AS 'id', login,  password, hash,
                    U.name AS 'name', contacts, customization, activity,
                    P.ID AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
             FROM " . $this->pf('users') . " U
             JOIN " . $this->pf('permission') . " P on U.permission_id = P.ID
             WHERE login = :login";
-
     return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
   }
 
@@ -485,6 +511,18 @@ trait DbUsers
     }
     return json_decode('{}');
   }
+
+  public function loadPermission(): array
+  {
+    $sqlMain = "SELECT id, dealer_id AS 'dealerId', name, properties
+            FROM permission
+            WHERE dealer_id";
+
+    $result = $this->jsonParseField(self::getAll($sqlMain . " = :dealerId", [':dealerId' => $this->getDealerId()]));
+    if (count($result)) return $result;
+
+    return $this->jsonParseField(self::getAll($sqlMain . " IS NULL"));
+  }
 }
 
 trait DbCsv
@@ -586,7 +624,6 @@ trait DbCsv
       }
 
       file_put_contents($csvPath . $this->csvTable, $fileContent);
-      $this->main->deleteCsvCache();
     }
 
     return $this;
@@ -597,7 +634,7 @@ trait ContentEditor
 {
   private string $CONTENT_PATH = SHARE_PATH . 'content.json';
   private string $contentData = '{}';
-  private mixed $contentLoaded;
+  private array $contentLoaded = [];
 
   private function contentPath(): string
   {
