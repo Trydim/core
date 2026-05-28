@@ -68,13 +68,13 @@ class File extends SplFileInfo
    * Moves the file to a new location.
    *
    * @param string $directory The destination folder
-   * @param ?string|null $name The new file name
+   * @param string|null $name The new file name
    *
    * @return self A File object representing the new file
    *
    * @throws FileException if the target file could not be created
    */
-  public function move(string $directory, string $name = null): File {
+  public function move(string $directory, ?string $name = null): File {
     $target = $this->getTargetFile($directory, $name);
 
     set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });

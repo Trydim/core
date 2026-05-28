@@ -67,9 +67,9 @@ class Query {
      * @param  {Function} always - Defines the callback which will be invoked on either success or failure.
      *
      * <pre>
-     * let dataManager: DataManager = new DataManager([{ ID: '10' }, { ID: '2' }, { ID: '1' }, { ID: '20' }]);
+     * let dataManager: DataManager = new DataManager([{ id: '10' }, { id: '2' }, { id: '1' }, { id: '20' }]);
      * let query: Query = new Query();
-     * query.sortBy('ID', (x: string, y: string): number => { return parseInt(x, 10) - parseInt(y, 10) });
+     * query.sortBy('id', (x: string, y: string): number => { return parseInt(x, 10) - parseInt(y, 10) });
      * let promise: Promise< Object > = query.execute(dataManager);
      * promise.then((e: { result: Object }) => { });
      * </pre>

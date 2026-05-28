@@ -16,11 +16,11 @@
 
 /**
  * @typedef {Object} HistoryEntry
- * @property {string} backupId - Уникальный ID бэкапа (timestamp)
+ * @property {string} backupId - Уникальный id бэкапа (timestamp)
  * @property {string} createdAt - Дата создания
  * @property {string} userLogin - Логин пользователя
  * @property {string} [note] - Примечание к версии
- * @property {number} [userId] - ID пользователя
+ * @property {number} [userId] - id пользователя
  */
 
 /**
@@ -36,7 +36,7 @@
  * @property {string} fileMd5 - MD5 хеш содержимого файла
  * @property {string} createdAt - Дата создания в формате DD.MM.YYYY HH:mm:ss
  * @property {number} timestamp - UNIX timestamp создания
- * @property {number} userId - ID пользователя
+ * @property {number} userId - id пользователя
  * @property {string} userName - Полное имя пользователя
  * @property {string} userLogin - Логин пользователя
  * @property {string} prevBackupId - Идентификатор предыдущего бэкапа

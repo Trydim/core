@@ -19,6 +19,8 @@ class DbMain extends R {
         DB_DATE_TO     = '2100-01-01 00:00:00',
         SHOW_DATE_FORMAT = 'H:i d-m-Y';
 
+  const DB_MAIN_TABLES = ['customers', 'orders', 'users', 'money', 'order_status', 'permission'];
+
   const DB_JSON_FIELDS = [
     'inputValue', 'saveValue', 'importantValue',
     'contacts', 'customerContacts', 'customization',
@@ -31,49 +33,27 @@ class DbMain extends R {
 
   const DB_BLOB_FIELDS = ['reportValue', 'settings'];
 
-  /**
-   * @var Main
-   */
-  protected $main;
-
-  /**
-   * @var int
-   */
-  private $currentUserID = 2;
 
   /**
    * @var boolean
    */
   private $usePrefix = true;
 
-  /**
-   * @var string
-   */
   private $prefix;
+  private string $dbName;
+  private string $login;
 
   /**
-   * @var string
-   */
-  private $dbName;
-
-  /**
-   * @var string
-   */
-  private $login;
-
-  /**
-   * @param Main $main
    * @throws RedException
    */
-  public function __construct(Main $main) {
-    $this->main = $main;
-
-    if (USE_DATABASE) {
-      $this->setting();
+  public function __construct(protected Main $main) {
+    if (defined('USE_DATABASE') && USE_DATABASE) {
+      self::ext('xdispense', fn($type, $count = 1) => $this->dis($type, $count));
     }
   }
 
-  public function connect() {
+  public function connect(): void
+  {
     if (!USE_DATABASE) return;
 
     if (!self::testConnection()) {
@@ -107,23 +87,12 @@ class DbMain extends R {
 
   /**
    * Plugin readBean for special name
-   * @param $type
-   * @param $count
-   *
-   * @return array|OODBBean|null
    */
-  private function dis($type, $count) {
+  private function dis($type, $count): array|OODBBean|null
+  {
     return self::getRedBean()->dispense($type, $count);
   }
 
-  /**
-   * @throws RedException
-   */
-  private function setting() {
-    self::ext('xdispense', function ($type, $count = 1) {
-      return $this->dis($type, $count);
-    });
-  }
 
   /**
    * get Table with Prefix
@@ -146,13 +115,8 @@ class DbMain extends R {
     return "ORDER BY $sortColumn " . $sortDirect . " LIMIT $countPerPage OFFSET $pageNumber";
   }
 
-  /**
-   * @param array $arr
-   * @return array
-   */
   public function jsonParseField(array $arr): array {
     $result = [];
-    //$arr = array_flatten($arr);
 
     foreach ($arr as $key => $value) {
       if (is_array($value)) {
@@ -179,10 +143,6 @@ class DbMain extends R {
     return $arr;
   }
 
-  /**
-   * @param array $arr
-   * @return array
-   */
   public function jsonEncodeField(array $arr): array {
     $result = [];
 
@@ -199,11 +159,6 @@ class DbMain extends R {
 
   /**
    * Multiple databases
-   * @param string $key
-   * @param array $dbConfig
-   * @param bool $freeze
-   * @return $this
-   * @throws RedException
    */
   public function addDb(string $key, array $dbConfig, bool $freeze = true): DbMain {
     self::addDatabase(
@@ -218,9 +173,7 @@ class DbMain extends R {
   }
 
   /**
-   * Select a database,
-   * @param string $key
-   * @return $this
+   * Select a database
    * @throws RedException
    */
   public function selectDb(string $key): DbMain {
@@ -231,18 +184,13 @@ class DbMain extends R {
 
   /**
    * What does this function do?
-   * @param $varName
-   * @return string
    */
-  public function setQueryAs($varName): string {
+  public function setQueryAs(string $varName): string {
     return AQueryWriter::camelsSnake($varName) . " AS '$varName'";
   }
 
-  /**
-   * @param string|integer $date
-   * @return false|string|null
-   */
-  public function getDbDateString($date) {
+  public function getDbDateString(int|string $date): bool|string|null
+  {
     $date = trim($date, '"\'');
 
     if (empty($date)) return null;
@@ -256,8 +204,7 @@ class DbMain extends R {
   public function setPrefix(string $prefix) { $this->prefix = $prefix; }
 
   /**
-   * Use or not prefix
-   * @return boolean
+   * @deprecated
    */
   public function togglePrefix(): bool {
     return $this->usePrefix = !$this->usePrefix;
@@ -267,10 +214,6 @@ class DbMain extends R {
   // MAIN query
   //------------------------------------------------------------------------------------------------------------------
 
-  /**
-   * @param string $type
-   * @return Closure
-   */
   private function getConvertDbType(string $type): Closure {
     if (stripos($type, 'int') === 0) {
       return function ($v) { return intval($v); };
@@ -286,12 +229,6 @@ class DbMain extends R {
   }
   /**
    * Проверка таблицы перед добавлениями/изменениями
-   *
-   * @param $curTable
-   * @param string $dbTable
-   * @param $param - link
-   * @param boolean $change - link
-   * @return array
    */
   private function checkTableBefore($curTable, string $dbTable, &$param, bool $change): array {
     $result = [];
@@ -360,10 +297,8 @@ class DbMain extends R {
    * @param string $dbTable name of table
    * @param array|string $columns of columns, if size of array is 1 (except all column "*") return simple array,
    * @param $filters string filter
-   *
-   * @return array
    */
-  public function selectQuery(string $dbTable, $columns = '*', string $filters = ''): array {
+  public function selectQuery(string $dbTable, array|string $columns = '*', string $filters = ''): array {
     $simple = false;
     if (!is_array($columns)) {
       $simple = $columns !== '*';
@@ -378,11 +313,7 @@ class DbMain extends R {
   }
 
   /**
-   * select all (*)
-   * @param string $dbTable
-   * @param bool $typed
-   *
-   * @return array|null
+   * Select all (*)
    */
   public function loadTable(string $dbTable, bool $typed = false): ?array {
     $result = self::getAll('SELECT * FROM ' . $this->pf($dbTable));
@@ -402,25 +333,11 @@ class DbMain extends R {
     return $result;
   }
 
-  /**
-   * @param $dbTable
-   * @param $columnName
-   * @param $value
-   *
-   * @return integer
-   */
-  public function checkHaveRows($dbTable, $columnName, $value): int {
+  public function checkHaveRows(string $dbTable, string $columnName, mixed $value): int {
     return intval(self::getCell("SELECT count(*) FROM " . $this->pf($dbTable) .
                                     " WHERE $columnName = :value", [':value' => $value]));
   }
 
-  /**
-   * @param string $dbTable
-   * @param array $ids
-   * @param string $primaryKey
-   *
-   * @return int
-   */
   public function deleteItem(string $dbTable, array $ids, string $primaryKey = 'ID'): int {
     $dbTable = $this->pf($dbTable);
     $count = 0;
@@ -448,12 +365,9 @@ class DbMain extends R {
   }
 
   /**
-   * @param string $dbTable
-   * @param array $requireParam
-   * @return mixed
    * @throws RedException\SQL
    */
-  public function getLastID(string $dbTable, array $requireParam = []) {
+  public function getLastID(string $dbTable, array $requireParam = []): mixed {
     $bean = self::xdispense($this->pf($dbTable));
     foreach ($requireParam as $field => $value) $bean->$field = $value;
     self::store($bean);
@@ -461,11 +375,8 @@ class DbMain extends R {
     return $bean->getID();
   }
 
-  /**
-   * @param string $like
-   * @return mixed|null
-   */
-  public function getTables(string $like = '') {
+  public function getTables(string $like = ''): mixed
+  {
     $like = $this->pf($like);
     $sql = "SHOW TABLES
             FROM `$this->dbName`
@@ -480,13 +391,7 @@ class DbMain extends R {
     }, []);
   }
 
-  /**
-   * get columns table
-   * @param $dbTable
-   *
-   * @return array|null
-   */
-  public function getColumnsTable($dbTable): ?array {
+  public function getColumnsTable(string $dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME AS "columnName", COLUMN_TYPE AS "type",
                                     COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE AS "null"
                              FROM information_schema.COLUMNS
@@ -495,13 +400,7 @@ class DbMain extends R {
        ':dbTable' => $this->pf($dbTable)]);
   }
 
-  /**
-   * @param $dbTable
-   * @param string $filters
-   *
-   * @return integer
-   */
-  public function getCountRows($dbTable, string $filters = ''): int {
+  public function getCountRows(string $dbTable, string $filters = ''): int {
     $sql = "SELECT COUNT(*) AS 'count' from " . $this->pf($dbTable);
 
     if (strlen($filters)) $sql .= ' WHERE ' . $filters;
@@ -614,19 +513,13 @@ class DbMain extends R {
 
   /**
    * @param mixed $ids - if sting use delimiter ","
-   *
-   * @return array
    */
-  public function getFiles($ids = false): array {
+  public function getFiles(mixed $ids = false): array {
     if (is_string($ids) && !empty($ids)) $ids = explode(',', $ids);
     $filters = $ids ? ' ID = ' . implode(' or ID = ', $ids) : '';
     return $this->selectQuery('files', '*', $filters);
   }
 
-  /**
-   * @param object $file
-   * @return array
-   */
   public function setFiles(object $file): array {
     $files = ['id' => ''];
 
@@ -651,174 +544,6 @@ class DbMain extends R {
     }
 
     return $files;
-  }
-
-
-  // Elements
-  //------------------------------------------------------------------------------------------------------------------
-
-  public function loadElements($sectionID, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): ?array {
-    $pageNumber *= $countPerPage;
-
-    $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
-            FROM " . $this->pf('elements') . " E
-            JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
-            JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
-            WHERE E.section_parent_id = $sectionID
-            GROUP BY E.ID
-            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '') . " LIMIT $countPerPage OFFSET $pageNumber";
-
-    return self::getAll($sql);
-  }
-
-  public function searchElements($searchValue, $pageNumber = 0, $countPerPage = 20, $sortColumn = 'C.name', $sortDirect = false): array {
-    $pageNumber *= $countPerPage;
-    $searchValue = str_replace(' ', '%', $searchValue);
-
-    $sql = "SELECT E.ID AS 'id', E.name AS 'name', E.activity AS 'activity', E.sort AS 'sort', E.last_edit_date AS 'lastEditDate',
-                   C.symbol_code AS 'symbolCode', C.name AS 'codeName', IF(COUNT(E.ID) = 1, true, false) AS 'simple'
-            FROM " . $this->pf('elements') . " E
-            JOIN " . $this->pf('codes') . " C on C.symbol_code = E.element_type_code
-            JOIN " . $this->pf('options_elements') . " O on E.ID = O.element_id
-            WHERE E.name LIKE '%$searchValue%'
-            GROUP BY E.ID
-            ORDER BY $sortColumn " . ($sortDirect ? 'DESC' : '');
-
-    $res = self::getAll($sql);
-
-    return [
-      'elements'          => array_slice($res, $pageNumber, $countPerPage),
-      'countRowsElements' => count($res)
-    ];
-  }
-
-
-  // Options
-  //------------------------------------------------------------------------------------------------------------------
-
-  private function setImages(string $imagesIds = ''): array {
-    $images = $this->getFiles($imagesIds);
-
-    return array_map(function ($item) {
-      $path = FS::findingFile($item['path']);
-      $item['id'] = $item['ID'];
-      $item['path'] = $item['src'] = $path
-        ? $this->main->url->getUri(true) . str_replace([ABS_SITE_PATH, '\\'], ['', '/'], $path)
-        : $item['ID'] . '_' . $item['name'] . '_' . $item['path'];
-
-      unset($item['ID']);
-      return $item;
-    }, $images);
-  }
-  private function getAlias(string $table): string {
-    $tables = ['codes.', 'money.', 'options_elements.', 'elements.', 'units.'];
-    $alias = ['C.', 'M.', 'O.', 'E.', 'U.'];
-    $table = str_replace($tables, $alias, $table);
-
-    $cols = ['.id', '.type', '.unit', '.lastDate'];
-    $alias = ['.ID', '.element_type_code', '.short_name', '.last_edit_date'];
-    return str_replace($cols, $alias, $table);
-  }
-
-  public function loadFiles(): array {
-    return $this->setImages();
-  }
-
-  /**
-   * Для страницы Catalog
-   * @param string $elementID
-   * @return array|null
-   */
-  public function openOptions(string $elementID): ?array {
-    $sql = "SELECT O.ID AS 'id',
-                   MI.short_name AS 'moneyInputName', MI.ID AS 'moneyInputId',
-                   MO.short_name as 'moneyOutputName', MO.ID AS 'moneyOutputId',
-                   images_ids AS 'images', properties,
-                   O.name AS 'name', U.ID AS 'unitId', U.name AS 'unitName', O.last_edit_date AS 'lastEditDate', O.activity AS 'activity', sort,
-                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'outputPrice'
-            FROM " . $this->pf('options_elements') . " O
-            JOIN " . $this->pf('money') . " MI on MI.ID = O.money_input_id
-            JOIN " . $this->pf('money') . " MO on MO.ID = O.money_output_id
-            JOIN " . $this->pf('units') . " U on U.ID = O.unit_id
-            WHERE element_id = $elementID";
-
-    return array_map(function ($option) {
-      // set images
-      $option['images'] = strlen($option['images']) ? $this->setImages($option['images']) : [];
-
-      // set property
-      $option['properties'] = json_decode($option['properties'] ?: '[]');
-
-      return $option;
-    }, self::getAll($sql));
-  }
-
-  /**
-   * Load for calculator
-   * @param array  $filter
-   * @param int    $pageNumber
-   * @param int    $countPerPage
-   * @return array
-   */
-  public function loadOptions(array $filter = [], int $pageNumber = 0, int $countPerPage = -1): array {
-    $sql = "SELECT O.ID AS 'id', element_id AS 'elementId', 
-                   E.element_type_code AS 'type', E.sort AS 'elementSort',
-                   O.name AS 'name', U.short_name AS 'unit', O.activity AS 'activity',
-                   O.sort AS 'sort', O.last_edit_date AS 'lastDate', properties, images_ids AS 'images',
-                   MI.code AS 'moneyInput', MO.code AS 'moneyOutput',
-                   input_price AS 'inputPrice', output_percent AS 'outputPercent', output_price AS 'price'
-            FROM " . $this->pf('options_elements') . " O
-            JOIN " . $this->pf('elements') . " E ON E.ID = O.element_id
-            JOIN section S ON S.ID = E.section_parent_id
-            JOIN " . $this->pf('money') . " MI ON MI.ID = O.money_input_id
-            JOIN " . $this->pf('money') . " MO ON MO.ID = O.money_output_id
-            JOIN " . $this->pf('units') . " U ON U.ID = O.unit_id
-            WHERE S.active <> 0 AND E.activity <> 0 AND O.activity <> 0";
-
-    // Filter
-    if (count($filter)) {
-      $filterArr = [];
-      foreach ($filter as $k => $values) {
-        $k = $this->getAlias(AQueryWriter::camelsSnake($k));
-        $values = convertToArray($values);
-        $str = '(';
-        foreach($values as $index => $v) {
-          $index > 0 && $str .= " OR ";
-          $str .= "$k LIKE '$v'";
-        }
-        $filterArr[] = $str . ')';
-      }
-
-      $sql .= ' AND ' . implode(' AND ', $filterArr);
-      unset($filterArr, $filter, $k, $v, $values, $str, $index);
-    }
-    // Sorting
-    $sql .= ' ORDER BY E.sort, O.sort';
-    // Paginate
-    if ($countPerPage !== -1) {
-      $pageNumber *= $countPerPage;
-      $sql .= " LIMIT $countPerPage OFFSET $pageNumber";
-    }
-
-    $options = self::getAll($sql);
-
-    return array_map(function ($option) {
-      // Set images
-      if (strlen($option['images'])) {
-        $option['images'] = $this->setImages($option['images']);
-      }
-
-      // Set property
-      $properties = json_decode($option['properties'] ?: '[]', true);
-      $option['properties'] = [];
-      foreach ($properties as $property => $id) {
-        $propName = str_replace('prop_', '', $property);
-        $option['properties'][$propName] = $this->getPropertyTable($id, $property);
-      }
-
-      return $option;
-    }, $options);
   }
 
 
@@ -961,10 +686,7 @@ class DbMain extends R {
   //--------------------------------------------------------------------------------------------------------------------
 
   /**
-   * @param array $pageParam[int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
-   * @param array $ids
-   *
-   * @return string[][]
+   * @param array{pageNumber: int, countPerPage: int, sortColumn: string, sortDirect: bool} $pageParam
    */
   public function loadCustomers(array $pageParam, array $ids = []): array {
     $sql = "SELECT C.ID as 'id', name, ITN, contacts, GROUP_CONCAT(O.ID) as 'orders'
@@ -1018,7 +740,8 @@ class DbMain extends R {
   /**
    * @throws RedException\SQL
    */
-  public function setMoney($rate) {
+  public function setMoney(array $rate): void
+  {
     $beans = self::xdispense($this->pf('money'), 1);
     $date = date($this::DB_DATE_FORMAT);
 
@@ -1107,11 +830,6 @@ class DbMain extends R {
     return $parseSettings ? $this->parseDealerSettings($dealers) : $dealers;
   }
 
-  /**
-   * Load all users by all dealers
-   * @param string $login
-   * @return array
-   */
   public function loadDealersUsers(string $login = ''): array {
     $result = [];
     $dealers = $this->loadDealers(true, false);
@@ -1153,12 +871,6 @@ class DbMain extends R {
     return $result;
   }
 
-  /**
-   * Load dealer by id
-   * @param string|null $id
-   * @param bool $parseSettings
-   * @return array
-   */
   public function loadDealerById(string $id = null, bool $parseSettings = true): array {
     $id = $id ?? $this->main->getCmsParam('dealerId');
 

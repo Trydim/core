@@ -4,30 +4,16 @@ class Dealer {
   const FOLDER = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR;
   const RESOURCES = Dealer::FOLDER . 'resource' . DIRECTORY_SEPARATOR;
 
-  /**
-   * @var Main
-   */
-  private $main;
+  private Main $main;
 
-  /**
-   * @var string
-   */
-  private $dealerDir;
-
-  /**
-   * @var string
-   */
-  private $dealerPath;
+  private string $dealerDir;
+  private string $dealerPath;
 
   /**
    * @var string
    */
   private $prefix;
-
-  /**
-   * @var MigrateDb;
-   */
-  private $migrateDb;
+  private MigrateDb $migrateDb;
 
   public function __construct($main) {
     $this->main = $main;
@@ -39,30 +25,33 @@ class Dealer {
 
     $this->prefix     = $dbPrefix;
   }
-  private function createFolderDealers() {
+  private function createFolderDealers(): void
+  {
     if (!is_dir($this::FOLDER)) {
       try {
         mkdir($this::FOLDER);
       } catch (\ErrorException $e) {
-        die('Dealer folder not created!');
+        throw new \RuntimeException('[Dealer:createFolderDealers]: Dealer folder not created!', 0, $e);
       }
     }
   }
-  private function createFolder() {
-    if (is_dir($this->dealerDir)) die('Dealer folder exist!');
+  private function createFolder(): void
+  {
+    if (is_dir($this->dealerDir)) throw new \RuntimeException('[Dealer:createFolder]: Dealer folder exist!');
 
     try {
       mkdir($this->dealerDir);
     } catch (\Exception $e) {
-      die("$this->dealerDir folder not created");
+      throw new \RuntimeException("[Dealer:createFolder]: $this->dealerDir folder not created", 0, $e);
     }
   }
   private function checkFolder(): bool {
-    if (!is_dir($this->dealerDir)) die("$this->dealerDir folder does not exist!");
+    if (!is_dir($this->dealerDir)) throw new \RuntimeException("[Dealer:checkFolder]: $this->dealerDir folder does not exist!");
 
     return true;
   }
-  private function copy(string $src, string $dst) {
+  private function copy(string $src, string $dst): void
+  {
     $sep = DIRECTORY_SEPARATOR;
     $dir = opendir($src);
 
@@ -78,18 +67,20 @@ class Dealer {
     }
     closedir($dir);
   }
-  private function copyFiles(array $folders = ['lang', 'public', 'shared']) {
+  private function copyFiles(array $folders = ['lang', 'public', 'shared']): void
+  {
     try {
       foreach ($folders as $dir) {
         $this->copy($this::RESOURCES . $dir, $this->dealerPath . $dir);
       }
     } catch (\Exception $e) {
-      die('Error copying resources');
+      throw new \RuntimeException('[Dealer:copyFiles]: Error copying resources', 0, $e);
     }
   }
-  private function createConfig(array $params) {
+  private function createConfig(array $params): void
+  {
     $config = file_get_contents($this::RESOURCES . 'config.php');
-    if (!$config) die('Dealer configuration file does not exist!');
+    if (!$config) throw new \RuntimeException('[Dealer:createConfig]: Dealer configuration file does not exist!');
 
     $setParam = function ($paramName, $params) use (&$config) {
       $value = is_array($params) ? $params[$paramName] : $params;
@@ -106,7 +97,8 @@ class Dealer {
     file_put_contents($this->dealerPath . 'config.php', $config);
   }
 
-  private function updateDb(array $param) {
+  private function updateDb(array $param): void
+  {
     $this->migrateDb = new MigrateDb($this->main, $param['prefix']);
 
     $this->migrateDb->createMoney();
@@ -129,12 +121,8 @@ class Dealer {
     }
   }
 
-  /**
-   * @param int|string $id
-   * @param array $configParam
-   * @param array $dbParam
-   */
-  public function create($id, array $configParam, array $dbParam) {
+  public function create(int|string $id, array $configParam, array $dbParam): void
+  {
     $this->main->fireHook(VC::HOOKS_DEALERS_BEFORE_CREATE, $this, $configParam, $dbParam);
 
     $this->setParam($id, $dbParam['prefix']);

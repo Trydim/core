@@ -1,19 +1,18 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
 use RedBeanPHP\RedException;
 
 require __DIR__ . '/traits/MainTraits.php';
+require __DIR__ . '/traits/MainAssets.php';
 
 final class Main {
   use Authorization;
+  use Assets;
   use Dictionary;
-  use Cache;
   use Hooks;
   use Utilities;
 
-  /**
-   * @const array
-   */
   const DEALER_MENU = ['dealers'];
 
   /**
@@ -30,72 +29,31 @@ final class Main {
 
   private static ?self $instance = null;
 
-  /**
-   * @var array
-   */
-  private $setting = [];
+  private bool $hasDealers = false;
+  private array $setting = [];
+  private array $cmsParam = [];
+  private array $controllerField;
 
-  /**
-   * @var array
-   */
-  private $cmsParam = [];
+  public array $dbTables = [];
 
-  /**
-   * @var array
-   */
-  private $controllerField;
+  public bool $frontSettingInit = false;
 
-  /**
-   * @var array
-   */
-  public $dbTables = [];
+  public \Dotenv\Dotenv $env;
 
-  /**
-   * @var boolean
-   */
-  public $frontSettingInit = false;
+  public readonly DbProxy $db;
+  public readonly UrlGenerator $url;
+  public readonly Dealer $dealer;
+  public readonly Response $response;
 
-  /**
-   * @var ?Dotenv\Dotenv
-   */
-  public $env;
-
-  /**
-   * @var DbProxy
-   */
-  public $db;
-
-  /**
-   * @var UrlGenerator
-   */
-  public $url;
-
-  /**
-   * @var Dealer
-   */
-  public $dealer;
-
-  /**
-   * @var Response
-   */
-  public $response;
-
-  /**
-   * @var bool
-   */
-  public $publicDealer = true;
+  public bool $publicDealer = true;
 
   /**
    * Cloning is not available for singleton
-   * @return void
    */
   private function __clone() {}
 
   /**
-   * Main constructor.
-   * @param array $publicConfig
-   * @param array $dbConfig
-   * @throws RedException
+   * @throws RedException|ReflectionException
    */
   private function __construct(array $publicConfig, array $dbConfig) {
     $this->setCmsParam(array_merge(self::CMS_PARAM, $publicConfig));
@@ -108,10 +66,7 @@ final class Main {
   }
 
   /**
-   * @param array $cmsParam
-   * @param array $dbConfig
-   * @return Main
-   * @throws RedException
+   * @throws RedException|ReflectionException
    */
   public static function getInstance(array $cmsParam, array $dbConfig): self {
     if (self::$instance === null) {
@@ -120,12 +75,18 @@ final class Main {
     return self::$instance;
   }
 
-  public function afterConstDefine() {
+  public function afterConstDefine(): void
+  {
     $this->initLocales()
          ->loadSetting()
          ->setHooks();
   }
-  public function beforeController() {
+
+  /**
+   * @throws ReflectionException
+   */
+  public function beforeController(): void
+  {
     if (OUTSIDE) return;
 
     if ($this->isDealer()) $this->setDealerParam();
@@ -135,17 +96,10 @@ final class Main {
       ->applyAuth();
   }
 
-
-  // Request
-  //--------------------------------------------------------------------------------------------------------------------
-  /*public function getRequest($key) {
-    $this->url->request->
-  }*/
-
   // Environment variables
   //--------------------------------------------------------------------------------------------------------------------
 
-  private function initEnvironment()
+  private function initEnvironment(): void
   {
     require_once CORE . 'libs/vendor/autoload.php';
 
@@ -153,11 +107,7 @@ final class Main {
     $this->env->load();
   }
 
-  /**
-   * @param string $key
-   * @param string $default
-   */
-  public function getEnv(string $key, string $default = '')
+  public function getEnv(string $key, string $default = ''): mixed
   {
     if (empty($_ENV)) {
       $this->initEnvironment();
@@ -174,6 +124,24 @@ final class Main {
   // Cms Params
   //--------------------------------------------------------------------------------------------------------------------
 
+  private function setDealersMode(): void
+  {
+    $accessMenu = $this->getCmsParam(VC::ACCESS_MENU, []);
+
+    foreach ($accessMenu as $item) {
+      if (is_array($item)) $item = $item['link'] ?? $item[0] ?? '';
+      if ($item === 'dealers') {
+        $this->hasDealers = true;
+        return;
+      }
+    }
+
+    $this->hasDealers = false;
+  }
+
+  /**
+   * @throws ReflectionException
+   */
   private function setDealerParam(): Main {
     // Remove access menu for dealer
     $filter = $this::DEALER_MENU;
@@ -181,7 +149,7 @@ final class Main {
     $this->setCmsParam(VC::ACCESS_MENU,
       array_filter($this->getCmsParam(VC::ACCESS_MENU),
         function ($item) use ($filter) {
-          if (is_array($item)) $item = $item['link'];
+          if (is_array($item)) $item = $item['link'] ?? $item[0];
 
           return !includes($filter, $item);
         }
@@ -193,18 +161,16 @@ final class Main {
     return $this;
   }
 
-  /**
-   * setCmsSetting from config
-   * @param string[]|string $param
-   * @param $value
-   *
-   * @return Main
-   */
-  public function setCmsParam($param, $value = null): Main {
-    if (is_array($param)) {
-      $refVC = new ReflectionClass(VC::class);
+  public function hasDealers(): bool
+  {
+    return $this->hasDealers;
+  }
 
-      array_walk($param, function ($item, $key) use ($refVC) {
+  public function setCmsParam(array|string $param, mixed $value = null): Main {
+    if (is_array($param)) {
+      array_walk($param, function ($item, $key) {
+        $refVC = new ReflectionClass(VC::class);
+
         if ($key === VC::CSV_PATH) $item = ABS_SITE_PATH . $item;
         if ($refVC->hasConstant($key)) $key = $refVC->getConstant($key);
         $this->cmsParam[$key] = $item;
@@ -218,12 +184,8 @@ final class Main {
     return $this;
   }
 
-  /**
-   * @param string $param
-   * @param ?mixed $default
-   * @return mixed|string|null
-   */
-  public function getCmsParam(string $param, $default = null) {
+  public function getCmsParam(string $param, mixed $default = null): mixed
+  {
     $param = explode('.', $param);
 
     if (count($param) === 1) {
@@ -233,13 +195,16 @@ final class Main {
     }
   }
 
+  public function getDealerId(): int|string
+  {
+    return $this->getCmsParam(VC::DEALER_ID) ?? 1;
+  }
+
   // Settings
   // -------------------------------------------------------------------------------------------------------------------
 
   /**
    * Load setting from file
-   *
-   * @return Main
    */
   private function loadSetting(): Main {
     $setting = [];
@@ -262,7 +227,6 @@ final class Main {
 
   /**
    * Установка всех параметров для аккаунта
-   * @return $this
    */
   private function setAccount(): Main {
     $this->setSideMenu();
@@ -270,12 +234,7 @@ final class Main {
     return $this;
   }
 
-  /**
-   * @param string $key
-   * @param mixed $value
-   * @return $this
-   */
-  public function setSettings(string $key, $value): Main {
+  public function setSettings(string $key, mixed $value): Main {
     $this->setting[$key] = $value;
 
     return $this;
@@ -284,7 +243,8 @@ final class Main {
   /**
    * Save cms setting to file
    */
-  public function saveSettings() {
+  public function saveSettings(): void
+  {
     $content = $this->setting;
 
     unset($content['permission'], $content[VC::DB_CONFIG]);
@@ -293,19 +253,14 @@ final class Main {
   }
 
   /**
-   * Get one setting or array if it has
-   * @param string $key [
-   * 'json' - return json, <p>
-   * 'managerFields' - return managers custom fields, <p>
-   * 'mailTarget' - <p>
-   * 'mailTargetCopy' - <p>
-   * 'mailSubject' - <p>
-   * 'mailFromName' - <p>
-   * 'optionProperties' - <p>
-   * @param boolean $front if true - ready html input
+   * Get one setting or array if it has.
+   *
+   * @param 'json'|'managerFields'|'mailTarget'|'mailTargetCopy'|'mailSubject'|'mailFromName'|'optionProperties'|string $key
+   * @param bool $front If true, returns ready-to-use HTML input
    * @return mixed
    */
-  public function getSettings(string $key = '', bool $front = false) {
+  public function getSettings(string $key = '', bool $front = false): mixed
+  {
     $data = $this->setting[$key] ?? null;
     if ($front) {
       $data = $this->setting;
@@ -323,10 +278,6 @@ final class Main {
     return empty($key) ? $this->setting : ($this->setting[$key] ?? null);
   }
 
-  /**
-   * @param mixed $field
-   * @return Main
-   */
   public function setControllerField(&$field): Main {
 /*    if (!empty($this->controllerField)) {
       foreach ($this->controllerField as $k => $v) {
@@ -339,14 +290,11 @@ final class Main {
   }
 
   /**
-   * @param string $key
-   * @param mixed $value
-   * @param mixed $position [optional] <br>
-   * before - if string - prepend to the beginning. if array - prepend elements to the beginning of an array<br>
-   * after - if string - append to the end. if array - append elements to the end of an array<br>
-   * @return $this
+   * @param 'before'|'after'|string $position
+   * 'before' - prepend to the beginning (string or array)
+   * 'after'  - append to the end (string or array)
    */
-  public function addControllerField(string $key, $value, string $position = 'after'): Main {
+  public function addControllerField(string $key, mixed $value, string $position = 'after'): Main {
     if (isset($this->controllerField[$key])) {
       $field =& $this->controllerField[$key];
 
@@ -366,36 +314,15 @@ final class Main {
     return $this;
   }
 
-  /*
-   * @param string $key
-   * @param mixed $value
-   * @return $this
-   *
-  public function addControllerField(string $key, $value): Main {
-    if (!isset($this->controllerParam['field'])) $this->controllerParam['field'] = [];
-
-    if (isset($this->controllerParam['field'][$key])) {
-      $field =& $this->controllerParam['field'][$key];
-
-      if (is_array($field)) $field[] = $value;
-      else if (is_object($field)) $field->$key = $value;
-
-    } else {
-      $this->controllerParam['field'][$key] = $value;
-    }
-    return $this;
-  }*/
-
-  public function getControllerField($key = '', $default = null) {
+  public function getControllerField($key = '', $default = null): mixed {
     return empty($key) ? $this->controllerField : ($this->controllerField[$key] ?? $default);
   }
 
   /**
    * @Danger
-   * @param string $path
-   * @return void
    */
-  public function setControllerViewField(string $path) {
+  public function setControllerViewField(string $path): void
+  {
     $main = $this;
     $field =& $this->controllerField;
     ob_start();
@@ -403,8 +330,6 @@ final class Main {
     $templateContent = ob_get_clean();
     $this->controllerField['content'] = $field['content'] ?? (empty($templateContent) ? $this->url->getRoute() . ' default content.' : $templateContent);
   }
-
-  //public function getControllerParam(string $key) { return $this->controllerParam[$key] ?: false; }
 
   public function initDefaultController(): Main {
     $target = $this->url->getRoute();
@@ -435,21 +360,13 @@ final class Main {
     return $this;
   }
 
-  /**
-   * @return array
-   */
   public function getBaseTable(): array { return $this->dbTables; }
 
-  /**
-   * @return DbProxy
-   */
   public function getDB(): DbProxy { return $this->db; }
 
-  /**
-   * @param string $target
-   * @return void
-   */
-  public function reDirect(string $target = '') {
+  #[NoReturn]
+  public function reDirect(string $target = ''): void
+  {
     if ($target === '') {
       $target = $_SESSION['target'] ?? '';
       isset($_GET['orderId']) && $target .= '?orderId=' . $_GET['orderId'];
@@ -458,13 +375,6 @@ final class Main {
     die;
   }
 
-  /**
-   * @param string $dataId
-   * @param bool   $justRate
-   * @return string
-   * @default $dataId = 'dataRate'
-   * @default $justRate = false
-   */
   public function getCourse(string $dataId = 'dataRate', bool $justRate = false): string {
     $rateParam = [
       VC::RATE_AUTO_REFRESH => $this->getSettings(VC::RATE_AUTO_REFRESH),

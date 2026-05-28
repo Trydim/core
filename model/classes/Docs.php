@@ -14,22 +14,21 @@ class Docs {
    *
    * @var string [P/L]
    */
-  private $pdfOrientation;
+  private string $pdfOrientation;
 
-  /**
-   * @var array
-   */
-  private $data, $pdfParam;
+  private array $data;
+  private array $pdfParam;
 
-  /**
-   * @var string
-   */
-  private $docsType, $fileTpl, $filePath, $content, $styleContent, $footerPage = '', $imgPath, $dealImgPath;
+  private string $docsType;
+  private string $fileTpl;
+  private string $filePath;
+  private string $content;
+  private string $styleContent;
+  private string $footerPage = '';
+  private string $imgPath;
+  private string $dealImgPath;
 
-  /**
-   * @var array
-   */
-  private $domFooter = [];
+  private array $domFooter = [];
 
   /**
    * @var object
@@ -38,40 +37,24 @@ class Docs {
 
   /**
    * If true, then use default template
-   * @var boolean
    */
-  private $useDefault = false;
+  private bool $useDefault = false;
 
   /**
    * temp files path, unlink after make pdf
-   * @var array
    */
-  private $tmpFiles = [];
+  private array $tmpFiles = [];
+
+  private Main $main;
+
+  private string $filename;
+  public string $fileName;
 
   /**
-   * @var Main|null
+   * @param array{docType: 'pdf'|'print'|'excel'|'excelNew', orientation?: 'P'|'L'} $param
    */
-  private $main;
-
-  /**
-   * @var string
-   */
-  private $filename;
-
-  /**
-   * @var string
-   */
-  public $fileName;
-
-  /**
-   * Docs constructor.
-   * @param Main $main
-   * @param array $param {library: string, orientation: string, docType: string}
-   * @param $data
-   * @param string $fileTpl
-   */
-  public function __construct(Main $main, array $param, $data, string $fileTpl = 'default') {
-    $this->main = $main ?? null;
+  public function __construct(Main $main, array $param, array $data, string $fileTpl = 'default') {
+    $this->main = $main;
 
     $this->pdfOrientation = $param['orientation'] ?? 'P';
     $this->docsType = $param['docType'] ?? 'pdf';
@@ -96,7 +79,8 @@ class Docs {
     }
   }
 
-  private function getFilename() {
+  private function getFilename(): void
+  {
     $file = str_replace($this->main->url->getScheme(), '', $this->main->url->getHost())
       . '_' . substr(uniqid(), 9, 4)
       . '_' . date('dmY');
@@ -108,7 +92,8 @@ class Docs {
     $this->filename = $file;
   }
 
-  private function setFileTpl($fileTpl) {
+  private function setFileTpl($fileTpl): void
+  {
     $this->fileTpl = $fileTpl !== 'default' ?
       $fileTpl : (in_array($this->docsType, ['pdf', 'print']) ? 'pdfTpl' : 'excelTpl');
 
@@ -124,7 +109,8 @@ class Docs {
     }
   }
 
-  private function setDefaultParam() {
+  private function setDefaultParam(): void
+  {
     $this->pdfParam = [
       'debug'         => DEBUG,
       'format'        => 'A4',
@@ -143,7 +129,8 @@ class Docs {
     }
   }
 
-  private function prepareTemplate() {
+  private function prepareTemplate(): void
+  {
     if ($this->useDefault) { $this->setPdfDefaultData(); return; }
 
     $this->setCss();
@@ -156,12 +143,14 @@ class Docs {
     $this->footerPage = $footerPage;
   }
 
-  private function setExcelData() {
+  private function setExcelData(): void
+  {
     if ($this->useDefault) $this->setExcelDefaultData();
     else include $this->filePath;
   }
 
-  private function initPdf() {
+  private function initPdf(): void
+  {
     require_once CORE . 'libs/vendor/autoload.php';
 
     try {
@@ -181,19 +170,22 @@ class Docs {
     }
   }
 
-  private function initPrint() {
+  private function initPrint(): void
+  {
     $this->content .= '<style>' . $this->styleContent . '</style>';
   }
 
-  private function initExcel() {
+  private function initExcel(): void
+  {
     require_once __DIR__ . '/Xlsxwriter.php';
     $this->docs = new XLSXWriter();
   }
 
   /**
-   * Add separate css to pdf
+   * Add separate CSS to pdf
    */
-  private function setCss() {
+  private function setCss(): void
+  {
     $path = "public/views/docs/$this->fileTpl.css";
     $fullPath = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $path;
 
@@ -214,11 +206,10 @@ class Docs {
    * saveUrl - save on server in RESULT_PATH and return HTTP link as string;<br>
    * saveWithUrl - save on server in RESULT_PATH and return HTTP link and filename as array;<br>
    * any other value send to browser
-   * @param string $path
    * @param string $dest - "", "save|savePath", "saveUrl", "saveWithUrl"
-   * @return array|string
    */
-  private function getPdf(string $path, string $dest) {
+  private function getPdf(string $path, string $dest): array|string
+  {
     if (isset($_REQUEST['resource'])) {
       return [
         'css'  => $this->styleContent,
@@ -269,12 +260,8 @@ class Docs {
     }
   }
 
-  /**
-   * @param string $path
-   * @param string $dest
-   * @return array|string
-   */
-  private function getPrint(string $path, string $dest) {
+  private function getPrint(string $path, string $dest): array|string
+  {
     $filename = $this->fileName ?? $this->filename;
 
     switch ($dest) {
@@ -291,12 +278,8 @@ class Docs {
     }
   }
 
-  /**
-   * @param string $path
-   * @param string $dest
-   * @return array|string
-   */
-  private function getExcel(string $path, string $dest) {
+  private function getExcel(string $path, string $dest): array|string
+  {
     $filename = $this->fileName ?? $this->filename;
 
     switch ($dest) {
@@ -311,7 +294,6 @@ class Docs {
         $this->docs->writeToFile($path . $filename);
 
         return $path . $filename;
-
     }
   }
 
@@ -335,7 +317,8 @@ class Docs {
   /**
    * Example for Excel
    */
-  private function setExcelDefaultData() {
+  private function setExcelDefaultData(): void
+  {
     $data = [
       // Sheet - 1
       [
@@ -365,10 +348,6 @@ class Docs {
     }
   }
 
-  /**
-   * @param string $filename
-   * @return Docs
-   */
   public function setFilename(string $filename): Docs {
     $this->filename = $filename;
 
@@ -381,8 +360,6 @@ class Docs {
    * The strings '{PAGE_NUM}' and '{PAGE_COUNT}' are automatically replaced
    * with their current values.
    *
-   * @param float  $x
-   * @param float  $y
    * @param string $text       The text to write
    * @param string $font       The font file to use
    * @param float  $size       The font size, in points
@@ -392,7 +369,8 @@ class Docs {
    * @param float $char_space Char spacing adjustment
    * @param float $angle      Angle to write the text at, measured clockwise starting from the x-axis
    * */
-  public function setFooter(float $x, float $y, string $text, string $font = 'Helvetica', float $size = 16.0, array $color = [0, 0, 0], float $word_space = 0.0, float $char_space = 0.0, float $angle = 0.0) {
+  public function setFooter(float $x, float $y, string $text, string $font = 'Helvetica', float $size = 16.0, array $color = [0, 0, 0], float $word_space = 0.0, float $char_space = 0.0, float $angle = 0.0): void
+  {
     $this->domFooter[] = [
       'x'     => $x,
       'y'     => $y,
@@ -408,11 +386,11 @@ class Docs {
 
   /**
    * Add bottom page counter
-   * @param ?string $position
-   * @param ?string $template - '{PAGE_NUM} / {PAGE_COUNT}'
-   * @param ?float  $size     - The font size, in points
+   * @param string $template - '{PAGE_NUM} / {PAGE_COUNT}'
+   * @param float $size - The font size, in points
    */
-  public function addPageCounter(string $position = 'right', string $template = '{PAGE_NUM} / {PAGE_COUNT}', float $size = 12.0) {
+  public function addPageCounter(string $position = 'right', string $template = '{PAGE_NUM} / {PAGE_COUNT}', float $size = 12.0): void
+  {
     $isPortrait = $this->pdfOrientation === 'P';
     $getX = function ($x) use ($isPortrait) { return round($x / 100 * ($isPortrait ? 612 : 792)); };
     $getY = function ($y) use ($isPortrait) { return round($y / 100 * ($isPortrait ? 792 : 612)); };
@@ -429,11 +407,8 @@ class Docs {
     $this->setFooter($x, $y, $template, 'DejaVu Sans', $size);
   }
 
-  /**
-   * @param string $dest
-   * @return array|string
-   */
-  public function getDocs(string $dest = '') {
+  public function getDocs(string $dest = ''): array|string
+  {
     $path = ($this->main->url->getPath(true) ?? ABS_SITE_PATH) . $this::RESULT_PATH;
     if (!is_dir($path)) mkdir($path);
 
@@ -448,22 +423,10 @@ class Docs {
     return $result;
   }
 
-  /**
-   * @param        $number
-   * @param int    $decimals
-   * @param string $decimalSeparator
-   * @param string $thousandsSeparator
-   * @return string
-   */
   public function numFormat($number, int $decimals = 0, string $decimalSeparator = '.', string $thousandsSeparator = ' '): string {
     return number_format(floatval($number), $decimals, $decimalSeparator, $thousandsSeparator);
   }
 
-  /**
-   * For What?
-   * @param string $path
-   * @return Docs
-   */
   public function setTmpFile(string $path): Docs {
     $this->tmpFiles[] = $path;
 
@@ -473,7 +436,8 @@ class Docs {
   /**
    * remove temporary files added during creation pdf
    */
-  public function unlinkTmpFiles() {
+  public function unlinkTmpFiles(): void
+  {
     array_map(function ($path) {
       unlink($path);
     }, $this->tmpFiles);

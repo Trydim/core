@@ -56,7 +56,7 @@ export default {
 
   /**
    * Get Element by id from document or shadow DOM
-   * @param {string} id String that specifies the ID value.
+   * @param {string} id String that specifies the id value.
    * @return {HTMLElement} HtmlElement
    */
   gI: id => (window.shadowCalc || document).getElementById(id) || f.log('not found note by id -' + id),

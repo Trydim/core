@@ -2,7 +2,7 @@
 
 /**
  * @var Main $main - global
- * @var string $tableActive - global
+ * @var string $tableActive - from controller
  */
 
 $gTxt = 'gTxt';

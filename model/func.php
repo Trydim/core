@@ -1,9 +1,7 @@
 <?php
 
-/**
- * @param string $class
- */
-function cmsAutoloader(string $class) {
+function cmsAutoloader(string $class): void
+{
   // Public classes
   $path = ABS_SITE_PATH . 'public/model/classes/' . $class . '.php';
   $path = str_replace('\\', DIRECTORY_SEPARATOR, $path);
@@ -19,13 +17,8 @@ function cmsAutoloader(string $class) {
   }
 }
 
-/**
- *
- * @param $number
- * @param string $importantValue - as json
- * @return false|string
- */
-function addCpNumber($number, string $importantValue) {
+function addCpNumber($number, string $importantValue): bool|string
+{
   global $main;
   return $main->fireHook(VC::HOOKS_SAVE_ORDER, $number, $importantValue);
 }
@@ -69,20 +62,14 @@ function addJsLink(string $jsLink, string $position = 'after') {
 
 /**
  * Alias for $main->addHook();
- * @param $hookName - string
- * @param $callable - func
  */
-function addHook($hookName, $callable) {
+function addHook(string $hookName, callable $callable): void
+{
   global $main;
   if ($main instanceof Main) $main->addHook($hookName, $callable);
 }
 
-/**
- *
- * @param mixed $var
- * @return bool
- */
-function boolValue($var): bool {
+function boolValue(mixed $var): bool {
   if (is_bool($var)) return $var;
   if (is_string($var)) {
     return !(empty($var) || $var === '-' || $var === 'false');
@@ -94,12 +81,10 @@ function boolValue($var): bool {
 }
 
 /**
- * for param by load csv
- * @param $type
- * @param $value
- * @return false|float
+ * For param by load csv
  */
-function csvTypeConvert($type, $value) {
+function csvTypeConvert(string $type, mixed $value): float|bool
+{
   switch ($type) {
     default: return $value;
     case 'int': case 'integer': return intval($value);
@@ -107,7 +92,7 @@ function csvTypeConvert($type, $value) {
   }
 }
 
-function convertToArray($value): array {
+function convertToArray(mixed $value): array {
   if (is_array($value)) return $value;
   if (is_string($value)) {
     return array_map(function ($item) { return trim($item); }, explode(',', $value));
@@ -116,11 +101,6 @@ function convertToArray($value): array {
 }
 
 if (!function_exists('compareFiles')) {
-  /**
-   * @param string $file1
-   * @param string $file2
-   * @return bool
-   */
   function compareFiles(string $file1, string $file2): bool {
     return file_exists($file1) && file_exists($file2)
       && md5_file($file1) === md5_file($file2);
@@ -128,11 +108,8 @@ if (!function_exists('compareFiles')) {
 }
 
 if (!function_exists('de')) {
-  /**
-   * @param $var
-   * @param bool $die
-   */
-  function de($var, bool $die = true) {
+  function de($var, bool $die = true): void
+  {
     echo '<pre>';
     var_dump($var);
     echo '</pre>';
@@ -141,24 +118,15 @@ if (!function_exists('de')) {
 }
 
 if (!function_exists('def')) {
-  /**
-   * @param $var
-   * @param bool $die
-   */
-  function def($var, bool $die = true) {
+  function def($var, bool $die = true): void
+  {
     if (is_array($var) || is_object($var)) $var = json_encode($var);
     file_put_contents(ABS_SITE_PATH . 'shared/debug.json', $var);
     if ($die) die();
   }
 }
 
-/**
- * @param string[]|string $hayStack
- * @param string $search
- * @param bool $strict
- * @return bool
- */
-function includes($hayStack, string $search, bool $strict = false): bool {
+function includes(array|string $hayStack, string $search, bool $strict = false): bool {
   if (is_array($hayStack)) {
     foreach ($hayStack as $item) {
       if (includes($item, $search, $strict)) return true;
@@ -170,7 +138,7 @@ function includes($hayStack, string $search, bool $strict = false): bool {
   return false;
 }
 
-function getPageAsString($data): string {
+function getPageAsString(array $data): string {
   $id = 'wrapCalcNode' . uniqid();
   $initJs = $data['initJs'];
   unset($data['initJs']);
@@ -183,9 +151,7 @@ function getPageAsString($data): string {
 }
 
 /**
- * translate text
- * @param string $str
- * @return string
+ * Translate text
  */
 function gTxt(string $str): string {
   global $main;
@@ -199,10 +165,7 @@ function gTxt(string $str): string {
 }
 
 /**
- * translate dataBase text
- * @param string $db
- * @param string $str
- * @return string
+ * Translate dataBase text
  */
 function gTxtDB(string $db, string $str): string {
   global $main;
@@ -217,16 +180,16 @@ function gTxtDB(string $db, string $str): string {
 
 
 /**
- * Find index of Levelshtein
+ * Find index of Levenshtein
  *
- * @param string $input - when search?
+ * @param string $input - when searched?
  * @param array  $row   - what search? arr of string
  * @param bool   $index - if true return word, default return index position
- * @param bool   $strict -
  *
- * @return integer or string - int: return index of position keyword in array
+ * @return int|string - int: return index of position keyword in array
  */
-function findWord(string $input, array $row, bool $index = false, bool $strict = false) {
+function findWord(string $input, array $row, bool $index = false, bool $strict = false): int|string
+{
   $gc = false;
   $shortest = -1;
   $nearestWord = null;
@@ -257,29 +220,7 @@ function findWord(string $input, array $row, bool $index = false, bool $strict =
 }
 
 /**
- * Find key
- *
- * @param string[] $cell - when searching?
- * @param array $input - what search? array of keys
- *
- * @return string|bool - keys or false
- */
-function findKey(array $cell, array $input) {
-  $count = count($input); // now forever 1
-  $input = '/(' . implode('|', $input) . ')/i';
-  foreach ($cell as $key => $item) {
-    if (preg_match_all($input, $key) === $count) {
-      return $key;
-    }
-  }
-
-  return false;
-}
-
-/**
  * Find csv file
- * @param string $filename
- * @return string
  */
 function findCsvFile(string $filename): string {
   global $main;
@@ -295,10 +236,6 @@ function findCsvFile(string $filename): string {
 
 /**
  * Determines whether a string can be considered JSON or not.
- *
- * @param string $value value to determine json of.
- *
- * @return boolean
  */
 function isJSON(string $value): bool {
   return (
@@ -314,17 +251,16 @@ function isJSON(string $value): bool {
  * @param string $filename - csv filename with path
  * @param bool   $oneRang  - if true that return one rang array
  * @param bool   $strict   - strict checking of column names
- *
- * @return array|string
  */
-function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $strict = false) {
+function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $strict = false): array|string
+{
   $filename = findCsvFile($filename);
   $result = [];
 
   if (!count($dict)) return loadFullCSV($filename);
 
   if (strlen($filename) && ($handle = fopen($filename, "rt")) !== false) {
-    if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
+    if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER, "\"", "\\"))) {
       $keyIndex = [];
 
       foreach ($dict as $key => $word) {
@@ -353,7 +289,7 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
 
       }
 
-      while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER)) !== false) {
+      while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER, "\"", "\\")) !== false) {
         $result[] = $addPos($data);
       }
     }
@@ -364,15 +300,11 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
   return $result;
 }
 
-/**
- * @param string $path
- * @return array
- */
 function loadFullCSV(string $path): array {
   if ($path !== '' && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
 
-    while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
+    while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER, "\"", "\\"))) {
       $result[] = array_map(function ($cell) {
         return preg_replace('/^d_/', '', $cell);
       }, $data);
@@ -385,14 +317,8 @@ function loadFullCSV(string $path): array {
 
 /**
  * Remove folder recursive
- * @param string $dir
- * @return bool
  */
 if (!function_exists('removeFolder')) {
-  /**
-   * @param string $dir
-   * @return bool
-   */
   function removeFolder(string $dir): bool {
     if (!is_dir($dir)) return false;
 
@@ -407,40 +333,17 @@ if (!function_exists('removeFolder')) {
   }
 }
 
-/**
- * @param string $lang
- */
 function setUserLocale(string $lang = 'ru_RU') {
-  /*switch ($lang) {
-    case 'ru_RU':
-      putenv('LANG=ru_RU.UTF8');
-      putenv('LANGUAGE=ru_RU.UTF8');
-      setlocale (LC_ALL, $lang . '.UTF8');
-      break;
-    default:
-      putenv('LC_ALL=' . $lang);
-      putenv('LANG=' . $lang);
-      putenv('LANGUAGE=' . $lang);
-      setlocale (LC_ALL,"English", "en", "en_US.UTF8");
-  }*/
-
   putenv('LANG=ru_RU.UTF8');
   putenv('LANGUAGE=ru_RU.UTF8');
   setlocale(LC_ALL, $lang . '.UTF8');
-
-  //putenv('LC_MESSAGES='.$locale);
-  //setlocale(LC_MESSAGES, $locale);
 
   bindtextdomain($lang, './lang');
   textdomain($lang);
 }
 
 /**
- * get template from directory view
- * @param string $path whit out
- * @param array  $vars
- *
- * @return string
+ * Get template from view directory
  */
 function template(string $path = 'base', array $vars = []): string {
   global $main;
@@ -456,10 +359,6 @@ function template(string $path = 'base', array $vars = []): string {
   return ob_get_clean();
 }
 
-/**
- * @param string $value
- * @return string
- */
 function translit(string $value): string {
   $converter = [
     'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
@@ -475,12 +374,10 @@ function translit(string $value): string {
 }
 
 /**
- * @param string $url
  * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'login', 'password', 'contentType', 'timeout'
- * @param string|array<string, string> $params - assoc array
- * @return string|array
  */
-function httpRequest(string $url, array $config = [], $params = []) {
+function httpRequest(string $url, array $config = [], array $params = []): array|string
+{
   $myCurl = curl_init();
 
   $curlConfig = [
@@ -566,40 +463,12 @@ if (!function_exists('trigger_deprecation')) {
   }
 }
 
-if (!function_exists('get_debug_type')) {
-  function get_debug_type($value): string {
-    switch (true) {
-      case null === $value: return 'null';
-      case is_bool($value): return 'bool';
-      case is_string($value): return 'string';
-      case is_array($value): return 'array';
-      case is_int($value): return 'int';
-      case is_float($value): return 'float';
-      case is_object($value): break;
-      case $value instanceof __PHP_Incomplete_Class: return '__PHP_Incomplete_Class';
-      default:
-        if (null === $type = @get_resource_type($value)) return 'unknown';
-
-        if ($type === 'Unknown') $type = 'closed';
-
-        return "resource ($type)";
-    }
-
-    $class = get_class($value);
-
-    if (false === strpos($class, '@')) return $class;
-
-    return (get_parent_class($class) ?: key(class_implements($class)) ?: 'class') . '@anonymous';
-  }
-}
-
 if (!function_exists('array_find')) {
   /**
    * @param array $array - The array to search.
    * @param callable $callback - The callback to run for each element.
-   * @return mixed|null
    */
-  function array_find(array $array, callable $callback) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound
+  function array_find(array $array, callable $callback): mixed { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound
     foreach ( $array as $key => $value ) {
       if ($callback($value, $key)) return $value;
     }

@@ -13,8 +13,7 @@ $field = [
 
 // получить конфиг текущего пользователя
 $setting = $main->getLogin('customization');
-$setting = $setting ?: [];;
-
+$setting = $setting ?: [];
 
 $columns = $setting['customersShowColumns'] ?? ['ID', 'name', 'contacts',  'ITN', 'orders'];
 $param['columns'] = array_map(function ($item) {

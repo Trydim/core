@@ -97,12 +97,8 @@ menu;
         if ($item === PUBLIC_PAGE) continue;
 
         if (is_array($item)) {
-          if (isset($item['label'])) { ?>
-            <li class="nav-label"><?= gTxt($item['label']) ?></li>
-          <?php continue; }
-
-          $link = $item['link'];
-          $icon = $item['icon'] ?? DEFAULT_ICON[$link] ?? 'pi-circle';
+          $link = $item['label'] ?? $item['link'] ?? $item[0];
+          $icon = $item['icon'] ?? $item[1] ?? DEFAULT_ICON[$link] ?? 'pi-circle';
         } else {
           $link = $item;
           $icon = DEFAULT_ICON[$link] ?? 'pi-circle';

@@ -344,18 +344,6 @@ export default class extends TableBase {
 
     this[action] && this[action](target);
   }
-  /*filterChange(target) {
-    const id = target.value,
-          dealerPath = f.SITE_PATH + 'dealer/' + id + '/';
-
-    this.queryParam.mode = 'DB';
-    this.queryParam.dbAction = this.mainAction;
-    this.queryParam.orderIds = '[]';
-    this.queryParam.currPage = 0;
-    this.toggleDisableBtn(+id);
-
-    this.query(+id ? dealerPath : undefined);
-  }*/
   filterCustomers(target) {
     this.queryParam.mode = 'DB';
     this.queryParam.dbAction = this.mainAction;

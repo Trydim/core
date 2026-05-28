@@ -33,17 +33,6 @@ $startPath = $main->url->getPath(true) . $main->getCmsParam('SHARE_PATH');
         </form>
       </div>
     </div>
-
-    <!--<a id="zipsite" class="btn asphalt" title="Архивировать и скачать"
-      href="</?= config['rootdirectory'] ?>downloadfolder.php?file=</?= ROOT ?>">
-      <i class=" fa fa-download" aria-hidden="true"></i>Архивировать и скачать
-    </a>-->
-    <!--<a class="btn asphalt" title="Основные настройки"
-       href="</?= config['rootdirectory'] ?>editor.php?editfile=config.php"
-       target="_blank">
-      <i class=" fa fa-cog" aria-hidden="true"></i>Основные настройки
-    </a>-->
-
   </div>
   <div class="row">
     <!-- left panel -->

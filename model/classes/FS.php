@@ -13,22 +13,10 @@ class FS {
   const PREV_MAX_SIZE_HEIGHT = 300;
   const PREV_POSTFIX = '_sm';
 
-  /**
-   * @var Main
-   */
-  private $main;
-  /**
-   * @var string
-   */
-  private $absUploadDir;
-  /**
-   * @var string
-   */
-  private $fileUrl;
-  /**
-   * @var array
-   */
-  private $config;
+  private Main $main;
+  private string $absUploadDir;
+  private string $fileUrl;
+  private array $config;
   /**
    * @var object
    */
@@ -44,11 +32,13 @@ class FS {
   }
 
 
-  private function setPath() {
+  private function setPath(): void
+  {
     $this->param->path = $this->param->name;
     $this->param->uri = $this->fileUrl . $this->param->name;
   }
-  private function setFileParam(array $file) {
+  private function setFileParam(array $file): void
+  {
     $this->param->originalName = $file['name'];
     $this->param->originalFileName = pathinfo($this->param->originalName, PATHINFO_FILENAME);
     $this->param->name = $file['name'];
@@ -57,12 +47,14 @@ class FS {
     $this->param->size = $file['size'] ?? null;
     $this->setPath();
   }
-  private function setNewName() {
+  private function setNewName(): void
+  {
     $name = $this->param->originalFileName . '_' . rand();
     $this->param->name = $name . '.' . $this->param->ext;
     $this->setPath();
   }
-  private function checkUploadDir() {
+  private function checkUploadDir(): void
+  {
     try {
       if (!is_dir($this->absUploadDir)) mkdir($this->absUploadDir, 0777, true);
     } catch (Exception $e) {
@@ -71,12 +63,13 @@ class FS {
   }
 
   /**
-   * @return bool|int - \n
+   * @return bool|int|string - \n
    * false - file not exist
    * self::HAVE_NAME - file exist
    * integer - id file from DB
    */
-  private function checkUploadFile() {
+  private function checkUploadFile(): bool|int|string
+  {
     $name = $this->param->name;
     $filePath = $this->absUploadDir . $name;
 
@@ -97,12 +90,14 @@ class FS {
     return false;
   }
 
-  private function move($file) {
+  private function move($file): void
+  {
     if (!move_uploaded_file($file['tmp_name'], $this->absUploadDir . $this->param->name))
       throw new Error('Moving file error: ' . $this->param->originalName);
   }
 
-  public function optimize() {
+  public function optimize(): void
+  {
     $baseName = $this->param->name;
     $ext = $this->param->ext;
     $filePath = $this->absUploadDir . $baseName;
@@ -144,11 +139,11 @@ class FS {
   }
 
   /**
-   * @param $fileName {string} - only file name without slash
-   * @param $path {string} - path without slash on the end
-   * @return false|string
+   * @param string $fileName  Only file name without slash
+   * @param string|null $path Path without slash on the end
    */
-  static function findingFile($fileName, $path = null) {
+  static function findingFile(string $fileName, ?string $path = null): false|string
+  {
     $sep = DIRECTORY_SEPARATOR;
     $path = $path ?? ABS_SITE_PATH . self::UPLOAD_DIR;
 
@@ -216,10 +211,6 @@ class FS {
     return $result;
   }
 
-  /**
-   * @param array $file
-   * @return FS
-   */
   public function prepareFile(array $file): FS {
     $this->setFileParam($file);
 
@@ -227,14 +218,13 @@ class FS {
   }
 
   /**
-   * @param string $key
-   * @param ?bool $optimize
-   * @return string|integer|object
+   * @return mixed - error<br>
    * string - error<br>
-   * integer - ID from DB <br>
+   * integer - id from DB <br>
    * object - {name, extension, type}
    */
-  public function saveFromRequest(string $key, bool $optimize = false) {
+  public function saveFromRequest(string $key, bool $optimize = false): mixed
+  {
     $file = $_FILES[$key] ?? null;
     if (!isset($file)) return false;
 

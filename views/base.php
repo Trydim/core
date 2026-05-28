@@ -2,10 +2,16 @@
 
 /**
  * @var Main $main - global
- * @var array $vars extract param
+ * @var ?string $pageHeader extract param
+ * @var ?string $pageFooter extract param
+ * @var ?string $sideLeft extract param
+ * @var ?string $sideRight extract param
  */
 
 $isAuth = $main->checkStatus();
+
+$cssLinks = $cssLinks ?? [];
+$jsLinks = $jsLinks ?? [];
 
 if (!isset($global)) {
   $pageHeader = $pageHeader ?? template('parts/header');
@@ -27,7 +33,7 @@ $jsGlobalConst = json_encode([
   'AUTH_STATUS'   => $isAuth,
   'IS_DEAL'       => $main->isDealer(),
   'DEAL_URI_IMG'  => $main->getCmsParam(VC::DEAL_URI_IMG, $main->getCmsParam(VC::URI_IMG)),
-  'DEAL_URI_SHARED' => $main->url->getUri(true) . SHARE_PATH,
+  'DEAL_URI_SHARED' => $main->url->getUri(true) . $main->getCmsParam('SHARE_PATH'),
   'INIT_SETTING'  => $main->frontSettingInit,
   'BASE_LANG'     => $main->getCmsParam(VC::LOCALES_BASE_LANG, Main::$BASE_LANG),
 ]);
@@ -53,7 +59,7 @@ $coreUrlJs  = CORE_JS; //$main->url->getUrl(VC::CORE_JS);
 
   array_map(function ($item) { ?>
     <link rel="stylesheet" href="<?= $item ?>">
-  <?php }, $cssLinks ?? []); ?>
+  <?php }, $cssLinks); ?>
 
   <script>
     window.CMS_CONST = '<?= $jsGlobalConst ?>'
@@ -64,7 +70,7 @@ $coreUrlJs  = CORE_JS; //$main->url->getUrl(VC::CORE_JS);
 
   <?php array_map(function ($item) { ?>
     <link rel="prefetch" href="<?= $item ?>" as="script" crossorigin>
-  <?php }, $jsLinks ?? []); ?>
+  <?php }, $jsLinks); ?>
 
   <?= $headContent ?? '' ?>
 </head>
@@ -83,17 +89,17 @@ $coreUrlJs  = CORE_JS; //$main->url->getUrl(VC::CORE_JS);
 
 <?php if (!isset($global)) { ?>
   <main class="main-wrapper mx-auto" id="mainWrapper">
-    <?= $pageHeader; ?>
+    <?= $pageHeader ?? ''; ?>
 
     <div class="container-content">
-      <?= $sideLeft ?>
+      <?= $sideLeft ?? '' ?>
 
       <section class="content-body">
         <div class="px-xl-2 pt-2 pb-5 h-100"><?= $content ?? '' ?></div>
         <?= $pageFooter ?>
       </section>
-      <?php if ($sideRight) { ?>
-        <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight ?></section>
+      <?php if ($sideRight ?? '') { ?>
+        <section id="sideRight" class="col-md-3 col-lg-2 d-md-block"><?= $sideRight ?? '' ?></section>
       <?php } ?>
     </div>
 
@@ -108,7 +114,7 @@ $coreUrlJs  = CORE_JS; //$main->url->getUrl(VC::CORE_JS);
 
 <?php array_map(function ($item) { ?>
   <script defer type="module" src="<?= $item ?>"></script>
-<?php }, $jsLinks ?? []); ?>
+<?php }, $jsLinks); ?>
 
 <?= $footerContent ?? '' ?>
 <?= $footerContentBase ?>

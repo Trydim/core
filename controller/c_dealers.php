@@ -53,10 +53,14 @@ if ($main->getCmsParam(VC::LOCALES)) {
 }
 
 // All dealers properties
+// If user have table property, add libs
+$hasTableProp = false;
 $dealerProps = array_merge($dealerProps, $main->getSettings(VC::DEALER_PROPERTIES));
 foreach ($main->db->getTables('prop') as $table) {
-  // Param saved in json
+  // Param saved in JSON
   $prop = $dealerProps[$table['dbTable']] ?? [];
+
+  if ($prop['type'] === 'table') $hasTableProp = true;
 
   $dealerProps[$table['dbTable']] = [
     'name'   => $prop['name'] ?? $table['name'],
@@ -69,9 +73,7 @@ foreach ($main->db->getTables('prop') as $table) {
 }
 $field['footerContent'] .= $main->getFrontContent('dataProperties', $dealerProps);
 
-// If user have table property, add libs
-$haveTable = array_find($dealerProps, function ($prop) { return $prop['type'] === 'table'; });
-if (!empty($haveTable)) {
+if ($hasTableProp) {
   array_unshift($field['jsLinks'], CORE_JS . 'libs/handsontable.full.min.js?ver=f3bb2b6859');
 }
 unset($values, $dealerProps, $haveTable);

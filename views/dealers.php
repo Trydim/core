@@ -29,7 +29,7 @@ if (!isset($param['isDBEditor'])) { ?>
           <input type="checkbox" name="selectedDealer[]" value="<?= $item['id'] ?>">
           <?= $item['id'] . '. ' . $item['name'] ?>
         </label>
-      <? } ?>
+      <?php } ?>
     </div>
 
     <div class="col-12">

@@ -15,11 +15,7 @@
 
     "type-check": "vue-tsc --build",
     "coreDev": "webpack --config ./bundler/webpack.config.js",
-    "coreModuleDev": "webpack --config ./bundler/webpack.module.js",
-
-    "createCypress": "node ./test/createCypressConfig.js",
-    "localCypressTest": "cypress open --project ../../ --config-file ./core/src/test/cypress.json",
-    "cypressDeployProd": "cypress open --project ../../ --config-file ./core/src/tests/cypress.json --env external=true"
+    "coreModuleDev": "webpack --config ./bundler/webpack.module.js"
   },
   "dependencies": {
     "@syncfusion/ej2-kanban": "^30.2.4",

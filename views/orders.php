@@ -2,7 +2,7 @@
 
 /**
  * @var Main $main - global
- * @var $param - from controller c_orders.php
+ * @var array $param - from controller c_orders.php
  */
 
 $field['content'] = template('parts/ordersContent', $param);
@@ -46,18 +46,6 @@ $field['footerContent'] .= <<<footerContent
 <template id="tableContactsValue">
   <div>\${key}: \${value}</div>
 </template>
-<!--template id="orderOpenForm">
-  <div>
-    <div>Дата создания - \${create_date}</div>
-    <div>Дата редактирования - \${last_edit_date}</div>
-    <div>Заказчик - \${customer}</div>
-    <div>Менеджер - \${name}</div>
-    <div>Статус - \${status}</div>
-    <div>\${important_value}</div>
-    <div>\${report_value}</div>
-    <div>\${total}</div>
-  </div>
-</template-->
 <template id="orderColumnsTableTmp">
   <form action="#" id="columnsSetting">$orderColumnsTableTmp</form>
 </template>

@@ -1,5 +1,7 @@
 <?php
 
+use RedBeanPHP\RedException\SQL;
+
 trait DbOrders
 {
   private function getOrdersDbColumns(string $field): string
@@ -41,16 +43,17 @@ trait DbOrders
   }
 
   /**
-   * @param array $pageParam [int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
-   * @param ?array $filters (<br> $filters['dateCreateFrom'], $filters['dateCreateTo'] - date
-   * or<br>
-   * $filters['dateEditedFrom'], $filters['dateEditedTo'] - date<br>
-   * ) and<br>
-   * $filters['userId']     - int|string<br>
-   * $filters['customerId'] - int|string<br>
-   * $filters['statusId']   - string|int|string[]|int[]$ids
-   *
-   * @return array
+   * @param array{pageNumber: int, countPerPage: int, sortColumn: string, sortDirect: bool} $pageParam
+   * @param array{
+   *   dateCreateFrom?: string,
+   *   dateCreateTo?  : string,
+   *   dateEditedFrom?: string,
+   *   dateEditedTo?  : string,
+   *   userId?        : int|string,
+   *   customerId?    : int|string,
+   *   statusId?      : string|int|array<int|string>
+   * } $filters
+   * @return array<int, mixed>
    */
   public function loadOrders(array $pageParam, array $filters = []): array
   {
@@ -102,13 +105,11 @@ trait DbOrders
 
   /**
    * load full information order
-   * @param string|int|string[]|int[] $ids
    * @param bool $oneOrder - if true, return one order and $ids must have one value.
    *
-   * @return array rows
    * @throws InvalidArgumentException
    */
-  public function loadOrdersById($ids, bool $oneOrder = false): array
+  public function loadOrdersById(array|int|string $ids, bool $oneOrder = false): array
   {
     $sql = $this->getBaseOrdersQuery(true) . "\n WHERE ";
 
@@ -135,13 +136,6 @@ trait DbOrders
     return $oneOrder ? $res[0] : $res;
   }
 
-  /**
-   * @param array $pageParam
-   * @param string $searchValue
-   * @param array $filters
-   * @param bool $includeValues
-   * @return array
-   */
   public function searchOrders(array $pageParam, string $searchValue, array $filters = [], bool $includeValues = false): array
   {
     $searchValue = '%' . $searchValue . '%';
@@ -181,14 +175,13 @@ trait DbOrders
     return $this->jsonParseField(self::getAll($sql));
   }
 
-  public function changeOrders($columns, $dbTable, $commonValues, $status_id)
+  public function changeOrders(array $columns, string $dbTable, array $commonValues, int $status_id): void
   {
     $param = [];
 
     array_map(function ($id) use (&$param, $status_id) {
       $param[$id] = [
-        'status_id'      => $status_id,
-        'last_edit_date' => date('Y-m-d G:i:s'), //нужен триггер
+        'status_id' => $status_id,
       ];
     }, array_values($commonValues));
     $this->insert($columns, $dbTable, $param, true);
@@ -197,7 +190,7 @@ trait DbOrders
   // Visitors
   //--------------------------------------------------------------------------------------------------------------------
 
-  public function saveVisitorOrder($param)
+  public function saveVisitorOrder(array $param): string|int
   {
     $bean = self::xdispense($this->pf('client_orders'));
 
@@ -211,11 +204,7 @@ trait DbOrders
   }
 
   /**
-   * @param array $pageParam [int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
-   * @param array $dateRange
-   * @param array $ids
-   *
-   * @return array|null
+   * @param array{pageNumber: int, countPerPage: int, sortColumn: string, sortDirect: bool} $pageParam
    */
   public function loadVisitorOrder(array $pageParam, array $dateRange = [], array $ids = []): ?array
   {
@@ -295,13 +284,7 @@ trait DbUsers
     }
   }
 
-  /**
-   * @param string $login
-   * @param string $password
-   * @param bool   $status
-   * @return array|false
-   */
-  public function getUserFromFile(string $login = '', string $password = '', bool $status = false)
+  public function getUserFromFile(string $login = '', string $password = '', bool $status = false): bool|array
   {
     if (file_exists(SYSTEM_PATH)) {
       $value = file(SYSTEM_PATH)[0];
@@ -322,13 +305,7 @@ trait DbUsers
     }
   }
 
-  /**
-   * @param string $login
-   * @param string $column
-   *
-   * @return array|null
-   */
-  public function getUser(string $login, string $column = 'ID'): ?array
+  public function getUser(string $login, string $column = 'id'): mixed
   {
     $result = self::getRow("SELECT $column FROM " . $this->pf('users') . " WHERE login = :login",
       [':login' => $login]
@@ -338,12 +315,7 @@ trait DbUsers
     return $result;
   }
 
-  /**
-   * @param string|integer $userId
-   *
-   * @return array|null
-   */
-  public function getUserById($userId): ?array
+  public function getUserById(int $userId, bool $allField = false): ?array
   {
     return $this->jsonParseField(self::getRow(
       "SELECT U.ID AS 'id', U.name AS 'name', U.contacts AS 'contacts',
@@ -355,11 +327,7 @@ trait DbUsers
     ));
   }
 
-  /**
-   * @param $login
-   * @return array|null
-   */
-  public function getUserByLogin($login): ?array
+  private function getFirstAuthUserByDealer(int $dealerId): array
   {
     $sql = "SELECT U.ID AS 'id', login,  password, hash,
                    U.name AS 'name', contacts, customization, activity,
@@ -371,11 +339,7 @@ trait DbUsers
     return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
   }
 
-  /**
-   * @param string|int $orderId
-   * @return array|null
-   */
-  public function getUserByOrderId($orderId): ?array
+  public function getUserByOrderId(int|string $orderId): ?array
   {
     return $this->jsonParseField(self::getRow(
       "SELECT U.ID AS 'id', U.name AS 'name', U.contacts AS 'contacts',
@@ -387,12 +351,7 @@ trait DbUsers
     ));
   }
 
-  /**
-   * @param string $login
-   * @param string $password
-   * @return array|false
-   */
-  public function checkPassword(string $login, string $password)
+  public function checkPassword(string $login, string $password): array|bool
   {
     if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
       $sql = "SELECT ID as 'id', name, login, password FROM " . $this->pf('users') . " WHERE ID = :id";
@@ -429,7 +388,10 @@ trait DbUsers
     return self::getRow($sql, [':contacts' => "%$token%"]);
   }
 
-  public function changeUser($loginId, $param)
+  /**
+   * @throws SQL
+   */
+  public function changeUser(int|string $loginId, array $param): void
   {
     $user = self::xdispense($this->pf('users'));
     $user->ID = $loginId;
@@ -440,9 +402,7 @@ trait DbUsers
   }
 
   /**
-   * @param array $pageParam [int 'pageNumber', int 'countPerPage', string 'sortColumn', bool 'sortDirect']
-   *
-   * @return array
+   * @param array{pageNumber?: int, countPerPage?: int, sortColumn?: string, sortDirect?: bool} $pageParam
    */
   public function loadUsers(array $pageParam): array
   {
@@ -459,7 +419,7 @@ trait DbUsers
     return $this->jsonParseField(self::getAll($sql));
   }
 
-  public function setUserHash($loginId, $hash)
+  public function setUserHash(int|string $loginId, string $hash, string $userType = 'user'): void
   {
     if (USE_DATABASE) {
       $user = self::xdispense($this->pf('users'));
@@ -474,11 +434,7 @@ trait DbUsers
     }
   }
 
-  /**
-   * @param $session
-   * @return array|bool[]|false
-   */
-  public function checkUserHash($session)
+  public function checkUserHash(array $session): bool|array
   {
     if (USE_DATABASE) {
       $user = $this->getUserByLogin($session['login']);
@@ -516,14 +472,6 @@ trait DbUsers
     return $ok ? $user : false;
   }
 
-  /**
-   * get Setting for current user
-   *
-   * @param string $currentUser {string}
-   * @param string $columns {string}
-   *
-   * @return mixed
-   */
   public function getUserSetting(string $currentUser = '', string $columns = 'customization')
   {
     if (!$currentUser) {
@@ -541,23 +489,17 @@ trait DbUsers
 
 trait DbCsv
 {
-  private $csvTable;
+  private string $csvTable;
 
-  /**
-   * @param string $path
-   */
-  public function setCsvTable(string $path)
+  public function setCsvTable(string $path): void
   {
     $this->csvTable = substr($path, 1);
   }
 
   /**
    * сделать поиск всех файлов, наверное. (хотя если их много переходить на БД, наверное)
-   * @param $path {string}
-   * @param $link {string}
-   * @return mixed|null
    */
-  public function scanDirCsv(string $path, string $link = '')
+  public function scanDirCsv(string $path, string $link = ''): array
   {
     return array_reduce(is_dir($path) ? scandir($path) : [], function ($r, $item) use ($link) {
       if (!($item === '.' || $item === '..')) {
@@ -586,7 +528,7 @@ trait DbCsv
 
     if (file_exists($csvPath)) {
       if ($file = fopen($csvPath, 'rt')) {
-        while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) $result[] = $cells;
+        while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER, "\"", "\\")) $result[] = $cells;
         fclose($file);
       }
     }
@@ -594,7 +536,7 @@ trait DbCsv
     return $result;
   }
 
-  public function fileForceDownload()
+  public function fileForceDownload(): void
   {
     $file = $this->main->getCmsParam(VC::CSV_PATH) . $this->csvTable;
 
@@ -619,12 +561,7 @@ trait DbCsv
     }
   }
 
-  /**
-   * @param array $csvData
-   *
-   * @return $this
-   */
-  public function saveCsv(array $csvData)
+  public function saveCsv(array $csvData): static
   {
     $main = $this->main;
     $csvPath = $main->getCmsParam(VC::CSV_PATH);
@@ -658,9 +595,9 @@ trait DbCsv
 
 trait ContentEditor
 {
-  private $CONTENT_PATH = SHARE_PATH . 'content.json';
-  private $contentData = '{}';
-  private $contentLoaded;
+  private string $CONTENT_PATH = SHARE_PATH . 'content.json';
+  private string $contentData = '{}';
+  private mixed $contentLoaded;
 
   private function contentPath(): string
   {
@@ -678,12 +615,7 @@ trait ContentEditor
     }
   }
 
-  /**
-   * @param bool $jsonDecode
-   * @param bool $assoc
-   * @return mixed
-   */
-  public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false)
+  public function loadContentEditorData(bool $jsonDecode = false, bool $assoc = false): mixed
   {
     $this->checkContentFile();
 
@@ -692,7 +624,7 @@ trait ContentEditor
     return $jsonDecode ? json_decode($data, $assoc) : $data;
   }
 
-  public function saveContentEditorData($data)
+  public function saveContentEditorData($data): bool|int
   {
     $this->checkContentFile();
 
@@ -701,17 +633,11 @@ trait ContentEditor
     return file_put_contents($this->contentPath(), $data);
   }
 
-  public function mergeContentData()
+  public function mergeContentData(): void
   {
     $this->contentLoaded = $this->getContentData(false);
   }
 
-  /**
-   * @param bool $flatten
-   * @param bool $assoc
-   *
-   * @return array
-   */
   public function getContentData(bool $flatten = true, bool $assoc = false): array
   {
     $data = $this->loadContentEditorData(true, true);

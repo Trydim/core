@@ -168,18 +168,10 @@ const customers = {
             value = f.replaceTemplate(this.contValue, arr);
           } else value = '';
         } catch (e) {
-          console.log(`Клиент ID: ${item.id} имеет не правильное значение`);
+          console.log(`Клиент id: ${item.id} имеет не правильное значение`);
         }
         item['contacts'] = value;
       }
-
-      /*if(true /!* TODO настройки вывода даты*!/) {
-        for (let i in item) {
-          if(i.includes('date')) {
-            item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
-          }
-        }
-      }*/
 
       if (item['orders']) {
         orders.setData(item.id, item['orders']);

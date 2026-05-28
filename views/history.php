@@ -5,4 +5,4 @@
  */
 global $field;
 
-$field[VC::BASE_CONTENT] = '<div class="historyPage" id="h-100"></div>';
+$field[VC::BASE_CONTENT] = '<div id="historyPage" class="h-100"></div>';

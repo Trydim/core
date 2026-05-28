@@ -50,7 +50,7 @@ acceptMenu = configRows.filter((r) => r.includes('\'ACCESS_MENU\''));
 menu = acceptMenu[0].toLowerCase();
 
 // Администрирование БД
-let modules = ['admindb', 'calendar', 'catalog', 'customers', 'fileManager', 'orders', 'setting', 'statistic', 'users', 'dealers'];
+let modules = ['admindb', 'history', 'customers', 'fileManager', 'orders', 'setting', 'users', 'dealers'];
 modules.forEach((name) => {
   addModule(name);
 });

@@ -48,11 +48,7 @@ $isAdmin = $main->getLogin('isAdmin');
   </div>
   <hr>
 
-  <?php if ($main->availablePage('catalog')) { ?>
-    <setting-properties type="catalog" :query="query" :query-param="queryParam" @update="updateProperties"></setting-properties>
-  <?php }
-
-  if ($main->availablePage('dealers')) { ?>
+  <?php if ($main->availablePage('dealers')) { ?>
     <setting-properties type="dealer" title="" :query="query" :query-param="queryParam" @update="updateDealersProperties"></setting-properties>
   <?php } ?>
 </div>

@@ -70,13 +70,6 @@ const storageLoad = () => {
   // Set Sidebar Toggle
   let node = f.gI('mainWrapper');
   if (node && storage.get(STORAGE_KEY.sidebarToggle) === 'true') node.classList.add(MENU_CLASS);
-
-  // Set theme
-  if (storage.get('themeToggle') === 'true') {
-    let node = f.qS('[data-action-cms="themeToggle"]');
-    node && (node.checked = true);
-    document.body.dataset.themeVersion = 'dark';
-  }
 }
 
 const setParentHeight = (target: HTMLElement, height: number) => {
@@ -126,10 +119,10 @@ const startPreloader = () => {
   f.show(f.gI('preloader'));
   f.gI('mainWrapper').classList?.remove('show');
 }
-const stopPreloader = (short = true) => {
+const stopPreloader = () => {
   if (f.OUTSIDE) return;
   f.hide(f.gI('preloader'));
-  short && f.gI('mainWrapper').classList?.add('show');
+  f.gI('mainWrapper')?.classList?.add('show');
 }
 
 // Event function
@@ -146,12 +139,6 @@ const sidebarToggle = () => {
   setTimeout(() => {
     setSideMenuStyle(!isShort);
   }, 500);
-}
-
-const themeToggle = () => {
-  const isLight = document.body.dataset.themeVersion === 'light';
-  document.body.dataset.themeVersion = isLight ? 'dark': 'light';
-  storage.set('themeToggle', isLight);
 }
 
 const dropdownToggle = (e: HTMLElement) => {
@@ -203,7 +190,6 @@ const cmsEventClick = function() {
 
   let select = {
     sidebarToggle,
-    themeToggle,
     dropdownToggle,
     exit: () => location.href = f.SITE_PATH + `?mode=auth&cmsAction=exit`,
   };
@@ -257,7 +243,7 @@ const onEvent = () => {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (f.gI('authForm')) { stopPreloader(false); return; }
+  if (f.gI('authForm')) { stopPreloader(); return; }
 
   cancelFormSubmit();
   loadLangList();

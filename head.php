@@ -14,14 +14,13 @@ require __DIR__ . '/cmsSetting.php';
 
 if ($mode = $main->getCmsParam('mode')) {
   $componentPath = __DIR__ . '/model/';
-  extract($_REQUEST);
+  extract($main->url->request->all());
   $cmsAction = $dbAction ?? $cmsAction ?? 'noAction';
 
   if (DEBUG || in_array($mode, ['auth', 'tBot', 'docs']) || $main->checkAction($cmsAction)) {
     try {
       switch ($mode) {
         case 'auth': require $componentPath . 'auth.php'; break;
-        case 'load':
         case 'DB':      require $componentPath . 'db.php'; break;
         case 'docs':    require $componentPath . 'docs.php'; break;
         case 'dictionary': require $componentPath . 'dictionary.php'; break;
