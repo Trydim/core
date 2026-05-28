@@ -578,7 +578,7 @@ trait DbUsers
                    register_date AS 'registerDate', activity
             FROM users U
             LEFT JOIN permission P ON U.permission_id = P.id
-            WHERE u.dealer_id = :dealerId AND activity = 1\n";
+            WHERE U.dealer_id = :dealerId AND U.activity = 1\n";
 
     $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn'] ?? 'id');
 

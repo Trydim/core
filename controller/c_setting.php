@@ -20,8 +20,6 @@ if (USE_DATABASE && $main->getLogin('isAdmin')) {
   $permissions['permissions'] = array_map(function ($row) {
     $row['id'] = intval($row['id']);
     $row['name'] = gTxt($row['name']);
-    $row['properties'] = json_decode($row['properties'], true);
-    unset($row['id']);
     return $row;
   }, $permissions['permissions']);
 
@@ -29,7 +27,7 @@ if (USE_DATABASE && $main->getLogin('isAdmin')) {
     return ['id' => $menu, 'name' => gTxt($menu)];
   }, $main->getSideMenu());
 
-  $main->addControllerField( VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataPermissions', $permissions))
+  $main->addControllerField( VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataPermissions', $permissions));
 
   // if available orders
   if ($main->availablePage('orders')) {
@@ -40,8 +38,8 @@ if (USE_DATABASE && $main->getLogin('isAdmin')) {
   unset($permissions);
 }
 
-$main->setControllerField($field)->fireHook(VC::HOOKS_SETTING_TEMPLATE, $main);
+$main->fireHook(VC::HOOKS_SETTING_TEMPLATE, $main);
 ob_start();
 require $main->url->getRoutePath();
-$field['content'] = ob_get_clean();
+$main->addControllerField(VC::BASE_CONTENT, ob_get_clean());
 $main->response->setContent(template());
