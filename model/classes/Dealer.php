@@ -6,6 +6,7 @@ class Dealer {
 
   private Main $main;
 
+  private int    $dealerId;
   private string $dealerDir;
   private string $dealerPath;
 
@@ -17,6 +18,7 @@ class Dealer {
 
   private function setParam(string $id): void
   {
+    $this->dealerId   = intval($id);
     $this->dealerDir  = $this::FOLDER . $id;
     $this->dealerPath = $this->dealerDir . DIRECTORY_SEPARATOR;
   }
@@ -97,9 +99,9 @@ class Dealer {
 
     if ($this->migrateDb->checkResourceDump()) {
       $this->migrateDb->seedingResourceDump();
-      $this->migrateDb->updateAdmin($param['login'], $param['pass']);
+      $this->migrateDb->updateAdmin($this->dealerId, $param['login'], $param['pass']);
     } else {
-      $this->migrateDb->addAdmin($param['login'], $param['pass']);
+      $this->migrateDb->addAdmin($this->dealerId, $param['login'], $param['pass']);
     }
   }
 
@@ -108,10 +110,10 @@ class Dealer {
     $this->main->fireHook(VC::HOOKS_DEALERS_BEFORE_CREATE, $this, $configParam, $dbParam);
 
     $this->setParam($id);
-    $this->createFolderDealers();
-    $this->createFolder();
-    $this->copyFiles();
-    $this->createConfig($configParam);
+    //$this->createFolderDealers();
+    //$this->createFolder();
+    //$this->copyFiles();
+    //$this->createConfig($configParam);
 
     $this->updateDb($dbParam);
 

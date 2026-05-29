@@ -30,12 +30,6 @@ else if (includes($main->url->getRequestUri(), 'database')) {
   }
 }
 
-$field = [
-  'pageTitle'     => gTxt('Dealers'),
-  'sideRight'     => '',
-  'footerContent' => $main->initDictionary(),
-];
-
 $dealerProps = [];
 
 // CMS Languages is enabled
@@ -43,10 +37,7 @@ if ($main->getCmsParam(VC::LOCALES)) {
   $dealerProps['prop_locales'] = [
     'name'   => gTxt('Available languages'),
     'type'   => 'multiSelect',
-    'values' => array_map(function ($row) {
-      $row['id'] = $row['ID'];
-      return $row;
-    }, $main->getAvailableLanguages()),
+    'values' => $main->getAvailableLanguages(),
   ];
 }
 
@@ -63,19 +54,18 @@ foreach ($main->db->getTables('prop') as $table) {
   $dealerProps[$table['dbTable']] = [
     'name'   => $prop['name'] ?? $table['name'],
     'type'   => $prop['type'] ?? 'select',
-    'values' => array_map(function ($row) {
-      $row['id'] = $row['ID'];
-      return $row;
-    }, $main->db->loadTable($table['dbTable'])),
+    'values' => $main->db->loadTable($table['dbTable']),
   ];
 }
-$field['footerContent'] .= $main->getFrontContent('dataProperties', $dealerProps);
 
-$main->setControllerField($field)
-     ->addAssets(['module/dealers.css', 'module/dealers.js']);
+$main->addAssets(['module/dealers.css', 'module/dealers.js']);
 if ($hasTableProp) $main->addAssets('libs/handsontable.full.min.js', 'before');
 
+$main->addControllerField(VC::BASE_PAGE_TITLE, gTxt('Dealers'))
+     ->addControllerField(VC::BASE_CONTENT, template('dealers', ['param' => $param ?? []]))
+     ->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary())
+     ->addControllerField(VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataProperties', $dealerProps));
+
 $main->fireHook(VC::HOOKS_DEALERS_TEMPLATE, $main);
-$field[VC::BASE_CONTENT] = template('dealers', ['param' => $param ?? []]);
-$main->response->setContent(template('base', $field));
+$main->response->setContent(template());
 unset($values, $dealerProps, $haveTable);

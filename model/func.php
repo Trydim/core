@@ -267,7 +267,7 @@ function loadFullCSV(string $path): array {
   if ($path !== '' && ($handle = fopen($path, "rt")) !== false) {
     $result = [];
 
-    while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER))) {
+    while (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER, "\"", "\\"))) {
       $result[] = array_map(function ($cell) {
         return preg_replace('/^d_/', '', $cell);
       }, $data);

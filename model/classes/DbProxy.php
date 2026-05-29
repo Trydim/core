@@ -7,9 +7,6 @@
  * @property DbMain $staticDb
  */
 final class DbProxy {
-  /**
-   * @var DbMain
-   */
   private DbMain $db;
 
   public static DbMain $staticDb;

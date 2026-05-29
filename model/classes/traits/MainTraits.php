@@ -46,13 +46,10 @@ trait Authorization {
 
     $this->setUser('contacts', $user['contacts'] ?? [])
          ->setUser('permission', $user['permissionValue'] ?? [])
-         ->setUser('customization', $user['customization'] ?? []);
+         ->setUser('customization', $user['customization'] ?? [])
+         ->setUser('isAdmin', str_contains($user['permissionValue']['tags'] ?? '', 'admin'))
+         ->setLoginStatus('ok');
 
-    $this->setUser('isAdmin',
-      stripos($this->user['permission']['tags'] ?? '', 'admin') !== false
-    );
-
-    $this->setLoginStatus('ok');
     return $this;
   }
 
@@ -448,53 +445,12 @@ trait Dictionary
   {
     if ($this->dictionary) return;
 
-    /*//Если целевой язык уже установлен, через метод setLocale, значит будет один язык (для заказов и шаблонов pdf, excel)
-    if (!isset($this->targetLocale)) {
-      $this->targetLocale = $_COOKIE['target_lang'] ?? ($locales['TARGET_LANG'] ?? $baseLang);
-      $this->initAvailableLanguages($locales);
-    }*/
-
     $this->dictionaryPath   = "lang/{$this->targetLocale}/dictionary.php";
     $this->dbDictionaryPath = "lang/{$this->targetLocale}/dbDictionary.php";
 
     $this->dictionary   = $this->loadAllDictionary();
     $this->dbDictionary = $this->loadDbDictionary();
   }
-
-  /**
-   * Инициализация доступных язык, не должен вызываться если целевой язык уже установлен
-   * @param array{
-   *       BASE_LANG: string,
-   *       TARGET_LANG: string,
-   *       ALL_LANGUAGES: array<array{name: string, code: string}>
-   *   } $locales
-   */
-  /*private function initAvailableLanguages(array $locales = []): array
-  {
-
-    if ($this->isDealer()) {
-      // Не так. Надо несколько вариантов:
-      // Проект не предусматривает что есть языки. Вообще.
-      // Проект предусматривает что есть языки и дилерам можно пользоваться всеми без ограничений.
-      // Проект предусматривает что есть языки и дилерам можно задать доступные.
-      $availableLanguages = $this->user['dealer'];
-
-      //Если у дилера нет доступных языков в настройках, то будет отсутвовать выбор языка у дилера
-      if (!$availableLanguages) {
-        $this->targetLocale = $locales['TARGET_LANG'] ?? $locales['BASE_LANG'] ?? self::$BASE_LANG;
-        return;
-      }
-
-      $this->availableLanguages = $availableLanguages;
-      if (!in_array($this->targetLocale, array_column($availableLanguages, 'code'), true)) {
-        $this->targetLocale = $availableLanguages[0]['code'] ?? self::$BASE_LANG;
-      }
-    }
-
-    return $this->localesList;
-    // Зачем?
-    // $this->availableLanguages = $locales['ALL_LANGUAGES'] ?? [];
-  }*/
 
   /**
    * Принудительно устанавливает целевой язык,
@@ -560,7 +516,6 @@ trait Dictionary
    * Когда управляем доступными языками через страницу управления языками (страницы пока нет) загружаем все доступные.
    * Когда управляем доступными языками для дилера через страницу дилеры, загружаем также все?
    * Когда вход под дилером, загружать только доступные ему
-   *
    *
    * @return array возвращает доступные языки
    */

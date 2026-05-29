@@ -4,9 +4,6 @@ class MigrateDb {
   const DEAL_LOGIN   = 'deal';
   const DEAL_PASS    = '$2y$10$BB2.m8vnYM7LCod4FQnHhuF3KSW5rJycwJIznvenAfJSsQsuP3hfS';
   const ORDER_STATUS = 'Order created';
-
-  //private string $charset = 'utf8mb4';
-
   /**
    * Resources dump files list
    * @var string[]
@@ -17,29 +14,31 @@ class MigrateDb {
 
   private DbProxy $db;
 
-  private function alterPrimaryKey(string $table, string $column = 'id'): int
-  {
-    return $this->db->exec("ALTER TABLE `$table` ADD PRIMARY KEY (`$column`)");
-  }
-  private function alterKey(string $table, string $column = 'id'): int
-  {
-    return $this->db->exec("ALTER TABLE `$table` ADD KEY `$column` (`$column`)");
-  }
-  private function alterUnique(string $table, string $column): int
-  {
-    return $this->db->exec("ALTER TABLE `$table` ADD UNIQUE(`$column`)");
-  }
-  private function alterPrimaryAi(string $table, string $column = 'id'): int {
-    return $this->db->exec("ALTER TABLE `$table` MODIFY `$column` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1");
-  }
-
   public function __construct(Main $main) {
     $this->main = $main;
     $this->db   = $main->db;
   }
 
-  //  SIDES
-  //--------------------------------------------------------------------------------------------------------------------
+  private function getPermissionId(): int
+  {
+    $bean = $this->db::findOne('permission', ' properties LIKE "%admin%" ');
+    $permId = $bean->getID();
+
+    if ($permId === '0') {
+      $bean = $this->db::findOne('permission');
+      $permId = $bean->getID();
+
+      // Создать пользователя админа если нету в БД
+      if ($permId === '0') {
+        $bean = $this->db::xdispense('permission');
+        $bean->name       = 'admin';
+        $bean->properties = '{"tags":"admin"}';
+        $permId = $bean->getID();
+      }
+    }
+
+    return $permId;
+  }
 
   public function checkResourceDump(string $dir = 'resource'): bool {
     $path = ABS_SITE_PATH . DEALERS_PATH . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR;
@@ -60,34 +59,27 @@ class MigrateDb {
     }
   }
 
-  public function addAdmin(string $login, string $pass): void
+  public function addAdmin(int $dealerId, string $login, string $pass): void
   {
-    $bean = $this->db::xdispense('permission');
-    $permId = $bean->getID();
-
     $bean = $this->db::xdispense('users');
-    $bean->permission_id = $permId;
+    $bean->dealer_id     = $dealerId;
+    $bean->permission_id = $this->getPermissionId();
     $bean->login         = $login;
     $bean->password      = $pass;
     $bean->name          = $login;
     $this->db->store($bean);
   }
 
-  /**
-   * Update login after user migrate DB
-   */
-  public function updateAdmin(string $login, string $pass): void
+  public function updateAdmin(int $id, string $login, string $pass): void
   {
     if ($login === '' || $pass === '') return;
 
     $bean = $this->db::xdispense('users');
-    $bean->id       = '1';
-    $bean->login    = $login;
-    $bean->password = $pass;
+    $bean->id        = $id;
+    $bean->login     = $login;
+    $bean->password  = $pass;
     $this->db->store($bean);
   }
-
-
 
   public function drop(): void
   {
