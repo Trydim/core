@@ -1,0 +1,92 @@
+name: CI/CD Deploy
+
+Сценарий запускается при пуше в ветки master и dev
+on:
+  push:
+    branches:
+      - master
+      - dev
+#
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Забираем код из репозитория
+      - name: Checkout repository code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_TOKEN }}
+
+    # Включение Bun
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+    # Сборка через Bun
+      - name: Build Frontend
+        working-directory: public/srcDealers
+        run: |
+          bun install # Скачает пакеты строго по вашему bun.lock
+          bun run analytics:Prod
+
+    # Сборка cms сборку через Bun
+      - name: Build СMS Frontend
+        working-directory: core/src
+        run: |
+          npm install # Скачает пакеты строго по вашему bun.lock
+          npm run coreProd
+          npm run coreModuleProd
+
+    # Установка vendor
+      - name: Composer install
+        working-directory: core/libs
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+    # Определяем, в какую папку слать код в зависимости от ветки
+      - name: Set Target Folder
+        run: |
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            echo "TARGET_DIR=/var/www/fastuser/data/www/dev.vistegra.by/tempDeploy/master" >> $GITHUB_ENV
+          else
+            echo "TARGET_DIR=/var/www/fastuser/data/www/dev.vistegra.by/tempDeploy/dev" >> $GITHUB_ENV
+          fi
+
+    # Копирование файлов на сервер
+      - name: Copy files to target
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          TARGET: ${{ env.TARGET_DIR }}
+          SOURCE: "./"
+          ARGS: >-
+            -avz
+            --exclude=/core/root/
+            --exclude=/core/src/
+            --include=/core/***
+            --include=/dealer/
+            --include=/dealer/resource/***
+            --include=/lang/***
+            --exclude=/public/src*/**
+            --exclude=/public/wardrobe/**
+            --include=/public/***
+            --include=/.htaccess
+            --include=/favicon.ico
+            --include=/index.php
+            --exclude=*
+
+    # Подключаемся по SSH и Команды в консоли сервера
+#      - name: Execute post-deploy commands
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.SSH_HOST }}
+#           username: ${{ secrets.SSH_USERNAME }}
+#           key: ${{ secrets.SSH_KEY }}
+#           script: |
+#             cd ${{ env.TARGET_DIR }}
+#            Проверяем наличие composer и подтягиваем зависимости (если нужно)
+#             if [ -f "composer.json" ]; then
+#               composer install --no-dev --optimize-autoloader --no-interaction
+#             fi

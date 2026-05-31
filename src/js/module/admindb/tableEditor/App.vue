@@ -76,7 +76,7 @@
 
 <script>
 
-import cloneDeep from 'lodash/clonedeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 import EditedSelect from "./EditedSelect.vue";
 import Modal from "../contentEditor/Modal.vue";

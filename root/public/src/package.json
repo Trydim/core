@@ -10,9 +10,6 @@
     "publicBuildProd": "webpack --env production --config ./bundler/webpack.config.js && node ./webpack/updateVersion.js",
     "publicBuildDev": "webpack --config ./bundler/webpack.config.js",
 
-    "localCypressTest": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=false",
-    "cypressDeployProd": "cypress open --project ../../ --config-file ./public/src/test/cypress.json --env external=true",
-
     "createDealerDev": "node ./webpack/createDealerDev.js",
 
     "publicBuildProdVite": "vite build --config ./bundler/vite.config.ts && node ./bundler/updateVersion.js",

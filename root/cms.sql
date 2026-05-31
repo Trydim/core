@@ -5,7 +5,7 @@
 -- Хост: 127.0.0.1:3306
 -- Время создания: Июл 27 2021 г., 10:45
 -- Версия сервера: 10.4.12-MariaDB
--- Версия PHP: 7.3.17
+-- Версия PHP: 8.2
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;

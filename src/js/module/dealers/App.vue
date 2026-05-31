@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-between mb-3">
     <Button @click="addDealer">{{ $t('Add') }}</Button>
-    <Button v-if="!false" @click="deleteDealer" class="p-button-danger">{{ $t('Delete') }}</Button>
+    <Button @click="deleteDealer" class="p-button-danger">{{ $t('Delete') }}</Button>
   </div>
 
   <div class="col-12 col-md-4 flex justify-content-between mb-3 position-relative">
@@ -16,18 +16,10 @@
              selection-mode="single" :meta-key-selection="false"
              :paginator="filteredDealers.length > 10" :rows="10" :rows-per-page-options="[10,20,50]"
              paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-             current-page-report-template="Showing {first} to {last} of {totalRecords}"
+             :current-page-report-template="$t('Showing {first} to {last} of {totalRecords}')"
              responsive-layout="scroll"
              v-model:selection="selected"
              @dblclick="dblClick($event)">
-    <!--<template #header>
-      <p-multi-select :model-value="columnsSelected"
-                      :options="columns"
-                      option-label="name"
-                      @update:model-value="onToggle"
-                      placeholder="Настроить колонки" style="width: 20em"
-      ></p-multi-select>
-    </template>-->
     <Column v-if="checkColumn('id')" field="id" :sortable="true" :header="$t('id')" class="text-center">
       <template #body="slotProps">
         <a target="_blank" :href="'../dealer/' + slotProps.data.id" :data-id="slotProps.data.id">{{ slotProps.data.id }}</a>
@@ -66,10 +58,9 @@
 
   <div class="d-flex gap-3 my-3">
     <Button class="btn-warning" @click="changeDealer">{{ $t('Edit dealer') }}</Button>
-    <!--<Button class="btn-warning" @click="changeDealerUser">{{ $t('Edit users') }}</Button>-->
   </div>
 
-  <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
+  <Dialog v-model:visible="modal.display" :modal="true" :base-z-index="10">
     <template #header>
       <h4>{{ modal.title }}</h4>
     </template>
@@ -116,10 +107,6 @@
       </div>
 
       <div class="col-12 col-md-6">
-        <!--<Button label="Обновить" icon="pi pi-refresh" class="w-100 my-2"
-          v-tooltip.bottom="'Обновить свойства'"
-          @click="refreshProperties"
-        ></Button>-->
         <template v-for="(prop, key) of properties" :key="key">
           <InputGroup v-if="prop.type !== 'table'" class="mb-2">
             <InputGroupAddon class="col-5" v-html="prop.name" />
@@ -133,10 +120,10 @@
                           on-icon="pi pi-check" off-icon="pi pi-times"
                           on-label="Да" off-label="Нет"
                           v-model="dealer.settings[key]" />
-            <Calendar v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]" />
-            <Dropdown v-else-if="prop.type === 'select'" option-label="name" option-value="id"
-                      :options="Object.values(prop.values)"
-                      v-model="dealer.settings[key]" />
+            <DatePicker v-else-if="prop.type === 'date'" date-format="dd.mm.yy" v-model="dealer.settings[key]"/>
+            <Select v-else-if="prop.type === 'select'" option-label="name" option-value="id"
+                    :options="Object.values(prop.values)"
+                    v-model="dealer.settings[key]" />
             <MultiSelect v-else-if="prop.type === 'multiSelect'" option-label="name" option-value="id"
                          :options="Object.values(prop.values)"
                          v-model="dealer.settings[key]" />
@@ -167,22 +154,22 @@
 
 <script>
 
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import ToggleButton from 'primevue/togglebutton';
-import Checkbox from 'primevue/checkbox';
-import InputGroup from 'primevue/inputgroup';
+import Dialog          from 'primevue/dialog';
+import Button          from 'primevue/button';
+import DataTable       from 'primevue/datatable';
+import Column          from 'primevue/column';
+import ToggleButton    from 'primevue/togglebutton';
+import Checkbox        from 'primevue/checkbox';
+import InputGroup      from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
-import InputNumber from 'primevue/inputnumber';
-import Dropdown from 'primevue/dropdown';
-import MultiSelect from 'primevue/multiselect';
-import Calendar from 'primevue/calendar';
+import InputText       from 'primevue/inputtext';
+import Textarea        from 'primevue/textarea';
+import InputNumber     from 'primevue/inputnumber';
+import Select          from 'primevue/select';
+import MultiSelect     from 'primevue/multiselect';
+import DatePicker      from 'primevue/datepicker';
 
-import cloneDeep from 'lodash/clonedeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 import TablePropertyValue from './TablePropertyValue.vue';
 import PropertyTable from "./PropertyTable.vue";
@@ -192,7 +179,7 @@ export default {
   components: {
     Button, Checkbox, ToggleButton,
     InputGroup, InputGroupAddon,
-    InputText, InputNumber, Textarea, Calendar, Dropdown, MultiSelect,
+    InputText, InputNumber, Textarea, DatePicker, Select, MultiSelect,
     DataTable, Column,
     TablePropertyValue, PropertyTable,
     Dialog,

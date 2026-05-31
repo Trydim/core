@@ -1,6 +1,6 @@
 'use strict';
 
-import Swal from 'sweetalert2/dist/sweetalert2.js';
+import Swal from '../libs/sweetalert2.js';
 
 const findNode = (n, role) => n.querySelector(`[data-role="${role}"]`);
 

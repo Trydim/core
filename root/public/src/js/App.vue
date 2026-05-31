@@ -1,16 +1,10 @@
-<script setup>
+<script lang="ts" setup>
 
 import {ref} from 'vue';
 
-const count = ref(0)
+const count = ref<number>(0)
 
 </script>
-
-<style>
-h1 {
-  color: red;
-}
-</style>
 
 <template>
   <h1>Hello, Vue!</h1>
@@ -18,3 +12,8 @@ h1 {
   <button @click="count++">Click me</button>
 </template>
 
+<style scoped>
+h1 {
+  color: red;
+}
+</style>

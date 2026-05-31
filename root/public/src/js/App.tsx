@@ -1,7 +1,5 @@
 import React, {useState} from "react";
 
-import Test from "./Test.jsx";
-
 export default function App() {
   const [counter, setCounter] = useState(0);
 

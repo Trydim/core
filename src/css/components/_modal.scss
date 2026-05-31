@@ -1,8 +1,7 @@
 @use "../mixin/functions";
 @use "../mixin/adaptive";
 
-
-@use 'sweetalert2/src/sweetalert2.scss';
+@use './sweetalert2.scss';
 
 $pr: 'vs_';
 
