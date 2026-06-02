@@ -554,6 +554,23 @@ trait DbUsers
   /**
    * @param array{pageNumber?: int, countPerPage?: int, sortColumn?: string, sortDirect?: bool} $pageParam
    */
+  public function loadRootUsers(array $pageParam): array
+  {
+    $sql = "SELECT U.id AS 'id', login, U.name AS 'name', contacts,
+                   '1' AS 'permissionId', 'Администратор' AS 'permissionName',
+                   register_date AS 'registerDate', activity
+            FROM root_users U \n";
+
+    $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn'] ?? 'id');
+
+    $sql .= $this->getPaginatorQuery($pageParam);
+
+    return $this->jsonParseField(self::getAll($sql));
+  }
+
+  /**
+   * @param array{pageNumber?: int, countPerPage?: int, sortColumn?: string, sortDirect?: bool} $pageParam
+   */
   public function loadUsers(array $pageParam): array
   {
     $sql = "SELECT U.id AS 'id', login, U.name AS 'name', contacts,
@@ -561,7 +578,7 @@ trait DbUsers
                    register_date AS 'registerDate', activity
             FROM users U
             LEFT JOIN permission P ON U.permission_id = P.id
-            WHERE U.dealer_id = :dealerId AND U.activity = 1\n";
+            WHERE U.dealer_id = :dealerId \n";
 
     $pageParam['sortColumn'] = $this->getUserDbColumns($pageParam['sortColumn'] ?? 'id');
 

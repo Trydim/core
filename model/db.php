@@ -420,10 +420,12 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       else $result['error'] = 'loadUser error: userId or userLogin is not exist';
       break;
     case 'loadUsers':
+      $useRoot = !$main->isDealer() && $main->hasDealers();
+
       $result = [
-        'countRows'       => $db->getCountRows('users'),
-        'users'           => $db->loadUsers($pagerParam),
-        'permissionUsers' => $db->loadPermission(),
+        'countRows'       => $db->getCountRows($useRoot ? 'root_users' : 'users'),
+        'users'           => $useRoot ? $db->loadRootUsers($pagerParam) : $db->loadUsers($pagerParam),
+        'permissionUsers' => $useRoot ? [['id' => '1', 'name' => 'Администратор']] : $db->loadPermission(),
       ];
       break;
     case 'addUser':
