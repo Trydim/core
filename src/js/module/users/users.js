@@ -17,6 +17,9 @@ const data = {
   currentLogin: '',
 }
 
+let searchInProgress = false,
+    searchDelay = false;
+
 const users = {
   node, tmp, data,
 
@@ -29,7 +32,6 @@ const users = {
 
   queryParam: {
     mode        : 'DB',
-    tableName   : 'users',
     dbAction    : 'loadUsers',
     sortColumn  : 'registerDate',
     sortDirect  : false, // true = DESC, false
@@ -80,6 +82,8 @@ const users = {
 
       item['contactsParse'] = item['contacts'] = item['contacts'] || {};
       arr = Object.entries(item['contacts']).map(([key, value]) => {
+        if (!value) value = '-';
+
         if (data.managerField[key]) {
           if (!Array.isArray(value)) value = [value];
           value = value.map(v => data.managerField[key][v]).join('<br>');
@@ -89,12 +93,9 @@ const users = {
       });
       item['contacts'] = f.replaceTemplate(contactsTmp, arr);
 
-
-      //if (true /* TODO настройки вывода даты */) {
       for (let i in item) {
         if (i.includes('date')) item[i] = item[i].replace(/ |(\d\d:\d\d:\d\d)/g, '');
       }
-      //}
 
       return item;
     })
@@ -108,13 +109,10 @@ const users = {
     data.forEach(i => this.permissionList.set(i['id'], i));
   },
 
-  fillPermission(data) {
-    f.gI('selectPermission').innerHTML = f.replaceTemplate(f.gT('#permission'), data);
-  },
   // Check unique login
   loadAllLogins() {
     f.Get({data: {mode: 'DB', cmsAction: 'loadUsersLogin'}})
-     .then(d => data.usersLogin = d.status ? d['users'] : []);
+     .then(d => data.usersLogin = d.status ? Object.values(d['users']) : []);
   },
   validLogin(form, validator) {
     const loginNode = form.querySelector('[name="login"]');
@@ -132,7 +130,7 @@ const users = {
       this.form.set(param[0], param[1].toString());
     })
 
-    f.Post({data: this.form}).then(data => {
+    return f.Post({data: this.form}).then(data => {
       if (this.needReload) {
         this.needReload = false;
         this.queryParam.dbAction = 'loadUsers';
@@ -143,7 +141,6 @@ const users = {
         this.confirmMsg && f.showMsg(this.confirmMsg, data.status ? 'success' : 'error') && (this.confirmMsg = false);
       }
 
-      if (data['permissionUsers']) { this.setPermission(data['permissionUsers']); this.fillPermission(data['permissionUsers']); }
       if (data['users']) { this.setUsers(data['users']); this.fillTable(data['users']); }
       if (data['countRows']) this.p.setCountPageBtn(data['countRows']);
     });
@@ -231,8 +228,10 @@ const users = {
     else node.parentNode.remove();
 
     node = form.querySelector('[name="permissionId"]');
-    if (oneElements) node.value = users['permissionId'];
-    else node.value = 1;
+    if (node) {
+      if (oneElements) node.value = users['permissionId'];
+      else node.value = 1;
+    }
 
     node = form.querySelector('[name="login"]');
     if (oneElements) data.currentLogin = node.value = users['login'];
@@ -355,21 +354,43 @@ const users = {
   },
 
   // Bind events
-  //--------------------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
 
-  /**
-   * @param node
-   * @param func
-   * @param options
-   * @param eventType
-   */
   onEventNode(node, func, options = {}, eventType = 'click') {
     node.addEventListener(eventType, e => func.call(this, e), options);
+  },
+
+  inputSearch(e) {
+    const node = e.target,
+          value = node.value.toString();
+
+    const loader = new f.LoaderIcon(node);
+
+    if (value.length < 2) {
+      if (searchInProgress) {
+        searchInProgress = false;
+      } else {
+        loader.stop();
+        return;
+      }
+    } else {
+      searchInProgress = true;
+      this.queryParam.searchValue = value;
+    }
+
+    if (searchDelay) return;
+
+    searchDelay = setTimeout(() => {
+      searchDelay = false;
+      this.query().then(() => loader.stop())
+    }, 300);
   },
 
   onEvent() {
     // Action buttons
     f.qA('input[data-action]', 'click', e => this.actionBtn.call(this, e));
+    // Focus Search Init
+    //f.qS('#search').addEventListener('input', e => this.inputSearch(e));
   },
 }
 

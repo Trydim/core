@@ -6,9 +6,12 @@
 
 function tree($path): void
 {
-  if (stream_resolve_include_path($path)) {
+  global $main;
 
-    $files = scandir($path);
+  $rootPath = $main->url->getPath(true);
+
+  if (stream_resolve_include_path($rootPath . $path)) {
+    $files = scandir($rootPath . $path);
     array_shift($files);
     array_shift($files);
     natcasesort($files);
@@ -18,7 +21,7 @@ function tree($path): void
     if (count($files)) {
 
       foreach ($files as $file) {
-        if (stream_resolve_include_path($path . $file)) {
+        if (stream_resolve_include_path($rootPath . $path . $file)) {
           if (filetype($path . $file) === 'dir') {
             echo '<li><div id="' . $file . '" data-fo="' . $path . $file . '/' . '" class="fo closed">' . $file . '</div>';
             tree($path . $file . '/');
@@ -44,5 +47,6 @@ function tree($path): void
 $main->addControllerField(VC::BASE_PAGE_TITLE, 'Файловый менеджер')
      ->addAssets(['module/fileManager.css', 'module/fileManager.js'])
      ->addControllerField(VC::BASE_CONTENT, template('fileManager'))
-     ->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main)
-     ->response->setContent(template());
+     ->fireHook(VC::HOOKS_FILE_MANAGER_TEMPLATE, $main);
+
+$main->response->setContent(template());

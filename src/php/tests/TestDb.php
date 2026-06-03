@@ -9,9 +9,9 @@ use PHPUnit\Framework\TestCase;
 class Test extends TestCase {
 
   /**
-   * @var RedBeanPHP\Db
+   * @var DbProxy
    */
-  private $db;
+  private DbProxy $db;
 
   private function connectToDb(): \RedBeanPHP\Db {
     require ABS_SITE_PATH . 'config.php';

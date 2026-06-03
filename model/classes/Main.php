@@ -21,6 +21,7 @@ final class Main {
   const CMS_PARAM = [
     VC::PROJECT_TITLE => 'Project title',
     VC::ACCESS_MENU   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
+    VC::SHARED_PATH   => 'shared/upload/',
     VC::ENCRYPT_ALGO  => 'aes-256-cbc',
   ];
   const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';

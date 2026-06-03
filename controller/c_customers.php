@@ -8,8 +8,8 @@ $main->addAssets('module/customers.js');
 
 // Used in views/customers.php
 $param = [];
-$main->addControllerField(VC::BASE_PAGE_TITLE, 'Клиенты');
-$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->getSettings('json', true));
+$main->addControllerField(VC::BASE_PAGE_TITLE, 'Клиенты')
+     ->addControllerField(VC::BASE_FOOTER_CONTENT, $main->getSettings('json', true));
 
 // получить конфиг текущего пользователя
 $setting = $main->getLogin('customization');

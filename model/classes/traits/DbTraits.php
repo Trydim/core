@@ -447,7 +447,7 @@ trait DbUsers
                    P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
             FROM users U
             JOIN permission P on U.permission_id = P.id 
-            WHERE U.dealer_id = :dealerId ";
+            WHERE U.dealer_id = :dealerId AND U.activity = 1";
 
     $param = [':dealerId' => $this->getDealerId()];
     if (isset($filter['id']) ) {

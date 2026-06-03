@@ -3,11 +3,8 @@
 import '../../../css/module/fileManager/fileManager.css';
 
 const t = dir => {
-  //$body.append('<div id="alerts" class="btn blue">загрузка..</div>');
-  //$("#alerts").fadeIn(1e3);
   fileManager.query({cmsAction: 'showTable', dir}, (data) => {
     $('#ab-container-table').html('').append(data);
-    //$("#alerts").hide().remove();
   });
 }
 
@@ -57,11 +54,9 @@ const fileManager = {
 
       $("#tree div.selected")[0].dataset.fo += folder + '/';
 
-      //t(href);
       u.parents("ul:hidden");
       ulNode.css("display", "block");
       div.removeClass("closed").addClass("open selected");
-      //scroll = 1;
       u.click();
     });
     $body.on("mouseenter", ".zoom", function (t) {
@@ -105,27 +100,6 @@ const fileManager = {
         f.showMsg('File name error', 'error');
       }
     });
-    $body.on("click", ".renamefolder", function (t) {
-      t.preventDefault();
-      var f = $(this).parents("tr").find("a.delete-directory").attr("href"),
-          r = f.match(/([^\/]*)\/*$/)[1],
-          i = prompt("New name:", r);
-
-      if (i != null && i !== "") {
-        //$body.append('<div id="alerts" class="btn blue">working..<\/div>');
-        var u = f.replace(r, i),
-            e = $("#ab-list-pages td.ab-tdfolder").find("a:contains(" + r + "):last"),
-            o = $(".selected").next("ul").find("li div:contains(" + r + "):last"),
-            s = $(this).parents("tr").find("a.delete-directory");
-
-        fileManager.query({cmsAction: 'renameFolder', oldName: f, newName: u}, function () {
-          //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
-          e.attr("href", u).text(i);
-          s.attr("href", u);
-          o.attr("id", i).attr("data-fo", u).text(i)
-        })
-      }
-    });
     $body.on("click", ".renamefile", function (t) {
       t.preventDefault();
       var u = $(this).parents("tr").find("a.delete-file").attr("href"),
@@ -135,16 +109,12 @@ const fileManager = {
           o = $(this).parents("tr").find("a.ab-edit-file");
 
       if (i != null && i !== "") {
-        //$body.append('<div id="alerts" class="btn blue">working..<\/div>');
         $("#alerts").fadeIn(1e3);
         var f = u.replace(r, i),
             s = $("#ab-list-pages td.ab-tdfile:contains(" + r + "):last"),
             h = $(".selected").next("ul").find("li:contains(" + r + "):last");
 
         return fileManager.query({cmsAction: 'renameFolder', oldName: u, newName: f}, function () {
-          //$("#alerts").hide().remove();
-          //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
-          //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
           s.find("span").text(i);
           e.attr("href", f);
           o.attr("href", "editor.php?editfile=" + f);
@@ -160,14 +130,11 @@ const fileManager = {
 
       let tr = $(this).parents("tr");
       confirm('Delete folder "' + r + '" ?') &&
-      fileManager.query({cmsAction: 'deleteFolder', dir: i},  function () {
-          //$("#alerts").hide().remove();
-          //$body.append('<div id="alerts" class="btn blue">' + t + "<\/div>");
-          //$("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
-          tr.hide(100).remove();
-          $(u).next("ul").remove();
-          $(u).remove()
-        })
+      fileManager.query({cmsAction: 'deleteFolder', dir: i}, function () {
+        tr.hide(100).remove();
+        $(u).next("ul").remove();
+        $(u).remove()
+      })
     });
     $body.on("click", "a.delete-file", function (t) {
       t.preventDefault();
@@ -178,7 +145,7 @@ const fileManager = {
       let tr = $(this).parents("tr");
 
       if (confirm('Удалить файл "' + r + '" ?')) {
-        fileManager.query({cmsAction: 'deleteFile', dir: i},  function () {
+        fileManager.query({cmsAction: 'deleteFile', dir: i}, function () {
           tr.hide(100).remove();
           u.remove();
           f.showMsg('Удалено');
@@ -187,20 +154,12 @@ const fileManager = {
     });
 
     $body.on("mousedown", "#zipsite, a.downloadfolder, a.downloadfile", function () {
-      //var t = $(this);
-      //t.html('<i class=" fa fa-refresh fa-spin fa-fw" aria-hidden="true"><\/i>');
-
       let cmsAction = this.dataset.action,
           dir = this.dataset.path;
 
       fileManager.query({cmsAction, dir, type: 'body'}, () => {});
-      //setTimeout(function () {t.html('<i class=" fa fa-download" aria-hidden="true"><\/i>')}, 3000)
     });
 
-    /*$body.on("change", "#file", function () {
-      $("#frm-uploadfile").submit();
-      $("#div-uploadfile").css("border-radius", 17).removeClass("fa-upload").addClass("fa-refresh fa-spin fa-fw")
-    });*/
 
     $("#frm-uploadfile #file").on('drop', changeInput)
                               .on('change', changeInput);
@@ -219,23 +178,6 @@ const fileManager = {
         t(dir);
 
         f.showMsg('Добавлено');
-        /*let u = t.split("/");
-
-        if (u.length > 1) {
-          $.each(u, (i) => {
-            let f = u[i].substr(u[i].lastIndexOf(".") + 1), e = r + u[i];
-            f !== "" && $("#tree div.selected").next("ul").append('<li class="ext-file ext-' + f + '" style="border-right:1px solid red">' + u[i] + "<\/li>");
-          }),
-
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {
-            $("#alerts").remove();
-          })
-        } else {
-          $("#alerts").hide().remove();
-          $body.append('<div id="alerts" class="btn blue">' + e + "<\/div>");
-          $("#alerts").fadeIn(1e3).delay(1e3).fadeOut(1200, function () {$("#alerts").remove()});
-          $("#div-uploadfile").css("border-radius", 2).removeClass("fa-refresh fa-spin fa-fw").addClass("fa-upload")
-        }*/
       })
     }
 

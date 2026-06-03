@@ -76,7 +76,7 @@ $publicConfig = [
   'FILTER_ORDERS' => false,
 
   /** Папка по умолчанию для файлового менеджера */
-  //'SHARE_PATH' => 'public/images/',
+  //VC::SHARED_PATH => 'shared/upload/',
 
   /** Контент редактор */
   //VC::USE_CONTENT_EDITOR => true,

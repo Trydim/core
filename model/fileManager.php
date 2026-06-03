@@ -9,10 +9,14 @@ $config = [
   'extensions_for_editor' => array('ab', 'txt', 'php', 'js', 'tpl',
                                    'html', 'htm', 'css', 'text', 'json', 'lng', 'xml', 'ini', 'sql') //Allowed extensions
 ];
+$rootPath = $main->url->getPath(true);
 
 switch ($cmsAction) {
   case 'showTable':
-    if (isset($dir) && $dir) $dir = urldecode($dir);
+    if (empty($dir)) {
+      $result['error'] = '[fileManager:showTable]: dir is empty';
+      break;
+    }
 
     function formatBytes($size) {
       $sizes = ['b', 'kb', 'mb', 'gb', 'tb'];
@@ -44,8 +48,8 @@ switch ($cmsAction) {
     $html = '<table id="ab-list-pages"><thead><tr><th>' . basename($dir) . '</th><th>Размер</th><th>Действие</th></tr></thead>';
     $curTime = time();
 
-    if (stream_resolve_include_path($dir)) {
-      $files = scandir($dir);
+    if (stream_resolve_include_path($rootPath . $dir)) {
+      $files = scandir($rootPath . $dir);
       array_shift($files);
       array_shift($files);
       natcasesort($files);
@@ -53,7 +57,7 @@ switch ($cmsAction) {
 
       if (count($files)) {
         foreach ($files as $file) {
-          if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) == 'dir') {
+          if (stream_resolve_include_path($rootPath . $dir . $file) && filetype($rootPath . $dir . $file) == 'dir') {
 
             // if folder
             $foldersize = '<small>' . formatBytes(folderSize($dir . $file)) . '</small>';
@@ -63,18 +67,16 @@ switch ($cmsAction) {
                         <td class="ab-tdfolder"><a href="' . $folderpath . '" class="closed">' . $file . '</a></td>
                         <td>' . $foldersize . '</td>
                         <td><a class="btn btn-danger delete-directory" title="Удалить папку" href="' . $folderpath . '"><i class="pi pi-trash" aria-hidden="true"></i></a>
-                        <!--<button class="btn blue renamefolder" title="Переименовать папку"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
                         <a class="btn btn-warning asphalt downloadfolder" title="Скачать архивом" data-action="downloadFolder" data-path="' . $folderpath . '"><i class="pi pi-table" aria-hidden="true"></i></a></td></tr>';
           }
         }
 
         foreach ($files as $file) { //if files
 
-          if (stream_resolve_include_path($dir . $file) && filetype($dir . $file) !== 'dir') {
+          if (stream_resolve_include_path($rootPath . $dir . $file) && filetype($rootPath . $dir . $file) !== 'dir') {
             $filepath = slashes($dir . $file);
 
-            $url = str_replace(slashes($main->url->getPath(true)), $main->url->getUri(true), $filepath);
-
+            $url = $main->url->getUri(true) . $filepath;
             $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 
             $size = '<small>' . formatBytes(filesize($filepath)) . '</small>';
@@ -88,13 +90,9 @@ switch ($cmsAction) {
                         <!--<button class="btn blue renamefile" title="Переименовать файл"><i class=" fa fa-random" aria-hidden="true"></i></button>-->
                         <a class="btn btn-success asphalt downloadfile" title="Скачать файл" data-action="downloadFile" data-path="' . $filepath . '"><i class="pi pi-download" aria-hidden="true"></i></a>';
 
-            //if image file
+            // if image file
             if (in_array($ext, array("jpg", "jpeg", "png", "gif", "ico", "bmp", 'svg'))) {
               $html .= '<a class="btn btn-info zoom" href="' . $url . '" target="_blank"><i class="pi pi-eye" aria-hidden="true"></i></a>';
-
-              //if edited file
-            } elseif (in_array($ext, $config['extensions_for_editor'])) {
-              //$html .= '<a class="btn violet ab-edit-file" href="editor.php?editfile=' . $filepath . '" target="_blank" title="Редактировать"><i class="fa fa-pencil" aria-hidden="true"></i></a></td></tr>';
             }
 
             $html .= '</td></tr>';
@@ -111,18 +109,14 @@ switch ($cmsAction) {
     $html .= '</table>';
     break;
   case 'createFolder':
-    if (isset($dir) && $dir) {
-      mkdir($dir, 0777, true);
-    }
-    break;
-  case 'renameFolder':
-    if (isset($oldName) && $oldName && isset($newName) && $newName) {
-      rename($oldName, $newName);
+    if (!empty($dir)) {
+      mkdir($rootPath . $dir, 0777, true);
+    } else {
+      $result['error'] = '[fileManager:createFolder]: dir is empty';
     }
     break;
   case 'deleteFolder':
     function deletefolder($dir) {
-
       $iterator = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
       $files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST);
       foreach ($files as $file) {
@@ -136,26 +130,26 @@ switch ($cmsAction) {
       return true;
     }
 
-    if (isset($dir) && $dir && file_exists($dir)) {
-      deletefolder($dir);
+    if (isset($dir) && $dir && file_exists($rootPath . $dir)) {
+      deletefolder($rootPath . $dir);
     }
     break;
   case 'createFile':
     if (isset($filename)) {
       $name = pathinfo($filename, PATHINFO_FILENAME);
       $ext = pathinfo($filename, PATHINFO_EXTENSION);
-      if (file_exists($filename)) { $result['error'] = 'File exist!'; break; }
-      if (empty($name) || empty($ext)) { $result['error'] = 'File name error!'; break; }
+      if (file_exists($rootPath . $filename)) { $result['error'] = '[fileManager:createFile]: File exist!'; break; }
+      if (empty($name) || empty($ext)) { $result['error'] = '[fileManager:createFile]: File name error!'; break; }
 
       $data = $ext === 'csv' ? ";;;\n;;;\n;;;\n" : '';
 
-      $result['error'] = file_put_contents($filename, $data);
-      if (!$result['error']) $result['error'] = 'Error create file!';
+      $result['error'] = file_put_contents($rootPath . $filename, $data);
+      if ($result['error'] === false) $result['error'] = '[fileManager:createFile]: Error create file!';
     }
     break;
   case 'deleteFile':
-    if (isset($dir) && $dir && file_exists($dir)) {
-      unlink($dir);
+    if (isset($dir) && $dir && file_exists($rootPath . $dir)) {
+      unlink($rootPath . $dir);
     }
     break;
   case 'downloadFolder':
@@ -168,7 +162,7 @@ switch ($cmsAction) {
 
 
       // Get real path for our folder
-      $rootPath = realpath($dir);
+      $rootPath = realpath($rootPath . $dir);
 
       // Initialize archive object
       $zip = new ZipArchive();
@@ -211,7 +205,7 @@ switch ($cmsAction) {
 
       $file = urldecode($dir); // Decode URL-encoded string
 
-      if (file_exists($file)) {
+      if (file_exists($rootPath . $file)) {
 
         // сбрасываем буфер вывода PHP, чтобы избежать переполнения памяти выделенной под скрипт
         // если этого не сделать файл будет читаться в память полностью!
@@ -220,9 +214,9 @@ switch ($cmsAction) {
         }
 
         header('filename: ' . json_encode(basename($file)));
-        header('content-length: ' . filesize($file));
+        header('content-length: ' . filesize($rootPath . $file));
 
-        if ($fd = fopen($file, 'rb')) {
+        if ($fd = fopen($rootPath . $file, 'rb')) {
           while (!feof($fd)) {
             print fread($fd, 1024);
           }
@@ -249,7 +243,7 @@ switch ($cmsAction) {
           $filePath = $dir . $_FILES['files']['name'][$i];
 
           //Upload the file into the temp dir
-          move_uploaded_file($tmpFilePath, $filePath);
+          move_uploaded_file($tmpFilePath, $rootPath . $filePath);
         }
       }
     }

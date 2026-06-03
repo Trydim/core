@@ -417,27 +417,31 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'loadUser':
       if (isset($userId)) $result['user'] = $db->getUserById($userId);
       else if(isset($userLogin)) $result['user'] = $db->getUserByLogin($userLogin);
-      else $result['error'] = 'loadUser error: userId or userLogin is not exist';
+      else $result['error'] = '[db:loadUser]: User id or user login is not exist';
       break;
     case 'loadUsers':
-      $useRoot = !$main->isDealer() && $main->hasDealers();
+      $useRoot = $main->hasDealers() && !$main->isDealer();
+
+      //if (isset($searchValue)) {$filters = ''}
 
       $result = [
-        'countRows'       => $db->getCountRows($useRoot ? 'root_users' : 'users'),
-        'users'           => $useRoot ? $db->loadRootUsers($pagerParam) : $db->loadUsers($pagerParam),
-        'permissionUsers' => $useRoot ? [['id' => '1', 'name' => 'Администратор']] : $db->loadPermission(),
+        'countRows' => $db->getCountRows($useRoot ? 'root_users' : 'users'),
+        'users'     => $useRoot ? $db->loadRootUsers($pagerParam) : $db->loadUsers($pagerParam),
       ];
       break;
     case 'addUser':
-      $param = [];
+      $useRoot = $main->hasDealers() && !$main->isDealer();
+      $dbTable = $useRoot ? 'root_users' : 'users';
+
       $user = json_decode($authForm ?? '[]', true);
 
-      $haveName = $db->selectQuery('users', 'id', ' login = "' . $user['login'] . '"');
+      $haveName = $db->selectQuery($dbTable, 'id', ' login = "' . $user['login'] . '"');
       if (count($haveName) > 0) {
-        $result['error'] = 'login_exist';
+        $result['error'] = '[db:addUser]: Login exist';
         break;
       }
 
+      $param = [];
       $contacts = [];
       foreach ($user as $k => $v) {
         if (in_array($k, ['login', 'name', 'permissionId'])) $param[$k] = $v;
@@ -447,9 +451,12 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       }
       $param['contacts'] = json_encode($contacts);
 
-      $result = $db->insert($columns, 'users', ['0' => $param]);
+      $result = $db->insert($db->getColumnsTable($dbTable), $dbTable, ['0' => $param]);
       break;
     case 'changeUser':
+      $useRoot = $main->hasDealers() && !$main->isDealer();
+      $dbTable = $useRoot ? 'root_users' : 'users';
+
       $usersId = json_decode($usersId ?? '[]');
       $authForm = json_decode($authForm ?? '[]', true);
 
@@ -457,9 +464,9 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $param = [];
 
         if (count($usersId) === 1) {
-          $haveName = $db->selectQuery('users', ['id', 'login'], ' login = "' . $authForm['login'] . '"');
+          $haveName = $db->selectQuery($dbTable, ['id', 'login'], ' login = "' . $authForm['login'] . '"');
           if (count($haveName) && $haveName[0]['id'] !== $usersId[0]) {
-            $result['error'] = 'login_exist';
+            $result['error'] = '[db:changeUser]: Login is exist';
             break;
           }
         }
@@ -475,9 +482,9 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
           count($contacts) && $param[$id]['contacts'] = json_encode($contacts);
         }
 
-        $result = $db->insert($columns, 'users', $param, true);
+        $result = $db->insert($db->getColumnsTable($dbTable), $dbTable, $param, true);
 
-        // If this is the current user, will be updating the session login
+        // If this is the current user, the login session will be updated
         if (empty($result['error']) && count($usersId) === 1 && $main->getLogin('id') === $usersId[0]) {
           $_SESSION['login'] = $authForm['login'];
         }
@@ -489,9 +496,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       if (count($usersId) === 1 && isset($validPass)) {
         $param[$usersId[0]]['password'] = password_hash($validPass, PASSWORD_BCRYPT);
 
-        $result = $db->insert($columns, 'users', $param, true);
+        $useRoot = $main->hasDealers() && !$main->isDealer();
+        $dbTable = $useRoot ? 'root_users' : 'users';
+        $result = $db->insert($db->getColumnsTable($dbTable), $dbTable, $param, true);
 
-        // If this is the current user, will be updating the session password
+        // If this is the current user, the session password will be updated
         if ($main->getLogin('id') === $usersId[0]) {
           $_SESSION['password'] = $validPass;
         }
@@ -501,18 +510,16 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $usersId = json_decode($usersId ?? '[]');
 
       if (count($usersId)) {
-        $db->deleteItem('users', $usersId);
+        $useRoot = $main->hasDealers() && !$main->isDealer();
+        $dbTable = $useRoot ? 'root_users' : 'users';
+        $db->deleteItem($dbTable, $usersId);
       }
       break;
     case 'loadUsersLogin':
-      $users = [];
-
-      $dealersUsers = $db->loadUsers([]);
-      if (count($dealersUsers)) $users = array_map(function ($user) { return $user['login']; }, $dealersUsers);
-
-      $users = array_merge($users, $db->selectQuery('users', 'login'));
-
-      $result['users'] = $users;
+      $result['users'] = array_unique(array_merge(
+        $db->selectQuery('root_users', 'login'),
+        $db->selectQuery('users', 'login')
+      ));
       break;
 
       // Files

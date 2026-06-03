@@ -4,7 +4,7 @@
  * @var Main $main - global
  */
 
-$startPath = $main->url->getPath(true) . $main->getCmsParam('SHARE_PATH');
+$sharedPath = $main->getCmsParam(VC::SHARED_PATH);
 
 ?>
 <div class="container-fluid ab-filemanager" id="ab-main">
@@ -38,9 +38,9 @@ $startPath = $main->url->getPath(true) . $main->getCmsParam('SHARE_PATH');
     <!-- left panel -->
     <div class="col-4">
       <div id="tree">
-        <div id="home" data-fo="<?= $startPath ?>" class="closed selected"><?= $startPath ?></div>
+        <div id="home" data-fo="<?= $sharedPath ?>" class="closed selected"><?= $sharedPath ?></div>
 
-        <?php tree($startPath); ?>
+        <?php tree($sharedPath); ?>
       </div>
     </div>
     <!-- table data -->
@@ -48,5 +48,5 @@ $startPath = $main->url->getPath(true) . $main->getCmsParam('SHARE_PATH');
   </div>
 </div>
 
-<input type="hidden" id="rootDirData" value="<?= $startPath ?>">
+<input type="hidden" id="rootDirData" value="<?= $sharedPath ?>">
 <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>

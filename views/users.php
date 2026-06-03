@@ -2,90 +2,15 @@
 
 /**
  * @var Main $main
- * @var array $param - ['columns', 'permission', 'managerField']
+ * @var array $param - ['permission', 'managerField']
  */
 
 $main->addControllerField(VC::BASE_CONTENT, template('parts/usersContent', $param));
 
 // Users/Manager custom field
-$managerFieldHtml = '';
 $managerField = [];
-foreach ($param['managerField'] as $k => $item) {
-  $rndId = uniqid();
-  switch ($item['type']) {
-    case 'textarea':
-      $input = '<textarea name="' . $k . '" class="form-control"></textarea>';
-      break;
-    case 'string': case 'number': case 'date': default:
-      $input = '<input id="' . $rndId . '" type="' . $item['type'] . '" class="form-control" name="' . $k . '">';
-      break;
-    case 'checkbox':
-      $managerFieldHtml .= '<div class="row managerField">
-        <div class="col-12 col-md-6 ps-4">
-          <label class="w-100" for="' . $rndId . '" role="button">' . $item['name'] .':</label>
-        </div>
-        <div class="col-12 col-md-6">
-          <div class="form-check form-switch mb-3 text-center">
-            <input type="checkbox" id="' . $rndId . '" class="form-check-input float-none" name="' . $k . '">
-          </div>
-        </div>
-      </div>';
-      continue 2;
-    case 'list':
-      $input = '<select name="' . $k . '" class="form-select">';
-      foreach ($item['options'] as $option) {
-        if (empty($option)) continue;
-        $input .= '<option value="' . htmlspecialchars($option) . '">' .  htmlspecialchars($option) . '</option>';
-      }
-      $input .= '</select>';
-      break;
-    case 'csvTable':
-      $o = $item['options'];
-      $managerField[$k] = [];
-      $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $o['table']);
-
-      if ($o['multiselect'] ?? false) {
-        $managerFieldHtml .= '<div class="form-control managerField mb-3" style="height: 60px; overflow: hidden auto; resize: vertical">'; //  ' . ($o['multiselect'] ?? false ? 'multiple style="resize: vertical"' : '') . '>'
-        foreach ($data as $row) {
-          $rndId = uniqid();
-          $dK = $row[$o['saveKey']];
-          $dV = $row[$o['showKey']];
-
-          $managerField[$k][$dK] = $dV;
-          $managerFieldHtml .= '
-          <div class="form-check">
-            <input type="checkbox" id="' . $rndId . '" class="form-check-input"  name="' . $k . '" value="' . $dK . '">
-            <label class="form-check-label" for="' . $rndId . '">' . $dV .'</label>
-          </div>';
-        }
-        $managerFieldHtml .= '</div>';
-        continue 2;
-      } else {
-        $input = '<select class="form-select" name="' . $k . '">';
-        foreach ($data as $row) {
-          $dK = $row[$o['saveKey']];
-          $dV = $row[$o['showKey']];
-
-          $managerField[$k][$dK] = $dV;
-          $input .= '<option value="' . htmlspecialchars($dK) . '">' . htmlspecialchars($dV) . '</option>';
-        }
-        $input .= '</select>';
-      }
-
-      break;
-  }
-
-  $managerFieldHtml .= '<div class="form-floating managerField mb-3">' . $input .
-                       '<label id="' . $rndId . '">' . $item['name'] .'</label></div>';
-}
-unset($k, $dK, $dV, $item, $rndId, $data, $o, $row, $input);
-  
-$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataManagerField', $managerField));
 
 ob_start(); ?>
-<template id="permission">
-  <option value="${id}">${name}</option>
-</template>
 <template id="tableContactsValue">
   <div class="d-flex align-items-center justify-content-start gap-2"><div>${key}:</div><div>${value}</div></div>
 </template>
@@ -96,10 +21,16 @@ ob_start(); ?>
       <label for="pName"><?= gTxt('Full name') ?></label>
     </div>
 
-    <div class="form-floating mb-3">
-      <select class="form-select" id="permissionId" name="permissionId"><?= $param['permission'] ?></select>
-      <label for="permissionId"><?= gTxt('Permissions') ?></label>
-    </div>
+    <?php if (!empty($param['permission'])) { ?>
+      <div class="form-floating mb-3">
+        <select class="form-select" id="permissionId" name="permissionId">
+          <?php foreach ($param['permission'] as $item) { ?>
+            <option value="<?= $item['id'] ?>"><?= gTxt($item['name']) ?></option>
+          <?php } ?>
+        </select>
+        <label for="permissionId"><?= gTxt('Permissions') ?></label>
+      </div>
+    <?php } ?>
 
     <div class="form-floating mb-3">
       <input type="text" class="form-control" id="pLogin" placeholder="<?= gTxt('Login') ?>" name="login">
@@ -112,15 +43,89 @@ ob_start(); ?>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="tel" class="form-control" id="pPhone" placeholder="<?= gTxt('Phone') ?>" name="phone" required>
+      <input type="tel" class="form-control" id="pPhone" placeholder="<?= gTxt('Phone') ?>" name="phone">
       <label for="pPhone"><?= gTxt('Phone') ?></label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="email" class="form-control" id="pEmail" placeholder="<?= gTxt('Email') ?>" name="email" required>
+      <input type="email" class="form-control" id="pEmail" placeholder="<?= gTxt('Email') ?>" name="email">
       <label for="pEmail"><?= gTxt('Email') ?></label>
     </div>
-    <?= $managerFieldHtml ?>
+
+    <?php foreach ($param['managerField'] ?? [] as $k => $item) {
+      $rndId = uniqid();
+      switch ($item['type']) {
+        case 'textarea': ?>
+          <div class="form-floating managerField mb-3">
+            <textarea id="<?= $rndId ?>" class="form-control" name="<?= $k ?>"></textarea>
+            <label for="<?= $rndId ?>"><?= $item['name'] ?></label>
+          </div>
+        <?php break;
+        case 'string': case 'number': case 'date': default: ?>
+          <div class="form-floating managerField mb-3">
+            <input id="<?= $rndId ?>" type="<?= $item['type'] ?>" class="form-control" name="<?= $k ?>">
+            <label for="<?= $rndId ?>"><?= $item['name'] ?></label>
+          </div>
+        <?php break;
+        case 'checkbox': ?>
+          <div class="row managerField">
+            <div class="col-12 col-md-6 ps-4">
+              <label class="w-100" for="<?= $rndId ?>" role="button"><?= $item['name'] ?>:</label>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="form-check form-switch mb-3 text-center">
+                <input type="checkbox" id="<?= $rndId ?>" class="form-check-input float-none" name="<?= $k ?>">
+              </div>
+            </div>
+          </div>
+        <?php break;
+        case 'list': ?>
+          <div class="form-floating managerField mb-3">
+            <select name="<?= $k ?>" class="form-select">
+              <?php foreach ($item['options'] as $option) { if (empty($option)) continue; ?>
+                <option value="<?= htmlspecialchars($option) ?>"><?= htmlspecialchars($option) ?></option>
+              <?php } ?>
+            </select>
+            <label id="<?= $rndId ?>"><?= $item['name'] ?></label>
+          </div>
+        <?php break;
+        case 'csvTable':
+          $o = $item['options'];
+          $managerField[$k] = [];
+          $data = loadCSV([$o['saveKey'] => $o['saveKey'], $o['showKey'] => $o['showKey']], $o['table']);
+
+          if ($o['multiselect'] ?? false) { ?>
+            <div class="form-control managerField mb-3" style="height: 60px; overflow: hidden auto; resize: vertical">
+              <?php foreach ($data as $row) {
+              $rndId = uniqid();
+              $dK = $row[$o['saveKey']];
+              $dV = $row[$o['showKey']];
+
+              $managerField[$k][$dK] = $dV; ?>
+                <div class="form-check">
+                  <input type="checkbox" id="<?= $rndId ?>" class="form-check-input" name="<?= $k ?>" value="<?= $dK ?>">
+                  <label class="form-check-label" for="<?= $rndId ?>"><?= $dV ?></label>
+                </div>
+              <?php } ?>
+            </div>
+          <?php } else { ?>
+            <div class="form-floating managerField mb-3">
+              <select class="form-select" name="<?= $k ?>">
+                <?php foreach ($data as $row) {
+                $dK = $row[$o['saveKey']];
+                $dV = $row[$o['showKey']];
+
+                $managerField[$k][$dK] = $dV; ?>
+                  <option value="<?= htmlspecialchars($dK) ?>"><?= htmlspecialchars($dV) ?></option>
+                <?php } ?>
+              </select>
+              <label id="<?= $rndId ?>"><?= $item['name'] ?></label>
+            </div>
+          <?php }
+        break;
+      }
+    } ?>
+
     <div id="changeField" class="row">
       <div class="col-12 col-md-6 ps-4">
         <label class="w-100" for="pActivity" role="button"><?= gTxt('Activity') ?>:</label>
@@ -150,4 +155,5 @@ ob_start(); ?>
 </template>
 <?php $main->addControllerField(VC::BASE_FOOTER_CONTENT, ob_get_clean());
 
-$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary());
+$main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->getFrontContent('dataManagerField', $managerField))
+     ->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary());

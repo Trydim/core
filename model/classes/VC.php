@@ -35,7 +35,8 @@ class VC {
         DEAL_IMG_PATH = 'dealImgPath',
         DEAL_URI_IMG  = 'dealUriImg',
         DEAL_URI_CSS  = 'dealUriCss',
-        DEAL_URI_JS   = 'dealUriJs';
+        DEAL_URI_JS   = 'dealUriJs',
+        SHARED_PATH   = 'sharedPath';
 
   /** userField */
   const USER_ID  = 'id',

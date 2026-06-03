@@ -1,15 +1,15 @@
 ###
-GET http://graddoor/?mode=DB&cmsAction=testAction
+GET http://localhost:8000/?mode=DB&cmsAction=testAction
 
 ###
-POST http://graddoor/
+POST http://localhost:8000/
 Content-Type: application/json
 
 mode=DB&cmsAction=loadTable&tableName=fasdwe&columnsParam={"a":23}
 
 
 ### Send POST request with json body
-POST http://graddoor/
+POST http://localhost:8000/
 Content-Type: application/json
 
 {
@@ -19,13 +19,16 @@ Content-Type: application/json
 
 
 ### Send POST request with json body
-POST http://graddoor/
+POST http://localhost:8000/
 Content-Type: application/x-www-form-urlencoded
 
 mode=DB&cmsAction=loadTable&tableName=c_00_margin.csv&columnsParam=["id","value"]
 
 ### Send POST request with json body
-POST http://graddoor/
+POST http://localhost:8000/
 Content-Type: application/x-www-form-urlencoded
 
 mode=DB&cmsAction=loadTable&tableName=c_00_margin.csv&columnsParam={"id":"id","value":"value"}
+
+###
+GET http://localhost:8000/index.php?mode=DB&cmsAction=loadUser&userId=1
