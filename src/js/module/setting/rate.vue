@@ -175,7 +175,7 @@ export default {
         this.display = false;
 
         if (this.changed) {
-          f.showMsg(_('To apply the changes to the courses, click "Save"'), 'warning');
+          f.showMsg('To apply the changes to the courses, click "Save"', 'warning');
         }
       }, 100);
     },

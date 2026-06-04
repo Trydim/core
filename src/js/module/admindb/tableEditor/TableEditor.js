@@ -82,7 +82,7 @@ export class TableEditor extends Main {
     data.set('configProperties', JSON.stringify(this.contentProperties));
 
     f.Post({data}).then(data => {
-      f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
+      f.showMsg(data['status'] ? 'Saved' : 'An error occurred!');
       this.disableBtnSave();
     });
   }

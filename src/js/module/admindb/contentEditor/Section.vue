@@ -85,7 +85,7 @@ export default {
     },
     deleteField(key, item) {
       if (item.locked) {
-        f.showMsg('Снимите защиту от удаления', 'error');
+        f.showMsg('Remove delete protection', 'error');
         return;
       }
 

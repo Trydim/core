@@ -179,7 +179,7 @@ const langChange = (target: HTMLSelectElement) => {
       f.cookieSet('lang', target.value);
       location.reload()
     } else {
-      f.showMsg(_('Change lang error'), 'error');
+      f.showMsg('Change lang error', 'error');
       stopPreloader();
     }
   });

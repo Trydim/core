@@ -161,7 +161,7 @@ export declare interface CMSGlobalObject {
   replaceTemplate(tmpString: string, arrayObjects: object): string
 
   /**
-   * show Toast
+   * Show toast
    */
   showMsg(message: string,
           type?: 'tip' | 'info' | 'success' | 'ok' | 'warning' | 'error' | 'alert',

@@ -53,7 +53,7 @@ export default {
 
     addListItem() {
       if (this.inputV === '') return;
-      if (this.options.hasOwnProperty(this.inputV)) { f.showMsg('Имя существует', 'error'); return; }
+      if (this.options.hasOwnProperty(this.inputV)) { f.showMsg('Name exists', 'error'); return; }
 
       this.$emit('addListKey', this.inputV);
     },

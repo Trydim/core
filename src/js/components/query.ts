@@ -20,7 +20,7 @@ const checkJSON = (data: string) => {
     }
 
     if (data) {
-      f.showMsg(window._('For more information see console'), 'error', false);
+      f.showMsg('For more information see console', 'error', false);
       console.error(data);
     }
 

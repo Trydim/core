@@ -213,7 +213,7 @@ const users = {
     return form;
   },
   changeUser() {
-    if (!this.id.getSelectedSize()) { f.showMsg(_('Please select at least one user'), 'error'); return; }
+    if (!this.id.getSelectedSize()) { f.showMsg('Please select at least one user', 'error'); return; }
 
     let oneElements = this.id.getSelectedSize() === 1, node,
         id    = this.id.getSelected(),
@@ -280,7 +280,7 @@ const users = {
     return form;
   },
   changeUserPassword() {
-    if (this.id.getSelectedSize() !== 1) { f.showMsg(_('Please select only one user'), 'error'); return; }
+    if (this.id.getSelectedSize() !== 1) { f.showMsg('Please select only one user', 'error'); return; }
 
     let id   = this.id.getSelected(),
         user = data.usersList.get(id[0]),
@@ -350,7 +350,7 @@ const users = {
   changeRepeatPass(e, newPass) {
     e.preventDefault();
 
-    if (e.target.value !== newPass.value) f.showMsg(_('Passwords don\'t match'), 'error');
+    if (e.target.value !== newPass.value) f.showMsg('Passwords don\'t match', 'error');
   },
 
   // Bind events

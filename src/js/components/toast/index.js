@@ -104,6 +104,7 @@ export class ToastClass {
 export const toast = (msg = 'message body', type = 'success', options = {}) => {
   const t = new ToastClass();
 
+  if (window._ && typeof window._ === 'function') msg = window._(msg);
   if (typeof options === "boolean" && options === false) options = {durations: {global: 0}};
 
   switch (type) {

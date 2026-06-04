@@ -615,7 +615,7 @@ export class Observer {
     if (searchKey) {
       const publisher = Object.keys(this.publisher).filter(i => i.includes(searchKey));
       return publisher ? this.publisher[publisher[0]]
-                       : f.showMsg('Publisher not found: ' + key, 'error');
+                       : f.showMsg(_('Publisher not found: %1', searchKey), 'error');
     }
 
     return {
@@ -630,7 +630,7 @@ export class Observer {
    */
   searchPublisherKey(searchKey) {
     const publisher = Object.keys(this.publisher).filter(i => i.includes(searchKey));
-    return publisher ? publisher[0] : f.showMsg('Publisher not found: ' + key, 'error');
+    return publisher ? publisher[0] : f.showMsg(_('Publisher not found: %1', searchKey), 'error');
   }
 
   /**

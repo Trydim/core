@@ -203,7 +203,7 @@ const customers = {
     })
 
     f.Post({data: this.form}).then(data => {
-      if (!data.status) { f.showMsg('Ошибка'); return; }
+      if (!data.status) { f.showMsg('Error'); return; }
 
       if (this.needReload) {
         this.needReload = false;
@@ -258,7 +258,7 @@ const customers = {
         f.relatedOption(form);
       },
       'changeCustomer': () => {
-        if (this.selected.getSelectedSize() !== 1) { f.showMsg(_('Choose one client!')); return; }
+        if (this.selected.getSelectedSize() !== 1) { f.showMsg('Choose one client!'); return; }
 
         let node,
             id = this.selected.getSelected(),
@@ -296,7 +296,7 @@ const customers = {
         f.relatedOption(form);
       },
       'delCustomer': () => {
-        if (!this.selected.getSelectedSize()) { f.showMsg(_('Choose a client!'), 'error'); return; }
+        if (!this.selected.getSelectedSize()) { f.showMsg('Choose a client!', 'error'); return; }
         if (this.checkCustomers()) return;
 
         this.queryParam.customerId = JSON.stringify(this.selected.getSelected());

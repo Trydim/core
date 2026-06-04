@@ -64,7 +64,7 @@ export const handson = {
               try {
                 mustache.parse(val);
               } catch (e) {
-                f.showMsg(`Ошибка в шаблоне (${e.message})` , 'warning');
+                f.showMsg(_('Template error (%1)', e.message), 'warning');
               }
             }
             this.admindb.enableBtnSave();
@@ -107,7 +107,7 @@ export const handson = {
       for (const cIndex of columns) {
         const important = this.getDataAtCol(cIndex).find(i => /^(c_|d_)/i.test(i));
         if (important) {
-          f.showMsg('Ключевые значения нельзя удалить', 'error');
+          f.showMsg('Key values cannot be deleted', 'error');
           throw new Error('[handsontable.option.js:beforeRemoveCol]: Try to delete important values!');
         }
       }
@@ -116,7 +116,7 @@ export const handson = {
       for (const rIndex of rows) {
         const important = this.getDataAtRow(rIndex).find(i => /^(c_|d_)/i.test(i));
         if (important) {
-          f.showMsg('Ключевые значения нельзя удалить', 'error');
+          f.showMsg('Key values cannot be deleted', 'error');
           throw new Error('[handsontable.option.js:beforeRemoveCol]: Try to delete important values!');
         }
       }

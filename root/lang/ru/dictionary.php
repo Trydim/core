@@ -192,5 +192,24 @@
   'address' => 'адрес',
 
   'Deleted' => 'Удалено',
-  'Delete selected clients?' => 'Удалить выбранных?'
+  'Delete selected clients?' => 'Удалить выбранных?',
+
+  'Access type %1 exists' => 'Тип доступа %1 существует',
+  'Added' => 'Добавлено',
+  'An error occurred!' => 'Произошла ошибка!',
+  'Customer for order %1 not found' => 'Клиент для заказа %1 не найден',
+  'Enter value' => 'Введите значение',
+  'Error' => 'Ошибка',
+  'Key values cannot be deleted' => 'Ключевые значения нельзя удалить',
+  'Load rate error: %1' => 'Ошибка загрузки курса: %1',
+  'Name exists' => 'Имя существует',
+  'Nothing selected' => 'Ничего не выбрано',
+  'Publisher not found: %1' => 'Издатель не найден: %1',
+  'Query set data error: %1' => 'Ошибка установки данных запроса: %1',
+  'Remove delete protection' => 'Снимите защиту от удаления',
+  'Saved' => 'Сохранено',
+  'Select order!' => 'Выберите заказ!',
+  'Property: %1 - will be deleted!' => 'Свойство: %1 - будет удалено!',
+  'Template error (%1)' => 'Ошибка в шаблоне (%1)',
+  'The client %1 has orders!' => 'У клиента %1 есть заказы!',
 ];

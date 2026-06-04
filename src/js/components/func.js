@@ -731,7 +731,7 @@ export default {
 
       node.remove();
     } catch (e) {
-      f.showMsg('Load rate error: ' + e.message, 'error');
+      f.showMsg(_('Load rate error: %1', e.message), 'error');
       rate = Object.create(null);
     }
     return rate;

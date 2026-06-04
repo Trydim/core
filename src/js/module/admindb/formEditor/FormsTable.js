@@ -68,7 +68,7 @@ export class FormsTable extends Main {
     data.set('csvData', JSON.stringify(this.contentData));
 
     f.Post({data}).then(data => {
-      f.showMsg(data['status'] ? 'Сохранено' : 'Произошла ошибка!');
+      f.showMsg(data['status'] ? 'Saved' : 'An error occurred!');
       this.disableBtnSave();
     });
   }

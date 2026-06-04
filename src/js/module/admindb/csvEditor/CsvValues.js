@@ -178,7 +178,7 @@ export class CsvValues extends Main {
       f.removeLoading(e.target);
 
       if (data.status) {
-        f.showMsg('Сохранено');
+        f.showMsg('Saved');
         this.disableBtnSave();
         // Reload DB Table
         await this.dbAction('showTable');
@@ -200,7 +200,7 @@ export class CsvValues extends Main {
       f.removeLoading(e.target);
 
       if (data.status) {
-        f.showMsg('Сохранено');
+        f.showMsg('Saved');
         this.disableBtnSave();
       }
     });

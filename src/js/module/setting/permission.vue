@@ -171,7 +171,7 @@ export default {
       } else {
         this.errorTimeOut = setTimeout(() => {
           this.permission.id = this.permissionsData[0].id;
-          f.showMsg(_('Empty name is not allowed'), 'error');
+          f.showMsg('Empty name is not allowed', 'error');
         }, 3000);
       }
     },
@@ -184,8 +184,7 @@ export default {
             sPer = this.permissionsData.find(i => i.id === id);
 
       if (/защ|guard/i.test(sPer.properties.tags)) {
-        f.showMsg(
-          _('To delete, protection must be removed! Deleting protected rights may disrupt functionality of the application!'),
+        f.showMsg('To delete, protection must be removed! Deleting protected rights may disrupt functionality of the application!',
           'warning'
         );
         return;

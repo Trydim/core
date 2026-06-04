@@ -198,8 +198,8 @@ export default {
    * @param {{type: 'set'|'change', value: string, valueType: 'absolute'|'relative', fraction: number}} c
    */
   applyChange(c) {
-    if (c.value.toString() === '') { f.showMsg('Введите значение', 'error'); return; }
-    if (!Object.keys(this.selectedCells).length) { f.showMsg('Ничего не выбрано', 'error'); return; }
+    if (c.value.toString() === '') { f.showMsg('Enter value', 'error'); return; }
+    if (!Object.keys(this.selectedCells).length) { f.showMsg('Nothing selected', 'error'); return; }
 
     this.addArchive();
 

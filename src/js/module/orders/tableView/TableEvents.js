@@ -79,10 +79,10 @@ export default class extends TableBase {
 
     if (!['confirmYes', 'confirmNo'].includes(action)) this.queryParam.dbAction = action;
     if (['loadOrder', 'openOrder', 'printOrder', 'savePdf', 'sendOrder'].includes(action) && selectedSize !== 1) {
-      f.showMsg(_('Select 1 order!'), 'warning'); return;
+      f.showMsg('Select 1 order!', 'warning'); return;
     }
     if (!selectedSize && !['setupColumns', 'orderTypeChange', 'confirmYes', 'confirmNo'].includes(action)) {
-      f.showMsg('Выберите заказ!', 'warning'); return;
+      f.showMsg('Select order!', 'warning'); return;
     }
     this.queryParam.orderIds = this.selected.getSelected();
 
@@ -186,7 +186,7 @@ export default class extends TableBase {
     fd.set('orderId', this.queryParam.orderIds);
     f.Post({data: fd}).then(data => {
       if (!data['customer']) {
-        f.showMsg('Customer for order ' + this.queryParam.orderIds + ' not found', 'error');
+        f.showMsg(_('Customer for order %1 not found', this.queryParam.orderIds), 'error');
         return;
       }
 
@@ -332,7 +332,7 @@ export default class extends TableBase {
     modal.show('Настройка колонок', form, {
       afterConfirm: () => {
         f.Post({data: queryParam}).then(data => {
-          if (data.status) f.showMsg(_('Saved! Change will be visible after reload page'), 'warning');
+          if (data.status) f.showMsg('Saved! Change will be visible after reload page', 'warning');
         });
       }
     });

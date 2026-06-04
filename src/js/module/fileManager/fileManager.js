@@ -148,7 +148,7 @@ const fileManager = {
         fileManager.query({cmsAction: 'deleteFile', dir: i}, function () {
           tr.hide(100).remove();
           u.remove();
-          f.showMsg('Удалено');
+          f.showMsg('Deleted');
         });
       }
     });
@@ -177,7 +177,7 @@ const fileManager = {
       fileManager.query({cmsAction: 'uploadFile', dir},  function () {
         t(dir);
 
-        f.showMsg('Добавлено');
+        f.showMsg('Added');
       })
     }
 

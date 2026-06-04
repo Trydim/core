@@ -124,7 +124,7 @@ export default {
       if (this.selected === key) this.selected = code;*/
     },
     deleteField(key, item) {
-      if (item.locked) { f.showMsg('Снимите защиту от удаления', 'error'); return; }
+      if (item.locked) { f.showMsg('Remove delete protection', 'error'); return; }
 
       new f.Toast().confirm('Удалить поле', () => {
         delete this.fields[key];
