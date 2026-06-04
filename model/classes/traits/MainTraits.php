@@ -363,27 +363,39 @@ trait Dictionary
   }
 
   /**
+   * @return array<string, string>
+   */
+  private function loadDictionaryFiles(string $dictionaryDir): array
+  {
+    $dictionary = [];
+    $files = glob($dictionaryDir . DIRECTORY_SEPARATOR . '*.php') ?: [];
+
+    foreach ($files as $file) {
+      if (basename($file) === 'dbDictionary.php') continue;
+
+      $fileDictionary = include $file;
+      if (is_array($fileDictionary)) {
+        $dictionary = array_merge($dictionary, $fileDictionary);
+      }
+    }
+
+    return $dictionary;
+  }
+
+  /**
    * Загружает и объединяет базовый словарь, словарь дилера и csv словари
    *
    * @return array<string, string>
    */
   private function loadAllDictionary(): array
   {
-    $dictionary = [];
-
     // Загрузка базового словаря
-    $baseDictPath = ABS_SITE_PATH . $this->dictionaryPath;
-    if (file_exists($baseDictPath)) {
-      $dictionary = include $baseDictPath;
-    }
+    $dictionary = $this->loadDictionaryFiles(ABS_SITE_PATH . $this->dictionaryPath);
 
     // Добавление словаря дилера (если это дилер и словарь существует)
     if ($this->isDealer()) {
-      $dealerPath = $this->url->getPath(true) . $this->dictionaryPath;
-      if (file_exists($dealerPath)) {
-        $dealerDictionary = include $dealerPath;
-        $dictionary = array_merge($dictionary, $dealerDictionary);
-      }
+      $dealerDictionary = $this->loadDictionaryFiles($this->url->getPath(true) . $this->dictionaryPath);
+      $dictionary = array_merge($dictionary, $dealerDictionary);
     }
 
     // Загрузка кастомных словарей администратора из CSV (приоритет директории дилера)
@@ -445,7 +457,7 @@ trait Dictionary
   {
     if ($this->dictionary) return;
 
-    $this->dictionaryPath   = "lang/{$this->targetLocale}/dictionary.php";
+    $this->dictionaryPath   = "lang/{$this->targetLocale}";
     $this->dbDictionaryPath = "lang/{$this->targetLocale}/dbDictionary.php";
 
     $this->dictionary   = $this->loadAllDictionary();
