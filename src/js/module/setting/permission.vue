@@ -1,59 +1,49 @@
 <template>
-  <div class="col-12 col-md-6 border" id="controlForm">
-    <h3 class="col text-center">{{ $t('Access') }}</h3>
-
-    <div class="input-group my-3">
-      <span class="input-group-text">{{ $t('Add') }}</span>
-      <p-input-text class="form-control" v-model="permission.name" />
-      <p-button v-tooltip.bottom="$t('Add access type')" icon="pi pi-plus-circle" class="p-button-success"
+  <p-panel id="controlForm" class="col-12 col-md-6 mb-3 p-0" :header="$t('Access')">
+    <p-input-group class="mb-1">
+      <p-input-group-addon class="py-0">{{ $t('Add') }}</p-input-group-addon>
+      <p-input-text v-model="permission.name" />
+      <p-button v-tooltip.bottom="$t('Add access type')" icon="pi pi-plus-circle" severity="success"
                 @click="addPermission" />
-    </div>
+    </p-input-group>
 
-    <div class="input-group mb-3">
-      <span class="input-group-text">{{ $t('Access type') }}</span>
-      <p-select class="col"
-                option-label="name" option-value="id"
+    <p-input-group class="mb-1">
+      <p-input-group-addon class="py-0">{{ $t('Access type') }}</p-input-group-addon>
+      <p-select option-label="name" option-value="id"
                 :editable="true" :options="permissionsData"
                 v-model="permission.id"
                 @input="changePermission" />
       <p-button v-tooltip.bottom="$t(isPermissionDelete ? 'Cancel deletion' : 'Delete access type')"
-                icon="pi pi-trash" class="p-button-danger"
+                icon="pi pi-trash" severity="danger"
                 @click="removePermission" />
-    </div>
+    </p-input-group>
 
-    <div class="input-group mb-3">
-        <span class="input-group-text">
-          {{ $t('Tags') }}
-          <i class="ms-1 pi pi-tag"
-             v-tooltip.bottom="$t('Special property tags (separated by a space):\n\'protection/guard\' - protection from deletion\n')"
-          ></i>
-        </span>
-      <p-input-text class="form-control" :disabled="isPermissionDelete"
-                    v-model="propertyTags" @change="changePermissionTags" />
-    </div>
+    <p-input-group class="mb-1">
+      <p-input-group-addon class="py-0">
+        {{ $t('Tags') }}
+        <i class="pi pi-tag ms-1"
+           v-tooltip.bottom="$t('Special property tags (separated by a space):\n\'protection/guard\' - protection from deletion\n')"
+        ></i>
+      </p-input-group-addon>
+      <p-input-text :disabled="isPermissionDelete" v-model="propertyTags" @change="changePermissionTags" />
+    </p-input-group>
 
-    <div class="col mb-3">
-      <p class="col-12 mt-2 text-center">
-        {{ $t('Available menus') }}
-        <i class="pi pi-tag" v-tooltip.bottom="$t('If `Available` is empty, then everything is available')"></i>
-      </p>
-      <p-picklist class="w-100" data-key="id"
-                  list-style="height:220px"
-                  v-model="permission.menu"
-                  @selection-change="pickedChange"
-      >
-        <template #source>
-          {{ $t('Possible') }}
-        </template>
-        <template #target>
-          {{ $t('Available') }}
-        </template>
-        <template #item="slotProps">
-          <div class="product-item">{{ slotProps.item.name }}</div>
-        </template>
-      </p-picklist>
-    </div>
-  </div>
+    <p class="text-center">
+      {{ $t('Available menus') }}
+      <i class="pi pi-tag" v-tooltip.bottom="$t('If `Available` is empty, then everything is available')"></i>
+    </p>
+    <p-picklist data-key="id" class="w-100" v-model="permission.menu" @selection-change="pickedChange">
+      <template #source>
+        {{ $t('Possible') }}
+      </template>
+      <template #target>
+        {{ $t('Available') }}
+      </template>
+      <template #item="slotProps">
+        <div class="product-item">{{ slotProps.item.name }}</div>
+      </template>
+    </p-picklist>
+  </p-panel>
 </template>
 
 <script>

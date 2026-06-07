@@ -1,24 +1,22 @@
 <template>
-  <div class="col-12 col-md-6 border" id="mailForm">
-    <h3 class="col text-center">{{ $t('Mail settings') }}</h3>
-    <div class="form-floating my-3">
-      <p-input-text ref="mailTarget" class="form-control" placeholder="" v-model="mail.target" />
-      <label>{{ $t('E-Mail To:') }}</label>
-    </div>
-
-    <div class="form-floating mb-3">
-      <p-input-text ref="mailTargetCopy" class="form-control" placeholder="" v-model="mail.targetCopy" />
-      <label>{{ $t('Copy') }}</label>
-    </div>
-    <div class="form-floating mb-3">
-      <p-input-text class="form-control" placeholder="" v-model="mail.subject" />
-      <label>{{ $t('Subject') }}</label>
-    </div>
-    <div class="form-floating mb-3">
-      <p-input-text class="form-control" placeholder="" v-model="mail.fromName" />
-      <label>{{ $t('From') }}</label>
-    </div>
-  </div>
+  <p-panel class="col-12 col-md-6 mb-3 p-0" id="mailForm" :header="$t('Mail settings')">
+    <p-float-label variant="on" class="d-block mb-3">
+      <p-input-text id="mailTarget" ref="mailTarget" class="w-100" v-model="mail.target" />
+      <label for="mailTarget">{{ $t('E-Mail To:') }}</label>
+    </p-float-label>
+    <p-float-label variant="on" class="d-block mb-3">
+      <p-input-text id="mailTargetCopy" ref="mailTargetCopy" class="w-100" v-model="mail.targetCopy" />
+      <label for="mailTargetCopy">{{ $t('Copy') }}</label>
+    </p-float-label>
+    <p-float-label variant="on" class="d-block mb-3">
+      <p-input-text id="mailSubject" class="w-100" v-model="mail.subject" />
+      <label for="mailSubject">{{ $t('Subject') }}</label>
+    </p-float-label>
+    <p-float-label variant="on" class="d-block">
+      <p-input-text id="mailFromName" class="w-100" v-model="mail.fromName" />
+      <label for="mailFromName">{{ $t('From') }}</label>
+    </p-float-label>
+  </p-panel>
 </template>
 
 <script>

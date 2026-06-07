@@ -217,17 +217,18 @@ final class Main {
   private function loadSetting(): Main
   {
     $setting = [];
-    $settingPath = $this->url->getPath(true) . self::SETTINGS_PATH;
 
+    $settingPath = $this->url->getBasePath(true) . self::SETTINGS_PATH;
     if (file_exists($settingPath)) {
       $setting = json_decode(file_get_contents($settingPath), true);
     }
 
-    $settingPath = $this->url->getBasePath(true) . self::SETTINGS_PATH;
-    if ($this->isDealer() && file_exists($settingPath)) {
-      $mainSetting = json_decode(file_get_contents($settingPath), true);
-      $setting[VC::OPTION_PROPERTIES] = $mainSetting[VC::OPTION_PROPERTIES] ?? [];
-      $setting[VC::DEALER_PROPERTIES] = $mainSetting[VC::DEALER_PROPERTIES] ?? [];
+    if ($this->isDealer()) {
+      $settingPath = $this->url->getPath(true) . self::SETTINGS_PATH;
+      if (file_exists($settingPath)) {
+        $dealSetting = json_decode(file_get_contents($settingPath), true);
+        $setting = array_merge($setting, $dealSetting);
+      }
     }
 
     $this->setting = array_merge($this->setting, $setting);

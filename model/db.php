@@ -14,7 +14,7 @@ $dbTable = $dbTable ?? $tableName ?? '';
 stripos($dbTable, '.csv') === false && $dbTable = basename($dbTable);
 
 if ($cmsAction === 'tables') { // Добавить фильтрацию таблиц
-  CHANGE_DATABASE && $result[$cmsAction] = $db->getTables();
+  $result[$cmsAction] = $db->getTables();
   $result['csvFiles'] = $db->scanDirCsv($main->getCmsParam(VC::CSV_PATH));
 } else {
   $columns = [];
@@ -29,7 +29,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
           $columns = $db->getColumnsTable($dbTable);
         }
       }
-    }
+    }/**/
   }
 
   $pageNumber = $currPage ?? 0;
@@ -50,8 +50,8 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       if (stripos($dbTable, '.csv')) $result['csvValues'] = $db->openCsv();
       elseif ($dbTable === 'content-js') $result['content'] = $db->loadContentEditorData();
       else {
-        if (CHANGE_DATABASE) {
-          USE_DATABASE && $result['dbValues'] = $db->loadTable($dbTable);
+        if (USE_DATABASE) {
+          $result['dbValues'] = $db->loadTable($dbTable);
         } else {
           $dbTable = $db->getTables($dbTable);
           count($dbTable) && $result['dbValues'] = $db->loadTable($dbTable[0]['dbTable']);

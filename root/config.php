@@ -35,7 +35,7 @@ $publicConfig = [
   /** Папка csv файлов */
   //'PATH_CSV'    => 'shared/csv/',
   /** Сохранять историю изменений */
-  //'CSV_CHANGE_HISTORY' => true,
+  //VC::SAVE_CHANGE_HISTORY => true,
 
   /** Количество символов в csv */
   //'CSV_STRING_LENGTH' => '1000',

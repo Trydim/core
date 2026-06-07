@@ -1,32 +1,29 @@
 <template>
-  <div class="col-12 col-md-6 border" id="statsForm">
-    <h3 class="w-100 text-center">Внешний доступ (ключи)</h3>
-    <div id="ordersStatusForm" class="col">
-      <div class="input-group my-3">
-        <span class="input-group-text flex-grow-1">Настройка статусов заказов</span>
-        <button type="button" class="btn btn-outline-secondary" @click="addStatus()">
-          <i class="pi pi-plus-circle align-text-bottom pi-green"></i>
-        </button>
+  <p-panel id="statsForm" class="col-12 col-md-6 mb-3 p-0" header="Внешний доступ (ключи)">
+    <div id="ordersStatusForm">
+      <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+        <span>Настройка статусов заказов</span>
+        <p-button v-tooltip.bottom="'Добавить'" icon="pi pi-plus-circle" severity="success" @click="addStatus()" />
       </div>
 
-      <div class="mb-3" style="max-height: 140px; overflow-y: auto">
+      <div class="overflow-auto">
         <template v-for="(item, index) of status" :key="item.id">
-          <div v-if="!item.delete" class="input-group mb-1">
-            <p-input-text v-tooltip.bottom="'код (необязательно)'" class="form-control"
+          <div v-if="!item.delete" class="row g-1 align-items-center mb-1">
+            <p-input-text v-tooltip.bottom="'код (необязательно)'"
                           :disabled="+item.required" v-model="item.code" />
-            <p-input-text v-model="item.name" class="form-control w-50" />
-            <p-input-text v-tooltip.bottom="'сортировка'" v-model="item.sort" class="form-control" />
-            <div class="input-group-text">
+            <p-input-text v-model="item.name" />
+            <p-input-text v-tooltip.bottom="'сортировка'" v-model="item.sort" />
+            <div class="col-auto d-flex justify-content-center">
               <p-radiobutton v-tooltip.bottom="'По умолчанию'" v-model="statusDef" :value="item.id" />
             </div>
-            <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-times" class="p-button-danger"
+            <p-button v-tooltip.bottom="'Удалить'" icon="pi pi-times" severity="danger"
                       :disabled="+item.required"
                       @click="removeStatus(index)" />
           </div>
         </template>
       </div>
     </div>
-  </div>
+  </p-panel>
 </template>
 
 <script>

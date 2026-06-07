@@ -11,20 +11,24 @@ $db = $main->getDB();
 
 switch ($cmsAction) {
   case 'saveSetting':
-    $usersId = $main->getLogin('id');
-    $user = json_decode($user ?? '[]', true);
-    $userName = !empty($user['name']) ? $user['name'] : 'noName';
+    $setting = [];
+    $settingPath = $this->url->getBasePath(true) . Main::SETTINGS_PATH;
+    if (file_exists($settingPath)) {
+      $setting = json_decode(file_get_contents($settingPath), true);
+    }
 
     // Change Setting
-    if (USE_DATABASE && $usersId) {
-
+    if (USE_DATABASE) {
       // Update User
       if (!empty($user)) {
+        $usersId = $main->getLogin('id');
+        $user = json_decode($user ?? '[]', true);
+        $userName = !empty($user['name']) ? $user['name'] : 'noName';
 
         // Test unique login
         $users = $db->selectQuery('users', '*', ' login = "' . $user['login'] . '"');
-        if (count($users) > 1 || (count($users) > 0 && $users[0]['ID'] !== $usersId)) {
-          $result['error'] = gTxt('Login exist');
+        if (count($users) > 1 || (count($users) > 0 && $users[0]['id'] !== $usersId)) {
+          $result['error'] = gTxt('[setting:saveSetting]: Login exist');
           break;
         }
 
@@ -63,7 +67,7 @@ switch ($cmsAction) {
       // Permission
       // Test unique permission name
       $permissions = json_decode($permissions ?? '[]', true);
-      if (count($permissions)) {
+      if (count($permissions) && (!$main->hasDealers() || $main->isDealer())) {
         $param = [
           'new'    => [],
           'change' => [],
@@ -101,7 +105,7 @@ switch ($cmsAction) {
         ];
 
         foreach (json_decode($orderStatus, true) as $status) {
-          $id = $status['ID'];
+          $id = $status['id'];
 
           if (isset($status['delete'])) {
             $result['statusDelete']['error'] = $db->deleteItem('order_status', [$id]) ? '' : 'ERROR: Delete order status failed';
@@ -133,9 +137,8 @@ switch ($cmsAction) {
       // Rate
       $rate = json_decode($rate ?? '[]', true);
       if (count($rate)) {
-        // Auto update
-        $main->setSettings(VC::RATE_AUTO_REFRESH, $rate[VC::RATE_AUTO_REFRESH]);
-        $main->setSettings(VC::RATE_SERVER_REFRESH, $rate[VC::RATE_SERVER_REFRESH]);
+        $setting[VC::RATE_AUTO_REFRESH]   = $rate[VC::RATE_AUTO_REFRESH] ?? $rate['autoRefresh'];
+        $setting[VC::RATE_SERVER_REFRESH] = $rate[VC::RATE_SERVER_REFRESH] ?? $rate['serverRefresh'];
 
         $rate = $rate['data'];
         $param = [
@@ -144,7 +147,7 @@ switch ($cmsAction) {
         ];
 
         foreach ($rate as $item) {
-          $id = $item['ID'];
+          $id = $item['id'];
 
           if (isset($item['delete']) && boolValue($item['delete']) === true) {
             $result['error']['del'] = $db->deleteItem('money', [$id]);
@@ -152,12 +155,12 @@ switch ($cmsAction) {
           }
 
           $field = [
-            'code' => $item['code'],
-            'name' => $item['name'],
+            'code'       => $item['code'],
+            'name'       => $item['name'],
             'short_name' => $item['shortName'],
-            'rate' => $item['rate'],
-            'scale' => $item['scale'],
-            'main' => intval($item['main']),
+            'rate'       => $item['rate'],
+            'scale'      => $item['scale'],
+            'main'       => intval($item['main']),
           ];
 
           if (includes($id, 'new')) $param['new'][uniqid()] = $field;
@@ -177,27 +180,25 @@ switch ($cmsAction) {
       }
 
       file_put_contents(SYSTEM_PATH, implode('|||', [$user['login'], $user['password'], $hash])); // todo перенести в DB
-      //$setting['onlyOne'] = boolval($user['onlyOne']);
     }
 
     // Global mail setting
     $mail = json_decode($mail ?? '[]', true);
-    !empty($mail['target'])     && $main->setSettings(VC::MAIL_TARGET, $mail['target']);
-    !empty($mail['targetCopy']) && $main->setSettings(VC::MAIL_TARGET_COPY, $mail['targetCopy']);
-    !empty($mail['subject'])    && $main->setSettings(VC::MAIL_SUBJECT, $mail['subject']);
-    !empty($mail['fromName'])   && $main->setSettings(VC::MAIL_FROM_NAME, $mail['fromName']);
+    !empty($mail['target'])     && $setting[VC::MAIL_TARGET]      = $mail['target'];
+    !empty($mail['targetCopy']) && $setting[VC::MAIL_TARGET_COPY] = $mail['targetCopy'];
+    !empty($mail['subject'])    && $setting[VC::MAIL_SUBJECT]     = $mail['subject'];
+    !empty($mail['fromName'])   && $setting[VC::MAIL_FROM_NAME]   = $mail['fromName'];
 
     // Global manager setting
     $managerFields = json_decode($managerFields ?? '[]', true);
-    count($managerFields) && $main->setSettings(VC::MANAGER_FIELDS, $managerFields);
+    count($managerFields) && $setting[VC::MANAGER_FIELDS] = $managerFields;
 
     // Global other setting
-    $main->setSettings(VC::STATUS_DEFAULT, $statusDefault ?? $main->db->selectQuery('order_status', 'ID')[0]);
+    $setting[VC::MANAGER_FIELDS] = $statusDefault ?? $main->db->selectQuery('order_status', 'id')[0];
     $other = json_decode($otherFields ?? '[]', true);
-    $main->setSettings(VC::PHONE_MASK_GLOBAL, $other['phoneMask']['global'] ?? $main->getSettings(VC::PHONE_MASK_GLOBAL) ?? '+_ (___) ___ __ __')
-         ->setSettings(VC::CATALOG_IMAGE_SIZE, $other[VC::CATALOG_IMAGE_SIZE] ?? []);
+    $setting[VC::MANAGER_FIELDS] = $other['phoneMask']['global'] ?? $main->getSettings(VC::PHONE_MASK_GLOBAL) ?? '+_ (___) ___ __ __';
 
-    $main->saveSettings();
+    file_put_contents($settingPath, json_encode($setting));
     break;
   case 'saveColumns':
     if (!isset($tableType) || !isset($columns)) { $result['error'] = 'saveColumns error'; break; }
@@ -213,23 +214,22 @@ switch ($cmsAction) {
     $result = $db->insert($db->getColumnsTable('users'), 'users', $param, true);
     break;
   case 'load':
-    if (USE_DATABASE) $result['user'] = $db->getUser($main->getLogin(), 'ID, login, customization');
+    if (USE_DATABASE) $result['user'] = $db->getUser($main->getLogin());
     else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus());
 
     $result['setting'] = $main->getSettings();
     break;
 
-  // Options property
-  case 'createProperty': case 'createDealersProperty':
-  case 'changeProperty': case 'changeDealersProperty':
-    $propKey  = in_array($cmsAction, ['createProperty', 'changeProperty']) ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
+  // Dealers property
+  case 'createDealersProperty':
+  case 'changeDealersProperty':
     $isChange = includes($cmsAction, 'change');
     $property = json_decode($property ?? '[]', true);
 
     $tableName = $property['newName'];
     $tableCode = strtolower(translit($property['newCode'] ?? $tableName));
     $propName  = 'prop_' . str_replace('prop_', '', $tableCode);
-    $setting   = $main->getSettings($propKey);
+    $setting   = $main->getSettings(VC::DEALER_PROPERTIES);
 
     // Удалить сущности свойства, если есть (пока только таблица)
     if ($isChange) {
@@ -261,14 +261,14 @@ switch ($cmsAction) {
         'name' => $tableName,
         'type' => $property['type'],
       ];
-      $main->setSettings($propKey, $setting)->saveSettings();
+      $main->setSettings(VC::DEALER_PROPERTIES, $setting)->saveSettings();
     } else if (includes($property['type'], 'table')) {
       $setting[$propName] = [
         'name' => $tableName,
         'type' => 'table',
         'columns' => $property['fields'],
       ];
-      $main->setSettings($propKey, $setting)->saveSettings();
+      $main->setSettings(VC::DEALER_PROPERTIES, $setting)->saveSettings();
     } else { // остальные
       // If changed, else remove old value.
       if ($isChange) unset($setting[$property['code']]);
@@ -278,12 +278,11 @@ switch ($cmsAction) {
           'name' => $tableName,
           'type' => $property['type'],
         ];
-        $main->setSettings($propKey, $setting)->saveSettings();
+        $main->setSettings(VC::DEALER_PROPERTIES, $setting)->saveSettings();
       } else $result['error'] = 'Property exist';
     }
     break;
-  case 'changePropertyOrder': case 'changeDealersPropertyOrder':
-    $propKey  = includes($cmsAction, 'Dealer') ? VC::DEALER_PROPERTIES : VC::OPTION_PROPERTIES;
+  case 'changeDealersPropertyOrder':
     $property = json_decode($property ?? '[]', true);
 
     if (!count($property)) { $result['error'] = $cmsAction . ' error: Property is empty'; break; }
@@ -296,13 +295,12 @@ switch ($cmsAction) {
       ];
     }
 
-    $main->setSettings($propKey, $setting)->saveSettings();
+    $main->setSettings(VC::DEALER_PROPERTIES, $setting)->saveSettings();
     $result = ['ok'];
     break;
-  case 'loadProperties': case 'loadDealersProperties':
-    $propKey = $cmsAction === 'loadProperties' ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
-    $result[$propKey] = [];
-    $setting = $main->getSettings($propKey);
+  case 'loadDealersProperties':
+    $result[VC::DEALER_PROPERTIES] = [];
+    $setting = $main->getSettings(VC::DEALER_PROPERTIES);
     $dbProperties = array_keys($db->getTables('prop'));
 
     if (is_array($setting)) {
@@ -341,7 +339,7 @@ switch ($cmsAction) {
               $fields = [];
 
               foreach ($columns as $column) {
-                if (in_array($column['columnName'], ['ID', 'name'])) continue;
+                if (in_array($column['columnName'], ['id', 'name'])) continue;
 
                 $fields[] = getPropertyField($column['columnName'], $column['type']);
               }
@@ -350,7 +348,7 @@ switch ($cmsAction) {
             }
           }
 
-          $result[$propKey][] = $param;
+          $result[VC::DEALER_PROPERTIES][] = $param;
         }
       }
     }
@@ -360,10 +358,9 @@ switch ($cmsAction) {
       $result['propertyValue'] = $db->getColumnsTable($props);
     }
     break;
-  case 'deleteProperty':  case 'deleteDealersProperty':
-    $propKey = $cmsAction === 'deleteProperty' ? VC::OPTION_PROPERTIES : VC::DEALER_PROPERTIES;
+  case 'deleteDealersProperty':
     $property = json_decode($property ?? '[]', true);
-    $setting = $main->getSettings($propKey);
+    $setting = $main->getSettings(VC::DEALER_PROPERTIES);
 
     if (!empty($property['fields'])) {
       $db->delPropertyTable([$property['code']]);
@@ -372,7 +369,7 @@ switch ($cmsAction) {
     if (isset($property['code'])) {
       unset($setting['prop_' . str_replace('prop_', '', $property['code'])]);
 
-      $main->setSettings($propKey, $setting)->saveSettings();
+      $main->setSettings(VC::DEALER_PROPERTIES, $setting)->saveSettings();
     }
     break;
 }

@@ -15,7 +15,6 @@ const CORE          = __DIR__ . '/',
 
 define('DEBUG', boolval($publicConfig['DEBUG'] ?? false));
 define('USE_DATABASE', $publicConfig[VC::USE_DATABASE] ?? true);
-define('CHANGE_DATABASE', USE_DATABASE ? ($publicConfig[VC::CHANGE_DATABASE] ?? false) : false);
 
 define('CSV_DELIMITER', $publicConfig['CSV_DELIMITER'] ?? ';');
 define('CSV_STRING_LENGTH', $publicConfig['CSV_STRING_LENGTH'] ?? 1000);

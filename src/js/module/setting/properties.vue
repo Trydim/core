@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12" id="propertiesWrap">
+  <div id="propertiesWrap" class="px-0">
     <p-accordion @tabOpen="openAccordion()" value="-1">
       <p-accordion-panel value="0">
         <p-accordion-header>{{ accordionHeader }}</p-accordion-header>
@@ -15,7 +15,7 @@
                    @rowReorder="onRowReorder"
                    @dblclick="dblClickProperty($event)"
           >
-            <p-t-column :rowReorder="true" header-style="width: 3rem" :header="$t('Priority')" />
+            <p-t-column :rowReorder="true" :header="$t('Priority')" />
             <p-t-column field="name" :header="$t('Name')" />
             <p-t-column field="code" :header="$t('Code')">
               <template #body="slotProps">
@@ -30,23 +30,23 @@
           </p-table>
 
           <div class="my-3 text-center">
-            <p-button v-tooltip.bottom="$t('Add')" icon="pi pi-plus-circle" class="p-button-warning mx-1"
+            <p-button v-tooltip.bottom="$t('Add')" icon="pi pi-plus-circle" severity="warn" class="mx-1"
                       :loading="loading" @click="createProperty" />
-            <p-button v-tooltip.bottom="$t('Change')" icon="pi pi-cog" class="p-button-warning mx-1"
+            <p-button v-tooltip.bottom="$t('Change')" icon="pi pi-cog" severity="warn" class="mx-1"
                       :loading="loading" @click="changeProperty" />
-            <p-button v-tooltip.bottom="$t('Delete')" icon="pi pi-trash" class="p-button-danger mx-1"
+            <p-button v-tooltip.bottom="$t('Delete')" icon="pi pi-trash" severity="danger" class="mx-1"
                       :loading="loading" @click="deleteProperty" />
           </div>
         </p-accordion-content>
       </p-accordion-panel>
     </p-accordion>
 
-    <p-dialog v-model:visible="modal.display" :modal="true" :base-z-index="-100">
+    <p-dialog :base-z-index="-100" :modal="true" v-model:visible="modal.display">
       <template #header>
         <h4>{{ modal.title }}</h4>
       </template>
 
-      <div v-if="queryParam.cmsAction !== deleteAction" style="width: 600px">
+      <div v-if="queryParam.cmsAction !== deleteAction" class="w-100">
         <!-- Имя -->
         <div class="col-12 row my-1">
           <div class="col">{{ $t('Property Name') }}:</div>
@@ -58,7 +58,7 @@
         <div class="col-12 row my-1">
           <div class="col">
             {{ $t('Property Code')}}:
-            <i class="ms-1 pi pi-tag" v-tooltip.bottom="$t('When changed, update the value for dealers')"></i>
+            <i class="pi pi-tag ms-1" v-tooltip.bottom="$t('When changed, update the value for dealers')"></i>
           </div>
           <div class="col">
             <p-input-text class="w-100" v-model="property.newCode" />
@@ -80,7 +80,7 @@
           <div class="col-12 row mb-1">
             <div class="col"> {{$t('Additional fields of the property (there is a name)')}} :</div>
             <div class="col">
-              <p-button v-tooltip.bottom="$t('Add field')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+              <p-button v-tooltip.bottom="$t('Add field')" icon="pi pi-plus-circle" class="w-100" raised
                         :label="$t('Add field')"
                         @click="addPropertyField" />
             </div>
@@ -97,7 +97,7 @@
                         v-model="field.type" />
             </div>
             <div class="col-1 text-center">
-              <p-button v-tooltip.bottom="$t('Delete Field')" icon="pi pi-times" class="p-button-danger"
+              <p-button v-tooltip.bottom="$t('Delete Field')" icon="pi pi-times" severity="danger"
                         @click="removePropertyField(key)" />
             </div>
           </div>
@@ -106,29 +106,29 @@
           <div class="col-12 row mb-1">
             <div class="col">{{$t('Columns')}}:</div>
             <div class="col">
-              <p-button v-tooltip.bottom="$t('Add column to the table')" icon="pi pi-plus-circle" class="w-100 p-button-raised"
+              <p-button v-tooltip.bottom="$t('Add column to the table')" icon="pi pi-plus-circle" class="w-100" raised
                         :label="$t('Add column')" @click="addTableColumn" />
             </div>
           </div>
 
-          <div v-for="(field, index) of property.fields" class="row  mb-1 border" :key="index">
+          <div v-for="(field, index) of property.fields" class="row mb-1 border" :key="index">
             <div class="col flex-grow-1 p-0 text-center">
               <p-input-text class="w-100" v-model="property.fields[index]" />
             </div>
             <div v-if="property.fields.length > 1" class="col-1 m-0 text-center">
-              <p-button v-tooltip.bottom="$t('Delete column')" icon="pi pi-times" class="p-button-danger"
+              <p-button v-tooltip.bottom="$t('Delete column')" icon="pi pi-times" severity="danger"
                         @click="removeTableColumn(index)" />
             </div>
           </div>
         </template>
       </div>
-      <div v-else style="min-width: 300px">
+      <div v-else class="w-100">
         {{$t('Delete property')}}
       </div>
 
       <template #footer>
         <p-button :label="$t('Yes')" icon="pi pi-check" :disabled="modal.confirmDisabled" @click="propertiesConfirm" />
-        <p-button :label="$t('No')" icon="pi pi-times" class="p-button-text" @click="propertiesCancel" />
+        <p-button :label="$t('No')" icon="pi pi-times" text @click="propertiesCancel" />
       </template>
     </p-dialog>
   </div>

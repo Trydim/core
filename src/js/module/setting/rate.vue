@@ -1,28 +1,26 @@
 <template>
-  <div class="col-12 col-md-6 border" id="rateForm">
-    <h3 class="col-12 text-center">{{ $t('Exchange rates') }}</h3>
-
-    <div class="col-12 row">
-      <p class="col-8">{{ $t('Auto-update') }}</p>
-      <div class="col-4 d-inline-flex">
-        <p class="col mt-0 text-center">{{ $t('No') }}</p>
+  <p-panel id="rateForm" class="col-12 col-md-6 mb-3 p-0" :header="$t('Exchange rates')">
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+      <span>{{ $t('Auto-update') }}</span>
+      <div class="d-inline-flex align-items-center gap-2">
+        <span>{{ $t('No') }}</span>
         <p-switch v-model="autoRefresh" />
-        <p class="col mt-0 text-center">{{ $t('Yes') }}</p>
+        <span>{{ $t('Yes') }}</span>
       </div>
     </div>
 
-    <div v-if="autoRefresh" class="col-12 row mb-3">
-      <div v-for="(label, key) of serverName" class="col-4 d-flex align-items-center">
-        <p-radiobutton v-model="serverRefresh" :value="key" :id="'server' + key" />
-        <label class="ms-1" :for="'server' + key">{{ label }}</label>
+    <div v-if="autoRefresh" class="row g-3 mb-3">
+      <div v-for="(label, key) of serverName" :key="key" class="col d-flex align-items-center gap-2">
+        <p-radiobutton v-model="serverRefresh" :value="key" :input-id="'server' + key" />
+        <label :for="'server' + key">{{ label }}</label>
       </div>
     </div>
 
-    <div v-if="!autoRefresh" class="col-12 text-center mb-3">
-      <p-button v-tooltip.bottom="$t('Edit rates')" icon="pi pi-sliders-h" class="p-button-success"
+    <div v-if="!autoRefresh" class="text-center">
+      <p-button v-tooltip.bottom="$t('Edit rates')" icon="pi pi-sliders-h" severity="success"
                 :label="$t('Edit')" @click="display = true" />
     </div>
-  </div>
+  </p-panel>
 
   <p-dialog v-model:visible="display" :modal="true" :closable="false">
     <template #header>
@@ -30,58 +28,61 @@
     </template>
 
     <p-table :value="rate"
-             class="text-center user-select-none"
+             class="w-100 text-center user-select-none"
              :rowClass="rowClass"
              :resizableColumns="true" columnResizeMode="fit" showGridlines
              :scrollable="true"
              editMode="cell"
              responsiveLayout="scroll"
              @cell-edit-complete="onEditComplete"
-             style="width: 60vw"
     >
-      <p-t-column field="id" header="id" style="width: 5%" />
-      <p-t-column field="code" :sortable="true" :header="$t('Code')"  style="width: 10%" >
+      <p-t-column field="id" header="id" />
+      <p-t-column field="code" :sortable="true" :header="$t('Code')">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
+          <p-input-text class="w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="name" :sortable="true" :header="$t('Name')" style="width: 30%" >
+      <p-t-column field="name" :sortable="true" :header="$t('Name')">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
+          <p-input-text class="w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="scale" :header="$t('Nominal')" style="width: 10%" >
+      <p-t-column field="scale" :header="$t('Nominal')">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm w-100" :disabled="autoRefresh" v-model.number="data[field]" />
+          <p-input-text class="w-100" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="rate" :header="$t('Rate')" style="width: 20%" >
+      <p-t-column field="rate" :header="$t('Rate')">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm w-100" :disabled="autoRefresh" v-model.number="data[field]" />
+          <p-input-text class="w-100" :disabled="autoRefresh" v-model.number="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="shortName" :header="$t('Symbol')" style="width: 10%">
+      <p-t-column field="shortName" :header="$t('Symbol')">
         <template #editor="{data, field}">
-          <p-input-text class="p-inputtext-sm w-100" v-model="data[field]" />
+          <p-input-text class="w-100" v-model="data[field]" />
         </template>
       </p-t-column>
-      <p-t-column field="main" :header="$t('Main')" style="width: 10%">
+      <p-t-column field="main" :header="$t('Main')">
         <template #body="slotProps">
-          <p-checkbox type="radio" class="d-block mx-auto" name="main" :binary="true" v-model="slotProps.data.main"
-                      @click="setMain(slotProps.data.id)" />
+          <div class="d-flex justify-content-center">
+            <p-checkbox type="radio" name="main" :binary="true" v-model="slotProps.data.main"
+                        @click="setMain(slotProps.data.id)" />
+          </div>
         </template>
       </p-t-column>
       <p-t-column field="lastEditDate" :header="$t('Delete')">
         <template #body="slotProps">
-          <p-button class="d-block mx-auto p-button-rounded p-button-text p-button-sm text-center" icon="pi pi-times"
+          <p-button icon="pi pi-times" rounded text size="small"
                     @click="deleteRate(slotProps.data.id)" />
         </template>
       </p-t-column>
     </p-table>
 
     <template #footer>
-      <p-button class="p-button-info me-auto" :label="$t('Add')" icon="pi pi-plus" @click="addRate()" />
-      <p-button class="p-button-success" :label="$t('Close')" icon="pi pi-check" @click="modalHide" />
+      <div class="d-flex justify-content-between gap-2 w-100">
+        <p-button severity="info" :label="$t('Add')" icon="pi pi-plus" @click="addRate()" />
+        <p-button severity="success" :label="$t('Close')" icon="pi pi-check" @click="modalHide" />
+      </div>
     </template>
   </p-dialog>
 </template>
@@ -150,8 +151,8 @@ export default {
       console.log(this.rate);
       this.$emit('update', {
         data: this.rate,
-        autoRefresh: this.autoRefresh,
-        serverRefresh: this.serverRefresh,
+        rateAutoRefresh  : this.autoRefresh,
+        rateServerRefresh: this.serverRefresh,
       });
     },
 

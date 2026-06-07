@@ -1,57 +1,52 @@
 <template>
-  <div class="col-12 col-md-6 border" id="managerForm">
-    <h3 class="col-12 text-center">{{ $t('Manager') }}</h3>
-
-    <div class="input-group my-3">
-      <span class="input-group-text flex-grow-1">{{ $t('Additional fields') }}</span>
-      <p-button v-tooltip.bottom="$t('Add new field')" icon="pi pi-plus-circle" class="p-button-success"
+  <p-panel class="col-12 col-md-6 mb-3 p-0" id="managerForm" :header="$t('Manager')">
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+      <span>{{ $t('Additional fields') }}</span>
+      <p-button v-tooltip.bottom="$t('Add new field')" icon="pi pi-plus-circle" severity="success"
                 @click="addField" />
     </div>
 
     <template v-for="(item, key) of managerFields" :key="key">
-      <div class="input-group mb-1">
-        <p-input-text v-model="item.code" class="form-control" />
-        <p-input-text v-model="item.name" class="form-control" />
-        <p-select class="col-5"
-                  :options="managerFieldTypes"
+      <p-input-group class="mb-1 py-0">
+        <p-input-text class="py-0" v-model="item.code" />
+        <p-input-text class="py-0" v-model="item.name" />
+        <p-select class="py-0" :options="managerFieldTypes"
                   option-value="id" option-label="name"
                   v-model="item.type" />
-        <p-button v-tooltip.bottom="this.$t('Delete field')" icon="pi pi-times" class="p-button-danger"
+        <p-button class="py-0" v-tooltip.bottom="$t('Delete field')" icon="pi pi-times" severity="danger"
                   @click="removeField(key)" />
-      </div>
-      <div v-if="item.type === 'list'" class="px-3">
-        <div v-for="(option, index) of item.options" :key="index" class="input-group mb-1">
-          <p-input-text v-model="item.options[index]" class="form-control" />
-          <p-button v-tooltip.bottom="this.$t('Add option')" icon="pi pi-plus-circle" class="p-button-success"
+      </p-input-group>
+      <p-input-group v-if="item.type === 'list'" class="mb-1">
+        <template v-for="(option, index) of item.options" :key="index">
+          <p-input-text class="col" v-model="item.options[index]" />
+          <p-button v-tooltip.bottom="$t('Add option')" icon="pi pi-plus-circle" severity="success"
                     @click="addOption(item, index)" />
-          <p-button v-tooltip.bottom="this.$t('Delete option')" icon="pi pi-times" class="p-button-danger"
+          <p-button v-tooltip.bottom="$t('Delete option')" icon="pi pi-times" severity="danger"
                     @click="removeOption(item, index)" />
-        </div>
-      </div>
-      <div v-if="item.type === 'csvTable'" class="px-3">
-        <div class="input-group mb-1">
-          <p-select class="col-3"
-                    :loading="loadingTable"
-                    :options="csvTable"
-                    option-value="filename" option-label="name"
-                    v-model="item.options.table" />
-          <p-input-text class="col-3 form-control" v-tooltip.bottom="$t('Column for save')" v-model="item.options.saveKey" />
-          <p-input-text class="col-3 form-control" v-tooltip.bottom="$t('Column for show')" v-model="item.options.showKey" />
-          <div class="col-3 d-flex justify-content-center align-items-center gap-1">
-            <label :for="'multiselect'">{{ $t('Multiselect') }}</label>
-            <p-checkbox input-id="multiselect" binary v-model="item.options.multiselect" />
-          </div>
-        </div>
-      </div>
+        </template>
+      </p-input-group>
+      <p-input-group v-if="item.type === 'csvTable'" class="mb-1 py-0">
+        <p-select :title="$t('Csv tables')"
+                  :loading="loadingTable"
+                  :options="csvTable"
+                  option-value="filename" option-label="name"
+                  v-model="item.options.table" />
+        <p-input-text v-tooltip.bottom="$t('Column for save')" v-model="item.options.saveKey" />
+        <p-input-text v-tooltip.bottom="$t('Column for show')" v-model="item.options.showKey" />
+        <p-input-group-addon class="gap-1 py-0">
+          <p-checkbox :input-id="'multiselect-' + key" binary v-model="item.options.multiselect" />
+          <label :for="'multiselect-' + key">{{ $t('Multiselect') }}</label>
+        </p-input-group-addon>
+      </p-input-group>
     </template>
-  </div>
+  </p-panel>
 </template>
 
 <script>
 
 const prepareCsvList = (data, path = '') => {
   return Object.entries(data).reduce((r, [k, v]) => {
-    if (isFinite(+k)) r.push({ filename: path + v.filename, name: v.name });
+    if (isFinite(+k)) r.push({ filename: path + v.fileName, name: v.name });
     else r = r.concat(prepareCsvList(v, k + '/' + path));
     return r;
   }, []);
@@ -76,7 +71,6 @@ export default {
       {id: 'date',     name: _('Date')},
       {id: 'list',     name: _('List')},
       {id: 'csvTable', name: _('Table')},
-      //{id: 'select',   name: _('Directory')},
     ],
 
     loadingTable: true,

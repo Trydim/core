@@ -6,7 +6,6 @@ class VC {
         DEBUG           = 'DEBUG',
         ACCESS_MENU     = 'accessMenu',
         USE_DATABASE    = 'USE_DATABASE',
-        CHANGE_DATABASE = 'CHANGE_DATABASE',
         LOCALES         = 'LOCALES',
         LOCALES_BASE_LANG  = 'localesBase',
         USE_CONTENT_EDITOR = 'useContentEditor',
@@ -80,7 +79,6 @@ class VC {
         RATE_AUTO_REFRESH   = 'rateAutoRefresh',
         RATE_SERVER_REFRESH = 'rateServerRefresh',
 
-        OPTION_PROPERTIES = 'optionProperties',
         DEALER_PROPERTIES = 'dealersProperties',
         TABLE_CONFIG_PROPERTIES = 'csvConfigProperties',
 

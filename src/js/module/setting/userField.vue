@@ -1,76 +1,68 @@
 <template>
-  <div class="col-12 col-md-6 border" id="userForm">
-    <h3 class="col text-center">{{ $t('User') }}</h3>
-    <div class="form-floating my-3">
-      <p-input-text class="form-control" placeholder="" v-model="user.login" />
-      <label>{{ $t('Login') }}</label>
-    </div>
-    <div class="form-floating mb-3">
-      <p-input-text type="password" class="form-control" placeholder="" v-model="user.password" />
-      <label>{{ $t('New password') }}</label>
-    </div>
-    <div class="form-floating mb-3">
-      <p-input-text type="password" class="form-control" placeholder="" v-model="user.passwordRepeat" />
-      <label>{{ $t('Repeat password') }}</label>
-    </div>
+  <p-panel id="userForm" class="col-12 col-md-6 mb-3 p-0" :header="$t('User')">
+    <p-float-label variant="on" class="d-block mb-3">
+      <p-input-text id="userLogin" class="w-100" v-model="user.login" />
+      <label for="userLogin">{{ $t('Login') }}</label>
+    </p-float-label>
+    <p-float-label variant="on" class="d-block mb-3">
+      <p-input-text id="userPassword" type="password" class="w-100" v-model="user.password" />
+      <label for="userPassword">{{ $t('New password') }}</label>
+    </p-float-label>
+    <p-float-label variant="on" class="d-block mb-3">
+      <p-input-text id="userPasswordRepeat" type="password" class="w-100" v-model="user.passwordRepeat" />
+      <label for="userPasswordRepeat">{{ $t('Repeat password') }}</label>
+    </p-float-label>
 
-    <div class="input-group mb-3">
-      <div class="input-group-text col-1">
-        <p-checkbox id="showAllField" :binary="true" v-model="showAllField" />
-      </div>
-      <label class="input-group-text col" :for="'showAllField'">{{ $t('Show all options') }}</label>
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <p-checkbox input-id="showAllField" :binary="true" v-model="showAllField" />
+      <label for="showAllField">{{ $t('Show all options') }}</label>
     </div>
 
     <template v-if="showAllField">
-      <div class="form-floating my-3">
-        <p-input-text class="form-control" placeholder="" v-model="user.name" />
-        <label>{{ $t('Full name') }}</label>
-      </div>
-      <div class="form-floating mb-3">
-        <p-input-text class="form-control" placeholder="" v-model="user.fields.phone" />
-        <label>{{ $t('Phone') }}</label>
-      </div>
-      <div class="form-floating mb-3">
-        <p-input-text class="form-control" placeholder="" v-model="user.fields.email" />
-        <label>{{ $t('Mail') }}</label>
-      </div>
+      <p-float-label variant="on" class="d-block mb-3">
+        <p-input-text id="userName" class="w-100" v-model="user.name" />
+        <label for="userName">{{ $t('Full name') }}</label>
+      </p-float-label>
+      <p-float-label variant="on" class="d-block mb-3">
+        <p-input-text id="userPhone" class="w-100" v-model="user.fields.phone" />
+        <label for="userPhone">{{ $t('Phone') }}</label>
+      </p-float-label>
+      <p-float-label variant="on" class="d-block mb-3">
+        <p-input-text id="userMail" class="w-100" v-model="user.fields.email" />
+        <label for="userMail">{{ $t('Mail') }}</label>
+      </p-float-label>
 
-      <div v-for="(item, key) of userFields" class="mb-3"
-           :class="{'form-floating': item.type === 'text' || item.type === 'textarea',
-                    'input-group': item.type !== 'text' && item.type !== 'textarea'}"
-      >
-        <p-input-text v-if="item.type === 'text'"
-                      class="form-control" :id="item.type + key" placeholder=""
+      <template v-for="(item, key) of userFields" :key="key">
+        <p-float-label v-if="item.type === 'text'" variant="on" class="d-block mb-3">
+          <p-input-text :id="item.type + key" class="w-100" v-model="user.fields[key]" />
+          <label :for="item.type + key">{{ $t(item.name) }}</label>
+        </p-float-label>
+
+        <p-float-label v-else-if="item.type === 'textarea'" variant="on" class="d-block mb-3">
+          <p-textarea :id="item.type + key" class="w-100" v-model="user.fields[key]" />
+          <label :for="item.type + key">{{ $t(item.name) }}</label>
+        </p-float-label>
+
+        <div v-else class="row g-3 align-items-center mb-3">
+          <label class="col" :for="item.type + key">{{ $t(item.name) }}</label>
+          <p-input-number v-if="item.type === 'number'"
+                          :id="item.type + key" class="col" placeholder="0"
+                          show-buttons v-model="user.fields[key]" />
+
+          <p-calendar v-if="item.type === 'date'"
+                      :id="item.type + key" class="col"
+                      date-format="mm-dd-yy"
                       v-model="user.fields[key]" />
-
-        <p-textarea v-if="item.type === 'textarea'"
-                    class="form-control" :id="item.type + key" placeholder=""
-                    v-model="user.fields[key]" />
-
-        <label :class="{'col-6 input-group-text': item.type !== 'text' && item.type !== 'textarea'}"
-               :for="item.type + key">
-          {{ $t(item.name) }}
-        </label>
-
-        <p-input-number v-if="item.type === 'number'"
-                        :id="item.type + key" class="col-6" placeholder="0"
-                        show-buttons v-model="user.fields[key]" />
-
-        <p-calendar v-if="item.type === 'date'"
-                    :id="item.type + key" class="col-6"
-                    date-format="mm-dd-yy"
-                    v-model="user.fields[key]" />
-      </div>
-
-      <div class="input-group mb-3">
-        <div class="input-group-text col-1">
-          <p-checkbox id="onlyOne" :binary="true" v-model="user.onlyOne" />
         </div>
-        <label class="input-group-text col" :for="'onlyOne'">{{ $t('Prevent simultaneous login') }}</label>
+      </template>
+
+      <div class="d-flex align-items-center gap-3">
+        <p-checkbox input-id="onlyOne" :binary="true" v-model="user.onlyOne" />
+        <label for="onlyOne">{{ $t('Prevent simultaneous login') }}</label>
       </div>
 
     </template>
-  </div>
+  </p-panel>
 </template>
 
 <script>

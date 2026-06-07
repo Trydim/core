@@ -116,15 +116,22 @@ function getPageAsString(array $data): string {
 /**
  * Translate text
  */
-function gTxt(string $str): string {
+function gTxt(string $str, ...$arg): string {
   global $main;
   static $txt;
 
-  if (!$txt) {
+  if (empty($txt)) {
     $txt = $main->getDictionary();
   }
 
-  return $txt[$str] ?? $str;
+  $str = $txt[$str] ?? $str;
+  if (empty($arg)) return $str;
+
+  foreach ($arg as $k => $item) {
+    $str = str_replace("%" . ($k + 1), $item, $str);
+  }
+
+  return $str;
 }
 
 /**
@@ -134,7 +141,7 @@ function gTxtDB(string $db, string $str): string {
   global $main;
   static $txt;
 
-  if (!$txt) {
+  if (empty($txt)) {
     $txt = $main->getDbDictionary();
   }
 

@@ -47,7 +47,8 @@ $hasTableProp = false;
 $dealerProps = array_merge($dealerProps, $main->getSettings(VC::DEALER_PROPERTIES));
 foreach ($main->db->getTables('prop') as $table) {
   // Param saved in JSON
-  $prop = $dealerProps[$table['dbTable']] ?? [];
+  $prop = $dealerProps[$table['dbTable']] ?? null;
+  if (!$prop) continue;
 
   if ($prop['type'] === 'table') $hasTableProp = true;
 

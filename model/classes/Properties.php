@@ -1,7 +1,6 @@
 <?php
 
 class Properties {
-
   /**
    * Настройки для дилеров, которые под особым управлением, пока только языки
    *
@@ -14,18 +13,9 @@ class Properties {
   private Main $main;
   private mixed $propSetting;
 
-  //private $data = []; Хранить всю таблицу свойства
-
-  public function __construct(Main $main, $table = 'option') {
+  public function __construct(Main $main) {
     $this->main = $main;
-    $this->propSetting = $main->getSettings($this->getSettingField($table));
-  }
-
-  private function getSettingField(string $table): string {
-    switch ($table) {
-      default: case 'option': return VC::OPTION_PROPERTIES;
-      case 'dealer': return VC::DEALER_PROPERTIES;
-    }
+    $this->propSetting = $main->getSettings(VC::DEALER_PROPERTIES);
   }
 
   private function getPropertyName($prop): string {

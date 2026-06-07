@@ -1,44 +1,41 @@
 <template>
-  <div class="col-12 col-md-6 border" id="otherForm">
-    <h3 class="col text-center">{{ $t('Other') }}</h3>
-    <div class="form-floating mb-3" v-tooltip.bottom="$t('For the mask, use _. Leave blank to disable')">
-      <p-input-text class="form-control" placeholder="" v-model="phoneMask.global" />
-      <label>{{ $t('Phone mask') }}</label>
-    </div>
-    <!--<div class="form-floating mb-3">
-      <p-input-text class="form-control" placeholder="" v-model="phoneMask.Customers" />
+  <p-panel id="otherForm" class="col-12 col-md-6 mb-3 p-0" :header="$t('Other')">
+    <p-float-label variant="on" class="d-block mb-3" v-tooltip.bottom="$t('For the mask, use _. Leave blank to disable')">
+      <p-input-text id="phoneMaskGlobal" class="w-100" v-model="phoneMask.global" />
+      <label for="phoneMaskGlobal">{{ $t('Phone mask') }}</label>
+    </p-float-label>
+    <!--<div>
+      <p-input-text class="w-100" placeholder="" v-model="phoneMask.Customers" />
       <label>Шаблон телефона для клиентов</label>
     </div>
-    <div class="form-floating mb-3">
-      <p-input-text class="form-control" placeholder="" v-model="phoneMask.global" />
+    <div>
+      <p-input-text class="w-100" placeholder="" v-model="phoneMask.global" />
       <label>Шаблон телефона для остальных пользователей</label>
     </div>-->
 
     <template v-if="haveCatalogPage">
-      <div class="input-group mb-3">
-        <span class="input-group-text col-8">
+      <div class="row g-2 align-items-center mb-3">
+        <span class="col-8">
           Макс. размер исходного изображения, px (ш*в)
-          <i class="ms-1 pi pi-info-circle" v-tooltip.bottom="'При сохранении изображений через каталог, файл будет уменьшен до указанных размеров. По умолчанию: 1000х1000'"></i>
+          <i class="pi pi-info-circle ms-1" v-tooltip.bottom="'При сохранении изображений через каталог, файл будет уменьшен до указанных размеров. По умолчанию: 1000х1000'"></i>
         </span>
-        <p-input-text v-model="catalogImageSize.maxHeight" class="form-control" />
-        <p-input-text v-model="catalogImageSize.maxWidth" class="form-control" />
+        <p-input-text class="col" v-model="catalogImageSize.maxHeight" />
+        <p-input-text class="col" v-model="catalogImageSize.maxWidth" />
       </div>
-      <div class="input-group mb-3">
-        <div class="input-group-text col-1">
-          <p-checkbox id="createMiniImage" v-model="catalogImageSize.createPrev" :binary="true" />
-        </div>
-        <label class="input-group-text col" for="createMiniImage">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <p-checkbox input-id="createMiniImage" v-model="catalogImageSize.createPrev" :binary="true" />
+        <label for="createMiniImage">
           Формировать мини-изображение
-          <i class="ms-1 pi pi-info-circle" v-tooltip.bottom="'При сохранении изображений через каталог, будет создана миниатюра. По умолчанию: 300x300'"></i>
+          <i class="pi pi-info-circle ms-1" v-tooltip.bottom="'При сохранении изображений через каталог, будет создана миниатюра. По умолчанию: 300x300'"></i>
         </label>
       </div>
-      <div v-if="catalogImageSize.createPrev" class="input-group mb-3">
-        <span class="input-group-text col-8">Макс. Размер миниаютюры, px (ш*в)</span>
-        <p-input-text v-model="catalogImageSize.prevMaxHeight" class="form-control" />
-        <p-input-text v-model="catalogImageSize.prevMaxWidth" class="form-control" />
+      <div v-if="catalogImageSize.createPrev" class="row g-2 align-items-center">
+        <span class="col-8">Макс. Размер миниаютюры, px (ш*в)</span>
+        <p-input-text class="col" v-model="catalogImageSize.prevMaxHeight" />
+        <p-input-text class="col" v-model="catalogImageSize.prevMaxWidth" />
       </div>
     </template>
-  </div>
+  </p-panel>
 </template>
 
 <script>

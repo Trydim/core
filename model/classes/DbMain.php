@@ -92,6 +92,11 @@ class DbMain extends R {
     return $this->dealerId ??= $this->main->getDealerId();
   }
 
+  private function useDealerId(string $dbTable): bool
+  {
+    return $this->main->hasDealers() && $this->main->isDealer() && in_array($dbTable, self::DB_MAIN_TABLES, true);
+  }
+
   private function getPaginatorQuery(array $pageParam): string {
     $pageNumber = $pageParam['pageNumber'] ?? 0;
     $countPerPage = $pageParam['countPerPage'] ?? 100;
@@ -188,11 +193,6 @@ class DbMain extends R {
     $date = date_create($date);
     return $date ? $date->format($this::DB_DATE_FORMAT) : null;
   }
-
-  /**
-   * @deprecated
-   */
-  public function setPrefix(): void {}
 
   /**
    * @deprecated
@@ -298,7 +298,7 @@ class DbMain extends R {
     $sql = 'SELECT ' . implode(', ',  $columns) . " FROM $dbTable\n";
 
     $hasWhere = false;
-    if (in_array($dbTable, self::DB_MAIN_TABLES)) {
+    if ($this->useDealerId($dbTable)) {
       $hasWhere = true;
       $sql .= ' WHERE dealer_id = ' . $this->getDealerId();
     }
@@ -336,7 +336,7 @@ class DbMain extends R {
     $sql = "SELECT count(*) FROM $dbTable WHERE $columnName = :value";
     $params = [':value' => $value];
 
-    if (in_array($dbTable, self::DB_MAIN_TABLES, true)) {
+    if ($this->useDealerId($dbTable)) {
       $sql .= " AND dealer_id = :dealerId";
       $params[':dealerId'] = $this->getDealerId();
     }
@@ -383,7 +383,7 @@ class DbMain extends R {
     foreach ($requireParam as $field => $value) {
       $bean->$field = $value;
     }
-    if (in_array($dbTable, self::DB_MAIN_TABLES)) {
+    if ($this->useDealerId($dbTable)) {
       $bean->dealerId = $this->getDealerId();
     }
     self::store($bean);
@@ -418,7 +418,7 @@ class DbMain extends R {
     $hasWhere = false;
     $sql = "SELECT COUNT(*) AS 'count' from $dbTable\n";
 
-    if (in_array($dbTable, self::DB_MAIN_TABLES)) {
+    if ($this->useDealerId($dbTable)) {
       $hasWhere = true;
       $sql .= "WHERE dealer_id = '" . $this->getDealerId() . "'";
     }
@@ -438,7 +438,7 @@ class DbMain extends R {
     if (count($param) === 0) return [];
     $result['error'] = $this->checkTableBefore($curTable, $dbTable, $param, $change);
 
-    $addDealerId = in_array($dbTable, self::DB_MAIN_TABLES, true);
+    $addDealerId = $this->useDealerId($dbTable);
     $dealerId = $this->getDealerId();
 
     $idColName = 'id';
@@ -777,7 +777,7 @@ class DbMain extends R {
   //--------------------------------------------------------------------------------------------------------------------
 
   public function parseDealerSettings(array $dealers): array {
-    $properties = new Properties($this->main, 'dealer');
+    $properties = new Properties($this->main);
 
     foreach ($dealers as &$dealer) {
       $settings = [];

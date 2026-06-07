@@ -200,22 +200,9 @@ trait Authorization {
     // Set AdminDb tree menu
     if ($this->availablePage('admindb')) {
       $dbTables = [];
-      if (USE_DATABASE) {
-        if (CHANGE_DATABASE) {
-          $dbTables = array_merge($dbTables, $this->db->getTables());
-        } else if ($this->availablePage('catalog') || $this->availablePage('dealers')) {
-          $props = array_merge(
-            [['dbTable' => 'codes', 'name' => 'codes']],
-            $this->db->getTables('prop')
-          );
-
-          $props = array_map(function ($prop) {
-            $setting = $this->getSettings(VC::OPTION_PROPERTIES)[$prop['dbTable']] ?? false;
-            $setting && $setting['name'] && $prop['name'] = $setting['name'];
-            return $prop;
-          }, $props);
-          $dbTables = array_merge($dbTables, ['z_prop' => $props]);
-        }
+      if ($this->availablePage('dealers')) {
+        $props = $this->db->getTables('prop');
+        $dbTables = array_merge($dbTables, ['z_prop' => $props]);
       }
       $this->dbTables = array_merge($dbTables, $this->db->scanDirCsv($this->getCmsParam(VC::CSV_PATH)));
 

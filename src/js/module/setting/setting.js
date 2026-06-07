@@ -27,10 +27,10 @@ import RadioButton from 'primevue/radiobutton';
 import Textarea from 'primevue/textarea';
 import ToggleSwitch from 'primevue/toggleswitch';
 import Select from 'primevue/select';
-//import ToggleButton from 'primevue/togglebutton';
-//import MultiSelect from 'primevue/multiselect';
-//import TreeSelect from 'primevue/treeselect';
-//import FileUpload from 'primevue/fileupload';
+import FloatLabel from 'primevue/floatlabel';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import Panel from 'primevue/panel';
 
 // Custom components
 // ---------------------------------------------------------------------------------------------------------------------
@@ -51,6 +51,21 @@ import Tooltip from 'primevue/tooltip';
 import App from './app';
 
 const app = createApp(App);
+
+const applySettingCompactOverrides = () => {
+  if (document.getElementById('settingPrimeCompactStyle')) return;
+
+  const style = document.createElement('style');
+  style.id = 'settingPrimeCompactStyle';
+  style.textContent = `
+    #settingForm .p-inputtext:not(.p-floatlabel .p-inputtext),
+    #settingForm .p-textarea:not(.p-floatlabel .p-textarea) {
+      --p-inputtext-padding-x: 0.625rem;
+      --p-inputtext-padding-y: 0.4rem;
+    }
+  `;
+  document.head.appendChild(style);
+};
 
 app.config.errorHandler = (err, vm, info) => {
   debugger
@@ -82,14 +97,108 @@ document.addEventListener("DOMContentLoaded", () => {
               800: '{indigo.800}',
               900: '{indigo.900}',
               950: '{indigo.950}'
+            },
+            list: {
+              option: {
+                padding: '0.4rem 0.625rem',
+              },
+              optionGroup: {
+                padding: '0.4rem 0.625rem',
+              }
             }
-          }
+          },
+          components: {
+            panel: {
+              header: {
+                padding: '0.5rem 1rem',
+              },
+              toggleableHeader: {
+                padding: '0.25rem 1rem',
+              },
+              content: {
+                padding: '0.75rem',
+              },
+              footer: {
+                padding: '0.5rem',
+              }
+            },
+            accordion: {
+              header: {
+                padding: '0.5rem',
+              }
+            },
+            datatable: {
+              header: {
+                cell: {
+                  padding: '0.5rem',
+                }
+              }
+            },
+            inputgroup: {
+              addon: {
+                padding: '0.625rem 0.5rem',
+                minWidth: '2.25rem',
+              }
+            },
+            button: {
+              root: {
+                paddingX: '6.5px',
+                paddingY: '6.5px',
+                iconOnlyWidth: '2.25rem',
+              }
+            },
+            select: {
+              root: {
+                paddingX: '0.5rem',
+                paddingY: '0.3rem',
+              },
+              dropdown: {
+                width: '2rem',
+              }
+            },
+            checkbox: {
+              root: {
+                width: '1.05rem',
+                height: '1.05rem',
+              },
+              icon: {
+                size: '0.75rem',
+              }
+            },
+            radiobutton: {
+              root: {
+                width: '1.05rem',
+                height: '1.05rem',
+              },
+              icon: {
+                size: '0.8rem',
+              }
+            },
+            picklist: {
+              root: {
+                gap: '0.75rem',
+              },
+              controls: {
+                gap: '0.35rem',
+              }
+            },
+            toggleswitch: {
+              root: {
+                width: '2.375rem',
+                height: '1.25rem',
+                handle: {
+                  size: '1rem',
+                },
+              },
+            },
+          },
         });
 
   app.use(PrimeVue, {
     theme: {preset, options: {prefix: 'p', cssLayer: false}},
     locale: {emptyMessage: ''},
   });
+  applySettingCompactOverrides();
   app.component('p-accordion', Accordion);
   app.component('p-accordion-panel', AccordionPanel);
   app.component('p-accordion-header', AccordionHeader);
@@ -108,10 +217,10 @@ document.addEventListener("DOMContentLoaded", () => {
   app.component('p-textarea', Textarea);
   app.component('p-switch', ToggleSwitch);
   app.component('p-select', Select);
-  //app.component('p-toggle-button', ToggleButton);
-  //app.component('p-multi-select', MultiSelect);
-  //app.component('p-tree-select', TreeSelect);
-  //app.component('p-file', FileUpload);
+  app.component('p-float-label', FloatLabel);
+  app.component('p-input-group', InputGroup);
+  app.component('p-input-group-addon', InputGroupAddon);
+  app.component('p-panel', Panel);
 
   // Custom component
   app.component('setting-mail', Mail);

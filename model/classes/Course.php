@@ -19,7 +19,7 @@ class Course {
   private mixed $sourceKey;
   public array $rate;
 
-  public function __construct(array $refreshParam, &$db,  string $dataFile = '') {
+  public function __construct(array $refreshParam, $db,  string $dataFile = '') {
     $dataFile = empty($dataFile) ? $this::COURSE_CACHE : $dataFile;
     $this->sourceKey = $refreshParam[VC::RATE_SERVER_REFRESH] ?: $this::DEFAULT_CURRENCY;
 
@@ -125,12 +125,19 @@ class Course {
     return $this;
   }
 
-  public function getRate(): array {
-    return array_map(function ($c) {
-      return [
-        'id' => $c['code'],
-        'value' => $c['rate'] ?? 1,
-      ];
-    }, $this->rate);
+  public function getRate(string $rateCode = ''): array {
+    if (empty($rateCode)) {
+      return array_map(function ($c) {
+        return [
+          'id' => $c['code'],
+          'value' => $c['rate'] ?? 1,
+        ];
+      }, $this->rate);
+    }
+
+    $lCode = strtolower($rateCode);
+    return array_find($this->rate, function (array $rate) use ($lCode) {
+      return strtolower($rate['code']) === $lCode;
+    });
   }
 }
