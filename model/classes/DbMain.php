@@ -243,7 +243,7 @@ class DbMain extends R {
             $result[] = [
               'columnName' => $col['columnName'],
               'value'      => $item[$col['columnName']],
-              'cause'      => 'Must be unique value',
+              'cause'      => 'Value must be unique',
             ];
 
             unset($param[$k][$col['columnName']]);
@@ -256,7 +256,7 @@ class DbMain extends R {
             $result[] = [
               'id'         => $k,
               'columnName' => $col['columnName'],
-              'cause'      => 'Must be Not Null value',
+              'cause'      => 'Value is required',
             ];
 
             unset($param[$k][$col['columnName']]);
@@ -480,7 +480,7 @@ class DbMain extends R {
             $result['error'][] = [
               'id'         => $id,
               'columnName' => 'dealer_id',
-              'cause'      => 'Wrong dealer_id',
+              'cause'      => 'Invalid dealer ID',
             ];
             continue;
           }
@@ -554,7 +554,7 @@ class DbMain extends R {
         'format' => $file->type || pathinfo($name, PATHINFO_EXTENSION),
       ]]);
     } else {
-      return ['error' => 'Error insert file info to Db'];
+      return ['error' => '[DbMain:setFiles]: Cannot insert file information into the database'];
     }
 
     if (isset($inserted['filesId']) && is_numeric($inserted['filesId'])) {

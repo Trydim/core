@@ -20,7 +20,7 @@ class CsvConfig {
 
   static function updateConfig(string $configPath, string $csvPath): array {
     $csv = loadCSV([], $csvPath);
-    if (count($csv) === 0) return ['error' => gTxt('Csv table is empty!')];
+    if (count($csv) === 0) return ['error' => '[CsvConfig:updateConfig]: CSV table is empty!'];
 
     $currentCfg = json_decode(file_get_contents($configPath), true);
     $cfg = [];

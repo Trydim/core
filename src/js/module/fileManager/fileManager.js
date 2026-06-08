@@ -97,7 +97,7 @@ const fileManager = {
                                  .append('<li class="ext-file ext-' + ext + '" style="border-right:1px solid red">' + r + "<\/li>")
         })
       } else {
-        f.showMsg('File name error', 'error');
+        f.showMsg('File name is invalid!', 'error');
       }
     });
     $body.on("click", ".renamefile", function (t) {

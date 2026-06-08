@@ -64,7 +64,10 @@ class Response {
     foreach ($result as $k => $v) {
       if ($k === 'error' || $insideError) {
         if (is_array($v)) $this->checkError($v, $error, true);
-        else if (!empty($v)) $error[] = ($insideError ? $k . ': ' : '') . $v;
+        else if (!empty($v)) {
+          $message = function_exists('gTxt') ? gTxt((string)$v) : (string)$v;
+          $error[] = ($insideError ? $k . ': ' : '') . $message;
+        }
       }
       else if (is_array($v)) $this->checkError($v, $error);
     }

@@ -6,7 +6,7 @@
 
 $main->addControllerField(VC::BASE_PAGE_TITLE, 'Настройки');
 $main->addControllerField(VC::BASE_FOOTER_CONTENT, $main->initDictionary());
-$main->addAssets(['module/setting.css', 'module/setting.js']);
+$main->addAssets(['module/setting.js']);
 
 $main->addControllerField(
   VC::BASE_FOOTER_CONTENT,

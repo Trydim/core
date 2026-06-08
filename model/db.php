@@ -104,14 +104,14 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       } else if (!empty($contentData)) {
         $db->saveContentEditorData($contentData);
       } else {
-        $result['error'] = 'Nothing to save!';
+        $result['error'] = '[db:save]: Nothing to save!';
       }
       break;
     case 'loadTable':
       $tables = json_decode($tables ?? '[]', true);
 
       if (count($tables) === 0) {
-        if (empty($tableName)) { $result['error'] = 'Error table name'; break; }
+        if (empty($tableName)) { $result['error'] = '[db:loadTable]: Invalid table name'; break; }
 
         $arrTable[] = [
           'param' => json_decode($columns ?? '{}', true),
@@ -256,7 +256,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if (count($param)) {
           $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
         } else {
-          $result['error'] = 'Error change orders: empty param';
+          $result['error'] = '[db:changeOrders]: Cannot change orders: parameters are empty';
         }
       }
       break;
@@ -317,11 +317,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       if (isset($orderIds) && isset($statusId)) {
         $orderIds = explode(',', $orderIds);
 
-        if (!is_numeric($statusId)) { $result['error'] = 'status_id_error'; break; }
+        if (!is_numeric($statusId)) { $result['error'] = '[db:changeStatusOrder]: Status ID is invalid'; break; }
 
-        if (!isset($currentStatusId)) { $result['error'] = 'current_status_id_error'; break; }
+        if (!isset($currentStatusId)) { $result['error'] = '[db:changeStatusOrder]: Current status ID is missing'; break; }
 
-        if (!is_numeric($currentStatusId)) { $result['error'] = 'current_status_id_error'; break; }
+        if (!is_numeric($currentStatusId)) { $result['error'] = '[db:changeStatusOrder]: Current status ID is invalid'; break; }
 
         $result = $db->changeOrdersStatus($orderIds, intval($statusId), intval($currentStatusId), [
           'id'      => $main->getLogin('id'),
@@ -417,7 +417,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'loadUser':
       if (isset($userId)) $result['user'] = $db->getUserById($userId);
       else if(isset($userLogin)) $result['user'] = $db->getUserByLogin($userLogin);
-      else $result['error'] = '[db:loadUser]: User id or user login is not exist';
+      else $result['error'] = '[db:loadUser]: User ID or login does not exist';
       break;
     case 'loadUsers':
       $useRoot = $main->hasDealers() && !$main->isDealer();
@@ -437,7 +437,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
       $haveName = $db->selectQuery($dbTable, 'id', ' login = "' . $user['login'] . '"');
       if (count($haveName) > 0) {
-        $result['error'] = '[db:addUser]: Login exist';
+        $result['error'] = '[db:addUser]: Login already exists';
         break;
       }
 
@@ -466,7 +466,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if (count($usersId) === 1) {
           $haveName = $db->selectQuery($dbTable, ['id', 'login'], ' login = "' . $authForm['login'] . '"');
           if (count($haveName) && $haveName[0]['id'] !== $usersId[0]) {
-            $result['error'] = '[db:changeUser]: Login is exist';
+            $result['error'] = '[db:changeUser]: Login already exists';
             break;
           }
         }
@@ -536,7 +536,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $dealer = json_decode($dealer, true);
 
         $dealerName = trim($dealer['name']);
-        if (strlen($dealerName) < 2) { $result['error'] = 'Name must be 2 or more chars!'; break; }
+        if (strlen($dealerName) < 2) { $result['error'] = '[db:addDealer]: Name must be 2 or more chars!'; break; }
 
         $login = trim($dealer['login'] ?? '');
         $pass = password_hash($dealer['password'] ?? 123, PASSWORD_BCRYPT);
@@ -578,7 +578,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $dealer = json_decode($dealer, true);
 
         $dealerName = trim($dealer['name']);
-        if (strlen($dealerName) < 2) { $result['error'] = 'Name must be 2 or more chars!'; break; }
+        if (strlen($dealerName) < 2) { $result['error'] = '[db:changeDealer]: Name must be 2 or more chars!'; break; }
 
         $param = [
           'name'     => $dealerName,
@@ -600,7 +600,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
             $param = ['login' => $login, 'password' => password_hash($pass, PASSWORD_BCRYPT)];
             $result = $db->insert($db->getColumnsTable('users'), 'users', [1 => $param], true);
           } else {
-            $result['error'] = 'Login or password is not validate!';
+            $result['error'] = '[db:changeDealer]: Login or password is invalid!';
           }
         }
       }
@@ -612,7 +612,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
         $dealer = $db->selectQuery('dealers', ['cms_param'], ' id = ' . $id);
 
-        if (empty($id)) { $result['error'] = 'Dealers id is empty!'; break; }
+        if (empty($id)) { $result['error'] = '[db:deleteDealer]: Dealer ID is empty!'; break; }
 
         $result = $main->dealer->drop($id);
         if ($result === 1) $result = ['dealerId' => strval($id)];
@@ -635,11 +635,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
     case 'loadHistoryBackup':
       if (!isset($relativePath)) {
-        $result['error'] = 'Missing relativePath parameter';
+        $result['error'] = '[db:loadHistoryBackup]: Missing relativePath parameter';
         break;
       }
       if (!isset($backupId)) {
-        $result['error'] = 'Missing backupId parameter';
+        $result['error'] = '[db:loadHistoryBackup]: Missing backupId parameter';
         break;
       }
 
@@ -656,7 +656,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
     case 'loadHistory':
       if (!isset($relativePath)) {
-        $result['error'] = 'Missing relativePath parameter';
+        $result['error'] = '[db:loadHistory]: Missing relativePath parameter';
         break;
       }
 
@@ -682,11 +682,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
     case 'getCsvBackupForDiff':
       if (!isset($relativePath)) {
-        $result['error'] = 'Missing relativePath parameter';
+        $result['error'] = '[db:getCsvBackupForDiff]: Missing relativePath parameter';
         break;
       }
       if (!isset($backupId)) {
-        $result['error'] = 'Missing backupId parameter';
+        $result['error'] = '[db:getCsvBackupForDiff]: Missing backupId parameter';
         break;
       }
 
@@ -704,7 +704,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
     case 'getCsvHistory':
       if (!isset($relativePath)) {
-        $result['error'] = 'Missing relativePath parameter';
+        $result['error'] = '[db:getCsvHistory]: Missing relativePath parameter';
         break;
       }
 
@@ -721,7 +721,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       break;
 
     default:
-      $result['error'] = 'db.php - switch default case: ' . $cmsAction;
+      $result['error'] = '[db:default]: Unknown action';
       break;
   }
 }

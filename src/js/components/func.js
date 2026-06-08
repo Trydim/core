@@ -798,12 +798,16 @@ export default {
   },
 
   /**
+   * @deprecated
+   */
+  parseNumber: v => f.toNumber(v),
+
+  /**
    * Try parse to float number from any value
    * @val {any} v
    * @return {number}
    */
-  toNumber: v => f.parseNumber(v),
-  parseNumber: v => {
+  toNumber: v => {
     typeof v === 'string' && (v = v.replace(',', '.'))
     && !isFinite(v) && /\d/.test(v) && (v = parseFloat(v.match(/\d+|\.|\d+/g).join('')));
     !isFinite(v) && (v = 0);

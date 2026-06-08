@@ -128,7 +128,7 @@ export default {
     removeOption(field, index) { f.arrRemoveItem(field.options, index) },
   },
   created() {
-    this.managerFields = this.propFields;
+    this.managerFields = Array.isArray(this.propFields) ? {} : this.propFields;
   },
 }
 </script>

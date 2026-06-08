@@ -41,22 +41,22 @@
       </p-accordion-panel>
     </p-accordion>
 
-    <p-dialog :base-z-index="-100" :modal="true" v-model:visible="modal.display">
+    <p-dialog :base-z-index="10" :modal="true" v-model:visible="modal.display">
       <template #header>
         <h4>{{ modal.title }}</h4>
       </template>
 
-      <div v-if="queryParam.cmsAction !== deleteAction" class="w-100">
+      <div v-if="queryParam.cmsAction !== deleteAction" class="w-100" style="min-width: 450px;">
         <!-- Имя -->
-        <div class="col-12 row my-1">
-          <div class="col">{{ $t('Property Name') }}:</div>
+        <div class="col-12 row align-items-center my-1">
+          <div class="col-5">{{ $t('Property Name') }}:</div>
           <div class="col">
             <p-input-text class="w-100" v-model="property.newName" autofocus />
           </div>
         </div>
         <!-- Код свойства -->
-        <div class="col-12 row my-1">
-          <div class="col">
+        <div class="col-12 row align-items-center my-1">
+          <div class="col-5">
             {{ $t('Property Code')}}:
             <i class="pi pi-tag ms-1" v-tooltip.bottom="$t('When changed, update the value for dealers')"></i>
           </div>
@@ -65,8 +65,8 @@
           </div>
         </div>
         <!-- Тип данных -->
-        <div class="col-12 row my-1">
-          <div class="col">{{ $t('Data type')}}:</div>
+        <div class="col-12 row align-items-center my-1">
+          <div class="col-5">{{ $t('Data type')}}:</div>
           <div class="col">
             <p-select class="w-100"
                       :options="propertiesTypes"
@@ -77,8 +77,8 @@
         </div>
         <!-- Составной тип (справочники) -->
         <template v-if="typeIsSelect">
-          <div class="col-12 row mb-1">
-            <div class="col"> {{$t('Additional fields of the property (there is a name)')}} :</div>
+          <div class="col-12 row align-items-center mb-1">
+            <div class="col-4">{{ $t('Additional fields of the property (there is a name)') }}:</div>
             <div class="col">
               <p-button v-tooltip.bottom="$t('Add field')" icon="pi pi-plus-circle" class="w-100" raised
                         :label="$t('Add field')"
@@ -86,7 +86,7 @@
             </div>
           </div>
 
-          <div v-for="(field, key) of property.fields" class="row mb-1 border" :key="key">
+          <div v-for="(field, key) of property.fields" class="row mb-1 align-items-center border" :key="key">
             <div class="col-5 text-center">
               <p-input-text class="w-100" v-model="field.newName" />
             </div>
@@ -103,19 +103,19 @@
           </div>
         </template>
         <template v-if="typeIsTable">
-          <div class="col-12 row mb-1">
-            <div class="col">{{$t('Columns')}}:</div>
+          <div class="col-12 row align-items-center mb-1">
+            <div class="col-5">{{$t('Columns')}}:</div>
             <div class="col">
               <p-button v-tooltip.bottom="$t('Add column to the table')" icon="pi pi-plus-circle" class="w-100" raised
                         :label="$t('Add column')" @click="addTableColumn" />
             </div>
           </div>
 
-          <div v-for="(field, index) of property.fields" class="row mb-1 border" :key="index">
-            <div class="col flex-grow-1 p-0 text-center">
+          <div v-for="(field, index) of property.fields" class="col-12 row align-items-center mb-1" :key="index">
+            <div class="col-4 flex-grow-1 p-0 text-center">
               <p-input-text class="w-100" v-model="property.fields[index]" />
             </div>
-            <div v-if="property.fields.length > 1" class="col-1 m-0 text-center">
+            <div v-if="property.fields.length > 1" class="col-1 m-0">
               <p-button v-tooltip.bottom="$t('Delete column')" icon="pi pi-times" severity="danger"
                         @click="removeTableColumn(index)" />
             </div>
@@ -182,20 +182,20 @@ export default {
       {
         label: _('Composite'),
         items: [
-          {id: 'select', name: _('Reference')},
+          {id: 'select',      name: _('Reference')},
           {id: 'multiSelect', name: _('Multiple reference')},
-          {id: 'table', name: _('Table')},
+          {id: 'table',       name: _('Table')},
         ]
       }
     ],
     propertiesDataBaseTypes: [
-      {id: 'text', name: _('Text (~200 characters)')},
+      {id: 'text',     name: _('Text (~200 characters)')},
       {id: 'textarea', name: _('Text (long)')},
-      {id: 'int', name: _('Integer')},
-      {id: 'float', name: _('Float')},
-      {id: 'date', name: _('Date')},
-      {id: 'file', name: _('File')},
-      {id: 'bool', name: _('Flag (yes/no)')},
+      {id: 'int',      name: _('Integer')},
+      {id: 'float',    name: _('Float')},
+      {id: 'date',     name: _('Date')},
+      {id: 'file',     name: _('File')},
+      {id: 'bool',     name: _('Checkbox (yes/no)')},
     ],
   }),
   computed: {

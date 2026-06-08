@@ -12,7 +12,7 @@ $db = $main->getDB();
 switch ($cmsAction) {
   case 'saveSetting':
     $setting = [];
-    $settingPath = $this->url->getBasePath(true) . Main::SETTINGS_PATH;
+    $settingPath = $main->url->getBasePath(true) . Main::SETTINGS_PATH;
     if (file_exists($settingPath)) {
       $setting = json_decode(file_get_contents($settingPath), true);
     }
@@ -21,14 +21,15 @@ switch ($cmsAction) {
     if (USE_DATABASE) {
       // Update User
       if (!empty($user)) {
+        $dbTable = $main->hasDealers() && !$main->isDealer() ? 'root_users' : 'users';
         $usersId = $main->getLogin('id');
         $user = json_decode($user ?? '[]', true);
         $userName = !empty($user['name']) ? $user['name'] : 'noName';
 
         // Test unique login
-        $users = $db->selectQuery('users', '*', ' login = "' . $user['login'] . '"');
+        $users = $db->selectQuery($dbTable, '*', ' login = "' . $user['login'] . '"');
         if (count($users) > 1 || (count($users) > 0 && $users[0]['id'] !== $usersId)) {
-          $result['error'] = gTxt('[setting:saveSetting]: Login exist');
+          $result['error'] = '[setting:saveSetting]: Login already exists';
           break;
         }
 
@@ -53,8 +54,7 @@ switch ($cmsAction) {
         }
 
         // Save user
-        $columns = $db->getColumnsTable('users');
-        $result  = $db->insert($columns, 'users', $param, true);
+        $result = $db->insert($db->getColumnsTable($dbTable), $dbTable, $param, true);
 
         // Set new User Params
         if (empty($result['error'])) {
@@ -77,7 +77,7 @@ switch ($cmsAction) {
           $id = $permission['id'];
 
           if (isset($permission['delete'])) {
-            $result['permDelete']['error'] = $db->deleteItem('permission', [$id]) ? '' : 'ERROR: Delete permission failed';
+            $result['permDelete']['error'] = $db->deleteItem('permission', [$id]) ? '' : '[setting:saveSetting]: Delete permission failed';
             continue;
           }
 
@@ -108,7 +108,7 @@ switch ($cmsAction) {
           $id = $status['id'];
 
           if (isset($status['delete'])) {
-            $result['statusDelete']['error'] = $db->deleteItem('order_status', [$id]) ? '' : 'ERROR: Delete order status failed';
+            $result['statusDelete']['error'] = $db->deleteItem('order_status', [$id]) ? '' : '[setting:saveSetting]: Delete order status failed';
             continue;
           }
 
@@ -150,7 +150,7 @@ switch ($cmsAction) {
           $id = $item['id'];
 
           if (isset($item['delete']) && boolValue($item['delete']) === true) {
-            $result['error']['del'] = $db->deleteItem('money', [$id]);
+            $result['error']['del'] = $db->deleteItem('money', [$id]) ? '' : '[setting:saveSetting]: Delete rate failed';
             continue;
           }
 
@@ -190,18 +190,21 @@ switch ($cmsAction) {
     !empty($mail['fromName'])   && $setting[VC::MAIL_FROM_NAME]   = $mail['fromName'];
 
     // Global manager setting
-    $managerFields = json_decode($managerFields ?? '[]', true);
-    count($managerFields) && $setting[VC::MANAGER_FIELDS] = $managerFields;
+    if ($main->url->request->has('managerFields')) {
+      $setting[VC::MANAGER_FIELDS] = json_decode($main->url->request->get('managerFields'), true);
+    }
 
     // Global other setting
-    $setting[VC::MANAGER_FIELDS] = $statusDefault ?? $main->db->selectQuery('order_status', 'id')[0];
+    $setting[VC::STATUS_DEFAULT] = $statusDefault ?? $main->db->selectQuery('order_status', 'id')[0];
     $other = json_decode($otherFields ?? '[]', true);
-    $setting[VC::MANAGER_FIELDS] = $other['phoneMask']['global'] ?? $main->getSettings(VC::PHONE_MASK_GLOBAL) ?? '+_ (___) ___ __ __';
+    $setting[VC::PHONE_MASK_GLOBAL] = $other['phoneMask']['global'] ?? $main->getSettings(VC::PHONE_MASK_GLOBAL) ?? '+_ (___) ___ __ __';
 
-    file_put_contents($settingPath, json_encode($setting));
+    $result = file_put_contents($settingPath, json_encode($setting));
+    if ($result === false) $result = ['error' => '[setting:saveSetting]: Could not write to file'];
+    else $result = [];
     break;
   case 'saveColumns':
-    if (!isset($tableType) || !isset($columns)) { $result['error'] = 'saveColumns error'; break; }
+    if (!isset($tableType) || !isset($columns)) { $result['error'] = '[setting:saveColumns]: Cannot save columns'; break; }
 
     $usersId = $main->getLogin('id');
     $tableType = $tableType ?? 'order';
@@ -255,7 +258,7 @@ switch ($cmsAction) {
         $result['error'] = $db->createPropertyTable($propName, $param);
       } else if ($isChange) {
         $result['error'] = $db->changePropertyTable($propName, $param);
-      } else $result['error'] = 'Property exist';
+      } else $result['error'] = $isChange ? '[setting:changeDealersProperty]: Property already exists' : '[setting:createDealersProperty]: Property already exists';
 
       $setting[$propName] = [
         'name' => $tableName,
@@ -279,13 +282,13 @@ switch ($cmsAction) {
           'type' => $property['type'],
         ];
         $main->setSettings(VC::DEALER_PROPERTIES, $setting)->saveSettings();
-      } else $result['error'] = 'Property exist';
+      } else $result['error'] = $isChange ? '[setting:changeDealersProperty]: Property already exists' : '[setting:createDealersProperty]: Property already exists';
     }
     break;
   case 'changeDealersPropertyOrder':
     $property = json_decode($property ?? '[]', true);
 
-    if (!count($property)) { $result['error'] = $cmsAction . ' error: Property is empty'; break; }
+    if (!count($property)) { $result['error'] = '[setting:changeDealersPropertyOrder]: Property is empty'; break; }
 
     $setting = [];
     foreach ($property as $prop) {

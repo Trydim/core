@@ -14,7 +14,7 @@ $rootPath = $main->url->getPath(true);
 switch ($cmsAction) {
   case 'showTable':
     if (empty($dir)) {
-      $result['error'] = '[fileManager:showTable]: dir is empty';
+      $result['error'] = '[fileManager:showTable]: Directory is not specified';
       break;
     }
 
@@ -112,7 +112,7 @@ switch ($cmsAction) {
     if (!empty($dir)) {
       mkdir($rootPath . $dir, 0777, true);
     } else {
-      $result['error'] = '[fileManager:createFolder]: dir is empty';
+      $result['error'] = '[fileManager:createFolder]: Directory is not specified';
     }
     break;
   case 'deleteFolder':
@@ -138,13 +138,13 @@ switch ($cmsAction) {
     if (isset($filename)) {
       $name = pathinfo($filename, PATHINFO_FILENAME);
       $ext = pathinfo($filename, PATHINFO_EXTENSION);
-      if (file_exists($rootPath . $filename)) { $result['error'] = '[fileManager:createFile]: File exist!'; break; }
-      if (empty($name) || empty($ext)) { $result['error'] = '[fileManager:createFile]: File name error!'; break; }
+      if (file_exists($rootPath . $filename)) { $result['error'] = '[fileManager:createFile]: File already exists!'; break; }
+      if (empty($name) || empty($ext)) { $result['error'] = '[fileManager:createFile]: File name is invalid!'; break; }
 
       $data = $ext === 'csv' ? ";;;\n;;;\n;;;\n" : '';
 
-      $result['error'] = file_put_contents($rootPath . $filename, $data);
-      if ($result['error'] === false) $result['error'] = '[fileManager:createFile]: Error create file!';
+      $writeResult = file_put_contents($rootPath . $filename, $data);
+      if ($writeResult === false) $result['error'] = '[fileManager:createFile]: Cannot create file!';
     }
     break;
   case 'deleteFile':

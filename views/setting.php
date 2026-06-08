@@ -13,7 +13,7 @@ $isAdmin = $main->getLogin('isAdmin');
 
   <setting-user :user-data="user" :user-fields="managerFields" @update="updateUser"></setting-user>
 
-  <?php if ($main->availablePage('users') && $isAdmin) { ?>
+  <?php if ($isAdmin && $main->availablePage('users') && (!$main->hasDealers() || $main->isDealer())) { ?>
     <setting-permission @update="updatePermission"></setting-permission>
 
     <setting-manager-field :prop-fields="managerFields" @update="updateManagerFields"></setting-manager-field>

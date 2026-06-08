@@ -103,6 +103,8 @@ trait DbOrders
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'id');
     $sql .= ' ' . $this->getPaginatorQuery($pageParam);
 
+    var_dump($sql);
+
     return $this->jsonParseField(self::getAll($sql));
   }
 
@@ -267,22 +269,22 @@ trait DbOrders
 
   public function changeOrdersStatus(array $orderIds, int $statusId, int $currentStatusId, array $author = []): array
   {
-    if (!count($orderIds)) return ['error' => 'order_ids_error'];
-    if ($statusId <= 0) return ['error' => 'status_id_error'];
-    if ($currentStatusId <= 0) return ['error' => 'current_status_id_error'];
+    if (!count($orderIds)) return ['error' => '[DbTraits:changeOrdersStatus]: Order IDs are missing'];
+    if ($statusId <= 0) return ['error' => '[DbTraits:changeOrdersStatus]: Status ID is invalid'];
+    if ($currentStatusId <= 0) return ['error' => '[DbTraits:changeOrdersStatus]: Current status ID is invalid'];
 
     try {
       self::begin();
 
       $toStatus = $this->getOrderStatusById($statusId);
-      if (!count($toStatus)) throw new RuntimeException('status_id_error');
+      if (!count($toStatus)) throw new RuntimeException('Status ID is invalid');
 
       $orders = $this->loadOrdersStatusForUpdate($orderIds);
-      if (count($orders) !== count($orderIds)) throw new RuntimeException('orders_not_found_error');
+      if (count($orders) !== count($orderIds)) throw new RuntimeException('Orders not found');
 
       foreach ($orders as $order) {
         if (intval($order['statusId']) !== $currentStatusId) {
-          throw new RuntimeException('current_status_is_not_equal_error');
+          throw new RuntimeException('Current status does not match');
         }
       }
 

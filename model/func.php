@@ -265,7 +265,7 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
     }
     fclose($handle);
   }
-  else return 'File is not exist';
+  else return 'File does not exist';
 
   return $result;
 }
@@ -280,7 +280,7 @@ function loadFullCSV(string $path): array {
       }, $data);
     }
     fclose($handle);
-  } else $result['error'] = 'File is not exist';
+  } else $result['error'] = '[func:loadFullCSV]: File does not exist';
 
   return $result;
 }
