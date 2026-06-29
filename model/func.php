@@ -215,7 +215,7 @@ function isJSON(string $value): bool {
 }
 
 /**
- * Load csv to array$_FILES['pictureHead']['error']
+ * Load csv to array $_FILES['pictureHead']['error']
  *
  * @param array  $dict     - dictionary for search on the key. example: ['name' => 'Имя'].
  * @param string $filename - csv filename with path
@@ -224,12 +224,12 @@ function isJSON(string $value): bool {
  */
 function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $strict = false): array|string
 {
-  $filename = findCsvFile($filename);
+  $filepath = findCsvFile($filename);
   $result = [];
 
-  if (!count($dict)) return loadFullCSV($filename);
+  if (!count($dict)) return loadFullCSV($filepath);
 
-  if (strlen($filename) && ($handle = fopen($filename, "rt")) !== false) {
+  if (strlen($filepath) && ($handle = fopen($filepath, "rt")) !== false) {
     if (($data = fgetcsv($handle, CSV_STRING_LENGTH, CSV_DELIMITER, "\"", "\\"))) {
       $keyIndex = [];
 
@@ -264,8 +264,9 @@ function loadCSV(array $dict, string $filename, bool $oneRang = false, bool $str
       }
     }
     fclose($handle);
+  } else {
+    return '[func:loadCSV]: File ' . basename($filename) . ' does not exist';
   }
-  else return 'File does not exist';
 
   return $result;
 }

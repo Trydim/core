@@ -103,8 +103,6 @@ trait DbOrders
     $pageParam['sortColumn'] = $this->getOrdersDbColumns($pageParam['sortColumn'] ?? 'id');
     $sql .= ' ' . $this->getPaginatorQuery($pageParam);
 
-    var_dump($sql);
-
     return $this->jsonParseField(self::getAll($sql));
   }
 
@@ -462,7 +460,7 @@ trait DbUsers
       $param[':login'] = $filter['login'];
     }
 
-    $sql .= "LIMIT 1";
+    $sql .= "\nLIMIT 1";
 
     return $this->jsonParseField(self::getRow($sql, $param));
   }
@@ -606,9 +604,8 @@ trait DbUsers
   public function checkUserHash(array $session): bool|array
   {
     if (USE_DATABASE) {
-      $userType = $session['userType'] ?? 'user';
-      $user = $userType === 'root' ? $this->getRootUser($session['login'])
-                                   : $this->getUserById($session['id']);
+      $useRoot = $this->main->hasDealers() && !$this->main->isDealer();
+      $user    = $useRoot ? $this->getRootUser($session['login']) : $this->getUserById($session['id']);
 
       if (!count($user) || !boolValue($user['activity'])) return false;
 
