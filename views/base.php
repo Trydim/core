@@ -39,6 +39,7 @@ $jsGlobalConst = json_encode([
   'DEAL_URI_SHARED' => $main->url->getUri(true) . $main->getCmsParam(VC::SHARED_PATH),
   'INIT_SETTING'  => $main->frontSettingInit,
   'BASE_LANG'     => $main->getCmsParam(VC::LOCALES_BASE_LANG, Main::$BASE_LANG),
+  'PAGE_DATA_ID'  => $main->getCmsParam(VC::PAGE_DATA_ID, 'pageData'),
 ]);
 
 
@@ -109,6 +110,8 @@ $jsGlobalConst = json_encode([
     <?php } ?>
   </main>
 <?php } else echo $main->getControllerField(VC::BASE_CONTENT); ?>
+
+<?= $main->renderPageData() ?>
 
 <script defer type="module" src="<?= $coreUrlJs ?>src.js?ver=1.2"></script>
 <script defer type="module" src="<?= $coreUrlJs ?>main.js?ver=1.2"></script>

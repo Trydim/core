@@ -14,6 +14,7 @@ export default {
   MAIN_PHP_PATH: cms['MAIN_PHP_PATH'] || (sitePath + 'index.php'),
 
   BASE_LANG    : cms['BASE_LANG'],
+  PAGE_DATA_ID : cms['PAGE_DATA_ID'] || 'pageData',
 
   /**
    * @var {string} PATH_IMG

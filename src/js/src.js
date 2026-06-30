@@ -2,23 +2,26 @@
 
 import '../css/style.scss';
 
-import c from "./components/const.ts";
-import f from "./components/func.js";
-import q from "./components/query.ts";
+import c from './components/const.ts';
+import f from './components/func.js';
+import q from './components/query.ts';
 
-import * as module from './components/component.js';
-import {Debugger} from "./components/Debugger";
-import {Modal, ModalOur} from './components/Modal.js';
-import {CustomSelect} from './components/CustomSelect.js';
-import LocalStorage from "./components/LocalStorage.js";
-import {ShadowNode} from './components/ShadowNode.js';
-import {SelectedRow} from "./components/SelectedRow.js";
-import {ToastClass, toast} from "./components/toast";
-import {Valid} from "./components/Valid";
-import {searching} from "./components/SearchCustomers";
-import User from "./components/User";
+import * as module         from './components/component.js';
+import {Debugger}          from './components/Debugger';
+import {Modal, ModalOur}   from './components/Modal.js';
+import {CustomSelect}      from './components/CustomSelect.js';
+import LocalStorage        from './components/LocalStorage.js';
+import {ShadowNode}        from './components/ShadowNode.js';
+import {SelectedRow}       from './components/SelectedRow.js';
+import {ToastClass, toast} from './components/toast';
+import {Valid}             from './components/Valid';
+import {searching}         from './components/SearchCustomers';
+import User                from './components/User';
+import pageData            from './components/PageData.js';
 
 const m = {
+  pageData,
+
   Debugger,
 
   /** modal Sweetalert2 */

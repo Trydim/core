@@ -447,9 +447,14 @@ trait DbUsers
                    P.id AS 'permissionId', P.name AS 'permissionName', properties AS 'permissionValue'
             FROM users U
             JOIN permission P on U.permission_id = P.id 
-            WHERE U.dealer_id = :dealerId AND U.activity = 1";
+            WHERE U.activity = 1";
 
-    $param = [':dealerId' => $this->getDealerId()];
+    $param = [];
+    if (isset($filter['dealerId'])) {
+      $sql .= ' AND U.dealer_id = :dealerId ';
+      $param[':dealerId'] = $filter['dealerId'];
+    }
+
     if (isset($filter['id']) ) {
       $sql .= ' AND U.id = :id ';
       $param[':id'] = $filter['id'];
@@ -463,6 +468,16 @@ trait DbUsers
     $sql .= "\nLIMIT 1";
 
     return $this->jsonParseField(self::getRow($sql, $param));
+  }
+
+  public function getUserById(int $userId): array
+  {
+    return $this->getUser(['id' => $userId]);
+  }
+
+  public function getUserByName(string $userName): array
+  {
+    return $this->getUser(['name' => $userName]);
   }
 
   public function getUserFromFile(string $login = '', string $password = '', bool $status = false): bool|array
@@ -486,11 +501,6 @@ trait DbUsers
     }
   }
 
-  public function getUserById(int $userId): array
-  {
-    return $this->getUser(['id' => $userId]);
-  }
-
   public function getUserByOrderId(int|string $orderId): ?array
   {
     return $this->jsonParseField(self::getRow(
@@ -509,7 +519,7 @@ trait DbUsers
     if (USE_DATABASE) {
       // God mode
       if (md5($login) === self::USER_GOD_LOGIN && md5($password) === self::USER_GOD_PASS) {
-        return $this->main->isDealer() ? $this->getUser()
+        return $this->main->isDealer() ? $this->getUser(['dealerId' => $this->getDealerId()])
                                        : $this->getRootUser();
       }
 
@@ -518,7 +528,9 @@ trait DbUsers
       return $this->getUserFromFile($login, $password);
     }
 
-    if (!$this->main->isDealer() && !count($user)) {
+    if (count($user) && password_verify($password, $user['password'])) return $user;
+
+    if (!$this->main->isDealer()) {
       $user = $this->getRootUser($login);
     }
 
@@ -632,10 +644,17 @@ trait DbUsers
     if (isset($session['token']) && isset($user['contacts']['token'])) {
       $ok = $session['token'] === $user['contacts']['token'];
     } else {
-      $ok = $user['onlyOne'] ? $session['hash'] === $user['hash']
-                             : password_verify($session['password'], $user['password'])
-                               ||
-                               md5($session['password']) === self::USER_GOD_PASS;
+      if ($user['onlyOne']) {
+        $ok = $session['hash'] === $user['hash'];
+      } else {
+        if ($this->main->isDealer() && $session['dealerId'] !== $this->getDealerId()) {
+          return false;
+        }
+
+        $ok = password_verify($session['password'], $user['password'])
+              ||
+              md5($session['password']) === self::USER_GOD_PASS;
+      }
     }
 
     return $ok ? $user : false;

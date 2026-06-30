@@ -7,6 +7,11 @@ declare interface Hooks {
   afterMoundedApp: Function|null
 }
 
+declare interface PageData {
+  get<T = any>(key?: string, defaultValue?: T): T
+  has(key: string): boolean
+}
+
 export declare interface CMSGlobalObject {
   /** Global debug flag */
   DEBUG: boolean
@@ -20,6 +25,8 @@ export declare interface CMSGlobalObject {
   MAIN_PHP_PATH: string
   /** Base lang from config or from Main class */
   BASE_LANG: string,
+  /** DOM id for pageData JSON container */
+  PAGE_DATA_ID: string,
   /**
    * use URI_IMG
    * @deprecated
@@ -120,6 +127,7 @@ export declare interface CMSGlobalObject {
   getDataAsMap(selector: string): Map<any, any>
   getDataAsSet(selector: string): Set<any>
   getDataAsArray(selector: string): any[]
+  pageData: PageData
 
   show(...collection: NodeList | Iterable<Node>)
   hide(...collection: NodeList | Iterable<Node>)

@@ -216,12 +216,6 @@ switch ($cmsAction) {
     // Save user
     $result = $db->insert($db->getColumnsTable('users'), 'users', $param, true);
     break;
-  case 'load':
-    if (USE_DATABASE) $result['user'] = $db->getUser($main->getLogin());
-    else $result['user'] = $db->getUserFromFile($main->getLogin(), '', $main->checkStatus());
-
-    $result['setting'] = $main->getSettings();
-    break;
 
   // Dealers property
   case 'createDealersProperty':

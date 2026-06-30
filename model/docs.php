@@ -19,8 +19,10 @@ $orderId = empty($reportValue) ? ($orderId ?? false) : false;
 // Manager data from data base
 // ---------------------------------------------------------------------------------------------------------------------
 if (isset($addManager)) {
-  if (isset($reportValue['name'])) { // Имя пользователя - неправильно
-    $userData = $main->db->getUser($reportValue['userId'] ?? $reportValue['name'], 'name, contacts');
+  if (isset($reportValue['userId'])) { // Ид пользователя
+    $userData = $main->db->getUserById($reportValue['userId']);
+  } else if (isset($reportValue['userName'])) { // Имя пользователя
+    $userData = $main->db->getUserByName($reportValue['name']);
   } else if ($orderId) { // Менеджер из сохраненного заказа
     $userData = $main->db->getUserByOrderId($orderId);
   } else { // Текущий пользователь

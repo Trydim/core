@@ -84,6 +84,9 @@ $publicConfig = [
   /** Поддомены для дилеров */
   //'USE_DEAL_SUBDOMAIN' => true,
 
+  /** ID JSON контейнера с данными страницы для frontend */
+  //VC::PAGE_DATA_ID => 'pageData',
+
   /** Доступны ли различные языки, по умолчанию нет */
   //VC::LOCALES => true,
 ];

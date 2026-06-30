@@ -586,10 +586,59 @@ trait Hooks
  */
 trait Utilities
 {
+  protected array $pageData = [];
+
   public function getFrontContent(string $id, mixed $data): string
   {
     $data = json_encode($data, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     return "<input type='hidden' id='$id' value='$data'>";
+  }
+
+  public function addPageData(string $key, mixed $data): self
+  {
+    $key = trim($key);
+    if ($key === '') return $this;
+
+    $path = array_values(array_filter(
+      array_map('trim', explode('.', $key)),
+      static fn($part) => $part !== ''
+    ));
+    if (!$path) return $this;
+
+    $target = &$this->pageData;
+    foreach ($path as $part) {
+      if (!isset($target[$part]) || !is_array($target[$part])) $target[$part] = [];
+      $target = &$target[$part];
+    }
+
+    $target = $data;
+    return $this;
+  }
+
+  public function addPageDataList(array $data): self
+  {
+    foreach ($data as $key => $value) {
+      $this->addPageData((string)$key, $value);
+    }
+
+    return $this;
+  }
+
+  public function renderPageData(): string
+  {
+    $id = htmlspecialchars(
+      (string)$this->getCmsParam(VC::PAGE_DATA_ID, 'pageData'),
+      ENT_QUOTES | ENT_SUBSTITUTE,
+      'UTF-8'
+    );
+
+    $data = json_encode(
+      $this->pageData,
+      JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE
+    );
+    if ($data === false) $data = '{}';
+
+    return "<script type='application/json' id='$id'>$data</script>";
   }
 
   public function isSafari(): bool

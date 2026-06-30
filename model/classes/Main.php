@@ -23,6 +23,7 @@ final class Main {
     VC::ACCESS_MENU   => ['admindb', 'calendar', 'catalog', 'customers', 'dealers', 'fileManager', 'orders', 'statistic', 'users'],
     VC::SHARED_PATH   => 'shared/upload/',
     VC::ENCRYPT_ALGO  => 'aes-256-cbc',
+    VC::PAGE_DATA_ID  => 'pageData',
   ];
   const SETTINGS_PATH = SHARE_PATH . 'settingSave.json';
 
