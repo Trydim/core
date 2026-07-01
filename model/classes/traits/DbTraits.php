@@ -28,8 +28,8 @@ trait DbOrders
             important_value AS 'importantValue'"
       . ($includeValues ? ", save_value AS 'saveValue', report_value AS 'reportValue'\n" : "\n") .
       "FROM orders O
-      LEFT JOIN users U ON O.user_id = U.id
-      LEFT JOIN customers C ON O.customer_id = C.id
+      JOIN users U ON O.user_id = U.id
+      JOIN customers C ON O.customer_id = C.id
       JOIN order_status S ON O.status_id = S.id
       WHERE O.dealer_id = " . $this->getDealerId() . "\n";
   }

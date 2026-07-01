@@ -98,6 +98,8 @@ final class Main {
     $this->checkAuth()
          ->setAccount()
          ->applyAuth();
+
+    $this->fireHook(VC::HOOKS_BEFORE_CONTROLLER, $this);
   }
 
   // Environment variables
@@ -239,13 +241,15 @@ final class Main {
   /**
    * Установка всех параметров для аккаунта
    */
-  private function setAccount(): Main {
-    $this->setSideMenu();
+  private function setAccount(): Main
+  {
+    $this->initSideMenu();
 
     return $this;
   }
 
-  public function setSettings(string $key, mixed $value): Main {
+  public function setSettings(string $key, mixed $value): Main
+  {
     $this->setting[$key] = $value;
 
     return $this;

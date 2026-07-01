@@ -4,7 +4,7 @@ class VC {
   /** Cms Const */
   const PROJECT_TITLE   = 'projectTitle',
         DEBUG           = 'DEBUG',
-        ACCESS_MENU     = 'accessMenu',
+        ACCESS_MENU     = 'ACCESS_MENU',
         USE_DATABASE    = 'USE_DATABASE',
         LOCALES         = 'LOCALES',
         LOCALES_BASE_LANG  = 'localesBase',
@@ -15,6 +15,7 @@ class VC {
   const ENCRYPT_ALGO  = 'encryptAlgo',
         ENCRYPT_KEY   = 'encryptKey',
         DB_CONFIG     = 'dbConfig',
+        PAGE_DATA_ID  = 'pageDataId',
         IS_DEALER     = 'isDealer',
         DEALER_ID     = 'dealerId',
         DEALER_LINK   = 'dealerLink',
@@ -88,8 +89,9 @@ class VC {
 
 
   /** Hooks */
-  const HOOKS_PUBLIC_TEMPLATE   = 'publicTemplate',
-        HOOKS_ADMIN_DB_TEMPLATE = 'admindbTemplate',
+  const HOOKS_BEFORE_CONTROLLER   = 'beforeController',
+        HOOKS_PUBLIC_TEMPLATE   = 'publicTemplate',
+        HOOKS_ADMIN_DB_TEMPLATE = 'adminDbTemplate',
         HOOKS_CALENDAR_TEMPLATE = 'calendarTemplate',
         HOOKS_CATALOG_TEMPLATE  = 'catalogTemplate',
         HOOKS_ORDER_TEMPLATE    = 'orderTemplate',

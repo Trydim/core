@@ -45,6 +45,7 @@ trait Authorization {
     }
 
     $this->setUser('contacts', $user['contacts'] ?? [])
+         ->setUser('permissionName', $user['permissionName'] ?? 'admin')
          ->setUser('permission', $user['permissionValue'] ?? [])
          ->setUser('customization', $user['customization'] ?? [])
          ->setUser('isAdmin', str_contains($user['permissionValue']['tags'] ?? '', 'admin'))
@@ -76,6 +77,13 @@ trait Authorization {
     if (!isset($this->user['id'])) $this->checkAuth();
     if ($field === 'all') return $this->user;
     return $this->user[$field] ?? null;
+  }
+
+  public function hasPermission(string $tag): bool
+  {
+    $permission = $this->getLogin('permission')['tags'] ?? '';
+
+    return str_contains($permission, $tag);
   }
 
   public function checkStatus(string $status = 'ok'): bool
@@ -171,7 +179,7 @@ trait Authorization {
     return $result;
   }
 
-  private function setSideMenu(): void
+  private function initSideMenu(): void
   {
     if ($this->checkStatus('no')) {
       $this->sideMenu = $this->getCmsParam(VC::ACCESS_MENU);
@@ -212,6 +220,20 @@ trait Authorization {
           'name'     => 'Content editor',
         ];
       }
+    }
+  }
+
+  public function setSideLinkMenu(string|array $menuItem, ?int $index = null): void
+  {
+    if (empty($menuItem)) {
+      $this->sideMenu[] = 'empty Menu Item';
+      return;
+    }
+
+    if (empty($index)) {
+      $this->sideMenu[] = $menuItem;
+    } else {
+      array_splice($this->sideMenu, $index, 0, [$menuItem]);
     }
   }
 
