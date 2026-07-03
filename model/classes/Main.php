@@ -96,10 +96,11 @@ final class Main {
     if ($this->isDealer()) $this->setDealerParam();
 
     $this->checkAuth()
-         ->setAccount()
-         ->applyAuth();
+         ->setAccount();
 
     $this->fireHook(VC::HOOKS_BEFORE_CONTROLLER, $this);
+
+    $this->applyAuth();
   }
 
   // Environment variables

@@ -130,7 +130,7 @@ trait Authorization {
    * Если открытая страница доступна без регистрации, то перейти
    * Если открытая страница не доступна без регистрации, то перейти на login
    *
-   *   Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт
+   * Перейти на страницу входа(login) если нет регистрации и доступ к открытой странице закрыт
    * или нет регистрации и целевая страница не открыта
    */
   private function applyAuth(): Main
@@ -150,6 +150,13 @@ trait Authorization {
     }
 
     session_abort();
+    return $this;
+  }
+
+  private function resetSideLinkMenu(): Main
+  {
+    $this->sideLinkMenu = [];
+
     return $this;
   }
 
@@ -194,7 +201,7 @@ trait Authorization {
       $menuAccess = !empty($menuAccess) ? explode(',', $menuAccess) : false;
       $this->sideMenu = $menuAccess ?: $this->getCmsParam(VC::ACCESS_MENU);
     } else {
-      $filterMenu = ['calendar', 'catalog', 'customers', 'orders', 'statistic', 'users'];
+      $filterMenu = ['customers', 'orders', 'users'];
       $this->sideMenu = array_filter($this->getCmsParam(VC::ACCESS_MENU), function ($m) use ($filterMenu) {
         return !in_array($m, $filterMenu);
       });
@@ -235,6 +242,8 @@ trait Authorization {
     } else {
       array_splice($this->sideMenu, $index, 0, [$menuItem]);
     }
+
+    $this->resetSideLinkMenu();
   }
 
   /**

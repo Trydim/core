@@ -105,15 +105,53 @@ class Dealer {
     }
   }
 
+  private function clearDbData(int $dealerId): void
+  {
+    $db = $this->main->db;
+
+    $db::exec(
+      "DELETE ocf
+       FROM order_comment_files ocf
+       JOIN order_comments oc ON oc.id = ocf.comment_id
+       WHERE oc.dealer_id = ?",
+      [$dealerId]
+    );
+    $db::exec(
+      "DELETE osi
+       FROM order_search_index osi
+       JOIN orders o ON o.id = osi.order_id
+       WHERE o.dealer_id = ?",
+      [$dealerId]
+    );
+
+    foreach ([
+      'order_status_history',
+      'order_comments',
+      'client_orders',
+      'files',
+      'orders',
+      'users',
+      'customers',
+      'money',
+      'order_status',
+      'permission',
+    ] as $table) {
+      $db::exec("DELETE FROM `$table` WHERE dealer_id = ?", [$dealerId]);
+    }
+
+    $db::exec("UPDATE top_dealers SET top_dealer_id = NULL WHERE top_dealer_id = ?", [$dealerId]);
+    $db::exec("DELETE FROM top_dealers WHERE dealer_id = ?", [$dealerId]);
+  }
+
   public function create(int|string $id, array $configParam, array $dbParam): void
   {
     $this->main->fireHook(VC::HOOKS_DEALERS_BEFORE_CREATE, $this, $configParam, $dbParam);
 
     $this->setParam($id);
-    //$this->createFolderDealers();
-    //$this->createFolder();
-    //$this->copyFiles();
-    //$this->createConfig($configParam);
+    $this->createFolderDealers();
+    $this->createFolder();
+    $this->copyFiles();
+    $this->createConfig($configParam);
 
     $this->updateDb($dbParam);
 
@@ -133,7 +171,17 @@ class Dealer {
       removeFolder($path);
     }
 
-    // Remove dealer
-    return $this->main->db->deleteItem('dealers', [$id]);
+    $dealerId = intval($id);
+    $this->main->db::begin();
+    try {
+      $this->clearDbData($dealerId);
+      $result = $this->main->db->deleteItem('dealers', [$dealerId]);
+
+      $this->main->db::commit();
+      return $result;
+    } catch (\Throwable $e) {
+      $this->main->db::rollback();
+      throw $e;
+    }
   }
 }

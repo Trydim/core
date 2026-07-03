@@ -608,14 +608,20 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
     case 'deleteDealer':
       if (isset($dealer)) {
         $dealer = json_decode($dealer, true);
-        $id = $dealer['id'];
-
-        $dealer = $db->selectQuery('dealers', ['cms_param'], ' id = ' . $id);
+        $id   = $dealer['id'];
+        $name = $dealer['name'];
 
         if (empty($id)) { $result['error'] = '[db:deleteDealer]: Dealer ID is empty!'; break; }
 
+        $dealer = $db->selectQuery('dealers', ['cms_param'], ' id = ' . $id);
+
         $result = $main->dealer->drop($id);
-        if ($result === 1) $result = ['dealerId' => strval($id)];
+        if ($result === 1) {
+          $result = [
+            'dealerId' => strval($id),
+            'dealerName' => strval($name),
+          ];
+        }
       }
       break;
     case 'dealersDatabaseEdit':
