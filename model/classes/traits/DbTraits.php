@@ -523,7 +523,10 @@ trait DbUsers
                                        : $this->getRootUser();
       }
 
-      $user = $this->getUser(['login' => $login]);
+      $filter = ['login' => $login];
+      if ($this->main->isDealer()) $filter['dealerId'] = $this->getDealerId();
+
+      $user = $this->getUser($filter);
     } else {
       return $this->getUserFromFile($login, $password);
     }

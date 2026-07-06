@@ -401,8 +401,8 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $db->insert($columns, 'customers', $param, $changeCustomer);
       break;
     case 'delCustomer':
-      $usersId = json_decode($customerId ?? '[]');
-      if (count($usersId)) $result['customers'] = $db->deleteItem('customers', $usersId);
+      $userIds = json_decode($customerIds ?? $customerId ?? '[]');
+      if (count($userIds)) $result['customers'] = $db->deleteItem('customers', $userIds);
       break;
 
       // Permission
@@ -457,25 +457,25 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $useRoot = $main->hasDealers() && !$main->isDealer();
       $dbTable = $useRoot ? 'root_users' : 'users';
 
-      $usersId = json_decode($usersId ?? '[]');
+      $userIds = json_decode($userIds ?? $usersId ?? '[]');
       $authForm = json_decode($authForm ?? '[]', true);
 
-      if (count($usersId)) {
+      if (count($userIds)) {
         $param = [];
 
-        if (count($usersId) === 1) {
+        if (count($userIds) === 1) {
           $haveName = $db->selectQuery($dbTable, ['id', 'login'], ' login = "' . $authForm['login'] . '"');
-          if (count($haveName) && $haveName[0]['id'] !== $usersId[0]) {
+          if (count($haveName) && $haveName[0]['id'] !== $userIds[0]) {
             $result['error'] = '[db:changeUser]: Login already exists';
             break;
           }
         }
 
-        foreach ($usersId as $id) {
+        foreach ($userIds as $id) {
           $param[$id] = ['activity' => '0'];
           $contacts = [];
           foreach ($authForm as $k => $v) {
-            if (in_array($k, ['login', 'name', 'permissionId'])) $param[$id][$k] = $v;
+            if (in_array($k, ['login', 'name', 'permissionId', 'customization'])) $param[$id][$k] = $v;
             else if ($k === 'activity') $param[$id][$k] = '1';
             else $contacts[$k] = $v;
           }
@@ -485,34 +485,34 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $result = $db->insert($db->getColumnsTable($dbTable), $dbTable, $param, true);
 
         // If this is the current user, the login session will be updated
-        if (empty($result['error']) && count($usersId) === 1 && $main->getLogin('id') === $usersId[0]) {
+        if (empty($result['error']) && count($userIds) === 1 && $main->getLogin('id') === $userIds[0]) {
           $_SESSION['login'] = $authForm['login'];
         }
       }
       break;
     case 'changeUserPassword':
-      $usersId = json_decode($usersId ?? '[]');
+      $userIds = json_decode($userIds ?? $usersId ?? '[]');
 
-      if (count($usersId) === 1 && isset($validPass)) {
-        $param[$usersId[0]]['password'] = password_hash($validPass, PASSWORD_BCRYPT);
+      if (count($userIds) === 1 && isset($validPass)) {
+        $param[$userIds[0]]['password'] = password_hash($validPass, PASSWORD_BCRYPT);
 
         $useRoot = $main->hasDealers() && !$main->isDealer();
         $dbTable = $useRoot ? 'root_users' : 'users';
         $result = $db->insert($db->getColumnsTable($dbTable), $dbTable, $param, true);
 
         // If this is the current user, the session password will be updated
-        if ($main->getLogin('id') === $usersId[0]) {
+        if ($main->getLogin('id') === $userIds[0]) {
           $_SESSION['password'] = $validPass;
         }
       }
       break;
     case 'delUser':
-      $usersId = json_decode($usersId ?? '[]');
+      $userIds = json_decode($userIds ?? $usersId ?? '[]');
 
-      if (count($usersId)) {
+      if (count($userIds)) {
         $useRoot = $main->hasDealers() && !$main->isDealer();
         $dbTable = $useRoot ? 'root_users' : 'users';
-        $db->deleteItem($dbTable, $usersId);
+        $db->deleteItem($dbTable, $userIds);
       }
       break;
     case 'loadUsersLogin':
