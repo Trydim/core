@@ -349,7 +349,7 @@ function translit(string $value): string {
 /**
  * @param array $config - 'method', 'json' => true (as default) or any, 'json_assoc', 'login', 'password', 'contentType', 'timeout'
  */
-function httpRequest(string $url, array $config = [], array $params = []): array|string
+function httpRequest(string $url, array $config = [], array|string $params = []): array|string
 {
   $myCurl = curl_init();
 
@@ -373,7 +373,7 @@ function httpRequest(string $url, array $config = [], array $params = []): array
 
   if (strtolower($config['method'] ?? 'get') === 'get') {
     $curlConfig[CURLOPT_HTTPGET] = true;
-    if (!empty($params)) $curlConfig[CURLOPT_URL] .= '?' . http_build_query($params);
+    if (is_array($params) && !empty($params)) $curlConfig[CURLOPT_URL] .= '?' . http_build_query($params);
   } else {
     $contentType = $config['contentType'] ?? 'application/json; charset=utf-8';
 

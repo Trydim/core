@@ -21,7 +21,7 @@ define('MAIL_PORT', $main->getCmsParam('MAIL_PORT') ?? 465);
 
 define('MAIL_HOST', $main->getCmsParam('MAIL_HOST') ?? 'smtp.mail.ru');
 define('MAIL_FROM', $main->getCmsParam('MAIL_FROM') ?? 'mail.common@list.ru');
-define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'eBsv3cj7LtofBLULy6ni');
+define('MAIL_PASSWORD', $main->getCmsParam('MAIL_PASSWORD') ?? 'grCUIE5dNsi1SqWHoyrV');
 
 class Mail {
   private Main $main;
@@ -108,7 +108,7 @@ class Mail {
     }, $files);
   }
 
-  public function send(): true|string
+  public function send(): string
   {
     require_once CORE . 'libs/vendor/autoload.php';
     $mail = new PHPMailer();
@@ -167,36 +167,16 @@ class Mail {
         $mail->addAttachment($file['path'], $file['name'], 'base64', $file['type']);
       }
 
-      $mail->send();
+      $result = $mail->send();
 
       if (isset($resource)) array_map(function ($item) { unlink($item); }, $resource);
 
-      return true;
+      return $result ? 'The email has been sent.'
+                     : 'The email has not been sent.';
     } catch (Exception $e) {
       return "The email has not been sent. Error: $mail->ErrorInfo";
     }
   }
-
-  /*
-private function createImg($img) {
-  define('PATH', '../'); // ссылки приходят относительно index.php - указать путь
-  // стоит добавить проверку на адекватность
-  $arrResource = [];
-  foreach ($img as $items) {
-    $size = getimagesize(PATH . $items[0]);
-    if($size) {
-      $resultImg = @imagecreatetruecolor($size[0], $size[1]);
-      foreach ($items as $img) {
-        if($layerImg = imagecreatefrompng( PATH . $img ))
-          imagecopy($resultImg, $layerImg, 0, 0, 0, 0, $size[0], $size[1]);
-      }
-      $filename = uniqid() . '.jpg';
-      imagejpeg($resultImg, $filename, 50);
-      array_push($arrResource, $filename);
-    }
-  }
-  return $arrResource;
-}*/
 
   private function getDefaultTemplate(): string {
     $htmlTemplate = 'Default Template<br>';

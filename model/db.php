@@ -168,7 +168,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if ($customerChange) {
           $param = [$customerId => [
             'name' => $name ?? 'No name',
-            'ITN'  => $ITN ?? $itn ?? '',
+            'tin'  => $TIN ?? $tin ?? '',
             'contacts' => json_encode([
               'phone'   => $phone ?? '',
               'email'   => $email ?? '',
@@ -179,14 +179,14 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
           $result = $db->insert($db->getColumnsTable('customers'), 'customers', $param, true);
         }
 
-        // Set Status Id
+        // Set Status ID
         $statusId = $statusId ?? $main->getSettings(VC::STATUS_DEFAULT) ?? 1;
         if (isset($statusCode)) {
           $status = $db->loadOrderStatus(" code = '$statusCode'");
           if (count($status) === 1) $statusId = $status[0]['id'];
         }
 
-        // Set order id, if have $orderId, then the order will be change.
+        // Set order ID, if $orderId exists, the order will be updated.
         $orderId = intval($orderId ?? 0);
         $orderChange = $orderId !== 0;
         $orderId = $orderId !== 0 ? $orderId
@@ -235,7 +235,6 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
 
       if (count($orderIds)) {
         $param = [];
-        //$single = count($orderIds) === 1;
 
         $statusId = $statusId ?? false;
         if (isset($statusCode)) {
@@ -256,7 +255,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         if (count($param)) {
           $result = $db->insert($db->getColumnsTable('orders'), 'orders', $param, true);
         } else {
-          $result['error'] = '[db:changeOrders]: Cannot change orders: parameters are empty';
+          $result['error'] = '[db:changeOrders]: Orders cannot be changed: params empty';
         }
       }
       break;
@@ -341,13 +340,11 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         $orderTotal = $orderTotal ?? 0;
 
         $param = [
-          'save_value'     => $saveValue ?? '{}',
-          'important_value' => addCpNumber(0, $importantValue ?? '{}'),
+          'save_value'      => $saveValue ?? '{}',
+          'important_value' => $importantValue ?? '{}',
           'report_value'    => gzcompress($reportValue, 9),
           'total'           => floatval(is_finite($orderTotal) ? $orderTotal : 0),
         ];
-
-        isset($importantValue) && $importantValue !== 'false' && $param['importantValue'] = $importantValue;
 
         $result['orderId'] = $db->saveVisitorOrder($param);
       }
@@ -393,7 +390,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
       $contacts = [];
       foreach ($customer as $k => $v) {
         if ($k === 'cType') continue;
-        if (in_array($k, ['name', 'ITN'])) $param[$customerId][$k] = $v;
+        if (in_array($k, ['name', 'tin'])) $param[$customerId][$k] = $v;
         else $contacts[$k] = $v;
       }
       count($contacts) && $param[$customerId]['contacts'] = json_encode($contacts);

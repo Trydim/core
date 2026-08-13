@@ -58,8 +58,8 @@ ob_start(); ?>
     </div>
     
     <div class="form-floating mb-3" data-relation="customerTypeB && !customerTypeI">
-      <input type="text" class="form-control" id="ITN" placeholder="<?= gTxt('ITN') ?>" name="ITN" value="">
-      <label for="ITN"><?= gTxt('ITN') ?></label>
+      <input type="text" class="form-control" id="tin" placeholder="<?= gTxt('TIN') ?>" name="tin" value="">
+      <label for="tin"><?= gTxt('TIN') ?></label>
     </div>
   </form>
 </template>

@@ -40,7 +40,7 @@ const CustomersList = {
       try { phone = JSON.parse(i['contacts'])['phone'].replace(/ |-|_|\(|\)|@/g, ''); }
       catch { phone = ''; }
 
-      this.searchData[i.id] = i['name'] + i['ITN'] + phone;
+      this.searchData[i.id] = i.name + i.tin + phone;
       r[i.id] = i;
       return r;
     }, Object.create(null));
@@ -244,10 +244,10 @@ const customers = {
       'addCustomer': () => {
         form = f.gTNode('#customerForm');
 
-        ['name', 'phone', 'email', 'address', 'ITN'].map(i => {
+        ['name', 'phone', 'email', 'address', 'tin'].map(i => {
           let node = form.querySelector(`[name="${i}"]`);
           i === 'phone' && f.initMask(node);
-          i === 'ITN' && f.initMask(node, '_________');
+          i === 'tin' && f.initMask(node, '_________');
         });
 
         form.querySelector('#cTypeI').checked = true;
@@ -283,12 +283,12 @@ const customers = {
         node = form.querySelector(`[name="address"]`);
         node.value = address;
 
-        node = form.querySelector(customer['ITN'] ? '#cTypeB' : '#cTypeI');
+        node = form.querySelector(customer['tin'] ? '#cTypeB' : '#cTypeI');
         node.checked = true;
 
-        node = form.querySelector(`[name="ITN"]`);
+        node = form.querySelector(`[name="tin"]`);
         f.initMask(node, '_________');
-        node.value = customer['ITN'];
+        node.value = customer['tin'];
 
         this.confirmMsg = _('Changes saved');
         this.M.btnConfig('confirmYes', {value: _('Confirm')});

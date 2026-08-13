@@ -608,7 +608,7 @@ export default {
    * @param {?string} param.customer.phone - phone for new customer
    * @param {?string} param.customer.email - email for new customer
    * @param {?string} param.customer.address - address for new customer
-   * @param {?string} param.customer.ITN - number itn for new customer
+   * @param {?string} param.customer.tin - number tin for new customer
    * @param {?string|boolean} param.customerChange - add|change
    *
    * @param {?string|number} param.orderId - input or other values (save as JSON)
@@ -664,7 +664,7 @@ export default {
    * @param {?string} param.customer.email - email for new customer
    * @param {?string} param.customer.address - address for new customer
    * @param {?string} param.customer.info - info for new customer
-   * @param {?string} param.customer.ITN - number itn for new customer
+   * @param {?string} param.customer.tin - number tin for new customer
    * @param {?string|boolean} param.customerChange - add|change
    *
    * @param {?boolean} param.orderChanged -

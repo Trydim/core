@@ -68,7 +68,6 @@ if (in_array($docType, ['excel', 'pdf', 'print'])) {
     $main,
     [
       'docType' => $docType,
-      'library' => $main->getCmsParam('PDF_LIBRARY'),
       'orientation' => $pdfOrientation ?? 'P',
     ],
     $data,

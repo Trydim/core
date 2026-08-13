@@ -702,7 +702,7 @@ class DbMain extends R {
    * @param array{pageNumber: int, countPerPage: int, sortColumn: string, sortDirect: bool} $pageParam
    */
   public function loadCustomers(array $pageParam, array $ids = []): array {
-    $sql = "SELECT C.id as 'id', name, ITN, contacts, GROUP_CONCAT(O.id) as 'orders'
+    $sql = "SELECT C.id as 'id', name, tin, contacts, GROUP_CONCAT(O.id) as 'orders'
             FROM customers C
             LEFT JOIN orders O on C.id = O.customer_id
             WHERE C.dealer_id = ?\n";
@@ -720,7 +720,7 @@ class DbMain extends R {
   }
 
   public function loadCustomerByOrderId(int|string $orderId): array {
-    $sql = "SELECT C.id as 'id', C.name as 'name', ITN, contacts
+    $sql = "SELECT C.id as 'id', C.name as 'name', tin, contacts
             FROM orders O 
             LEFT JOIN customers C ON C.id = O.customer_id
             WHERE O.id = :id AND O.dealer_id = :dealer_id";
