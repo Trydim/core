@@ -250,7 +250,7 @@ class DbMain extends R {
           }
         }
       } // Если поле не может быть пустым
-      else if ($col['null'] === 'NO') {
+      else if ($col['null'] === 'NO' && $col['default'] === null) {
         foreach ($param as $k => $item) {
           if (isset($item[$col['columnName']]) && $item[$col['columnName']] === '') {
             $result[] = [
@@ -408,7 +408,8 @@ class DbMain extends R {
 
   public function getColumnsTable(string $dbTable): ?array {
     return self::getAll('SELECT COLUMN_NAME AS "columnName", COLUMN_TYPE AS "type",
-                                    COLUMN_KEY AS "key", EXTRA AS "extra", IS_NULLABLE AS "null"
+                                    COLUMN_KEY AS "key", EXTRA AS "extra", 
+                                    IS_NULLABLE AS "null", COLUMN_DEFAULT AS "default"
                              FROM information_schema.COLUMNS
                              WHERE TABLE_SCHEMA = :dbName AND TABLE_NAME = :dbTable',
       [':dbName'  => $this->dbName, ':dbTable' => $dbTable]);

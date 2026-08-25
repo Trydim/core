@@ -203,6 +203,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
           $param = [
             'customer_id'  => $customerId,
             'report_value' => gzcompress($reportValue, 9),
+            'important_value' => $importantValue,
           ];
 
           isset($userId) && $param['user_id'] = $userId;
@@ -216,7 +217,7 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
             'customer_id' => $customerId,
             'status_id'   => $statusId,
             'total'       => floatval(is_finite($orderTotal) ? $orderTotal : 0),
-            'important_value' => addCpNumber($orderId, $importantValue ?? '{}'),
+            'important_value' => $importantValue,
             'save_value'      => $saveValue ?? '{}',
             'report_value'    => gzcompress($reportValue, 9),
           ];
@@ -243,13 +244,12 @@ if ($cmsAction === 'tables') { // Добавить фильтрацию табл
         }
 
         foreach ($orderIds as $id) {
-          isset($userId)         && $param[$id]['user_id']     = $userId;
-          isset($customerId)     && $param[$id]['customer_id'] = $customerId;
-          isset($orderTotal)     && $param[$id]['total']       = $orderTotal;
-          isset($total)          && $param[$id]['total']       = $total;
-          isset($importantValue) && $param[$id]['important_value'] = isset($orderId) ? addCpNumber($orderId, $importantValue) : $importantValue;
-          isset($saveValue)      && $param[$id]['save_value']  = $saveValue;
+          if (isset($customerId)) $param[$id]['customer_id'] = $customerId;
+          if (isset($userId)) $param[$id]['user_id'] = $userId;
           if ($statusId) $param[$id]['status_id'] = $statusId;
+          if (isset($importantValue)) $param[$id]['important_value'] = $importantValue;
+          if (isset($saveValue)) $param[$id]['save_value']  = $saveValue;
+          if (isset($orderTotal) || isset($total)) $param[$id]['total'] = $orderTotal ?? $total ?? 0;
         }
 
         if (count($param)) {

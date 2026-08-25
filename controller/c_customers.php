@@ -15,7 +15,7 @@ $main->addControllerField(VC::BASE_PAGE_TITLE, 'Клиенты')
 $setting = $main->getLogin('customization');
 $setting = $setting ?: [];
 
-$columns = $setting['customersShowColumns'] ?? ['id', 'name', 'contacts',  'ITN', 'orders'];
+$columns = $setting['customersShowColumns'] ?? ['id', 'name', 'contacts', 'tin', 'orders'];
 $param['columns'] = array_map(function ($item) {
   return [
     'dbName' => $item,

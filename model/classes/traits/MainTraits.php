@@ -578,9 +578,6 @@ trait Hooks
   private string $hooksPath = ABS_SITE_PATH . 'public/hooks.php';
   private array $hooks = [];
 
-  /**
-   * add public hooks
-   */
   private function setHooks(): void
   {
     require_once CORE . 'model/hooks.php';
@@ -594,6 +591,11 @@ trait Hooks
     $this->hooks[$hookName] = $callable;
   }
 
+  public function hookExists($hookName): bool
+  {
+    return isset($this->hooks[$hookName]);
+  }
+
   public function fireHook($hookName, ...$args): mixed
   {
     if ($this->hookExists($hookName)) {
@@ -603,11 +605,6 @@ trait Hooks
       if (isset($func)) return $func(...$args);
     }
     return false;
-  }
-
-  public function hookExists($hookName): bool
-  {
-    return isset($this->hooks[$hookName]);
   }
 }
 
